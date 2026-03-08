@@ -2812,19 +2812,27 @@ function AcledSection() {
 
       {/* ═══ OVERVIEW ═══ */}
       {acledView === "overview" && (<>
+        {/* Stacked weekly bars — clickable */}
         {weekly.length > 1 && (
           <Card>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>Eventos por semana · Barras apiladas por tipo</div>
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
+              Eventos por semana · Click en una barra para ver detalle
+            </div>
             <svg width="100%" viewBox="0 0 700 180" style={{ display:"block" }}>
               {(() => {
                 const maxW = Math.max(...weekly.map(w => w.total),1);
                 const bw = Math.max(6, (640/weekly.length)-2);
                 return weekly.map((w,i) => {
                   const x = 45 + i*(650/weekly.length); let cy = 155;
-                  return (<g key={i}>
+                  const isSel = filter === `week:${w.d}`;
+                  return (<g key={i} style={{ cursor:"pointer" }}
+                    onClick={() => { setFilter(filter===`week:${w.d}` ? "all" : `week:${w.d}`); setAcledPage(1); }}>
+                    <rect x={x-1} y={10} width={bw+2} height={165} fill={isSel ? "rgba(255,255,255,0.05)" : "transparent"} />
                     {typeOrder.map(t => { const c = w.types[t]||0; if (!c) return null; const h = (c/maxW)*130; cy -= h;
-                      return <rect key={t} x={x} y={cy} width={bw} height={h} fill={EC[t]||ACCENT} opacity={0.85} rx={1}><title>{t}: {c}</title></rect>; })}
-                    {i % Math.max(1,Math.floor(weekly.length/8)) === 0 && <text x={x+bw/2} y={172} textAnchor="middle" fontSize={7} fill={MUTED} fontFamily={font}>{new Date(w.d+"T00:00").toLocaleDateString("es",{day:"numeric",month:"short"})}</text>}
+                      return <rect key={t} x={x} y={cy} width={bw} height={h} fill={EC[t]||ACCENT}
+                        opacity={filter!=="all"&&!isSel&&!filter.startsWith("week:")?0.3:isSel?1:0.75} rx={1}><title>{w.d} · {t}: {c}</title></rect>; })}
+                    {isSel && <line x1={x+bw/2} y1={155} x2={x+bw/2} y2={160} stroke={ACCENT} strokeWidth={2} />}
+                    {i % Math.max(1,Math.floor(weekly.length/8)) === 0 && <text x={x+bw/2} y={172} textAnchor="middle" fontSize={7} fill={isSel?TEXT:MUTED} fontWeight={isSel?700:400} fontFamily={font}>{new Date(w.d+"T00:00").toLocaleDateString("es",{day:"numeric",month:"short"})}</text>}
                   </g>);
                 });
               })()}
@@ -2835,32 +2843,201 @@ function AcledSection() {
           </Card>
         )}
 
+        {/* Week detail panel */}
+        {filter.startsWith("week:") && (() => {
+          const wkDate = filter.replace("week:","");
+          const wk = weekly.find(w => w.d === wkDate);
+          if (!wk) return null;
+          const wkEnd = new Date(wkDate); wkEnd.setDate(wkEnd.getDate()+7);
+          const wkEvents = events.filter(e => e.event_date >= wkDate && e.event_date < wkEnd.toISOString().slice(0,10))
+            .sort((a,b) => (b.event_date||"").localeCompare(a.event_date||""));
+          const wkFatal = wkEvents.reduce((s,e) => s+(parseInt(e.fatalities)||0),0);
+          const wkTypes = {}; wkEvents.forEach(e => { wkTypes[e.event_type]=(wkTypes[e.event_type]||0)+1; });
+          return (<>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
+              {[{l:`Semana ${wkDate}`,v:wkEvents.length,c:ACCENT},{l:"Fatalidades",v:wkFatal,c:"#dc2626"},
+                {l:"Tipos activos",v:Object.keys(wkTypes).length,c:"#4C9F38"},{l:"",v:<span style={{fontSize:8,cursor:"pointer",color:MUTED}} onClick={() => setFilter("all")}>✕ Cerrar</span>,c:MUTED}
+              ].map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:7,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
+            </div>
+            <Card>
+              {wkEvents.slice(0,15).map((e,i) => (
+                <div key={i} style={{ padding:"5px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
+                  <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
+                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>{e.sub_event_type||e.event_type}</span>
+                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
+                  <div style={{ flex:1 }}><div style={{ fontSize:8, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
+                    <div style={{ fontSize:7, color:MUTED, marginTop:1, lineHeight:1.4 }}>{(e.notes||"").slice(0,180)}{(e.notes||"").length>180?"...":""}</div></div>
+                </div>
+              ))}
+              {wkEvents.length > 15 && <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginTop:6 }}>... y {wkEvents.length-15} más</div>}
+            </Card>
+          </>);
+        })()}
+
+        {/* Type + Actor — selectable with detail */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
           <Card>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>Por tipo de evento</div>
-            {Object.entries(byType).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
-              <div key={t} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4, cursor:"pointer" }} onClick={() => { setFilter(filter===t?"all":t); setAcledPage(1); setAcledView("events"); }}>
-                <span style={{ fontSize:8, fontFamily:font, color:EC[t]||MUTED, minWidth:140 }}>{t}</span>
-                <div style={{ flex:1, height:14, background:`${BORDER}30`, position:"relative" }}>
-                  <div style={{ width:`${(c/events.length)*100}%`, height:"100%", background:EC[t]||ACCENT, opacity:0.8 }} />
-                  <span style={{ position:"absolute", right:4, top:1, fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
+              Por tipo de evento {filter !== "all" && !filter.startsWith("week:") && <span style={{ color:EC[filter]||ACCENT, cursor:"pointer" }} onClick={() => setFilter("all")}> · {filter} ✕</span>}
+            </div>
+            {Object.entries(byType).sort((a,b) => b[1]-a[1]).map(([t,c]) => {
+              const isActive = filter === t;
+              return (
+                <div key={t} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4, cursor:"pointer",
+                  opacity:filter!=="all"&&!filter.startsWith("week:")&&!isActive?0.3:1, padding:"2px 4px",
+                  background:isActive?`${EC[t]}15`:"transparent", border:isActive?`1px solid ${EC[t]}30`:"1px solid transparent" }}
+                  onClick={() => { setFilter(isActive?"all":t); setAcledPage(1); }}>
+                  <span style={{ fontSize:8, fontFamily:font, color:EC[t]||MUTED, minWidth:140 }}>{t}</span>
+                  <div style={{ flex:1, height:14, background:`${BORDER}30`, position:"relative" }}>
+                    <div style={{ width:`${(c/events.length)*100}%`, height:"100%", background:EC[t]||ACCENT, opacity:isActive?1:0.7 }} />
+                    <span style={{ position:"absolute", right:4, top:1, fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </Card>
           <Card>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>Top actores involucrados</div>
-            {topActors.map(([a,c]) => (
-              <div key={a} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3, cursor:"pointer" }} onClick={() => { setActorFilter(actorFilter===a?"all":a); setAcledPage(1); setAcledView("events"); }}>
-                <span style={{ fontSize:7, fontFamily:font, color:MUTED, minWidth:150, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a}</span>
-                <div style={{ flex:1, height:12, background:`${BORDER}30`, position:"relative" }}>
-                  <div style={{ width:`${(c/topActors[0][1])*100}%`, height:"100%", background:`${ACCENT}70` }} />
-                  <span style={{ position:"absolute", right:3, top:0, fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
+              Top actores {actorFilter !== "all" && <span style={{ color:ACCENT, cursor:"pointer" }} onClick={() => setActorFilter("all")}> · {actorFilter.slice(0,30)} ✕</span>}
+            </div>
+            {topActors.map(([a,c]) => {
+              const isActive = actorFilter === a;
+              return (
+                <div key={a} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3, cursor:"pointer",
+                  opacity:actorFilter!=="all"&&!isActive?0.3:1, padding:"2px 4px",
+                  background:isActive?`${ACCENT}15`:"transparent", border:isActive?`1px solid ${ACCENT}30`:"1px solid transparent" }}
+                  onClick={() => { setActorFilter(isActive?"all":a); setAcledPage(1); }}>
+                  <span style={{ fontSize:7, fontFamily:font, color:isActive?ACCENT:MUTED, minWidth:150, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a}</span>
+                  <div style={{ flex:1, height:12, background:`${BORDER}30`, position:"relative" }}>
+                    <div style={{ width:`${(c/topActors[0][1])*100}%`, height:"100%", background:isActive?ACCENT:`${ACCENT}60` }} />
+                    <span style={{ position:"absolute", right:3, top:0, fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </Card>
         </div>
+
+        {/* Type detail panel */}
+        {filter !== "all" && !filter.startsWith("week:") && (() => {
+          const tEvents = events.filter(e => e.event_type === filter).sort((a,b) => (b.event_date||"").localeCompare(a.event_date||""));
+          const tFatal = tEvents.reduce((s,e) => s+(parseInt(e.fatalities)||0),0);
+          const tStates = {}; tEvents.forEach(e => { if(e.admin1) tStates[e.admin1]=(tStates[e.admin1]||0)+1; });
+          const tActors = {}; tEvents.forEach(e => { if(e.actor1) { const a=e.actor1.slice(0,50); tActors[a]=(tActors[a]||0)+1; }});
+          const tPP = 15, tTotalP = Math.ceil(tEvents.length/tPP), tPage = tEvents.slice((acledPage-1)*tPP, acledPage*tPP);
+          return (<>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
+              {[{l:filter,v:tEvents.length,c:EC[filter]||ACCENT},{l:"Fatalidades",v:tFatal,c:"#dc2626"},{l:"Estados",v:Object.keys(tStates).length,c:"#0A97D9"},{l:"Actores",v:Object.keys(tActors).length,c:"#9b59b6"}]
+                .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:7,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+              <Card>
+                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Por estado</div>
+                {Object.entries(tStates).sort((a,b) => b[1]-a[1]).slice(0,12).map(([s,c]) => (
+                  <div key={s} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
+                    <span style={{ fontSize:7, fontFamily:font, color:TEXT, minWidth:110 }}>{s}</span>
+                    <div style={{ flex:1, height:10, background:`${BORDER}30`, position:"relative" }}>
+                      <div style={{ width:`${(c/Object.values(tStates).reduce((a,b)=>Math.max(a,b),1))*100}%`, height:"100%", background:EC[filter]||ACCENT, opacity:0.7 }} />
+                    </div>
+                    <span style={{ fontSize:7, fontWeight:600, color:EC[filter]||ACCENT, fontFamily:font }}>{c}</span>
+                  </div>
+                ))}
+              </Card>
+              <Card>
+                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Actores principales</div>
+                {Object.entries(tActors).sort((a,b) => b[1]-a[1]).slice(0,10).map(([a,c]) => (
+                  <div key={a} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
+                    <span style={{ fontSize:7, fontFamily:font, color:MUTED, minWidth:140, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a}</span>
+                    <div style={{ flex:1, height:10, background:`${BORDER}30`, position:"relative" }}>
+                      <div style={{ width:`${(c/Object.values(tActors).reduce((a,b)=>Math.max(a,b),1))*100}%`, height:"100%", background:`${ACCENT}70` }} />
+                    </div>
+                    <span style={{ fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+                  </div>
+                ))}
+              </Card>
+            </div>
+            <Card>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Eventos · {filter} · {tEvents.length}</div>
+                {tTotalP>1 && <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                  <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}40`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
+                  <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>{acledPage}/{tTotalP}</span>
+                  <button onClick={() => setAcledPage(Math.min(tTotalP,acledPage+1))} disabled={acledPage>=tTotalP} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=tTotalP?`${MUTED}40`:TEXT, cursor:acledPage>=tTotalP?"default":"pointer" }}>→</button>
+                </div>}
+              </div>
+              {tPage.map((e,i) => (
+                <div key={i} style={{ padding:"5px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
+                  <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
+                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, whiteSpace:"nowrap" }}>{e.sub_event_type||e.event_type}</span>
+                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
+                  <div style={{ flex:1 }}><div style={{ fontSize:8, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
+                    {e.actor1 && <div style={{ fontSize:7, color:ACCENT, marginTop:1 }}>{e.actor1}</div>}
+                    <div style={{ fontSize:7, color:MUTED, marginTop:1, lineHeight:1.4 }}>{(e.notes||"").slice(0,180)}{(e.notes||"").length>180?"...":""}</div></div>
+                </div>
+              ))}
+            </Card>
+          </>);
+        })()}
+
+        {/* Actor detail panel */}
+        {actorFilter !== "all" && (() => {
+          const aEvents = events.filter(e => (e.actor1||"").includes(actorFilter)).sort((a,b) => (b.event_date||"").localeCompare(a.event_date||""));
+          const aFatal = aEvents.reduce((s,e) => s+(parseInt(e.fatalities)||0),0);
+          const aTypes = {}; aEvents.forEach(e => { aTypes[e.event_type]=(aTypes[e.event_type]||0)+1; });
+          const aStates = {}; aEvents.forEach(e => { if(e.admin1) aStates[e.admin1]=(aStates[e.admin1]||0)+1; });
+          const aPP = 15, aTotalP = Math.ceil(aEvents.length/aPP), aPage = aEvents.slice((acledPage-1)*aPP, acledPage*aPP);
+          return (<>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
+              {[{l:actorFilter.slice(0,35),v:aEvents.length,c:ACCENT},{l:"Fatalidades",v:aFatal,c:"#dc2626"},{l:"Tipos",v:Object.keys(aTypes).length,c:"#4C9F38"},{l:"Estados",v:Object.keys(aStates).length,c:"#0A97D9"}]
+                .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:7,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+              <Card>
+                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Tipos de evento</div>
+                {Object.entries(aTypes).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
+                  <div key={t} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
+                    <span style={{ fontSize:7, fontFamily:font, color:EC[t]||MUTED, minWidth:130 }}>{t}</span>
+                    <div style={{ flex:1, height:10, background:`${BORDER}30`, position:"relative" }}>
+                      <div style={{ width:`${(c/aEvents.length)*100}%`, height:"100%", background:EC[t]||ACCENT, opacity:0.7 }} />
+                    </div>
+                    <span style={{ fontSize:7, fontWeight:600, color:EC[t]||ACCENT, fontFamily:font }}>{c}</span>
+                  </div>
+                ))}
+              </Card>
+              <Card>
+                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Estados donde opera</div>
+                {Object.entries(aStates).sort((a,b) => b[1]-a[1]).slice(0,10).map(([s,c]) => (
+                  <div key={s} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
+                    <span style={{ fontSize:7, fontFamily:font, color:TEXT, minWidth:110 }}>{s}</span>
+                    <div style={{ flex:1, height:10, background:`${BORDER}30`, position:"relative" }}>
+                      <div style={{ width:`${(c/Object.values(aStates).reduce((a,b)=>Math.max(a,b),1))*100}%`, height:"100%", background:`${ACCENT}70` }} />
+                    </div>
+                    <span style={{ fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+                  </div>
+                ))}
+              </Card>
+            </div>
+            <Card>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Eventos · {actorFilter.slice(0,40)} · {aEvents.length}</div>
+                {aTotalP>1 && <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                  <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}40`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
+                  <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>{acledPage}/{aTotalP}</span>
+                  <button onClick={() => setAcledPage(Math.min(aTotalP,acledPage+1))} disabled={acledPage>=aTotalP} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=aTotalP?`${MUTED}40`:TEXT, cursor:acledPage>=aTotalP?"default":"pointer" }}>→</button>
+                </div>}
+              </div>
+              {aPage.map((e,i) => (
+                <div key={i} style={{ padding:"5px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
+                  <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
+                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, whiteSpace:"nowrap" }}>{e.sub_event_type||e.event_type}</span>
+                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
+                  <div style={{ flex:1 }}><div style={{ fontSize:8, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
+                    <div style={{ fontSize:7, color:MUTED, marginTop:1, lineHeight:1.4 }}>{(e.notes||"").slice(0,180)}{(e.notes||"").length>180?"...":""}</div></div>
+                </div>
+              ))}
+            </Card>
+          </>);
+        })()}
 
         <Card>
           <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
