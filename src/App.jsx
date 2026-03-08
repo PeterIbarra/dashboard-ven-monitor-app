@@ -3079,81 +3079,8 @@ function TabMacro() {
 
   useEffect(() => {
     async function fetchAll() {
-      // First get live rate
-      let liveBcv = null, livePar = null;
-      try {
-        const liveUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
-        const res = await fetch(liveUrl, { signal: AbortSignal.timeout(8000) });
-        if (res.ok) {
-          const data = await res.json();
-          const oficial = data.find(d => d.fuente === "oficial");
-          const paralelo = data.find(d => d.fuente === "paralelo");
-          liveBcv = oficial?.promedio || null;
-          livePar = paralelo?.promedio || null;
-          const brecha = liveBcv && livePar ? (((livePar - liveBcv) / liveBcv) * 100) : null;
-          setDolar({ bcv: liveBcv, par: livePar, brecha, updated: oficial?.fechaActualizacion || new Date().toISOString() });
-        }
-      } catch {}
-      setLoading(false);
-
-      // Then get history — try Supabase (accumulated) -> DolarAPI -> fallback seed
-      let histLoaded = false;
-
-      // Try Supabase rates (accumulated daily history)
-      if (IS_DEPLOYED) {
-        try {
-          const res = await fetch("/api/rates?limit=365", { signal: AbortSignal.timeout(6000) });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.rates?.length > 5) {
-              const hist = data.rates.map(r => ({ d:r.date, bcv:Number(r.bcv), par:Number(r.paralelo), usdt:Number(r.usdt), brecha:Number(r.brecha) }));
-              // Append today
-              if (liveBcv && livePar) {
-                const today = new Date().toISOString().slice(0,10);
-                if (!hist.find(h => h.d === today)) hist.push({ d:today, bcv:liveBcv, par:livePar, usdt:livePar*1.02, brecha:((livePar-liveBcv)/liveBcv)*100 });
-              }
-              setRateHistory(hist);
-              histLoaded = true;
-            }
-          }
-        } catch {}
-      }
-
-      // Try DolarAPI historical (only ~30 days)
-      if (!histLoaded) {
-        try {
-        const histUrl = IS_DEPLOYED ? "/api/dolar?type=historico" : "https://ve.dolarapi.com/v1/historicos/dolares";
-        const res = await fetch(histUrl, { signal: AbortSignal.timeout(12000) });
-        if (res.ok) {
-          const data = await res.json();
-          // Serverless returns { rates: [...] }, direct API returns raw array
-          let hist = data.rates || [];
-          if (!hist.length && Array.isArray(data)) {
-            // Direct API fallback: parse raw
-            const byDate = {};
-            let lastPar = null;
-            data.forEach(r => {
-              if (!byDate[r.fecha]) byDate[r.fecha] = { d: r.fecha };
-              if (r.fuente === "oficial") byDate[r.fecha].bcv = r.promedio;
-              if (r.fuente === "paralelo") byDate[r.fecha].par = r.promedio;
-            });
-            hist = Object.values(byDate).filter(h => h.bcv || h.par).sort((a, b) => a.d.localeCompare(b.d))
-              .map(h => { if (h.par) lastPar = h.par; return { ...h, bcv: h.bcv||null, par: h.par||lastPar }; });
-          }
-          // Append today
-          if (liveBcv && livePar) {
-            const today = new Date().toISOString().slice(0, 10);
-            if (!hist.find(h => h.d === today)) {
-              hist.push({ d: today, bcv: liveBcv, par: livePar, usdt: livePar*1.02, brecha: ((livePar-liveBcv)/liveBcv)*100 });
-            }
-          }
-          if (hist.length > 2) { setRateHistory(hist); histLoaded = true; }
-        }
-      } catch {}
-      }
-
-      // Fallback — real monthly data BCV + Paralelo (último día de cada mes, fuente: BCV + Dólar Promedio)
-      if (!histLoaded) setRateHistory([
+      // Base historical data (monthly, from official BCV + Dólar Promedio table)
+      const HIST_BASE = [
         // 2022
         {d:"2022-01-31",bcv:4.52,par:4.65},{d:"2022-02-28",bcv:4.46,par:4.61},{d:"2022-03-31",bcv:4.38,par:4.48},
         {d:"2022-04-30",bcv:4.49,par:4.57},{d:"2022-05-31",bcv:5.06,par:5.14},{d:"2022-06-30",bcv:5.53,par:5.78},
@@ -3174,11 +3101,88 @@ function TabMacro() {
         {d:"2025-04-30",bcv:87.56,par:108.90},{d:"2025-05-31",bcv:96.85,par:135.25},{d:"2025-06-30",bcv:107.62,par:140.23},
         {d:"2025-07-31",bcv:124.51,par:164.83},{d:"2025-08-31",bcv:147.08,par:207.33},{d:"2025-09-30",bcv:177.61,par:288.50},
         {d:"2025-10-31",bcv:223.64,par:308.10},{d:"2025-11-30",bcv:245.67,par:382.50},{d:"2025-12-31",bcv:301.37,par:587.00},
-        // 2026 (daily data from DolarAPI + SITREP)
+        // 2026 key points
         {d:"2026-01-06",bcv:382.6,par:896.6},{d:"2026-01-15",bcv:385.0,par:750.0},{d:"2026-01-27",bcv:388.0,par:650.0},
-        {d:"2026-02-06",bcv:382.6,par:552.0},{d:"2026-02-14",bcv:396.4,par:531.1},{d:"2026-02-20",bcv:402.3,par:574.1},
-        {d:"2026-02-27",bcv:420.0,par:603.3},{d:"2026-03-03",bcv:421.9,par:600.0},{d:"2026-03-08",bcv:433.2,par:602.7},
-      ]);
+        {d:"2026-02-06",bcv:382.6,par:552.0},
+      ];
+
+      // 1. Get live rate
+      let liveBcv = null, livePar = null;
+      try {
+        const liveUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
+        const res = await fetch(liveUrl, { signal: AbortSignal.timeout(8000) });
+        if (res.ok) {
+          const data = await res.json();
+          const oficial = data.find(d => d.fuente === "oficial");
+          const paralelo = data.find(d => d.fuente === "paralelo");
+          liveBcv = oficial?.promedio || null;
+          livePar = paralelo?.promedio || null;
+          const brecha = liveBcv && livePar ? (((livePar - liveBcv) / liveBcv) * 100) : null;
+          setDolar({ bcv: liveBcv, par: livePar, brecha, updated: oficial?.fechaActualizacion || new Date().toISOString() });
+        }
+      } catch {}
+      setLoading(false);
+
+      // 2. Collect daily data from Supabase and/or DolarAPI
+      let dailyData = [];
+
+      // Try Supabase (accumulated daily history)
+      if (IS_DEPLOYED) {
+        try {
+          const res = await fetch("/api/rates?limit=365", { signal: AbortSignal.timeout(6000) });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.rates?.length > 0) {
+              dailyData = data.rates.map(r => ({ d:r.date, bcv:Number(r.bcv), par:Number(r.paralelo) }));
+            }
+          }
+        } catch {}
+      }
+
+      // Also try DolarAPI historical (adds recent ~30 days)
+      try {
+        const histUrl = IS_DEPLOYED ? "/api/dolar?type=historico" : "https://ve.dolarapi.com/v1/historicos/dolares";
+        const res = await fetch(histUrl, { signal: AbortSignal.timeout(12000) });
+        if (res.ok) {
+          const data = await res.json();
+          const apiRates = data.rates || [];
+          if (apiRates.length > 0) {
+            apiRates.forEach(r => {
+              if (!dailyData.find(d => d.d === r.d)) {
+                dailyData.push({ d: r.d, bcv: r.bcv, par: r.par });
+              }
+            });
+          } else if (Array.isArray(data)) {
+            const byDate = {};
+            let lastPar = null;
+            data.forEach(r => {
+              if (!byDate[r.fecha]) byDate[r.fecha] = { d: r.fecha };
+              if (r.fuente === "oficial") byDate[r.fecha].bcv = r.promedio;
+              if (r.fuente === "paralelo") byDate[r.fecha].par = r.promedio;
+            });
+            Object.values(byDate).filter(h => h.bcv || h.par).forEach(h => {
+              if (h.par) lastPar = h.par;
+              const entry = { d: h.d, bcv: h.bcv||null, par: h.par||lastPar };
+              if (!dailyData.find(d => d.d === entry.d)) dailyData.push(entry);
+            });
+          }
+        }
+      } catch {}
+
+      // 3. Add today's live point
+      if (liveBcv && livePar) {
+        const today = new Date().toISOString().slice(0,10);
+        dailyData = dailyData.filter(d => d.d !== today);
+        dailyData.push({ d: today, bcv: liveBcv, par: livePar });
+      }
+
+      // 4. Merge: base historical + daily data (daily overrides base if same date)
+      const merged = {};
+      HIST_BASE.forEach(h => { merged[h.d] = h; });
+      dailyData.forEach(h => { if (h.bcv && h.par) merged[h.d] = h; });
+
+      const final = Object.values(merged).sort((a,b) => a.d.localeCompare(b.d));
+      setRateHistory(final);
     }
 
     fetchAll();
