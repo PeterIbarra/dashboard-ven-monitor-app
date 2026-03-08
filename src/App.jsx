@@ -116,14 +116,20 @@ const GDELT_ANNOTATIONS = [
 ];
 
 const POLYMARKET_SLUGS = [
-  { slug:"venezuela-leader-end-of-2026", title:"¿Quién lidera Venezuela a fin de 2026?" },
-  { slug:"will-mara-corina-machado-enter-venezuela-by-january-31", title:"¿MCM entra a Venezuela?" },
-  { slug:"will-the-us-invade-venezuela-in-2025", title:"¿EE.UU. invade Venezuela?" },
-  { slug:"another-us-strike-on-venezuela-by", title:"¿Otro operativo EE.UU. en Venezuela?" },
-  { slug:"venezuela-presidential-election-scheduled-by", title:"¿Elecciones presidenciales programadas?" },
-  { slug:"delcy-rodrguez-out-as-leader-of-venezuela-by", title:"¿Delcy Rodríguez sale del poder?" },
-  { slug:"venezuela-coup-attempt-by-january-31-428", title:"¿Intento de golpe en Venezuela?" },
-  { slug:"will-venezuelan-crude-oil-production-reach-barrels-per-day-in-2026", title:"¿Producción petrolera alcanza meta 2026?" },
+  // Original contracts (keep these)
+  { slug:"will-venezuela-become-51st-state", title:"¿Venezuela 51° estado?", embed:true },
+  { slug:"will-mara-corina-machado-enter-venezuela-by-march-31-426-698-771", title:"¿MCM entra a Venezuela antes del 31 mar?", embed:true },
+  { slug:"will-delcy-rodrguez-be-the-leader-of-venezuela-end-of-2026", title:"¿Delcy líder a fin de 2026?", embed:true },
+  { slug:"will-the-us-embassy-in-venezuela-reopen-by-march-31", title:"¿Embajada EE.UU. reabre antes del 31 mar?", embed:true },
+  // New contracts
+  { slug:"venezuela-leader-end-of-2026", title:"¿Quién lidera Venezuela a fin de 2026?", embed:false, multi:true, desc:"Edmundo 33% · Delcy 29% · MCM 21%" },
+  { slug:"will-mara-corina-machado-enter-venezuela-by-january-31", title:"¿MCM entra a Venezuela antes del 31 ene?", embed:true },
+  { slug:"will-the-us-invade-venezuela-in-2025", title:"¿EE.UU. invade Venezuela?", embed:false, multi:true, desc:"Multi-fecha: ene 31, mar 31, dic 31" },
+  { slug:"another-us-strike-on-venezuela-by", title:"¿Otro operativo EE.UU. en Venezuela?", embed:false, multi:true, desc:"Multi-fecha" },
+  { slug:"venezuela-presidential-election-scheduled-by", title:"¿Elecciones presidenciales programadas?", embed:false, multi:true, desc:"Multi-fecha" },
+  { slug:"delcy-rodrguez-out-as-leader-of-venezuela-by", title:"¿Delcy Rodríguez sale del poder?", embed:false, multi:true, desc:"Multi-fecha" },
+  { slug:"venezuela-coup-attempt-by-january-31-428", title:"¿Intento de golpe en Venezuela?", embed:true },
+  { slug:"will-venezuelan-crude-oil-production-reach-barrels-per-day-in-2026", title:"¿Producción petrolera alcanza meta 2026?", embed:false, multi:true, desc:"Multi-nivel: 500K, 750K, 1M bpd" },
 ];
 
 const CONF_HISTORICO = [
@@ -1158,12 +1164,12 @@ function MarketOverviewWidget() {
         {
           title: "Commodity",
           symbols: [
-            { s: "ICEEUR:BRN1!", d: "Brent Crude" },
-            { s: "NYMEX:CL1!", d: "WTI Crude" },
-            { s: "NYMEX:NG1!", d: "Natural Gas" },
-            { s: "COMEX:GC1!", d: "Gold" },
-            { s: "COMEX:SI1!", d: "Silver" },
-            { s: "NYMEX:HG1!", d: "Copper" },
+            { s: "PEPPERSTONE:XBRUSD", d: "Brent Crude" },
+            { s: "PEPPERSTONE:XTIUSD", d: "WTI Crude" },
+            { s: "PEPPERSTONE:XNGUSD", d: "Natural Gas" },
+            { s: "PEPPERSTONE:XAUUSD", d: "Gold" },
+            { s: "PEPPERSTONE:XAGUSD", d: "Silver" },
+            { s: "CAPITALCOM:COPPER", d: "Copper" },
           ]
         },
         {
@@ -1211,10 +1217,10 @@ function MarketOverviewWidget() {
         {
           title: "Bond",
           symbols: [
-            { s: "TVC:US10Y", d: "US 10Y Treasury" },
-            { s: "TVC:US02Y", d: "US 2Y Treasury" },
-            { s: "TVC:US30Y", d: "US 30Y Treasury" },
-            { s: "TVC:DE10Y", d: "Germany 10Y Bund" },
+            { s: "CAPITALCOM:US10Y", d: "US 10Y Treasury" },
+            { s: "CAPITALCOM:US02Y", d: "US 2Y Treasury" },
+            { s: "CAPITALCOM:US30Y", d: "US 30Y Treasury" },
+            { s: "CAPITALCOM:DE10Y", d: "Germany 10Y Bund" },
           ]
         },
       ]
@@ -1289,7 +1295,7 @@ function BrentChart({ history }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-            Brent Crude · 7 días
+            Brent Crude · Últimos 7 días · ~4h intervalo
           </span>
           <Badge color="#22c55e">EN VIVO</Badge>
         </div>
@@ -1597,8 +1603,9 @@ function TabMercados() {
       {/* ── PREDICCIÓN ── */}
       {seccion === "prediccion" && (
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          {/* Embeddable markets */}
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
-            {POLYMARKET_SLUGS.map((m,i) => (
+            {POLYMARKET_SLUGS.filter(m => m.embed).map((m,i) => (
               <Card key={i}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
                   <span style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.3 }}>{m.title}</span>
@@ -1614,7 +1621,26 @@ function TabMercados() {
               </Card>
             ))}
           </div>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, textAlign:"center" }}>
+          {/* Multi-outcome markets (can't embed — link cards) */}
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginTop:4, marginBottom:2 }}>
+            Mercados multi-resultado · Ver en Polymarket
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+            {POLYMARKET_SLUGS.filter(m => m.multi).map((m,i) => (
+              <a key={i} href={`https://polymarket.com/event/${m.slug}`} target="_blank" rel="noopener noreferrer"
+                style={{ textDecoration:"none" }}>
+                <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"14px 16px", cursor:"pointer",
+                  transition:"border-color 0.2s" }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor=ACCENT}
+                  onMouseLeave={e => e.currentTarget.style.borderColor=BORDER}>
+                  <div style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:6 }}>{m.title}</div>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, lineHeight:1.5 }}>{m.desc}</div>
+                  <div style={{ fontSize:8, fontFamily:font, color:ACCENT, marginTop:8, letterSpacing:"0.08em" }}>↗ VER EN POLYMARKET</div>
+                </div>
+              </a>
+            ))}
+          </div>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, textAlign:"center", marginTop:4 }}>
             Fuente: Polymarket · Precios = probabilidad implícita del mercado · No son predicciones
           </div>
         </div>
