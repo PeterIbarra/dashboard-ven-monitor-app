@@ -322,17 +322,17 @@ const VZ_MAP = [
 ];
 
 // ═══════════════════════════════════════════════════════════════
-// STYLES
+// STYLES — Light theme, high contrast, legible fonts
 // ═══════════════════════════════════════════════════════════════
-const BG = "#060c14";
-const BG2 = "#091628";
-const BG3 = "#0d1e35";
-const BORDER = "#1a3050";
-const TEXT = "#e2e8f0";
-const MUTED = "#4a7090";
-const ACCENT = "#0A97D9";
-const SC = { 1:"#4C9F38", 2:"#E5243B", 3:"#0A97D9", 4:"#FCC30B" };
-const SEM = { green:"#22c55e", yellow:"#eab308", red:"#ef4444" };
+const BG = "#f4f6f9";
+const BG2 = "#ffffff";
+const BG3 = "#eef1f5";
+const BORDER = "#d0d7e0";
+const TEXT = "#1a202c";
+const MUTED = "#5a6a7a";
+const ACCENT = "#0468B1";
+const SC = { 1:"#2d8a30", 2:"#c92a2a", 3:"#0468B1", 4:"#d4850a" };
+const SEM = { green:"#16a34a", yellow:"#ca8a04", red:"#dc2626" };
 
 const font = "'Space Mono', monospace";
 const fontSans = "'DM Sans', sans-serif";
@@ -444,7 +444,7 @@ function generateMockGdelt() {
 
 function Badge({ children, color }) {
   return (
-    <span style={{ fontSize:9, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase",
+    <span style={{ fontSize:12, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase",
       padding:"2px 7px", background:`${color}18`, color, border:`1px solid ${color}30` }}>
       {children}
     </span>
@@ -453,8 +453,8 @@ function Badge({ children, color }) {
 
 function Card({ children, style, accent }) {
   return (
-    <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"16px 18px", position:"relative", ...style }}>
-      {accent && <div style={{ position:"absolute", left:0, top:0, bottom:0, width:3, background:accent }} />}
+    <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"18px 20px", position:"relative", borderRadius:6, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", marginBottom:10, ...style }}>
+      {accent && <div style={{ position:"absolute", left:0, top:0, bottom:0, width:3, background:accent, borderRadius:"6px 0 0 6px" }} />}
       {children}
     </div>
   );
@@ -528,7 +528,7 @@ function ISVGauge({ score=67, prev=63 }) {
         <text x="100" y="96" textAnchor="middle" fill={c} fontSize="24" fontWeight="700" fontFamily={font}>{score}</text>
         <text x="100" y="112" textAnchor="middle" fill={MUTED} fontSize="9" fontFamily={font}>/100</text>
       </svg>
-      <div style={{ fontSize:11, color:delta>0?"#ef4444":"#22c55e", fontFamily:font, fontWeight:600 }}>
+      <div style={{ fontSize:14, color:delta>0?"#ef4444":"#22c55e", fontFamily:font, fontWeight:600 }}>
         {delta>0?"▲":"▼"} {Math.abs(delta)} pts vs anterior
       </div>
     </div>
@@ -580,7 +580,7 @@ function GdeltChart({ data }) {
         {Object.keys(sigColor).map(k => (
           <button key={k} onClick={() => setSignals(p=>({...p,[k]:!p[k]}))}
             style={{ display:"flex", alignItems:"center", gap:5, padding:"3px 10px", borderRadius:20,
-              fontSize:10, fontFamily:font, border:`1px solid ${signals[k]?sigColor[k]:BORDER}`,
+              fontSize:13, fontFamily:font, border:`1px solid ${signals[k]?sigColor[k]:BORDER}`,
               background:"transparent", color:sigColor[k], opacity:signals[k]?1:0.3, cursor:"pointer" }}>
             <span style={{ width:6, height:6, borderRadius:"50%", background:sigColor[k] }} />
             {sigLabel[k]}
@@ -597,7 +597,7 @@ function GdeltChart({ data }) {
         onMouseLeave={() => setHover(null)}>
         {/* Grid */}
         {[0,0.25,0.5,0.75,1].map(f => (
-          <line key={f} x1={padL} y1={padT+f*cH} x2={padL+cW} y2={padT+f*cH} stroke="rgba(255,255,255,0.04)" />
+          <line key={f} x1={padL} y1={padT+f*cH} x2={padL+cW} y2={padT+f*cH} stroke="rgba(0,0,0,0.06)" />
         ))}
         {/* Left Y axis labels */}
         {[0,0.25,0.5,0.75,1].map(f => (
@@ -645,7 +645,7 @@ function GdeltChart({ data }) {
       </svg>
       {/* Tooltip */}
       {hover !== null && data[hover] && (
-        <div style={{ fontSize:10, fontFamily:font, color:TEXT, marginTop:6, padding:"8px 12px", background:BG2, border:`1px solid ${BORDER}`, display:"flex", gap:16, flexWrap:"wrap", alignItems:"center" }}>
+        <div style={{ fontSize:13, fontFamily:font, color:TEXT, marginTop:6, padding:"8px 12px", background:BG2, border:`1px solid ${BORDER}`, display:"flex", gap:16, flexWrap:"wrap", alignItems:"center" }}>
           <span style={{ color:TEXT, fontWeight:600 }}>{new Date(data[hover].date+"T00:00").toLocaleDateString("es",{day:"numeric",month:"short",year:"numeric"})}</span>
           {signals.instability && <span style={{ color:"#ff3b3b" }}>Conflicto: {data[hover].instability?.toFixed(2)}</span>}
           {signals.tone && <span style={{ color:"#3bf0ff" }}>Tono: {data[hover].tone?.toFixed(2)}</span>}
@@ -672,12 +672,12 @@ function ConflictividadChart() {
         const isPeak = h.p === max;
         return (
           <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", height:"100%" }}>
-            <div style={{ fontSize:7, fontFamily:font, color:isLast?ACCENT:isPeak?"#E5243B":MUTED, marginBottom:2 }}>
+            <div style={{ fontSize:9, fontFamily:font, color:isLast?ACCENT:isPeak?"#E5243B":MUTED, marginBottom:2 }}>
               {(h.p/1000).toFixed(1)}k
             </div>
             <div style={{ width:"100%", height:`${pct}%`, background:isLast?ACCENT:isPeak?"#E5243B":`${ACCENT}40`,
               borderRadius:"2px 2px 0 0", transition:"height 0.5s", minHeight:2 }} />
-            <div style={{ fontSize:7, fontFamily:font, color:isLast?ACCENT:MUTED, marginTop:4, transform:"rotate(-45deg)", transformOrigin:"top left", whiteSpace:"nowrap" }}>
+            <div style={{ fontSize:9, fontFamily:font, color:isLast?ACCENT:MUTED, marginTop:4, transform:"rotate(-45deg)", transformOrigin:"top left", whiteSpace:"nowrap" }}>
               {String(h.y).slice(2)}
             </div>
           </div>
@@ -728,7 +728,7 @@ function TabDashboard({ week }) {
           const delta = prevWk ? p.v - (prevWk.probs.find(pp=>pp.sc===p.sc)?.v||0) : null;
           return (
             <div key={p.sc} style={{ background:isDom?BG3:BG2, padding:"14px 16px", borderTop:`3px solid ${sc.color}` }}>
-              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:4, display:"flex", alignItems:"center", gap:6 }}>
+              <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:4, display:"flex", alignItems:"center", gap:6 }}>
                 E{sc.id}
                 {isDom && <Badge color={sc.color}>Dominante</Badge>}
               </div>
@@ -736,7 +736,7 @@ function TabDashboard({ week }) {
               <div style={{ display:"flex", alignItems:"flex-end", gap:8, marginBottom:6 }}>
                 <span style={{ fontSize:26, fontWeight:900, color:sc.color, fontFamily:"'Playfair Display',serif", lineHeight:1 }}>{p.v}%</span>
                 {delta !== null && delta !== 0 && (
-                  <span style={{ fontSize:10, fontFamily:font, fontWeight:600, color:delta>0?"#22c55e":"#ef4444", marginBottom:2 }}>
+                  <span style={{ fontSize:13, fontFamily:font, fontWeight:600, color:delta>0?"#22c55e":"#ef4444", marginBottom:2 }}>
                     {delta>0?"▲":"▼"}{Math.abs(delta)}pp
                   </span>
                 )}
@@ -745,7 +745,7 @@ function TabDashboard({ week }) {
                 <div style={{ height:3, background:sc.color, width:`${p.v}%`, transition:"width 0.5s" }} />
               </div>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                <span style={{ fontSize:9, fontFamily:font, color:trendColor[p.t] }}>
+                <span style={{ fontSize:12, fontFamily:font, color:trendColor[p.t] }}>
                   {trendIcon[p.t]} {trendLabel[p.t]}
                 </span>
                 <Sparkline scId={p.sc} currentWeek={week} />
@@ -781,13 +781,13 @@ function TabDashboard({ week }) {
             ]},
           ].map((sec,i) => (
             <div key={i} style={{ background:BG2, padding:"14px 16px" }}>
-              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+              <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
                 {sec.icon} {sec.title}
               </div>
               {sec.rows.map((r,j) => (
                 <div key={j} style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6, gap:8 }}>
-                  <span style={{ fontSize:10, color:"#5a8aaa" }}>{r.k}</span>
-                  <span style={{ fontSize:10, fontFamily:font, fontWeight:500, color:r.v==="—"?`${MUTED}60`:TEXT, whiteSpace:"nowrap", textAlign:"right", maxWidth:140, overflow:"hidden", textOverflow:"ellipsis" }}>{r.v}</span>
+                  <span style={{ fontSize:13, color:"#5a8aaa" }}>{r.k}</span>
+                  <span style={{ fontSize:13, fontFamily:font, fontWeight:500, color:r.v==="—"?`${MUTED}60`:TEXT, whiteSpace:"nowrap", textAlign:"right", maxWidth:140, overflow:"hidden", textOverflow:"ellipsis" }}>{r.v}</span>
                 </div>
               ))}
             </div>
@@ -796,7 +796,7 @@ function TabDashboard({ week }) {
 
         {/* Semáforo resumen */}
         <Card>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
             🚦 Señales
           </div>
           {[{label:"Verde",count:wk.sem.g,color:"green"},
@@ -805,16 +805,16 @@ function TabDashboard({ week }) {
           ].map((s,i) => (
             <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
               <span style={{ fontSize:18, fontWeight:700, fontFamily:font, color:SEM[s.color], width:24, textAlign:"right" }}>{s.count}</span>
-              <span style={{ fontSize:9, color:SEM[s.color], width:46, letterSpacing:"0.06em", textTransform:"uppercase" }}>{s.label}</span>
+              <span style={{ fontSize:12, color:SEM[s.color], width:46, letterSpacing:"0.06em", textTransform:"uppercase" }}>{s.label}</span>
               <div style={{ flex:1, height:5, background:BORDER, borderRadius:2 }}>
                 <div style={{ height:5, background:SEM[s.color], width:`${(s.count/semTotal)*100}%`, borderRadius:2, transition:"width 0.4s" }} />
               </div>
             </div>
           ))}
           <div style={{ marginTop:10, paddingTop:10, borderTop:`1px solid ${BORDER}`, textAlign:"center" }}>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Dominante</div>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Dominante</div>
             <div style={{ fontSize:16, fontWeight:800, color:domSc.color, fontFamily:"'Syne',sans-serif" }}>E{domSc.id} · {dom.v}%</div>
-            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>{domSc.short}</div>
+            <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>{domSc.short}</div>
           </div>
         </Card>
       </div>
@@ -822,10 +822,10 @@ function TabDashboard({ week }) {
       {/* ── ROW 3: Lectura rápida ── */}
       {wk.lectura && (
         <div style={{ background:`linear-gradient(135deg, ${domSc.color}08, transparent)`, border:`1px solid ${domSc.color}18`, padding:"14px 18px" }}>
-          <div style={{ fontSize:8, fontFamily:font, color:domSc.color, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:6 }}>
+          <div style={{ fontSize:10, fontFamily:font, color:domSc.color, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:6 }}>
             Lectura de la semana · {wk.label}
           </div>
-          <div style={{ fontSize:11, color:"#94a3b8", lineHeight:1.7, fontStyle:"italic" }}>
+          <div style={{ fontSize:14, color:"#94a3b8", lineHeight:1.7, fontStyle:"italic" }}>
             {wk.lectura}
           </div>
         </div>
@@ -833,13 +833,13 @@ function TabDashboard({ week }) {
 
       {/* ── ROW 4: Tensiones activas ── */}
       <Card>
-        <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, paddingBottom:5, borderBottom:`1px solid ${BORDER}` }}>
+        <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, paddingBottom:5, borderBottom:`1px solid ${BORDER}` }}>
           ⚠ Tensiones activas · {wk.label}
         </div>
         {wk.tensiones.map((t,i) => (
           <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:7, paddingBottom:7, borderBottom:i<wk.tensiones.length-1?`1px solid ${BORDER}40`:"none" }}>
             <SemDot color={t.l} />
-            <span style={{ fontSize:10, color:"#7a9ab0", lineHeight:1.6 }} dangerouslySetInnerHTML={{ __html:t.t }} />
+            <span style={{ fontSize:13, color:"#7a9ab0", lineHeight:1.6 }} dangerouslySetInnerHTML={{ __html:t.t }} />
           </div>
         ))}
       </Card>
@@ -981,26 +981,26 @@ function TabMatriz({ week, setWeek }) {
               border:`1px solid ${trendSc.color}25`, padding:"14px 18px", position:"relative" }}>
               <button onClick={() => setShowTrend(false)}
                 style={{ position:"absolute", top:8, right:12, background:"transparent", border:"none",
-                  color:MUTED, cursor:"pointer", fontSize:14, fontFamily:font }}>×</button>
+                  color:MUTED, cursor:"pointer", fontSize:16, fontFamily:font }}>×</button>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
                 <span style={{ fontSize:16 }}>{isSameTrend ? "→" : "↑"}</span>
                 <div>
-                  <div style={{ fontSize:9, fontFamily:font, color:trendSc.color, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:700 }}>
+                  <div style={{ fontSize:12, fontFamily:font, color:trendSc.color, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:700 }}>
                     {isSameTrend ? "CONSOLIDANDO" : "PRESIÓN HACIA TRANSICIÓN"}
                   </div>
                   <div style={{ fontSize:12, fontWeight:700, color:TEXT }}>
                     E{trendSc.id}: {trendSc.name}
                   </div>
                 </div>
-                <span style={{ marginLeft:"auto", fontSize:11, fontFamily:font, color:trendSc.color, fontWeight:700 }}>
+                <span style={{ marginLeft:"auto", fontSize:14, fontFamily:font, color:trendSc.color, fontWeight:700 }}>
                   {wk.probs.find(p=>p.sc===trendSc.id)?.v}%
                 </span>
               </div>
-              <div style={{ fontSize:9, fontFamily:font, color:trendSc.color, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>
+              <div style={{ fontSize:12, fontFamily:font, color:trendSc.color, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>
                 Factores que empujan en esta dirección
               </div>
               {trendDriversList.map((d,i) => (
-                <div key={i} style={{ display:"flex", gap:8, marginBottom:5, fontSize:10, color:"#94a3b8", lineHeight:1.6 }}>
+                <div key={i} style={{ display:"flex", gap:8, marginBottom:5, fontSize:13, color:"#94a3b8", lineHeight:1.6 }}>
                   <span style={{ color:trendSc.color, flexShrink:0 }}>›</span>{d}
                 </div>
               ))}
@@ -1014,17 +1014,17 @@ function TabMatriz({ week, setWeek }) {
               const delta = prevWk ? p.v - (prevWk.probs.find(pp=>pp.sc===p.sc)?.v||0) : null;
               return (
                 <div key={p.sc} style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", padding:"3px 0" }} onClick={()=>setSel(p.sc)}>
-                  <span style={{ fontSize:10, fontFamily:font, color:sc.color, width:22, fontWeight:sel===p.sc?700:400 }}>E{sc.id}</span>
+                  <span style={{ fontSize:13, fontFamily:font, color:sc.color, width:22, fontWeight:sel===p.sc?700:400 }}>E{sc.id}</span>
                   <div style={{ flex:1, height:6, background:BORDER, borderRadius:2 }}>
                     <div style={{ height:6, background:sc.color, width:`${p.v}%`, borderRadius:2, transition:"width 0.4s", opacity:sel===p.sc?1:0.6 }} />
                   </div>
-                  <span style={{ fontSize:11, fontFamily:font, color:sc.color, width:32, textAlign:"right", fontWeight:700 }}>{p.v}%</span>
+                  <span style={{ fontSize:14, fontFamily:font, color:sc.color, width:32, textAlign:"right", fontWeight:700 }}>{p.v}%</span>
                   {delta !== null && delta !== 0 && (
-                    <span style={{ fontSize:9, fontFamily:font, color:delta>0?"#22c55e":"#ef4444", width:32 }}>
+                    <span style={{ fontSize:12, fontFamily:font, color:delta>0?"#22c55e":"#ef4444", width:32 }}>
                       {delta>0?"+":""}{delta}pp
                     </span>
                   )}
-                  <span style={{ fontSize:9, color:trendColorMap[p.t] }}>{trendIconMap[p.t]}</span>
+                  <span style={{ fontSize:12, color:trendColorMap[p.t] }}>{trendIconMap[p.t]}</span>
                 </div>
               );
             })}
@@ -1041,28 +1041,28 @@ function TabMatriz({ week, setWeek }) {
                 style={{ background:isActive?`${sc.color}08`:BG2, border:`1px solid ${isActive?sc.color:BORDER}`, borderLeft:`3px solid ${sc.color}`,
                   padding:"10px 14px", cursor:"pointer", transition:"all 0.2s" }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:3 }}>
-                  <span style={{ fontSize:9, fontFamily:font, color:sc.color, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:700 }}>
+                  <span style={{ fontSize:12, fontFamily:font, color:sc.color, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:700 }}>
                     E{sc.id} {p.sc===dom.sc?"· DOMINANTE":""}
                   </span>
-                  <span style={{ fontSize:13, fontFamily:font, fontWeight:700, color:sc.color }}>{p.v}%</span>
+                  <span style={{ fontSize:15, fontFamily:font, fontWeight:700, color:sc.color }}>{p.v}%</span>
                 </div>
-                <div style={{ fontSize:11, fontWeight:600, color:isActive?TEXT:`${TEXT}90`, lineHeight:1.3 }}>{sc.name}</div>
+                <div style={{ fontSize:14, fontWeight:600, color:isActive?TEXT:`${TEXT}90`, lineHeight:1.3 }}>{sc.name}</div>
               </div>
             );
           })}
 
           {/* Detail panel for selected scenario */}
           <div style={{ background:BG3, border:`1px solid ${BORDER}`, padding:"14px 16px", flex:1 }}>
-            <div style={{ fontSize:9, fontFamily:"'Syne',sans-serif", fontWeight:700, color:SC[sel], letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+            <div style={{ fontSize:12, fontFamily:"'Syne',sans-serif", fontWeight:700, color:SC[sel], letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
               E{sel} — {SCENARIOS.find(s=>s.id===sel)?.name}
             </div>
             {selDrivers.drivers && (
               <>
-                <div style={{ fontSize:8, fontFamily:font, color:SC[sel], letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
+                <div style={{ fontSize:10, fontFamily:font, color:SC[sel], letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
                   Drivers estructurales
                 </div>
                 {selDrivers.drivers.map((d,i) => (
-                  <div key={i} style={{ display:"flex", gap:6, marginBottom:4, fontSize:10, color:"#94a3b8", lineHeight:1.5 }}>
+                  <div key={i} style={{ display:"flex", gap:6, marginBottom:4, fontSize:13, color:"#94a3b8", lineHeight:1.5 }}>
                     <span style={{ color:`${SC[sel]}80`, flexShrink:0 }}>›</span>{d}
                   </div>
                 ))}
@@ -1070,11 +1070,11 @@ function TabMatriz({ week, setWeek }) {
             )}
             {selDrivers.signals && (
               <>
-                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginTop:10, marginBottom:6 }}>
+                <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginTop:10, marginBottom:6 }}>
                   Señales de activación
                 </div>
                 {selDrivers.signals.map((s,i) => (
-                  <div key={i} style={{ display:"flex", gap:6, marginBottom:4, fontSize:10, color:"#6b7280", lineHeight:1.5 }}>
+                  <div key={i} style={{ display:"flex", gap:6, marginBottom:4, fontSize:13, color:"#6b7280", lineHeight:1.5 }}>
                     <span style={{ color:`${MUTED}80`, flexShrink:0 }}>›</span>{s}
                   </div>
                 ))}
@@ -1086,7 +1086,7 @@ function TabMatriz({ week, setWeek }) {
 
       {/* ── ROW 2: Weekly evolution chart ── */}
       <div style={{ border:`1px solid ${BORDER}`, padding:"14px 16px" }}>
-        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:12 }}>
+        <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:12 }}>
           Evolución de probabilidades por semana
         </div>
         <div style={{ display:"flex", gap:3, alignItems:"flex-end", height:90 }}>
@@ -1101,7 +1101,7 @@ function TabMatriz({ week, setWeek }) {
                 ))}
               </div>
               {/* Label */}
-              <span style={{ fontSize:8, fontFamily:font, color:i===week?ACCENT:MUTED, marginTop:6, fontWeight:i===week?700:400 }}>
+              <span style={{ fontSize:10, fontFamily:font, color:i===week?ACCENT:MUTED, marginTop:6, fontWeight:i===week?700:400 }}>
                 {w.short}
               </span>
             </div>
@@ -1109,7 +1109,7 @@ function TabMatriz({ week, setWeek }) {
         </div>
         <div style={{ display:"flex", gap:14, marginTop:10, justifyContent:"center" }}>
           {SCENARIOS.map(sc => (
-            <div key={sc.id} style={{ display:"flex", alignItems:"center", gap:5, fontSize:9, color:MUTED }}>
+            <div key={sc.id} style={{ display:"flex", alignItems:"center", gap:5, fontSize:12, color:MUTED }}>
               <span style={{ width:8, height:8, background:sc.color, borderRadius:1, flexShrink:0 }} />
               E{sc.id}: {sc.short}
             </div>
@@ -1121,12 +1121,12 @@ function TabMatriz({ week, setWeek }) {
       {wk.lectura && (
         <div style={{ background:`linear-gradient(135deg, ${domSc.color}06, transparent)`, border:`1px solid ${domSc.color}15`, padding:"16px 20px" }}>
           <div style={{ display:"flex", alignItems:"baseline", gap:12, marginBottom:10 }}>
-            <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase" }}>
+            <span style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase" }}>
               Lectura analítica · {wk.label}
             </span>
-            <span style={{ fontSize:11, fontWeight:700, color:domSc.color }}>E{domSc.id}: {domSc.name} · {dom.v}%</span>
+            <span style={{ fontSize:14, fontWeight:700, color:domSc.color }}>E{domSc.id}: {domSc.name} · {dom.v}%</span>
           </div>
-          <div style={{ fontSize:11, color:"#94a3b8", lineHeight:1.75, fontStyle:"italic" }}>
+          <div style={{ fontSize:14, color:"#94a3b8", lineHeight:1.75, fontStyle:"italic" }}>
             {wk.lectura}
           </div>
         </div>
@@ -1153,15 +1153,15 @@ function TabMonitor() {
     <div>
       {/* Header + toggle */}
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14, flexWrap:"wrap" }}>
-        <span style={{ fontSize:14 }}>🚦</span>
+        <span style={{ fontSize:16 }}>🚦</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:13, fontWeight:600, color:TEXT }}>Monitor de Señales — {INDICATORS.length} indicadores · {MONITOR_WEEKS.length} semanas</div>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Semáforos, umbrales y señales por escenario</div>
+          <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Monitor de Señales — {INDICATORS.length} indicadores · {MONITOR_WEEKS.length} semanas</div>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Semáforos, umbrales y señales por escenario</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
           {[{id:"indicadores",label:"Indicadores"},{id:"senales",label:"Señales E1/E2/E4"},{id:"noticias",label:"Noticias"},{id:"factcheck",label:"Verificación"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
-              style={{ fontSize:9, fontFamily:font, padding:"6px 14px", border:"none",
+              style={{ fontSize:12, fontFamily:font, padding:"6px 14px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED,
                 cursor:"pointer", letterSpacing:"0.08em" }}>
               {s.label}
@@ -1178,9 +1178,9 @@ function TabMonitor() {
           {label:"Total",count:total,color:ACCENT,desc:`${dims.length} dimensiones`}
         ].map((c,i) => (
           <Card key={i} accent={typeof c.color==="string"&&c.color.startsWith("#")?c.color:SEM[c.color]}>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>{c.label}</div>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>{c.label}</div>
             <div style={{ fontSize:22, fontWeight:800, color:typeof c.color==="string"&&c.color.startsWith("#")?c.color:SEM[c.color], fontFamily:"'Syne',sans-serif" }}>{c.count}</div>
-            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>{c.desc}</div>
+            <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>{c.desc}</div>
           </Card>
         ))}
       </div>
@@ -1189,17 +1189,17 @@ function TabMonitor() {
       {seccion === "indicadores" && grouped.map(g => (
         <div key={g.dim} style={{ marginBottom:20 }}>
           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
-            <span style={{ fontSize:14 }}>{g.icon}</span>
+            <span style={{ fontSize:16 }}>{g.icon}</span>
             <span style={{ fontSize:12, fontWeight:700, fontFamily:"'Syne',sans-serif", color:ACCENT, letterSpacing:"0.1em", textTransform:"uppercase" }}>{g.dim}</span>
-            <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{g.inds.length} indicadores</span>
+            <span style={{ fontSize:12, color:MUTED, marginLeft:"auto" }}>{g.inds.length} indicadores</span>
           </div>
           {/* Column headers */}
           <div style={{ display:"grid", gridTemplateColumns:"1fr 100px auto 80px 40px", gap:8, padding:"2px 0 6px", borderBottom:`1px solid ${BORDER}30` }}>
-            <span style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Indicador</span>
-            <span style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Historial</span>
-            <span style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Valor actual</span>
-            <span style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Estado</span>
-            <span style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", textAlign:"center" }}>Tend.</span>
+            <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Indicador</span>
+            <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Historial</span>
+            <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Valor actual</span>
+            <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Estado</span>
+            <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", textAlign:"center" }}>Tend.</span>
           </div>
           {g.inds.map((ind,j) => {
             const last = ind.hist[ind.hist.length-1];
@@ -1211,8 +1211,8 @@ function TabMonitor() {
                   cursor:"pointer" }} onClick={() => setExpanded(isExpanded ? null : `${g.dim}-${j}`)}>
                   <div>
                     <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                      <span style={{ fontSize:11, fontWeight:600, color:TEXT }}>{ind.name}</span>
-                      <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${SC[ind.esc.charAt(1)]||ACCENT}15`,
+                      <span style={{ fontSize:14, fontWeight:600, color:TEXT }}>{ind.name}</span>
+                      <span style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${SC[ind.esc.charAt(1)]||ACCENT}15`,
                         color:SC[ind.esc.charAt(1)]||ACCENT, border:`1px solid ${SC[ind.esc.charAt(1)]||ACCENT}30`, letterSpacing:"0.08em" }}>
                         {ind.esc}
                       </span>
@@ -1230,28 +1230,28 @@ function TabMonitor() {
                     ))}
                   </div>
                   {/* Current value */}
-                  <div style={{ fontSize:10, fontFamily:font, color:SEM[sem], maxWidth:150, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{val}</div>
+                  <div style={{ fontSize:13, fontFamily:font, color:SEM[sem], maxWidth:150, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{val}</div>
                   {/* Semaforo */}
                   <div style={{ display:"flex", alignItems:"center", gap:4 }}>
                     <SemDot color={sem} size={7} />
-                    <span style={{ fontSize:9, fontFamily:font, color:SEM[sem] }}>{{green:"Verde",yellow:"Amarillo",red:"Rojo"}[sem]}</span>
+                    <span style={{ fontSize:12, fontFamily:font, color:SEM[sem] }}>{{green:"Verde",yellow:"Amarillo",red:"Rojo"}[sem]}</span>
                   </div>
                   {/* Trend */}
-                  <div style={{ fontSize:14, fontWeight:700, color:trendColorMap[trend], textAlign:"center" }}>
+                  <div style={{ fontSize:16, fontWeight:700, color:trendColorMap[trend], textAlign:"center" }}>
                     {trendIconMap[trend]}
                   </div>
                 </div>
                 {/* Expanded detail */}
                 {isExpanded && (
                   <div style={{ padding:"4px 0 12px 16px", borderLeft:`2px solid ${SC[ind.esc.charAt(1)]||ACCENT}30` }}>
-                    <div style={{ fontSize:10, color:"#94a3b8", marginBottom:6 }}>{ind.desc}</div>
-                    <div style={{ fontSize:9, fontFamily:font, color:"#eab308", marginBottom:8, padding:"4px 8px", background:"rgba(234,179,8,0.06)", border:"1px solid rgba(234,179,8,0.15)", display:"inline-block" }}>
+                    <div style={{ fontSize:13, color:"#94a3b8", marginBottom:6 }}>{ind.desc}</div>
+                    <div style={{ fontSize:12, fontFamily:font, color:"#eab308", marginBottom:8, padding:"4px 8px", background:"rgba(234,179,8,0.06)", border:"1px solid rgba(234,179,8,0.15)", display:"inline-block" }}>
                       ⚠ {ind.umbral}
                     </div>
-                    <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Historial</div>
+                    <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Historial</div>
                     <div style={{ display:"flex", gap:6 }}>
                       {ind.hist.map((h,k) => (
-                        <div key={k} style={{ fontSize:9, padding:"3px 8px", background:`${SEM[h[0]]}10`, border:`1px solid ${SEM[h[0]]}25`,
+                        <div key={k} style={{ fontSize:12, padding:"3px 8px", background:`${SEM[h[0]]}10`, border:`1px solid ${SEM[h[0]]}25`,
                           color:SEM[h[0]], fontFamily:font, whiteSpace:"nowrap" }}>
                           <span style={{ color:MUTED, marginRight:4 }}>{MONITOR_WEEKS[k]}</span>{h[2]}
                         </div>
@@ -1277,17 +1277,17 @@ function TabMonitor() {
               </span>
               <div style={{ marginLeft:"auto", display:"flex", gap:6 }}>
                 {[["green",gCounts.green],["yellow",gCounts.yellow],["red",gCounts.red]].filter(([,c])=>c>0).map(([col,cnt]) => (
-                  <span key={col} style={{ fontSize:9, fontFamily:font, color:SEM[col] }}>{cnt} {{green:"✓",yellow:"⚠",red:"✗"}[col]}</span>
+                  <span key={col} style={{ fontSize:12, fontFamily:font, color:SEM[col] }}>{cnt} {{green:"✓",yellow:"⚠",red:"✗"}[col]}</span>
                 ))}
               </div>
             </div>
             {group.signals.map((sig,i) => (
               <div key={i} style={{ display:"grid", gridTemplateColumns:"1fr 180px 80px", gap:8, padding:"6px 0", borderBottom:`1px solid ${BORDER}30`, alignItems:"center" }}>
-                <span style={{ fontSize:11, color:TEXT }}>{sig.name}</span>
-                <span style={{ fontSize:10, fontFamily:font, color:SEM[sig.sem] }}>{sig.val}</span>
+                <span style={{ fontSize:14, color:TEXT }}>{sig.name}</span>
+                <span style={{ fontSize:13, fontFamily:font, color:SEM[sig.sem] }}>{sig.val}</span>
                 <div style={{ display:"flex", alignItems:"center", gap:4 }}>
                   <SemDot color={sig.sem} size={7} />
-                  <span style={{ fontSize:9, fontFamily:font, color:SEM[sig.sem] }}>{{green:"Activa",yellow:"Parcial",red:"Bloqueada"}[sig.sem]}</span>
+                  <span style={{ fontSize:12, fontFamily:font, color:SEM[sig.sem] }}>{{green:"Activa",yellow:"Parcial",red:"Bloqueada"}[sig.sem]}</span>
                 </div>
               </div>
             ))}
@@ -1358,21 +1358,21 @@ function MonitorNoticias() {
         </Badge>
         {["all","E1","E2","E3","E4"].map(f => (
           <button key={f} onClick={() => { setFilter(f); setPage(1); }}
-            style={{ fontSize:9, fontFamily:font, padding:"3px 10px", border:`1px solid ${f==="all"?BORDER:escColors[f]||BORDER}`,
+            style={{ fontSize:12, fontFamily:font, padding:"3px 10px", border:`1px solid ${f==="all"?BORDER:escColors[f]||BORDER}`,
               background:filter===f?(f==="all"?ACCENT:escColors[f]):"transparent",
               color:filter===f?"#fff":(f==="all"?MUTED:escColors[f]||MUTED), cursor:"pointer", borderRadius:0 }}>
             {f === "all" ? "Todas" : f}
           </button>
         ))}
-        <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{filtered.length} noticias · pág {page}/{totalPages||1}</span>
+        <span style={{ fontSize:12, color:MUTED, marginLeft:"auto" }}>{filtered.length} noticias · pág {page}/{totalPages||1}</span>
       </div>
       {/* News list */}
       {loading ? (
-        <Card><div style={{ textAlign:"center", padding:30, color:MUTED, fontSize:10, fontFamily:font }}>
+        <Card><div style={{ textAlign:"center", padding:30, color:MUTED, fontSize:13, fontFamily:font }}>
           Cargando noticias de Venezuela...
         </div></Card>
       ) : filtered.length === 0 ? (
-        <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:10 }}>No se encontraron noticias</div></Card>
+        <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:13 }}>No se encontraron noticias</div></Card>
       ) : (
         <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
           {paginated.map((n,i) => (
@@ -1382,28 +1382,28 @@ function MonitorNoticias() {
                 onMouseEnter={e=>e.currentTarget.style.background=`${BG3}`}
                 onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                 <div>
-                  <div style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:4 }}>{n.title}</div>
+                  <div style={{ fontSize:14, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:4 }}>{n.title}</div>
                   <div style={{ display:"flex", gap:6, alignItems:"center", flexWrap:"wrap" }}>
-                    <span style={{ fontSize:8, fontFamily:font, color:ACCENT }}>{n.source}</span>
-                    {n.date && <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>
+                    <span style={{ fontSize:10, fontFamily:font, color:ACCENT }}>{n.source}</span>
+                    {n.date && <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>
                       {new Date(n.date).toLocaleDateString("es",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
                     </span>}
                     {n.tags?.map((t,k) => (
-                      <span key={`s${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
+                      <span key={`s${k}`} style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
                         color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
                     ))}
                     {n.scenarios?.map((t,k) => (
-                      <span key={`sc${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
+                      <span key={`sc${k}`} style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
                         color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
                     ))}
                     {n.dims?.map((d,k) => (
-                      <span key={`d${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${dimColors[d]||MUTED}15`,
+                      <span key={`d${k}`} style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${dimColors[d]||MUTED}15`,
                         color:dimColors[d]||MUTED, border:`1px solid ${dimColors[d]||MUTED}30` }}>{dimIcons[d]||""} {d}</span>
                     ))}
                   </div>
-                  {n.desc && <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.4 }}>{n.desc}</div>}
+                  {n.desc && <div style={{ fontSize:12, color:MUTED, marginTop:4, lineHeight:1.4 }}>{n.desc}</div>}
                 </div>
-                <span style={{ fontSize:9, color:ACCENT, fontFamily:font, whiteSpace:"nowrap" }}>↗</span>
+                <span style={{ fontSize:12, color:ACCENT, fontFamily:font, whiteSpace:"nowrap" }}>↗</span>
               </div>
             </a>
           ))}
@@ -1413,19 +1413,19 @@ function MonitorNoticias() {
       {totalPages > 1 && (
         <div style={{ display:"flex", justifyContent:"center", gap:4, marginTop:12 }}>
           <button onClick={() => setPage(Math.max(1,page-1))} disabled={page===1}
-            style={{ fontSize:9, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
+            style={{ fontSize:12, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
               background:page===1?"transparent":BG2, color:page===1?`${MUTED}50`:MUTED, cursor:page===1?"default":"pointer" }}>← Anterior</button>
           {Array.from({length:totalPages},(_,i)=>i+1).map(p => (
             <button key={p} onClick={() => setPage(p)}
-              style={{ fontSize:9, fontFamily:font, padding:"4px 8px", border:`1px solid ${page===p?ACCENT:BORDER}`,
+              style={{ fontSize:12, fontFamily:font, padding:"4px 8px", border:`1px solid ${page===p?ACCENT:BORDER}`,
                 background:page===p?ACCENT:"transparent", color:page===p?"#fff":MUTED, cursor:"pointer", minWidth:28 }}>{p}</button>
           ))}
           <button onClick={() => setPage(Math.min(totalPages,page+1))} disabled={page===totalPages}
-            style={{ fontSize:9, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
+            style={{ fontSize:12, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
               background:page===totalPages?"transparent":BG2, color:page===totalPages?`${MUTED}50`:MUTED, cursor:page===totalPages?"default":"pointer" }}>Siguiente →</button>
         </div>
       )}
-      <div style={{ fontSize:7, fontFamily:font, color:`${MUTED}60`, marginTop:10 }}>
+      <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}60`, marginTop:10 }}>
         Fuentes: Efecto Cocuyo · El Pitazo · Runrunes · Tal Cual · El Estímulo · Caracas Chronicles · Tags por keywords
       </div>
     </div>
@@ -1512,8 +1512,8 @@ function MonitorFactCheck() {
           <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration:"none" }}>
             <div style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`2px solid ${s.color}`, padding:"10px 12px", cursor:"pointer" }}
               onMouseEnter={e=>e.currentTarget.style.borderColor=s.color} onMouseLeave={e=>e.currentTarget.style.borderColor=BORDER}>
-              <div style={{ fontSize:10, fontWeight:600, color:s.color, marginBottom:2 }}>{s.name}</div>
-              <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>@{s.handle}</div>
+              <div style={{ fontSize:13, fontWeight:600, color:s.color, marginBottom:2 }}>{s.name}</div>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED }}>@{s.handle}</div>
             </div>
           </a>
         ))}
@@ -1527,17 +1527,17 @@ function MonitorFactCheck() {
           onMouseEnter={e=>e.currentTarget.style.borderColor=ACCENT}
           onMouseLeave={e=>e.currentTarget.style.borderColor=BORDER}>
           <span style={{ fontSize:12 }}>𝕏</span>
-          <span style={{ fontSize:10, fontFamily:font, color:TEXT, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase" }}>
+          <span style={{ fontSize:13, fontFamily:font, color:TEXT, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase" }}>
             Timelines verificadores
           </span>
-          <span style={{ fontSize:8, color:MUTED }}>@cazamosfakenews · @cotejoinfo · @EsPajaVe · @_provea</span>
+          <span style={{ fontSize:10, color:MUTED }}>@cazamosfakenews · @cotejoinfo · @EsPajaVe · @_provea</span>
           <span style={{ fontSize:12, color:MUTED, marginLeft:"auto" }}>{showTwitter ? "▲" : "▼"}</span>
         </button>
         {showTwitter && (
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginTop:8 }}>
             {FACTCHECK_SOURCES.map((s,i) => (
               <div key={i} style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`2px solid ${s.color}`, padding:"8px", overflow:"hidden" }}>
-                <div style={{ fontSize:9, fontFamily:font, color:s.color, fontWeight:600, marginBottom:4 }}>@{s.handle}</div>
+                <div style={{ fontSize:12, fontFamily:font, color:s.color, fontWeight:600, marginBottom:4 }}>@{s.handle}</div>
                 <TwitterTimeline handle={s.handle} height={280} />
               </div>
             ))}
@@ -1548,52 +1548,52 @@ function MonitorFactCheck() {
       {/* RSS Articles */}
       {(() => { const totalPages = Math.ceil(articles.length / PER_PAGE); const paginated = articles.slice((page-1)*PER_PAGE, page*PER_PAGE); return (<>
       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
-        <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>📰 Artículos de verificación</span>
+        <span style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>📰 Artículos de verificación</span>
         <Badge color={source==="supabase"?"#22c55e":source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
           {source==="supabase"?"EN VIVO":source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
         </Badge>
-        <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{articles.length} artículos · pág {page}/{totalPages||1}</span>
+        <span style={{ fontSize:12, color:MUTED, marginLeft:"auto" }}>{articles.length} artículos · pág {page}/{totalPages||1}</span>
       </div>
       {loading ? (
-        <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:10, fontFamily:font }}>Cargando verificaciones...</div></Card>
+        <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:13, fontFamily:font }}>Cargando verificaciones...</div></Card>
       ) : articles.length === 0 ? (
-        <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:10 }}>Sin artículos. Visita los sitios directamente.</div></Card>
+        <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:13 }}>Sin artículos. Visita los sitios directamente.</div></Card>
       ) : paginated.map((a,i) => (
         <a key={i} href={a.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration:"none" }}>
           <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:12, padding:"8px 0", borderBottom:`1px solid ${BORDER}30` }}
             onMouseEnter={e=>e.currentTarget.style.background=BG3} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
             <div>
-              <div style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:3 }}>{a.title}</div>
+              <div style={{ fontSize:14, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:3 }}>{a.title}</div>
               <div style={{ display:"flex", gap:5, alignItems:"center", flexWrap:"wrap" }}>
-                <span style={{ fontSize:8, fontFamily:font, color:FACTCHECK_SOURCES.find(s=>s.name===a.source)?.color||ACCENT, fontWeight:600 }}>{a.source}</span>
-                {a.date && <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>{new Date(a.date).toLocaleDateString("es",{day:"numeric",month:"short"})}</span>}
+                <span style={{ fontSize:10, fontFamily:font, color:FACTCHECK_SOURCES.find(s=>s.name===a.source)?.color||ACCENT, fontWeight:600 }}>{a.source}</span>
+                {a.date && <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>{new Date(a.date).toLocaleDateString("es",{day:"numeric",month:"short"})}</span>}
                 {(a.scenarios||[]).map((t,k) => (
-                  <span key={`s${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`, color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
+                  <span key={`s${k}`} style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`, color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
                 ))}
                 {(a.dims||[]).map((d,k) => (
-                  <span key={`d${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${{Energético:"#0A97D9",Político:"#4C9F38",Económico:"#FCC30B",Internacional:"#9B59B6"}[d]||MUTED}15`,
+                  <span key={`d${k}`} style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${{Energético:"#0A97D9",Político:"#4C9F38",Económico:"#FCC30B",Internacional:"#9B59B6"}[d]||MUTED}15`,
                     color:{Energético:"#0A97D9",Político:"#4C9F38",Económico:"#FCC30B",Internacional:"#9B59B6"}[d]||MUTED }}>
                     {{Energético:"⚡",Político:"🏛",Económico:"📊",Internacional:"🌐"}[d]||""} {d}
                   </span>
                 ))}
               </div>
             </div>
-            <span style={{ fontSize:9, color:ACCENT, fontFamily:font }}>↗</span>
+            <span style={{ fontSize:12, color:ACCENT, fontFamily:font }}>↗</span>
           </div>
         </a>
       ))}
       {totalPages > 1 && (
         <div style={{ display:"flex", justifyContent:"center", gap:4, marginTop:12 }}>
           <button onClick={() => setPage(Math.max(1,page-1))} disabled={page===1}
-            style={{ fontSize:9, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
+            style={{ fontSize:12, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
               background:page===1?"transparent":BG2, color:page===1?`${MUTED}50`:MUTED, cursor:page===1?"default":"pointer" }}>← Anterior</button>
           {Array.from({length:totalPages},(_,i)=>i+1).map(p => (
             <button key={p} onClick={() => setPage(p)}
-              style={{ fontSize:9, fontFamily:font, padding:"4px 8px", border:`1px solid ${page===p?ACCENT:BORDER}`,
+              style={{ fontSize:12, fontFamily:font, padding:"4px 8px", border:`1px solid ${page===p?ACCENT:BORDER}`,
                 background:page===p?ACCENT:"transparent", color:page===p?"#fff":MUTED, cursor:"pointer", minWidth:28 }}>{p}</button>
           ))}
           <button onClick={() => setPage(Math.min(totalPages,page+1))} disabled={page===totalPages}
-            style={{ fontSize:9, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
+            style={{ fontSize:12, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
               background:page===totalPages?"transparent":BG2, color:page===totalPages?`${MUTED}50`:MUTED, cursor:page===totalPages?"default":"pointer" }}>Siguiente →</button>
         </div>
       )}
@@ -1647,22 +1647,22 @@ function TabGdelt() {
     <div>
       {/* Header */}
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16, flexWrap:"wrap" }}>
-        <span style={{ fontSize:14 }}>📡</span>
+        <span style={{ fontSize:16 }}>📡</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:13, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Panel de Señales GDELT</div>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>
+          <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Panel de Señales GDELT</div>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>
             Señales mediáticas en tiempo real del Proyecto GDELT monitoreando la cobertura sobre Venezuela
           </div>
         </div>
         <div style={{ display:"flex", gap:6, alignItems:"center" }}>
           {source === "mock" && !loading && (
-            <button onClick={loadData} style={{ fontSize:9, fontFamily:font, padding:"4px 10px", background:"transparent",
+            <button onClick={loadData} style={{ fontSize:12, fontFamily:font, padding:"4px 10px", background:"transparent",
               border:`1px solid ${ACCENT}40`, color:ACCENT, cursor:"pointer" }}>↻ Reintentar</button>
           )}
           <div style={{ display:"flex", alignItems:"center", gap:6, padding:"4px 10px", border:`1px solid ${source==="live"?"#22c55e30":source==="mock"?"#eab30830":"#4a709030"}` }}>
             <span style={{ width:6, height:6, borderRadius:"50%", background:source==="live"?"#22c55e":source==="mock"?"#eab308":"#4a7090",
               boxShadow:source==="live"?"0 0 6px #22c55e":"none", animation:source==="live"?"pulse 1.5s infinite":"none" }} />
-            <span style={{ fontSize:9, fontFamily:font, color:source==="live"?"#22c55e":source==="mock"?"#eab308":"#4a7090" }}>
+            <span style={{ fontSize:12, fontFamily:font, color:source==="live"?"#22c55e":source==="mock"?"#eab308":"#4a7090" }}>
               {source==="live"?"EN VIVO":source==="mock"?"SIMULADO":"..."}
             </span>
           </div>
@@ -1670,14 +1670,14 @@ function TabGdelt() {
       </div>
 
       {error && (
-        <div style={{ fontSize:9, fontFamily:font, color:"#eab308", padding:"6px 12px",
+        <div style={{ fontSize:12, fontFamily:font, color:"#eab308", padding:"6px 12px",
           background:"rgba(234,179,8,0.08)", border:"1px solid rgba(234,179,8,0.2)", marginBottom:12 }}>
           ⚠ {error}
         </div>
       )}
 
       {loading ? (
-        <Card><div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:11, fontFamily:font }}>
+        <Card><div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:14, fontFamily:font }}>
           <div style={{ fontSize:20, marginBottom:8 }}>📡</div>
           Conectando con GDELT DOC API v2...
         </div></Card>
@@ -1685,31 +1685,31 @@ function TabGdelt() {
         {/* KPI Cards */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginBottom:16 }}>
           <Card accent={stats.instDelta>0?"#ff3b3b":"#14b8a6"}>
-            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Inestabilidad Δ</div>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Inestabilidad Δ</div>
             <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-              <span style={{ fontSize:9 }}>{stats.instDelta>0?"📈":"📉"}</span>
+              <span style={{ fontSize:12 }}>{stats.instDelta>0?"📈":"📉"}</span>
               <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
                 color:stats.instDelta>0?"#ff3b3b":"#14b8a6" }}>
                 {stats.instDelta!==null ? `${stats.instDelta>0?"+":""}${stats.instDelta.toFixed(1)}%` : "—"}
               </span>
             </div>
-            <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>vs línea base dic 2025</div>
+            <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>vs línea base dic 2025</div>
           </Card>
           <Card accent={(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#14b8a6"}>
-            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Tono Mediático</div>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Tono Mediático</div>
             <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
               color:(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#14b8a6" }}>
               {stats.tone!==null ? stats.tone.toFixed(2) : "—"}
             </span>
-            <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>Actual</div>
+            <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>Actual</div>
           </Card>
           <Card accent={stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#14b8a6"}>
-            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Señal Compuesta</div>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Señal Compuesta</div>
             <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
               color:stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#14b8a6" }}>
               {stats.phase || "—"}
             </span>
-            <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>Incluye inestabilidad, tono y oleada</div>
+            <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>Incluye inestabilidad, tono y oleada</div>
           </Card>
         </div>
 
@@ -1718,7 +1718,7 @@ function TabGdelt() {
 
         {/* Event Timeline */}
         <div style={{ marginTop:16 }}>
-          <div style={{ fontSize:10, fontWeight:700, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+          <div style={{ fontSize:13, fontWeight:700, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
             Línea de Tiempo de Eventos
           </div>
           {GDELT_ANNOTATIONS.map((a,i) => (
@@ -1728,11 +1728,11 @@ function TabGdelt() {
               onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
               <span style={{ width:10, height:10, borderRadius:"50%", background:tierColor[a.tier], flexShrink:0,
                 boxShadow:`0 0 8px ${tierColor[a.tier]}50`, border:`2px solid ${BG}` }} />
-              <span style={{ fontSize:10, fontFamily:font, color:MUTED, minWidth:100 }}>
+              <span style={{ fontSize:13, fontFamily:font, color:MUTED, minWidth:100 }}>
                 {new Date(a.date+"T00:00").toLocaleDateString("es",{day:"numeric",month:"short",year:"numeric"})}
               </span>
-              <span style={{ fontSize:11, color:TEXT, flex:1 }}>{a.label}</span>
-              <span style={{ fontSize:8, fontFamily:font, fontWeight:700, padding:"2px 8px", letterSpacing:"0.1em",
+              <span style={{ fontSize:14, color:TEXT, flex:1 }}>{a.label}</span>
+              <span style={{ fontSize:10, fontFamily:font, fontWeight:700, padding:"2px 8px", letterSpacing:"0.1em",
                 color:tierColor[a.tier], background:`${tierColor[a.tier]}12`, border:`1px solid ${tierColor[a.tier]}30`,
                 minWidth:60, textAlign:"center" }}>{a.tierEs}</span>
             </div>
@@ -1742,32 +1742,32 @@ function TabGdelt() {
         {/* Signal descriptions */}
         <div style={{ marginTop:16, display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12 }}>
           <Card accent="#ff3b3b">
-            <div style={{ fontSize:10, fontWeight:600, color:"#ff3b3b", marginBottom:6 }}>● Índice de Conflicto</div>
-            <div style={{ fontSize:10, color:MUTED, lineHeight:1.6 }}>
+            <div style={{ fontSize:13, fontWeight:600, color:"#ff3b3b", marginBottom:6 }}>● Índice de Conflicto</div>
+            <div style={{ fontSize:13, color:MUTED, lineHeight:1.6 }}>
               Volumen normalizado de artículos con Venezuela + conflicto/protesta/crisis/violencia. <span style={{color:"#ff3b3b50"}}>Eje izquierdo · Línea sólida</span>
             </div>
           </Card>
           <Card accent="#f5c842">
-            <div style={{ fontSize:10, fontWeight:600, color:"#f5c842", marginBottom:6 }}>● Oleada de Atención</div>
-            <div style={{ fontSize:10, color:MUTED, lineHeight:1.6 }}>
+            <div style={{ fontSize:13, fontWeight:600, color:"#f5c842", marginBottom:6 }}>● Oleada de Atención</div>
+            <div style={{ fontSize:13, color:MUTED, lineHeight:1.6 }}>
               Atención mediática normalizada. Mide la intensidad del interés internacional. <span style={{color:"#f5c84250"}}>Eje izquierdo · Línea sólida</span>
             </div>
           </Card>
           <Card accent="#3bf0ff">
-            <div style={{ fontSize:10, fontWeight:600, color:"#3bf0ff", marginBottom:6 }}>● Tono Mediático</div>
-            <div style={{ fontSize:10, color:MUTED, lineHeight:1.6 }}>
+            <div style={{ fontSize:13, fontWeight:600, color:"#3bf0ff", marginBottom:6 }}>● Tono Mediático</div>
+            <div style={{ fontSize:13, color:MUTED, lineHeight:1.6 }}>
               Sentimiento promedio de cobertura internacional (-10 a +2). Negativo = conflictivo. <span style={{color:"#3bf0ff50"}}>Eje derecho · Línea punteada</span>
             </div>
           </Card>
         </div>
 
         {/* Footer */}
-        <div style={{ marginTop:12, fontSize:8, fontFamily:font, color:`${MUTED}60`, lineHeight:1.8, display:"flex", justifyContent:"space-between" }}>
+        <div style={{ marginTop:12, fontSize:10, fontFamily:font, color:`${MUTED}60`, lineHeight:1.8, display:"flex", justifyContent:"space-between" }}>
           <span>📡 Fuente: GDELT Project DOC API v2 · 3 queries paralelas via CORS proxy</span>
           <span>Última actualización: {new Date().toLocaleString("es",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})}</span>
         </div>
       </>) : (
-        <Card><div style={{ color:MUTED, fontSize:11, textAlign:"center", padding:20 }}>No se pudieron obtener datos</div></Card>
+        <Card><div style={{ color:MUTED, fontSize:14, textAlign:"center", padding:20 }}>No se pudieron obtener datos</div></Card>
       )}
     </div>
   );
@@ -1804,7 +1804,7 @@ function TVMarketQuotes({ title, height=350, groups }) {
 
   return (
     <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px", overflow:"hidden" }}>
-      <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
+      <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
         {title} · En vivo
       </div>
       <div id={containerId} style={{ width:"100%", height }} />
@@ -1956,7 +1956,7 @@ function OilPriceTicker() {
 
   return (
     <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px 16px", minHeight:60 }}>
-      <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>
+      <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>
         🛢 Precios en tiempo real · OilPriceAPI · Actualiza cada 5 min
       </div>
       <div ref={tickerRef} />
@@ -2028,7 +2028,7 @@ function BrentChart({ history: rawHistory }) {
         {/* Grid */}
         {[0, 0.25, 0.5, 0.75, 1].map(f => (
           <g key={f}>
-            <line x1={padL} y1={padT + f * cH} x2={padL + cW} y2={padT + f * cH} stroke="rgba(255,255,255,0.04)" />
+            <line x1={padL} y1={padT + f * cH} x2={padL + cW} y2={padT + f * cH} stroke="rgba(0,0,0,0.06)" />
             <text x={padL - 4} y={padT + f * cH + 3} textAnchor="end" fontSize={7} fill={MUTED} fontFamily={font}>
               {(max - f * range).toFixed(1)}
             </text>
@@ -2050,7 +2050,7 @@ function BrentChart({ history: rawHistory }) {
         {/* Hover */}
         {hover !== null && hover < history.length && (
           <>
-            <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT + cH} stroke="rgba(255,255,255,0.15)" />
+            <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT + cH} stroke="rgba(0,0,0,0.1)" />
             <circle cx={toX(hover)} cy={toY(history[hover].price)} r={3.5} fill="#22c55e" />
           </>
         )}
@@ -2190,46 +2190,46 @@ function MereyEstimator() {
   
   return (
     <Card accent="#FCC30B">
-      <div style={{ fontSize:9, fontFamily:font, color:"#FCC30B", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
+      <div style={{ fontSize:12, fontFamily:font, color:"#FCC30B", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
         Estimador Merey venezolano
       </div>
-      <div style={{ fontSize:9, color:MUTED, marginBottom:10, lineHeight:1.5 }}>
+      <div style={{ fontSize:12, color:MUTED, marginBottom:10, lineHeight:1.5 }}>
         El crudo Merey 16° API no tiene feed público. Se estima como Brent menos descuento por gravedad y riesgo país.
       </div>
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:12 }}>
         <div>
-          <label style={{ fontSize:8, fontFamily:font, color:MUTED, display:"block", marginBottom:4, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+          <label style={{ fontSize:10, fontFamily:font, color:MUTED, display:"block", marginBottom:4, letterSpacing:"0.1em", textTransform:"uppercase" }}>
             Brent (USD/bbl)
           </label>
           <input type="number" value={brentPrice} onChange={e => setBrentPrice(+e.target.value)}
-            style={{ width:"100%", padding:"6px 10px", fontSize:13, fontFamily:font, fontWeight:700,
+            style={{ width:"100%", padding:"6px 10px", fontSize:15, fontFamily:font, fontWeight:700,
               background:BG, border:`1px solid ${BORDER}`, color:"#22c55e", outline:"none" }} />
         </div>
         <div>
-          <label style={{ fontSize:8, fontFamily:font, color:MUTED, display:"block", marginBottom:4, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+          <label style={{ fontSize:10, fontFamily:font, color:MUTED, display:"block", marginBottom:4, letterSpacing:"0.1em", textTransform:"uppercase" }}>
             Descuento (USD)
           </label>
           <input type="number" value={discount} onChange={e => setDiscount(+e.target.value)}
-            style={{ width:"100%", padding:"6px 10px", fontSize:13, fontFamily:font, fontWeight:700,
+            style={{ width:"100%", padding:"6px 10px", fontSize:15, fontFamily:font, fontWeight:700,
               background:BG, border:`1px solid ${BORDER}`, color:"#ef4444", outline:"none" }} />
-          <div style={{ fontSize:7, color:MUTED, marginTop:3 }}>Rango típico: 10-15 (abierto) · 18-25 (sanciones)</div>
+          <div style={{ fontSize:9, color:MUTED, marginTop:3 }}>Rango típico: 10-15 (abierto) · 18-25 (sanciones)</div>
         </div>
       </div>
       <div style={{ background:BG, border:`1px solid ${BORDER}`, padding:"12px 14px", display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12 }}>
         <div style={{ textAlign:"center" }}>
           <div style={{ fontSize:22, fontWeight:900, color:"#FCC30B", fontFamily:"'Playfair Display',serif" }}>${merey.toFixed(1)}</div>
-          <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Merey est. /bbl</div>
+          <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Merey est. /bbl</div>
         </div>
         <div style={{ textAlign:"center" }}>
           <div style={{ fontSize:22, fontWeight:900, color:ACCENT, fontFamily:"'Playfair Display',serif" }}>${revenue800k}M</div>
-          <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Ingreso diario 800K bpd</div>
+          <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Ingreso diario 800K bpd</div>
         </div>
         <div style={{ textAlign:"center" }}>
           <div style={{ fontSize:22, fontWeight:900, color:"#22c55e", fontFamily:"'Playfair Display',serif" }}>${revenueYear}B</div>
-          <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Proyección anualizada</div>
+          <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Proyección anualizada</div>
         </div>
       </div>
-      <div style={{ fontSize:8, color:MUTED, marginTop:8, lineHeight:1.5, fontStyle:"italic" }}>
+      <div style={{ fontSize:10, color:MUTED, marginTop:8, lineHeight:1.5, fontStyle:"italic" }}>
         Merey = Brent − descuento · Producción actual ~800K bpd · Compradores: India (Reliance, BPCL, HPCL), Vitol, Trafigura, Valero, Phillips 66
       </div>
     </Card>
@@ -2243,20 +2243,20 @@ function TabMercados() {
     <div>
       {/* Header + section toggle */}
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14, flexWrap:"wrap" }}>
-        <span style={{ fontSize:14 }}>📈</span>
+        <span style={{ fontSize:16 }}>📈</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:13, fontWeight:600, color:TEXT }}>Mercados — Petróleo · Commodities · Predicción</div>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
+          <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Mercados — Petróleo · Commodities · Predicción</div>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
             Indicadores de mercado relevantes para el análisis de contexto Venezuela
           </div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
           {[{id:"petroleo",label:"Petróleo",icon:"🛢"},{id:"global",label:"Global",icon:"🌍"},{id:"prediccion",label:"Predicción",icon:"🔮"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
-              style={{ fontSize:9, fontFamily:font, padding:"6px 14px", border:"none",
+              style={{ fontSize:12, fontFamily:font, padding:"6px 14px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED,
                 cursor:"pointer", letterSpacing:"0.08em", display:"flex", alignItems:"center", gap:4 }}>
-              <span style={{ fontSize:11 }}>{s.icon}</span>{s.label}
+              <span style={{ fontSize:14 }}>{s.icon}</span>{s.label}
             </button>
           ))}
         </div>
@@ -2277,26 +2277,26 @@ function TabMercados() {
           {/* Context cards */}
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
             <Card accent="#22c55e">
-              <div style={{ fontSize:10, fontWeight:600, color:"#22c55e", marginBottom:6 }}>Exportaciones Venezuela</div>
+              <div style={{ fontSize:13, fontWeight:600, color:"#22c55e", marginBottom:6 }}>Exportaciones Venezuela</div>
               <div style={{ fontSize:18, fontWeight:900, color:"#22c55e", fontFamily:"'Playfair Display',serif" }}>~800K bpd</div>
-              <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.5 }}>
+              <div style={{ fontSize:12, color:MUTED, marginTop:4, lineHeight:1.5 }}>
                 Destino: India (Reliance, BPCL, HPCL-Mittal), EE.UU. (Valero, Phillips 66, Citgo). 
                 VLCC de hasta 2M barriles. Vitol/Trafigura 3 buques marzo.
               </div>
             </Card>
             <Card accent={ACCENT}>
-              <div style={{ fontSize:10, fontWeight:600, color:ACCENT, marginBottom:6 }}>Licencias OFAC activas</div>
-              <div style={{ fontSize:11, fontWeight:700, color:ACCENT, fontFamily:font }}>GL49 · GL50 · GL50A</div>
-              <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.5 }}>
+              <div style={{ fontSize:13, fontWeight:600, color:ACCENT, marginBottom:6 }}>Licencias OFAC activas</div>
+              <div style={{ fontSize:14, fontWeight:700, color:ACCENT, fontFamily:font }}>GL49 · GL50 · GL50A</div>
+              <div style={{ fontSize:12, color:MUTED, marginTop:4, lineHeight:1.5 }}>
                 FAQ 1238: marco regulado para licencias a Cuba condicionado. 
                 BP, Chevron, Eni, Repsol, Shell autorizadas bajo ley EE.UU.
                 19 contratos en revisión de solvencia.
               </div>
             </Card>
             <Card accent="#ef4444">
-              <div style={{ fontSize:10, fontWeight:600, color:"#ef4444", marginBottom:6 }}>Infraestructura</div>
-              <div style={{ fontSize:11, fontWeight:700, color:"#ef4444", fontFamily:font }}>&lt;20% capacidad refinación</div>
-              <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.5 }}>
+              <div style={{ fontSize:13, fontWeight:600, color:"#ef4444", marginBottom:6 }}>Infraestructura</div>
+              <div style={{ fontSize:14, fontWeight:700, color:"#ef4444", fontFamily:font }}>&lt;20% capacidad refinación</div>
+              <div style={{ fontSize:12, color:MUTED, marginTop:4, lineHeight:1.5 }}>
                 Paraguaná: 5 de 9 unidades (~287K bpd). 
                 2-4 taladros activos (vs 100+ históricos).
                 Inversión requerida: +USD 100B para alcanzar 3-4 Mbpd en 10 años.
@@ -2317,9 +2317,9 @@ function TabMercados() {
             {POLYMARKET_SLUGS.filter(m => m.embed).map((m,i) => (
               <Card key={i}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                  <span style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.3 }}>{m.title}</span>
+                  <span style={{ fontSize:14, fontWeight:600, color:TEXT, lineHeight:1.3 }}>{m.title}</span>
                   <a href={`https://polymarket.com/event/${m.slug}`} target="_blank" rel="noopener noreferrer"
-                    style={{ fontSize:9, color:ACCENT, textDecoration:"none", fontFamily:font }}>↗</a>
+                    style={{ fontSize:12, color:ACCENT, textDecoration:"none", fontFamily:font }}>↗</a>
                 </div>
                 <iframe
                   src={`https://embed.polymarket.com/market.html?market=${m.slug}&theme=dark&features=volume,chart&width=380`}
@@ -2331,7 +2331,7 @@ function TabMercados() {
             ))}
           </div>
           {/* Multi-outcome markets (can't embed — link cards) */}
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginTop:4, marginBottom:2 }}>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginTop:4, marginBottom:2 }}>
             Mercados multi-resultado · Ver en Polymarket
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
@@ -2342,14 +2342,14 @@ function TabMercados() {
                   transition:"border-color 0.2s" }}
                   onMouseEnter={e => e.currentTarget.style.borderColor=ACCENT}
                   onMouseLeave={e => e.currentTarget.style.borderColor=BORDER}>
-                  <div style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:6 }}>{m.title}</div>
-                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, lineHeight:1.5 }}>{m.desc}</div>
-                  <div style={{ fontSize:8, fontFamily:font, color:ACCENT, marginTop:8, letterSpacing:"0.08em" }}>↗ VER EN POLYMARKET</div>
+                  <div style={{ fontSize:14, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:6 }}>{m.title}</div>
+                  <div style={{ fontSize:12, fontFamily:font, color:MUTED, lineHeight:1.5 }}>{m.desc}</div>
+                  <div style={{ fontSize:10, fontFamily:font, color:ACCENT, marginTop:8, letterSpacing:"0.08em" }}>↗ VER EN POLYMARKET</div>
                 </div>
               </a>
             ))}
           </div>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, textAlign:"center", marginTop:4 }}>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, textAlign:"center", marginTop:4 }}>
             Fuente: Polymarket · Precios = probabilidad implícita del mercado · No son predicciones
           </div>
         </div>
@@ -2421,83 +2421,83 @@ function EstadosMap() {
           {[{c:"#E5243B",l:">170"},{c:"#ff6b35",l:"130–170"},{c:"#f59e0b",l:"85–130"},{c:"#0A97D9",l:"45–85"},{c:"#0A97D980",l:"<45"}].map((l,i) => (
             <div key={i} style={{ display:"flex", alignItems:"center", gap:4 }}>
               <div style={{ width:10, height:10, background:l.c, borderRadius:2 }} />
-              <span style={{ fontSize:7, fontFamily:font, color:MUTED }}>{l.l}</span>
+              <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>{l.l}</span>
             </div>
           ))}
         </div>
-        <div style={{ fontSize:7, fontFamily:font, color:`${MUTED}60`, textAlign:"center", marginTop:4 }}>Click en un estado para ver detalles</div>
+        <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}60`, textAlign:"center", marginTop:4 }}>Click en un estado para ver detalles</div>
       </div>
 
       {/* Detail panel */}
       <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"16px", display:"flex", flexDirection:"column", gap:12 }}>
         {sel ? (<>
           <div>
-            <div style={{ fontSize:14, fontWeight:800, color:TEXT, fontFamily:"'Syne',sans-serif" }}>{sel.e}</div>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Posición #{selRank} de {CONF_ESTADOS.length} estados</div>
+            <div style={{ fontSize:16, fontWeight:800, color:TEXT, fontFamily:"'Syne',sans-serif" }}>{sel.e}</div>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Posición #{selRank} de {CONF_ESTADOS.length} estados</div>
           </div>
 
           {/* KPIs */}
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
             <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
-              <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Protestas</div>
+              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Protestas</div>
               <div style={{ fontSize:20, fontWeight:800, color:ACCENT, fontFamily:"'Syne',sans-serif" }}>{sel.p}</div>
-              <div style={{ fontSize:8, color:MUTED }}>{((sel.p/2219)*100).toFixed(1)}% del total nacional</div>
+              <div style={{ fontSize:10, color:MUTED }}>{((sel.p/2219)*100).toFixed(1)}% del total nacional</div>
             </div>
             <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
-              <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Reprimidas</div>
+              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Reprimidas</div>
               <div style={{ fontSize:20, fontWeight:800, color:sel.r>3?"#E5243B":sel.r>0?"#eab308":"#22c55e", fontFamily:"'Syne',sans-serif" }}>{sel.r}</div>
-              <div style={{ fontSize:8, color:MUTED }}>{sel.r > 0 ? `${((sel.r/55)*100).toFixed(1)}% de las 55 nacionales` : "Sin represión documentada"}</div>
+              <div style={{ fontSize:10, color:MUTED }}>{sel.r > 0 ? `${((sel.r/55)*100).toFixed(1)}% de las 55 nacionales` : "Sin represión documentada"}</div>
             </div>
           </div>
 
           {sel.c > 0 && (
             <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
-              <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Por combustible</div>
+              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Por combustible</div>
               <div style={{ fontSize:16, fontWeight:700, color:"#f59e0b", fontFamily:"'Syne',sans-serif" }}>{sel.c}</div>
-              <div style={{ fontSize:8, color:MUTED }}>protestas por desabastecimiento</div>
+              <div style={{ fontSize:10, color:MUTED }}>protestas por desabastecimiento</div>
             </div>
           )}
 
           {/* Comparativa vs líder */}
           <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
-            <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Comparativa vs. {lider.e} (#1)</div>
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Comparativa vs. {lider.e} (#1)</div>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
               <div style={{ flex:1, height:6, background:BORDER, borderRadius:3, position:"relative" }}>
                 <div style={{ width:`${(sel.p/lider.p)*100}%`, height:"100%", background:ACCENT, borderRadius:3 }} />
               </div>
-              <span style={{ fontSize:9, fontFamily:font, color:ACCENT }}>{((sel.p/lider.p)*100).toFixed(0)}%</span>
+              <span style={{ fontSize:12, fontFamily:font, color:ACCENT }}>{((sel.p/lider.p)*100).toFixed(0)}%</span>
             </div>
-            <div style={{ fontSize:8, color:MUTED, marginTop:4 }}>
+            <div style={{ fontSize:10, color:MUTED, marginTop:4 }}>
               {sel.e === lider.e ? "Estado líder en protestas" : `${lider.p - sel.p} protestas menos que ${lider.e}`}
             </div>
           </div>
 
           {/* Exigencias */}
           <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
-            <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Principales exigencias</div>
-            <div style={{ fontSize:10, color:TEXT, lineHeight:1.5 }}>{sel.x}</div>
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Principales exigencias</div>
+            <div style={{ fontSize:13, color:TEXT, lineHeight:1.5 }}>{sel.x}</div>
           </div>
         </>) : (
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", flex:1, gap:8, padding:20 }}>
             <span style={{ fontSize:28, opacity:0.3 }}>🗺️</span>
-            <div style={{ fontSize:10, color:MUTED, textAlign:"center" }}>Selecciona un estado en el mapa para ver sus detalles</div>
-            <div style={{ fontSize:8, fontFamily:font, color:`${MUTED}60`, textAlign:"center", marginTop:8 }}>
+            <div style={{ fontSize:13, color:MUTED, textAlign:"center" }}>Selecciona un estado en el mapa para ver sus detalles</div>
+            <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}60`, textAlign:"center", marginTop:8 }}>
               Top 3: {CONF_ESTADOS.slice(0,3).map(e=>`${e.e} (${e.p})`).join(" · ")}
             </div>
           </div>
         )}
 
         {/* Ranking mini table */}
-        <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginTop:4, paddingTop:8, borderTop:`1px solid ${BORDER}` }}>
+        <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginTop:4, paddingTop:8, borderTop:`1px solid ${BORDER}` }}>
           Top 10 estados
         </div>
         {CONF_ESTADOS.slice(0,10).map((e,i) => (
           <div key={i} style={{ display:"flex", alignItems:"center", gap:6, padding:"3px 0", cursor:"pointer",
             background:selected===e.e?`${ACCENT}15`:"transparent" }}
             onClick={() => setSelected(selected===e.e?null:e.e)}>
-            <span style={{ fontSize:8, fontFamily:font, color:MUTED, width:16, textAlign:"right" }}>{i+1}</span>
-            <span style={{ fontSize:9, color:selected===e.e?ACCENT:TEXT, flex:1, fontWeight:selected===e.e?600:400 }}>{e.e}</span>
-            <span style={{ fontSize:9, fontFamily:font, color:ACCENT }}>{e.p}</span>
+            <span style={{ fontSize:10, fontFamily:font, color:MUTED, width:16, textAlign:"right" }}>{i+1}</span>
+            <span style={{ fontSize:12, color:selected===e.e?ACCENT:TEXT, flex:1, fontWeight:selected===e.e?600:400 }}>{e.e}</span>
+            <span style={{ fontSize:12, fontFamily:font, color:ACCENT }}>{e.p}</span>
           </div>
         ))}
       </div>
@@ -2517,15 +2517,15 @@ function TabConflictividad() {
     <div>
       {/* Header */}
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14, flexWrap:"wrap" }}>
-        <span style={{ fontSize:14 }}>📊</span>
+        <span style={{ fontSize:16 }}>📊</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:13, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Conflictividad Social — Venezuela 2025</div>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Fuente: OVCS · Informe Anual 2025 · 2.219 protestas documentadas</div>
+          <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Conflictividad Social — Venezuela 2025</div>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Fuente: OVCS · Informe Anual 2025 · 2.219 protestas documentadas</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
           {[{id:"resumen",label:"Resumen"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
-              style={{ fontSize:9, fontFamily:font, padding:"6px 12px", border:"none",
+              style={{ fontSize:12, fontFamily:font, padding:"6px 12px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
               {s.label}
             </button>
@@ -2540,36 +2540,36 @@ function TabConflictividad() {
             {k:"DCP",v:"971",c:"#0A97D9",s:"44% · Políticos, justicia"},{k:"Reprimidas",v:"55",c:"#E5243B",s:"2,5% · Patrón selectivo"}
           ].map((d,i) => (
             <Card key={i} accent={d.c}>
-              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{d.k}</div>
+              <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{d.k}</div>
               <div style={{ fontSize:22, fontWeight:800, color:d.c, fontFamily:"'Syne',sans-serif" }}>{d.v}</div>
-              <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>{d.s}</div>
+              <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>{d.s}</div>
             </Card>
           ))}
         </div>
         {/* Servicios básicos */}
-        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+        <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
           Protestas por servicios básicos · 275 total
         </div>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, marginBottom:16 }}>
           {CONF_SERVICIOS.map((s,i) => (
             <div key={i} style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"10px 12px" }}>
               <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:6 }}>
-                <span style={{ fontSize:14 }}>{s.i}</span>
-                <span style={{ fontSize:10, fontWeight:600, color:TEXT }}>{s.s}</span>
+                <span style={{ fontSize:16 }}>{s.i}</span>
+                <span style={{ fontSize:13, fontWeight:600, color:TEXT }}>{s.s}</span>
               </div>
               <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                 <div style={{ flex:1, height:4, background:`${BORDER}`, borderRadius:2 }}>
                   <div style={{ width:`${s.pct}%`, height:"100%", background:ACCENT, borderRadius:2 }} />
                 </div>
-                <span style={{ fontSize:9, fontFamily:font, color:ACCENT, minWidth:30 }}>{s.p}</span>
+                <span style={{ fontSize:12, fontFamily:font, color:ACCENT, minWidth:30 }}>{s.p}</span>
               </div>
-              <div style={{ fontSize:8, color:MUTED, marginTop:4 }}>{s.pct}%</div>
+              <div style={{ fontSize:10, color:MUTED, marginTop:4 }}>{s.pct}%</div>
             </div>
           ))}
         </div>
         {/* Mini histórico */}
         <Card>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
             Serie histórica 2011–2025
           </div>
           <ConflictividadChart />
@@ -2580,14 +2580,14 @@ function TabConflictividad() {
       {seccion === "mensual" && (<>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, marginBottom:16 }}>
           <Card accent="#E5243B">
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Mes pico</div>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Mes pico</div>
             <div style={{ fontSize:22, fontWeight:800, color:"#E5243B", fontFamily:"'Syne',sans-serif" }}>Enero · 401</div>
-            <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>36 reprimidas · DCP dominante</div>
+            <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>36 reprimidas · DCP dominante</div>
           </Card>
           <Card accent="#4C9F38">
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Mes mínimo</div>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Mes mínimo</div>
             <div style={{ fontSize:22, fontWeight:800, color:"#4C9F38", fontFamily:"'Syne',sans-serif" }}>Diciembre · 123</div>
-            <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>1 reprimida · DESCA dominante</div>
+            <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>1 reprimida · DESCA dominante</div>
           </Card>
         </div>
         {/* Monthly bar chart */}
@@ -2598,30 +2598,30 @@ function TabConflictividad() {
               const descaPct = (m.desca/m.t)*100;
               return (
                 <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", height:"100%", position:"relative" }}>
-                  <div style={{ fontSize:7, fontFamily:font, color:m.rep>0?"#E5243B":MUTED, marginBottom:2 }}>{m.t}</div>
+                  <div style={{ fontSize:9, fontFamily:font, color:m.rep>0?"#E5243B":MUTED, marginBottom:2 }}>{m.t}</div>
                   <div style={{ width:"100%", height:`${pct}%`, position:"relative", borderRadius:"2px 2px 0 0", overflow:"hidden", minHeight:2 }}>
                     <div style={{ position:"absolute", bottom:0, width:"100%", height:`${descaPct}%`, background:"#4C9F38" }} />
                     <div style={{ position:"absolute", top:0, width:"100%", height:`${100-descaPct}%`, background:"#0A97D9" }} />
                   </div>
-                  {m.rep > 0 && <div style={{ fontSize:6, color:"#E5243B", marginTop:1 }}>{m.rep}R</div>}
-                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, marginTop:3 }}>{m.m}</div>
+                  {m.rep > 0 && <div style={{ fontSize:8, color:"#E5243B", marginTop:1 }}>{m.rep}R</div>}
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginTop:3 }}>{m.m}</div>
                 </div>
               );
             })}
           </div>
           <div style={{ display:"flex", gap:12, justifyContent:"center", marginTop:8 }}>
-            <span style={{ fontSize:8, fontFamily:font, color:"#4C9F38" }}>● DESCA</span>
-            <span style={{ fontSize:8, fontFamily:font, color:"#0A97D9" }}>● DCP</span>
-            <span style={{ fontSize:8, fontFamily:font, color:"#E5243B" }}>● R = Reprimidas</span>
+            <span style={{ fontSize:10, fontFamily:font, color:"#4C9F38" }}>● DESCA</span>
+            <span style={{ fontSize:10, fontFamily:font, color:"#0A97D9" }}>● DCP</span>
+            <span style={{ fontSize:10, fontFamily:font, color:"#E5243B" }}>● R = Reprimidas</span>
           </div>
         </Card>
         {/* Monthly detail */}
         <div style={{ marginTop:12 }}>
           {CONF_MESES.map((m,i) => (
             <div key={i} style={{ display:"grid", gridTemplateColumns:"60px 50px 1fr", gap:12, padding:"8px 0", borderBottom:`1px solid ${BORDER}30`, alignItems:"center" }}>
-              <span style={{ fontSize:10, fontWeight:600, color:TEXT }}>{m.m}</span>
-              <span style={{ fontSize:10, fontFamily:font, color:ACCENT }}>{m.t}</span>
-              <span style={{ fontSize:9, color:MUTED, lineHeight:1.4 }}>{m.hecho}</span>
+              <span style={{ fontSize:13, fontWeight:600, color:TEXT }}>{m.m}</span>
+              <span style={{ fontSize:13, fontFamily:font, color:ACCENT }}>{m.t}</span>
+              <span style={{ fontSize:12, color:MUTED, lineHeight:1.4 }}>{m.hecho}</span>
             </div>
           ))}
         </div>
@@ -2634,12 +2634,12 @@ function TabConflictividad() {
             <div key={i} style={{ display:"grid", gridTemplateColumns:"30px 1fr 60px 50px", gap:10, padding:"10px 0", borderBottom:`1px solid ${BORDER}30`, alignItems:"center" }}>
               <span style={{ fontSize:16, fontWeight:800, color:catColor[d.cat], fontFamily:"'Syne',sans-serif", textAlign:"center" }}>#{i+1}</span>
               <div>
-                <div style={{ fontSize:11, fontWeight:600, color:TEXT }}>{d.d}</div>
-                <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${catColor[d.cat]}15`, color:catColor[d.cat], border:`1px solid ${catColor[d.cat]}30` }}>{d.cat}</span>
+                <div style={{ fontSize:14, fontWeight:600, color:TEXT }}>{d.d}</div>
+                <span style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${catColor[d.cat]}15`, color:catColor[d.cat], border:`1px solid ${catColor[d.cat]}30` }}>{d.cat}</span>
               </div>
               <div style={{ textAlign:"right" }}>
-                <div style={{ fontSize:14, fontWeight:700, color:catColor[d.cat], fontFamily:"'Syne',sans-serif" }}>{d.p}</div>
-                <div style={{ fontSize:8, color:MUTED }}>{d.pct}%</div>
+                <div style={{ fontSize:16, fontWeight:700, color:catColor[d.cat], fontFamily:"'Syne',sans-serif" }}>{d.p}</div>
+                <div style={{ fontSize:10, color:MUTED }}>{d.pct}%</div>
               </div>
               <div style={{ height:6, background:BORDER, borderRadius:3 }}>
                 <div style={{ width:`${(d.pct/30)*100}%`, height:"100%", background:catColor[d.cat], borderRadius:3, maxWidth:"100%" }} />
@@ -2657,7 +2657,7 @@ function TabConflictividad() {
       {/* ── HISTÓRICO ── */}
       {seccion === "historico" && (<>
         <Card>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
             Serie histórica 2011–2025 · OVCS
           </div>
           <div style={{ display:"flex", alignItems:"flex-end", gap:3, height:200, paddingBottom:20 }}>
@@ -2667,12 +2667,12 @@ function TabConflictividad() {
               const isPeak = h.p === maxHist;
               return (
                 <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", height:"100%" }}>
-                  <div style={{ fontSize:7, fontFamily:font, color:isLast?ACCENT:isPeak?"#E5243B":MUTED, marginBottom:2 }}>
+                  <div style={{ fontSize:9, fontFamily:font, color:isLast?ACCENT:isPeak?"#E5243B":MUTED, marginBottom:2 }}>
                     {(h.p/1000).toFixed(1)}k
                   </div>
                   <div style={{ width:"100%", height:`${pct}%`, background:isLast?ACCENT:isPeak?"#E5243B":`${ACCENT}40`,
                     borderRadius:"2px 2px 0 0", minHeight:2 }} />
-                  <div style={{ fontSize:7, fontFamily:font, color:isLast?ACCENT:MUTED, marginTop:4, transform:"rotate(-45deg)", transformOrigin:"top left", whiteSpace:"nowrap" }}>
+                  <div style={{ fontSize:9, fontFamily:font, color:isLast?ACCENT:MUTED, marginTop:4, transform:"rotate(-45deg)", transformOrigin:"top left", whiteSpace:"nowrap" }}>
                     {String(h.y).slice(2)}
                   </div>
                 </div>
@@ -2687,11 +2687,11 @@ function TabConflictividad() {
             const delta = prev ? h.p - prev.p : null;
             return (
               <div key={i} style={{ display:"grid", gridTemplateColumns:"50px 70px 1fr 60px", gap:10, padding:"8px 0", borderBottom:`1px solid ${BORDER}30`, alignItems:"center" }}>
-                <span style={{ fontSize:11, fontWeight:h.y===2025||h.y===2019?700:400, color:h.y===2025?ACCENT:h.y===2019?"#E5243B":TEXT }}>{h.y}</span>
-                <span style={{ fontSize:11, fontFamily:font, color:h.y===2025?ACCENT:h.y===2019?"#E5243B":TEXT, fontWeight:600 }}>{h.p.toLocaleString()}</span>
-                <span style={{ fontSize:9, color:MUTED, lineHeight:1.4 }}>{h.h}</span>
+                <span style={{ fontSize:14, fontWeight:h.y===2025||h.y===2019?700:400, color:h.y===2025?ACCENT:h.y===2019?"#E5243B":TEXT }}>{h.y}</span>
+                <span style={{ fontSize:14, fontFamily:font, color:h.y===2025?ACCENT:h.y===2019?"#E5243B":TEXT, fontWeight:600 }}>{h.p.toLocaleString()}</span>
+                <span style={{ fontSize:12, color:MUTED, lineHeight:1.4 }}>{h.h}</span>
                 {delta !== null && (
-                  <span style={{ fontSize:9, fontFamily:font, color:delta>0?"#E5243B":"#22c55e", textAlign:"right" }}>
+                  <span style={{ fontSize:12, fontFamily:font, color:delta>0?"#E5243B":"#22c55e", textAlign:"right" }}>
                     {delta>0?"+":""}{delta.toLocaleString()}
                   </span>
                 )}
@@ -2730,7 +2730,7 @@ function LeafletMap({ events, EC, TR }) {
       if (!mapRef.current || mapInstance.current) return;
       const L = window.L;
       const map = L.map(mapRef.current, { zoomControl: true, scrollWheelZoom: true }).setView([7.5, -66.5], 6);
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/">CARTO</a>',
         maxZoom: 18,
       }).addTo(map);
@@ -2777,7 +2777,7 @@ function LeafletMap({ events, EC, TR }) {
     markersRef.current = group;
   }
 
-  return <div ref={mapRef} style={{ width: "100%", height: 450, border: `1px solid ${BORDER}`, background: "#0a0e17" }} />;
+  return <div ref={mapRef} style={{ width: "100%", height: 450, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius:6 }} />;
 }
 
 function AcledSection() {
@@ -2889,20 +2889,20 @@ function AcledSection() {
     return Object.values(agg).sort((a,b) => b.total_forecast - a.total_forecast);
   }, [cast]);
 
-  if (loading) return <div style={{ textAlign:"center", padding:40, color:MUTED, fontFamily:font, fontSize:11 }}>Conectando con ACLED...</div>;
-  if (error) return <Card><div style={{ color:"#E5243B", fontSize:11, fontFamily:font }}>⚠ {error}</div></Card>;
+  if (loading) return <div style={{ textAlign:"center", padding:40, color:MUTED, fontFamily:font, fontSize:14 }}>Conectando con ACLED...</div>;
+  if (error) return <Card><div style={{ color:"#E5243B", fontSize:14, fontFamily:font }}>⚠ {error}</div></Card>;
 
   return (
     <div>
       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, flexWrap:"wrap" }}>
         <div style={{ width:6, height:6, borderRadius:"50%", background:"#22c55e", animation:"pulse 2s infinite" }} />
-        <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", flex:1 }}>
+        <span style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", flex:1 }}>
           ACLED · Venezuela {new Date().getFullYear()} · {events.length} eventos · Actualiza cada lunes
         </span>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
           {[{id:"overview",l:"Vista general"},{id:"map",l:"Mapa"},{id:"cast",l:"CAST"},{id:"events",l:"Eventos"}].map(s => (
             <button key={s.id} onClick={() => setAcledView(s.id)}
-              style={{ fontSize:8, fontFamily:font, padding:"5px 10px", border:"none",
+              style={{ fontSize:10, fontFamily:font, padding:"5px 10px", border:"none",
                 background:acledView===s.id?ACCENT:"transparent", color:acledView===s.id?"#fff":MUTED, cursor:"pointer" }}>
               {s.l}
             </button>
@@ -2920,7 +2920,7 @@ function AcledSection() {
           {l:"Estados activos",v:Object.keys(byAdmin).length,c:"#4C9F38"},
         ].map((k,i) => (
           <Card key={i} accent={k.c}>
-            <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>{k.l}</div>
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>{k.l}</div>
             <div style={{ fontSize:22, fontWeight:800, color:k.c, fontFamily:"'Playfair Display',serif" }}>{k.v}</div>
           </Card>
         ))}
@@ -2931,7 +2931,7 @@ function AcledSection() {
         {/* Stacked weekly bars — clickable */}
         {weekly.length > 1 && (
           <Card>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
               Eventos por semana · Click en una barra para ver detalle
             </div>
             <svg width="100%" viewBox="0 0 700 180" style={{ display:"block" }}>
@@ -2943,7 +2943,7 @@ function AcledSection() {
                   const isSel = filter === `week:${w.d}`;
                   return (<g key={i} style={{ cursor:"pointer" }}
                     onClick={() => { setFilter(filter===`week:${w.d}` ? "all" : `week:${w.d}`); setAcledPage(1); }}>
-                    <rect x={x-1} y={10} width={bw+2} height={165} fill={isSel ? "rgba(255,255,255,0.05)" : "transparent"} />
+                    <rect x={x-1} y={10} width={bw+2} height={165} fill={isSel ? "rgba(0,0,0,0.06)" : "transparent"} />
                     {typeOrder.map(t => { const c = w.types[t]||0; if (!c) return null; const h = (c/maxW)*130; cy -= h;
                       return <rect key={t} x={x} y={cy} width={bw} height={h} fill={EC[t]||ACCENT}
                         opacity={filter!=="all"&&!isSel&&!filter.startsWith("week:")?0.3:isSel?1:0.75} rx={1}><title>{w.d} · {t}: {c}</title></rect>; })}
@@ -2954,7 +2954,7 @@ function AcledSection() {
               })()}
             </svg>
             <div style={{ display:"flex", gap:10, justifyContent:"center", marginTop:4 }}>
-              {typeOrder.map(t => <span key={t} style={{ fontSize:7, fontFamily:font, color:EC[t] }}>■ {trad(t)}</span>)}
+              {typeOrder.map(t => <span key={t} style={{ fontSize:9, fontFamily:font, color:EC[t] }}>■ {trad(t)}</span>)}
             </div>
           </Card>
         )}
@@ -2972,20 +2972,20 @@ function AcledSection() {
           return (<>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
               {[{l:`Semana ${wkDate}`,v:wkEvents.length,c:ACCENT},{l:"Fatalidades",v:wkFatal,c:"#dc2626"},
-                {l:"Tipos activos",v:Object.keys(wkTypes).length,c:"#4C9F38"},{l:"",v:<span style={{fontSize:8,cursor:"pointer",color:MUTED}} onClick={() => setFilter("all")}>✕ Cerrar</span>,c:MUTED}
-              ].map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:7,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
+                {l:"Tipos activos",v:Object.keys(wkTypes).length,c:"#4C9F38"},{l:"",v:<span style={{fontSize:10,cursor:"pointer",color:MUTED}} onClick={() => setFilter("all")}>✕ Cerrar</span>,c:MUTED}
+              ].map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
             </div>
             <Card>
               {wkEvents.slice(0,15).map((e,i) => (
                 <div key={i} style={{ padding:"5px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
-                  <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
-                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
-                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
-                  <div style={{ flex:1 }}><div style={{ fontSize:8, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
-                    <div style={{ fontSize:7, color:MUTED, marginTop:1, lineHeight:1.4 }}>{(e.notes||"").slice(0,180)}{(e.notes||"").length>180?"...":""}</div></div>
+                  <div style={{ minWidth:62, fontSize:10, fontFamily:font, color:MUTED }}>{e.event_date}</div>
+                  <span style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
+                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:9, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
+                  <div style={{ flex:1 }}><div style={{ fontSize:10, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
+                    <div style={{ fontSize:9, color:MUTED, marginTop:1, lineHeight:1.4 }}>{(e.notes||"").slice(0,180)}{(e.notes||"").length>180?"...":""}</div></div>
                 </div>
               ))}
-              {wkEvents.length > 15 && <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginTop:6 }}>... y {wkEvents.length-15} más</div>}
+              {wkEvents.length > 15 && <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginTop:6 }}>... y {wkEvents.length-15} más</div>}
             </Card>
           </>);
         })()}
@@ -2993,7 +2993,7 @@ function AcledSection() {
         {/* Type + Actor — selectable with detail */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
           <Card>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
               Por tipo de evento {filter !== "all" && !filter.startsWith("week:") && <span style={{ color:EC[filter]||ACCENT, cursor:"pointer" }} onClick={() => setFilter("all")}> · {filter} ✕</span>}
             </div>
             {Object.entries(byType).sort((a,b) => b[1]-a[1]).map(([t,c]) => {
@@ -3003,17 +3003,17 @@ function AcledSection() {
                   opacity:filter!=="all"&&!filter.startsWith("week:")&&!isActive?0.3:1, padding:"2px 4px",
                   background:isActive?`${EC[t]}15`:"transparent", border:isActive?`1px solid ${EC[t]}30`:"1px solid transparent" }}
                   onClick={() => { setFilter(isActive?"all":t); setAcledPage(1); }}>
-                  <span style={{ fontSize:8, fontFamily:font, color:EC[t]||MUTED, minWidth:140 }}>{trad(t)}</span>
+                  <span style={{ fontSize:10, fontFamily:font, color:EC[t]||MUTED, minWidth:140 }}>{trad(t)}</span>
                   <div style={{ flex:1, height:14, background:`${BORDER}30`, position:"relative" }}>
                     <div style={{ width:`${(c/events.length)*100}%`, height:"100%", background:EC[t]||ACCENT, opacity:isActive?1:0.7 }} />
-                    <span style={{ position:"absolute", right:4, top:1, fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+                    <span style={{ position:"absolute", right:4, top:1, fontSize:9, fontFamily:font, color:TEXT }}>{c}</span>
                   </div>
                 </div>
               );
             })}
           </Card>
           <Card>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
               Top actores {actorFilter !== "all" && <span style={{ color:ACCENT, cursor:"pointer" }} onClick={() => setActorFilter("all")}> · {actorFilter.slice(0,30)} ✕</span>}
             </div>
             {topActors.map(([a,c]) => {
@@ -3023,10 +3023,10 @@ function AcledSection() {
                   opacity:actorFilter!=="all"&&!isActive?0.3:1, padding:"2px 4px",
                   background:isActive?`${ACCENT}15`:"transparent", border:isActive?`1px solid ${ACCENT}30`:"1px solid transparent" }}
                   onClick={() => { setActorFilter(isActive?"all":a); setAcledPage(1); }}>
-                  <span style={{ fontSize:7, fontFamily:font, color:isActive?ACCENT:MUTED, minWidth:150, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a}</span>
+                  <span style={{ fontSize:9, fontFamily:font, color:isActive?ACCENT:MUTED, minWidth:150, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a}</span>
                   <div style={{ flex:1, height:12, background:`${BORDER}30`, position:"relative" }}>
                     <div style={{ width:`${(c/topActors[0][1])*100}%`, height:"100%", background:isActive?ACCENT:`${ACCENT}60` }} />
-                    <span style={{ position:"absolute", right:3, top:0, fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+                    <span style={{ position:"absolute", right:3, top:0, fontSize:9, fontFamily:font, color:TEXT }}>{c}</span>
                   </div>
                 </div>
               );
@@ -3044,51 +3044,51 @@ function AcledSection() {
           return (<>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
               {[{l:filter,v:tEvents.length,c:EC[filter]||ACCENT},{l:"Fatalidades",v:tFatal,c:"#dc2626"},{l:"Estados",v:Object.keys(tStates).length,c:"#0A97D9"},{l:"Actores",v:Object.keys(tActors).length,c:"#9b59b6"}]
-                .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:7,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
+                .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
             </div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
               <Card>
-                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Por estado</div>
+                <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Por estado</div>
                 {Object.entries(tStates).sort((a,b) => b[1]-a[1]).slice(0,12).map(([s,c]) => (
                   <div key={s} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
-                    <span style={{ fontSize:7, fontFamily:font, color:TEXT, minWidth:110 }}>{s}</span>
+                    <span style={{ fontSize:9, fontFamily:font, color:TEXT, minWidth:110 }}>{s}</span>
                     <div style={{ flex:1, height:10, background:`${BORDER}30`, position:"relative" }}>
                       <div style={{ width:`${(c/Object.values(tStates).reduce((a,b)=>Math.max(a,b),1))*100}%`, height:"100%", background:EC[filter]||ACCENT, opacity:0.7 }} />
                     </div>
-                    <span style={{ fontSize:7, fontWeight:600, color:EC[filter]||ACCENT, fontFamily:font }}>{c}</span>
+                    <span style={{ fontSize:9, fontWeight:600, color:EC[filter]||ACCENT, fontFamily:font }}>{c}</span>
                   </div>
                 ))}
               </Card>
               <Card>
-                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Actores principales</div>
+                <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Actores principales</div>
                 {Object.entries(tActors).sort((a,b) => b[1]-a[1]).slice(0,10).map(([a,c]) => (
                   <div key={a} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
-                    <span style={{ fontSize:7, fontFamily:font, color:MUTED, minWidth:140, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a}</span>
+                    <span style={{ fontSize:9, fontFamily:font, color:MUTED, minWidth:140, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a}</span>
                     <div style={{ flex:1, height:10, background:`${BORDER}30`, position:"relative" }}>
                       <div style={{ width:`${(c/Object.values(tActors).reduce((a,b)=>Math.max(a,b),1))*100}%`, height:"100%", background:`${ACCENT}70` }} />
                     </div>
-                    <span style={{ fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+                    <span style={{ fontSize:9, fontFamily:font, color:TEXT }}>{c}</span>
                   </div>
                 ))}
               </Card>
             </div>
             <Card>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Eventos · {filter} · {tEvents.length}</div>
+                <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Eventos · {filter} · {tEvents.length}</div>
                 {tTotalP>1 && <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-                  <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}40`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
-                  <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>{acledPage}/{tTotalP}</span>
-                  <button onClick={() => setAcledPage(Math.min(tTotalP,acledPage+1))} disabled={acledPage>=tTotalP} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=tTotalP?`${MUTED}40`:TEXT, cursor:acledPage>=tTotalP?"default":"pointer" }}>→</button>
+                  <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}40`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
+                  <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>{acledPage}/{tTotalP}</span>
+                  <button onClick={() => setAcledPage(Math.min(tTotalP,acledPage+1))} disabled={acledPage>=tTotalP} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=tTotalP?`${MUTED}40`:TEXT, cursor:acledPage>=tTotalP?"default":"pointer" }}>→</button>
                 </div>}
               </div>
               {tPage.map((e,i) => (
                 <div key={i} style={{ padding:"5px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
-                  <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
-                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
-                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
-                  <div style={{ flex:1 }}><div style={{ fontSize:8, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
-                    {e.actor1 && <div style={{ fontSize:7, color:ACCENT, marginTop:1 }}>{e.actor1}</div>}
-                    <div style={{ fontSize:7, color:MUTED, marginTop:1, lineHeight:1.4 }}>{(e.notes||"").slice(0,180)}{(e.notes||"").length>180?"...":""}</div></div>
+                  <div style={{ minWidth:62, fontSize:10, fontFamily:font, color:MUTED }}>{e.event_date}</div>
+                  <span style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
+                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:9, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
+                  <div style={{ flex:1 }}><div style={{ fontSize:10, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
+                    {e.actor1 && <div style={{ fontSize:9, color:ACCENT, marginTop:1 }}>{e.actor1}</div>}
+                    <div style={{ fontSize:9, color:MUTED, marginTop:1, lineHeight:1.4 }}>{(e.notes||"").slice(0,180)}{(e.notes||"").length>180?"...":""}</div></div>
                 </div>
               ))}
             </Card>
@@ -3105,50 +3105,50 @@ function AcledSection() {
           return (<>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
               {[{l:actorFilter.slice(0,35),v:aEvents.length,c:ACCENT},{l:"Fatalidades",v:aFatal,c:"#dc2626"},{l:"Tipos",v:Object.keys(aTypes).length,c:"#4C9F38"},{l:"Estados",v:Object.keys(aStates).length,c:"#0A97D9"}]
-                .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:7,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
+                .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
             </div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
               <Card>
-                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Tipos de evento</div>
+                <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Tipos de evento</div>
                 {Object.entries(aTypes).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
                   <div key={t} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
-                    <span style={{ fontSize:7, fontFamily:font, color:EC[t]||MUTED, minWidth:130 }}>{trad(t)}</span>
+                    <span style={{ fontSize:9, fontFamily:font, color:EC[t]||MUTED, minWidth:130 }}>{trad(t)}</span>
                     <div style={{ flex:1, height:10, background:`${BORDER}30`, position:"relative" }}>
                       <div style={{ width:`${(c/aEvents.length)*100}%`, height:"100%", background:EC[t]||ACCENT, opacity:0.7 }} />
                     </div>
-                    <span style={{ fontSize:7, fontWeight:600, color:EC[t]||ACCENT, fontFamily:font }}>{c}</span>
+                    <span style={{ fontSize:9, fontWeight:600, color:EC[t]||ACCENT, fontFamily:font }}>{c}</span>
                   </div>
                 ))}
               </Card>
               <Card>
-                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Estados donde opera</div>
+                <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Estados donde opera</div>
                 {Object.entries(aStates).sort((a,b) => b[1]-a[1]).slice(0,10).map(([s,c]) => (
                   <div key={s} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
-                    <span style={{ fontSize:7, fontFamily:font, color:TEXT, minWidth:110 }}>{s}</span>
+                    <span style={{ fontSize:9, fontFamily:font, color:TEXT, minWidth:110 }}>{s}</span>
                     <div style={{ flex:1, height:10, background:`${BORDER}30`, position:"relative" }}>
                       <div style={{ width:`${(c/Object.values(aStates).reduce((a,b)=>Math.max(a,b),1))*100}%`, height:"100%", background:`${ACCENT}70` }} />
                     </div>
-                    <span style={{ fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+                    <span style={{ fontSize:9, fontFamily:font, color:TEXT }}>{c}</span>
                   </div>
                 ))}
               </Card>
             </div>
             <Card>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Eventos · {actorFilter.slice(0,40)} · {aEvents.length}</div>
+                <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Eventos · {actorFilter.slice(0,40)} · {aEvents.length}</div>
                 {aTotalP>1 && <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-                  <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}40`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
-                  <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>{acledPage}/{aTotalP}</span>
-                  <button onClick={() => setAcledPage(Math.min(aTotalP,acledPage+1))} disabled={acledPage>=aTotalP} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=aTotalP?`${MUTED}40`:TEXT, cursor:acledPage>=aTotalP?"default":"pointer" }}>→</button>
+                  <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}40`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
+                  <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>{acledPage}/{aTotalP}</span>
+                  <button onClick={() => setAcledPage(Math.min(aTotalP,acledPage+1))} disabled={acledPage>=aTotalP} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=aTotalP?`${MUTED}40`:TEXT, cursor:acledPage>=aTotalP?"default":"pointer" }}>→</button>
                 </div>}
               </div>
               {aPage.map((e,i) => (
                 <div key={i} style={{ padding:"5px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
-                  <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
-                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
-                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
-                  <div style={{ flex:1 }}><div style={{ fontSize:8, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
-                    <div style={{ fontSize:7, color:MUTED, marginTop:1, lineHeight:1.4 }}>{(e.notes||"").slice(0,180)}{(e.notes||"").length>180?"...":""}</div></div>
+                  <div style={{ minWidth:62, fontSize:10, fontFamily:font, color:MUTED }}>{e.event_date}</div>
+                  <span style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
+                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:9, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
+                  <div style={{ flex:1 }}><div style={{ fontSize:10, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
+                    <div style={{ fontSize:9, color:MUTED, marginTop:1, lineHeight:1.4 }}>{(e.notes||"").slice(0,180)}{(e.notes||"").length>180?"...":""}</div></div>
                 </div>
               ))}
             </Card>
@@ -3156,13 +3156,13 @@ function AcledSection() {
         })()}
 
         <Card>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
             Eventos por estado {stateFilter !== "all" && <span style={{ color:ACCENT, cursor:"pointer" }} onClick={() => setStateFilter("all")}>· {stateFilter} ✕</span>}
           </div>
           <div style={{ display:"flex", gap:12 }}>
             {/* SVG Map */}
             <div style={{ flex:"0 0 55%" }}>
-              <svg viewBox="0 0 600 420" width="100%" style={{ background:`${BG2}80` }}>
+              <svg viewBox="0 0 600 420" width="100%" style={{ background:BG3 }}>
                 {VZ_MAP.map(state => {
                   const acledName = Object.keys(byAdmin).find(a =>
                     a.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").includes(state.id.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")) ||
@@ -3191,13 +3191,13 @@ function AcledSection() {
               </svg>
               <div style={{ display:"flex", gap:8, justifyContent:"center", marginTop:4 }}>
                 {[["Bajo","#4C9F38"],["Medio","#0A97D9"],["Alto","#f59e0b"],["Crítico","#E5243B"]].map(([l,c]) =>
-                  <span key={l} style={{ fontSize:7, fontFamily:font, color:c }}>■ {l}</span>
+                  <span key={l} style={{ fontSize:9, fontFamily:font, color:c }}>■ {l}</span>
                 )}
               </div>
             </div>
             {/* Ranking */}
             <div style={{ flex:1, maxHeight:400, overflowY:"auto" }}>
-              <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginBottom:6, letterSpacing:"0.08em", textTransform:"uppercase" }}>Ranking por eventos</div>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginBottom:6, letterSpacing:"0.08em", textTransform:"uppercase" }}>Ranking por eventos</div>
               {Object.entries(byAdmin).sort((a,b) => b[1]-a[1]).map(([st,ct], idx) => {
                 const mx = Math.max(...Object.values(byAdmin),1);
                 const int = ct/mx;
@@ -3208,12 +3208,12 @@ function AcledSection() {
                     opacity: stateFilter!=="all"&&!isActive?0.3:1, padding:"3px 4px",
                     background: isActive?`${bg}20`:"transparent", border: isActive?`1px solid ${bg}40`:"1px solid transparent" }}
                     onClick={() => { setStateFilter(isActive?"all":st); setAcledPage(1); }}>
-                    <span style={{ fontSize:8, fontFamily:font, color:MUTED, minWidth:16 }}>{idx+1}</span>
-                    <span style={{ fontSize:8, fontFamily:font, color:isActive?bg:TEXT, flex:1 }}>{st}</span>
+                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, minWidth:16 }}>{idx+1}</span>
+                    <span style={{ fontSize:10, fontFamily:font, color:isActive?bg:TEXT, flex:1 }}>{st}</span>
                     <div style={{ width:60, height:10, background:`${BORDER}30`, position:"relative" }}>
                       <div style={{ width:`${(ct/mx)*100}%`, height:"100%", background:bg, opacity:0.7 }} />
                     </div>
-                    <span style={{ fontSize:8, fontWeight:700, color:bg, fontFamily:font, minWidth:24, textAlign:"right" }}>{ct}</span>
+                    <span style={{ fontSize:10, fontWeight:700, color:bg, fontFamily:font, minWidth:24, textAlign:"right" }}>{ct}</span>
                   </div>
                 );
               })}
@@ -3243,7 +3243,7 @@ function AcledSection() {
                 {l:"Tipos de evento",v:Object.keys(stTypes).length,c:"#4C9F38"},
               ].map((k,i) => (
                 <Card key={i} accent={k.c}>
-                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>{k.l}</div>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>{k.l}</div>
                   <div style={{ fontSize:20, fontWeight:800, color:k.c, fontFamily:"'Playfair Display',serif" }}>{k.v}</div>
                 </Card>
               ))}
@@ -3252,25 +3252,25 @@ function AcledSection() {
             {/* State type + actors */}
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
               <Card>
-                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Tipos en {stateFilter}</div>
+                <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Tipos en {stateFilter}</div>
                 {Object.entries(stTypes).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
                   <div key={t} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
-                    <span style={{ fontSize:7, fontFamily:font, color:EC[t]||MUTED, minWidth:130 }}>{trad(t)}</span>
+                    <span style={{ fontSize:9, fontFamily:font, color:EC[t]||MUTED, minWidth:130 }}>{trad(t)}</span>
                     <div style={{ flex:1, height:12, background:`${BORDER}30`, position:"relative" }}>
                       <div style={{ width:`${(c/stEvents.length)*100}%`, height:"100%", background:EC[t]||ACCENT, opacity:0.8 }} />
-                      <span style={{ position:"absolute", right:3, top:0, fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+                      <span style={{ position:"absolute", right:3, top:0, fontSize:9, fontFamily:font, color:TEXT }}>{c}</span>
                     </div>
                   </div>
                 ))}
               </Card>
               <Card>
-                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Actores en {stateFilter}</div>
+                <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Actores en {stateFilter}</div>
                 {Object.entries(stActors).sort((a,b) => b[1]-a[1]).slice(0,10).map(([a,c]) => (
                   <div key={a} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
-                    <span style={{ fontSize:7, fontFamily:font, color:MUTED, minWidth:140, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a}</span>
+                    <span style={{ fontSize:9, fontFamily:font, color:MUTED, minWidth:140, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a}</span>
                     <div style={{ flex:1, height:12, background:`${BORDER}30`, position:"relative" }}>
                       <div style={{ width:`${(c/Object.values(stActors).reduce((a,b)=>Math.max(a,b),1))*100}%`, height:"100%", background:`${ACCENT}70` }} />
-                      <span style={{ position:"absolute", right:3, top:0, fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
+                      <span style={{ position:"absolute", right:3, top:0, fontSize:9, fontFamily:font, color:TEXT }}>{c}</span>
                     </div>
                   </div>
                 ))}
@@ -3280,28 +3280,28 @@ function AcledSection() {
             {/* State events list */}
             <Card>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+                <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
                   Eventos en {stateFilter} · {stSorted.length} registros
                 </div>
                 {stTotalP > 1 && (
                   <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-                    <button onClick={() => setAcledPage(Math.max(1,stPage-1))} disabled={stPage===1} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:stPage===1?`${MUTED}40`:TEXT, cursor:stPage===1?"default":"pointer" }}>←</button>
-                    <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>{stPage}/{stTotalP}</span>
-                    <button onClick={() => setAcledPage(Math.min(stTotalP,stPage+1))} disabled={stPage>=stTotalP} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:stPage>=stTotalP?`${MUTED}40`:TEXT, cursor:stPage>=stTotalP?"default":"pointer" }}>→</button>
+                    <button onClick={() => setAcledPage(Math.max(1,stPage-1))} disabled={stPage===1} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:stPage===1?`${MUTED}40`:TEXT, cursor:stPage===1?"default":"pointer" }}>←</button>
+                    <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>{stPage}/{stTotalP}</span>
+                    <button onClick={() => setAcledPage(Math.min(stTotalP,stPage+1))} disabled={stPage>=stTotalP} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:stPage>=stTotalP?`${MUTED}40`:TEXT, cursor:stPage>=stTotalP?"default":"pointer" }}>→</button>
                   </div>
                 )}
               </div>
               {stPageEvents.map((e,i) => (
                 <div key={i} style={{ padding:"6px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
-                  <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
-                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>
+                  <div style={{ minWidth:62, fontSize:10, fontFamily:font, color:MUTED }}>{e.event_date}</div>
+                  <span style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>
                     {trad(e.sub_event_type||e.event_type)}
                   </span>
-                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:"#dc262615", color:"#dc2626", border:"1px solid #dc262625" }}>💀{e.fatalities}</span>}
+                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:"#dc262615", color:"#dc2626", border:"1px solid #dc262625" }}>💀{e.fatalities}</span>}
                   <div style={{ flex:1 }}>
-                    <div style={{ fontSize:9, color:TEXT }}>{e.location}{e.admin2?`, ${e.admin2}`:""}</div>
-                    {e.actor1 && <div style={{ fontSize:7, color:ACCENT, marginTop:1 }}>{e.actor1}</div>}
-                    <div style={{ fontSize:8, color:MUTED, marginTop:2, lineHeight:1.5 }}>{(e.notes||"").slice(0,200)}{(e.notes||"").length>200?"...":""}</div>
+                    <div style={{ fontSize:12, color:TEXT }}>{e.location}{e.admin2?`, ${e.admin2}`:""}</div>
+                    {e.actor1 && <div style={{ fontSize:9, color:ACCENT, marginTop:1 }}>{e.actor1}</div>}
+                    <div style={{ fontSize:10, color:MUTED, marginTop:2, lineHeight:1.5 }}>{(e.notes||"").slice(0,200)}{(e.notes||"").length>200?"...":""}</div>
                   </div>
                 </div>
               ))}
@@ -3309,7 +3309,7 @@ function AcledSection() {
                 <div style={{ display:"flex", justifyContent:"center", gap:3, marginTop:8 }}>
                   {Array.from({length:Math.min(7,stTotalP)},(_,i) => {
                     let p; if(stTotalP<=7) p=i+1; else if(stPage<=4) p=i+1; else if(stPage>=stTotalP-3) p=stTotalP-6+i; else p=stPage-3+i;
-                    return <button key={p} onClick={() => setAcledPage(p)} style={{ fontSize:7, fontFamily:font, padding:"2px 6px", border:`1px solid ${p===stPage?ACCENT:BORDER}`, background:p===stPage?ACCENT:"transparent", color:p===stPage?"#fff":MUTED, cursor:"pointer", minWidth:20 }}>{p}</button>;
+                    return <button key={p} onClick={() => setAcledPage(p)} style={{ fontSize:9, fontFamily:font, padding:"2px 6px", border:`1px solid ${p===stPage?ACCENT:BORDER}`, background:p===stPage?ACCENT:"transparent", color:p===stPage?"#fff":MUTED, cursor:"pointer", minWidth:20 }}>{p}</button>;
                   })}
                 </div>
               )}
@@ -3321,17 +3321,17 @@ function AcledSection() {
       {/* ═══ MAP ═══ */}
       {acledView === "map" && (
         <Card>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
             Mapa de eventos · {filtered.length} puntos {filter!=="all"?`(${filter})`:""} {actorFilter!=="all"?`· ${actorFilter}`:""} {stateFilter!=="all"?`· ${stateFilter}`:""}
           </div>
           <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:8 }}>
-            <button onClick={() => setFilter("all")} style={{ fontSize:7, fontFamily:font, padding:"2px 6px", border:`1px solid ${filter==="all"?ACCENT:BORDER}`, background:filter==="all"?ACCENT:"transparent", color:filter==="all"?"#fff":MUTED, cursor:"pointer" }}>Todos</button>
-            {typeOrder.map(t => <button key={t} onClick={() => setFilter(filter===t?"all":t)} style={{ fontSize:7, fontFamily:font, padding:"2px 6px", border:`1px solid ${filter===t?EC[t]:BORDER}`, background:filter===t?`${EC[t]}20`:"transparent", color:EC[t], cursor:"pointer" }}>{t}</button>)}
+            <button onClick={() => setFilter("all")} style={{ fontSize:9, fontFamily:font, padding:"2px 6px", border:`1px solid ${filter==="all"?ACCENT:BORDER}`, background:filter==="all"?ACCENT:"transparent", color:filter==="all"?"#fff":MUTED, cursor:"pointer" }}>Todos</button>
+            {typeOrder.map(t => <button key={t} onClick={() => setFilter(filter===t?"all":t)} style={{ fontSize:9, fontFamily:font, padding:"2px 6px", border:`1px solid ${filter===t?EC[t]:BORDER}`, background:filter===t?`${EC[t]}20`:"transparent", color:EC[t], cursor:"pointer" }}>{t}</button>)}
           </div>
           <LeafletMap events={filtered} EC={EC} TR={TR} />
           <div style={{ display:"flex", gap:10, justifyContent:"center", marginTop:6 }}>
-            {typeOrder.map(t => <span key={t} style={{ fontSize:7, fontFamily:font, color:EC[t] }}>● {t}</span>)}
-            <span style={{ fontSize:7, fontFamily:font, color:MUTED }}>· Tamaño = fatalidades</span>
+            {typeOrder.map(t => <span key={t} style={{ fontSize:9, fontFamily:font, color:EC[t] }}>● {t}</span>)}
+            <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>· Tamaño = fatalidades</span>
           </div>
         </Card>
       )}
@@ -3343,8 +3343,8 @@ function AcledSection() {
           <div style={{ display:"flex", alignItems:"flex-start", gap:12 }}>
             <span style={{ fontSize:22 }}>🔮</span>
             <div>
-              <div style={{ fontSize:11, fontWeight:700, color:TEXT, marginBottom:4 }}>Sistema de Alerta de Conflictos (CAST)</div>
-              <div style={{ fontSize:9, color:MUTED, lineHeight:1.7 }}>
+              <div style={{ fontSize:14, fontWeight:700, color:TEXT, marginBottom:4 }}>Sistema de Alerta de Conflictos (CAST)</div>
+              <div style={{ fontSize:12, color:MUTED, lineHeight:1.7 }}>
                 ACLED usa inteligencia artificial para predecir cuántos eventos de conflicto ocurrirán en los próximos meses en cada estado de Venezuela.
                 La predicción se compara con lo que realmente se observó para medir la precisión del modelo.
                 <strong style={{ color:"#f59e0b" }}> Amarillo = predicción</strong>, <strong style={{ color:ACCENT }}> Azul = realidad observada</strong>.
@@ -3354,7 +3354,7 @@ function AcledSection() {
           </div>
         </Card>
 
-        {cast.length === 0 ? <Card><div style={{ color:MUTED, fontSize:10, fontFamily:font, textAlign:"center", padding:20 }}>No hay predicciones disponibles actualmente.</div></Card> : (<>
+        {cast.length === 0 ? <Card><div style={{ color:MUTED, fontSize:13, fontFamily:font, textAlign:"center", padding:20 }}>No hay predicciones disponibles actualmente.</div></Card> : (<>
           {/* Summary KPIs */}
           {(() => {
             const totalF = Math.round(castByState.reduce((s,p) => s+p.total_forecast,0));
@@ -3367,29 +3367,29 @@ function AcledSection() {
             return (
               <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:8, marginBottom:12 }}>
                 <Card accent="#f59e0b">
-                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Eventos previstos</div>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Eventos previstos</div>
                   <div style={{ fontSize:20, fontWeight:800, color:"#f59e0b", fontFamily:"'Playfair Display',serif" }}>{totalF}</div>
-                  <div style={{ fontSize:7, color:MUTED }}>Próximos meses</div>
+                  <div style={{ fontSize:9, color:MUTED }}>Próximos meses</div>
                 </Card>
                 <Card accent={ACCENT}>
-                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Eventos observados</div>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Eventos observados</div>
                   <div style={{ fontSize:20, fontWeight:800, color:ACCENT, fontFamily:"'Playfair Display',serif" }}>{totalO}</div>
-                  <div style={{ fontSize:7, color:MUTED }}>Hasta ahora</div>
+                  <div style={{ fontSize:9, color:MUTED }}>Hasta ahora</div>
                 </Card>
                 <Card accent={trendColor}>
-                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Tendencia</div>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Tendencia</div>
                   <div style={{ fontSize:16, fontWeight:800, color:trendColor, fontFamily:"'Syne',sans-serif" }}>{trend}</div>
-                  <div style={{ fontSize:7, color:MUTED }}>{diff > 0 ? `+${diff}` : diff} vs observado</div>
+                  <div style={{ fontSize:9, color:MUTED }}>{diff > 0 ? `+${diff}` : diff} vs observado</div>
                 </Card>
                 <Card accent="#E5243B">
-                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Batallas previstas</div>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Batallas previstas</div>
                   <div style={{ fontSize:20, fontWeight:800, color:"#E5243B", fontFamily:"'Playfair Display',serif" }}>{battlesF}</div>
-                  <div style={{ fontSize:7, color:MUTED }}>Enfrentamientos armados</div>
+                  <div style={{ fontSize:9, color:MUTED }}>Enfrentamientos armados</div>
                 </Card>
                 <Card accent="#dc2626">
-                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Violencia civil prev.</div>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Violencia civil prev.</div>
                   <div style={{ fontSize:20, fontWeight:800, color:"#dc2626", fontFamily:"'Playfair Display',serif" }}>{vacF}</div>
-                  <div style={{ fontSize:7, color:MUTED }}>Contra civiles</div>
+                  <div style={{ fontSize:9, color:MUTED }}>Contra civiles</div>
                 </Card>
               </div>
             );
@@ -3397,7 +3397,7 @@ function AcledSection() {
 
           {/* State-by-state risk table */}
           <Card>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>
               Nivel de riesgo por estado · Previsto vs Observado
             </div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
@@ -3416,16 +3416,16 @@ function AcledSection() {
                       border: isSel ? `1px solid ${riskColor}40` : "1px solid transparent",
                       opacity: castState && !isSel ? 0.35 : 1 }}
                       onClick={() => setCastState(isSel ? null : p.admin1)}>
-                      <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:`${riskColor}20`, color:riskColor,
+                      <span style={{ fontSize:9, fontFamily:font, padding:"1px 4px", background:`${riskColor}20`, color:riskColor,
                         border:`1px solid ${riskColor}30`, minWidth:32, textAlign:"center", fontWeight:700 }}>{riskLabel}</span>
-                      <span style={{ fontSize:8, fontFamily:font, color:isSel ? riskColor : TEXT, fontWeight:isSel?700:400, minWidth:100 }}>{p.admin1}</span>
+                      <span style={{ fontSize:10, fontFamily:font, color:isSel ? riskColor : TEXT, fontWeight:isSel?700:400, minWidth:100 }}>{p.admin1}</span>
                       <div style={{ flex:1, height:16, position:"relative", background:`${BORDER}20` }}>
                         <div style={{ position:"absolute", top:0, left:0, height:7, width:`${(f/maxBar)*100}%`, background:"#f59e0b", opacity:0.8, borderRadius:"1px 1px 0 0" }} />
                         <div style={{ position:"absolute", top:8, left:0, height:7, width:`${(o/maxBar)*100}%`, background:ACCENT, opacity:0.8, borderRadius:"0 0 1px 1px" }} />
                       </div>
-                      <span style={{ fontSize:7, fontFamily:font, color:"#f59e0b", minWidth:20, textAlign:"right" }}>{f}</span>
-                      <span style={{ fontSize:7, fontFamily:font, color:ACCENT, minWidth:20, textAlign:"right" }}>{o}</span>
-                      <span style={{ fontSize:7, fontFamily:font, color: diff > 0 ? "#E5243B" : "#4C9F38", minWidth:28, textAlign:"right" }}>
+                      <span style={{ fontSize:9, fontFamily:font, color:"#f59e0b", minWidth:20, textAlign:"right" }}>{f}</span>
+                      <span style={{ fontSize:9, fontFamily:font, color:ACCENT, minWidth:20, textAlign:"right" }}>{o}</span>
+                      <span style={{ fontSize:9, fontFamily:font, color: diff > 0 ? "#E5243B" : "#4C9F38", minWidth:28, textAlign:"right" }}>
                         {diff > 0 ? `↑${diff}` : diff < 0 ? `↓${Math.abs(diff)}` : "="}
                       </span>
                     </div>
@@ -3435,14 +3435,14 @@ function AcledSection() {
               {/* Explanation sidebar OR selected state detail */}
               <div style={{ padding:8 }}>
                 {!castState ? (<>
-                  <div style={{ fontSize:9, fontWeight:600, color:TEXT, marginBottom:8 }}>¿Cómo leer esta tabla?</div>
-                  <div style={{ fontSize:8, color:MUTED, lineHeight:1.8, marginBottom:12 }}>
+                  <div style={{ fontSize:12, fontWeight:600, color:TEXT, marginBottom:8 }}>¿Cómo leer esta tabla?</div>
+                  <div style={{ fontSize:10, color:MUTED, lineHeight:1.8, marginBottom:12 }}>
                     Cada fila es un estado. Las barras muestran eventos previstos (amarillo) vs observados (azul). Click en un estado para ver el detalle.
                   </div>
-                  <div style={{ fontSize:8, color:MUTED, lineHeight:1.8, marginBottom:12 }}>
+                  <div style={{ fontSize:10, color:MUTED, lineHeight:1.8, marginBottom:12 }}>
                     La flecha indica si se espera <strong style={{ color:"#E5243B" }}>↑ más conflicto</strong> o <strong style={{ color:"#4C9F38" }}>↓ menos</strong>.
                   </div>
-                  <div style={{ fontSize:9, fontWeight:600, color:TEXT, marginBottom:6 }}>Niveles de riesgo</div>
+                  <div style={{ fontSize:12, fontWeight:600, color:TEXT, marginBottom:6 }}>Niveles de riesgo</div>
                   {[
                     {l:"ALTO",c:"#E5243B",d:">20 eventos. Máxima alerta."},
                     {l:"MEDIO",c:"#f59e0b",d:"10-20 eventos. Monitoreo activo."},
@@ -3450,13 +3450,13 @@ function AcledSection() {
                     {l:"MÍN.",c:"#4C9F38",d:"<3 eventos. Sin alertas."},
                   ].map((r,i) => (
                     <div key={i} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
-                      <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:`${r.c}20`, color:r.c, border:`1px solid ${r.c}30`, minWidth:36, textAlign:"center", fontWeight:700 }}>{r.l}</span>
-                      <span style={{ fontSize:8, color:MUTED }}>{r.d}</span>
+                      <span style={{ fontSize:9, fontFamily:font, padding:"1px 4px", background:`${r.c}20`, color:r.c, border:`1px solid ${r.c}30`, minWidth:36, textAlign:"center", fontWeight:700 }}>{r.l}</span>
+                      <span style={{ fontSize:10, color:MUTED }}>{r.d}</span>
                     </div>
                   ))}
                   <div style={{ display:"flex", gap:12, marginTop:10 }}>
-                    <span style={{ fontSize:7, fontFamily:font, color:"#f59e0b" }}>■ Previsto</span>
-                    <span style={{ fontSize:7, fontFamily:font, color:ACCENT }}>■ Observado</span>
+                    <span style={{ fontSize:9, fontFamily:font, color:"#f59e0b" }}>■ Previsto</span>
+                    <span style={{ fontSize:9, fontFamily:font, color:ACCENT }}>■ Observado</span>
                   </div>
                 </>) : (<>
                   {/* Selected state detail */}
@@ -3478,62 +3478,62 @@ function AcledSection() {
                     return (
                       <div>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                          <div style={{ fontSize:11, fontWeight:700, color:riskColor }}>{castState}</div>
-                          <span style={{ fontSize:8, fontFamily:font, color:MUTED, cursor:"pointer" }} onClick={() => setCastState(null)}>✕ Cerrar</span>
+                          <div style={{ fontSize:14, fontWeight:700, color:riskColor }}>{castState}</div>
+                          <span style={{ fontSize:10, fontFamily:font, color:MUTED, cursor:"pointer" }} onClick={() => setCastState(null)}>✕ Cerrar</span>
                         </div>
                         {/* Risk badge */}
-                        <div style={{ display:"inline-block", padding:"3px 10px", background:`${riskColor}20`, color:riskColor, border:`1px solid ${riskColor}40`, fontSize:10, fontWeight:700, fontFamily:font, marginBottom:10 }}>
+                        <div style={{ display:"inline-block", padding:"3px 10px", background:`${riskColor}20`, color:riskColor, border:`1px solid ${riskColor}40`, fontSize:13, fontWeight:700, fontFamily:font, marginBottom:10 }}>
                           Riesgo {riskLabel}
                         </div>
                         {/* CAST predictions */}
-                        <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Predicción CAST</div>
+                        <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Predicción CAST</div>
                         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:4, marginBottom:10 }}>
                           {[
                             {l:"Total previsto",v:f,c:"#f59e0b"},{l:"Total observado",v:o,c:ACCENT},
                             {l:"Batallas prev.",v:bf,c:"#E5243B"},{l:"Violencia civil",v:vf,c:"#dc2626"},
                           ].map((k,i) => (
                             <div key={i} style={{ padding:"4px 6px", background:BG2, border:`1px solid ${BORDER}` }}>
-                              <div style={{ fontSize:6, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>{k.l}</div>
+                              <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>{k.l}</div>
                               <div style={{ fontSize:16, fontWeight:800, color:k.c, fontFamily:"'Playfair Display',serif" }}>{k.v}</div>
                             </div>
                           ))}
                         </div>
                         {/* Trend */}
                         <div style={{ padding:"6px 8px", background:`${diff>0?"#E5243B":"#4C9F38"}10`, border:`1px solid ${diff>0?"#E5243B":"#4C9F38"}30`, marginBottom:10 }}>
-                          <span style={{ fontSize:9, color:diff>0?"#E5243B":"#4C9F38", fontWeight:700 }}>
+                          <span style={{ fontSize:12, color:diff>0?"#E5243B":"#4C9F38", fontWeight:700 }}>
                             {diff > 0 ? `↑ Se esperan ${diff} eventos más de los observados` : diff < 0 ? `↓ Se esperan ${Math.abs(diff)} eventos menos` : "= Predicción alineada con lo observado"}
                           </span>
                         </div>
                         {/* Real events from ACLED */}
-                        <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Datos reales ACLED · {stEvents.length} eventos</div>
+                        <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Datos reales ACLED · {stEvents.length} eventos</div>
                         {stEvents.length > 0 ? (<>
                           <div style={{ marginBottom:8 }}>
                             {Object.entries(stTypes).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
                               <div key={t} style={{ display:"flex", alignItems:"center", gap:4, marginBottom:2 }}>
-                                <span style={{ fontSize:7, fontFamily:font, color:EC[t]||MUTED, minWidth:100 }}>{trad(t)}</span>
+                                <span style={{ fontSize:9, fontFamily:font, color:EC[t]||MUTED, minWidth:100 }}>{trad(t)}</span>
                                 <div style={{ flex:1, height:8, background:`${BORDER}30` }}>
                                   <div style={{ width:`${(c/stEvents.length)*100}%`, height:"100%", background:EC[t]||ACCENT, opacity:0.7 }} />
                                 </div>
-                                <span style={{ fontSize:7, color:EC[t]||TEXT, fontFamily:font }}>{c}</span>
+                                <span style={{ fontSize:9, color:EC[t]||TEXT, fontFamily:font }}>{c}</span>
                               </div>
                             ))}
                           </div>
-                          {stFatal > 0 && <div style={{ fontSize:8, color:"#dc2626", marginBottom:6 }}>💀 {stFatal} fatalidades registradas</div>}
-                          <div style={{ fontSize:7, fontFamily:font, color:MUTED, marginBottom:4 }}>Últimos eventos:</div>
+                          {stFatal > 0 && <div style={{ fontSize:10, color:"#dc2626", marginBottom:6 }}>💀 {stFatal} fatalidades registradas</div>}
+                          <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginBottom:4 }}>Últimos eventos:</div>
                           {stEvents.slice(0,5).map((e,i) => (
-                            <div key={i} style={{ padding:"3px 0", borderBottom:`1px solid ${BORDER}15`, fontSize:8 }}>
+                            <div key={i} style={{ padding:"3px 0", borderBottom:`1px solid ${BORDER}15`, fontSize:10 }}>
                               <span style={{ color:MUTED, fontFamily:font }}>{e.event_date}</span>
                               <span style={{ color:EC[e.event_type]||ACCENT, marginLeft:6 }}>{trad(e.sub_event_type||e.event_type)}</span>
                               {parseInt(e.fatalities)>0 && <span style={{ color:"#dc2626", marginLeft:4 }}>💀{e.fatalities}</span>}
-                              <div style={{ fontSize:7, color:MUTED, marginTop:1 }}>{e.location}</div>
+                              <div style={{ fontSize:9, color:MUTED, marginTop:1 }}>{e.location}</div>
                             </div>
                           ))}
-                          {stEvents.length > 5 && <div style={{ fontSize:7, color:ACCENT, marginTop:4, cursor:"pointer" }}
+                          {stEvents.length > 5 && <div style={{ fontSize:9, color:ACCENT, marginTop:4, cursor:"pointer" }}
                             onClick={() => { setStateFilter(castState); setAcledView("overview"); }}>
                             Ver los {stEvents.length} eventos en Vista General →
                           </div>}
                         </>) : (
-                          <div style={{ fontSize:8, color:MUTED }}>No hay eventos ACLED registrados para este estado en el período actual.</div>
+                          <div style={{ fontSize:10, color:MUTED }}>No hay eventos ACLED registrados para este estado en el período actual.</div>
                         )}
                       </div>
                     );
@@ -3548,39 +3548,39 @@ function AcledSection() {
       {/* ═══ EVENTS ═══ */}
       {acledView === "events" && (<>
         <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:8 }}>
-          <button onClick={() => { setFilter("all"); setAcledPage(1); }} style={{ fontSize:7, fontFamily:font, padding:"3px 7px", border:`1px solid ${filter==="all"?ACCENT:BORDER}`, background:filter==="all"?ACCENT:"transparent", color:filter==="all"?"#fff":MUTED, cursor:"pointer" }}>Todos ({events.length})</button>
-          {typeOrder.map(t => <button key={t} onClick={() => { setFilter(filter===t?"all":t); setAcledPage(1); }} style={{ fontSize:7, fontFamily:font, padding:"3px 7px", border:`1px solid ${filter===t?EC[t]:BORDER}`, background:filter===t?`${EC[t]}20`:"transparent", color:EC[t], cursor:"pointer" }}>{trad(t)} ({byType[t]})</button>)}
+          <button onClick={() => { setFilter("all"); setAcledPage(1); }} style={{ fontSize:9, fontFamily:font, padding:"3px 7px", border:`1px solid ${filter==="all"?ACCENT:BORDER}`, background:filter==="all"?ACCENT:"transparent", color:filter==="all"?"#fff":MUTED, cursor:"pointer" }}>Todos ({events.length})</button>
+          {typeOrder.map(t => <button key={t} onClick={() => { setFilter(filter===t?"all":t); setAcledPage(1); }} style={{ fontSize:9, fontFamily:font, padding:"3px 7px", border:`1px solid ${filter===t?EC[t]:BORDER}`, background:filter===t?`${EC[t]}20`:"transparent", color:EC[t], cursor:"pointer" }}>{trad(t)} ({byType[t]})</button>)}
         </div>
-        {actorFilter !== "all" && <div style={{ fontSize:8, fontFamily:font, color:ACCENT, marginBottom:8, cursor:"pointer" }} onClick={() => setActorFilter("all")}>Filtro actor: <strong>{actorFilter}</strong> ✕</div>}
-        {stateFilter !== "all" && <div style={{ fontSize:8, fontFamily:font, color:"#f59e0b", marginBottom:8, cursor:"pointer" }} onClick={() => setStateFilter("all")}>Filtro estado: <strong>{stateFilter}</strong> ✕</div>}
+        {actorFilter !== "all" && <div style={{ fontSize:10, fontFamily:font, color:ACCENT, marginBottom:8, cursor:"pointer" }} onClick={() => setActorFilter("all")}>Filtro actor: <strong>{actorFilter}</strong> ✕</div>}
+        {stateFilter !== "all" && <div style={{ fontSize:10, fontFamily:font, color:"#f59e0b", marginBottom:8, cursor:"pointer" }} onClick={() => setStateFilter("all")}>Filtro estado: <strong>{stateFilter}</strong> ✕</div>}
         <Card>
           {(() => {
             const PP = 20, totalP = Math.ceil(sorted.length/PP), page = sorted.slice((acledPage-1)*PP, acledPage*PP);
             return (<>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>{sorted.length} eventos</div>
+                <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>{sorted.length} eventos</div>
                 <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-                  <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}40`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
-                  <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>{acledPage}/{totalP}</span>
-                  <button onClick={() => setAcledPage(Math.min(totalP,acledPage+1))} disabled={acledPage>=totalP} style={{ fontSize:8, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=totalP?`${MUTED}40`:TEXT, cursor:acledPage>=totalP?"default":"pointer" }}>→</button>
+                  <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}40`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
+                  <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>{acledPage}/{totalP}</span>
+                  <button onClick={() => setAcledPage(Math.min(totalP,acledPage+1))} disabled={acledPage>=totalP} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=totalP?`${MUTED}40`:TEXT, cursor:acledPage>=totalP?"default":"pointer" }}>→</button>
                 </div>
               </div>
               {page.map((e,i) => (
                 <div key={i} style={{ padding:"7px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
-                  <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
-                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
-                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:"#dc262615", color:"#dc2626", border:"1px solid #dc262625" }}>💀{e.fatalities}</span>}
+                  <div style={{ minWidth:62, fontSize:10, fontFamily:font, color:MUTED }}>{e.event_date}</div>
+                  <span style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
+                  {parseInt(e.fatalities)>0 && <span style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:"#dc262615", color:"#dc2626", border:"1px solid #dc262625" }}>💀{e.fatalities}</span>}
                   <div style={{ flex:1 }}>
-                    <div style={{ fontSize:9, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
-                    {e.actor1 && <div style={{ fontSize:7, color:ACCENT, marginTop:1, cursor:"pointer" }} onClick={() => { setActorFilter(e.actor1.slice(0,50)); setAcledPage(1); }}>{e.actor1}</div>}
-                    <div style={{ fontSize:8, color:MUTED, marginTop:2, lineHeight:1.5 }}>{(e.notes||"").slice(0,220)}{(e.notes||"").length>220?"...":""}</div>
+                    <div style={{ fontSize:12, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
+                    {e.actor1 && <div style={{ fontSize:9, color:ACCENT, marginTop:1, cursor:"pointer" }} onClick={() => { setActorFilter(e.actor1.slice(0,50)); setAcledPage(1); }}>{e.actor1}</div>}
+                    <div style={{ fontSize:10, color:MUTED, marginTop:2, lineHeight:1.5 }}>{(e.notes||"").slice(0,220)}{(e.notes||"").length>220?"...":""}</div>
                   </div>
                 </div>
               ))}
               {totalP > 1 && <div style={{ display:"flex", justifyContent:"center", gap:3, marginTop:10 }}>
                 {Array.from({length:Math.min(9,totalP)},(_,i) => {
                   let p; if(totalP<=9) p=i+1; else if(acledPage<=5) p=i+1; else if(acledPage>=totalP-4) p=totalP-8+i; else p=acledPage-4+i;
-                  return <button key={p} onClick={() => setAcledPage(p)} style={{ fontSize:7, fontFamily:font, padding:"2px 6px", border:`1px solid ${p===acledPage?ACCENT:BORDER}`, background:p===acledPage?ACCENT:"transparent", color:p===acledPage?"#fff":MUTED, cursor:"pointer", minWidth:20 }}>{p}</button>;
+                  return <button key={p} onClick={() => setAcledPage(p)} style={{ fontSize:9, fontFamily:font, padding:"2px 6px", border:`1px solid ${p===acledPage?ACCENT:BORDER}`, background:p===acledPage?ACCENT:"transparent", color:p===acledPage?"#fff":MUTED, cursor:"pointer", minWidth:20 }}>{p}</button>;
                 })}
               </div>}
             </>);
@@ -3673,8 +3673,8 @@ function TabIODA() {
     const vals = data.map(d => d[key]).filter(v => v !== null);
     if (vals.length === 0) return (
       <Card accent={color}>
-        <div style={{ fontSize:10, fontWeight:600, color, marginBottom:4 }}>{label}</div>
-        <div style={{ fontSize:10, color:MUTED, padding:"20px 0", textAlign:"center" }}>Sin datos</div>
+        <div style={{ fontSize:13, fontWeight:600, color, marginBottom:4 }}>{label}</div>
+        <div style={{ fontSize:13, color:MUTED, padding:"20px 0", textAlign:"center" }}>Sin datos</div>
       </Card>
     );
     const max = Math.max(...vals);
@@ -3709,11 +3709,11 @@ function TabIODA() {
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
           <div style={{ display:"flex", alignItems:"center", gap:6 }}>
             <span style={{ width:8, height:8, borderRadius:"50%", background:color }} />
-            <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>{label}</span>
+            <span style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>{label}</span>
           </div>
           <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
-            <span style={{ fontSize:14, fontWeight:700, fontFamily:font, color }}>{fmtVal(current)}</span>
-            <span style={{ fontSize:9, fontFamily:font, color: pctChange < -5 ? "#dc2626" : pctChange > 5 ? "#14b8a6" : MUTED }}>
+            <span style={{ fontSize:16, fontWeight:700, fontFamily:font, color }}>{fmtVal(current)}</span>
+            <span style={{ fontSize:12, fontFamily:font, color: pctChange < -5 ? "#dc2626" : pctChange > 5 ? "#14b8a6" : MUTED }}>
               {pctChange > 0 ? "+" : ""}{pctChange.toFixed(1)}%
             </span>
           </div>
@@ -3728,7 +3728,7 @@ function TabIODA() {
           onMouseLeave={() => setHover(null)}>
           {/* Grid */}
           {[0,0.5,1].map(f => (
-            <line key={f} x1={padL} y1={padT+f*cH} x2={padL+cW} y2={padT+f*cH} stroke="rgba(255,255,255,0.04)" />
+            <line key={f} x1={padL} y1={padT+f*cH} x2={padL+cW} y2={padT+f*cH} stroke="rgba(0,0,0,0.06)" />
           ))}
           {/* Y axis labels */}
           <text x={padL-4} y={padT+6} textAnchor="end" fontSize={7} fill={MUTED} fontFamily={font}>{fmtVal(max)}</text>
@@ -3739,13 +3739,13 @@ function TabIODA() {
           {/* Hover */}
           {hover && hover.key === key && hover.idx < data.length && data[hover.idx][key] !== null && (
             <>
-              <line x1={toX(hover.idx)} y1={padT} x2={toX(hover.idx)} y2={padT+cH} stroke="rgba(255,255,255,0.15)" />
+              <line x1={toX(hover.idx)} y1={padT} x2={toX(hover.idx)} y2={padT+cH} stroke="rgba(0,0,0,0.1)" />
               <circle cx={toX(hover.idx)} cy={toY(data[hover.idx][key])} r={3} fill={color} />
             </>
           )}
         </svg>
         {hover && hover.key === key && hover.idx < data.length && (
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginTop:4 }}>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, marginTop:4 }}>
             {data[hover.idx].time} · <span style={{ color }}>{data[hover.idx][key] !== null ? fmtVal(data[hover.idx][key]) : "—"}</span>
           </div>
         )}
@@ -3757,10 +3757,10 @@ function TabIODA() {
     <div>
       {/* Header */}
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16, flexWrap:"wrap" }}>
-        <span style={{ fontSize:14 }}>🌐</span>
+        <span style={{ fontSize:16 }}>🌐</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:13, fontWeight:600, color:TEXT }}>Monitor de Conectividad — IODA Venezuela</div>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
+          <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Monitor de Conectividad — IODA Venezuela</div>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
             Internet Outage Detection & Analysis · Georgia Tech · {source === "live" ? `${signals?.length || 0} puntos · EN VIVO` : source === "failed" ? "Sin conexión" : "Conectando..."}
           </div>
         </div>
@@ -3771,7 +3771,7 @@ function TabIODA() {
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
           {["24h","48h","7d"].map(r => (
             <button key={r} onClick={() => setTimeRange(r)}
-              style={{ fontSize:9, fontFamily:font, padding:"5px 12px", border:"none",
+              style={{ fontSize:12, fontFamily:font, padding:"5px 12px", border:"none",
                 background:timeRange===r?ACCENT:"transparent", color:timeRange===r?"#fff":MUTED,
                 cursor:"pointer", letterSpacing:"0.08em" }}>
               {r}
@@ -3780,7 +3780,7 @@ function TabIODA() {
         </div>
         {source === "failed" && (
           <button onClick={loadIODA}
-            style={{ fontSize:9, fontFamily:font, padding:"4px 10px", background:"transparent",
+            style={{ fontSize:12, fontFamily:font, padding:"4px 10px", background:"transparent",
               border:`1px solid ${ACCENT}40`, color:ACCENT, cursor:"pointer" }}>
             ↻ Reintentar
           </button>
@@ -3788,7 +3788,7 @@ function TabIODA() {
       </div>
 
       {error && (
-        <div style={{ fontSize:9, fontFamily:font, color:"#eab308", padding:"6px 12px",
+        <div style={{ fontSize:12, fontFamily:font, color:"#eab308", padding:"6px 12px",
           background:"rgba(234,179,8,0.08)", border:"1px solid rgba(234,179,8,0.2)", marginBottom:12 }}>
           ⚠ {error}
         </div>
@@ -3796,10 +3796,10 @@ function TabIODA() {
 
       {loading ? (
         <Card>
-          <div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:11, fontFamily:font }}>
+          <div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:14, fontFamily:font }}>
             <div style={{ fontSize:20, marginBottom:8 }}>🌐</div>
             Conectando con IODA API v2 (Georgia Tech)...
-            <div style={{ fontSize:9, marginTop:4, color:`${MUTED}80` }}>
+            <div style={{ fontSize:12, marginTop:4, color:`${MUTED}80` }}>
               Señales BGP + Active Probing + Telescope · Venezuela · {timeRange}
             </div>
           </div>
@@ -3817,18 +3817,18 @@ function TabIODA() {
             <div style={{ fontSize:12, fontWeight:600, color:TEXT, marginBottom:8 }}>
               Conexión directa no disponible
             </div>
-            <div style={{ fontSize:10, color:MUTED, lineHeight:1.6, maxWidth:500, margin:"0 auto", marginBottom:16 }}>
+            <div style={{ fontSize:13, color:MUTED, lineHeight:1.6, maxWidth:500, margin:"0 auto", marginBottom:16 }}>
               La API de IODA bloquea requests cross-origin desde el navegador. 
               Puedes ver los datos en tiempo real en los links de abajo, o desplegar 
               el dashboard en Vercel con rutas API server-side.
             </div>
             <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
               <a href="https://ioda.inetintel.cc.gatech.edu/country/VE" target="_blank" rel="noopener noreferrer"
-                style={{ fontSize:10, fontFamily:font, color:ACCENT, textDecoration:"none", padding:"6px 14px", border:`1px solid ${ACCENT}30` }}>
+                style={{ fontSize:13, fontFamily:font, color:ACCENT, textDecoration:"none", padding:"6px 14px", border:`1px solid ${ACCENT}30` }}>
                 ↗ IODA Venezuela
               </a>
               <a href="https://umbral.watch" target="_blank" rel="noopener noreferrer"
-                style={{ fontSize:10, fontFamily:font, color:"#4C9F38", textDecoration:"none", padding:"6px 14px", border:"1px solid rgba(76,159,56,0.3)" }}>
+                style={{ fontSize:13, fontFamily:font, color:"#4C9F38", textDecoration:"none", padding:"6px 14px", border:"1px solid rgba(76,159,56,0.3)" }}>
                 ↗ Umbral (mapa subnacional)
               </a>
             </div>
@@ -3843,13 +3843,13 @@ function TabIODA() {
           {title:"Network Telescope",desc:"Tráfico de fondo no solicitado. Anomalías (caídas abruptas) indican interrupciones masivas a nivel de infraestructura nacional.",color:"#dc2626"}
         ].map((s,i) => (
           <Card key={i} accent={s.color}>
-            <div style={{ fontSize:10, fontWeight:600, color:s.color, marginBottom:4 }}>{s.title}</div>
-            <div style={{ fontSize:9, color:MUTED, lineHeight:1.5 }}>{s.desc}</div>
+            <div style={{ fontSize:13, fontWeight:600, color:s.color, marginBottom:4 }}>{s.title}</div>
+            <div style={{ fontSize:12, color:MUTED, lineHeight:1.5 }}>{s.desc}</div>
           </Card>
         ))}
       </div>
 
-      <div style={{ marginTop:12, fontSize:8, fontFamily:font, color:`${MUTED}60`, lineHeight:1.8 }}>
+      <div style={{ marginTop:12, fontSize:10, fontFamily:font, color:`${MUTED}60`, lineHeight:1.8 }}>
         Fuente: IODA (Internet Outage Detection & Analysis) · Georgia Tech INETINTEL · API v2 · 
         Señales en tiempo real via CORS proxy (corsproxy.io / allorigins.win) · 
         Hora Venezuela (UTC-4)
@@ -3897,7 +3897,7 @@ function RateChart({ data }) {
         onMouseLeave={() => setHover(null)}>
         {/* Grid */}
         {[0,0.25,0.5,0.75,1].map(f => (
-          <line key={f} x1={padL} y1={padT+f*cH} x2={padL+cW} y2={padT+f*cH} stroke="rgba(255,255,255,0.04)" />
+          <line key={f} x1={padL} y1={padT+f*cH} x2={padL+cW} y2={padT+f*cH} stroke="rgba(0,0,0,0.06)" />
         ))}
         {/* Left Y axis (Bs/USD) */}
         {[0,0.25,0.5,0.75,1].map(f => (
@@ -3933,14 +3933,14 @@ function RateChart({ data }) {
         ) : null)}
         {/* Hover */}
         {hover !== null && hover < data.length && <>
-          <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT+cH} stroke="rgba(255,255,255,0.2)" />
+          <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT+cH} stroke="rgba(0,0,0,0.12)" />
           {data[hover].bcv && <circle cx={toX(hover)} cy={toY(data[hover].bcv)} r={4} fill="#0468B1" stroke={BG} strokeWidth={2} />}
           {data[hover].par && <circle cx={toX(hover)} cy={toY(data[hover].par)} r={4} fill="#E5243B" stroke={BG} strokeWidth={2} />}
         </>}
       </svg>
       {/* Tooltip */}
       {hover !== null && hover < data.length && (
-        <div style={{ fontSize:10, fontFamily:font, marginTop:4, padding:"6px 12px", background:BG2, border:`1px solid ${BORDER}`, display:"flex", gap:14, flexWrap:"wrap", alignItems:"center" }}>
+        <div style={{ fontSize:13, fontFamily:font, marginTop:4, padding:"6px 12px", background:BG2, border:`1px solid ${BORDER}`, display:"flex", gap:14, flexWrap:"wrap", alignItems:"center" }}>
           <span style={{ color:TEXT, fontWeight:600 }}>{new Date(data[hover].d+"T00:00").toLocaleDateString("es",{day:"numeric",month:"short",year:"numeric"})}</span>
           <span style={{ color:"#0468B1" }}>BCV: {data[hover].bcv?.toFixed(1)}</span>
           <span style={{ color:"#E5243B" }}>Paralelo: {data[hover].par?.toFixed(1)}</span>
@@ -3950,10 +3950,10 @@ function RateChart({ data }) {
       )}
       {/* Legend */}
       <div style={{ display:"flex", gap:12, justifyContent:"center", marginTop:8 }}>
-        <span style={{ fontSize:9, fontFamily:font, color:"#0468B1" }}>━ BCV Oficial</span>
-        <span style={{ fontSize:9, fontFamily:font, color:"#E5243B" }}>━ Paralelo</span>
-        <span style={{ fontSize:9, fontFamily:font, color:"#14b8a6" }}>┅ USDT (est.)</span>
-        <span style={{ fontSize:9, fontFamily:font, color:"#f59e0b" }}>┅ Brecha % (eje der.)</span>
+        <span style={{ fontSize:12, fontFamily:font, color:"#0468B1" }}>━ BCV Oficial</span>
+        <span style={{ fontSize:12, fontFamily:font, color:"#E5243B" }}>━ Paralelo</span>
+        <span style={{ fontSize:12, fontFamily:font, color:"#14b8a6" }}>┅ USDT (est.)</span>
+        <span style={{ fontSize:12, fontFamily:font, color:"#f59e0b" }}>┅ Brecha % (eje der.)</span>
       </div>
     </div>
   );
@@ -4006,7 +4006,7 @@ function BrechaChart({ data }) {
       {/* Grid */}
       {[0,0.25,0.5,0.75,1].map(f => (
         <g key={f}>
-          <line x1={padL} y1={padT+f*cH} x2={padL+cW} y2={padT+f*cH} stroke="rgba(255,255,255,0.03)" />
+          <line x1={padL} y1={padT+f*cH} x2={padL+cW} y2={padT+f*cH} stroke="rgba(0,0,0,0.04)" />
           <text x={padL-4} y={padT+(1-f)*cH+3} textAnchor="end" fontSize={7} fill={MUTED} fontFamily={font}>{(maxB*f).toFixed(0)}%</text>
         </g>
       ))}
@@ -4021,7 +4021,7 @@ function BrechaChart({ data }) {
       ) : null)}
       {/* Hover */}
       {hover !== null && hover < data.length && brechas[hover] != null && <>
-        <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT+cH} stroke="rgba(255,255,255,0.15)" />
+        <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT+cH} stroke="rgba(0,0,0,0.1)" />
         <circle cx={toX(hover)} cy={toY(brechas[hover])} r={4} fill="#f59e0b" stroke={BG} strokeWidth={2} />
         <text x={toX(hover)} y={toY(brechas[hover])-8} textAnchor="middle" fontSize={9} fill="#f59e0b" fontWeight={700} fontFamily={font}>
           {brechas[hover].toFixed(1)}%
@@ -4175,15 +4175,15 @@ function TabMacro() {
     <div>
       {/* Header */}
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14, flexWrap:"wrap" }}>
-        <span style={{ fontSize:14 }}>💵</span>
+        <span style={{ fontSize:16 }}>💵</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:13, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Macroeconomía — Venezuela</div>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Tipo de cambio en vivo · Indicadores macroeconómicos · Mercado cambiario</div>
+          <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Macroeconomía — Venezuela</div>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Tipo de cambio en vivo · Indicadores macroeconómicos · Mercado cambiario</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
           {[{id:"cambio",label:"Tipo de cambio"},{id:"indicadores",label:"Indicadores"},{id:"charts",label:"Gráficos"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
-              style={{ fontSize:9, fontFamily:font, padding:"6px 12px", border:"none",
+              style={{ fontSize:12, fontFamily:font, padding:"6px 12px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
               {s.label}
             </button>
@@ -4196,39 +4196,39 @@ function TabMacro() {
         {/* Live rates */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:10, marginBottom:16 }}>
           <Card accent="#0468B1">
-            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Dólar BCV (oficial)</div>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Dólar BCV (oficial)</div>
             <div style={{ fontSize:26, fontWeight:800, color:"#0468B1", fontFamily:"'Playfair Display',serif" }}>
               {loading ? "..." : dolar?.bcv ? `${dolar.bcv.toFixed(2)}` : "—"}
             </div>
-            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>Bs/USD · Fuente: BCV</div>
+            <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>Bs/USD · Fuente: BCV</div>
           </Card>
           <Card accent="#E5243B">
-            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Dólar Paralelo</div>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Dólar Paralelo</div>
             <div style={{ fontSize:26, fontWeight:800, color:"#E5243B", fontFamily:"'Playfair Display',serif" }}>
               {loading ? "..." : dolar?.par ? `${dolar.par.toFixed(2)}` : "—"}
             </div>
-            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>Bs/USD · Mercado no oficial</div>
+            <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>Bs/USD · Mercado no oficial</div>
           </Card>
           <Card accent={dolar?.brecha > 50 ? "#E5243B" : dolar?.brecha > 30 ? "#f59e0b" : "#22c55e"}>
-            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Brecha cambiaria</div>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Brecha cambiaria</div>
             <div style={{ fontSize:26, fontWeight:800, color:dolar?.brecha > 50 ? "#E5243B" : dolar?.brecha > 30 ? "#f59e0b" : "#22c55e", fontFamily:"'Playfair Display',serif" }}>
               {loading ? "..." : dolar?.brecha ? `${dolar.brecha.toFixed(1)}%` : "—"}
             </div>
-            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>{dolar?.brecha > 55 ? "⚠ Zona de alerta E2" : dolar?.brecha > 40 ? "Monitoreo activo" : "Rango aceptable"}</div>
+            <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>{dolar?.brecha > 55 ? "⚠ Zona de alerta E2" : dolar?.brecha > 40 ? "Monitoreo activo" : "Rango aceptable"}</div>
           </Card>
           <Card accent="#14b8a6">
-            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>USDT/VES (ref.)</div>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>USDT/VES (ref.)</div>
             <div style={{ fontSize:26, fontWeight:800, color:"#14b8a6", fontFamily:"'Playfair Display',serif" }}>
               {loading ? "..." : dolar?.par ? `~${(dolar.par * 1.02).toFixed(0)}` : "—"}
             </div>
-            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>Estimado · Binance P2P +2%</div>
+            <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>Estimado · Binance P2P +2%</div>
           </Card>
         </div>
 
         {/* Rate evolution chart */}
         {rateHistory.length > 2 && (
           <Card>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
               Evolución cambiaria · {rateHistory.length > 0 ? `${rateHistory[0].d.slice(0,7)} — ${rateHistory[rateHistory.length-1].d.slice(0,7)}` : "..."} · {rateHistory.length} puntos
             </div>
             <RateChart data={rateHistory} />
@@ -4238,22 +4238,22 @@ function TabMacro() {
         {/* Explanation cards */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginBottom:16 }}>
           <Card accent="#0468B1">
-            <div style={{ fontSize:10, fontWeight:600, color:"#0468B1", marginBottom:4 }}>🏦 Tasa BCV</div>
-            <div style={{ fontSize:9, color:MUTED, lineHeight:1.6 }}>Publicada diariamente por el Banco Central. Referencia para operaciones formales, banca y comercio registrado.</div>
+            <div style={{ fontSize:13, fontWeight:600, color:"#0468B1", marginBottom:4 }}>🏦 Tasa BCV</div>
+            <div style={{ fontSize:12, color:MUTED, lineHeight:1.6 }}>Publicada diariamente por el Banco Central. Referencia para operaciones formales, banca y comercio registrado.</div>
           </Card>
           <Card accent="#E5243B">
-            <div style={{ fontSize:10, fontWeight:600, color:"#E5243B", marginBottom:4 }}>🔄 Tasa Paralela</div>
-            <div style={{ fontSize:9, color:MUTED, lineHeight:1.6 }}>Precio del dólar en el mercado no oficial. Referencia real para la mayoría de transacciones cotidianas.</div>
+            <div style={{ fontSize:13, fontWeight:600, color:"#E5243B", marginBottom:4 }}>🔄 Tasa Paralela</div>
+            <div style={{ fontSize:12, color:MUTED, lineHeight:1.6 }}>Precio del dólar en el mercado no oficial. Referencia real para la mayoría de transacciones cotidianas.</div>
           </Card>
           <Card accent="#14b8a6">
-            <div style={{ fontSize:10, fontWeight:600, color:"#14b8a6", marginBottom:4 }}>₿ USDT / Binance P2P</div>
-            <div style={{ fontSize:9, color:MUTED, lineHeight:1.6 }}>Precio del USDT en bolívares via Binance P2P. Usado masivamente para remesas y ahorro digital.</div>
+            <div style={{ fontSize:13, fontWeight:600, color:"#14b8a6", marginBottom:4 }}>₿ USDT / Binance P2P</div>
+            <div style={{ fontSize:12, color:MUTED, lineHeight:1.6 }}>Precio del USDT en bolívares via Binance P2P. Usado masivamente para remesas y ahorro digital.</div>
           </Card>
         </div>
 
         {/* Semáforo escenarios */}
         <Card>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>
             Implicaciones por escenario
           </div>
           {[
@@ -4269,18 +4269,18 @@ function TabMacro() {
             return (
               <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 0", borderBottom:i<3?`1px solid ${BORDER}30`:"none",
                 opacity:isActive?1:0.4 }}>
-                <span style={{ fontSize:8, fontFamily:font, padding:"2px 6px", fontWeight:700, color:e.color, background:`${e.color}12`, border:`1px solid ${e.color}30`, minWidth:24, textAlign:"center" }}>{e.esc}</span>
-                <span style={{ fontSize:10, fontWeight:600, color:e.color, minWidth:90 }}>{e.label}</span>
-                <span style={{ fontSize:9, fontFamily:font, color:MUTED, minWidth:100 }}>{e.cond}</span>
-                <span style={{ fontSize:9, color:TEXT, flex:1 }}>{e.desc}</span>
-                {isActive && <span style={{ fontSize:9, fontFamily:font, color:e.color, fontWeight:700 }}>◄ ACTUAL</span>}
+                <span style={{ fontSize:10, fontFamily:font, padding:"2px 6px", fontWeight:700, color:e.color, background:`${e.color}12`, border:`1px solid ${e.color}30`, minWidth:24, textAlign:"center" }}>{e.esc}</span>
+                <span style={{ fontSize:13, fontWeight:600, color:e.color, minWidth:90 }}>{e.label}</span>
+                <span style={{ fontSize:12, fontFamily:font, color:MUTED, minWidth:100 }}>{e.cond}</span>
+                <span style={{ fontSize:12, color:TEXT, flex:1 }}>{e.desc}</span>
+                {isActive && <span style={{ fontSize:12, fontFamily:font, color:e.color, fontWeight:700 }}>◄ ACTUAL</span>}
               </div>
             );
           })}
         </Card>
 
         {dolar?.updated && (
-          <div style={{ fontSize:7, fontFamily:font, color:`${MUTED}60`, marginTop:8 }}>
+          <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}60`, marginTop:8 }}>
             Fuente: DolarAPI.com (ve.dolarapi.com) · Última actualización: {new Date(dolar.updated).toLocaleString("es")} · Refresco cada 2 min
           </div>
         )}
@@ -4291,9 +4291,9 @@ function TabMacro() {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10 }}>
           {MACRO.map((m,i) => (
             <Card key={i} accent={m.c}>
-              <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{m.k}</div>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{m.k}</div>
               <div style={{ fontSize:20, fontWeight:800, color:m.c, fontFamily:"'Syne',sans-serif" }}>{m.v}</div>
-              <div style={{ fontSize:8, color:MUTED, marginTop:4, lineHeight:1.5 }}>{m.s}</div>
+              <div style={{ fontSize:10, color:MUTED, marginTop:4, lineHeight:1.5 }}>{m.s}</div>
             </Card>
           ))}
         </div>
@@ -4305,7 +4305,7 @@ function TabMacro() {
           {/* Full historical chart using our data */}
           {rateHistory.length > 2 && (
             <Card>
-              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
+              <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
                 BCV Oficial vs Paralelo · Serie completa · {rateHistory.length} puntos
               </div>
               <RateChart data={rateHistory} />
@@ -4315,7 +4315,7 @@ function TabMacro() {
           {/* 2026 zoom */}
           {rateHistory.length > 2 && (
             <Card>
-              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
+              <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
                 Zoom 2026 · Post-transición
               </div>
               <RateChart data={rateHistory.filter(r => r.d >= "2026-01-01")} />
@@ -4326,7 +4326,7 @@ function TabMacro() {
             {/* Brecha chart */}
             {rateHistory.length > 2 && (
               <Card>
-                <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
+                <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
                   Brecha cambiaria % · Histórico
                 </div>
                 <BrechaChart data={rateHistory} />
@@ -4335,7 +4335,7 @@ function TabMacro() {
 
             {/* USD/COP */}
             <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:12, overflow:"hidden" }}>
-              <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>USD/COP · Peso Colombiano</div>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>USD/COP · Peso Colombiano</div>
               <TradingViewMini symbol="FX_IDC:USDCOP" />
             </div>
           </div>
@@ -4362,7 +4362,7 @@ function TradingViewMini({ symbol, height=280 }) {
     s.async = true;
     s.innerHTML = JSON.stringify({
       symbol, width:"100%", height, dateRange:"3M",
-      colorTheme:"dark", isTransparent:true, autosize:false, locale:"es"
+      colorTheme:"light", isTransparent:true, autosize:false, locale:"es"
     });
     w.appendChild(s);
     el.appendChild(w);
@@ -4407,28 +4407,29 @@ export default function MonitorPNUD() {
       <style>{`
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
         .goog-te-banner-frame, .skiptranslate > iframe { display:none !important; }
-        body { top:0 !important; }
+        body { top:0 !important; margin:0; }
         .goog-te-gadget { font-family:${font} !important; font-size:0 !important; }
-        .goog-te-gadget .goog-te-combo { font-family:${font}; font-size:10px; background:${BG2}; border:1px solid ${BORDER}; color:${ACCENT};
-          padding:4px 8px; cursor:pointer; outline:none; }
+        .goog-te-gadget .goog-te-combo { font-family:${font}; font-size:11px; background:${BG2}; border:1px solid ${BORDER}; color:${ACCENT};
+          padding:5px 10px; cursor:pointer; outline:none; border-radius:4px; }
         .goog-te-gadget > span { display:none !important; }
         #google_translate_element { display:inline-block; }
+        * { box-sizing: border-box; }
       `}</style>
       <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap" rel="stylesheet" />
 
       {/* HEADER */}
-      <div style={{ borderBottom:`1px solid ${BORDER}`, padding:"10px 20px", display:"flex", justifyContent:"space-between", alignItems:"center", background:BG }}>
-        <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-          <div style={{ background:ACCENT, color:"#fff", fontFamily:font, fontSize:10, fontWeight:700, letterSpacing:"0.15em", padding:"4px 8px" }}>PNUD</div>
+      <div style={{ borderBottom:`2px solid ${ACCENT}`, padding:"12px 24px", display:"flex", justifyContent:"space-between", alignItems:"center", background:BG2, boxShadow:"0 1px 4px rgba(0,0,0,0.08)" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+          <div style={{ background:ACCENT, color:"#fff", fontFamily:font, fontSize:14, fontWeight:700, letterSpacing:"0.15em", padding:"5px 10px", borderRadius:3 }}>PNUD</div>
           <div>
-            <div style={{ fontSize:13, fontWeight:600, color:TEXT, letterSpacing:"0.02em" }}>Monitor de Contexto Situacional · Venezuela 2026</div>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.08em" }}>Programa de las Naciones Unidas para el Desarrollo</div>
+            <div style={{ fontSize:16, fontWeight:600, color:TEXT, letterSpacing:"0.02em" }}>Monitor de Contexto Situacional · Venezuela 2026</div>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.08em" }}>Programa de las Naciones Unidas para el Desarrollo</div>
           </div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
           <div id="google_translate_element" />
           <select value={week} onChange={e => setWeek(+e.target.value)}
-            style={{ fontFamily:font, fontSize:10, background:BG2, border:`1px solid ${BORDER}`, color:ACCENT,
+            style={{ fontFamily:font, fontSize:13, background:BG2, border:`1px solid ${BORDER}`, color:ACCENT,
               padding:"5px 28px 5px 10px", cursor:"pointer", outline:"none",
               appearance:"none", WebkitAppearance:"none",
               backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%230A97D9'/%3E%3C/svg%3E")`,
@@ -4440,22 +4441,22 @@ export default function MonitorPNUD() {
       </div>
 
       {/* TAB BAR */}
-      <div style={{ display:"flex", alignItems:"center", gap:0, padding:"0 20px", background:BG, borderBottom:`1px solid ${BORDER}`, overflowX:"auto" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:0, padding:"0 24px", background:BG2, borderBottom:`1px solid ${BORDER}`, overflowX:"auto", boxShadow:"0 1px 2px rgba(0,0,0,0.04)" }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            style={{ fontFamily:font, fontSize:9, letterSpacing:"0.1em", textTransform:"uppercase",
-              padding:"10px 14px", background:tab===t.id?ACCENT:"transparent",
-              border:"none", borderBottom:tab===t.id?`2px solid ${ACCENT}`:"2px solid transparent",
-              color:tab===t.id?"#fff":MUTED, cursor:"pointer", transition:"all 0.15s",
-              whiteSpace:"nowrap", display:"flex", alignItems:"center", gap:5 }}>
-            <span style={{ fontSize:11 }}>{t.icon}</span>
+            style={{ fontFamily:font, fontSize:11, letterSpacing:"0.08em", textTransform:"uppercase",
+              padding:"12px 16px", background:"transparent",
+              border:"none", borderBottom:tab===t.id?`3px solid ${ACCENT}`:"3px solid transparent",
+              color:tab===t.id?ACCENT:MUTED, fontWeight:tab===t.id?700:400, cursor:"pointer", transition:"all 0.15s",
+              whiteSpace:"nowrap", display:"flex", alignItems:"center", gap:6 }}>
+            <span style={{ fontSize:15 }}>{t.icon}</span>
             {t.label}
           </button>
         ))}
       </div>
 
       {/* CONTENT */}
-      <div style={{ maxWidth:1300, margin:"0 auto", padding:"20px 20px 60px" }}>
+      <div style={{ maxWidth:1340, margin:"0 auto", padding:"24px 24px 60px" }}>
         {tab === "dashboard" && <TabDashboard week={week} />}
         {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
@@ -4467,7 +4468,7 @@ export default function MonitorPNUD() {
       </div>
 
       {/* FOOTER */}
-      <div style={{ textAlign:"center", fontSize:9, fontFamily:font, color:`${MUTED}60`, padding:"8px 0 16px", letterSpacing:"0.1em", textTransform:"uppercase" }}>
+      <div style={{ textAlign:"center", fontSize:12, fontFamily:font, color:`${MUTED}60`, padding:"8px 0 16px", letterSpacing:"0.1em", textTransform:"uppercase" }}>
         PNUD Venezuela · Monitor Situacional · Uso interno · {WEEKS[week].label}
       </div>
     </div>
