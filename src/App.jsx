@@ -1345,9 +1345,8 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
             const providerMatch = aiAnalysis.match(/^\[([^\]]+)\]\n\n/);
             const provider = providerMatch ? providerMatch[1] : "claude";
             const displayText = providerMatch ? aiAnalysis.slice(providerMatch[0].length) : aiAnalysis;
-            const isGemini = provider.includes("gemini");
-            const badgeColor = isGemini ? "#4285f4" : "#8b5cf6";
-            const badgeLabel = isGemini ? "GEMINI" : "CLAUDE";
+            const badgeColor = provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : "#8b5cf6";
+            const badgeLabel = provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : "CLAUDE";
             return (
               <div style={{ ...cardStyle, marginTop:mob?10:14, borderLeft:`3px solid ${badgeColor}`, background:`${badgeColor}08` }}>
                 <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
@@ -1531,9 +1530,8 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
         const providerMatch = aiAnalysis.match(/^\[([^\]]+)\]\n\n/);
         const provider = providerMatch ? providerMatch[1] : "claude";
         const displayText = providerMatch ? aiAnalysis.slice(providerMatch[0].length) : aiAnalysis;
-        const isGemini = provider.includes("gemini");
-        const badgeColor = isGemini ? "#4285f4" : "#8b5cf6";
-        const badgeLabel = isGemini ? "GEMINI" : "CLAUDE";
+        const badgeColor = provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : "#8b5cf6";
+        const badgeLabel = provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : "CLAUDE";
         return (
         <div style={{ borderBottom:`1px solid ${BORDER}40` }}>
           <div style={{ display:"flex", alignItems:"center", gap:mob?8:12, cursor:"pointer",

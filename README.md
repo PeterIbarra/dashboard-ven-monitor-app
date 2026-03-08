@@ -194,8 +194,10 @@ Para indicadores **nuevos**, usar `null` en semanas anteriores y `addedWeek`:
 | `SUPABASE_URL` | Opcional | Base de datos de artículos |
 | `SUPABASE_KEY` | Opcional | Auth Supabase |
 | `ACLED_API_KEY` | Opcional | Datos de conflictividad ACLED |
-| `GEMINI_API_KEY` | Opcional | Análisis IA con Gemini Flash gratuito (botón 🤖 en SITREP) |
-| `ANTHROPIC_API_KEY` | Opcional | Fallback: Análisis IA con Claude (si Gemini no configurado) |
+| `GEMINI_API_KEY` | Opcional | 🤖 IA: Gemini Flash (gratuito) — [aistudio.google.com](https://aistudio.google.com) |
+| `GROQ_API_KEY` | Opcional | 🤖 IA: Groq Llama 3.3 70B (gratuito) — [console.groq.com](https://console.groq.com) |
+| `OPENROUTER_API_KEY` | Opcional | 🤖 IA: OpenRouter modelos free (gratuito) — [openrouter.ai](https://openrouter.ai) |
+| `ANTHROPIC_API_KEY` | Opcional | 🤖 IA: Claude Sonnet (pago) — [console.anthropic.com](https://console.anthropic.com) |
 
 ## Deploy
 
@@ -287,6 +289,8 @@ Botón que llama a la API de Claude (Sonnet 4) directamente desde el dashboard p
 
 El análisis se genera en español profesional con tono institucional PNUD, usando exclusivamente los datos del período seleccionado (no inventa datos). Se muestra tanto en la vista Briefing como se incluye en el documento descargable.
 
-> **En Vercel**: las llamadas pasan por `/api/ai` (serverless proxy) que usa `ANTHROPIC_API_KEY` del lado del servidor. Sin CORS, sin exposición de la key. Requiere agregar la variable de entorno en Vercel Dashboard → Settings → Environment Variables.
+> **En Vercel**: `/api/ai` prueba proveedores en cascada: Gemini → Groq → OpenRouter → Claude. Basta con configurar **una sola key** (recomendada: `GEMINI_API_KEY` por ser gratuita y estable). Si un proveedor falla, pasa al siguiente automáticamente.
 >
-> **En Claude.ai**: las llamadas van directas a la API (el entorno inyecta la autenticación automáticamente).
+> **En Claude.ai**: las llamadas van directas a la API de Anthropic (el entorno inyecta la autenticación).
+>
+> **Obtener keys gratuitas**: [aistudio.google.com](https://aistudio.google.com) (Gemini) · [console.groq.com](https://console.groq.com) (Groq) · [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys) (OpenRouter). Ninguna requiere tarjeta de crédito.
