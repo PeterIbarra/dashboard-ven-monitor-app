@@ -123,7 +123,6 @@ const POLYMARKET_SLUGS = [
   { slug:"will-the-us-embassy-in-venezuela-reopen-by-march-31", title:"¿Embajada EE.UU. reabre antes del 31 mar?", embed:true },
   // New contracts
   { slug:"venezuela-leader-end-of-2026", title:"¿Quién lidera Venezuela a fin de 2026?", embed:false, multi:true, desc:"Edmundo 33% · Delcy 29% · MCM 21%" },
-  { slug:"will-mara-corina-machado-enter-venezuela-by-january-31", title:"¿MCM entra a Venezuela antes del 31 ene?", embed:true },
   { slug:"will-the-us-invade-venezuela-in-2025", title:"¿EE.UU. invade Venezuela?", embed:false, multi:true, desc:"Multi-fecha: ene 31, mar 31, dic 31" },
   { slug:"another-us-strike-on-venezuela-by", title:"¿Otro operativo EE.UU. en Venezuela?", embed:false, multi:true, desc:"Multi-fecha" },
   { slug:"venezuela-presidential-election-scheduled-by", title:"¿Elecciones presidenciales programadas?", embed:false, multi:true, desc:"Multi-fecha" },
@@ -1127,6 +1126,45 @@ function TabGdelt() {
   );
 }
 
+function TVMarketQuotes({ title, height=350, groups }) {
+  const containerId = useMemo(() => `tvmq-${Math.random().toString(36).slice(2,8)}`, []);
+  
+  useEffect(() => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+    const wrapper = document.createElement("div");
+    wrapper.className = "tradingview-widget-container";
+    const widgetDiv = document.createElement("div");
+    widgetDiv.className = "tradingview-widget-container__widget";
+    wrapper.appendChild(widgetDiv);
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js";
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      width: "100%",
+      height: height,
+      symbolsGroups: groups,
+      showSymbolLogo: true,
+      isTransparent: true,
+      colorTheme: "dark",
+      locale: "es",
+    });
+    wrapper.appendChild(script);
+    container.appendChild(wrapper);
+  }, [containerId, height, groups]);
+
+  return (
+    <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px", overflow:"hidden" }}>
+      <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
+        {title} · En vivo
+      </div>
+      <div id={containerId} style={{ width:"100%", height }} />
+    </div>
+  );
+}
+
 function MarketOverviewWidget() {
   const containerRef = useCallback((node) => {
     if (!node) return;
@@ -1161,17 +1199,6 @@ function MarketOverviewWidget() {
       belowLineFillColorFallingBottom: "rgba(239,68,68,0)",
       symbolActiveColor: "rgba(10,151,217,0.12)",
       tabs: [
-        {
-          title: "Commodity",
-          symbols: [
-            { s: "PEPPERSTONE:XBRUSD", d: "Brent Crude" },
-            { s: "PEPPERSTONE:XTIUSD", d: "WTI Crude" },
-            { s: "PEPPERSTONE:XNGUSD", d: "Natural Gas" },
-            { s: "PEPPERSTONE:XAUUSD", d: "Gold" },
-            { s: "PEPPERSTONE:XAGUSD", d: "Silver" },
-            { s: "CAPITALCOM:COPPER", d: "Copper" },
-          ]
-        },
         {
           title: "Index",
           symbols: [
@@ -1214,15 +1241,6 @@ function MarketOverviewWidget() {
             { s: "COINBASE:SOLUSD", d: "Solana" },
           ]
         },
-        {
-          title: "Bond",
-          symbols: [
-            { s: "CAPITALCOM:US10Y", d: "US 10Y Treasury" },
-            { s: "CAPITALCOM:US02Y", d: "US 2Y Treasury" },
-            { s: "CAPITALCOM:US30Y", d: "US 30Y Treasury" },
-            { s: "CAPITALCOM:DE10Y", d: "Germany 10Y Bund" },
-          ]
-        },
       ]
     });
     wrapper.appendChild(script);
@@ -1230,11 +1248,47 @@ function MarketOverviewWidget() {
   }, []);
 
   return (
-    <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: "12px", minHeight: 400 }}>
-      <div style={{ fontSize: 8, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>
-        🌍 Mercados globales · TradingView · Commodity · Index · Stocks · Forex · Crypto · Bond
+    <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+      <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: "12px", minHeight: 400 }}>
+        <div style={{ fontSize: 8, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>
+          🌍 Mercados globales · TradingView · Index · Stocks · Forex · Crypto
+        </div>
+        <div ref={containerRef} />
       </div>
-      <div ref={containerRef} />
+      {/* Commodity & Bond — TradingView Market Quotes widget with free CFD symbols */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+        <TVMarketQuotes
+          title="📦 Commodity"
+          height={350}
+          groups={[
+            { name:"Energy", symbols:[
+              { name:"PEPPERSTONE:XBRUSD", displayName:"Brent Crude" },
+              { name:"PEPPERSTONE:XTIUSD", displayName:"WTI Crude" },
+              { name:"PEPPERSTONE:XNGUSD", displayName:"Natural Gas" },
+            ]},
+            { name:"Metals", symbols:[
+              { name:"CMCMARKETS:GOLD", displayName:"Gold" },
+              { name:"CMCMARKETS:SILVER", displayName:"Silver" },
+              { name:"CMCMARKETS:COPPER", displayName:"Copper" },
+            ]},
+          ]}
+        />
+        <TVMarketQuotes
+          title="📊 Bond Yields"
+          height={350}
+          groups={[
+            { name:"US Treasuries", symbols:[
+              { name:"FRED:DGS2", displayName:"US 2Y Yield" },
+              { name:"FRED:DGS10", displayName:"US 10Y Yield" },
+              { name:"FRED:DGS30", displayName:"US 30Y Yield" },
+            ]},
+            { name:"Europe", symbols:[
+              { name:"FRED:IRLTLT01DEM156N", displayName:"Germany 10Y" },
+              { name:"FRED:IRLTLT01GBM156N", displayName:"UK 10Y" },
+            ]},
+          ]}
+        />
+      </div>
     </div>
   );
 }
@@ -1268,9 +1322,18 @@ function OilPriceTicker() {
   );
 }
 
-function BrentChart({ history }) {
+function BrentChart({ history: rawHistory }) {
   const [hover, setHover] = useState(null);
-  if (!history || history.length < 2) return null;
+  if (!rawHistory || rawHistory.length < 2) return null;
+
+  // Downsample: group by day, take last price of each day
+  const byDay = new Map();
+  rawHistory.forEach(h => {
+    const day = h.time ? h.time.split("T")[0] : new Date(h.time).toISOString().split("T")[0];
+    byDay.set(day, h);
+  });
+  const history = Array.from(byDay.values());
+  if (history.length < 2) return null;
 
   const prices = history.map(h => h.price);
   const min = Math.min(...prices);
