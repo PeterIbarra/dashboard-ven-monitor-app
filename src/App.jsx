@@ -2712,6 +2712,7 @@ function AcledSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
+  const [acledPage, setAcledPage] = useState(1);
 
   useEffect(() => {
     async function load() {
@@ -2813,29 +2814,6 @@ function AcledSection() {
         </Card>
       </div>
 
-      {/* By type breakdown */}
-      <Card>
-        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>Eventos por tipo</div>
-        <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:10 }}>
-          <button onClick={() => setFilter("all")} style={{ fontSize:8, fontFamily:font, padding:"3px 8px", border:`1px solid ${filter==="all"?ACCENT:BORDER}`, background:filter==="all"?ACCENT:"transparent", color:filter==="all"?"#fff":MUTED, cursor:"pointer" }}>Todos ({totalEvents})</button>
-          {Object.entries(byType).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
-            <button key={t} onClick={() => setFilter(t)} style={{ fontSize:8, fontFamily:font, padding:"3px 8px", border:`1px solid ${filter===t?(EVENT_COLORS[t]||ACCENT):BORDER}`, background:filter===t?`${EVENT_COLORS[t]||ACCENT}20`:"transparent", color:EVENT_COLORS[t]||MUTED, cursor:"pointer" }}>
-              {t} ({c})
-            </button>
-          ))}
-        </div>
-        {/* Bar chart by type */}
-        {Object.entries(byType).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
-          <div key={t} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
-            <span style={{ fontSize:8, fontFamily:font, color:EVENT_COLORS[t]||MUTED, minWidth:160 }}>{t}</span>
-            <div style={{ flex:1, height:14, background:`${BORDER}40`, position:"relative" }}>
-              <div style={{ width:`${(c/totalEvents)*100}%`, height:"100%", background:EVENT_COLORS[t]||ACCENT, opacity:0.7 }} />
-              <span style={{ position:"absolute", right:4, top:1, fontSize:8, fontFamily:font, color:TEXT }}>{c}</span>
-            </div>
-          </div>
-        ))}
-      </Card>
-
       {/* Weekly timeline chart */}
       {weekly.length > 2 && (
         <Card>
@@ -2863,6 +2841,28 @@ function AcledSection() {
         </Card>
       )}
 
+      {/* By type breakdown */}
+      <Card>
+        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>Eventos por tipo</div>
+        <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:10 }}>
+          <button onClick={() => { setFilter("all"); setAcledPage(1); }} style={{ fontSize:8, fontFamily:font, padding:"3px 8px", border:`1px solid ${filter==="all"?ACCENT:BORDER}`, background:filter==="all"?ACCENT:"transparent", color:filter==="all"?"#fff":MUTED, cursor:"pointer" }}>Todos ({totalEvents})</button>
+          {Object.entries(byType).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
+            <button key={t} onClick={() => { setFilter(t); setAcledPage(1); }} style={{ fontSize:8, fontFamily:font, padding:"3px 8px", border:`1px solid ${filter===t?(EVENT_COLORS[t]||ACCENT):BORDER}`, background:filter===t?`${EVENT_COLORS[t]||ACCENT}20`:"transparent", color:EVENT_COLORS[t]||MUTED, cursor:"pointer" }}>
+              {t} ({c})
+            </button>
+          ))}
+        </div>
+        {Object.entries(byType).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
+          <div key={t} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
+            <span style={{ fontSize:8, fontFamily:font, color:EVENT_COLORS[t]||MUTED, minWidth:160 }}>{t}</span>
+            <div style={{ flex:1, height:14, background:`${BORDER}40`, position:"relative" }}>
+              <div style={{ width:`${(c/totalEvents)*100}%`, height:"100%", background:EVENT_COLORS[t]||ACCENT, opacity:0.7 }} />
+              <span style={{ position:"absolute", right:4, top:1, fontSize:8, fontFamily:font, color:TEXT }}>{c}</span>
+            </div>
+          </div>
+        ))}
+      </Card>
+
       {/* CAST Predictions */}
       {cast.length > 0 && (
         <Card>
@@ -2883,30 +2883,71 @@ function AcledSection() {
         </Card>
       )}
 
-      {/* Recent events table */}
+      {/* Paginated events table */}
       <Card>
-        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
-          Eventos recientes · {filter === "all" ? "Todos" : filter} · Mostrando {Math.min(25, sortedEvents.length)} de {sortedEvents.length}
-        </div>
-        <div style={{ maxHeight:400, overflowY:"auto" }}>
-          {sortedEvents.slice(0,25).map((e,i) => (
-            <div key={i} style={{ padding:"8px 0", borderBottom:`1px solid ${BORDER}30`, display:"flex", gap:10, alignItems:"flex-start" }}>
-              <div style={{ minWidth:65, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
-              <span style={{ fontSize:7, fontFamily:font, padding:"2px 5px", background:`${EVENT_COLORS[e.event_type]||ACCENT}20`, color:EVENT_COLORS[e.event_type]||ACCENT, border:`1px solid ${EVENT_COLORS[e.event_type]||ACCENT}30`, whiteSpace:"nowrap" }}>
-                {e.sub_event_type || e.event_type}
-              </span>
-              {parseInt(e.fatalities) > 0 && (
-                <span style={{ fontSize:7, fontFamily:font, padding:"2px 5px", background:"#dc262620", color:"#dc2626", border:"1px solid #dc262630" }}>
-                  💀 {e.fatalities}
-                </span>
-              )}
-              <div style={{ flex:1 }}>
-                <div style={{ fontSize:9, color:TEXT }}>{e.location}{e.admin1 ? `, ${e.admin1}` : ""}</div>
-                <div style={{ fontSize:8, color:MUTED, marginTop:2, lineHeight:1.5 }}>{(e.notes||"").slice(0,200)}{(e.notes||"").length > 200 ? "..." : ""}</div>
+        {(() => {
+          const PER_PAGE = 20;
+          const totalPages = Math.ceil(sortedEvents.length / PER_PAGE);
+          const pageEvents = sortedEvents.slice((acledPage-1)*PER_PAGE, acledPage*PER_PAGE);
+          return (<>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+                Eventos recientes · {filter === "all" ? "Todos" : filter} · {sortedEvents.length} eventos
+              </div>
+              <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1}
+                  style={{ fontSize:8, fontFamily:font, padding:"3px 8px", border:`1px solid ${BORDER}`, background:acledPage===1?"transparent":BG3, color:acledPage===1?`${MUTED}50`:TEXT, cursor:acledPage===1?"default":"pointer" }}>
+                  ← Anterior
+                </button>
+                <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>{acledPage} / {totalPages}</span>
+                <button onClick={() => setAcledPage(Math.min(totalPages,acledPage+1))} disabled={acledPage>=totalPages}
+                  style={{ fontSize:8, fontFamily:font, padding:"3px 8px", border:`1px solid ${BORDER}`, background:acledPage>=totalPages?"transparent":BG3, color:acledPage>=totalPages?`${MUTED}50`:TEXT, cursor:acledPage>=totalPages?"default":"pointer" }}>
+                  Siguiente →
+                </button>
               </div>
             </div>
-          ))}
-        </div>
+            {pageEvents.map((e,i) => (
+              <div key={i} style={{ padding:"8px 0", borderBottom:`1px solid ${BORDER}30`, display:"flex", gap:10, alignItems:"flex-start" }}>
+                <div style={{ minWidth:65, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
+                <span style={{ fontSize:7, fontFamily:font, padding:"2px 5px", background:`${EVENT_COLORS[e.event_type]||ACCENT}20`, color:EVENT_COLORS[e.event_type]||ACCENT, border:`1px solid ${EVENT_COLORS[e.event_type]||ACCENT}30`, whiteSpace:"nowrap" }}>
+                  {e.sub_event_type || e.event_type}
+                </span>
+                {parseInt(e.fatalities) > 0 && (
+                  <span style={{ fontSize:7, fontFamily:font, padding:"2px 5px", background:"#dc262620", color:"#dc2626", border:"1px solid #dc262630" }}>
+                    💀 {e.fatalities}
+                  </span>
+                )}
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:9, color:TEXT }}>{e.location}{e.admin1 ? `, ${e.admin1}` : ""}</div>
+                  <div style={{ fontSize:8, color:MUTED, marginTop:2, lineHeight:1.5 }}>{(e.notes||"").slice(0,250)}{(e.notes||"").length > 250 ? "..." : ""}</div>
+                </div>
+              </div>
+            ))}
+            {/* Bottom pagination */}
+            {totalPages > 1 && (
+              <div style={{ display:"flex", justifyContent:"center", alignItems:"center", gap:4, marginTop:10 }}>
+                <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1}
+                  style={{ fontSize:8, fontFamily:font, padding:"3px 8px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}50`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
+                {Array.from({length:Math.min(7,totalPages)}, (_,i) => {
+                  let p;
+                  if (totalPages <= 7) p = i+1;
+                  else if (acledPage <= 4) p = i+1;
+                  else if (acledPage >= totalPages-3) p = totalPages-6+i;
+                  else p = acledPage-3+i;
+                  return (
+                    <button key={p} onClick={() => setAcledPage(p)}
+                      style={{ fontSize:8, fontFamily:font, padding:"3px 8px", border:`1px solid ${p===acledPage?ACCENT:BORDER}`,
+                        background:p===acledPage?ACCENT:"transparent", color:p===acledPage?"#fff":MUTED, cursor:"pointer", minWidth:24 }}>
+                      {p}
+                    </button>
+                  );
+                })}
+                <button onClick={() => setAcledPage(Math.min(totalPages,acledPage+1))} disabled={acledPage>=totalPages}
+                  style={{ fontSize:8, fontFamily:font, padding:"3px 8px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=totalPages?`${MUTED}50`:TEXT, cursor:acledPage>=totalPages?"default":"pointer" }}>→</button>
+              </div>
+            )}
+          </>);
+        })()}
       </Card>
     </div>
   );
