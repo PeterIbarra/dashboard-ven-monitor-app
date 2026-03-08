@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 
 // ═══════════════════════════════════════════════════════════════
 // DATA — All inline for single-file artifact
@@ -2706,6 +2706,80 @@ function TabConflictividad() {
   );
 }
 
+function LeafletMap({ events, EC }) {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const markersRef = useRef(null);
+
+  // Load Leaflet CSS + JS from CDN
+  useEffect(() => {
+    if (document.getElementById("leaflet-css")) return;
+    const css = document.createElement("link");
+    css.id = "leaflet-css";
+    css.rel = "stylesheet";
+    css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(css);
+
+    const js = document.createElement("script");
+    js.id = "leaflet-js";
+    js.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    js.onload = () => initMap();
+    document.head.appendChild(js);
+
+    function initMap() {
+      if (!mapRef.current || mapInstance.current) return;
+      const L = window.L;
+      const map = L.map(mapRef.current, { zoomControl: true, scrollWheelZoom: true }).setView([7.5, -66.5], 6);
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/">CARTO</a>',
+        maxZoom: 18,
+      }).addTo(map);
+      mapInstance.current = map;
+      addMarkers(map, L);
+    }
+
+    return () => {
+      if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
+    };
+  }, []);
+
+  // Update markers when events change
+  useEffect(() => {
+    if (mapInstance.current && window.L) addMarkers(mapInstance.current, window.L);
+  }, [events]);
+
+  function addMarkers(map, L) {
+    if (markersRef.current) map.removeLayer(markersRef.current);
+    const group = L.layerGroup();
+    events.forEach(e => {
+      const lat = parseFloat(e.latitude), lng = parseFloat(e.longitude);
+      if (!lat || !lng) return;
+      const fatal = parseInt(e.fatalities) || 0;
+      const r = fatal > 5 ? 10 : fatal > 0 ? 6 : 4;
+      const color = EC[e.event_type] || "#0A97D9";
+      const circle = L.circleMarker([lat, lng], {
+        radius: r, fillColor: color, color: color, weight: 1, opacity: 0.8, fillOpacity: 0.5,
+      });
+      circle.bindPopup(
+        `<div style="font-family:monospace;font-size:11px;max-width:250px">` +
+        `<b>${e.event_date}</b><br>` +
+        `<span style="color:${color};font-weight:bold">${e.sub_event_type || e.event_type}</span><br>` +
+        `📍 ${e.location}${e.admin1 ? `, ${e.admin1}` : ""}<br>` +
+        (fatal > 0 ? `💀 <b>${fatal} fatalidades</b><br>` : "") +
+        (e.actor1 ? `👤 ${e.actor1}<br>` : "") +
+        `<div style="margin-top:4px;font-size:10px;color:#888">${(e.notes || "").slice(0, 150)}${(e.notes || "").length > 150 ? "..." : ""}</div>` +
+        `</div>`,
+        { maxWidth: 280 }
+      );
+      group.addLayer(circle);
+    });
+    group.addTo(map);
+    markersRef.current = group;
+  }
+
+  return <div ref={mapRef} style={{ width: "100%", height: 450, border: `1px solid ${BORDER}`, background: "#0a0e17" }} />;
+}
+
 function AcledSection() {
   const [events, setEvents] = useState([]);
   const [cast, setCast] = useState([]);
@@ -3212,20 +3286,7 @@ function AcledSection() {
             <button onClick={() => setFilter("all")} style={{ fontSize:7, fontFamily:font, padding:"2px 6px", border:`1px solid ${filter==="all"?ACCENT:BORDER}`, background:filter==="all"?ACCENT:"transparent", color:filter==="all"?"#fff":MUTED, cursor:"pointer" }}>Todos</button>
             {typeOrder.map(t => <button key={t} onClick={() => setFilter(filter===t?"all":t)} style={{ fontSize:7, fontFamily:font, padding:"2px 6px", border:`1px solid ${filter===t?EC[t]:BORDER}`, background:filter===t?`${EC[t]}20`:"transparent", color:EC[t], cursor:"pointer" }}>{t}</button>)}
           </div>
-          <svg viewBox="0 0 520 400" width="100%" style={{ background:BG2, border:`1px solid ${BORDER}` }}>
-            {/* Venezuela bounds: lat ~1-12, lng ~-73 to -60 */}
-            {filtered.map((e,i) => {
-              const lat = parseFloat(e.latitude), lng = parseFloat(e.longitude);
-              if (!lat || !lng || lat < 0 || lat > 13 || lng < -74 || lng > -59) return null;
-              const x = ((lng + 74) / 15) * 500 + 10;
-              const y = ((13 - lat) / 13) * 380 + 10;
-              const fatal = parseInt(e.fatalities)||0;
-              const r = fatal > 5 ? 6 : fatal > 0 ? 4 : 2.5;
-              return <circle key={i} cx={x} cy={y} r={r} fill={EC[e.event_type]||ACCENT} opacity={0.6} stroke={EC[e.event_type]||ACCENT} strokeWidth={0.5} strokeOpacity={0.3}>
-                <title>{e.event_date} · {e.sub_event_type||e.event_type} · {e.location}, {e.admin1}{fatal?` · ${fatal} muertos`:""}</title>
-              </circle>;
-            })}
-          </svg>
+          <LeafletMap events={filtered} EC={EC} />
           <div style={{ display:"flex", gap:10, justifyContent:"center", marginTop:6 }}>
             {typeOrder.map(t => <span key={t} style={{ fontSize:7, fontFamily:font, color:EC[t] }}>● {t}</span>)}
             <span style={{ fontSize:7, fontFamily:font, color:MUTED }}>· Tamaño = fatalidades</span>
