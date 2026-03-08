@@ -13,11 +13,14 @@ export default async function handler(req, res) {
   };
 
   try {
+    // Brent history: from Jan 1, 2025 to now
+    const fromEpoch = Math.floor(new Date("2025-01-01").getTime() / 1000);
+    const toEpoch = Math.floor(Date.now() / 1000);
     const [brentRes, wtiRes, gasRes, brentHistoryRes] = await Promise.all([
       fetchJson(`${API_BASE}/prices/latest?by_code=BRENT_CRUDE_USD`, headers),
       fetchJson(`${API_BASE}/prices/latest?by_code=WTI_USD`, headers),
       fetchJson(`${API_BASE}/prices/latest?by_code=NATURAL_GAS_USD`, headers),
-      fetchJson(`${API_BASE}/prices/past_week?by_code=BRENT_CRUDE_USD`, headers),
+      fetchJson(`${API_BASE}/prices?by_code=BRENT_CRUDE_USD&by_period[from]=${fromEpoch}&by_period[to]=${toEpoch}`, headers),
     ]);
 
     const brent = brentRes?.data || null;
@@ -30,9 +33,9 @@ export default async function handler(req, res) {
         .map(p => ({ price: p.price, time: p.created_at }))
         .sort((a, b) => new Date(a.time) - new Date(b.time));
 
-      // Downsample to ~1 point per 4 hours (42 points for 7 days)
-      if (raw.length > 50) {
-        const step = Math.ceil(raw.length / 42);
+      // Downsample to ~1 point per day (max ~400 points for ~15 months)
+      if (raw.length > 400) {
+        const step = Math.ceil(raw.length / 365);
         brentHistory = raw.filter((_, i) => i % step === 0);
         // Always include the last point
         if (brentHistory[brentHistory.length - 1] !== raw[raw.length - 1]) {

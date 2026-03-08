@@ -1261,11 +1261,6 @@ function MarketOverviewWidget() {
           title="📦 Commodity"
           height={350}
           groups={[
-            { name:"Energy", symbols:[
-              { name:"PEPPERSTONE:XBRUSD", displayName:"Brent Crude" },
-              { name:"PEPPERSTONE:XTIUSD", displayName:"WTI Crude" },
-              { name:"PEPPERSTONE:XNGUSD", displayName:"Natural Gas" },
-            ]},
             { name:"Metals", symbols:[
               { name:"CMCMARKETS:GOLD", displayName:"Gold" },
               { name:"CMCMARKETS:SILVER", displayName:"Silver" },
@@ -1358,7 +1353,7 @@ function BrentChart({ history: rawHistory }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-            Brent Crude · Últimos 7 días · ~4h intervalo
+            Brent Crude · Desde enero 2025
           </span>
           <Badge color="#22c55e">EN VIVO</Badge>
         </div>
