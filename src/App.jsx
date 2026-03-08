@@ -1022,6 +1022,119 @@ function TabSitrep() {
   const isLatest = sitrepWeek === SITREP_ALL.length - 1;
   const hasDetail = !!d.nacional; // S8 has extra detail sections
   const [expandedSection, setExpandedSection] = useState(null);
+  const [viewMode, setViewMode] = useState("informe"); // informe | briefing
+  const [aiAnalysis, setAiAnalysis] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
+
+  const wk = WEEKS[sitrepWeek] || WEEKS[WEEKS.length - 1];
+
+  // ── AI Analysis generator ──
+  const generateAiAnalysis = async () => {
+    setAiLoading(true); setAiError(""); setAiAnalysis("");
+    const weekData = {
+      periodo: d.period,
+      escenarios: wk.probs.map(p => { const sc = SCENARIOS.find(s=>s.id===p.sc); return { nombre:sc?.name, prob:p.v, tendencia:p.t }; }),
+      tendencia: { escenario: SCENARIOS.find(s=>s.id===wk.trendSc)?.name, drivers: wk.trendDrivers },
+      puntosClaveVen: d.keyPoints.map(kp => kp.title + ": " + kp.text),
+      sintesis: d.sintesis,
+      tensiones: wk.tensiones.map(t => t.t.replace(/<[^>]+>/g,"")),
+      kpis: wk.kpis,
+      semaforo: wk.sem,
+    };
+    const prompt = `Eres un analista político-económico senior del PNUD especializado en Venezuela. Con base en los siguientes datos del período ${d.period}, genera un análisis narrativo de contexto situacional de 4-5 párrafos.
+
+DATOS DEL PERÍODO:
+${JSON.stringify(weekData, null, 2)}
+
+INSTRUCCIONES:
+1. Escribe en español profesional, tono institucional PNUD, sin bullet points.
+2. Primer párrafo: panorama general del período y escenario dominante.
+3. Segundo párrafo: dinámica energética y económica.
+4. Tercer párrafo: dinámica política interna y DDHH.
+5. Cuarto párrafo: factores internacionales y geopolíticos.
+6. Párrafo final: perspectiva de corto plazo y variables críticas a monitorear.
+7. Sé específico con datos, cifras y nombres propios del período.
+8. No inventes datos. Usa solo la información proporcionada.`;
+
+    try {
+      let text = "";
+      if (IS_DEPLOYED) {
+        // On Vercel: use serverless proxy (Gemini free → Claude fallback)
+        const res = await fetch("/api/ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt, max_tokens: 1500 }),
+          signal: AbortSignal.timeout(40000),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || `API error: ${res.status}`);
+        }
+        const data = await res.json();
+        text = data.text || "Sin respuesta.";
+        if (data.provider) text = `[${data.provider}]\n\n` + text;
+      } else {
+        // In Claude.ai artifact: direct call (API key injected by environment)
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 1500,
+            messages: [{ role: "user", content: prompt }],
+          }),
+        });
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        const data = await res.json();
+        text = data.content?.map(c => c.text || "").join("\n") || "Sin respuesta.";
+      }
+      setAiAnalysis(text);
+    } catch (err) {
+      setAiError(err.message || "Error al generar análisis");
+    } finally { setAiLoading(false); }
+  };
+
+  // ── Document generator ──
+  const generateDocument = () => {
+    const escRows = wk.probs.map(p => {
+      const sc = SCENARIOS.find(s=>s.id===p.sc);
+      return `<tr><td style="padding:8px;border-bottom:1px solid #d0d7e0;font-weight:600;color:${sc?.color}">${sc?.name}</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;text-align:center;font-size:18px;font-weight:700;color:${sc?.color}">${p.v}%</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;color:#5a6a7a">${{up:"↑ Subiendo",down:"↓ Bajando",flat:"→ Estable"}[p.t]}</td></tr>`;
+    }).join("");
+    const kpCards = d.keyPoints.map(kp => `<div style="flex:1;min-width:200px;border-left:3px solid ${kp.color};padding:12px 16px;background:#f8fafc"><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:${kp.color};margin-bottom:4px">${kp.tag}</div><div style="font-weight:600;margin-bottom:6px">${kp.title}</div><div style="font-size:13px;color:#5a6a7a;line-height:1.5">${kp.text}</div></div>`).join("");
+    const tensionRows = wk.tensiones.map(t => {
+      const colors = {green:"#16a34a",yellow:"#ca8a04",red:"#dc2626"};
+      return `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #eef1f5"><span style="width:8px;height:8px;border-radius:50%;background:${colors[t.l]};margin-top:5px;flex-shrink:0"></span><span style="font-size:13px;color:#3d4f5f;line-height:1.5">${t.t}</span></div>`;
+    }).join("");
+    const actorBlocks = d.actores.map(a => `<div style="margin-bottom:16px"><div style="font-weight:700;font-size:14px;margin-bottom:6px;color:#0468B1">${a.name}</div>${a.items.map(item=>`<div style="font-size:12px;color:#5a6a7a;padding:3px 0 3px 10px;border-left:2px solid #eef1f5;line-height:1.4">· ${item}</div>`).join("")}</div>`).join("");
+
+    const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>SITREP — ${d.period}</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;color:#1a202c;line-height:1.6;background:#fff}@media print{body{font-size:11px}.no-print{display:none!important}}</style></head><body>
+<div style="background:linear-gradient(135deg,#0468B1,#009edb);padding:20px 32px;color:#fff">
+<div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.2em;opacity:0.7;text-transform:uppercase;margin-bottom:4px">PNUD Venezuela · Análisis de Contexto Situacional</div>
+<div style="font-size:22px;font-weight:700">SITREP Semanal</div>
+<div style="font-family:'Space Mono',monospace;font-size:11px;margin-top:4px;opacity:0.8">${d.period}</div>
+</div>
+<div style="max-width:900px;margin:0 auto;padding:32px">
+<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid #0468B1;padding-bottom:6px;margin-bottom:16px">Puntos Clave del Período</h2>
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px">${kpCards}</div>
+<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid #0468B1;padding-bottom:6px;margin-bottom:16px">Escenarios — Probabilidades</h2>
+<table style="width:100%;border-collapse:collapse;margin-bottom:32px"><thead><tr style="border-bottom:2px solid #0468B1"><th style="text-align:left;padding:8px;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#5a6a7a">Escenario</th><th style="text-align:center;padding:8px;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#5a6a7a">Prob.</th><th style="text-align:left;padding:8px;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#5a6a7a">Tendencia</th></tr></thead><tbody>${escRows}</tbody></table>
+<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid #0468B1;padding-bottom:6px;margin-bottom:16px">Síntesis</h2>
+<div style="font-size:14px;color:#3d4f5f;line-height:1.75;margin-bottom:32px;padding:16px;background:#f8fafc;border-left:3px solid #0468B1">${d.sintesis}</div>
+<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid #0468B1;padding-bottom:6px;margin-bottom:16px">Semáforo de Tensiones</h2>
+<div style="margin-bottom:32px">${tensionRows}</div>
+<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid #0468B1;padding-bottom:6px;margin-bottom:16px">Dinámicas por Actor</h2>
+<div style="margin-bottom:32px">${actorBlocks}</div>
+${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid #0468B1;padding-bottom:6px;margin-bottom:16px">Análisis Narrativo (IA)</h2><div style="font-size:14px;color:#3d4f5f;line-height:1.75;margin-bottom:32px;white-space:pre-wrap">${aiAnalysis}</div>` : ""}
+<div style="text-align:center;font-family:'Space Mono',monospace;font-size:10px;color:#5a6a7a80;padding:24px 0;letter-spacing:0.1em;text-transform:uppercase;border-top:1px solid #d0d7e0;margin-top:32px">PNUD Venezuela · Monitor de Contexto Situacional · ${d.periodShort} · Uso interno</div>
+</div></body></html>`;
+
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url;
+    a.download = `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g,"_")}.html`;
+    a.click(); URL.revokeObjectURL(url);
+  };
 
   const toggle = (id) => setExpandedSection(prev => prev === id ? null : id);
 
@@ -1104,6 +1217,153 @@ function TabSitrep() {
           </select>
         </div>
       </div>
+
+      {/* TOOLBAR: Mode toggle + Actions */}
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:mob?12:16, flexWrap:"wrap" }}>
+        {/* View mode toggle */}
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+          {[{id:"informe",label:"📄 Informe"},{id:"briefing",label:"📌 Briefing"}].map(m => (
+            <button key={m.id} onClick={() => setViewMode(m.id)}
+              style={{ fontSize:mob?10:12, fontFamily:font, padding:mob?"5px 10px":"6px 14px", border:"none",
+                background:viewMode===m.id?ACCENT:"transparent", color:viewMode===m.id?"#fff":MUTED,
+                cursor:"pointer", letterSpacing:"0.06em", transition:"all 0.15s" }}>
+              {m.label}
+            </button>
+          ))}
+        </div>
+        <div style={{ flex:1 }} />
+        {/* Action buttons */}
+        <button onClick={generateAiAnalysis} disabled={aiLoading}
+          style={{ fontSize:mob?10:11, fontFamily:font, padding:mob?"5px 10px":"6px 14px",
+            background:aiLoading?BG3:`linear-gradient(135deg, #8b5cf6, #6d28d9)`, color:aiLoading?MUTED:"#fff",
+            border:"none", cursor:aiLoading?"wait":"pointer", letterSpacing:"0.06em", transition:"all 0.15s" }}>
+          {aiLoading ? "⏳ Generando..." : "🤖 Análisis IA"}
+        </button>
+        <button onClick={generateDocument}
+          style={{ fontSize:mob?10:11, fontFamily:font, padding:mob?"5px 10px":"6px 14px",
+            background:ACCENT, color:"#fff", border:"none", cursor:"pointer", letterSpacing:"0.06em" }}>
+          📥 Descargar SITREP
+        </button>
+      </div>
+
+      {/* ═══ BRIEFING VIEW ═══ */}
+      {viewMode === "briefing" && (
+        <div>
+          {/* Briefing: One-page consolidated view */}
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"2fr 1fr", gap:mob?10:14 }}>
+            {/* Left column */}
+            <div>
+              {/* Scenario probabilities */}
+              <div style={{ ...cardStyle, marginBottom:mob?10:14 }}>
+                <div style={{ fontSize:11, fontFamily:font, color:ACCENT, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>Escenarios — {d.periodShort}</div>
+                {wk.probs.map(p => {
+                  const sc = SCENARIOS.find(s=>s.id===p.sc);
+                  return (
+                    <div key={p.sc} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                      <span style={{ fontSize:12, fontFamily:font, color:sc.color, width:20, fontWeight:700 }}>E{sc.id}</span>
+                      <div style={{ flex:1, height:8, background:BG3, borderRadius:3 }}>
+                        <div style={{ height:8, background:sc.color, width:`${p.v}%`, borderRadius:3, transition:"width 0.4s" }} />
+                      </div>
+                      <span style={{ fontSize:14, fontFamily:font, color:sc.color, fontWeight:700, width:36, textAlign:"right" }}>{p.v}%</span>
+                      <span style={{ fontSize:11, color:p.t==="up"?"#22c55e":p.t==="down"?"#ef4444":MUTED }}>
+                        {{up:"↑",down:"↓",flat:"→"}[p.t]}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Key Points */}
+              {d.keyPoints.map((kp, i) => (
+                <div key={i} style={{ ...cardStyle, borderLeft:`3px solid ${kp.color}`, marginBottom:mob?6:8, padding:mob?10:14 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
+                    <span style={{ fontSize:8, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", padding:"1px 6px",
+                      background:`${kp.color}14`, color:kp.color, border:`1px solid ${kp.color}28` }}>{kp.tag}</span>
+                    <span style={{ fontSize:mob?12:13, fontWeight:600, color:TEXT }}>{kp.title}</span>
+                  </div>
+                  <div style={{ fontSize:mob?11:12, color:MUTED, lineHeight:1.5 }}>{kp.text}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Right column */}
+            <div>
+              {/* Semáforo de tensiones */}
+              <div style={{ ...cardStyle, marginBottom:mob?10:14 }}>
+                <div style={{ fontSize:11, fontFamily:font, color:ACCENT, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>Semáforo</div>
+                <div style={{ display:"flex", gap:12, marginBottom:10 }}>
+                  {[{l:"Verde",c:SEM.green,n:wk.sem.g},{l:"Amarillo",c:SEM.yellow,n:wk.sem.y},{l:"Rojo",c:SEM.red,n:wk.sem.r}].map((s,i) => (
+                    <div key={i} style={{ textAlign:"center" }}>
+                      <div style={{ fontSize:18, fontWeight:800, color:s.c }}>{s.n}</div>
+                      <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>{s.l}</div>
+                    </div>
+                  ))}
+                </div>
+                {wk.tensiones.map((t,i) => (
+                  <div key={i} style={{ display:"flex", gap:6, padding:"4px 0", borderBottom:i<wk.tensiones.length-1?`1px solid ${BORDER}30`:"none", alignItems:"flex-start" }}>
+                    <div style={{ width:6, height:6, borderRadius:"50%", background:SEM[t.l], marginTop:5, flexShrink:0 }} />
+                    <div style={{ fontSize:11, color:MUTED, lineHeight:1.4 }} dangerouslySetInnerHTML={{__html:t.t}} />
+                  </div>
+                ))}
+              </div>
+
+              {/* Tendencia */}
+              <div style={{ ...cardStyle, marginBottom:mob?10:14, background:`${SCENARIOS.find(s=>s.id===wk.trendSc)?.color}08`,
+                borderLeft:`3px solid ${SCENARIOS.find(s=>s.id===wk.trendSc)?.color}` }}>
+                <div style={{ fontSize:11, fontFamily:font, color:SCENARIOS.find(s=>s.id===wk.trendSc)?.color, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
+                  Tendencia → E{wk.trendSc}
+                </div>
+                {wk.trendDrivers.map((dr,i) => (
+                  <div key={i} style={{ fontSize:11, color:TEXT, lineHeight:1.5, padding:"2px 0" }}>› {dr}</div>
+                ))}
+              </div>
+
+              {/* Actors compact */}
+              <div style={cardStyle}>
+                <div style={{ fontSize:11, fontFamily:font, color:ACCENT, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>Actores</div>
+                {d.actores.map((a,i) => (
+                  <div key={i} style={{ marginBottom:i<d.actores.length-1?10:0 }}>
+                    <div style={{ fontSize:12, fontWeight:700, color:TEXT, marginBottom:3 }}>{a.name}</div>
+                    {a.items.slice(0,2).map((item,j) => (
+                      <div key={j} style={{ fontSize:10, color:MUTED, lineHeight:1.4, paddingLeft:8, borderLeft:`2px solid ${BG3}` }}>· {item}</div>
+                    ))}
+                    {a.items.length > 2 && <div style={{ fontSize:9, color:`${MUTED}80`, paddingLeft:8 }}>+{a.items.length-2} más</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Síntesis */}
+          <div style={{ ...cardStyle, marginTop:mob?10:14, borderLeft:`3px solid ${ACCENT}` }}>
+            <div style={{ fontSize:11, fontFamily:font, color:ACCENT, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>Síntesis del período</div>
+            <div style={{ fontSize:mob?12:13, color:TEXT, lineHeight:1.7 }}>{d.sintesis}</div>
+          </div>
+
+          {/* AI Analysis if generated */}
+          {aiAnalysis && (() => {
+            const providerMatch = aiAnalysis.match(/^\[([^\]]+)\]\n\n/);
+            const provider = providerMatch ? providerMatch[1] : "claude";
+            const displayText = providerMatch ? aiAnalysis.slice(providerMatch[0].length) : aiAnalysis;
+            const isGemini = provider.includes("gemini");
+            const badgeColor = isGemini ? "#4285f4" : "#8b5cf6";
+            const badgeLabel = isGemini ? "GEMINI" : "CLAUDE";
+            return (
+              <div style={{ ...cardStyle, marginTop:mob?10:14, borderLeft:`3px solid ${badgeColor}`, background:`${badgeColor}08` }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+                  <span style={{ fontSize:11, fontFamily:font, color:badgeColor, letterSpacing:"0.12em", textTransform:"uppercase" }}>Análisis narrativo · IA</span>
+                  <span style={{ fontSize:8, fontFamily:font, padding:"1px 6px", background:`${badgeColor}18`, color:badgeColor, border:`1px solid ${badgeColor}30` }}>{badgeLabel}</span>
+                </div>
+                <div style={{ fontSize:mob?12:13, color:TEXT, lineHeight:1.75, whiteSpace:"pre-wrap" }}>{displayText}</div>
+              </div>
+            );
+          })()}
+          {aiError && <div style={{ ...cardStyle, marginTop:8, color:"#dc2626", fontSize:12 }}>Error: {aiError}</div>}
+        </div>
+      )}
+
+      {/* ═══ INFORME VIEW (original) ═══ */}
+      {viewMode === "informe" && <>
 
       {/* SECTION 00: KEY POINTS */}
       <Section num="00" title="Puntos Clave del Período" id="keypoints" defaultOpen>
@@ -1266,7 +1526,38 @@ function TabSitrep() {
         </Section>
       )}
 
-      {/* FOOTER */}
+      {/* AI ANALYSIS within informe view */}
+      {viewMode === "informe" && aiAnalysis && (() => {
+        const providerMatch = aiAnalysis.match(/^\[([^\]]+)\]\n\n/);
+        const provider = providerMatch ? providerMatch[1] : "claude";
+        const displayText = providerMatch ? aiAnalysis.slice(providerMatch[0].length) : aiAnalysis;
+        const isGemini = provider.includes("gemini");
+        const badgeColor = isGemini ? "#4285f4" : "#8b5cf6";
+        const badgeLabel = isGemini ? "GEMINI" : "CLAUDE";
+        return (
+        <div style={{ borderBottom:`1px solid ${BORDER}40` }}>
+          <div style={{ display:"flex", alignItems:"center", gap:mob?8:12, cursor:"pointer",
+            padding:mob?"12px 0":"16px 0", userSelect:"none" }} onClick={() => toggle("aianalysis")}>
+            <span style={{ fontFamily:font, fontSize:mob?10:11, color:badgeColor, letterSpacing:"0.15em", opacity:0.5, minWidth:mob?24:30 }}>AI</span>
+            <span style={{ fontFamily:fontSans, fontSize:mob?15:18, fontWeight:600, color:TEXT, flex:1 }}>Análisis Narrativo · Inteligencia Artificial</span>
+            <span style={{ fontSize:8, fontFamily:font, padding:"1px 6px", background:`${badgeColor}18`, color:badgeColor, border:`1px solid ${badgeColor}30`, marginRight:8 }}>{badgeLabel}</span>
+            <span style={{ fontSize:mob?12:14, color:MUTED, transition:"transform 0.2s", transform: expandedSection==="aianalysis" ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+          </div>
+          {expandedSection === "aianalysis" && (
+            <div style={{ paddingBottom:mob?16:24 }}>
+              <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:mob?14:20, borderLeft:`3px solid ${badgeColor}` }}>
+                <div style={{ fontSize:mob?13:14, fontFamily:fontSans, color:TEXT, lineHeight:1.75, whiteSpace:"pre-wrap" }}>{displayText}</div>
+              </div>
+            </div>
+          )}
+        </div>
+        );
+      })()}
+      {viewMode === "informe" && aiError && <div style={{ background:BG2, border:`1px solid #dc262630`, padding:12, marginBottom:12, color:"#dc2626", fontSize:12 }}>Error IA: {aiError}</div>}
+
+      </>}
+
+      {/* SITREP FOOTER */}
       <div style={{ textAlign:"center", fontFamily:font, fontSize:mob?9:10, color:`${MUTED}70`,
         padding:"24px 0 8px", letterSpacing:"0.1em", textTransform:"uppercase" }}>
         PNUD Venezuela · Análisis de Contexto Situacional · {d.periodShort} · Uso interno

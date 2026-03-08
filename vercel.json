@@ -1,6 +1,7 @@
 {
   "functions": {
-    "api/cron/index.js": { "maxDuration": 60 }
+    "api/cron/index.js": { "maxDuration": 60 },
+    "api/ai/index.js": { "maxDuration": 45 }
   },
   "rewrites": [
     { "source": "/api/gdelt", "destination": "/api/gdelt/index.js" },
@@ -12,6 +13,7 @@
     { "source": "/api/rates", "destination": "/api/rates/index.js" },
     { "source": "/api/dolar", "destination": "/api/dolar/index.js" },
     { "source": "/api/acled", "destination": "/api/acled/index.js" },
+    { "source": "/api/ai", "destination": "/api/ai/index.js" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [
@@ -19,7 +21,8 @@
       "source": "/api/(.*)",
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET" }
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
       ]
     }
   ]
