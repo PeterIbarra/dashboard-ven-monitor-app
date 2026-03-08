@@ -7,6 +7,7 @@
     { "source": "/api/cron", "destination": "/api/cron/index.js" },
     { "source": "/api/articles", "destination": "/api/articles/index.js" },
     { "source": "/api/rates", "destination": "/api/rates/index.js" },
+    { "source": "/api/dolar", "destination": "/api/dolar/index.js" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [

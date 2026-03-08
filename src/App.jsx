@@ -3077,52 +3077,120 @@ function TabMacro() {
   const [seccion, setSeccion] = useState("cambio");
   const [rateHistory, setRateHistory] = useState([]);
 
-  // Historical rates (seed data — augmented by Supabase history)
-  const SEED_RATES = [
-    {d:"2026-01-06",bcv:37.5,par:42.2},{d:"2026-01-13",bcv:38.0,par:44.5},{d:"2026-01-20",bcv:42.8,par:55.0},
-    {d:"2026-01-27",bcv:65.5,par:120.0},{d:"2026-02-03",bcv:150.0,par:280.0},{d:"2026-02-10",bcv:280.0,par:420.0},
-    {d:"2026-02-17",bcv:380.0,par:520.0},{d:"2026-02-24",bcv:414.0,par:631.0},{d:"2026-03-03",bcv:425.0,par:595.0},
-  ];
-
   useEffect(() => {
-    async function fetchDolar() {
+    async function fetchAll() {
+      // First get live rate
+      let liveBcv = null, livePar = null;
       try {
-        const res = await fetch("https://ve.dolarapi.com/v1/dolares", { signal: AbortSignal.timeout(8000) });
+        const liveUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
+        const res = await fetch(liveUrl, { signal: AbortSignal.timeout(8000) });
         if (res.ok) {
           const data = await res.json();
           const oficial = data.find(d => d.fuente === "oficial");
           const paralelo = data.find(d => d.fuente === "paralelo");
-          const bcv = oficial?.promedio || null;
-          const par = paralelo?.promedio || null;
-          const brecha = bcv && par ? (((par - bcv) / bcv) * 100) : null;
-          setDolar({ bcv, par, brecha, updated: oficial?.fechaActualizacion || new Date().toISOString() });
+          liveBcv = oficial?.promedio || null;
+          livePar = paralelo?.promedio || null;
+          const brecha = liveBcv && livePar ? (((livePar - liveBcv) / liveBcv) * 100) : null;
+          setDolar({ bcv: liveBcv, par: livePar, brecha, updated: oficial?.fechaActualizacion || new Date().toISOString() });
         }
       } catch {}
       setLoading(false);
-    }
 
-    async function fetchHistory() {
-      // Try Supabase first
+      // Then get history — try Supabase (accumulated) -> DolarAPI -> fallback seed
+      let histLoaded = false;
+
+      // Try Supabase rates (accumulated daily history)
       if (IS_DEPLOYED) {
         try {
-          const res = await fetch("/api/rates?limit=90", { signal: AbortSignal.timeout(6000) });
+          const res = await fetch("/api/rates?limit=365", { signal: AbortSignal.timeout(6000) });
           if (res.ok) {
             const data = await res.json();
-            if (data.rates?.length > 2) {
-              const mapped = data.rates.map(r => ({ d:r.date, bcv:Number(r.bcv), par:Number(r.paralelo), usdt:Number(r.usdt), brecha:Number(r.brecha) }));
-              setRateHistory(mapped);
-              return;
+            if (data.rates?.length > 5) {
+              const hist = data.rates.map(r => ({ d:r.date, bcv:Number(r.bcv), par:Number(r.paralelo), usdt:Number(r.usdt), brecha:Number(r.brecha) }));
+              // Append today
+              if (liveBcv && livePar) {
+                const today = new Date().toISOString().slice(0,10);
+                if (!hist.find(h => h.d === today)) hist.push({ d:today, bcv:liveBcv, par:livePar, usdt:livePar*1.02, brecha:((livePar-liveBcv)/liveBcv)*100 });
+              }
+              setRateHistory(hist);
+              histLoaded = true;
             }
           }
         } catch {}
       }
-      // Fallback to seed + live
-      setRateHistory(SEED_RATES);
+
+      // Try DolarAPI historical (only ~30 days)
+      if (!histLoaded) {
+        try {
+        const histUrl = IS_DEPLOYED ? "/api/dolar?type=historico" : "https://ve.dolarapi.com/v1/historicos/dolares";
+        const res = await fetch(histUrl, { signal: AbortSignal.timeout(12000) });
+        if (res.ok) {
+          const data = await res.json();
+          // Serverless returns { rates: [...] }, direct API returns raw array
+          let hist = data.rates || [];
+          if (!hist.length && Array.isArray(data)) {
+            // Direct API fallback: parse raw
+            const byDate = {};
+            let lastPar = null;
+            data.forEach(r => {
+              if (!byDate[r.fecha]) byDate[r.fecha] = { d: r.fecha };
+              if (r.fuente === "oficial") byDate[r.fecha].bcv = r.promedio;
+              if (r.fuente === "paralelo") byDate[r.fecha].par = r.promedio;
+            });
+            hist = Object.values(byDate).filter(h => h.bcv || h.par).sort((a, b) => a.d.localeCompare(b.d))
+              .map(h => { if (h.par) lastPar = h.par; return { ...h, bcv: h.bcv||null, par: h.par||lastPar }; });
+          }
+          // Append today
+          if (liveBcv && livePar) {
+            const today = new Date().toISOString().slice(0, 10);
+            if (!hist.find(h => h.d === today)) {
+              hist.push({ d: today, bcv: liveBcv, par: livePar, usdt: livePar*1.02, brecha: ((livePar-liveBcv)/liveBcv)*100 });
+            }
+          }
+          if (hist.length > 2) { setRateHistory(hist); histLoaded = true; }
+        }
+      } catch {}
+      }
+
+      // Fallback — real monthly data BCV + Paralelo (último día de cada mes, fuente: BCV + Dólar Promedio)
+      if (!histLoaded) setRateHistory([
+        // 2022
+        {d:"2022-01-31",bcv:4.52,par:4.65},{d:"2022-02-28",bcv:4.46,par:4.61},{d:"2022-03-31",bcv:4.38,par:4.48},
+        {d:"2022-04-30",bcv:4.49,par:4.57},{d:"2022-05-31",bcv:5.06,par:5.14},{d:"2022-06-30",bcv:5.53,par:5.78},
+        {d:"2022-07-31",bcv:5.78,par:5.97},{d:"2022-08-31",bcv:7.89,par:8.15},{d:"2022-09-30",bcv:8.20,par:8.32},
+        {d:"2022-10-31",bcv:8.59,par:9.03},{d:"2022-11-30",bcv:11.07,par:13.25},{d:"2022-12-31",bcv:17.48,par:18.60},
+        // 2023
+        {d:"2023-01-31",bcv:22.37,par:23.11},{d:"2023-02-28",bcv:24.36,par:24.75},{d:"2023-03-31",bcv:24.52,par:24.72},
+        {d:"2023-04-30",bcv:24.75,par:25.63},{d:"2023-05-31",bcv:26.26,par:27.67},{d:"2023-06-30",bcv:28.01,par:29.04},
+        {d:"2023-07-31",bcv:29.50,par:31.58},{d:"2023-08-31",bcv:32.59,par:34.17},{d:"2023-09-30",bcv:34.46,par:36.39},
+        {d:"2023-10-31",bcv:35.58,par:36.92},{d:"2023-11-30",bcv:35.95,par:37.07},{d:"2023-12-31",bcv:35.95,par:39.57},
+        // 2024
+        {d:"2024-01-31",bcv:36.26,par:38.39},{d:"2024-02-29",bcv:36.15,par:38.33},{d:"2024-03-31",bcv:36.26,par:38.47},
+        {d:"2024-04-30",bcv:36.47,par:39.40},{d:"2024-05-31",bcv:36.53,par:40.36},{d:"2024-06-30",bcv:36.44,par:40.23},
+        {d:"2024-07-31",bcv:36.60,par:42.24},{d:"2024-08-31",bcv:36.62,par:42.50},{d:"2024-09-30",bcv:36.92,par:43.09},
+        {d:"2024-10-31",bcv:42.56,par:52.43},{d:"2024-11-30",bcv:47.60,par:56.20},{d:"2024-12-31",bcv:51.93,par:66.25},
+        // 2025
+        {d:"2025-01-31",bcv:57.96,par:68.43},{d:"2025-02-28",bcv:64.48,par:79.35},{d:"2025-03-31",bcv:69.56,par:99.00},
+        {d:"2025-04-30",bcv:87.56,par:108.90},{d:"2025-05-31",bcv:96.85,par:135.25},{d:"2025-06-30",bcv:107.62,par:140.23},
+        {d:"2025-07-31",bcv:124.51,par:164.83},{d:"2025-08-31",bcv:147.08,par:207.33},{d:"2025-09-30",bcv:177.61,par:288.50},
+        {d:"2025-10-31",bcv:223.64,par:308.10},{d:"2025-11-30",bcv:245.67,par:382.50},{d:"2025-12-31",bcv:301.37,par:587.00},
+        // 2026 (daily data from DolarAPI + SITREP)
+        {d:"2026-01-06",bcv:382.6,par:896.6},{d:"2026-01-15",bcv:385.0,par:750.0},{d:"2026-01-27",bcv:388.0,par:650.0},
+        {d:"2026-02-06",bcv:382.6,par:552.0},{d:"2026-02-14",bcv:396.4,par:531.1},{d:"2026-02-20",bcv:402.3,par:574.1},
+        {d:"2026-02-27",bcv:420.0,par:603.3},{d:"2026-03-03",bcv:421.9,par:600.0},{d:"2026-03-08",bcv:433.2,par:602.7},
+      ]);
     }
 
-    fetchDolar();
-    fetchHistory();
-    const iv = setInterval(fetchDolar, 120000);
+    fetchAll();
+    const iv = setInterval(() => {
+      fetch("https://ve.dolarapi.com/v1/dolares", { signal: AbortSignal.timeout(8000) })
+        .then(r => r.ok ? r.json() : null).then(data => {
+          if (!data) return;
+          const o = data.find(d => d.fuente === "oficial"), p = data.find(d => d.fuente === "paralelo");
+          const bcv = o?.promedio, par = p?.promedio;
+          if (bcv && par) setDolar({ bcv, par, brecha: ((par-bcv)/bcv)*100, updated: new Date().toISOString() });
+        }).catch(() => {});
+    }, 120000);
     return () => clearInterval(iv);
   }, []);
 
@@ -3196,7 +3264,7 @@ function TabMacro() {
         {rateHistory.length > 2 && (
           <Card>
             <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
-              Evolución cambiaria · Ene–Mar 2026
+              Evolución cambiaria · {rateHistory.length > 0 ? `${rateHistory[0].d.slice(0,7)} — ${rateHistory[rateHistory.length-1].d.slice(0,7)}` : "..."} · {rateHistory.length} puntos
             </div>
             <RateChart data={rateHistory} />
           </Card>
