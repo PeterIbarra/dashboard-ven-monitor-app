@@ -227,9 +227,98 @@ const POLYMARKET_SLUGS = [
 ];
 
 const CONF_HISTORICO = [
-  {y:2011,p:5338},{y:2012,p:5483},{y:2013,p:4410},{y:2014,p:9286},{y:2015,p:5851},
-  {y:2016,p:6917},{y:2017,p:9787},{y:2018,p:12715},{y:2019,p:16739},{y:2020,p:9633},
-  {y:2021,p:6560},{y:2022,p:7032},{y:2023,p:6956},{y:2024,p:5226},{y:2025,p:2219},
+  {y:2011,p:5338,h:"Inicio monitoreo OVCS. Gobierno Chávez."},{y:2012,p:5483,h:"Año electoral. Reelección de Chávez."},
+  {y:2013,p:4410,h:"Muerte de Chávez. Maduro asume."},{y:2014,p:9286,h:"Protestas masivas 'La Salida'. 43 muertos."},
+  {y:2015,p:5851,h:"AN elegida con mayoría opositora."},{y:2016,p:6917,h:"Revocatorio bloqueado. Hiperinflación."},
+  {y:2017,p:9787,h:"112 días de protestas. 125+ muertos."},{y:2018,p:12715,h:"Elecciones cuestionadas. Éxodo masivo."},
+  {y:2019,p:16739,h:"PICO HISTÓRICO. Apagones. Guaidó."},{y:2020,p:9633,h:"Pandemia COVID-19."},
+  {y:2021,p:6560,h:"Elecciones regionales."},{y:2022,p:7032,h:"Negociaciones en México."},
+  {y:2023,p:6956,h:"Acuerdo de Barbados. Primarias."},{y:2024,p:5226,h:"Elecciones julio 28. Operación TunTun."},
+  {y:2025,p:2219,h:"MÍNIMO HISTÓRICO. Captura Maduro ene 2026."},
+];
+
+const CONF_MESES = [
+  {m:"Ene",t:401,desca:96,dcp:305,rep:36,hecho:"Rechazo juramentación. Colectivos en 17 protestas."},
+  {m:"Feb",t:170,desca:107,dcp:63,rep:0,hecho:"Ruta por la Justicia y la Libertad."},
+  {m:"Mar",t:217,desca:130,dcp:87,rep:2,hecho:"Rechazo deportaciones desde EE.UU."},
+  {m:"Abr",t:146,desca:95,dcp:51,rep:3,hecho:"Movilizaciones por elecciones parlamentarias."},
+  {m:"May",t:163,desca:119,dcp:44,rep:3,hecho:"Restricciones al derecho a manifestar."},
+  {m:"Jun",t:152,desca:91,dcp:61,rep:6,hecho:"Persona non grata al Alto Comisionado ONU."},
+  {m:"Jul",t:144,desca:97,dcp:47,rep:0,hecho:"Exigencia aumento salarial real."},
+  {m:"Ago",t:168,desca:75,dcp:93,rep:1,hecho:"Rechazo sanciones. Alistamiento militar."},
+  {m:"Sep",t:187,desca:134,dcp:53,rep:0,hecho:"Ruta Global por la Justicia."},
+  {m:"Oct",t:186,desca:109,dcp:77,rep:3,hecho:"Vigilias presos políticos."},
+  {m:"Nov",t:162,desca:121,dcp:41,rep:0,hecho:"Exigencia aguinaldos. Rechazo Constituyente Obrera."},
+  {m:"Dic",t:123,desca:74,dcp:49,rep:1,hecho:"Reclamos bajos aguinaldos."},
+];
+
+const CONF_DERECHOS = [
+  {d:"Participación política",cat:"DCP",p:648,pct:29.2},{d:"Derechos laborales",cat:"DESCA",p:573,pct:25.8},
+  {d:"Vivienda/hábitat",cat:"DESCA",p:556,pct:25.1},{d:"Justicia",cat:"DCP",p:504,pct:22.7},
+  {d:"Servicios básicos",cat:"DESCA",p:275,pct:12.4},{d:"Salud",cat:"DESCA",p:189,pct:8.5},
+  {d:"Educación",cat:"DESCA",p:186,pct:8.4},{d:"Seguridad social",cat:"DESCA",p:151,pct:6.8},
+];
+
+const CONF_SERVICIOS = [
+  {s:"Electricidad",i:"⚡",p:160,pct:58.2},{s:"Agua potable",i:"💧",p:98,pct:35.6},
+  {s:"Aguas servidas",i:"🚰",p:88,pct:32.0},{s:"Vialidad",i:"🛣️",p:85,pct:30.9},
+  {s:"Desechos sólidos",i:"🗑️",p:38,pct:13.8},{s:"Combustible/gas",i:"⛽",p:29,pct:10.5},
+  {s:"Gas doméstico",i:"🔥",p:16,pct:5.8},{s:"Alumbrado",i:"💡",p:11,pct:4.0},
+];
+
+const CONF_ESTADOS = [
+  {e:"Anzoátegui",p:214,r:1,c:2,x:"Servicios básicos, empleo y derechos fundamentales"},
+  {e:"Táchira",p:202,r:2,c:5,x:"Combustible y servicios básicos"},
+  {e:"Distrito Capital",p:201,r:9,c:0,x:"Dinámicas políticas y servicios básicos"},
+  {e:"Sucre",p:181,r:5,c:7,x:"Desabastecimiento combustible y servicios"},
+  {e:"Bolívar",p:166,r:3,c:0,x:"Servicios básicos, empleo y derechos"},
+  {e:"Lara",p:166,r:2,c:2,x:"Servicios básicos, empleo y derechos"},
+  {e:"Falcón",p:112,r:1,c:1,x:"Derechos fundamentales y servicios"},
+  {e:"Mérida",p:107,r:1,c:1,x:"Derechos fundamentales"},
+  {e:"Aragua",p:102,r:7,c:1,x:"Derechos fundamentales y servicios"},
+  {e:"Portuguesa",p:98,r:0,c:0,x:"Derechos fundamentales"},
+  {e:"Monagas",p:95,r:1,c:1,x:"Derechos fundamentales"},
+  {e:"Miranda",p:90,r:4,c:0,x:"Derechos fundamentales y servicios"},
+  {e:"Carabobo",p:88,r:7,c:0,x:"Derechos fundamentales y servicios"},
+  {e:"Nueva Esparta",p:82,r:2,c:6,x:"Suministro combustible y servicios"},
+  {e:"Zulia",p:61,r:2,c:0,x:"Derechos fundamentales"},
+  {e:"Cojedes",p:52,r:2,c:0,x:"Derechos fundamentales"},
+  {e:"Vargas",p:51,r:3,c:3,x:"Combustible y servicios básicos"},
+  {e:"Barinas",p:34,r:0,c:0,x:"Derechos fundamentales"},
+  {e:"Guárico",p:31,r:0,c:0,x:"Derechos fundamentales"},
+  {e:"Trujillo",p:28,r:1,c:0,x:"Derechos fundamentales"},
+  {e:"Yaracuy",p:28,r:0,c:0,x:"Derechos fundamentales"},
+  {e:"Delta Amacuro",p:14,r:2,c:0,x:"Servicios básicos y derechos"},
+  {e:"Apure",p:10,r:0,c:0,x:"Servicios básicos, empleo y derechos"},
+  {e:"Amazonas",p:6,r:0,c:0,x:"Servicios básicos, empleo y derechos"},
+];
+
+// Venezuela map — clean hand-drawn state polygons (viewBox 0 0 600 420)
+const VZ_MAP = [
+  {id:"Zulia",d:"M 28,95 L 40,78 L 55,72 L 72,80 L 82,95 L 88,115 L 90,140 L 85,165 L 75,180 L 60,188 L 45,182 L 33,170 L 25,148 L 22,125Z"},
+  {id:"Falcón",d:"M 82,58 L 100,42 L 125,32 L 155,28 L 180,35 L 195,48 L 185,62 L 165,72 L 145,76 L 125,74 L 108,78 L 90,72Z"},
+  {id:"Lara",d:"M 90,78 L 115,74 L 135,78 L 145,92 L 140,108 L 125,115 L 108,112 L 95,104 L 86,92Z"},
+  {id:"Yaracuy",d:"M 140,76 L 158,72 L 168,82 L 162,94 L 150,98 L 142,92Z"},
+  {id:"Carabobo",d:"M 162,72 L 178,68 L 188,80 L 182,92 L 170,96 L 162,90Z"},
+  {id:"Aragua",d:"M 182,68 L 200,64 L 212,75 L 206,90 L 192,94 L 182,88Z"},
+  {id:"Vargas",d:"M 192,52 L 220,46 L 240,50 L 235,60 L 210,66 L 194,62Z"},
+  {id:"Distrito Capital",d:"M 210,62 L 224,58 L 232,66 L 224,74 L 212,70Z"},
+  {id:"Miranda",d:"M 224,70 L 248,64 L 268,74 L 262,92 L 242,100 L 225,96 L 215,86Z"},
+  {id:"Trujillo",d:"M 88,104 L 108,98 L 118,110 L 110,124 L 95,126 L 86,116Z"},
+  {id:"Mérida",d:"M 60,125 L 82,112 L 96,125 L 90,145 L 74,152 L 58,146Z"},
+  {id:"Táchira",d:"M 38,152 L 58,140 L 72,152 L 66,172 L 52,182 L 36,175Z"},
+  {id:"Barinas",d:"M 90,125 L 128,115 L 148,126 L 145,155 L 122,168 L 95,158 L 82,145Z"},
+  {id:"Portuguesa",d:"M 128,98 L 158,92 L 172,102 L 168,124 L 150,132 L 130,125Z"},
+  {id:"Cojedes",d:"M 168,90 L 192,86 L 200,100 L 192,118 L 175,122 L 165,110Z"},
+  {id:"Guárico",d:"M 200,86 L 262,82 L 282,92 L 288,118 L 272,145 L 238,155 L 205,142 L 192,122 L 195,102Z"},
+  {id:"Anzoátegui",d:"M 282,68 L 338,58 L 365,68 L 360,95 L 340,110 L 310,115 L 288,108 L 278,92Z"},
+  {id:"Sucre",d:"M 338,48 L 385,40 L 405,52 L 395,70 L 370,78 L 342,72Z"},
+  {id:"Nueva Esparta",d:"M 385,30 L 408,26 L 416,36 L 405,44 L 388,42Z"},
+  {id:"Monagas",d:"M 340,75 L 380,68 L 400,82 L 392,105 L 368,115 L 342,108Z"},
+  {id:"Delta Amacuro",d:"M 392,72 L 430,62 L 458,75 L 452,105 L 430,118 L 400,110 L 388,95Z"},
+  {id:"Bolívar",d:"M 288,118 L 368,110 L 430,122 L 448,165 L 442,225 L 415,270 L 370,288 L 315,275 L 280,245 L 268,200 L 265,158Z"},
+  {id:"Amazonas",d:"M 148,170 L 265,158 L 272,210 L 268,265 L 255,310 L 230,348 L 200,365 L 172,348 L 155,310 L 145,255 L 142,210Z"},
+  {id:"Apure",d:"M 55,185 L 148,170 L 158,210 L 148,245 L 120,255 L 85,245 L 62,225 L 50,205Z"},
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -2269,35 +2358,348 @@ function TabMercados() {
   );
 }
 
-function TabConflictividad() {
+function EstadosMap() {
+  const [selected, setSelected] = useState(null);
+  const maxEst = Math.max(...CONF_ESTADOS.map(e=>e.p));
+  const lider = CONF_ESTADOS[0]; // highest
+
+  // Color scale: protestas -> intensity
+  const getColor = (protestas) => {
+    const t = protestas / maxEst;
+    if (t > 0.8) return "#E5243B";
+    if (t > 0.6) return "#ff6b35";
+    if (t > 0.4) return "#f59e0b";
+    if (t > 0.2) return "#0A97D9";
+    return "#0A97D980";
+  };
+
+  const sel = selected ? CONF_ESTADOS.find(e => e.e === selected) : null;
+  const selRank = sel ? CONF_ESTADOS.indexOf(sel) + 1 : null;
+
   return (
-    <div>
-      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
-        <span style={{ fontSize:14 }}>📊</span>
-        <div>
-          <div style={{ fontSize:13, fontWeight:600, color:TEXT }}>Conflictividad Social — Venezuela 2025</div>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Fuente: OVCS · Informe Anual 2025</div>
+    <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:16 }}>
+      {/* Map */}
+      <div>
+        <svg viewBox="0 0 600 420" style={{ width:"100%", background:BG2, border:`1px solid ${BORDER}`, padding:8 }}>
+          {VZ_MAP.map(state => {
+            const data = CONF_ESTADOS.find(e => e.e === state.id);
+            const isSelected = selected === state.id;
+            return (
+              <g key={state.id}>
+                <path d={state.d} fill={data ? getColor(data.p) : `${MUTED}30`}
+                  stroke={isSelected ? "#fff" : `${BORDER}`} strokeWidth={isSelected ? 2 : 0.5}
+                  style={{ cursor:"pointer", transition:"all 0.2s" }}
+                  opacity={selected && !isSelected ? 0.4 : 1}
+                  onClick={() => setSelected(isSelected ? null : state.id)}
+                  onMouseEnter={e => { if(!isSelected) e.currentTarget.setAttribute("stroke","#fff"); e.currentTarget.setAttribute("stroke-width","1.5"); }}
+                  onMouseLeave={e => { if(!isSelected) { e.currentTarget.setAttribute("stroke",BORDER); e.currentTarget.setAttribute("stroke-width","0.5"); }}}
+                />
+              </g>
+            );
+          })}
+          {/* State labels */}
+          {VZ_MAP.map(state => {
+            const data = CONF_ESTADOS.find(e => e.e === state.id);
+            if (!data) return null;
+            // Calculate center of path bounding box approximately
+            const nums = (state.d || "").match(/[\d.]+/g);
+            if (!nums || nums.length < 4) return null;
+            const nf = nums.map(Number);
+            const xs = nf.filter((_,i) => i%2===0), ys = nf.filter((_,i) => i%2===1);
+            const cx = (Math.min(...xs)+Math.max(...xs))/2, cy = (Math.min(...ys)+Math.max(...ys))/2;
+            return (
+              <text key={`l${state.id}`} x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
+                fontSize={data.p > 100 ? 7 : 5} fill={selected===state.id?"#fff":"rgba(255,255,255,0.7)"}
+                fontFamily={font} fontWeight={selected===state.id?700:400} pointerEvents="none">
+                {data.p}
+              </text>
+            );
+          })}
+        </svg>
+        {/* Legend */}
+        <div style={{ display:"flex", gap:8, justifyContent:"center", marginTop:8, flexWrap:"wrap" }}>
+          {[{c:"#E5243B",l:">170"},{c:"#ff6b35",l:"130–170"},{c:"#f59e0b",l:"85–130"},{c:"#0A97D9",l:"45–85"},{c:"#0A97D980",l:"<45"}].map((l,i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:4 }}>
+              <div style={{ width:10, height:10, background:l.c, borderRadius:2 }} />
+              <span style={{ fontSize:7, fontFamily:font, color:MUTED }}>{l.l}</span>
+            </div>
+          ))}
         </div>
+        <div style={{ fontSize:7, fontFamily:font, color:`${MUTED}60`, textAlign:"center", marginTop:4 }}>Click en un estado para ver detalles</div>
       </div>
-      {/* KPIs */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:16 }}>
-        {[{k:"Total 2025",v:"2.219",c:ACCENT,s:"-57% vs 2024"},{k:"DESCA",v:"1.248",c:"#0468B1",s:"56% del total"},
-          {k:"DCP",v:"971",c:ACCENT,s:"44% del total"},{k:"Reprimidas",v:"55",c:"#E5243B",s:"2,5% patrón selectivo"}
-        ].map((d,i) => (
-          <Card key={i}>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{d.k}</div>
-            <div style={{ fontSize:22, fontWeight:800, color:d.c, fontFamily:"'Syne',sans-serif" }}>{d.v}</div>
-            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>{d.s}</div>
-          </Card>
+
+      {/* Detail panel */}
+      <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"16px", display:"flex", flexDirection:"column", gap:12 }}>
+        {sel ? (<>
+          <div>
+            <div style={{ fontSize:14, fontWeight:800, color:TEXT, fontFamily:"'Syne',sans-serif" }}>{sel.e}</div>
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Posición #{selRank} de {CONF_ESTADOS.length} estados</div>
+          </div>
+
+          {/* KPIs */}
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+            <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
+              <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Protestas</div>
+              <div style={{ fontSize:20, fontWeight:800, color:ACCENT, fontFamily:"'Syne',sans-serif" }}>{sel.p}</div>
+              <div style={{ fontSize:8, color:MUTED }}>{((sel.p/2219)*100).toFixed(1)}% del total nacional</div>
+            </div>
+            <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
+              <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Reprimidas</div>
+              <div style={{ fontSize:20, fontWeight:800, color:sel.r>3?"#E5243B":sel.r>0?"#eab308":"#22c55e", fontFamily:"'Syne',sans-serif" }}>{sel.r}</div>
+              <div style={{ fontSize:8, color:MUTED }}>{sel.r > 0 ? `${((sel.r/55)*100).toFixed(1)}% de las 55 nacionales` : "Sin represión documentada"}</div>
+            </div>
+          </div>
+
+          {sel.c > 0 && (
+            <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
+              <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Por combustible</div>
+              <div style={{ fontSize:16, fontWeight:700, color:"#f59e0b", fontFamily:"'Syne',sans-serif" }}>{sel.c}</div>
+              <div style={{ fontSize:8, color:MUTED }}>protestas por desabastecimiento</div>
+            </div>
+          )}
+
+          {/* Comparativa vs líder */}
+          <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
+            <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Comparativa vs. {lider.e} (#1)</div>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <div style={{ flex:1, height:6, background:BORDER, borderRadius:3, position:"relative" }}>
+                <div style={{ width:`${(sel.p/lider.p)*100}%`, height:"100%", background:ACCENT, borderRadius:3 }} />
+              </div>
+              <span style={{ fontSize:9, fontFamily:font, color:ACCENT }}>{((sel.p/lider.p)*100).toFixed(0)}%</span>
+            </div>
+            <div style={{ fontSize:8, color:MUTED, marginTop:4 }}>
+              {sel.e === lider.e ? "Estado líder en protestas" : `${lider.p - sel.p} protestas menos que ${lider.e}`}
+            </div>
+          </div>
+
+          {/* Exigencias */}
+          <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
+            <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Principales exigencias</div>
+            <div style={{ fontSize:10, color:TEXT, lineHeight:1.5 }}>{sel.x}</div>
+          </div>
+        </>) : (
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", flex:1, gap:8, padding:20 }}>
+            <span style={{ fontSize:28, opacity:0.3 }}>🗺️</span>
+            <div style={{ fontSize:10, color:MUTED, textAlign:"center" }}>Selecciona un estado en el mapa para ver sus detalles</div>
+            <div style={{ fontSize:8, fontFamily:font, color:`${MUTED}60`, textAlign:"center", marginTop:8 }}>
+              Top 3: {CONF_ESTADOS.slice(0,3).map(e=>`${e.e} (${e.p})`).join(" · ")}
+            </div>
+          </div>
+        )}
+
+        {/* Ranking mini table */}
+        <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginTop:4, paddingTop:8, borderTop:`1px solid ${BORDER}` }}>
+          Top 10 estados
+        </div>
+        {CONF_ESTADOS.slice(0,10).map((e,i) => (
+          <div key={i} style={{ display:"flex", alignItems:"center", gap:6, padding:"3px 0", cursor:"pointer",
+            background:selected===e.e?`${ACCENT}15`:"transparent" }}
+            onClick={() => setSelected(selected===e.e?null:e.e)}>
+            <span style={{ fontSize:8, fontFamily:font, color:MUTED, width:16, textAlign:"right" }}>{i+1}</span>
+            <span style={{ fontSize:9, color:selected===e.e?ACCENT:TEXT, flex:1, fontWeight:selected===e.e?600:400 }}>{e.e}</span>
+            <span style={{ fontSize:9, fontFamily:font, color:ACCENT }}>{e.p}</span>
+          </div>
         ))}
       </div>
-      {/* Historical chart */}
-      <Card>
-        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
-          Serie histórica 2011–2025
+    </div>
+  );
+}
+
+function TabConflictividad() {
+  const [seccion, setSeccion] = useState("resumen");
+
+  const maxMes = Math.max(...CONF_MESES.map(m=>m.t));
+  const maxEst = Math.max(...CONF_ESTADOS.map(e=>e.p));
+  const maxHist = Math.max(...CONF_HISTORICO.map(h=>h.p));
+  const catColor = { DCP:"#0A97D9", DESCA:"#4C9F38" };
+
+  return (
+    <div>
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14, flexWrap:"wrap" }}>
+        <span style={{ fontSize:14 }}>📊</span>
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:13, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Conflictividad Social — Venezuela 2025</div>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Fuente: OVCS · Informe Anual 2025 · 2.219 protestas documentadas</div>
         </div>
-        <ConflictividadChart />
-      </Card>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+          {[{id:"resumen",label:"Resumen"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"}].map(s => (
+            <button key={s.id} onClick={() => setSeccion(s.id)}
+              style={{ fontSize:9, fontFamily:font, padding:"6px 12px", border:"none",
+                background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── RESUMEN ── */}
+      {seccion === "resumen" && (<>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:16 }}>
+          {[{k:"Total 2025",v:"2.219",c:ACCENT,s:"-57% vs 2024 · Mínimo histórico"},{k:"DESCA",v:"1.248",c:"#4C9F38",s:"56% · Laborales, vivienda, servicios"},
+            {k:"DCP",v:"971",c:"#0A97D9",s:"44% · Políticos, justicia"},{k:"Reprimidas",v:"55",c:"#E5243B",s:"2,5% · Patrón selectivo"}
+          ].map((d,i) => (
+            <Card key={i} accent={d.c}>
+              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{d.k}</div>
+              <div style={{ fontSize:22, fontWeight:800, color:d.c, fontFamily:"'Syne',sans-serif" }}>{d.v}</div>
+              <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>{d.s}</div>
+            </Card>
+          ))}
+        </div>
+        {/* Servicios básicos */}
+        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+          Protestas por servicios básicos · 275 total
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, marginBottom:16 }}>
+          {CONF_SERVICIOS.map((s,i) => (
+            <div key={i} style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"10px 12px" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:6 }}>
+                <span style={{ fontSize:14 }}>{s.i}</span>
+                <span style={{ fontSize:10, fontWeight:600, color:TEXT }}>{s.s}</span>
+              </div>
+              <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                <div style={{ flex:1, height:4, background:`${BORDER}`, borderRadius:2 }}>
+                  <div style={{ width:`${s.pct}%`, height:"100%", background:ACCENT, borderRadius:2 }} />
+                </div>
+                <span style={{ fontSize:9, fontFamily:font, color:ACCENT, minWidth:30 }}>{s.p}</span>
+              </div>
+              <div style={{ fontSize:8, color:MUTED, marginTop:4 }}>{s.pct}%</div>
+            </div>
+          ))}
+        </div>
+        {/* Mini histórico */}
+        <Card>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
+            Serie histórica 2011–2025
+          </div>
+          <ConflictividadChart />
+        </Card>
+      </>)}
+
+      {/* ── MENSUAL ── */}
+      {seccion === "mensual" && (<>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, marginBottom:16 }}>
+          <Card accent="#E5243B">
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Mes pico</div>
+            <div style={{ fontSize:22, fontWeight:800, color:"#E5243B", fontFamily:"'Syne',sans-serif" }}>Enero · 401</div>
+            <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>36 reprimidas · DCP dominante</div>
+          </Card>
+          <Card accent="#4C9F38">
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Mes mínimo</div>
+            <div style={{ fontSize:22, fontWeight:800, color:"#4C9F38", fontFamily:"'Syne',sans-serif" }}>Diciembre · 123</div>
+            <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>1 reprimida · DESCA dominante</div>
+          </Card>
+        </div>
+        {/* Monthly bar chart */}
+        <Card>
+          <div style={{ display:"flex", alignItems:"flex-end", gap:4, height:200, paddingBottom:20 }}>
+            {CONF_MESES.map((m,i) => {
+              const pct = (m.t/maxMes)*100;
+              const descaPct = (m.desca/m.t)*100;
+              return (
+                <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", height:"100%", position:"relative" }}>
+                  <div style={{ fontSize:7, fontFamily:font, color:m.rep>0?"#E5243B":MUTED, marginBottom:2 }}>{m.t}</div>
+                  <div style={{ width:"100%", height:`${pct}%`, position:"relative", borderRadius:"2px 2px 0 0", overflow:"hidden", minHeight:2 }}>
+                    <div style={{ position:"absolute", bottom:0, width:"100%", height:`${descaPct}%`, background:"#4C9F38" }} />
+                    <div style={{ position:"absolute", top:0, width:"100%", height:`${100-descaPct}%`, background:"#0A97D9" }} />
+                  </div>
+                  {m.rep > 0 && <div style={{ fontSize:6, color:"#E5243B", marginTop:1 }}>{m.rep}R</div>}
+                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, marginTop:3 }}>{m.m}</div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ display:"flex", gap:12, justifyContent:"center", marginTop:8 }}>
+            <span style={{ fontSize:8, fontFamily:font, color:"#4C9F38" }}>● DESCA</span>
+            <span style={{ fontSize:8, fontFamily:font, color:"#0A97D9" }}>● DCP</span>
+            <span style={{ fontSize:8, fontFamily:font, color:"#E5243B" }}>● R = Reprimidas</span>
+          </div>
+        </Card>
+        {/* Monthly detail */}
+        <div style={{ marginTop:12 }}>
+          {CONF_MESES.map((m,i) => (
+            <div key={i} style={{ display:"grid", gridTemplateColumns:"60px 50px 1fr", gap:12, padding:"8px 0", borderBottom:`1px solid ${BORDER}30`, alignItems:"center" }}>
+              <span style={{ fontSize:10, fontWeight:600, color:TEXT }}>{m.m}</span>
+              <span style={{ fontSize:10, fontFamily:font, color:ACCENT }}>{m.t}</span>
+              <span style={{ fontSize:9, color:MUTED, lineHeight:1.4 }}>{m.hecho}</span>
+            </div>
+          ))}
+        </div>
+      </>)}
+
+      {/* ── DERECHOS ── */}
+      {seccion === "derechos" && (
+        <div>
+          {CONF_DERECHOS.map((d,i) => (
+            <div key={i} style={{ display:"grid", gridTemplateColumns:"30px 1fr 60px 50px", gap:10, padding:"10px 0", borderBottom:`1px solid ${BORDER}30`, alignItems:"center" }}>
+              <span style={{ fontSize:16, fontWeight:800, color:catColor[d.cat], fontFamily:"'Syne',sans-serif", textAlign:"center" }}>#{i+1}</span>
+              <div>
+                <div style={{ fontSize:11, fontWeight:600, color:TEXT }}>{d.d}</div>
+                <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${catColor[d.cat]}15`, color:catColor[d.cat], border:`1px solid ${catColor[d.cat]}30` }}>{d.cat}</span>
+              </div>
+              <div style={{ textAlign:"right" }}>
+                <div style={{ fontSize:14, fontWeight:700, color:catColor[d.cat], fontFamily:"'Syne',sans-serif" }}>{d.p}</div>
+                <div style={{ fontSize:8, color:MUTED }}>{d.pct}%</div>
+              </div>
+              <div style={{ height:6, background:BORDER, borderRadius:3 }}>
+                <div style={{ width:`${(d.pct/30)*100}%`, height:"100%", background:catColor[d.cat], borderRadius:3, maxWidth:"100%" }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── ESTADOS ── */}
+      {seccion === "estados" && (
+        <EstadosMap />
+      )}
+
+      {/* ── HISTÓRICO ── */}
+      {seccion === "historico" && (<>
+        <Card>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
+            Serie histórica 2011–2025 · OVCS
+          </div>
+          <div style={{ display:"flex", alignItems:"flex-end", gap:3, height:200, paddingBottom:20 }}>
+            {CONF_HISTORICO.map((h,i) => {
+              const pct = (h.p/maxHist)*100;
+              const isLast = i === CONF_HISTORICO.length-1;
+              const isPeak = h.p === maxHist;
+              return (
+                <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", height:"100%" }}>
+                  <div style={{ fontSize:7, fontFamily:font, color:isLast?ACCENT:isPeak?"#E5243B":MUTED, marginBottom:2 }}>
+                    {(h.p/1000).toFixed(1)}k
+                  </div>
+                  <div style={{ width:"100%", height:`${pct}%`, background:isLast?ACCENT:isPeak?"#E5243B":`${ACCENT}40`,
+                    borderRadius:"2px 2px 0 0", minHeight:2 }} />
+                  <div style={{ fontSize:7, fontFamily:font, color:isLast?ACCENT:MUTED, marginTop:4, transform:"rotate(-45deg)", transformOrigin:"top left", whiteSpace:"nowrap" }}>
+                    {String(h.y).slice(2)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+        {/* Year detail */}
+        <div style={{ marginTop:12 }}>
+          {CONF_HISTORICO.slice().reverse().map((h,i) => {
+            const prev = CONF_HISTORICO.find(x=>x.y===h.y-1);
+            const delta = prev ? h.p - prev.p : null;
+            return (
+              <div key={i} style={{ display:"grid", gridTemplateColumns:"50px 70px 1fr 60px", gap:10, padding:"8px 0", borderBottom:`1px solid ${BORDER}30`, alignItems:"center" }}>
+                <span style={{ fontSize:11, fontWeight:h.y===2025||h.y===2019?700:400, color:h.y===2025?ACCENT:h.y===2019?"#E5243B":TEXT }}>{h.y}</span>
+                <span style={{ fontSize:11, fontFamily:font, color:h.y===2025?ACCENT:h.y===2019?"#E5243B":TEXT, fontWeight:600 }}>{h.p.toLocaleString()}</span>
+                <span style={{ fontSize:9, color:MUTED, lineHeight:1.4 }}>{h.h}</span>
+                {delta !== null && (
+                  <span style={{ fontSize:9, fontFamily:font, color:delta>0?"#E5243B":"#22c55e", textAlign:"right" }}>
+                    {delta>0?"+":""}{delta.toLocaleString()}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </>)}
     </div>
   );
 }
@@ -2572,6 +2974,212 @@ function TabIODA() {
 // MAIN APP
 // ═══════════════════════════════════════════════════════════════
 
+function TabMacro() {
+  const [dolar, setDolar] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [seccion, setSeccion] = useState("cambio");
+
+  useEffect(() => {
+    async function fetchDolar() {
+      try {
+        const res = await fetch("https://ve.dolarapi.com/v1/dolares", { signal: AbortSignal.timeout(8000) });
+        if (res.ok) {
+          const data = await res.json();
+          const oficial = data.find(d => d.fuente === "oficial");
+          const paralelo = data.find(d => d.fuente === "paralelo");
+          const bcv = oficial?.promedio || null;
+          const par = paralelo?.promedio || null;
+          const brecha = bcv && par ? (((par - bcv) / bcv) * 100) : null;
+          setDolar({ bcv, par, brecha, updated: oficial?.fechaActualizacion || new Date().toISOString() });
+        }
+      } catch {}
+      setLoading(false);
+    }
+    fetchDolar();
+    const iv = setInterval(fetchDolar, 120000); // refresh every 2 min
+    return () => clearInterval(iv);
+  }, []);
+
+  // Static macro indicators (update weekly/monthly)
+  const MACRO = [
+    { k:"PIB proyectado 2025", v:"10–15%", c:"#22c55e", s:"FMI / Ecoanalítica · crecimiento estimado" },
+    { k:"Inflación anual", v:"~100%", c:"#E5243B", s:"FMI: tres dígitos · BCV sin publicar" },
+    { k:"Reservas internacionales", v:"~$9.5B", c:"#f59e0b", s:"BCV · incluye oro monetario" },
+    { k:"Deuda externa", v:">$150B", c:"#E5243B", s:"FMI: >180% del PIB · en default" },
+    { k:"Salario mínimo", v:"130 Bs", c:"#E5243B", s:"~$0.30 al paralelo · 47+ meses sin ajuste" },
+    { k:"Canasta alimentaria", v:"~$550", c:"#f59e0b", s:"CENDA · ingreso promedio ~$270" },
+    { k:"Producción petrolera", v:"~800 kbd", c:"#22c55e", s:"↑60% interanual · meta 1M bpd" },
+    { k:"Liquidez monetaria", v:"Expansión", c:"#f59e0b", s:"BCV inyecta vía subastas semanales" },
+  ];
+
+  return (
+    <div>
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14, flexWrap:"wrap" }}>
+        <span style={{ fontSize:14 }}>💵</span>
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:13, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Macroeconomía — Venezuela</div>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Tipo de cambio en vivo · Indicadores macroeconómicos · Mercado cambiario</div>
+        </div>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+          {[{id:"cambio",label:"Tipo de cambio"},{id:"indicadores",label:"Indicadores"},{id:"charts",label:"Gráficos"}].map(s => (
+            <button key={s.id} onClick={() => setSeccion(s.id)}
+              style={{ fontSize:9, fontFamily:font, padding:"6px 12px", border:"none",
+                background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── TIPO DE CAMBIO ── */}
+      {seccion === "cambio" && (<>
+        {/* Live rates */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:10, marginBottom:16 }}>
+          <Card accent="#0468B1">
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Dólar BCV (oficial)</div>
+            <div style={{ fontSize:26, fontWeight:800, color:"#0468B1", fontFamily:"'Playfair Display',serif" }}>
+              {loading ? "..." : dolar?.bcv ? `${dolar.bcv.toFixed(2)}` : "—"}
+            </div>
+            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>Bs/USD · Fuente: BCV</div>
+          </Card>
+          <Card accent="#E5243B">
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Dólar Paralelo</div>
+            <div style={{ fontSize:26, fontWeight:800, color:"#E5243B", fontFamily:"'Playfair Display',serif" }}>
+              {loading ? "..." : dolar?.par ? `${dolar.par.toFixed(2)}` : "—"}
+            </div>
+            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>Bs/USD · Mercado no oficial</div>
+          </Card>
+          <Card accent={dolar?.brecha > 50 ? "#E5243B" : dolar?.brecha > 30 ? "#f59e0b" : "#22c55e"}>
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Brecha cambiaria</div>
+            <div style={{ fontSize:26, fontWeight:800, color:dolar?.brecha > 50 ? "#E5243B" : dolar?.brecha > 30 ? "#f59e0b" : "#22c55e", fontFamily:"'Playfair Display',serif" }}>
+              {loading ? "..." : dolar?.brecha ? `${dolar.brecha.toFixed(1)}%` : "—"}
+            </div>
+            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>{dolar?.brecha > 55 ? "⚠ Zona de alerta E2" : dolar?.brecha > 40 ? "Monitoreo activo" : "Rango aceptable"}</div>
+          </Card>
+          <Card accent="#14b8a6">
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>USDT/VES (ref.)</div>
+            <div style={{ fontSize:26, fontWeight:800, color:"#14b8a6", fontFamily:"'Playfair Display',serif" }}>
+              {loading ? "..." : dolar?.par ? `~${(dolar.par * 1.02).toFixed(0)}` : "—"}
+            </div>
+            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>Estimado · Binance P2P +2%</div>
+          </Card>
+        </div>
+
+        {/* Explanation cards */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginBottom:16 }}>
+          <Card accent="#0468B1">
+            <div style={{ fontSize:10, fontWeight:600, color:"#0468B1", marginBottom:4 }}>🏦 Tasa BCV</div>
+            <div style={{ fontSize:9, color:MUTED, lineHeight:1.6 }}>Publicada diariamente por el Banco Central. Referencia para operaciones formales, banca y comercio registrado.</div>
+          </Card>
+          <Card accent="#E5243B">
+            <div style={{ fontSize:10, fontWeight:600, color:"#E5243B", marginBottom:4 }}>🔄 Tasa Paralela</div>
+            <div style={{ fontSize:9, color:MUTED, lineHeight:1.6 }}>Precio del dólar en el mercado no oficial. Referencia real para la mayoría de transacciones cotidianas.</div>
+          </Card>
+          <Card accent="#14b8a6">
+            <div style={{ fontSize:10, fontWeight:600, color:"#14b8a6", marginBottom:4 }}>₿ USDT / Binance P2P</div>
+            <div style={{ fontSize:9, color:MUTED, lineHeight:1.6 }}>Precio del USDT en bolívares via Binance P2P. Usado masivamente para remesas y ahorro digital.</div>
+          </Card>
+        </div>
+
+        {/* Semáforo escenarios */}
+        <Card>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>
+            Implicaciones por escenario
+          </div>
+          {[
+            { esc:"E1", label:"Transición", cond:"Brecha <20%", desc:"Convergencia cambiaria. Señal de estabilización y confianza.", color:"#4C9F38" },
+            { esc:"E3", label:"Continuidad", cond:"Brecha 20-40%", desc:"Brecha manejable. Subastas BCV sostienen la tasa. Equilibrio frágil.", color:"#0A97D9" },
+            { esc:"E4", label:"Resistencia", cond:"Brecha 40-55%", desc:"Presión cambiaria creciente. Riesgo de espiral si supera 55%.", color:"#FCC30B" },
+            { esc:"E2", label:"Colapso", cond:"Brecha >55%", desc:"Zona de alerta. Pérdida de control cambiario. Activa indicador E2.", color:"#E5243B" },
+          ].map((e,i) => {
+            const isActive = dolar?.brecha && (
+              (e.esc==="E1" && dolar.brecha < 20) || (e.esc==="E3" && dolar.brecha >= 20 && dolar.brecha < 40) ||
+              (e.esc==="E4" && dolar.brecha >= 40 && dolar.brecha < 55) || (e.esc==="E2" && dolar.brecha >= 55)
+            );
+            return (
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 0", borderBottom:i<3?`1px solid ${BORDER}30`:"none",
+                opacity:isActive?1:0.4 }}>
+                <span style={{ fontSize:8, fontFamily:font, padding:"2px 6px", fontWeight:700, color:e.color, background:`${e.color}12`, border:`1px solid ${e.color}30`, minWidth:24, textAlign:"center" }}>{e.esc}</span>
+                <span style={{ fontSize:10, fontWeight:600, color:e.color, minWidth:90 }}>{e.label}</span>
+                <span style={{ fontSize:9, fontFamily:font, color:MUTED, minWidth:100 }}>{e.cond}</span>
+                <span style={{ fontSize:9, color:TEXT, flex:1 }}>{e.desc}</span>
+                {isActive && <span style={{ fontSize:9, fontFamily:font, color:e.color, fontWeight:700 }}>◄ ACTUAL</span>}
+              </div>
+            );
+          })}
+        </Card>
+
+        {dolar?.updated && (
+          <div style={{ fontSize:7, fontFamily:font, color:`${MUTED}60`, marginTop:8 }}>
+            Fuente: DolarAPI.com (ve.dolarapi.com) · Última actualización: {new Date(dolar.updated).toLocaleString("es")} · Refresco cada 2 min
+          </div>
+        )}
+      </>)}
+
+      {/* ── INDICADORES ── */}
+      {seccion === "indicadores" && (
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10 }}>
+          {MACRO.map((m,i) => (
+            <Card key={i} accent={m.c}>
+              <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{m.k}</div>
+              <div style={{ fontSize:20, fontWeight:800, color:m.c, fontFamily:"'Syne',sans-serif" }}>{m.v}</div>
+              <div style={{ fontSize:8, color:MUTED, marginTop:4, lineHeight:1.5 }}>{m.s}</div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* ── GRÁFICOS ── */}
+      {seccion === "charts" && (
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+          <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:12, overflow:"hidden" }}>
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>USD/VES · BCV</div>
+            <iframe src="https://www.xe.com/currencycharts/?from=USD&to=VES" style={{ width:"100%", height:300, border:"none", borderRadius:4, filter:"invert(0.88) hue-rotate(180deg)" }} title="USD/VES" />
+          </div>
+          <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:12, overflow:"hidden" }}>
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>DXY · Índice Dólar</div>
+            <TradingViewMini symbol="TVC:DXY" />
+          </div>
+          <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:12, overflow:"hidden" }}>
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>USD/COP · Peso Colombiano</div>
+            <TradingViewMini symbol="FX_IDC:USDCOP" />
+          </div>
+          <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:12, overflow:"hidden" }}>
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>Brent Crude · Petróleo</div>
+            <TradingViewMini symbol="TVC:UKOIL" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TradingViewMini({ symbol, height=280 }) {
+  const id = useMemo(() => `tv-${Math.random().toString(36).slice(2,8)}`, []);
+  useEffect(() => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = "";
+    const w = document.createElement("div");
+    w.className = "tradingview-widget-container";
+    const d = document.createElement("div");
+    d.className = "tradingview-widget-container__widget";
+    w.appendChild(d);
+    const s = document.createElement("script");
+    s.type = "text/javascript";
+    s.src = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
+    s.async = true;
+    s.innerHTML = JSON.stringify({
+      symbol, width:"100%", height, dateRange:"3M",
+      colorTheme:"dark", isTransparent:true, autosize:false, locale:"es"
+    });
+    w.appendChild(s);
+    el.appendChild(w);
+  }, [id, symbol, height]);
+  return <div id={id} style={{ width:"100%", height }} />;
+}
+
 const TABS = [
   { id:"dashboard", label:"Dashboard", icon:"📊" },
   { id:"matriz", label:"Matriz", icon:"🎯" },
@@ -2580,6 +3188,7 @@ const TABS = [
   { id:"conflictividad", label:"Conflictividad", icon:"✊" },
   { id:"ioda", label:"IODA", icon:"🌐" },
   { id:"mercados", label:"Mercados", icon:"📈" },
+  { id:"macro", label:"Macro VEN", icon:"💵" },
 ];
 
 export default function MonitorPNUD() {
@@ -2664,6 +3273,7 @@ export default function MonitorPNUD() {
         {tab === "conflictividad" && <TabConflictividad />}
         {tab === "ioda" && <TabIODA />}
         {tab === "mercados" && <TabMercados />}
+        {tab === "macro" && <TabMacro />}
       </div>
 
       {/* FOOTER */}
