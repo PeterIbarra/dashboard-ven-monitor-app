@@ -51,7 +51,7 @@ module.exports = async function handler(req, res) {
       const currentYear = new Date().getFullYear();
       const y = year || currentYear;
       url = `https://acleddata.com/api/acled/read?_format=json&country=Venezuela&year=${y}&limit=${limit}`;
-      url += `&fields=event_id_cnty|event_date|event_type|sub_event_type|actor1|actor2|fatalities|admin1|admin2|location|latitude|longitude|notes|civilian_targeting|disorder_type`;
+      url += `&fields=event_id_cnty|event_date|event_type|sub_event_type|actor1|actor2|fatalities|admin1|admin2|location|latitude|longitude|notes|civilian_targeting|disorder_type|population_best`;
       if (event_type) url += `&event_type=${encodeURIComponent(event_type)}`;
       if (admin1) url += `&admin1=${encodeURIComponent(admin1)}`;
     }
