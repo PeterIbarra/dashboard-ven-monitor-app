@@ -2713,6 +2713,7 @@ function AcledSection() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
   const [actorFilter, setActorFilter] = useState("all");
+  const [stateFilter, setStateFilter] = useState("all");
   const [acledPage, setAcledPage] = useState(1);
   const [acledView, setAcledView] = useState("overview");
 
@@ -2756,6 +2757,7 @@ function AcledSection() {
   const filtered = events.filter(e => {
     if (filter !== "all" && e.event_type !== filter) return false;
     if (actorFilter !== "all" && !(e.actor1||"").includes(actorFilter)) return false;
+    if (stateFilter !== "all" && e.admin1 !== stateFilter) return false;
     return true;
   });
   const sorted = [...filtered].sort((a,b) => (b.event_date||"").localeCompare(a.event_date||""));
@@ -2861,20 +2863,78 @@ function AcledSection() {
         </div>
 
         <Card>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>Eventos por estado</div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))", gap:4 }}>
-            {Object.entries(byAdmin).sort((a,b) => b[1]-a[1]).map(([st,ct]) => {
-              const mx = Object.values(byAdmin).reduce((a,b)=>Math.max(a,b),1);
-              const int = ct/mx;
-              const bg = int>0.7?"#E5243B":int>0.4?"#f59e0b":int>0.15?"#0A97D9":"#4C9F38";
-              return (
-                <div key={st} style={{ padding:"6px 8px", background:`${bg}15`, border:`1px solid ${bg}30`, display:"flex", justifyContent:"space-between", cursor:"pointer" }}
-                  onClick={() => { setFilter("all"); setActorFilter("all"); setAcledView("events"); }}>
-                  <span style={{ fontSize:8, fontFamily:font, color:TEXT }}>{st}</span>
-                  <span style={{ fontSize:10, fontWeight:700, color:bg, fontFamily:font }}>{ct}</span>
-                </div>
-              );
-            })}
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
+            Eventos por estado {stateFilter !== "all" && <span style={{ color:ACCENT }}>· Filtro: {stateFilter} <span style={{ cursor:"pointer" }} onClick={() => setStateFilter("all")}>✕</span></span>}
+          </div>
+          <div style={{ display:"flex", gap:12 }}>
+            {/* SVG Map */}
+            <div style={{ flex:"0 0 60%" }}>
+              <svg viewBox="0 0 600 420" width="100%" style={{ background:`${BG2}80` }}>
+                {VZ_MAP.map(state => {
+                  // Match ACLED admin1 names to our map IDs
+                  const acledName = Object.keys(byAdmin).find(a =>
+                    a.toLowerCase().includes(state.id.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")) ||
+                    state.id.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").includes(a.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""))
+                  );
+                  const count = acledName ? byAdmin[acledName] : 0;
+                  const mx = Math.max(...Object.values(byAdmin), 1);
+                  const intensity = count / mx;
+                  const isSelected = stateFilter === acledName;
+                  const fillColor = count === 0 ? `${MUTED}15` :
+                    intensity > 0.7 ? "#E5243B" : intensity > 0.4 ? "#f59e0b" : intensity > 0.15 ? "#0A97D9" : "#4C9F38";
+                  return (
+                    <g key={state.id}>
+                      <path d={state.d}
+                        fill={isSelected ? fillColor : `${fillColor}${count > 0 ? "60" : "15"}`}
+                        stroke={isSelected ? "#fff" : `${BORDER}`}
+                        strokeWidth={isSelected ? 2 : 0.5}
+                        style={{ cursor: count > 0 ? "pointer" : "default", transition:"all 0.2s" }}
+                        opacity={stateFilter !== "all" && !isSelected ? 0.25 : 1}
+                        onClick={() => {
+                          if (acledName) {
+                            setStateFilter(stateFilter === acledName ? "all" : acledName);
+                            setAcledPage(1);
+                          }
+                        }}
+                        onMouseEnter={e => { if(count > 0) { e.currentTarget.setAttribute("stroke","#fff"); e.currentTarget.setAttribute("stroke-width","1.5"); }}}
+                        onMouseLeave={e => { if(!isSelected) { e.currentTarget.setAttribute("stroke",BORDER); e.currentTarget.setAttribute("stroke-width","0.5"); }}}
+                      >
+                        <title>{state.id}: {count} eventos{acledName ? ` (${acledName})` : ""}</title>
+                      </path>
+                    </g>
+                  );
+                })}
+              </svg>
+              <div style={{ display:"flex", gap:8, justifyContent:"center", marginTop:4 }}>
+                <span style={{ fontSize:7, fontFamily:font, color:"#4C9F38" }}>■ Bajo</span>
+                <span style={{ fontSize:7, fontFamily:font, color:"#0A97D9" }}>■ Medio</span>
+                <span style={{ fontSize:7, fontFamily:font, color:"#f59e0b" }}>■ Alto</span>
+                <span style={{ fontSize:7, fontFamily:font, color:"#E5243B" }}>■ Crítico</span>
+              </div>
+            </div>
+            {/* Ranking */}
+            <div style={{ flex:1, maxHeight:380, overflowY:"auto" }}>
+              <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginBottom:6, letterSpacing:"0.08em", textTransform:"uppercase" }}>Ranking</div>
+              {Object.entries(byAdmin).sort((a,b) => b[1]-a[1]).map(([st,ct], idx) => {
+                const mx = Object.values(byAdmin).reduce((a,b) => Math.max(a,b), 1);
+                const int = ct/mx;
+                const bg = int>0.7?"#E5243B":int>0.4?"#f59e0b":int>0.15?"#0A97D9":"#4C9F38";
+                const isActive = stateFilter === st;
+                return (
+                  <div key={st} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3, cursor:"pointer",
+                    opacity: stateFilter !== "all" && !isActive ? 0.3 : 1, padding:"3px 4px",
+                    background: isActive ? `${bg}20` : "transparent", border: isActive ? `1px solid ${bg}40` : "1px solid transparent" }}
+                    onClick={() => { setStateFilter(isActive ? "all" : st); setAcledPage(1); }}>
+                    <span style={{ fontSize:8, fontFamily:font, color:MUTED, minWidth:16 }}>{idx+1}</span>
+                    <span style={{ fontSize:8, fontFamily:font, color:isActive ? bg : TEXT, flex:1 }}>{st}</span>
+                    <div style={{ width:60, height:10, background:`${BORDER}30`, position:"relative" }}>
+                      <div style={{ width:`${(ct/mx)*100}%`, height:"100%", background:bg, opacity:0.7 }} />
+                    </div>
+                    <span style={{ fontSize:8, fontWeight:700, color:bg, fontFamily:font, minWidth:24, textAlign:"right" }}>{ct}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </Card>
       </>)}
@@ -2883,7 +2943,7 @@ function AcledSection() {
       {acledView === "map" && (
         <Card>
           <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
-            Mapa de eventos · {filtered.length} puntos {filter!=="all"?`(${filter})`:""} {actorFilter!=="all"?`· ${actorFilter}`:""}
+            Mapa de eventos · {filtered.length} puntos {filter!=="all"?`(${filter})`:""} {actorFilter!=="all"?`· ${actorFilter}`:""} {stateFilter!=="all"?`· ${stateFilter}`:""}
           </div>
           <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:8 }}>
             <button onClick={() => setFilter("all")} style={{ fontSize:7, fontFamily:font, padding:"2px 6px", border:`1px solid ${filter==="all"?ACCENT:BORDER}`, background:filter==="all"?ACCENT:"transparent", color:filter==="all"?"#fff":MUTED, cursor:"pointer" }}>Todos</button>
@@ -2959,6 +3019,7 @@ function AcledSection() {
           {typeOrder.map(t => <button key={t} onClick={() => { setFilter(filter===t?"all":t); setAcledPage(1); }} style={{ fontSize:7, fontFamily:font, padding:"3px 7px", border:`1px solid ${filter===t?EC[t]:BORDER}`, background:filter===t?`${EC[t]}20`:"transparent", color:EC[t], cursor:"pointer" }}>{t} ({byType[t]})</button>)}
         </div>
         {actorFilter !== "all" && <div style={{ fontSize:8, fontFamily:font, color:ACCENT, marginBottom:8, cursor:"pointer" }} onClick={() => setActorFilter("all")}>Filtro actor: <strong>{actorFilter}</strong> ✕</div>}
+        {stateFilter !== "all" && <div style={{ fontSize:8, fontFamily:font, color:"#f59e0b", marginBottom:8, cursor:"pointer" }} onClick={() => setStateFilter("all")}>Filtro estado: <strong>{stateFilter}</strong> ✕</div>}
         <Card>
           {(() => {
             const PP = 20, totalP = Math.ceil(sorted.length/PP), page = sorted.slice((acledPage-1)*PP, acledPage*PP);
