@@ -8,7 +8,7 @@ const SCENARIOS = [
   { id:1, name:"Transición política pacífica", short:"Transición", color:"#4C9F38" },
   { id:2, name:"Colapso y fragmentación", short:"Colapso", color:"#E5243B" },
   { id:3, name:"Continuidad negociada", short:"Continuidad", color:"#0A97D9" },
-  { id:4, name:"Resistencia coercitiva", short:"Resistencia", color:"#FCC30B" },
+  { id:4, name:"Resistencia coercitiva", short:"Resistencia", color:"#b8860b" },
 ];
 
 const WEEKS = [
@@ -67,12 +67,12 @@ const KPIS_LATEST = {
     { k:"Amnistía", v:"4.203 solicitudes", c:"#22c55e" },
     { k:"Presos políticos", v:"568 (Foro Penal)", c:"#ef4444" },
     { k:"Agenda electoral", v:"Sin fecha", c:"#ef4444" },
-    { k:"Poder Ciudadano", v:"Encargados", c:"#eab308" },
+    { k:"Poder Ciudadano", v:"Encargados", c:"#a17d08" },
   ],
   opinion: [
     { k:"País mejor s/ Maduro", v:"51,5%", c:"#22c55e" },
     { k:"Influencia EE.UU.", v:"62,4% positiva", c:"#22c55e" },
-    { k:"Aprobación Delcy", v:"37,0%", c:"#eab308" },
+    { k:"Aprobación Delcy", v:"37,0%", c:"#a17d08" },
     { k:"Corrupción #1", v:"56,7%", c:"#ef4444" },
   ],
 };
@@ -570,8 +570,8 @@ function GdeltChart({ data }) {
     return idx >= 0 ? { ...a, x: toX(idx) } : null;
   }).filter(Boolean);
 
-  const tierColor = { CRITICAL:"#ff2222", HIGH:"#ff7733", MEDIUM:"#f5c842", LOW:"#3bf0ff" };
-  const sigColor = { instability:"#ff3b3b", tone:"#3bf0ff", artvolnorm:"#f5c842" };
+  const tierColor = { CRITICAL:"#ff2222", HIGH:"#ff7733", MEDIUM:"#c49000", LOW:"#0e7490" };
+  const sigColor = { instability:"#ff3b3b", tone:"#0e7490", artvolnorm:"#c49000" };
   const sigLabel = { instability:"Índice de Conflicto", tone:"Tono Mediático", artvolnorm:"Oleada de Atención" };
 
   return (
@@ -608,7 +608,7 @@ function GdeltChart({ data }) {
         {/* Right Y axis labels (tone) */}
         {[0,0.25,0.5,0.75,1].map(f => {
           const v = toneMin + (toneMax-toneMin)*f;
-          return <text key={`r${f}`} x={padL+cW+6} y={padT+(1-f)*cH+3} textAnchor="start" fontSize={8} fill="#3bf0ff50" fontFamily={font}>
+          return <text key={`r${f}`} x={padL+cW+6} y={padT+(1-f)*cH+3} textAnchor="start" fontSize={8} fill="#0e7490" fontFamily={font}>
             {v.toFixed(0)}
           </text>;
         })}
@@ -621,13 +621,13 @@ function GdeltChart({ data }) {
           </g>
         ))}
         {/* Areas */}
-        {signals.artvolnorm && <path d={makeArea("artvolnorm",toYLeft)} fill="#f5c84215" />}
-        {signals.instability && <path d={makeArea("instability",toYLeft)} fill="#ff3b3b12" />}
-        {signals.tone && <path d={makeArea("tone",toYRight)} fill="#3bf0ff0a" />}
+        {signals.artvolnorm && <path d={makeArea("artvolnorm",toYLeft)} fill="#c4900020" />}
+        {signals.instability && <path d={makeArea("instability",toYLeft)} fill="#ff3b3b18" />}
+        {signals.tone && <path d={makeArea("tone",toYRight)} fill="#0e749015" />}
         {/* Lines */}
-        {signals.artvolnorm && <path d={makePath("artvolnorm",toYLeft)} fill="none" stroke="#f5c842" strokeWidth={2} />}
+        {signals.artvolnorm && <path d={makePath("artvolnorm",toYLeft)} fill="none" stroke="#c49000" strokeWidth={2} />}
         {signals.instability && <path d={makePath("instability",toYLeft)} fill="none" stroke="#ff3b3b" strokeWidth={2} />}
-        {signals.tone && <path d={makePath("tone",toYRight)} fill="none" stroke="#3bf0ff" strokeWidth={1.5} strokeDasharray="4 2" />}
+        {signals.tone && <path d={makePath("tone",toYRight)} fill="none" stroke="#0e7490" strokeWidth={1.5} strokeDasharray="4 2" />}
         {/* X labels */}
         {data.filter((_,i) => i % Math.floor(data.length/8) === 0).map((d,i) => {
           const idx = data.indexOf(d);
@@ -639,8 +639,8 @@ function GdeltChart({ data }) {
         {hover !== null && <>
           <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT+cH} stroke="rgba(255,255,255,0.25)" />
           {signals.instability && data[hover].instability!=null && <circle cx={toX(hover)} cy={toYLeft(data[hover].instability)} r={3.5} fill="#ff3b3b" stroke={BG} strokeWidth={2} />}
-          {signals.tone && data[hover].tone!=null && <circle cx={toX(hover)} cy={toYRight(data[hover].tone)} r={3.5} fill="#3bf0ff" stroke={BG} strokeWidth={2} />}
-          {signals.artvolnorm && data[hover].artvolnorm!=null && <circle cx={toX(hover)} cy={toYLeft(data[hover].artvolnorm)} r={3.5} fill="#f5c842" stroke={BG} strokeWidth={2} />}
+          {signals.tone && data[hover].tone!=null && <circle cx={toX(hover)} cy={toYRight(data[hover].tone)} r={3.5} fill="#0e7490" stroke={BG} strokeWidth={2} />}
+          {signals.artvolnorm && data[hover].artvolnorm!=null && <circle cx={toX(hover)} cy={toYLeft(data[hover].artvolnorm)} r={3.5} fill="#c49000" stroke={BG} strokeWidth={2} />}
         </>}
       </svg>
       {/* Tooltip */}
@@ -648,8 +648,8 @@ function GdeltChart({ data }) {
         <div style={{ fontSize:13, fontFamily:font, color:TEXT, marginTop:6, padding:"8px 12px", background:BG2, border:`1px solid ${BORDER}`, display:"flex", gap:16, flexWrap:"wrap", alignItems:"center" }}>
           <span style={{ color:TEXT, fontWeight:600 }}>{new Date(data[hover].date+"T00:00").toLocaleDateString("es",{day:"numeric",month:"short",year:"numeric"})}</span>
           {signals.instability && <span style={{ color:"#ff3b3b" }}>Conflicto: {data[hover].instability?.toFixed(2)}</span>}
-          {signals.tone && <span style={{ color:"#3bf0ff" }}>Tono: {data[hover].tone?.toFixed(2)}</span>}
-          {signals.artvolnorm && <span style={{ color:"#f5c842" }}>Atención: {data[hover].artvolnorm?.toFixed(2)}</span>}
+          {signals.tone && <span style={{ color:"#0e7490" }}>Tono: {data[hover].tone?.toFixed(2)}</span>}
+          {signals.artvolnorm && <span style={{ color:"#c49000" }}>Atención: {data[hover].artvolnorm?.toFixed(2)}</span>}
           {GDELT_ANNOTATIONS.find(a=>a.date===data[hover].date) && (
             <span style={{ color:tierColor[GDELT_ANNOTATIONS.find(a=>a.date===data[hover].date).tier], fontWeight:600 }}>
               ● {GDELT_ANNOTATIONS.find(a=>a.date===data[hover].date).label}
@@ -821,11 +821,11 @@ function TabDashboard({ week }) {
 
       {/* ── ROW 3: Lectura rápida ── */}
       {wk.lectura && (
-        <div style={{ background:`linear-gradient(135deg, ${domSc.color}08, transparent)`, border:`1px solid ${domSc.color}18`, padding:"14px 18px" }}>
+        <div style={{ background:`linear-gradient(135deg, ${domSc.color}12, transparent)`, border:`1px solid ${domSc.color}25`, padding:"14px 18px" }}>
           <div style={{ fontSize:10, fontFamily:font, color:domSc.color, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:6 }}>
             Lectura de la semana · {wk.label}
           </div>
-          <div style={{ fontSize:14, color:"#94a3b8", lineHeight:1.7, fontStyle:"italic" }}>
+          <div style={{ fontSize:14, color:"#3d4f5f", lineHeight:1.7, fontStyle:"italic" }}>
             {wk.lectura}
           </div>
         </div>
@@ -839,7 +839,7 @@ function TabDashboard({ week }) {
         {wk.tensiones.map((t,i) => (
           <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:7, paddingBottom:7, borderBottom:i<wk.tensiones.length-1?`1px solid ${BORDER}40`:"none" }}>
             <SemDot color={t.l} />
-            <span style={{ fontSize:13, color:"#7a9ab0", lineHeight:1.6 }} dangerouslySetInnerHTML={{ __html:t.t }} />
+            <span style={{ fontSize:13, color:"#3d4f5f", lineHeight:1.6 }} dangerouslySetInnerHTML={{ __html:t.t }} />
           </div>
         ))}
       </Card>
@@ -909,7 +909,7 @@ function FullMatrix({ weekIdx, onClickWeek, onArrowClick }) {
       <text x={16} y={50} fontSize={9} fontWeight={700} fill="#4C9F38" fontFamily="'Syne',sans-serif">E1: Transición pacífica</text>
       <text x={W/2+16} y={50} fontSize={9} fontWeight={700} fill="#E5243B" fontFamily="'Syne',sans-serif">E2: Colapso y fragmentación</text>
       <text x={16} y={H/2+40} fontSize={9} fontWeight={700} fill="#0A97D9" fontFamily="'Syne',sans-serif">E3: Continuidad negociada</text>
-      <text x={W/2+16} y={H/2+40} fontSize={9} fontWeight={700} fill="#FCC30B" fontFamily="'Syne',sans-serif">E4: Resistencia coercitiva</text>
+      <text x={W/2+16} y={H/2+40} fontSize={9} fontWeight={700} fill="#b8860b" fontFamily="'Syne',sans-serif">E4: Resistencia coercitiva</text>
       {/* Trail segments */}
       {trail.slice(1).map((p,i) => {
         const prev = trail[i];
@@ -1000,7 +1000,7 @@ function TabMatriz({ week, setWeek }) {
                 Factores que empujan en esta dirección
               </div>
               {trendDriversList.map((d,i) => (
-                <div key={i} style={{ display:"flex", gap:8, marginBottom:5, fontSize:13, color:"#94a3b8", lineHeight:1.6 }}>
+                <div key={i} style={{ display:"flex", gap:8, marginBottom:5, fontSize:13, color:"#3d4f5f", lineHeight:1.6 }}>
                   <span style={{ color:trendSc.color, flexShrink:0 }}>›</span>{d}
                 </div>
               ))}
@@ -1062,7 +1062,7 @@ function TabMatriz({ week, setWeek }) {
                   Drivers estructurales
                 </div>
                 {selDrivers.drivers.map((d,i) => (
-                  <div key={i} style={{ display:"flex", gap:6, marginBottom:4, fontSize:13, color:"#94a3b8", lineHeight:1.5 }}>
+                  <div key={i} style={{ display:"flex", gap:6, marginBottom:4, fontSize:13, color:"#3d4f5f", lineHeight:1.5 }}>
                     <span style={{ color:`${SC[sel]}80`, flexShrink:0 }}>›</span>{d}
                   </div>
                 ))}
@@ -1126,7 +1126,7 @@ function TabMatriz({ week, setWeek }) {
             </span>
             <span style={{ fontSize:14, fontWeight:700, color:domSc.color }}>E{domSc.id}: {domSc.name} · {dom.v}%</span>
           </div>
-          <div style={{ fontSize:14, color:"#94a3b8", lineHeight:1.75, fontStyle:"italic" }}>
+          <div style={{ fontSize:14, color:"#3d4f5f", lineHeight:1.75, fontStyle:"italic" }}>
             {wk.lectura}
           </div>
         </div>
@@ -1244,8 +1244,8 @@ function TabMonitor() {
                 {/* Expanded detail */}
                 {isExpanded && (
                   <div style={{ padding:"4px 0 12px 16px", borderLeft:`2px solid ${SC[ind.esc.charAt(1)]||ACCENT}30` }}>
-                    <div style={{ fontSize:13, color:"#94a3b8", marginBottom:6 }}>{ind.desc}</div>
-                    <div style={{ fontSize:12, fontFamily:font, color:"#eab308", marginBottom:8, padding:"4px 8px", background:"rgba(234,179,8,0.06)", border:"1px solid rgba(234,179,8,0.15)", display:"inline-block" }}>
+                    <div style={{ fontSize:13, color:"#3d4f5f", marginBottom:6 }}>{ind.desc}</div>
+                    <div style={{ fontSize:12, fontFamily:font, color:"#a17d08", marginBottom:8, padding:"4px 8px", background:"rgba(234,179,8,0.06)", border:"1px solid rgba(234,179,8,0.15)", display:"inline-block" }}>
                       ⚠ {ind.umbral}
                     </div>
                     <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Historial</div>
@@ -1342,8 +1342,8 @@ function MonitorNoticias() {
     fetchNews();
   }, []);
 
-  const escColors = { E1:"#4C9F38", E2:"#E5243B", E3:"#0A97D9", E4:"#FCC30B" };
-  const dimColors = { "Energético":"#0A97D9", "Político":"#4C9F38", "Económico":"#FCC30B", "Internacional":"#9B59B6" };
+  const escColors = { E1:"#4C9F38", E2:"#E5243B", E3:"#0A97D9", E4:"#b8860b" };
+  const dimColors = { "Energético":"#0A97D9", "Político":"#4C9F38", "Económico":"#b8860b", "Internacional":"#9B59B6" };
   const dimIcons = { "Energético":"⚡", "Político":"🏛", "Económico":"📊", "Internacional":"🌐" };
   const filtered = filter === "all" ? news : news.filter(n => (n.scenarios||n.tags||[]).includes(filter));
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
@@ -1353,7 +1353,7 @@ function MonitorNoticias() {
     <div>
       {/* Filter */}
       <div style={{ display:"flex", gap:6, marginBottom:12, alignItems:"center", flexWrap:"wrap" }}>
-        <Badge color={source==="supabase"?"#22c55e":source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
+        <Badge color={source==="supabase"?"#22c55e":source==="live"?"#22c55e":source==="partial"?"#a17d08":"#ef4444"}>
           {source==="supabase"?"EN VIVO":source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
         </Badge>
         {["all","E1","E2","E3","E4"].map(f => (
@@ -1442,7 +1442,7 @@ function TwitterTimeline({ handle, height=280 }) {
     const a = document.createElement("a");
     a.className = "twitter-timeline";
     a.href = `https://twitter.com/${handle}`;
-    a.setAttribute("data-theme", "dark");
+    a.setAttribute("data-theme", "light");
     a.setAttribute("data-chrome", "noheader nofooter noborders transparent");
     a.setAttribute("data-height", String(height));
     a.setAttribute("data-tweet-limit", "3");
@@ -1474,7 +1474,7 @@ function MonitorFactCheck() {
     { name:"EsPaja", handle:"EsPajaVe", url:"https://espaja.com", color:"#f59e0b" },
     { name:"Provea", handle:"_provea", url:"https://provea.org", color:"#9333ea" },
   ];
-  const escColors = { E1:"#4C9F38", E2:"#E5243B", E3:"#0A97D9", E4:"#FCC30B" };
+  const escColors = { E1:"#4C9F38", E2:"#E5243B", E3:"#0A97D9", E4:"#b8860b" };
 
   useEffect(() => {
     async function fetchFactCheck() {
@@ -1549,7 +1549,7 @@ function MonitorFactCheck() {
       {(() => { const totalPages = Math.ceil(articles.length / PER_PAGE); const paginated = articles.slice((page-1)*PER_PAGE, page*PER_PAGE); return (<>
       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
         <span style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>📰 Artículos de verificación</span>
-        <Badge color={source==="supabase"?"#22c55e":source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
+        <Badge color={source==="supabase"?"#22c55e":source==="live"?"#22c55e":source==="partial"?"#a17d08":"#ef4444"}>
           {source==="supabase"?"EN VIVO":source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
         </Badge>
         <span style={{ fontSize:12, color:MUTED, marginLeft:"auto" }}>{articles.length} artículos · pág {page}/{totalPages||1}</span>
@@ -1571,8 +1571,8 @@ function MonitorFactCheck() {
                   <span key={`s${k}`} style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`, color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
                 ))}
                 {(a.dims||[]).map((d,k) => (
-                  <span key={`d${k}`} style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${{Energético:"#0A97D9",Político:"#4C9F38",Económico:"#FCC30B",Internacional:"#9B59B6"}[d]||MUTED}15`,
-                    color:{Energético:"#0A97D9",Político:"#4C9F38",Económico:"#FCC30B",Internacional:"#9B59B6"}[d]||MUTED }}>
+                  <span key={`d${k}`} style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${{Energético:"#0A97D9",Político:"#4C9F38",Económico:"#b8860b",Internacional:"#9B59B6"}[d]||MUTED}15`,
+                    color:{Energético:"#0A97D9",Político:"#4C9F38",Económico:"#b8860b",Internacional:"#9B59B6"}[d]||MUTED }}>
                     {{Energético:"⚡",Político:"🏛",Económico:"📊",Internacional:"🌐"}[d]||""} {d}
                   </span>
                 ))}
@@ -1641,7 +1641,7 @@ function TabGdelt() {
     return { instDelta, tone, phase };
   }, [data]);
 
-  const tierColor = { CRITICAL:"#ff2222", HIGH:"#ff7733", MEDIUM:"#f5c842", LOW:"#3bf0ff" };
+  const tierColor = { CRITICAL:"#ff2222", HIGH:"#ff7733", MEDIUM:"#c49000", LOW:"#0e7490" };
 
   return (
     <div>
@@ -1649,7 +1649,7 @@ function TabGdelt() {
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16, flexWrap:"wrap" }}>
         <span style={{ fontSize:16 }}>📡</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Panel de Señales GDELT</div>
+          <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Cobertura Mediática Internacional</div>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>
             Señales mediáticas en tiempo real del Proyecto GDELT monitoreando la cobertura sobre Venezuela
           </div>
@@ -1659,10 +1659,10 @@ function TabGdelt() {
             <button onClick={loadData} style={{ fontSize:12, fontFamily:font, padding:"4px 10px", background:"transparent",
               border:`1px solid ${ACCENT}40`, color:ACCENT, cursor:"pointer" }}>↻ Reintentar</button>
           )}
-          <div style={{ display:"flex", alignItems:"center", gap:6, padding:"4px 10px", border:`1px solid ${source==="live"?"#22c55e30":source==="mock"?"#eab30830":"#4a709030"}` }}>
-            <span style={{ width:6, height:6, borderRadius:"50%", background:source==="live"?"#22c55e":source==="mock"?"#eab308":"#4a7090",
+          <div style={{ display:"flex", alignItems:"center", gap:6, padding:"4px 10px", border:`1px solid ${source==="live"?"#22c55e30":source==="mock"?"#a17d0830":"#4a709030"}` }}>
+            <span style={{ width:6, height:6, borderRadius:"50%", background:source==="live"?"#22c55e":source==="mock"?"#a17d08":"#4a7090",
               boxShadow:source==="live"?"0 0 6px #22c55e":"none", animation:source==="live"?"pulse 1.5s infinite":"none" }} />
-            <span style={{ fontSize:12, fontFamily:font, color:source==="live"?"#22c55e":source==="mock"?"#eab308":"#4a7090" }}>
+            <span style={{ fontSize:12, fontFamily:font, color:source==="live"?"#22c55e":source==="mock"?"#a17d08":"#4a7090" }}>
               {source==="live"?"EN VIVO":source==="mock"?"SIMULADO":"..."}
             </span>
           </div>
@@ -1670,11 +1670,18 @@ function TabGdelt() {
       </div>
 
       {error && (
-        <div style={{ fontSize:12, fontFamily:font, color:"#eab308", padding:"6px 12px",
+        <div style={{ fontSize:12, fontFamily:font, color:"#a17d08", padding:"6px 12px",
           background:"rgba(234,179,8,0.08)", border:"1px solid rgba(234,179,8,0.2)", marginBottom:12 }}>
           ⚠ {error}
         </div>
       )}
+
+      {/* Explanation */}
+      <Card accent={ACCENT} style={{ marginBottom:14 }}>
+        <div style={{ fontSize:13, color:TEXT, lineHeight:1.7 }}>
+          <strong>¿Qué es esto?</strong> Este panel analiza cómo los medios de comunicación internacionales cubren Venezuela. Usa el <strong>Proyecto GDELT</strong>, que procesa miles de noticias diarias y mide: <strong style={{ color:"#ff3b3b" }}>Conflicto</strong> (cuánto se habla de inestabilidad), <strong style={{ color:"#0e7490" }}>Tono</strong> (si la cobertura es positiva o negativa), y <strong style={{ color:"#c49000" }}>Atención</strong> (volumen de noticias). Cambios bruscos pueden indicar eventos significativos.
+        </div>
+      </Card>
 
       {loading ? (
         <Card><div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:14, fontFamily:font }}>
@@ -1684,29 +1691,29 @@ function TabGdelt() {
       ) : data ? (<>
         {/* KPI Cards */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginBottom:16 }}>
-          <Card accent={stats.instDelta>0?"#ff3b3b":"#14b8a6"}>
+          <Card accent={stats.instDelta>0?"#ff3b3b":"#7c3aed"}>
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Inestabilidad Δ</div>
             <div style={{ display:"flex", alignItems:"center", gap:6 }}>
               <span style={{ fontSize:12 }}>{stats.instDelta>0?"📈":"📉"}</span>
               <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
-                color:stats.instDelta>0?"#ff3b3b":"#14b8a6" }}>
+                color:stats.instDelta>0?"#ff3b3b":"#7c3aed" }}>
                 {stats.instDelta!==null ? `${stats.instDelta>0?"+":""}${stats.instDelta.toFixed(1)}%` : "—"}
               </span>
             </div>
             <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>vs línea base dic 2025</div>
           </Card>
-          <Card accent={(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#14b8a6"}>
+          <Card accent={(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#7c3aed"}>
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Tono Mediático</div>
             <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
-              color:(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#14b8a6" }}>
+              color:(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#7c3aed" }}>
               {stats.tone!==null ? stats.tone.toFixed(2) : "—"}
             </span>
             <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>Actual</div>
           </Card>
-          <Card accent={stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#14b8a6"}>
+          <Card accent={stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#7c3aed"}>
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Señal Compuesta</div>
             <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
-              color:stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#14b8a6" }}>
+              color:stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#7c3aed" }}>
               {stats.phase || "—"}
             </span>
             <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>Incluye inestabilidad, tono y oleada</div>
@@ -1744,19 +1751,19 @@ function TabGdelt() {
           <Card accent="#ff3b3b">
             <div style={{ fontSize:13, fontWeight:600, color:"#ff3b3b", marginBottom:6 }}>● Índice de Conflicto</div>
             <div style={{ fontSize:13, color:MUTED, lineHeight:1.6 }}>
-              Volumen normalizado de artículos con Venezuela + conflicto/protesta/crisis/violencia. <span style={{color:"#ff3b3b50"}}>Eje izquierdo · Línea sólida</span>
+              Volumen normalizado de artículos con Venezuela + conflicto/protesta/crisis/violencia. <span style={{color:"#ff3b3b"}}>Eje izquierdo · Línea sólida</span>
             </div>
           </Card>
-          <Card accent="#f5c842">
-            <div style={{ fontSize:13, fontWeight:600, color:"#f5c842", marginBottom:6 }}>● Oleada de Atención</div>
+          <Card accent="#c49000">
+            <div style={{ fontSize:13, fontWeight:600, color:"#c49000", marginBottom:6 }}>● Oleada de Atención</div>
             <div style={{ fontSize:13, color:MUTED, lineHeight:1.6 }}>
-              Atención mediática normalizada. Mide la intensidad del interés internacional. <span style={{color:"#f5c84250"}}>Eje izquierdo · Línea sólida</span>
+              Atención mediática normalizada. Mide la intensidad del interés internacional. <span style={{color:"#c49000"}}>Eje izquierdo · Línea sólida</span>
             </div>
           </Card>
-          <Card accent="#3bf0ff">
-            <div style={{ fontSize:13, fontWeight:600, color:"#3bf0ff", marginBottom:6 }}>● Tono Mediático</div>
+          <Card accent="#0e7490">
+            <div style={{ fontSize:13, fontWeight:600, color:"#0e7490", marginBottom:6 }}>● Tono Mediático</div>
             <div style={{ fontSize:13, color:MUTED, lineHeight:1.6 }}>
-              Sentimiento promedio de cobertura internacional (-10 a +2). Negativo = conflictivo. <span style={{color:"#3bf0ff50"}}>Eje derecho · Línea punteada</span>
+              Sentimiento promedio de cobertura internacional (-10 a +2). Negativo = conflictivo. <span style={{color:"#0e7490"}}>Eje derecho · Línea punteada</span>
             </div>
           </Card>
         </div>
@@ -2156,7 +2163,7 @@ function LivePriceCards() {
           <Card key={i} accent={item.color}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
               <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase" }}>{item.label}</span>
-              {i === 0 && <Badge color={source === "live" ? "#22c55e" : "#eab308"}>{source === "live" ? "EN VIVO" : "ESTÁTICO"}</Badge>}
+              {i === 0 && <Badge color={source === "live" ? "#22c55e" : "#a17d08"}>{source === "live" ? "EN VIVO" : "ESTÁTICO"}</Badge>}
             </div>
             <div style={{ fontSize: 28, fontWeight: 900, color: item.color, fontFamily: "'Playfair Display',serif", lineHeight: 1 }}>
               ${item.value.toFixed(2)}
@@ -2170,7 +2177,7 @@ function LivePriceCards() {
       {brentHistory.length > 2 && <BrentChart history={brentHistory} />}
       {/* Fallback notice */}
       {!loading && source === "static" && (
-        <div style={{ fontSize: 8, fontFamily: font, color: "#eab308", textAlign: "center" }}>
+        <div style={{ fontSize: 8, fontFamily: font, color: "#a17d08", textAlign: "center" }}>
           ⚠ Precios de referencia estáticos — en vivo requiere deploy en Vercel con OILPRICE_API_KEY
         </div>
       )}
@@ -2189,8 +2196,8 @@ function MereyEstimator() {
   const revenueYear = (merey * 800000 * 365 / 1e9).toFixed(1);
   
   return (
-    <Card accent="#FCC30B">
-      <div style={{ fontSize:12, fontFamily:font, color:"#FCC30B", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
+    <Card accent="#b8860b">
+      <div style={{ fontSize:12, fontFamily:font, color:"#b8860b", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
         Estimador Merey venezolano
       </div>
       <div style={{ fontSize:12, color:MUTED, marginBottom:10, lineHeight:1.5 }}>
@@ -2217,7 +2224,7 @@ function MereyEstimator() {
       </div>
       <div style={{ background:BG, border:`1px solid ${BORDER}`, padding:"12px 14px", display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12 }}>
         <div style={{ textAlign:"center" }}>
-          <div style={{ fontSize:22, fontWeight:900, color:"#FCC30B", fontFamily:"'Playfair Display',serif" }}>${merey.toFixed(1)}</div>
+          <div style={{ fontSize:22, fontWeight:900, color:"#b8860b", fontFamily:"'Playfair Display',serif" }}>${merey.toFixed(1)}</div>
           <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Merey est. /bbl</div>
         </div>
         <div style={{ textAlign:"center" }}>
@@ -2445,7 +2452,7 @@ function EstadosMap() {
             </div>
             <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Reprimidas</div>
-              <div style={{ fontSize:20, fontWeight:800, color:sel.r>3?"#E5243B":sel.r>0?"#eab308":"#22c55e", fontFamily:"'Syne',sans-serif" }}>{sel.r}</div>
+              <div style={{ fontSize:20, fontWeight:800, color:sel.r>3?"#E5243B":sel.r>0?"#a17d08":"#22c55e", fontFamily:"'Syne',sans-serif" }}>{sel.r}</div>
               <div style={{ fontSize:10, color:MUTED }}>{sel.r > 0 ? `${((sel.r/55)*100).toFixed(1)}% de las 55 nacionales` : "Sin represión documentada"}</div>
             </div>
           </div>
@@ -2816,7 +2823,7 @@ function AcledSection() {
     else { setLoading(false); setError("ACLED requiere deploy en Vercel"); }
   }, []);
 
-  const EC = { "Protests":"#4C9F38","Riots":"#FCC30B","Battles":"#E5243B","Violence against civilians":"#dc2626","Explosions/Remote violence":"#f97316","Strategic developments":"#0A97D9" };
+  const EC = { "Protests":"#4C9F38","Riots":"#b8860b","Battles":"#E5243B","Violence against civilians":"#dc2626","Explosions/Remote violence":"#f97316","Strategic developments":"#0A97D9" };
 
   // Spanish translations
   const TR = {
@@ -3713,7 +3720,7 @@ function TabIODA() {
           </div>
           <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
             <span style={{ fontSize:16, fontWeight:700, fontFamily:font, color }}>{fmtVal(current)}</span>
-            <span style={{ fontSize:12, fontFamily:font, color: pctChange < -5 ? "#dc2626" : pctChange > 5 ? "#14b8a6" : MUTED }}>
+            <span style={{ fontSize:12, fontFamily:font, color: pctChange < -5 ? "#dc2626" : pctChange > 5 ? "#7c3aed" : MUTED }}>
               {pctChange > 0 ? "+" : ""}{pctChange.toFixed(1)}%
             </span>
           </div>
@@ -3759,12 +3766,12 @@ function TabIODA() {
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16, flexWrap:"wrap" }}>
         <span style={{ fontSize:16 }}>🌐</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Monitor de Conectividad — IODA Venezuela</div>
+          <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Monitor de Internet — Venezuela</div>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
-            Internet Outage Detection & Analysis · Georgia Tech · {source === "live" ? `${signals?.length || 0} puntos · EN VIVO` : source === "failed" ? "Sin conexión" : "Conectando..."}
+            Detección de interrupciones de internet · Georgia Tech IODA · {source === "live" ? `${signals?.length || 0} puntos · EN VIVO` : source === "failed" ? "Sin conexión" : "Conectando..."}
           </div>
         </div>
-        <Badge color={source==="live"?"#14b8a6":source==="failed"?"#dc2626":"#eab308"}>
+        <Badge color={source==="live"?"#7c3aed":source==="failed"?"#dc2626":"#a17d08"}>
           {source==="live"?"EN VIVO":source==="failed"?"OFFLINE":"..."}
         </Badge>
         {/* Time range selector */}
@@ -3788,17 +3795,24 @@ function TabIODA() {
       </div>
 
       {error && (
-        <div style={{ fontSize:12, fontFamily:font, color:"#eab308", padding:"6px 12px",
+        <div style={{ fontSize:12, fontFamily:font, color:"#a17d08", padding:"6px 12px",
           background:"rgba(234,179,8,0.08)", border:"1px solid rgba(234,179,8,0.2)", marginBottom:12 }}>
           ⚠ {error}
         </div>
       )}
 
+      {/* Explanation */}
+      <Card accent="#7c3aed" style={{ marginBottom:14 }}>
+        <div style={{ fontSize:13, color:TEXT, lineHeight:1.7 }}>
+          <strong>¿Qué es esto?</strong> Este panel monitorea en tiempo real si hay cortes o interrupciones de internet en Venezuela. Cuando se bloquean sitios, se restringen redes sociales o hay fallas de infraestructura, las señales caen. Una caída simultánea indica un corte generalizado. Para reportes de censura digital: <a href="https://x.com/vesinfiltro" target="_blank" rel="noopener" style={{ color:"#1d9bf0", textDecoration:"none", fontWeight:600 }}>@VeSinFiltro</a>.
+        </div>
+      </Card>
+
       {loading ? (
         <Card>
           <div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:14, fontFamily:font }}>
             <div style={{ fontSize:20, marginBottom:8 }}>🌐</div>
-            Conectando con IODA API v2 (Georgia Tech)...
+            Conectando con IODA...
             <div style={{ fontSize:12, marginTop:4, color:`${MUTED}80` }}>
               Señales BGP + Active Probing + Telescope · Venezuela · {timeRange}
             </div>
@@ -3806,7 +3820,7 @@ function TabIODA() {
         </Card>
       ) : signals ? (
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          {renderSignalChart("bgp", "BGP Routes", "#14b8a6", signals)}
+          {renderSignalChart("bgp", "BGP Routes", "#7c3aed", signals)}
           {renderSignalChart("probing", "Active Probing", "#f59e0b", signals)}
           {renderSignalChart("telescope", "Network Telescope", "#dc2626", signals)}
         </div>
@@ -3824,12 +3838,12 @@ function TabIODA() {
             </div>
             <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
               <a href="https://ioda.inetintel.cc.gatech.edu/country/VE" target="_blank" rel="noopener noreferrer"
-                style={{ fontSize:13, fontFamily:font, color:ACCENT, textDecoration:"none", padding:"6px 14px", border:`1px solid ${ACCENT}30` }}>
+                style={{ fontSize:13, fontFamily:font, color:ACCENT, textDecoration:"none", padding:"6px 14px", border:`1px solid ${ACCENT}30`, borderRadius:4 }}>
                 ↗ IODA Venezuela
               </a>
-              <a href="https://umbral.watch" target="_blank" rel="noopener noreferrer"
-                style={{ fontSize:13, fontFamily:font, color:"#4C9F38", textDecoration:"none", padding:"6px 14px", border:"1px solid rgba(76,159,56,0.3)" }}>
-                ↗ Umbral (mapa subnacional)
+              <a href="https://x.com/vesinfiltro" target="_blank" rel="noopener noreferrer"
+                style={{ fontSize:13, fontFamily:font, color:"#1d9bf0", textDecoration:"none", padding:"6px 14px", border:"1px solid rgba(29,155,240,0.3)", borderRadius:4 }}>
+                𝕏 @VeSinFiltro
               </a>
             </div>
           </div>
@@ -3838,7 +3852,7 @@ function TabIODA() {
 
       {/* Signal descriptions */}
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginTop:12 }}>
-        {[{title:"BGP Routes",desc:"Rutas de red anunciadas a nivel de proveedor. Una caída indica pérdida de conectividad upstream — Venezuela tiene ~4.500 prefijos BGP.",color:"#14b8a6"},
+        {[{title:"BGP Routes",desc:"Rutas de red anunciadas a nivel de proveedor. Una caída indica pérdida de conectividad upstream — Venezuela tiene ~4.500 prefijos BGP.",color:"#7c3aed"},
           {title:"Active Probing",desc:"Sondeo activo de ~85K hosts venezolanos. Mide reachability real de dispositivos finales. Más granular que BGP.",color:"#f59e0b"},
           {title:"Network Telescope",desc:"Tráfico de fondo no solicitado. Anomalías (caídas abruptas) indican interrupciones masivas a nivel de infraestructura nacional.",color:"#dc2626"}
         ].map((s,i) => (
@@ -3849,10 +3863,24 @@ function TabIODA() {
         ))}
       </div>
 
-      <div style={{ marginTop:12, fontSize:10, fontFamily:font, color:`${MUTED}60`, lineHeight:1.8 }}>
-        Fuente: IODA (Internet Outage Detection & Analysis) · Georgia Tech INETINTEL · API v2 · 
-        Señales en tiempo real via CORS proxy (corsproxy.io / allorigins.win) · 
-        Hora Venezuela (UTC-4)
+      {/* VeSinFiltro Timeline */}
+      <Card accent="#1d9bf0" style={{ marginTop:12 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+          <div>
+            <div style={{ fontSize:14, fontWeight:600, color:TEXT }}>𝕏 @VeSinFiltro</div>
+            <div style={{ fontSize:12, color:MUTED }}>Reportes de censura y bloqueos de internet en Venezuela</div>
+          </div>
+          <a href="https://x.com/vesinfiltro" target="_blank" rel="noopener noreferrer"
+            style={{ fontSize:12, fontFamily:font, color:"#1d9bf0", textDecoration:"none", padding:"4px 12px", border:"1px solid rgba(29,155,240,0.3)", borderRadius:4 }}>
+            Ver en 𝕏
+          </a>
+        </div>
+        <TwitterTimeline handle="vesinfiltro" height={400} />
+      </Card>
+
+      <div style={{ marginTop:12, fontSize:10, fontFamily:font, color:`${MUTED}80`, lineHeight:1.8 }}>
+        Fuente: IODA (Georgia Tech) · API v2 · Hora Venezuela (UTC-4) · 
+        Reportes de censura: <a href="https://x.com/vesinfiltro" target="_blank" rel="noopener" style={{ color:"#1d9bf0", textDecoration:"none" }}>@VeSinFiltro</a>
       </div>
     </div>
   );
@@ -3924,7 +3952,7 @@ function RateChart({ data }) {
         )}
         {/* USDT estimate (par * 1.02) */}
         <path d={data.map((d,i) => d.par ? `${i===0?"M":"L"}${toX(i)},${toY(d.par*1.02)}` : "").filter(Boolean).join(" ")}
-          fill="none" stroke="#14b8a6" strokeWidth={1} strokeDasharray="2 2" opacity={0.6} />
+          fill="none" stroke="#7c3aed" strokeWidth={1} strokeDasharray="2 2" opacity={0.6} />
         {/* X labels */}
         {data.map((d,i) => i % Math.max(1,Math.floor(data.length/6)) === 0 ? (
           <text key={i} x={toX(i)} y={H-6} textAnchor="middle" fontSize={8} fill={MUTED} fontFamily={font}>
@@ -3944,7 +3972,7 @@ function RateChart({ data }) {
           <span style={{ color:TEXT, fontWeight:600 }}>{new Date(data[hover].d+"T00:00").toLocaleDateString("es",{day:"numeric",month:"short",year:"numeric"})}</span>
           <span style={{ color:"#0468B1" }}>BCV: {data[hover].bcv?.toFixed(1)}</span>
           <span style={{ color:"#E5243B" }}>Paralelo: {data[hover].par?.toFixed(1)}</span>
-          {data[hover].par && <span style={{ color:"#14b8a6" }}>USDT: ~{(data[hover].par*1.02).toFixed(0)}</span>}
+          {data[hover].par && <span style={{ color:"#7c3aed" }}>USDT: ~{(data[hover].par*1.02).toFixed(0)}</span>}
           {brechaData[hover] && <span style={{ color:"#f59e0b" }}>Brecha: {brechaData[hover].toFixed(1)}%</span>}
         </div>
       )}
@@ -3952,7 +3980,7 @@ function RateChart({ data }) {
       <div style={{ display:"flex", gap:12, justifyContent:"center", marginTop:8 }}>
         <span style={{ fontSize:12, fontFamily:font, color:"#0468B1" }}>━ BCV Oficial</span>
         <span style={{ fontSize:12, fontFamily:font, color:"#E5243B" }}>━ Paralelo</span>
-        <span style={{ fontSize:12, fontFamily:font, color:"#14b8a6" }}>┅ USDT (est.)</span>
+        <span style={{ fontSize:12, fontFamily:font, color:"#7c3aed" }}>┅ USDT (est.)</span>
         <span style={{ fontSize:12, fontFamily:font, color:"#f59e0b" }}>┅ Brecha % (eje der.)</span>
       </div>
     </div>
@@ -3961,7 +3989,7 @@ function RateChart({ data }) {
 
 function BrechaChart({ data }) {
   const [hover, setHover] = useState(null);
-  const W = 600, H = 200, padL = 45, padR = 15, padT = 10, padB = 28;
+  const W = 800, H = 500, padL = 55, padR = 25, padT = 20, padB = 36;
   const cW = W-padL-padR, cH = H-padT-padB;
 
   const brechas = data.map(d => d.bcv && d.par ? ((d.par-d.bcv)/d.bcv)*100 : null);
@@ -3994,7 +4022,7 @@ function BrechaChart({ data }) {
       }}
       onMouseLeave={() => setHover(null)}>
       {/* Alert zones */}
-      <rect x={padL} y={toY(55)} width={cW} height={toY(40)-toY(55)} fill="#FCC30B08" />
+      <rect x={padL} y={toY(55)} width={cW} height={toY(40)-toY(55)} fill="#b8860b08" />
       <rect x={padL} y={padT} width={cW} height={toY(55)-padT} fill="#E5243B08" />
       {/* Threshold lines */}
       <line x1={padL} y1={toY(20)} x2={padL+cW} y2={toY(20)} stroke="#4C9F3830" strokeDasharray="3 3" />
@@ -4216,9 +4244,9 @@ function TabMacro() {
             </div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>{dolar?.brecha > 55 ? "⚠ Zona de alerta E2" : dolar?.brecha > 40 ? "Monitoreo activo" : "Rango aceptable"}</div>
           </Card>
-          <Card accent="#14b8a6">
+          <Card accent="#7c3aed">
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>USDT/VES (ref.)</div>
-            <div style={{ fontSize:26, fontWeight:800, color:"#14b8a6", fontFamily:"'Playfair Display',serif" }}>
+            <div style={{ fontSize:26, fontWeight:800, color:"#7c3aed", fontFamily:"'Playfair Display',serif" }}>
               {loading ? "..." : dolar?.par ? `~${(dolar.par * 1.02).toFixed(0)}` : "—"}
             </div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>Estimado · Binance P2P +2%</div>
@@ -4245,35 +4273,35 @@ function TabMacro() {
             <div style={{ fontSize:13, fontWeight:600, color:"#E5243B", marginBottom:4 }}>🔄 Tasa Paralela</div>
             <div style={{ fontSize:12, color:MUTED, lineHeight:1.6 }}>Precio del dólar en el mercado no oficial. Referencia real para la mayoría de transacciones cotidianas.</div>
           </Card>
-          <Card accent="#14b8a6">
-            <div style={{ fontSize:13, fontWeight:600, color:"#14b8a6", marginBottom:4 }}>₿ USDT / Binance P2P</div>
+          <Card accent="#7c3aed">
+            <div style={{ fontSize:13, fontWeight:600, color:"#7c3aed", marginBottom:4 }}>₿ USDT / Binance P2P</div>
             <div style={{ fontSize:12, color:MUTED, lineHeight:1.6 }}>Precio del USDT en bolívares via Binance P2P. Usado masivamente para remesas y ahorro digital.</div>
           </Card>
         </div>
 
         {/* Semáforo escenarios */}
         <Card>
-          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>
+          <div style={{ fontSize:14, fontFamily:font, color:TEXT, fontWeight:600, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>
             Implicaciones por escenario
           </div>
           {[
-            { esc:"E1", label:"Transición", cond:"Brecha <20%", desc:"Convergencia cambiaria. Señal de estabilización y confianza.", color:"#4C9F38" },
-            { esc:"E3", label:"Continuidad", cond:"Brecha 20-40%", desc:"Brecha manejable. Subastas BCV sostienen la tasa. Equilibrio frágil.", color:"#0A97D9" },
-            { esc:"E4", label:"Resistencia", cond:"Brecha 40-55%", desc:"Presión cambiaria creciente. Riesgo de espiral si supera 55%.", color:"#FCC30B" },
-            { esc:"E2", label:"Colapso", cond:"Brecha >55%", desc:"Zona de alerta. Pérdida de control cambiario. Activa indicador E2.", color:"#E5243B" },
+            { esc:"E1", label:"Transición", cond:"Brecha <20%", desc:"Convergencia cambiaria. Señal de estabilización y confianza.", color:"#1a7a1a" },
+            { esc:"E3", label:"Continuidad", cond:"Brecha 20-40%", desc:"Brecha manejable. Subastas BCV sostienen la tasa. Equilibrio frágil.", color:"#0468B1" },
+            { esc:"E4", label:"Resistencia", cond:"Brecha 40-55%", desc:"Presión cambiaria creciente. Riesgo de espiral si supera 55%.", color:"#b45309" },
+            { esc:"E2", label:"Colapso", cond:"Brecha >55%", desc:"Zona de alerta. Pérdida de control cambiario. Activa indicador E2.", color:"#c92a2a" },
           ].map((e,i) => {
             const isActive = dolar?.brecha && (
               (e.esc==="E1" && dolar.brecha < 20) || (e.esc==="E3" && dolar.brecha >= 20 && dolar.brecha < 40) ||
               (e.esc==="E4" && dolar.brecha >= 40 && dolar.brecha < 55) || (e.esc==="E2" && dolar.brecha >= 55)
             );
             return (
-              <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 0", borderBottom:i<3?`1px solid ${BORDER}30`:"none",
-                opacity:isActive?1:0.4 }}>
-                <span style={{ fontSize:10, fontFamily:font, padding:"2px 6px", fontWeight:700, color:e.color, background:`${e.color}12`, border:`1px solid ${e.color}30`, minWidth:24, textAlign:"center" }}>{e.esc}</span>
-                <span style={{ fontSize:13, fontWeight:600, color:e.color, minWidth:90 }}>{e.label}</span>
-                <span style={{ fontSize:12, fontFamily:font, color:MUTED, minWidth:100 }}>{e.cond}</span>
-                <span style={{ fontSize:12, color:TEXT, flex:1 }}>{e.desc}</span>
-                {isActive && <span style={{ fontSize:12, fontFamily:font, color:e.color, fontWeight:700 }}>◄ ACTUAL</span>}
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 8px", borderBottom:i<3?`1px solid ${BORDER}`:"none",
+                opacity:isActive?1:0.5, background:isActive?`${e.color}10`:"transparent" }}>
+                <span style={{ fontSize:11, fontFamily:font, padding:"3px 8px", fontWeight:700, color:"#fff", background:e.color, minWidth:28, textAlign:"center", borderRadius:3 }}>{e.esc}</span>
+                <span style={{ fontSize:14, fontWeight:700, color:e.color, minWidth:110 }}>{e.label}</span>
+                <span style={{ fontSize:13, fontFamily:font, color:e.color, fontWeight:600, minWidth:110 }}>{e.cond}</span>
+                <span style={{ fontSize:13, color:TEXT, flex:1 }}>{e.desc}</span>
+                {isActive && <span style={{ fontSize:11, fontFamily:font, color:"#fff", fontWeight:700, background:e.color, padding:"3px 10px", borderRadius:3 }}>◄ ACTUAL</span>}
               </div>
             );
           })}
@@ -4374,9 +4402,9 @@ const TABS = [
   { id:"dashboard", label:"Dashboard", icon:"📊" },
   { id:"matriz", label:"Matriz", icon:"🎯" },
   { id:"monitor", label:"Monitor", icon:"🚦" },
-  { id:"gdelt", label:"GDELT", icon:"📡" },
+  { id:"gdelt", label:"Medios", icon:"📡" },
   { id:"conflictividad", label:"Conflictividad", icon:"✊" },
-  { id:"ioda", label:"IODA", icon:"🌐" },
+  { id:"ioda", label:"Internet", icon:"🌐" },
   { id:"mercados", label:"Mercados", icon:"📈" },
   { id:"macro", label:"Macro VEN", icon:"💵" },
 ];
