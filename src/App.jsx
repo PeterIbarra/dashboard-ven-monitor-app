@@ -768,10 +768,10 @@ function TabDashboard({ week }) {
       </div>
 
       {/* ── ROW 2: KPIs + Semáforo ── */}
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 200px", gap:12 }}>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 200px", gap:12 }}>
 
         {/* KPIs por dimensión — de la semana activa */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:1, background:BORDER, border:`1px solid ${BORDER}` }}>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:1, background:BORDER, border:`1px solid ${BORDER}` }}>
           {[
             {title:"Energético",icon:"⚡",rows:[
               {k:"Exportaciones",v:wk.kpis.energia.exportaciones},
@@ -980,7 +980,7 @@ function TabMatriz({ week, setWeek }) {
     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
       {/* ── ROW 1: Matrix + Sidebar ── */}
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:14 }}>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 320px", gap:14 }}>
 
         {/* Matrix SVG */}
         <div>
@@ -1208,7 +1208,7 @@ function TabMonitor() {
             <span style={{ fontSize:12, color:MUTED, marginLeft:"auto" }}>{g.inds.length} indicadores</span>
           </div>
           {/* Column headers */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 100px auto 80px 40px", gap:8, padding:"2px 0 6px", borderBottom:`1px solid ${BORDER}30` }}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr auto":"1fr 100px auto 80px 40px", gap:8, padding:"2px 0 6px", borderBottom:`1px solid ${BORDER}30` }}>
             <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Indicador</span>
             <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Historial</span>
             <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Valor actual</span>
@@ -1221,7 +1221,7 @@ function TabMonitor() {
             const isExpanded = expanded === `${g.dim}-${j}`;
             return (
               <div key={j} style={{ borderBottom:`1px solid ${BORDER}30` }}>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 100px auto 80px 40px", gap:8, padding:"8px 0", alignItems:"center",
+                <div style={{ display:"grid", gridTemplateColumns:mob?"1fr auto":"1fr 100px auto 80px 40px", gap:8, padding:"8px 0", alignItems:"center",
                   cursor:"pointer" }} onClick={() => setExpanded(isExpanded ? null : `${g.dim}-${j}`)}>
                   <div>
                     <div style={{ display:"flex", alignItems:"center", gap:6 }}>
@@ -1296,7 +1296,7 @@ function TabMonitor() {
               </div>
             </div>
             {group.signals.map((sig,i) => (
-              <div key={i} style={{ display:"grid", gridTemplateColumns:"1fr 180px 80px", gap:8, padding:"6px 0", borderBottom:`1px solid ${BORDER}30`, alignItems:"center" }}>
+              <div key={i} style={{ display:"grid", gridTemplateColumns:mob?"1fr auto":"1fr 180px 80px", gap:8, padding:"6px 0", borderBottom:`1px solid ${BORDER}30`, alignItems:"center" }}>
                 <span style={{ fontSize:14, color:TEXT }}>{sig.name}</span>
                 <span style={{ fontSize:13, fontFamily:font, color:SEM[sig.sem] }}>{sig.val}</span>
                 <div style={{ display:"flex", alignItems:"center", gap:4 }}>
@@ -1457,7 +1457,7 @@ function TwitterTimeline({ handle, height=280 }) {
     a.className = "twitter-timeline";
     a.href = `https://twitter.com/${handle}`;
     a.setAttribute("data-theme", "light");
-    a.setAttribute("data-chrome", "noheader nofooter noborders transparent");
+    a.setAttribute("data-chrome", "noheader nofooter noborders");
     a.setAttribute("data-height", String(height));
     a.setAttribute("data-tweet-limit", "3");
     a.textContent = `@${handle}`;
@@ -1471,10 +1471,11 @@ function TwitterTimeline({ handle, height=280 }) {
       window.twttr.widgets.load(node);
     }
   }, [handle, height]);
-  return <div ref={ref} style={{ minHeight:height }} />;
+  return <div ref={ref} style={{ minHeight:height, background:"#fff", borderRadius:4 }} />;
 }
 
 function MonitorFactCheck() {
+  const mob = useIsMobile();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("loading");
@@ -1705,7 +1706,7 @@ function TabGdelt() {
         </div></Card>
       ) : data ? (<>
         {/* KPI Cards */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginBottom:16 }}>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:12, marginBottom:16 }}>
           <Card accent={stats.instDelta>0?"#ff3b3b":"#7c3aed"}>
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Inestabilidad Δ</div>
             <div style={{ display:"flex", alignItems:"center", gap:6 }}>
@@ -1762,7 +1763,7 @@ function TabGdelt() {
         </div>
 
         {/* Signal descriptions */}
-        <div style={{ marginTop:16, display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12 }}>
+        <div style={{ marginTop:16, display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:12 }}>
           <Card accent="#ff3b3b">
             <div style={{ fontSize:13, fontWeight:600, color:"#ff3b3b", marginBottom:6 }}>● Índice de Conflicto</div>
             <div style={{ fontSize:13, color:MUTED, lineHeight:1.6 }}>
@@ -2239,7 +2240,7 @@ function MereyEstimator() {
           <div style={{ fontSize:9, color:MUTED, marginTop:3 }}>Rango típico: 10-15 (abierto) · 18-25 (sanciones)</div>
         </div>
       </div>
-      <div style={{ background:BG, border:`1px solid ${BORDER}`, padding:"12px 14px", display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12 }}>
+      <div style={{ background:BG, border:`1px solid ${BORDER}`, padding:"12px 14px", display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:12 }}>
         <div style={{ textAlign:"center" }}>
           <div style={{ fontSize:22, fontWeight:900, color:"#b8860b", fontFamily:"'Playfair Display',serif" }}>${merey.toFixed(1)}</div>
           <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Merey est. /bbl</div>
@@ -2300,7 +2301,7 @@ function TabMercados() {
           <MereyEstimator />
 
           {/* Context cards */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:10 }}>
             <Card accent="#22c55e">
               <div style={{ fontSize:13, fontWeight:600, color:"#22c55e", marginBottom:6 }}>Exportaciones Venezuela</div>
               <div style={{ fontSize:18, fontWeight:900, color:"#22c55e", fontFamily:"'Playfair Display',serif" }}>~800K bpd</div>
@@ -2359,7 +2360,7 @@ function TabMercados() {
           <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginTop:4, marginBottom:2 }}>
             Mercados multi-resultado · Ver en Polymarket
           </div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:10 }}>
             {POLYMARKET_SLUGS.filter(m => m.multi).map((m,i) => (
               <a key={i} href={`https://polymarket.com/event/${m.slug}`} target="_blank" rel="noopener noreferrer"
                 style={{ textDecoration:"none" }}>
@@ -2384,6 +2385,7 @@ function TabMercados() {
 }
 
 function EstadosMap() {
+  const mob = useIsMobile();
   const [selected, setSelected] = useState(null);
   const maxEst = Math.max(...CONF_ESTADOS.map(e=>e.p));
   const lider = CONF_ESTADOS[0]; // highest
@@ -2402,7 +2404,7 @@ function EstadosMap() {
   const selRank = sel ? CONF_ESTADOS.indexOf(sel) + 1 : null;
 
   return (
-    <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:16 }}>
+    <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 320px", gap:16 }}>
       {/* Map */}
       <div>
         <svg viewBox="0 0 600 420" style={{ width:"100%", background:BG2, border:`1px solid ${BORDER}`, padding:8 }}>
@@ -3872,7 +3874,7 @@ function TabIODA() {
       )}
 
       {/* Signal descriptions */}
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginTop:12 }}>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:12, marginTop:12 }}>
         {[{title:"BGP Routes",desc:"Rutas de red anunciadas a nivel de proveedor. Una caída indica pérdida de conectividad upstream — Venezuela tiene ~4.500 prefijos BGP.",color:"#7c3aed"},
           {title:"Active Probing",desc:"Sondeo activo de ~85K hosts venezolanos. Mide reachability real de dispositivos finales. Más granular que BGP.",color:"#f59e0b"},
           {title:"Network Telescope",desc:"Tráfico de fondo no solicitado. Anomalías (caídas abruptas) indican interrupciones masivas a nivel de infraestructura nacional.",color:"#dc2626"}
@@ -4244,7 +4246,7 @@ function TabMacro() {
       {/* ── TIPO DE CAMBIO ── */}
       {seccion === "cambio" && (<>
         {/* Live rates */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:10, marginBottom:16 }}>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"1fr 1fr 1fr 1fr", gap:10, marginBottom:16 }}>
           <Card accent="#0468B1">
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Dólar BCV (oficial)</div>
             <div style={{ fontSize:26, fontWeight:800, color:"#0468B1", fontFamily:"'Playfair Display',serif" }}>
@@ -4286,7 +4288,7 @@ function TabMacro() {
         )}
 
         {/* Explanation cards */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginBottom:16 }}>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:10, marginBottom:16 }}>
           <Card accent="#0468B1">
             <div style={{ fontSize:13, fontWeight:600, color:"#0468B1", marginBottom:4 }}>🏦 Tasa BCV</div>
             <div style={{ fontSize:12, color:MUTED, lineHeight:1.6 }}>Publicada diariamente por el Banco Central. Referencia para operaciones formales, banca y comercio registrado.</div>
@@ -4454,11 +4456,12 @@ export default function MonitorPNUD() {
   }, []);
 
   return (
-    <div style={{ fontFamily:fontSans, background:BG, minHeight:"100vh", color:TEXT }}>
+    <div style={{ fontFamily:fontSans, background:BG, minHeight:"100vh", color:TEXT, overflowX:"hidden" }}>
       <style>{`
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
         .goog-te-banner-frame, .skiptranslate > iframe { display:none !important; }
-        body { top:0 !important; margin:0; }
+        body { top:0 !important; margin:0; overflow-x:hidden; }
+        html { overflow-x:hidden; }
         .goog-te-gadget { font-family:${font} !important; font-size:0 !important; }
         .goog-te-gadget .goog-te-combo { font-family:${font}; font-size:11px; background:${BG2}; border:1px solid ${BORDER}; color:${ACCENT};
           padding:5px 10px; cursor:pointer; outline:none; border-radius:4px; }
@@ -4468,8 +4471,11 @@ export default function MonitorPNUD() {
         ::-webkit-scrollbar { width:6px; height:6px; }
         ::-webkit-scrollbar-track { background:transparent; }
         ::-webkit-scrollbar-thumb { background:${BORDER}; border-radius:3px; }
+        svg { max-width:100%; }
         @media (max-width:768px) {
           .leaflet-container { height:300px !important; }
+          table { font-size:11px; }
+          svg text { font-size:9px !important; }
         }
       `}</style>
       <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap" rel="stylesheet" />
@@ -4483,17 +4489,17 @@ export default function MonitorPNUD() {
             {!mob && <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.08em" }}>Programa de las Naciones Unidas para el Desarrollo</div>}
           </div>
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <div id="google_translate_element" />
+        <div style={{ display:"flex", alignItems:"center", gap:mob?6:10, flexWrap:"wrap" }}>
+          {!mob && <div id="google_translate_element" />}
           <select value={week} onChange={e => setWeek(+e.target.value)}
-            style={{ fontFamily:font, fontSize:13, background:BG2, border:`1px solid ${BORDER}`, color:ACCENT,
-              padding:"5px 28px 5px 10px", cursor:"pointer", outline:"none",
+            style={{ fontFamily:font, fontSize:mob?11:13, background:BG2, border:`1px solid ${BORDER}`, color:ACCENT,
+              padding:mob?"4px 22px 4px 6px":"5px 28px 5px 10px", cursor:"pointer", outline:"none",
               appearance:"none", WebkitAppearance:"none",
               backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%230A97D9'/%3E%3C/svg%3E")`,
-              backgroundRepeat:"no-repeat", backgroundPosition:"right 8px center" }}>
+              backgroundRepeat:"no-repeat", backgroundPosition:"right 6px center" }}>
             {WEEKS.map((w,i) => <option key={i} value={i}>{w.label}</option>)}
           </select>
-          <Badge color={week===WEEKS.length-1?"#22c55e":MUTED}>{week===WEEKS.length-1?"Más reciente":"Archivo"}</Badge>
+          {!mob && <Badge color={week===WEEKS.length-1?"#22c55e":MUTED}>{week===WEEKS.length-1?"Más reciente":"Archivo"}</Badge>}
         </div>
       </div>
 
