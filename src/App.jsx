@@ -3295,46 +3295,131 @@ function AcledSection() {
       )}
 
       {/* ═══ CAST ═══ */}
-      {acledView === "cast" && (
-        <Card>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>
-            🔮 CAST — Conflict Alert System · Predicciones para Venezuela
+      {acledView === "cast" && (<>
+        {/* Explainer */}
+        <Card accent="#f59e0b">
+          <div style={{ display:"flex", alignItems:"flex-start", gap:12 }}>
+            <span style={{ fontSize:22 }}>🔮</span>
+            <div>
+              <div style={{ fontSize:11, fontWeight:700, color:TEXT, marginBottom:4 }}>Sistema de Alerta de Conflictos (CAST)</div>
+              <div style={{ fontSize:9, color:MUTED, lineHeight:1.7 }}>
+                ACLED usa inteligencia artificial para predecir cuántos eventos de conflicto ocurrirán en los próximos meses en cada estado de Venezuela.
+                La predicción se compara con lo que realmente se observó para medir la precisión del modelo.
+                <strong style={{ color:"#f59e0b" }}> Amarillo = predicción</strong>, <strong style={{ color:ACCENT }}> Azul = realidad observada</strong>.
+                Si la predicción supera lo observado, significa que ACLED espera un <strong style={{ color:"#E5243B" }}>aumento de conflicto</strong>.
+              </div>
+            </div>
           </div>
-          {cast.length === 0 ? <div style={{ color:MUTED, fontSize:10, fontFamily:font }}>No hay predicciones disponibles.</div> : (<>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, marginBottom:14 }}>
-              {[
-                {l:"Total pronosticado",v:Math.round(cast.reduce((s,p)=>s+(p.total_forecast||0),0)),c:"#f59e0b"},
-                {l:"Total observado",v:Math.round(cast.reduce((s,p)=>s+(p.total_observed||0),0)),c:TEXT},
-                {l:"Batallas previstas",v:Math.round(cast.reduce((s,p)=>s+(p.battles_forecast||0),0)),c:"#E5243B"},
-              ].map((k,i) => (
-                <div key={i} style={{ padding:10, background:BG3, border:`1px solid ${BORDER}`, textAlign:"center" }}>
-                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{k.l}</div>
-                  <div style={{ fontSize:20, fontWeight:800, color:k.c, fontFamily:"'Playfair Display',serif" }}>{k.v}</div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>Por estado · Previsto vs Observado</div>
-            {cast.filter(p => p.admin1).sort((a,b) => (b.total_forecast||0)-(a.total_forecast||0)).map((p,i) => {
-              const f = Math.round(p.total_forecast||0), o = Math.round(p.total_observed||0), mx = Math.max(f,o,1);
-              return (
-                <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:5 }}>
-                  <span style={{ fontSize:8, fontFamily:font, color:TEXT, minWidth:120 }}>{p.admin1}</span>
-                  <div style={{ flex:1, position:"relative", height:18 }}>
-                    <div style={{ position:"absolute", top:0, left:0, height:8, width:`${(f/mx)*100}%`, background:"#f59e0b", opacity:0.7, borderRadius:1 }} />
-                    <div style={{ position:"absolute", top:9, left:0, height:8, width:`${(o/mx)*100}%`, background:ACCENT, opacity:0.7, borderRadius:1 }} />
-                  </div>
-                  <span style={{ fontSize:7, fontFamily:font, color:"#f59e0b", minWidth:25, textAlign:"right" }}>{f}</span>
-                  <span style={{ fontSize:7, fontFamily:font, color:ACCENT, minWidth:25, textAlign:"right" }}>{o}</span>
-                </div>
-              );
-            })}
-            <div style={{ display:"flex", gap:12, justifyContent:"center", marginTop:8 }}>
-              <span style={{ fontSize:7, fontFamily:font, color:"#f59e0b" }}>■ Previsto</span>
-              <span style={{ fontSize:7, fontFamily:font, color:ACCENT }}>■ Observado</span>
-            </div>
-          </>)}
         </Card>
-      )}
+
+        {cast.length === 0 ? <Card><div style={{ color:MUTED, fontSize:10, fontFamily:font, textAlign:"center", padding:20 }}>No hay predicciones disponibles actualmente.</div></Card> : (<>
+          {/* Summary KPIs */}
+          {(() => {
+            const totalF = Math.round(cast.reduce((s,p) => s+(p.total_forecast||0),0));
+            const totalO = Math.round(cast.reduce((s,p) => s+(p.total_observed||0),0));
+            const battlesF = Math.round(cast.reduce((s,p) => s+(p.battles_forecast||0),0));
+            const vacF = Math.round(cast.reduce((s,p) => s+(p.vac_forecast||0),0));
+            const diff = totalF - totalO;
+            const trend = diff > 10 ? "AUMENTO" : diff < -10 ? "DESCENSO" : "ESTABLE";
+            const trendColor = diff > 10 ? "#E5243B" : diff < -10 ? "#4C9F38" : "#f59e0b";
+            return (
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:8, marginBottom:12 }}>
+                <Card accent="#f59e0b">
+                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Eventos previstos</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:"#f59e0b", fontFamily:"'Playfair Display',serif" }}>{totalF}</div>
+                  <div style={{ fontSize:7, color:MUTED }}>Próximos meses</div>
+                </Card>
+                <Card accent={ACCENT}>
+                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Eventos observados</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:ACCENT, fontFamily:"'Playfair Display',serif" }}>{totalO}</div>
+                  <div style={{ fontSize:7, color:MUTED }}>Hasta ahora</div>
+                </Card>
+                <Card accent={trendColor}>
+                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Tendencia</div>
+                  <div style={{ fontSize:16, fontWeight:800, color:trendColor, fontFamily:"'Syne',sans-serif" }}>{trend}</div>
+                  <div style={{ fontSize:7, color:MUTED }}>{diff > 0 ? `+${diff}` : diff} vs observado</div>
+                </Card>
+                <Card accent="#E5243B">
+                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Batallas previstas</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:"#E5243B", fontFamily:"'Playfair Display',serif" }}>{battlesF}</div>
+                  <div style={{ fontSize:7, color:MUTED }}>Enfrentamientos armados</div>
+                </Card>
+                <Card accent="#dc2626">
+                  <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Violencia civil prev.</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:"#dc2626", fontFamily:"'Playfair Display',serif" }}>{vacF}</div>
+                  <div style={{ fontSize:7, color:MUTED }}>Contra civiles</div>
+                </Card>
+              </div>
+            );
+          })()}
+
+          {/* State-by-state risk table */}
+          <Card>
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>
+              Nivel de riesgo por estado · Previsto vs Observado
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+              {/* Risk map */}
+              <div>
+                {cast.filter(p => p.admin1).sort((a,b) => (b.total_forecast||0)-(a.total_forecast||0)).map((p,i) => {
+                  const f = Math.round(p.total_forecast||0), o = Math.round(p.total_observed||0);
+                  const maxBar = Math.max(...cast.filter(q=>q.admin1).map(q => Math.max(q.total_forecast||0, q.total_observed||0)), 1);
+                  const diff = f - o;
+                  const riskColor = f > 20 ? "#E5243B" : f > 10 ? "#f59e0b" : f > 3 ? "#0A97D9" : "#4C9F38";
+                  const riskLabel = f > 20 ? "ALTO" : f > 10 ? "MEDIO" : f > 3 ? "BAJO" : "MÍN.";
+                  return (
+                    <div key={i} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4, padding:"3px 4px",
+                      background: i < 3 ? `${riskColor}08` : "transparent" }}>
+                      <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:`${riskColor}20`, color:riskColor,
+                        border:`1px solid ${riskColor}30`, minWidth:32, textAlign:"center", fontWeight:700 }}>{riskLabel}</span>
+                      <span style={{ fontSize:8, fontFamily:font, color:TEXT, minWidth:100 }}>{p.admin1}</span>
+                      <div style={{ flex:1, height:16, position:"relative", background:`${BORDER}20` }}>
+                        <div style={{ position:"absolute", top:0, left:0, height:7, width:`${(f/maxBar)*100}%`, background:"#f59e0b", opacity:0.8, borderRadius:"1px 1px 0 0" }}>
+                          <title>Previsto: {f}</title>
+                        </div>
+                        <div style={{ position:"absolute", top:8, left:0, height:7, width:`${(o/maxBar)*100}%`, background:ACCENT, opacity:0.8, borderRadius:"0 0 1px 1px" }}>
+                          <title>Observado: {o}</title>
+                        </div>
+                      </div>
+                      <span style={{ fontSize:7, fontFamily:font, color:"#f59e0b", minWidth:20, textAlign:"right" }}>{f}</span>
+                      <span style={{ fontSize:7, fontFamily:font, color:ACCENT, minWidth:20, textAlign:"right" }}>{o}</span>
+                      <span style={{ fontSize:7, fontFamily:font, color: diff > 0 ? "#E5243B" : "#4C9F38", minWidth:28, textAlign:"right" }}>
+                        {diff > 0 ? `↑${diff}` : diff < 0 ? `↓${Math.abs(diff)}` : "="}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Explanation sidebar */}
+              <div style={{ padding:8 }}>
+                <div style={{ fontSize:9, fontWeight:600, color:TEXT, marginBottom:8 }}>¿Cómo leer esta tabla?</div>
+                <div style={{ fontSize:8, color:MUTED, lineHeight:1.8, marginBottom:12 }}>
+                  Cada fila es un estado de Venezuela. Las barras muestran cuántos eventos de conflicto se esperan (amarillo) vs cuántos ya ocurrieron (azul).
+                </div>
+                <div style={{ fontSize:8, color:MUTED, lineHeight:1.8, marginBottom:12 }}>
+                  La flecha a la derecha indica si se espera <strong style={{ color:"#E5243B" }}>↑ más conflicto</strong> del observado o <strong style={{ color:"#4C9F38" }}>↓ menos</strong>.
+                </div>
+                <div style={{ fontSize:9, fontWeight:600, color:TEXT, marginBottom:6 }}>Niveles de riesgo</div>
+                {[
+                  {l:"ALTO",c:"#E5243B",d:">20 eventos previstos. Zona de máxima alerta."},
+                  {l:"MEDIO",c:"#f59e0b",d:"10-20 eventos. Monitoreo activo recomendado."},
+                  {l:"BAJO",c:"#0A97D9",d:"3-10 eventos. Situación controlada."},
+                  {l:"MÍN.",c:"#4C9F38",d:"<3 eventos. Sin alertas significativas."},
+                ].map((r,i) => (
+                  <div key={i} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
+                    <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:`${r.c}20`, color:r.c, border:`1px solid ${r.c}30`, minWidth:36, textAlign:"center", fontWeight:700 }}>{r.l}</span>
+                    <span style={{ fontSize:8, color:MUTED }}>{r.d}</span>
+                  </div>
+                ))}
+                <div style={{ display:"flex", gap:12, marginTop:10 }}>
+                  <span style={{ fontSize:7, fontFamily:font, color:"#f59e0b" }}>■ Previsto (predicción IA)</span>
+                  <span style={{ fontSize:7, fontFamily:font, color:ACCENT }}>■ Observado (datos reales)</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </>)}
+      </>)}
 
       {/* ═══ EVENTS ═══ */}
       {acledView === "events" && (<>
