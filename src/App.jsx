@@ -337,6 +337,17 @@ const SEM = { green:"#16a34a", yellow:"#ca8a04", red:"#dc2626" };
 const font = "'Space Mono', monospace";
 const fontSans = "'DM Sans', sans-serif";
 
+// Responsive hook
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < breakpoint);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, [breakpoint]);
+  return isMobile;
+}
+
 // ═══════════════════════════════════════════════════════════════
 // GDELT FETCHER — Live via CORS proxy, fallback to mock
 // ═══════════════════════════════════════════════════════════════
@@ -708,6 +719,7 @@ function Sparkline({ scId, currentWeek }) {
 }
 
 function TabDashboard({ week }) {
+  const mob = useIsMobile();
   const wk = WEEKS[week];
   const prevWk = week > 0 ? WEEKS[week-1] : null;
   const dom = wk.probs.reduce((a,b) => a.v > b.v ? a : b);
@@ -721,7 +733,7 @@ function TabDashboard({ week }) {
     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
       {/* ── ROW 1: Scenario Hero Cards ── */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:1, background:BORDER, border:`1px solid ${BORDER}` }}>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:1, background:BORDER, border:`1px solid ${BORDER}` }}>
         {wk.probs.map(p => {
           const sc = SCENARIOS.find(s=>s.id===p.sc);
           const isDom = p.sc === dom.sc;
@@ -950,6 +962,7 @@ function FullMatrix({ weekIdx, onClickWeek, onArrowClick }) {
 }
 
 function TabMatriz({ week, setWeek }) {
+  const mob = useIsMobile();
   const [sel, setSel] = useState(3);
   const [showTrend, setShowTrend] = useState(false);
   const wk = WEEKS[week];
@@ -1136,6 +1149,7 @@ function TabMatriz({ week, setWeek }) {
 }
 
 function TabMonitor() {
+  const mob = useIsMobile();
   const [seccion, setSeccion] = useState("indicadores");
   const [expanded, setExpanded] = useState(null);
   const dims = [...new Set(INDICATORS.map(i=>i.dim))];
@@ -1158,7 +1172,7 @@ function TabMonitor() {
           <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Monitor de Señales — {INDICATORS.length} indicadores · {MONITOR_WEEKS.length} semanas</div>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Semáforos, umbrales y señales por escenario</div>
         </div>
-        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {[{id:"indicadores",label:"Indicadores"},{id:"senales",label:"Señales E1/E2/E4"},{id:"noticias",label:"Noticias"},{id:"factcheck",label:"Verificación"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:12, fontFamily:font, padding:"6px 14px", border:"none",
@@ -1171,7 +1185,7 @@ function TabMonitor() {
       </div>
 
       {/* Summary cards */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:16 }}>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:10, marginBottom:16 }}>
         {[{label:"Verde",count:counts.green,color:"green",desc:"Estables / confirmados"},
           {label:"Amarillo",count:counts.yellow,color:"yellow",desc:"En monitoreo"},
           {label:"Rojo",count:counts.red,color:"red",desc:"Alerta activa"},
@@ -1534,7 +1548,7 @@ function MonitorFactCheck() {
           <span style={{ fontSize:12, color:MUTED, marginLeft:"auto" }}>{showTwitter ? "▲" : "▼"}</span>
         </button>
         {showTwitter && (
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginTop:8 }}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:8, marginTop:8 }}>
             {FACTCHECK_SOURCES.map((s,i) => (
               <div key={i} style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`2px solid ${s.color}`, padding:"8px", overflow:"hidden" }}>
                 <div style={{ fontSize:12, fontFamily:font, color:s.color, fontWeight:600, marginBottom:4 }}>@{s.handle}</div>
@@ -1605,6 +1619,7 @@ function MonitorFactCheck() {
 
 
 function TabGdelt() {
+  const mob = useIsMobile();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("loading");
@@ -1910,7 +1925,7 @@ function MarketOverviewWidget() {
         <div ref={containerRef} />
       </div>
       {/* Commodity & Bond — TradingView Market Quotes widget with free CFD symbols */}
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:12 }}>
         <TVMarketQuotes
           title="📦 Commodity"
           height={350}
@@ -2203,7 +2218,7 @@ function MereyEstimator() {
       <div style={{ fontSize:12, color:MUTED, marginBottom:10, lineHeight:1.5 }}>
         El crudo Merey 16° API no tiene feed público. Se estima como Brent menos descuento por gravedad y riesgo país.
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:12 }}>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:10, marginBottom:12 }}>
         <div>
           <label style={{ fontSize:10, fontFamily:font, color:MUTED, display:"block", marginBottom:4, letterSpacing:"0.1em", textTransform:"uppercase" }}>
             Brent (USD/bbl)
@@ -2244,6 +2259,7 @@ function MereyEstimator() {
 }
 
 function TabMercados() {
+  const mob = useIsMobile();
   const [seccion, setSeccion] = useState("petroleo");
 
   return (
@@ -2257,7 +2273,7 @@ function TabMercados() {
             Indicadores de mercado relevantes para el análisis de contexto Venezuela
           </div>
         </div>
-        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {[{id:"petroleo",label:"Petróleo",icon:"🛢"},{id:"global",label:"Global",icon:"🌍"},{id:"prediccion",label:"Predicción",icon:"🔮"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:12, fontFamily:font, padding:"6px 14px", border:"none",
@@ -2320,7 +2336,7 @@ function TabMercados() {
       {seccion === "prediccion" && (
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
           {/* Embeddable markets */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:12 }}>
             {POLYMARKET_SLUGS.filter(m => m.embed).map((m,i) => (
               <Card key={i}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
@@ -2444,7 +2460,7 @@ function EstadosMap() {
           </div>
 
           {/* KPIs */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:8 }}>
             <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Protestas</div>
               <div style={{ fontSize:20, fontWeight:800, color:ACCENT, fontFamily:"'Syne',sans-serif" }}>{sel.p}</div>
@@ -2513,6 +2529,7 @@ function EstadosMap() {
 }
 
 function TabConflictividad() {
+  const mob = useIsMobile();
   const [seccion, setSeccion] = useState("resumen");
 
   const maxMes = Math.max(...CONF_MESES.map(m=>m.t));
@@ -2529,7 +2546,7 @@ function TabConflictividad() {
           <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Conflictividad Social — Venezuela 2025</div>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Fuente: OVCS · Informe Anual 2025 · 2.219 protestas documentadas</div>
         </div>
-        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {[{id:"resumen",label:"Resumen"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:12, fontFamily:font, padding:"6px 12px", border:"none",
@@ -2542,7 +2559,7 @@ function TabConflictividad() {
 
       {/* ── RESUMEN ── */}
       {seccion === "resumen" && (<>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:16 }}>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:10, marginBottom:16 }}>
           {[{k:"Total 2025",v:"2.219",c:ACCENT,s:"-57% vs 2024 · Mínimo histórico"},{k:"DESCA",v:"1.248",c:"#4C9F38",s:"56% · Laborales, vivienda, servicios"},
             {k:"DCP",v:"971",c:"#0A97D9",s:"44% · Políticos, justicia"},{k:"Reprimidas",v:"55",c:"#E5243B",s:"2,5% · Patrón selectivo"}
           ].map((d,i) => (
@@ -2557,7 +2574,7 @@ function TabConflictividad() {
         <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
           Protestas por servicios básicos · 275 total
         </div>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, marginBottom:16 }}>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8, marginBottom:16 }}>
           {CONF_SERVICIOS.map((s,i) => (
             <div key={i} style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"10px 12px" }}>
               <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:6 }}>
@@ -2784,10 +2801,11 @@ function LeafletMap({ events, EC, TR }) {
     markersRef.current = group;
   }
 
-  return <div ref={mapRef} style={{ width: "100%", height: 450, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius:6 }} />;
+  return <div ref={mapRef} style={{ width: "100%", height: typeof window !== "undefined" && window.innerWidth < 768 ? 300 : 450, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius:6 }} />;
 }
 
 function AcledSection() {
+  const mob = useIsMobile();
   const [events, setEvents] = useState([]);
   const [cast, setCast] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -2906,7 +2924,7 @@ function AcledSection() {
         <span style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", flex:1 }}>
           ACLED · Venezuela {new Date().getFullYear()} · {events.length} eventos · Actualiza cada lunes
         </span>
-        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {[{id:"overview",l:"Vista general"},{id:"map",l:"Mapa"},{id:"cast",l:"CAST"},{id:"events",l:"Eventos"}].map(s => (
             <button key={s.id} onClick={() => setAcledView(s.id)}
               style={{ fontSize:10, fontFamily:font, padding:"5px 10px", border:"none",
@@ -2918,7 +2936,7 @@ function AcledSection() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:8, marginBottom:12 }}>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(5,1fr)", gap:8, marginBottom:12 }}>
         {[
           {l:"Eventos",v:events.length,c:"#E5243B"},
           {l:"Fatalidades",v:totalFatal,c:"#dc2626"},
@@ -2977,7 +2995,7 @@ function AcledSection() {
           const wkFatal = wkEvents.reduce((s,e) => s+(parseInt(e.fatalities)||0),0);
           const wkTypes = {}; wkEvents.forEach(e => { wkTypes[e.event_type]=(wkTypes[e.event_type]||0)+1; });
           return (<>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
+            <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8 }}>
               {[{l:`Semana ${wkDate}`,v:wkEvents.length,c:ACCENT},{l:"Fatalidades",v:wkFatal,c:"#dc2626"},
                 {l:"Tipos activos",v:Object.keys(wkTypes).length,c:"#4C9F38"},{l:"",v:<span style={{fontSize:10,cursor:"pointer",color:MUTED}} onClick={() => setFilter("all")}>✕ Cerrar</span>,c:MUTED}
               ].map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
@@ -2998,7 +3016,7 @@ function AcledSection() {
         })()}
 
         {/* Type + Actor — selectable with detail */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:10 }}>
           <Card>
             <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
               Por tipo de evento {filter !== "all" && !filter.startsWith("week:") && <span style={{ color:EC[filter]||ACCENT, cursor:"pointer" }} onClick={() => setFilter("all")}> · {filter} ✕</span>}
@@ -3049,11 +3067,11 @@ function AcledSection() {
           const tActors = {}; tEvents.forEach(e => { if(e.actor1) { const a=e.actor1.slice(0,50); tActors[a]=(tActors[a]||0)+1; }});
           const tPP = 15, tTotalP = Math.ceil(tEvents.length/tPP), tPage = tEvents.slice((acledPage-1)*tPP, acledPage*tPP);
           return (<>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
+            <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8 }}>
               {[{l:filter,v:tEvents.length,c:EC[filter]||ACCENT},{l:"Fatalidades",v:tFatal,c:"#dc2626"},{l:"Estados",v:Object.keys(tStates).length,c:"#0A97D9"},{l:"Actores",v:Object.keys(tActors).length,c:"#9b59b6"}]
                 .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
             </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+            <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:10 }}>
               <Card>
                 <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Por estado</div>
                 {Object.entries(tStates).sort((a,b) => b[1]-a[1]).slice(0,12).map(([s,c]) => (
@@ -3110,11 +3128,11 @@ function AcledSection() {
           const aStates = {}; aEvents.forEach(e => { if(e.admin1) aStates[e.admin1]=(aStates[e.admin1]||0)+1; });
           const aPP = 15, aTotalP = Math.ceil(aEvents.length/aPP), aPage = aEvents.slice((acledPage-1)*aPP, acledPage*aPP);
           return (<>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
+            <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8 }}>
               {[{l:actorFilter.slice(0,35),v:aEvents.length,c:ACCENT},{l:"Fatalidades",v:aFatal,c:"#dc2626"},{l:"Tipos",v:Object.keys(aTypes).length,c:"#4C9F38"},{l:"Estados",v:Object.keys(aStates).length,c:"#0A97D9"}]
                 .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
             </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+            <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:10 }}>
               <Card>
                 <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Tipos de evento</div>
                 {Object.entries(aTypes).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
@@ -3166,9 +3184,9 @@ function AcledSection() {
           <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
             Eventos por estado {stateFilter !== "all" && <span style={{ color:ACCENT, cursor:"pointer" }} onClick={() => setStateFilter("all")}>· {stateFilter} ✕</span>}
           </div>
-          <div style={{ display:"flex", gap:12 }}>
+          <div style={{ display:"flex", gap:12, flexDirection:mob?"column":"row" }}>
             {/* SVG Map */}
-            <div style={{ flex:"0 0 55%" }}>
+            <div style={{ flex:mob?"1 1 100%":"0 0 55%" }}>
               <svg viewBox="0 0 600 420" width="100%" style={{ background:BG3 }}>
                 {VZ_MAP.map(state => {
                   const acledName = Object.keys(byAdmin).find(a =>
@@ -3203,7 +3221,7 @@ function AcledSection() {
               </div>
             </div>
             {/* Ranking */}
-            <div style={{ flex:1, maxHeight:400, overflowY:"auto" }}>
+            <div style={{ flex:1, maxHeight:mob?250:400, overflowY:"auto" }}>
               <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginBottom:6, letterSpacing:"0.08em", textTransform:"uppercase" }}>Ranking por eventos</div>
               {Object.entries(byAdmin).sort((a,b) => b[1]-a[1]).map(([st,ct], idx) => {
                 const mx = Math.max(...Object.values(byAdmin),1);
@@ -3242,7 +3260,7 @@ function AcledSection() {
           const stPageEvents = stSorted.slice((stPage-1)*stPP, stPage*stPP);
           return (<>
             {/* State KPIs */}
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, marginTop:0 }}>
+            <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8, marginTop:0 }}>
               {[
                 {l:"Eventos",v:stEvents.length,c:"#E5243B"},
                 {l:"Fatalidades",v:stFatal,c:"#dc2626"},
@@ -3257,7 +3275,7 @@ function AcledSection() {
             </div>
 
             {/* State type + actors */}
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+            <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:10 }}>
               <Card>
                 <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Tipos en {stateFilter}</div>
                 {Object.entries(stTypes).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
@@ -3372,7 +3390,7 @@ function AcledSection() {
             const trend = diff > 10 ? "AUMENTO" : diff < -10 ? "DESCENSO" : "ESTABLE";
             const trendColor = diff > 10 ? "#E5243B" : diff < -10 ? "#4C9F38" : "#f59e0b";
             return (
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:8, marginBottom:12 }}>
+              <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(5,1fr)", gap:8, marginBottom:12 }}>
                 <Card accent="#f59e0b">
                   <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Eventos previstos</div>
                   <div style={{ fontSize:20, fontWeight:800, color:"#f59e0b", fontFamily:"'Playfair Display',serif" }}>{totalF}</div>
@@ -3407,7 +3425,7 @@ function AcledSection() {
             <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>
               Nivel de riesgo por estado · Previsto vs Observado
             </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+            <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:10 }}>
               {/* Risk map */}
               <div>
                 {castByState.map((p,i) => {
@@ -3494,7 +3512,7 @@ function AcledSection() {
                         </div>
                         {/* CAST predictions */}
                         <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Predicción CAST</div>
-                        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:4, marginBottom:10 }}>
+                        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:4, marginBottom:10 }}>
                           {[
                             {l:"Total previsto",v:f,c:"#f59e0b"},{l:"Total observado",v:o,c:ACCENT},
                             {l:"Batallas prev.",v:bf,c:"#E5243B"},{l:"Violencia civil",v:vf,c:"#dc2626"},
@@ -3600,6 +3618,7 @@ function AcledSection() {
 
 
 function TabIODA() {
+  const mob = useIsMobile();
   const [signals, setSignals] = useState(null);
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("loading");
@@ -3775,7 +3794,7 @@ function TabIODA() {
           {source==="live"?"EN VIVO":source==="failed"?"OFFLINE":"..."}
         </Badge>
         {/* Time range selector */}
-        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {["24h","48h","7d"].map(r => (
             <button key={r} onClick={() => setTimeRange(r)}
               style={{ fontSize:12, fontFamily:font, padding:"5px 12px", border:"none",
@@ -4061,6 +4080,7 @@ function BrechaChart({ data }) {
 }
 
 function TabMacro() {
+  const mob = useIsMobile();
   const [dolar, setDolar] = useState(null);
   const [loading, setLoading] = useState(true);
   const [seccion, setSeccion] = useState("cambio");
@@ -4208,7 +4228,7 @@ function TabMacro() {
           <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Macroeconomía — Venezuela</div>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Tipo de cambio en vivo · Indicadores macroeconómicos · Mercado cambiario</div>
         </div>
-        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {[{id:"cambio",label:"Tipo de cambio"},{id:"indicadores",label:"Indicadores"},{id:"charts",label:"Gráficos"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:12, fontFamily:font, padding:"6px 12px", border:"none",
@@ -4316,7 +4336,7 @@ function TabMacro() {
 
       {/* ── INDICADORES ── */}
       {seccion === "indicadores" && (
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10 }}>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:10 }}>
           {MACRO.map((m,i) => (
             <Card key={i} accent={m.c}>
               <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{m.k}</div>
@@ -4350,7 +4370,7 @@ function TabMacro() {
             </Card>
           )}
 
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:12 }}>
             {/* Brecha chart */}
             {rateHistory.length > 2 && (
               <Card>
@@ -4412,6 +4432,7 @@ const TABS = [
 export default function MonitorPNUD() {
   const [tab, setTab] = useState("dashboard");
   const [week, setWeek] = useState(WEEKS.length - 1);
+  const mob = useIsMobile();
 
   // Google Translate init
   useEffect(() => {
@@ -4442,16 +4463,22 @@ export default function MonitorPNUD() {
         .goog-te-gadget > span { display:none !important; }
         #google_translate_element { display:inline-block; }
         * { box-sizing: border-box; }
+        ::-webkit-scrollbar { width:6px; height:6px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:${BORDER}; border-radius:3px; }
+        @media (max-width:768px) {
+          .leaflet-container { height:300px !important; }
+        }
       `}</style>
       <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap" rel="stylesheet" />
 
       {/* HEADER */}
-      <div style={{ borderBottom:`2px solid ${ACCENT}`, padding:"12px 24px", display:"flex", justifyContent:"space-between", alignItems:"center", background:BG2, boxShadow:"0 1px 4px rgba(0,0,0,0.08)" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-          <div style={{ background:ACCENT, color:"#fff", fontFamily:font, fontSize:14, fontWeight:700, letterSpacing:"0.15em", padding:"5px 10px", borderRadius:3 }}>PNUD</div>
+      <div style={{ borderBottom:`2px solid ${ACCENT}`, padding:mob?"10px 12px":"12px 24px", display:"flex", justifyContent:"space-between", alignItems:"center", background:BG2, boxShadow:"0 1px 4px rgba(0,0,0,0.08)", flexWrap:"wrap", gap:8 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:mob?8:14 }}>
+          <div style={{ background:ACCENT, color:"#fff", fontFamily:font, fontSize:mob?11:14, fontWeight:700, letterSpacing:"0.15em", padding:mob?"3px 6px":"5px 10px", borderRadius:3 }}>PNUD</div>
           <div>
-            <div style={{ fontSize:16, fontWeight:600, color:TEXT, letterSpacing:"0.02em" }}>Monitor de Contexto Situacional · Venezuela 2026</div>
-            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.08em" }}>Programa de las Naciones Unidas para el Desarrollo</div>
+            <div style={{ fontSize:mob?12:16, fontWeight:600, color:TEXT, letterSpacing:"0.02em" }}>{mob?"Monitor Venezuela 2026":"Monitor de Contexto Situacional · Venezuela 2026"}</div>
+            {!mob && <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.08em" }}>Programa de las Naciones Unidas para el Desarrollo</div>}
           </div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
@@ -4469,22 +4496,22 @@ export default function MonitorPNUD() {
       </div>
 
       {/* TAB BAR */}
-      <div style={{ display:"flex", alignItems:"center", gap:0, padding:"0 24px", background:BG2, borderBottom:`1px solid ${BORDER}`, overflowX:"auto", boxShadow:"0 1px 2px rgba(0,0,0,0.04)" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:0, padding:mob?"0 8px":"0 24px", background:BG2, borderBottom:`1px solid ${BORDER}`, overflowX:"auto", boxShadow:"0 1px 2px rgba(0,0,0,0.04)", WebkitOverflowScrolling:"touch" }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            style={{ fontFamily:font, fontSize:11, letterSpacing:"0.08em", textTransform:"uppercase",
-              padding:"12px 16px", background:"transparent",
+            style={{ fontFamily:font, fontSize:mob?9:11, letterSpacing:"0.08em", textTransform:"uppercase",
+              padding:mob?"10px 8px":"12px 16px", background:"transparent",
               border:"none", borderBottom:tab===t.id?`3px solid ${ACCENT}`:"3px solid transparent",
               color:tab===t.id?ACCENT:MUTED, fontWeight:tab===t.id?700:400, cursor:"pointer", transition:"all 0.15s",
-              whiteSpace:"nowrap", display:"flex", alignItems:"center", gap:6 }}>
-            <span style={{ fontSize:15 }}>{t.icon}</span>
-            {t.label}
+              whiteSpace:"nowrap", display:"flex", alignItems:"center", gap:mob?3:6 }}>
+            <span style={{ fontSize:mob?12:15 }}>{t.icon}</span>
+            {mob ? null : t.label}
           </button>
         ))}
       </div>
 
       {/* CONTENT */}
-      <div style={{ maxWidth:1340, margin:"0 auto", padding:"24px 24px 60px" }}>
+      <div style={{ maxWidth:1340, margin:"0 auto", padding:mob?"12px 10px 40px":"24px 24px 60px" }}>
         {tab === "dashboard" && <TabDashboard week={week} />}
         {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
