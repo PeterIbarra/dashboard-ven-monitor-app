@@ -4,7 +4,7 @@
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON = process.env.SUPABASE_ANON_KEY;
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (!SUPABASE_URL || !SUPABASE_ANON) {
     return res.status(500).json({ error: "Supabase not configured" });
   }

@@ -1,6 +1,6 @@
 const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const { signal } = req.query;
   
   const queries = {

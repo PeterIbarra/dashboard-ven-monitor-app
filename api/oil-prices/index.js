@@ -1,6 +1,6 @@
 const API_BASE = "https://api.oilpriceapi.com/v1";
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const apiKey = process.env.OILPRICE_API_KEY;
 
   if (!apiKey) {

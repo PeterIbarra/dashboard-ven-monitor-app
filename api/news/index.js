@@ -75,7 +75,7 @@ function parseRSS(xml, sourceName) {
   return items;
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   try {
     const results = await Promise.all(
       RSS_SOURCES.map(async (src) => {

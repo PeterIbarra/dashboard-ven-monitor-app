@@ -1,6 +1,6 @@
 const IODA_BASE = "https://api.ioda.inetintel.cc.gatech.edu/v2";
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const { path, ...params } = req.query;
 
   if (!path) {
