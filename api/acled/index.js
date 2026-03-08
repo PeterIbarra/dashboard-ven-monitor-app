@@ -12,13 +12,13 @@ async function getToken() {
 
   const res = await fetch("https://acleddata.com/oauth/token", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
       username: ACLED_EMAIL,
       password: ACLED_PASSWORD,
       grant_type: "password",
       client_id: "acled",
-    }),
+    }).toString(),
     signal: AbortSignal.timeout(10000),
   });
 
