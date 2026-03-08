@@ -2848,6 +2848,22 @@ function AcledSection() {
   const typeOrder = Object.entries(byType).sort((a,b) => b[1]-a[1]).map(([t]) => t);
   const topActors = Object.entries(byActor).sort((a,b) => b[1]-a[1]).slice(0,15);
 
+  // Aggregate CAST by state (API returns one row per state per month)
+  const castByState = useMemo(() => {
+    const agg = {};
+    cast.forEach(p => {
+      if (!p.admin1) return;
+      if (!agg[p.admin1]) agg[p.admin1] = { admin1:p.admin1, total_forecast:0, total_observed:0, battles_forecast:0, vac_forecast:0, erv_forecast:0, months:0 };
+      agg[p.admin1].total_forecast += (p.total_forecast||0);
+      agg[p.admin1].total_observed += (p.total_observed||0);
+      agg[p.admin1].battles_forecast += (p.battles_forecast||0);
+      agg[p.admin1].vac_forecast += (p.vac_forecast||0);
+      agg[p.admin1].erv_forecast += (p.erv_forecast||0);
+      agg[p.admin1].months++;
+    });
+    return Object.values(agg).sort((a,b) => b.total_forecast - a.total_forecast);
+  }, [cast]);
+
   if (loading) return <div style={{ textAlign:"center", padding:40, color:MUTED, fontFamily:font, fontSize:11 }}>Conectando con ACLED...</div>;
   if (error) return <Card><div style={{ color:"#E5243B", fontSize:11, fontFamily:font }}>⚠ {error}</div></Card>;
 
@@ -3316,10 +3332,10 @@ function AcledSection() {
         {cast.length === 0 ? <Card><div style={{ color:MUTED, fontSize:10, fontFamily:font, textAlign:"center", padding:20 }}>No hay predicciones disponibles actualmente.</div></Card> : (<>
           {/* Summary KPIs */}
           {(() => {
-            const totalF = Math.round(cast.reduce((s,p) => s+(p.total_forecast||0),0));
-            const totalO = Math.round(cast.reduce((s,p) => s+(p.total_observed||0),0));
-            const battlesF = Math.round(cast.reduce((s,p) => s+(p.battles_forecast||0),0));
-            const vacF = Math.round(cast.reduce((s,p) => s+(p.vac_forecast||0),0));
+            const totalF = Math.round(castByState.reduce((s,p) => s+p.total_forecast,0));
+            const totalO = Math.round(castByState.reduce((s,p) => s+p.total_observed,0));
+            const battlesF = Math.round(castByState.reduce((s,p) => s+p.battles_forecast,0));
+            const vacF = Math.round(castByState.reduce((s,p) => s+p.vac_forecast,0));
             const diff = totalF - totalO;
             const trend = diff > 10 ? "AUMENTO" : diff < -10 ? "DESCENSO" : "ESTABLE";
             const trendColor = diff > 10 ? "#E5243B" : diff < -10 ? "#4C9F38" : "#f59e0b";
@@ -3362,9 +3378,9 @@ function AcledSection() {
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
               {/* Risk map */}
               <div>
-                {cast.filter(p => p.admin1).sort((a,b) => (b.total_forecast||0)-(a.total_forecast||0)).map((p,i) => {
-                  const f = Math.round(p.total_forecast||0), o = Math.round(p.total_observed||0);
-                  const maxBar = Math.max(...cast.filter(q=>q.admin1).map(q => Math.max(q.total_forecast||0, q.total_observed||0)), 1);
+                {castByState.map((p,i) => {
+                  const f = Math.round(p.total_forecast), o = Math.round(p.total_observed);
+                  const maxBar = Math.max(...castByState.map(q => Math.max(q.total_forecast, q.total_observed)), 1);
                   const diff = f - o;
                   const riskColor = f > 20 ? "#E5243B" : f > 10 ? "#f59e0b" : f > 3 ? "#0A97D9" : "#4C9F38";
                   const riskLabel = f > 20 ? "ALTO" : f > 10 ? "MEDIO" : f > 3 ? "BAJO" : "MÍN.";
@@ -3420,10 +3436,10 @@ function AcledSection() {
                 </>) : (<>
                   {/* Selected state detail */}
                   {(() => {
-                    const cp = cast.find(p => p.admin1 === castState);
+                    const cp = castByState.find(p => p.admin1 === castState);
                     if (!cp) return null;
-                    const f = Math.round(cp.total_forecast||0), o = Math.round(cp.total_observed||0);
-                    const bf = Math.round(cp.battles_forecast||0), vf = Math.round(cp.vac_forecast||0), ef = Math.round(cp.erv_forecast||0);
+                    const f = Math.round(cp.total_forecast), o = Math.round(cp.total_observed);
+                    const bf = Math.round(cp.battles_forecast), vf = Math.round(cp.vac_forecast), ef = Math.round(cp.erv_forecast);
                     const diff = f - o;
                     const riskColor = f > 20 ? "#E5243B" : f > 10 ? "#f59e0b" : f > 3 ? "#0A97D9" : "#4C9F38";
                     const riskLabel = f > 20 ? "ALTO" : f > 10 ? "MEDIO" : f > 3 ? "BAJO" : "MÍNIMO";
