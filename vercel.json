@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/api/gdelt", "destination": "/api/gdelt/index.js" },
     { "source": "/api/ioda", "destination": "/api/ioda/index.js" },
+    { "source": "/api/oil-prices", "destination": "/api/oil-prices/index.js" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [

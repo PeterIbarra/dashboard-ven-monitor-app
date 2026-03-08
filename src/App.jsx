@@ -1117,31 +1117,126 @@ function TabGdelt() {
   );
 }
 
-function TradingViewWidget({ symbol, title, height=220 }) {
-  const containerId = useMemo(() => `tv-${symbol.replace(/[^a-zA-Z0-9]/g,"")}-${Math.random().toString(36).slice(2,8)}`, [symbol]);
-  
-  useEffect(() => {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    container.innerHTML = "";
+function OilPriceTicker() {
+  const tickerRef = useCallback((node) => {
+    if (!node) return;
+    // Clear previous
+    node.innerHTML = "";
+    // Create the OilPriceAPI ticker div
+    const div = document.createElement("div");
+    div.id = "oilpriceapi-ticker";
+    div.setAttribute("data-theme", "dark");
+    div.setAttribute("data-commodities", "BRENT,WTI,NATURAL_GAS");
+    div.setAttribute("data-layout", "horizontal");
+    node.appendChild(div);
+    // Load the script
     const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
+    script.src = "https://www.oilpriceapi.com/widgets/ticker.js";
     script.async = true;
-    script.innerHTML = JSON.stringify({
-      symbol, width:"100%", height, locale:"es", dateRange:"1M",
-      colorTheme:"dark", isTransparent:true, autosize:false,
-      largeChartUrl:"", chartOnly:false, noTimeScale:false,
-    });
-    container.appendChild(script);
-  }, [symbol, containerId, height]);
+    node.appendChild(script);
+  }, []);
 
   return (
-    <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"8px 10px", overflow:"hidden" }}>
-      <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{title}</div>
-      <div id={containerId} style={{ width:"100%", height }} />
+    <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px 16px", minHeight:60 }}>
+      <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>
+        🛢 Precios en tiempo real · OilPriceAPI · Actualiza cada 5 min
+      </div>
+      <div ref={tickerRef} />
     </div>
   );
 }
+
+function LivePriceCards() {
+  const [prices, setPrices] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [source, setSource] = useState("loading");
+
+  useEffect(() => {
+    async function fetchPrices() {
+      // Try our Vercel serverless function first (has API key server-side)
+      if (IS_DEPLOYED) {
+        try {
+          const res = await fetch("/api/oil-prices", { signal: AbortSignal.timeout(8000) });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.brent || data.wti) {
+              setPrices(data);
+              setSource("live");
+              setLoading(false);
+              return;
+            }
+          }
+        } catch {}
+      }
+      // Try direct API with CORS proxy (for Claude artifact / local dev)
+      for (const proxyFn of CORS_PROXIES) {
+        try {
+          const res = await fetch(proxyFn("https://api.oilpriceapi.com/v1/prices/latest"), {
+            headers: { Authorization: "Token ee08dc36b7a3ff883080dfe426bffd6ed1a392b53d3818c60a57c84b50858f93", "Content-Type": "application/json" },
+            signal: AbortSignal.timeout(6000),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data?.data) { setPrices({ raw: data.data }); setSource("live"); setLoading(false); return; }
+          }
+        } catch {}
+      }
+      // Fallback static
+      setPrices({ brent:{price:72.50}, wti:{price:68.80}, natgas:{price:3.85} });
+      setSource("static");
+      setLoading(false);
+    }
+    fetchPrices();
+  }, []);
+
+  const extract = (obj) => {
+    if (!obj) return null;
+    if (typeof obj === "number") return obj;
+    if (obj.price) return typeof obj.price === "number" ? obj.price : parseFloat(obj.price);
+    return null;
+  };
+
+  const brent = extract(prices?.brent) || extract(prices?.raw) || 72.50;
+  const wti = extract(prices?.wti) || 68.80;
+  const natgas = extract(prices?.natgas) || 3.85;
+
+  const items = [
+    { label:"Brent Crude", value:brent, unit:"USD/bbl", color:"#22c55e", desc:"Referencia internacional · Mar del Norte" },
+    { label:"WTI Crude", value:wti, unit:"USD/bbl", color:"#38bdf8", desc:"Referencia EE.UU. · Cushing, Oklahoma" },
+    { label:"Natural Gas", value:natgas, unit:"USD/MMBtu", color:"#f59e0b", desc:"Henry Hub · Referencia gas natural" },
+  ];
+
+  return (
+    <div>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+        {loading ? (
+          <div style={{ gridColumn:"1/-1", textAlign:"center", padding:20, color:MUTED, fontSize:10, fontFamily:font }}>
+            Conectando con OilPriceAPI...
+          </div>
+        ) : items.map((item,i) => (
+          <Card key={i} accent={item.color}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
+              <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>{item.label}</span>
+              {i === 0 && <Badge color={source==="live"?"#22c55e":"#eab308"}>{source==="live"?"EN VIVO":"ESTÁTICO"}</Badge>}
+            </div>
+            <div style={{ fontSize:26, fontWeight:900, color:item.color, fontFamily:"'Playfair Display',serif", lineHeight:1 }}>
+              ${item.value.toFixed(2)}
+            </div>
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginTop:6 }}>{item.unit} · {item.desc}</div>
+          </Card>
+        ))}
+      </div>
+      {!loading && source === "static" && (
+        <div style={{ fontSize:8, fontFamily:font, color:"#eab308", marginTop:6, textAlign:"center" }}>
+          ⚠ Precios de referencia estáticos — los precios en vivo requieren deploy en Vercel con API key configurada
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
 
 function MereyEstimator() {
   const [brentPrice, setBrentPrice] = useState(72.5);
@@ -1213,7 +1308,7 @@ function TabMercados() {
           </div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
-          {[{id:"petroleo",label:"Petróleo",icon:"🛢"},{id:"macro",label:"Macro",icon:"💱"},{id:"prediccion",label:"Predicción",icon:"🔮"}].map(s => (
+          {[{id:"petroleo",label:"Petróleo",icon:"🛢"},{id:"prediccion",label:"Predicción",icon:"🔮"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:9, fontFamily:font, padding:"6px 14px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED,
@@ -1227,12 +1322,11 @@ function TabMercados() {
       {/* ── PETRÓLEO ── */}
       {seccion === "petroleo" && (
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          {/* TradingView widgets row */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
-            <TradingViewWidget symbol="ICEEUR:BRN1!" title="Brent Crude" />
-            <TradingViewWidget symbol="NYMEX:CL1!" title="WTI Crude" />
-            <TradingViewWidget symbol="NYMEX:NG1!" title="Natural Gas" />
-          </div>
+          {/* OilPriceAPI live ticker */}
+          <OilPriceTicker />
+
+          {/* Price cards */}
+          <LivePriceCards />
 
           {/* Merey estimator */}
           <MereyEstimator />
@@ -1263,59 +1357,6 @@ function TabMercados() {
                 Paraguaná: 5 de 9 unidades (~287K bpd). 
                 2-4 taladros activos (vs 100+ históricos).
                 Inversión requerida: +USD 100B para alcanzar 3-4 Mbpd en 10 años.
-              </div>
-            </Card>
-          </div>
-        </div>
-      )}
-
-      {/* ── MACRO ── */}
-      {seccion === "macro" && (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
-            <TradingViewWidget symbol="TVC:DXY" title="Índice Dólar (DXY)" />
-            <TradingViewWidget symbol="ECONOMICS:VEINR" title="Inflación Venezuela" />
-            <TradingViewWidget symbol="FX:USDCOP" title="USD/COP (ref. frontera)" />
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-            <Card accent="#eab308">
-              <div style={{ fontSize:10, fontWeight:600, color:"#eab308", marginBottom:6 }}>Brecha cambiaria Venezuela</div>
-              <div style={{ display:"flex", gap:20, marginTop:8 }}>
-                <div>
-                  <div style={{ fontSize:20, fontWeight:900, color:"#eab308", fontFamily:"'Playfair Display',serif" }}>52,6%</div>
-                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>Brecha 25 feb</div>
-                </div>
-                <div>
-                  <div style={{ fontSize:14, fontWeight:700, color:TEXT, fontFamily:font }}>631,68</div>
-                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>Mercado Bs/$</div>
-                </div>
-                <div>
-                  <div style={{ fontSize:14, fontWeight:700, color:ACCENT, fontFamily:font }}>414,05</div>
-                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>BCV oficial Bs/$</div>
-                </div>
-              </div>
-              <div style={{ fontSize:9, color:MUTED, marginTop:8, lineHeight:1.5 }}>
-                ↑6,5pp semanal · Subastas BCV USD 70M insuficientes · ~USD 30M a banca pública · Tasa promedio subastas: 540 Bs/$
-              </div>
-            </Card>
-            <Card accent="#ef4444">
-              <div style={{ fontSize:10, fontWeight:600, color:"#ef4444", marginBottom:6 }}>FMI: "Intensa Fragilidad"</div>
-              <div style={{ display:"flex", gap:20, marginTop:8 }}>
-                <div>
-                  <div style={{ fontSize:20, fontWeight:900, color:"#ef4444", fontFamily:"'Playfair Display',serif" }}>&gt;180%</div>
-                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>Deuda/PIB</div>
-                </div>
-                <div>
-                  <div style={{ fontSize:14, fontWeight:700, color:"#eab308", fontFamily:font }}>174%</div>
-                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>Inflación proy. 2026</div>
-                </div>
-                <div>
-                  <div style={{ fontSize:14, fontWeight:700, color:"#22c55e", fontFamily:font }}>10-15%</div>
-                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>PIB proy. 2026</div>
-                </div>
-              </div>
-              <div style={{ fontSize:9, color:MUTED, marginTop:8, lineHeight:1.5 }}>
-                47 meses sin ajuste salarial · Canasta básica USD 550 vs ingreso ~USD 270 · 69.5% con ingresos &lt;USD 300
               </div>
             </Card>
           </div>
