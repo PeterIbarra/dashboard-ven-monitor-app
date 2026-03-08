@@ -196,16 +196,18 @@ const SCENARIO_SIGNALS = [
 ];
 
 const GDELT_ANNOTATIONS = [
-  { date:"2026-01-03", tier:"CRITICAL", label:"Operación EE.UU. / Captura Maduro" },
-  { date:"2026-01-05", tier:"HIGH", label:"Delcy Rodríguez juramentada" },
-  { date:"2026-01-10", tier:"HIGH", label:"Decreto emergencia + represión" },
-  { date:"2026-01-15", tier:"MEDIUM", label:"Machado se reúne con Trump" },
-  { date:"2026-01-20", tier:"MEDIUM", label:"Acuerdo petrolero $300M" },
-  { date:"2026-01-29", tier:"MEDIUM", label:"Ley de hidrocarburos firmada" },
-  { date:"2026-02-05", tier:"LOW", label:"Debate amnistía" },
-  { date:"2026-02-12", tier:"LOW", label:"Rodríguez promete elecciones" },
-  { date:"2026-02-19", tier:"MEDIUM", label:"Amnistía promulgada" },
-  { date:"2026-02-25", tier:"LOW", label:"Trump: \"nuevo amigo\"" },
+  { date:"2026-01-03", tier:"CRITICAL", label:"Operación EE.UU. / Maduro capturado", tierEs:"CRÍTICO" },
+  { date:"2026-01-05", tier:"HIGH", label:"Delcy Rodríguez juramentada", tierEs:"ALTA" },
+  { date:"2026-01-10", tier:"HIGH", label:"Decreto emergencia + represión", tierEs:"ALTA" },
+  { date:"2026-01-15", tier:"MEDIUM", label:"Machado se reúne con Trump", tierEs:"MEDIA" },
+  { date:"2026-01-20", tier:"MEDIUM", label:"Acuerdo petrolero $300M", tierEs:"MEDIA" },
+  { date:"2026-01-29", tier:"MEDIUM", label:"Ley de hidrocarburos firmada", tierEs:"MEDIA" },
+  { date:"2026-02-05", tier:"LOW", label:"Comienza debate de amnistía", tierEs:"BAJA" },
+  { date:"2026-02-11", tier:"HIGH", label:"Visita Secretario de Energía EE.UU.", tierEs:"ALTA" },
+  { date:"2026-02-12", tier:"LOW", label:"Rodríguez promete elecciones (NBC)", tierEs:"BAJA" },
+  { date:"2026-02-13", tier:"MEDIUM", label:"Nuevas licencias petroleras", tierEs:"MEDIA" },
+  { date:"2026-02-19", tier:"HIGH", label:"Ley de Amnistía aprobada y firmada", tierEs:"ALTA" },
+  { date:"2026-02-25", tier:"LOW", label:"Trump: \"nuevo amigo\"", tierEs:"BAJA" },
 ];
 
 const POLYMARKET_SLUGS = [
@@ -451,25 +453,25 @@ function GdeltChart({ data }) {
   
   const maxInst = Math.max(...data.map(d=>d.instability||0));
   const maxArt = Math.max(...data.map(d=>d.artvolnorm||0));
-  const maxY = Math.max(maxInst, maxArt, 1);
+  const maxLeft = Math.max(maxInst, maxArt, 1);
+  const toneMin = -10, toneMax = 2;
   
-  const W = 800, H = 200, padL = 40, padR = 10, padT = 10, padB = 30;
+  const W = 800, H = 280, padL = 45, padR = 45, padT = 15, padB = 35;
   const cW = W-padL-padR, cH = H-padT-padB;
   
   const toX = (i) => padL + (i/(data.length-1)) * cW;
-  const toY = (v, max) => padT + cH - (v/max)*cH;
+  const toYLeft = (v) => padT + cH - (v/maxLeft)*cH;
+  const toYRight = (v) => padT + cH - ((v-toneMin)/(toneMax-toneMin))*cH;
   
-  const makePath = (key, max) => {
-    const pts = data.map((d,i) => d[key] != null ? `${i===0?"M":"L"}${toX(i)},${toY(d[key],max)}` : "").filter(Boolean);
-    return pts.join(" ");
+  const makePath = (key, yFn) => {
+    return data.map((d,i) => d[key] != null ? `${i===0?"M":"L"}${toX(i)},${yFn(d[key])}` : "").filter(Boolean).join(" ");
   };
   
-  const makeArea = (key, max) => {
-    const pts = data.filter(d => d[key] != null);
-    if (!pts.length) return "";
+  const makeArea = (key, yFn) => {
     const indices = data.map((d,i) => d[key]!=null ? i : -1).filter(i=>i>=0);
-    let path = `M${toX(indices[0])},${toY(pts[0][key],max)}`;
-    for (let j=1; j<indices.length; j++) path += ` L${toX(indices[j])},${toY(pts[j][key],max)}`;
+    if (!indices.length) return "";
+    let path = `M${toX(indices[0])},${yFn(data[indices[0]][key])}`;
+    for (let j=1; j<indices.length; j++) path += ` L${toX(indices[j])},${yFn(data[indices[j]][key])}`;
     path += ` L${toX(indices[indices.length-1])},${padT+cH} L${toX(indices[0])},${padT+cH} Z`;
     return path;
   };
@@ -481,7 +483,7 @@ function GdeltChart({ data }) {
 
   const tierColor = { CRITICAL:"#ff2222", HIGH:"#ff7733", MEDIUM:"#f5c842", LOW:"#3bf0ff" };
   const sigColor = { instability:"#ff3b3b", tone:"#3bf0ff", artvolnorm:"#f5c842" };
-  const sigLabel = { instability:"Inestabilidad", tone:"Tono mediático", artvolnorm:"Vol. artículos" };
+  const sigLabel = { instability:"Índice de Conflicto", tone:"Tono Mediático", artvolnorm:"Oleada de Atención" };
 
   return (
     <div>
@@ -508,50 +510,64 @@ function GdeltChart({ data }) {
         {[0,0.25,0.5,0.75,1].map(f => (
           <line key={f} x1={padL} y1={padT+f*cH} x2={padL+cW} y2={padT+f*cH} stroke="rgba(255,255,255,0.04)" />
         ))}
-        {/* Annotations */}
+        {/* Left Y axis labels */}
+        {[0,0.25,0.5,0.75,1].map(f => (
+          <text key={`l${f}`} x={padL-6} y={padT+(1-f)*cH+3} textAnchor="end" fontSize={8} fill={MUTED} fontFamily={font}>
+            {(maxLeft*f).toFixed(0)}
+          </text>
+        ))}
+        {/* Right Y axis labels (tone) */}
+        {[0,0.25,0.5,0.75,1].map(f => {
+          const v = toneMin + (toneMax-toneMin)*f;
+          return <text key={`r${f}`} x={padL+cW+6} y={padT+(1-f)*cH+3} textAnchor="start" fontSize={8} fill="#3bf0ff50" fontFamily={font}>
+            {v.toFixed(0)}
+          </text>;
+        })}
+        {/* Annotation lines */}
         {annotations.map((a,i) => (
-          <line key={i} x1={a.x} y1={padT} x2={a.x} y2={padT+cH} stroke={tierColor[a.tier]} strokeDasharray="3 3" opacity={0.4} />
+          <g key={`ann${i}`}>
+            <line x1={a.x} y1={padT} x2={a.x} y2={padT+cH} stroke={tierColor[a.tier]} strokeDasharray="4 3" opacity={0.4} />
+            <polygon points={`${a.x-4},${padT+cH+6} ${a.x+4},${padT+cH+6} ${a.x},${padT+cH+1}`} fill={tierColor[a.tier]} opacity={0.8} />
+            <polygon points={`${a.x-4},${padT-1} ${a.x+4},${padT-1} ${a.x},${padT+5}`} fill={tierColor[a.tier]} opacity={0.5} />
+          </g>
         ))}
         {/* Areas */}
-        {signals.artvolnorm && <path d={makeArea("artvolnorm",maxY)} fill="#f5c84210" />}
-        {signals.instability && <path d={makeArea("instability",maxY)} fill="#ff3b3b10" />}
+        {signals.artvolnorm && <path d={makeArea("artvolnorm",toYLeft)} fill="#f5c84215" />}
+        {signals.instability && <path d={makeArea("instability",toYLeft)} fill="#ff3b3b12" />}
+        {signals.tone && <path d={makeArea("tone",toYRight)} fill="#3bf0ff0a" />}
         {/* Lines */}
-        {signals.artvolnorm && <path d={makePath("artvolnorm",maxY)} fill="none" stroke="#f5c842" strokeWidth={1.5} />}
-        {signals.instability && <path d={makePath("instability",maxY)} fill="none" stroke="#ff3b3b" strokeWidth={1.5} />}
-        {signals.tone && <path d={makePath("tone",10)} fill="none" stroke="#3bf0ff" strokeWidth={1.5} />}
+        {signals.artvolnorm && <path d={makePath("artvolnorm",toYLeft)} fill="none" stroke="#f5c842" strokeWidth={2} />}
+        {signals.instability && <path d={makePath("instability",toYLeft)} fill="none" stroke="#ff3b3b" strokeWidth={2} />}
+        {signals.tone && <path d={makePath("tone",toYRight)} fill="none" stroke="#3bf0ff" strokeWidth={1.5} strokeDasharray="4 2" />}
         {/* X labels */}
-        {data.filter((_,i) => i % Math.floor(data.length/8) === 0).map((d,i,arr) => {
+        {data.filter((_,i) => i % Math.floor(data.length/8) === 0).map((d,i) => {
           const idx = data.indexOf(d);
           return <text key={i} x={toX(idx)} y={H-4} textAnchor="middle" fontSize={8} fill={MUTED} fontFamily={font}>
             {new Date(d.date+"T00:00").toLocaleDateString("es",{month:"short",day:"numeric"})}
           </text>;
         })}
-        {/* Hover line */}
-        {hover !== null && <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT+cH} stroke="rgba(255,255,255,0.2)" />}
+        {/* Hover */}
+        {hover !== null && <>
+          <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT+cH} stroke="rgba(255,255,255,0.25)" />
+          {signals.instability && data[hover].instability!=null && <circle cx={toX(hover)} cy={toYLeft(data[hover].instability)} r={3.5} fill="#ff3b3b" stroke={BG} strokeWidth={2} />}
+          {signals.tone && data[hover].tone!=null && <circle cx={toX(hover)} cy={toYRight(data[hover].tone)} r={3.5} fill="#3bf0ff" stroke={BG} strokeWidth={2} />}
+          {signals.artvolnorm && data[hover].artvolnorm!=null && <circle cx={toX(hover)} cy={toYLeft(data[hover].artvolnorm)} r={3.5} fill="#f5c842" stroke={BG} strokeWidth={2} />}
+        </>}
       </svg>
+      {/* Tooltip */}
       {hover !== null && data[hover] && (
-        <div style={{ fontSize:10, fontFamily:font, color:TEXT, marginTop:6, display:"flex", gap:16, flexWrap:"wrap" }}>
-          <span style={{ color:MUTED }}>{data[hover].date}</span>
-          {signals.instability && <span style={{ color:"#ff3b3b" }}>Inest: {data[hover].instability?.toFixed(2)}</span>}
+        <div style={{ fontSize:10, fontFamily:font, color:TEXT, marginTop:6, padding:"8px 12px", background:BG2, border:`1px solid ${BORDER}`, display:"flex", gap:16, flexWrap:"wrap", alignItems:"center" }}>
+          <span style={{ color:TEXT, fontWeight:600 }}>{new Date(data[hover].date+"T00:00").toLocaleDateString("es",{day:"numeric",month:"short",year:"numeric"})}</span>
+          {signals.instability && <span style={{ color:"#ff3b3b" }}>Conflicto: {data[hover].instability?.toFixed(2)}</span>}
           {signals.tone && <span style={{ color:"#3bf0ff" }}>Tono: {data[hover].tone?.toFixed(2)}</span>}
-          {signals.artvolnorm && <span style={{ color:"#f5c842" }}>Vol: {data[hover].artvolnorm?.toFixed(2)}</span>}
+          {signals.artvolnorm && <span style={{ color:"#f5c842" }}>Atención: {data[hover].artvolnorm?.toFixed(2)}</span>}
           {GDELT_ANNOTATIONS.find(a=>a.date===data[hover].date) && (
-            <span style={{ color:tierColor[GDELT_ANNOTATIONS.find(a=>a.date===data[hover].date).tier] }}>
+            <span style={{ color:tierColor[GDELT_ANNOTATIONS.find(a=>a.date===data[hover].date).tier], fontWeight:600 }}>
               ● {GDELT_ANNOTATIONS.find(a=>a.date===data[hover].date).label}
             </span>
           )}
         </div>
       )}
-      {/* Annotations timeline */}
-      <div style={{ marginTop:16, display:"flex", flexDirection:"column", gap:4 }}>
-        {GDELT_ANNOTATIONS.map((a,i) => (
-          <div key={i} style={{ display:"flex", alignItems:"center", gap:8, fontSize:10, fontFamily:font }}>
-            <span style={{ width:6, height:6, borderRadius:"50%", background:tierColor[a.tier], flexShrink:0 }} />
-            <span style={{ color:MUTED, minWidth:68 }}>{a.date.slice(5)}</span>
-            <span style={{ color:TEXT }}>{a.label}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
@@ -1504,36 +1520,39 @@ function TabGdelt() {
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("loading");
   const [error, setError] = useState(null);
-  const [retrying, setRetrying] = useState(false);
 
   const loadData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setSource("loading");
+    setLoading(true); setError(null); setSource("loading");
     try {
       const live = await fetchAllGdelt();
-      if (live && live.length > 10) {
-        setData(live);
-        setSource("live");
-      } else {
-        setData(generateMockGdelt());
-        setSource("mock");
-        setError("GDELT no respondió — usando datos simulados");
-      }
-    } catch (e) {
-      setData(generateMockGdelt());
-      setSource("mock");
-      setError(`Fallback a mock: ${e.message}`);
-    }
+      if (live && live.length > 10) { setData(live); setSource("live"); }
+      else { setData(generateMockGdelt()); setSource("mock"); setError("GDELT no respondió — datos simulados"); }
+    } catch (e) { setData(generateMockGdelt()); setSource("mock"); setError(`Fallback: ${e.message}`); }
     setLoading(false);
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const dataPoints = data?.length || 0;
-  const dateRange = data && data.length > 0
-    ? `${data[0].date} → ${data[data.length-1].date}`
-    : "";
+  // Compute KPI stats (like Umbral)
+  const stats = useMemo(() => {
+    if (!data || data.length < 30) return { instDelta:null, tone:null, phase:null };
+    const baseline = data.slice(0, 30);
+    const recent = data.slice(-14);
+    const baseAvg = baseline.reduce((s,d) => s+(d.instability||0), 0) / baseline.length;
+    const recentAvg = recent.reduce((s,d) => s+(d.instability||0), 0) / recent.length;
+    const instDelta = baseAvg > 0 ? ((recentAvg-baseAvg)/baseAvg)*100 : null;
+    const tone = data[data.length-1]?.tone ?? null;
+    // Composite phase
+    const rI = recent.reduce((s,d) => s+(d.instability||0), 0) / recent.length;
+    const rT = recent.reduce((s,d) => s+(d.tone||0), 0) / recent.length;
+    const rA = recent.reduce((s,d) => s+(d.artvolnorm||0), 0) / recent.length;
+    const clamp = (v,mn,mx) => Math.min(mx,Math.max(mn,v));
+    const composite = (clamp(rI/6,0,1) + clamp(-rT/8,0,1) + clamp(rA/4,0,1)) / 3;
+    const phase = composite > 0.6 ? "CRISIS" : composite > 0.35 ? "ELEVADO" : "ESTABLE";
+    return { instDelta, tone, phase };
+  }, [data]);
+
+  const tierColor = { CRITICAL:"#ff2222", HIGH:"#ff7733", MEDIUM:"#f5c842", LOW:"#3bf0ff" };
 
   return (
     <div>
@@ -1541,90 +1560,126 @@ function TabGdelt() {
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16, flexWrap:"wrap" }}>
         <span style={{ fontSize:14 }}>📡</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:13, fontWeight:600, color:TEXT }}>GDELT Media Signals — Venezuela</div>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
-            {source === "live"
-              ? `EN VIVO · ${dataPoints} puntos · ${dateRange} · via CORS proxy`
-              : source === "mock"
-              ? `Datos simulados · ${dataPoints} puntos · Fallback local`
-              : "Conectando con GDELT DOC API v2..."}
+          <div style={{ fontSize:13, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Panel de Señales GDELT</div>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>
+            Señales mediáticas en tiempo real del Proyecto GDELT monitoreando la cobertura sobre Venezuela
           </div>
         </div>
-        <Badge color={source==="live"?"#22c55e":source==="mock"?"#eab308":"#4a7090"}>
-          {source==="live"?"EN VIVO":source==="mock"?"SIMULADO":"..."}
-        </Badge>
-        {source === "mock" && !loading && (
-          <button onClick={loadData}
-            style={{ fontSize:9, fontFamily:font, padding:"4px 10px", background:"transparent",
-              border:`1px solid ${ACCENT}40`, color:ACCENT, cursor:"pointer", letterSpacing:"0.08em" }}>
-            ↻ Reintentar
-          </button>
-        )}
+        <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+          {source === "mock" && !loading && (
+            <button onClick={loadData} style={{ fontSize:9, fontFamily:font, padding:"4px 10px", background:"transparent",
+              border:`1px solid ${ACCENT}40`, color:ACCENT, cursor:"pointer" }}>↻ Reintentar</button>
+          )}
+          <div style={{ display:"flex", alignItems:"center", gap:6, padding:"4px 10px", border:`1px solid ${source==="live"?"#22c55e30":source==="mock"?"#eab30830":"#4a709030"}` }}>
+            <span style={{ width:6, height:6, borderRadius:"50%", background:source==="live"?"#22c55e":source==="mock"?"#eab308":"#4a7090",
+              boxShadow:source==="live"?"0 0 6px #22c55e":"none", animation:source==="live"?"pulse 1.5s infinite":"none" }} />
+            <span style={{ fontSize:9, fontFamily:font, color:source==="live"?"#22c55e":source==="mock"?"#eab308":"#4a7090" }}>
+              {source==="live"?"EN VIVO":source==="mock"?"SIMULADO":"..."}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Status bar */}
       {error && (
         <div style={{ fontSize:9, fontFamily:font, color:"#eab308", padding:"6px 12px",
-          background:"rgba(234,179,8,0.08)", border:"1px solid rgba(234,179,8,0.2)",
-          marginBottom:12, display:"flex", alignItems:"center", gap:8 }}>
-          <span>⚠</span> {error}
-          <span style={{ marginLeft:"auto", color:MUTED }}>
-            Proxies intentados: corsproxy.io, allorigins.win
-          </span>
+          background:"rgba(234,179,8,0.08)", border:"1px solid rgba(234,179,8,0.2)", marginBottom:12 }}>
+          ⚠ {error}
         </div>
       )}
 
-      {/* Chart */}
       {loading ? (
-        <Card>
-          <div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:11, fontFamily:font }}>
-            <div style={{ fontSize:20, marginBottom:8, animation:"pulse 1.5s infinite" }}>📡</div>
-            Conectando con GDELT DOC API v2...
-            <div style={{ fontSize:9, marginTop:4, color:`${MUTED}80` }}>
-              3 queries paralelas · instabilidad + tono + volumen · 120 días
-            </div>
-          </div>
-        </Card>
-      ) : data ? (
-        <Card><GdeltChart data={data} /></Card>
-      ) : (
-        <Card><div style={{ color:MUTED, fontSize:11, textAlign:"center", padding:20 }}>
-          No se pudieron obtener datos de GDELT
+        <Card><div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:11, fontFamily:font }}>
+          <div style={{ fontSize:20, marginBottom:8 }}>📡</div>
+          Conectando con GDELT DOC API v2...
         </div></Card>
+      ) : data ? (<>
+        {/* KPI Cards */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginBottom:16 }}>
+          <Card accent={stats.instDelta>0?"#ff3b3b":"#14b8a6"}>
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Inestabilidad Δ</div>
+            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+              <span style={{ fontSize:9 }}>{stats.instDelta>0?"📈":"📉"}</span>
+              <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
+                color:stats.instDelta>0?"#ff3b3b":"#14b8a6" }}>
+                {stats.instDelta!==null ? `${stats.instDelta>0?"+":""}${stats.instDelta.toFixed(1)}%` : "—"}
+              </span>
+            </div>
+            <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>vs línea base dic 2025</div>
+          </Card>
+          <Card accent={(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#14b8a6"}>
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Tono Mediático</div>
+            <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
+              color:(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#14b8a6" }}>
+              {stats.tone!==null ? stats.tone.toFixed(2) : "—"}
+            </span>
+            <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>Actual</div>
+          </Card>
+          <Card accent={stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#14b8a6"}>
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Señal Compuesta</div>
+            <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
+              color:stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#14b8a6" }}>
+              {stats.phase || "—"}
+            </span>
+            <div style={{ fontSize:8, color:MUTED, marginTop:2 }}>Incluye inestabilidad, tono y oleada</div>
+          </Card>
+        </div>
+
+        {/* Chart */}
+        <Card><GdeltChart data={data} /></Card>
+
+        {/* Event Timeline */}
+        <div style={{ marginTop:16 }}>
+          <div style={{ fontSize:10, fontWeight:700, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+            Línea de Tiempo de Eventos
+          </div>
+          {GDELT_ANNOTATIONS.map((a,i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 12px",
+              transition:"background 0.15s", cursor:"default", borderBottom:`1px solid ${BORDER}20` }}
+              onMouseEnter={e=>e.currentTarget.style.background=`${BG3}`}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <span style={{ width:10, height:10, borderRadius:"50%", background:tierColor[a.tier], flexShrink:0,
+                boxShadow:`0 0 8px ${tierColor[a.tier]}50`, border:`2px solid ${BG}` }} />
+              <span style={{ fontSize:10, fontFamily:font, color:MUTED, minWidth:100 }}>
+                {new Date(a.date+"T00:00").toLocaleDateString("es",{day:"numeric",month:"short",year:"numeric"})}
+              </span>
+              <span style={{ fontSize:11, color:TEXT, flex:1 }}>{a.label}</span>
+              <span style={{ fontSize:8, fontFamily:font, fontWeight:700, padding:"2px 8px", letterSpacing:"0.1em",
+                color:tierColor[a.tier], background:`${tierColor[a.tier]}12`, border:`1px solid ${tierColor[a.tier]}30`,
+                minWidth:60, textAlign:"center" }}>{a.tierEs}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Signal descriptions */}
+        <div style={{ marginTop:16, display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12 }}>
+          <Card accent="#ff3b3b">
+            <div style={{ fontSize:10, fontWeight:600, color:"#ff3b3b", marginBottom:6 }}>● Índice de Conflicto</div>
+            <div style={{ fontSize:10, color:MUTED, lineHeight:1.6 }}>
+              Volumen normalizado de artículos con Venezuela + conflicto/protesta/crisis/violencia. <span style={{color:"#ff3b3b50"}}>Eje izquierdo · Línea sólida</span>
+            </div>
+          </Card>
+          <Card accent="#f5c842">
+            <div style={{ fontSize:10, fontWeight:600, color:"#f5c842", marginBottom:6 }}>● Oleada de Atención</div>
+            <div style={{ fontSize:10, color:MUTED, lineHeight:1.6 }}>
+              Atención mediática normalizada. Mide la intensidad del interés internacional. <span style={{color:"#f5c84250"}}>Eje izquierdo · Línea sólida</span>
+            </div>
+          </Card>
+          <Card accent="#3bf0ff">
+            <div style={{ fontSize:10, fontWeight:600, color:"#3bf0ff", marginBottom:6 }}>● Tono Mediático</div>
+            <div style={{ fontSize:10, color:MUTED, lineHeight:1.6 }}>
+              Sentimiento promedio de cobertura internacional (-10 a +2). Negativo = conflictivo. <span style={{color:"#3bf0ff50"}}>Eje derecho · Línea punteada</span>
+            </div>
+          </Card>
+        </div>
+
+        {/* Footer */}
+        <div style={{ marginTop:12, fontSize:8, fontFamily:font, color:`${MUTED}60`, lineHeight:1.8, display:"flex", justifyContent:"space-between" }}>
+          <span>📡 Fuente: GDELT Project DOC API v2 · 3 queries paralelas via CORS proxy</span>
+          <span>Última actualización: {new Date().toLocaleString("es",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})}</span>
+        </div>
+      </>) : (
+        <Card><div style={{ color:MUTED, fontSize:11, textAlign:"center", padding:20 }}>No se pudieron obtener datos</div></Card>
       )}
-
-      {/* Signal descriptions */}
-      <div style={{ marginTop:16, display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12 }}>
-        <Card accent="#ff3b3b">
-          <div style={{ fontSize:10, fontWeight:600, color:"#ff3b3b", marginBottom:6 }}>Índice de Inestabilidad</div>
-          <div style={{ fontSize:10, color:MUTED, lineHeight:1.6 }}>
-            Volumen normalizado de artículos con Venezuela + conflicto/protesta/crisis/violencia. 
-            Pico el 3 de enero por la captura de Maduro.
-          </div>
-        </Card>
-        <Card accent="#3bf0ff">
-          <div style={{ fontSize:10, fontWeight:600, color:"#3bf0ff", marginBottom:6 }}>Tono Mediático</div>
-          <div style={{ fontSize:10, color:MUTED, lineHeight:1.6 }}>
-            Sentimiento promedio de cobertura internacional (-10 a +2). 
-            Recuperación gradual desde el shock de enero.
-          </div>
-        </Card>
-        <Card accent="#f5c842">
-          <div style={{ fontSize:10, fontWeight:600, color:"#f5c842", marginBottom:6 }}>Volumen de Artículos</div>
-          <div style={{ fontSize:10, color:MUTED, lineHeight:1.6 }}>
-            Atención mediática normalizada. Mide la intensidad del interés 
-            internacional en Venezuela como tema noticioso.
-          </div>
-        </Card>
-      </div>
-
-      {/* Technical details */}
-      <div style={{ marginTop:12, fontSize:8, fontFamily:font, color:`${MUTED}60`, lineHeight:1.8 }}>
-        Fuente: GDELT Project DOC API v2 · 3 queries paralelas via CORS proxy · 
-        Instabilidad = timelinevol (protest|conflict|crisis|violence|unrest) · 
-        Tono = timelinetone · Volumen = timelinevol general · 
-        Actualización: cada carga de página
-      </div>
     </div>
   );
 }
@@ -2551,6 +2606,7 @@ export default function MonitorPNUD() {
   return (
     <div style={{ fontFamily:fontSans, background:BG, minHeight:"100vh", color:TEXT }}>
       <style>{`
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
         .goog-te-banner-frame, .skiptranslate > iframe { display:none !important; }
         body { top:0 !important; }
         .goog-te-gadget { font-family:${font} !important; font-size:0 !important; }
