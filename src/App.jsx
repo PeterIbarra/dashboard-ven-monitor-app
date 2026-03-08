@@ -1088,6 +1088,14 @@ function TabMonitor() {
             <span style={{ fontSize:12, fontWeight:700, fontFamily:"'Syne',sans-serif", color:ACCENT, letterSpacing:"0.1em", textTransform:"uppercase" }}>{g.dim}</span>
             <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{g.inds.length} indicadores</span>
           </div>
+          {/* Column headers */}
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 100px auto 80px 40px", gap:8, padding:"2px 0 6px", borderBottom:`1px solid ${BORDER}30` }}>
+            <span style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Indicador</span>
+            <span style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Historial</span>
+            <span style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Valor actual</span>
+            <span style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Estado</span>
+            <span style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", textAlign:"center" }}>Tend.</span>
+          </div>
           {g.inds.map((ind,j) => {
             const last = ind.hist[ind.hist.length-1];
             const sem = last[0], trend = last[1], val = last[2];
@@ -1108,11 +1116,11 @@ function TabMonitor() {
                   {/* History dots */}
                   <div style={{ display:"flex", gap:3, alignItems:"center" }}>
                     {ind.hist.map((h,k) => (
-                      <div key={k} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
+                      <div key={k} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:1 }}>
+                        <div style={{ fontSize:5, color:MUTED, fontFamily:font }}>{MONITOR_WEEKS[k]}</div>
                         <div style={{ width:7, height:7, borderRadius:"50%", background:SEM[h[0]],
                           boxShadow:k===ind.hist.length-1?`0 0 4px ${SEM[h[0]]}`:"none",
                           opacity:0.4+(k/ind.hist.length)*0.6 }} />
-                        {k===ind.hist.length-1 && <div style={{ fontSize:5, color:MUTED }}>{MONITOR_WEEKS[k]}</div>}
                       </div>
                     ))}
                   </div>
@@ -1196,6 +1204,8 @@ function MonitorNoticias() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [source, setSource] = useState("loading");
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 20;
 
   useEffect(() => {
     async function fetchNews() {
@@ -1231,23 +1241,25 @@ function MonitorNoticias() {
   const dimColors = { "Energético":"#0A97D9", "Político":"#4C9F38", "Económico":"#FCC30B", "Internacional":"#9B59B6" };
   const dimIcons = { "Energético":"⚡", "Político":"🏛", "Económico":"📊", "Internacional":"🌐" };
   const filtered = filter === "all" ? news : news.filter(n => (n.scenarios||n.tags||[]).includes(filter));
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paginated = filtered.slice((page-1)*PER_PAGE, page*PER_PAGE);
 
   return (
     <div>
       {/* Filter */}
       <div style={{ display:"flex", gap:6, marginBottom:12, alignItems:"center", flexWrap:"wrap" }}>
         <Badge color={source==="supabase"?"#22c55e":source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
-          {source==="supabase"?"SUPABASE":source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
+          {source==="supabase"?"EN VIVO":source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
         </Badge>
         {["all","E1","E2","E3","E4"].map(f => (
-          <button key={f} onClick={() => setFilter(f)}
+          <button key={f} onClick={() => { setFilter(f); setPage(1); }}
             style={{ fontSize:9, fontFamily:font, padding:"3px 10px", border:`1px solid ${f==="all"?BORDER:escColors[f]||BORDER}`,
               background:filter===f?(f==="all"?ACCENT:escColors[f]):"transparent",
               color:filter===f?"#fff":(f==="all"?MUTED:escColors[f]||MUTED), cursor:"pointer", borderRadius:0 }}>
             {f === "all" ? "Todas" : f}
           </button>
         ))}
-        <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{filtered.length} noticias</span>
+        <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{filtered.length} noticias · pág {page}/{totalPages||1}</span>
       </div>
       {/* News list */}
       {loading ? (
@@ -1258,7 +1270,7 @@ function MonitorNoticias() {
         <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:10 }}>No se encontraron noticias</div></Card>
       ) : (
         <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
-          {filtered.map((n,i) => (
+          {paginated.map((n,i) => (
             <a key={i} href={n.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration:"none" }}>
               <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:12, padding:"10px 0", borderBottom:`1px solid ${BORDER}30`,
                 cursor:"pointer" }}
@@ -1290,6 +1302,22 @@ function MonitorNoticias() {
               </div>
             </a>
           ))}
+        </div>
+      )}
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ display:"flex", justifyContent:"center", gap:4, marginTop:12 }}>
+          <button onClick={() => setPage(Math.max(1,page-1))} disabled={page===1}
+            style={{ fontSize:9, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
+              background:page===1?"transparent":BG2, color:page===1?`${MUTED}50`:MUTED, cursor:page===1?"default":"pointer" }}>← Anterior</button>
+          {Array.from({length:totalPages},(_,i)=>i+1).map(p => (
+            <button key={p} onClick={() => setPage(p)}
+              style={{ fontSize:9, fontFamily:font, padding:"4px 8px", border:`1px solid ${page===p?ACCENT:BORDER}`,
+                background:page===p?ACCENT:"transparent", color:page===p?"#fff":MUTED, cursor:"pointer", minWidth:28 }}>{p}</button>
+          ))}
+          <button onClick={() => setPage(Math.min(totalPages,page+1))} disabled={page===totalPages}
+            style={{ fontSize:9, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
+              background:page===totalPages?"transparent":BG2, color:page===totalPages?`${MUTED}50`:MUTED, cursor:page===totalPages?"default":"pointer" }}>Siguiente →</button>
         </div>
       )}
       <div style={{ fontSize:7, fontFamily:font, color:`${MUTED}60`, marginTop:10 }}>
@@ -1384,11 +1412,37 @@ function MonitorFactCheck() {
         ))}
       </div>
 
+      {/* Twitter Timelines — collapsible, before articles */}
+      <div style={{ marginBottom:16 }}>
+        <button onClick={() => setShowTwitter(!showTwitter)}
+          style={{ display:"flex", alignItems:"center", gap:8, width:"100%", padding:"10px 14px",
+            background:BG2, border:`1px solid ${BORDER}`, cursor:"pointer", transition:"border-color 0.2s" }}
+          onMouseEnter={e=>e.currentTarget.style.borderColor=ACCENT}
+          onMouseLeave={e=>e.currentTarget.style.borderColor=BORDER}>
+          <span style={{ fontSize:12 }}>𝕏</span>
+          <span style={{ fontSize:10, fontFamily:font, color:TEXT, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase" }}>
+            Timelines verificadores
+          </span>
+          <span style={{ fontSize:8, color:MUTED }}>@cazamosfakenews · @cotejoinfo · @EsPajaVe · @_provea</span>
+          <span style={{ fontSize:12, color:MUTED, marginLeft:"auto" }}>{showTwitter ? "▲" : "▼"}</span>
+        </button>
+        {showTwitter && (
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginTop:8 }}>
+            {FACTCHECK_SOURCES.map((s,i) => (
+              <div key={i} style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`2px solid ${s.color}`, padding:"8px", overflow:"hidden" }}>
+                <div style={{ fontSize:9, fontFamily:font, color:s.color, fontWeight:600, marginBottom:4 }}>@{s.handle}</div>
+                <TwitterTimeline handle={s.handle} height={280} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* RSS Articles */}
       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
         <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>📰 Artículos de verificación</span>
         <Badge color={source==="supabase"?"#22c55e":source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
-          {source==="supabase"?"SUPABASE":source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
+          {source==="supabase"?"EN VIVO":source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
         </Badge>
         <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{articles.length} artículos</span>
       </div>
@@ -1420,32 +1474,6 @@ function MonitorFactCheck() {
           </div>
         </a>
       ))}
-
-      {/* Twitter Timelines — compact, collapsible */}
-      <div style={{ marginTop:16 }}>
-        <button onClick={() => setShowTwitter(!showTwitter)}
-          style={{ display:"flex", alignItems:"center", gap:8, width:"100%", padding:"10px 14px",
-            background:BG2, border:`1px solid ${BORDER}`, cursor:"pointer", transition:"border-color 0.2s" }}
-          onMouseEnter={e=>e.currentTarget.style.borderColor=ACCENT}
-          onMouseLeave={e=>e.currentTarget.style.borderColor=BORDER}>
-          <span style={{ fontSize:12 }}>𝕏</span>
-          <span style={{ fontSize:10, fontFamily:font, color:TEXT, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase" }}>
-            Timelines verificadores
-          </span>
-          <span style={{ fontSize:8, color:MUTED }}>@cazamosfakenews · @cotejoinfo · @EsPajaVe · @_provea</span>
-          <span style={{ fontSize:12, color:MUTED, marginLeft:"auto" }}>{showTwitter ? "▲" : "▼"}</span>
-        </button>
-        {showTwitter && (
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginTop:8 }}>
-            {FACTCHECK_SOURCES.map((s,i) => (
-              <div key={i} style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`2px solid ${s.color}`, padding:"8px", overflow:"hidden" }}>
-                <div style={{ fontSize:9, fontFamily:font, color:s.color, fontWeight:600, marginBottom:4 }}>@{s.handle}</div>
-                <TwitterTimeline handle={s.handle} height={280} />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
