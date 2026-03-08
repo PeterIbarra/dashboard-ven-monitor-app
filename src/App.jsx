@@ -1226,7 +1226,9 @@ function MonitorNoticias() {
   }, []);
 
   const escColors = { E1:"#4C9F38", E2:"#E5243B", E3:"#0A97D9", E4:"#FCC30B" };
-  const filtered = filter === "all" ? news : news.filter(n => n.tags?.includes(filter));
+  const dimColors = { "Energético":"#0A97D9", "Político":"#4C9F38", "Económico":"#FCC30B", "Internacional":"#9B59B6" };
+  const dimIcons = { "Energético":"⚡", "Político":"🏛", "Económico":"📊", "Internacional":"🌐" };
+  const filtered = filter === "all" ? news : news.filter(n => (n.tags||n.scenarios||[]).includes(filter));
 
   return (
     <div>
@@ -1268,8 +1270,16 @@ function MonitorNoticias() {
                       {new Date(n.date).toLocaleDateString("es",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
                     </span>}
                     {n.tags?.map((t,k) => (
-                      <span key={k} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
+                      <span key={`s${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
                         color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
+                    ))}
+                    {n.scenarios?.map((t,k) => (
+                      <span key={`sc${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
+                        color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
+                    ))}
+                    {n.dims?.map((d,k) => (
+                      <span key={`d${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${dimColors[d]||MUTED}15`,
+                        color:dimColors[d]||MUTED, border:`1px solid ${dimColors[d]||MUTED}30` }}>{dimIcons[d]||""} {d}</span>
                     ))}
                   </div>
                   {n.desc && <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.4 }}>{n.desc}</div>}
@@ -1293,7 +1303,7 @@ function MonitorFactCheck() {
   const [source, setSource] = useState("loading");
 
   const FACTCHECK_SOURCES = [
-    { name:"Cazamos Fake News", handle:"@cazamosfakenews", url:"https://cazamosfakenews.com", color:"#ef4444" },
+    { name:"Cazamos Fake News", handle:"@cazamosfakenews", url:"https://www.cazadoresdefakenews.info", color:"#ef4444" },
     { name:"Cotejo.info", handle:"@cotejoinfo", url:"https://cotejo.info", color:"#3b82f6" },
     { name:"EsPaja", handle:"@EsPaja", url:"https://espaja.com", color:"#f59e0b" },
     { name:"Cocuyo Chequea", handle:"@cocuyochequea", url:"https://efectococuyo.com/cocuyo-chequea/", color:"#22c55e" },
@@ -1387,9 +1397,18 @@ function MonitorFactCheck() {
                     {a.date && <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>
                       {new Date(a.date).toLocaleDateString("es",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
                     </span>}
-                    {a.tags?.map((t,k) => (
-                      <span key={k} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
+                    {(a.tags||a.scenarios||[]).map((t,k) => (
+                      <span key={`s${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
                         color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
+                    ))}
+                    {a.dims?.map((d,k) => (
+                      <span key={`d${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${({
+                        "Energético":"#0A97D9","Político":"#4C9F38","Económico":"#FCC30B","Internacional":"#9B59B6"
+                      })[d]||MUTED}15`, color:({
+                        "Energético":"#0A97D9","Político":"#4C9F38","Económico":"#FCC30B","Internacional":"#9B59B6"
+                      })[d]||MUTED, border:`1px solid ${({
+                        "Energético":"#0A97D9","Político":"#4C9F38","Económico":"#FCC30B","Internacional":"#9B59B6"
+                      })[d]||MUTED}30` }}>{({"Energético":"⚡","Político":"🏛","Económico":"📊","Internacional":"🌐"})[d]||""} {d}</span>
                     ))}
                   </div>
                   {a.desc && <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.4 }}>{a.desc}</div>}

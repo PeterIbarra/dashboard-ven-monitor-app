@@ -11,7 +11,7 @@ const RSS_SOURCES = [
   { name:"Cocuyo Chequea", feed:"https://efectococuyo.com/cocuyo-chequea/feed/", lang:"es", type:"factcheck" },
   { name:"Cotejo.info", feed:"https://cotejo.info/feed/", lang:"es", type:"factcheck" },
   { name:"EsPaja", feed:"https://espaja.com/feed/", lang:"es", type:"factcheck" },
-  { name:"Cazamos Fake News", feed:"https://cazamosfakenews.com/feed/", lang:"es", type:"factcheck" },
+  { name:"Cazamos Fake News", feed:"https://www.cazadoresdefakenews.info/feed/", lang:"es", type:"factcheck" },
   { name:"Provea", feed:"https://provea.org/feed/", lang:"es", type:"factcheck" },
 ];
 
@@ -23,13 +23,28 @@ const SCENARIO_TAGS = {
   E4: /FANB|militar|colectivo|represi[oó]n|detenci[oó]n|preso|SEBIN|DGCIM|Cabello|coerci|arma|violencia/i,
 };
 
+// Dimension category patterns
+const DIM_TAGS = {
+  "Energético": /petr[oó]le|PDVSA|crudo|barril|refiner|gas|energ|taladro|Chevron|Eni|Repsol|Shell|BP|OFAC|licencia|exportaci|bpd|OPEP|VLCC|Vitol|Trafigura/i,
+  "Político": /elecci[oó]n|electoral|amnist[ií]a|excarcel|preso|pol[ií]tic|Asamblea|AN |diput|partido|oposici|oficialis|Delcy|Cabello|Rodr[ií]guez|MCM|Machado|FANB|militar|PSUV|govern/i,
+  "Económico": /inflaci[oó]n|salario|bol[ií]var|d[oó]lar|cambiar|BCV|precio|econ[oó]m|PIB|FMI|deuda|canasta|pobreza|cripto|USDT|brecha|subasta|divisa/i,
+  "Internacional": /EE\.UU|Trump|Rubio|Blinken|UE|Europa|Uni[oó]n Europea|ONU|Colombia|Petro|China|Rusia|sanci[oó]n|diplom|embajad|fronter|migra|SOUTHCOM|geopo/i,
+};
+
 function tagScenario(title, description) {
   const text = `${title} ${description}`;
-  const tags = [];
+  const scenarios = [];
   for (const [esc, pattern] of Object.entries(SCENARIO_TAGS)) {
-    if (pattern.test(text)) tags.push(esc);
+    if (pattern.test(text)) scenarios.push(esc);
   }
-  return tags.length > 0 ? tags : ["E3"]; // Default to E3
+  const dims = [];
+  for (const [dim, pattern] of Object.entries(DIM_TAGS)) {
+    if (pattern.test(text)) dims.push(dim);
+  }
+  return {
+    scenarios: scenarios.length > 0 ? scenarios : ["E3"],
+    dims: dims.length > 0 ? dims : ["Político"],
+  };
 }
 
 // Simple XML parser for RSS (no dependencies)
@@ -53,7 +68,7 @@ function parseRSS(xml, sourceName) {
         desc: cleanDesc,
         date: pubDate,
         source: sourceName,
-        tags: tagScenario(cleanTitle, cleanDesc),
+        ...tagScenario(cleanTitle, cleanDesc),
       });
     }
   }
