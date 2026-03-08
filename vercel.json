@@ -1,9 +1,14 @@
 {
+  "crons": [
+    { "path": "/api/cron", "schedule": "0 * * * *" }
+  ],
   "rewrites": [
     { "source": "/api/gdelt", "destination": "/api/gdelt/index.js" },
     { "source": "/api/ioda", "destination": "/api/ioda/index.js" },
     { "source": "/api/oil-prices", "destination": "/api/oil-prices/index.js" },
     { "source": "/api/news", "destination": "/api/news/index.js" },
+    { "source": "/api/cron", "destination": "/api/cron/index.js" },
+    { "source": "/api/articles", "destination": "/api/articles/index.js" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [

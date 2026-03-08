@@ -1199,23 +1199,25 @@ function MonitorNoticias() {
 
   useEffect(() => {
     async function fetchNews() {
+      // Try Supabase via /api/articles first
       if (IS_DEPLOYED) {
+        try {
+          const res = await fetch("/api/articles?type=news&limit=30", { signal: AbortSignal.timeout(8000) });
+          if (res.ok) { const data = await res.json(); if (data.articles?.length) { setNews(data.articles.map(a => ({...a, date:a.published_at}))); setSource("supabase"); setLoading(false); return; } }
+        } catch {}
+        // Fallback to direct RSS
         try {
           const res = await fetch("/api/news", { signal: AbortSignal.timeout(12000) });
           if (res.ok) { const data = await res.json(); if (data.news?.length) { setNews(data.news); setSource("live"); setLoading(false); return; } }
         } catch {}
       }
-      // Fallback: CORS proxy to one RSS feed
       for (const proxyFn of CORS_PROXIES) {
         try {
           const res = await fetch(proxyFn("https://efectococuyo.com/feed/"), { signal: AbortSignal.timeout(6000) });
           if (res.ok) {
-            const xml = await res.text();
-            const items = [];
+            const xml = await res.text(); const items = [];
             const regex = /<item>[\s\S]*?<title><!\[CDATA\[(.*?)\]\]><\/title>[\s\S]*?<link>(.*?)<\/link>[\s\S]*?<pubDate>(.*?)<\/pubDate>[\s\S]*?<\/item>/gi;
-            let m; while ((m = regex.exec(xml)) !== null && items.length < 10) {
-              items.push({ title:m[1], link:m[2], date:m[3], source:"Efecto Cocuyo", tags:["E3"], desc:"" });
-            }
+            let m; while ((m = regex.exec(xml)) !== null && items.length < 10) { items.push({ title:m[1], link:m[2], date:m[3], source:"Efecto Cocuyo", scenarios:["E3"], dims:[], desc:"" }); }
             if (items.length) { setNews(items); setSource("partial"); setLoading(false); return; }
           }
         } catch { continue; }
@@ -1228,14 +1230,14 @@ function MonitorNoticias() {
   const escColors = { E1:"#4C9F38", E2:"#E5243B", E3:"#0A97D9", E4:"#FCC30B" };
   const dimColors = { "Energético":"#0A97D9", "Político":"#4C9F38", "Económico":"#FCC30B", "Internacional":"#9B59B6" };
   const dimIcons = { "Energético":"⚡", "Político":"🏛", "Económico":"📊", "Internacional":"🌐" };
-  const filtered = filter === "all" ? news : news.filter(n => (n.tags||n.scenarios||[]).includes(filter));
+  const filtered = filter === "all" ? news : news.filter(n => (n.scenarios||n.tags||[]).includes(filter));
 
   return (
     <div>
       {/* Filter */}
       <div style={{ display:"flex", gap:6, marginBottom:12, alignItems:"center", flexWrap:"wrap" }}>
-        <Badge color={source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
-          {source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
+        <Badge color={source==="supabase"?"#22c55e":source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
+          {source==="supabase"?"SUPABASE":source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
         </Badge>
         {["all","E1","E2","E3","E4"].map(f => (
           <button key={f} onClick={() => setFilter(f)}
@@ -1297,99 +1299,67 @@ function MonitorNoticias() {
   );
 }
 
-function XTimelines({ handles }) {
-  const [active, setActive] = useState(0);
-  const containerRef = useCallback((node) => {
-    if (!node) return;
-    // Load Twitter widget script
-    if (!window.twttr) {
-      const script = document.createElement("script");
-      script.src = "https://platform.twitter.com/widgets.js";
-      script.async = true;
-      script.charset = "utf-8";
-      document.head.appendChild(script);
-    }
-    // Re-render widgets when they become visible
-    const timer = setTimeout(() => {
-      if (window.twttr?.widgets) window.twttr.widgets.load(node);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [active]);
 
-  return (
-    <div style={{ marginBottom:16 }}>
-      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
-        <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>
-          𝕏 Timelines en vivo
-        </span>
-        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, marginLeft:"auto" }}>
-          {handles.map((h,i) => (
-            <button key={i} onClick={() => setActive(i)}
-              style={{ fontSize:8, fontFamily:font, padding:"4px 10px", border:"none",
-                background:active===i?h.color:"transparent", color:active===i?"#fff":MUTED,
-                cursor:"pointer" }}>
-              {h.name.length > 12 ? h.name.slice(0,12)+"…" : h.name}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div ref={containerRef} style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"8px", minHeight:400, overflow:"hidden" }}>
-        {handles.map((h,i) => (
-          <div key={h.handle} style={{ display:active===i?"block":"none" }}>
-            <a className="twitter-timeline"
-              href={`https://twitter.com/${h.handle}`}
-              data-theme="dark"
-              data-chrome="noheader nofooter noborders transparent"
-              data-height="400"
-              data-tweet-limit="5">
-              Cargando @{h.handle}...
-            </a>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+// Fact-check tweet data — update weekly from @cazamosfakenews, @cotejoinfo, @EsPajaVe, @_provea
+
+function TwitterTimeline({ handle, height=280 }) {
+  const ref = useCallback((node) => {
+    if (!node) return;
+    node.innerHTML = "";
+    const a = document.createElement("a");
+    a.className = "twitter-timeline";
+    a.href = `https://twitter.com/${handle}`;
+    a.setAttribute("data-theme", "dark");
+    a.setAttribute("data-chrome", "noheader nofooter noborders transparent");
+    a.setAttribute("data-height", String(height));
+    a.setAttribute("data-tweet-limit", "3");
+    a.textContent = `@${handle}`;
+    node.appendChild(a);
+    if (!window.twttr) {
+      const s = document.createElement("script");
+      s.src = "https://platform.twitter.com/widgets.js";
+      s.async = true;
+      document.head.appendChild(s);
+    } else {
+      window.twttr.widgets.load(node);
+    }
+  }, [handle, height]);
+  return <div ref={ref} style={{ minHeight:height }} />;
 }
 
 function MonitorFactCheck() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("loading");
+  const [showTwitter, setShowTwitter] = useState(false);
 
   const FACTCHECK_SOURCES = [
-    { name:"Cazamos Fake News", handle:"@cazamosfakenews", url:"https://www.cazadoresdefakenews.info", color:"#ef4444" },
-    { name:"Cotejo.info", handle:"@cotejoinfo", url:"https://cotejo.info", color:"#3b82f6" },
-    { name:"EsPaja", handle:"@EsPaja", url:"https://espaja.com", color:"#f59e0b" },
-    { name:"Cocuyo Chequea", handle:"@cocuyochequea", url:"https://efectococuyo.com/cocuyo-chequea/", color:"#22c55e" },
-    { name:"Provea", handle:"@_provea", url:"https://provea.org", color:"#9333ea" },
+    { name:"Cazamos Fake News", handle:"cazamosfakenews", url:"https://www.cazadoresdefakenews.info", color:"#ef4444" },
+    { name:"Cotejo.info", handle:"cotejoinfo", url:"https://cotejo.info", color:"#3b82f6" },
+    { name:"EsPaja", handle:"EsPajaVe", url:"https://espaja.com", color:"#f59e0b" },
+    { name:"Provea", handle:"_provea", url:"https://provea.org", color:"#9333ea" },
   ];
-
   const escColors = { E1:"#4C9F38", E2:"#E5243B", E3:"#0A97D9", E4:"#FCC30B" };
 
   useEffect(() => {
     async function fetchFactCheck() {
-      // Try Vercel serverless (same endpoint as news, returns factcheck separately)
       if (IS_DEPLOYED) {
         try {
+          const res = await fetch("/api/articles?type=factcheck&limit=20", { signal: AbortSignal.timeout(8000) });
+          if (res.ok) { const data = await res.json(); if (data.articles?.length) { setArticles(data.articles.map(a => ({...a, date:a.published_at}))); setSource("supabase"); setLoading(false); return; } }
+        } catch {}
+        try {
           const res = await fetch("/api/news", { signal: AbortSignal.timeout(12000) });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.factcheck?.length) { setArticles(data.factcheck); setSource("live"); setLoading(false); return; }
-          }
+          if (res.ok) { const data = await res.json(); if (data.factcheck?.length) { setArticles(data.factcheck); setSource("live"); setLoading(false); return; } }
         } catch {}
       }
-      // CORS proxy fallback — try Cotejo.info
       for (const proxyFn of CORS_PROXIES) {
         try {
           const res = await fetch(proxyFn("https://cotejo.info/feed/"), { signal: AbortSignal.timeout(6000) });
           if (res.ok) {
-            const xml = await res.text();
-            const items = [];
+            const xml = await res.text(); const items = [];
             const regex = /<item>[\s\S]*?<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>[\s\S]*?<link>(.*?)<\/link>[\s\S]*?(?:<pubDate>(.*?)<\/pubDate>)?[\s\S]*?<\/item>/gi;
-            let m; while ((m = regex.exec(xml)) !== null && items.length < 10) {
-              const t = m[1].replace(/<[^>]*>/g,"").trim();
-              items.push({ title:t, link:m[2], date:m[3]||"", source:"Cotejo.info", tags:["E3"], desc:"" });
-            }
+            let m; while ((m = regex.exec(xml)) !== null && items.length < 10) { items.push({ title:m[1].replace(/<[^>]*>/g,"").trim(), link:m[2], date:m[3]||"", source:"Cotejo.info", scenarios:["E3"], dims:["Político"] }); }
             if (items.length) { setArticles(items); setSource("partial"); setLoading(false); return; }
           }
         } catch { continue; }
@@ -1402,86 +1372,85 @@ function MonitorFactCheck() {
   return (
     <div>
       {/* Source cards */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:8, marginBottom:16 }}>
+      <div style={{ display:"grid", gridTemplateColumns:`repeat(${FACTCHECK_SOURCES.length},1fr)`, gap:8, marginBottom:16 }}>
         {FACTCHECK_SOURCES.map((s,i) => (
           <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration:"none" }}>
-            <div style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`2px solid ${s.color}`, padding:"10px 12px",
-              cursor:"pointer", transition:"border-color 0.2s" }}
-              onMouseEnter={e=>e.currentTarget.style.borderColor=s.color}
-              onMouseLeave={e=>e.currentTarget.style.borderColor=BORDER}>
+            <div style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`2px solid ${s.color}`, padding:"10px 12px", cursor:"pointer" }}
+              onMouseEnter={e=>e.currentTarget.style.borderColor=s.color} onMouseLeave={e=>e.currentTarget.style.borderColor=BORDER}>
               <div style={{ fontSize:10, fontWeight:600, color:s.color, marginBottom:2 }}>{s.name}</div>
-              <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>{s.handle}</div>
+              <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>@{s.handle}</div>
             </div>
           </a>
         ))}
       </div>
 
-      {/* Twitter Timelines */}
-      <XTimelines handles={FACTCHECK_SOURCES.map(s => ({ handle:s.handle.replace("@",""), name:s.name, color:s.color }))} />
-
-      {/* Live feed header */}
+      {/* RSS Articles */}
       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
-        <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>
-          🔍 Verificaciones recientes
-        </span>
-        <Badge color={source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
-          {source==="live"?"EN VIVO · RSS":source==="partial"?"PARCIAL":"OFFLINE"}
+        <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>📰 Artículos de verificación</span>
+        <Badge color={source==="supabase"?"#22c55e":source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
+          {source==="supabase"?"SUPABASE":source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
         </Badge>
         <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{articles.length} artículos</span>
       </div>
-
-      {/* Articles */}
       {loading ? (
-        <Card><div style={{ textAlign:"center", padding:30, color:MUTED, fontSize:10, fontFamily:font }}>
-          Cargando verificaciones de hechos...
-        </div></Card>
+        <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:10, fontFamily:font }}>Cargando verificaciones...</div></Card>
       ) : articles.length === 0 ? (
-        <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:10 }}>
-          No se pudieron cargar verificaciones. Visita los sitios directamente.
-        </div></Card>
-      ) : (
-        <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
-          {articles.map((a,i) => (
-            <a key={i} href={a.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration:"none" }}>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:12, padding:"10px 0", borderBottom:`1px solid ${BORDER}30`,
-                cursor:"pointer" }}
-                onMouseEnter={e=>e.currentTarget.style.background=BG3}
-                onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                <div>
-                  <div style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:4 }}>{a.title}</div>
-                  <div style={{ display:"flex", gap:6, alignItems:"center", flexWrap:"wrap" }}>
-                    <span style={{ fontSize:8, fontFamily:font, color:FACTCHECK_SOURCES.find(s=>s.name===a.source)?.color||ACCENT, fontWeight:600 }}>{a.source}</span>
-                    {a.date && <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>
-                      {new Date(a.date).toLocaleDateString("es",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
-                    </span>}
-                    {(a.tags||a.scenarios||[]).map((t,k) => (
-                      <span key={`s${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
-                        color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
-                    ))}
-                    {a.dims?.map((d,k) => (
-                      <span key={`d${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${({
-                        "Energético":"#0A97D9","Político":"#4C9F38","Económico":"#FCC30B","Internacional":"#9B59B6"
-                      })[d]||MUTED}15`, color:({
-                        "Energético":"#0A97D9","Político":"#4C9F38","Económico":"#FCC30B","Internacional":"#9B59B6"
-                      })[d]||MUTED, border:`1px solid ${({
-                        "Energético":"#0A97D9","Político":"#4C9F38","Económico":"#FCC30B","Internacional":"#9B59B6"
-                      })[d]||MUTED}30` }}>{({"Energético":"⚡","Político":"🏛","Económico":"📊","Internacional":"🌐"})[d]||""} {d}</span>
-                    ))}
-                  </div>
-                  {a.desc && <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.4 }}>{a.desc}</div>}
-                </div>
-                <span style={{ fontSize:9, color:ACCENT, fontFamily:font }}>↗</span>
+        <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:10 }}>Sin artículos. Visita los sitios directamente.</div></Card>
+      ) : articles.map((a,i) => (
+        <a key={i} href={a.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration:"none" }}>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:12, padding:"8px 0", borderBottom:`1px solid ${BORDER}30` }}
+            onMouseEnter={e=>e.currentTarget.style.background=BG3} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+            <div>
+              <div style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:3 }}>{a.title}</div>
+              <div style={{ display:"flex", gap:5, alignItems:"center", flexWrap:"wrap" }}>
+                <span style={{ fontSize:8, fontFamily:font, color:FACTCHECK_SOURCES.find(s=>s.name===a.source)?.color||ACCENT, fontWeight:600 }}>{a.source}</span>
+                {a.date && <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>{new Date(a.date).toLocaleDateString("es",{day:"numeric",month:"short"})}</span>}
+                {(a.scenarios||[]).map((t,k) => (
+                  <span key={`s${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`, color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
+                ))}
+                {(a.dims||[]).map((d,k) => (
+                  <span key={`d${k}`} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${{Energético:"#0A97D9",Político:"#4C9F38",Económico:"#FCC30B",Internacional:"#9B59B6"}[d]||MUTED}15`,
+                    color:{Energético:"#0A97D9",Político:"#4C9F38",Económico:"#FCC30B",Internacional:"#9B59B6"}[d]||MUTED }}>
+                    {{Energético:"⚡",Político:"🏛",Económico:"📊",Internacional:"🌐"}[d]||""} {d}
+                  </span>
+                ))}
               </div>
-            </a>
-          ))}
-        </div>
-      )}
-      <div style={{ fontSize:7, fontFamily:font, color:`${MUTED}60`, marginTop:10 }}>
-        Fuentes RSS en vivo: Cazamos Fake News · Cotejo.info · EsPaja · Cocuyo Chequea · Provea · Tags automáticos por keywords
+            </div>
+            <span style={{ fontSize:9, color:ACCENT, fontFamily:font }}>↗</span>
+          </div>
+        </a>
+      ))}
+
+      {/* Twitter Timelines — compact, collapsible */}
+      <div style={{ marginTop:16 }}>
+        <button onClick={() => setShowTwitter(!showTwitter)}
+          style={{ display:"flex", alignItems:"center", gap:8, width:"100%", padding:"10px 14px",
+            background:BG2, border:`1px solid ${BORDER}`, cursor:"pointer", transition:"border-color 0.2s" }}
+          onMouseEnter={e=>e.currentTarget.style.borderColor=ACCENT}
+          onMouseLeave={e=>e.currentTarget.style.borderColor=BORDER}>
+          <span style={{ fontSize:12 }}>𝕏</span>
+          <span style={{ fontSize:10, fontFamily:font, color:TEXT, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase" }}>
+            Timelines verificadores
+          </span>
+          <span style={{ fontSize:8, color:MUTED }}>@cazamosfakenews · @cotejoinfo · @EsPajaVe · @_provea</span>
+          <span style={{ fontSize:12, color:MUTED, marginLeft:"auto" }}>{showTwitter ? "▲" : "▼"}</span>
+        </button>
+        {showTwitter && (
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginTop:8 }}>
+            {FACTCHECK_SOURCES.map((s,i) => (
+              <div key={i} style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`2px solid ${s.color}`, padding:"8px", overflow:"hidden" }}>
+                <div style={{ fontSize:9, fontFamily:font, color:s.color, fontWeight:600, marginBottom:4 }}>@{s.handle}</div>
+                <TwitterTimeline handle={s.handle} height={280} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
+
 
 function TabGdelt() {
   const [data, setData] = useState(null);
