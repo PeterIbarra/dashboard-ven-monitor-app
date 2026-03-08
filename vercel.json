@@ -8,6 +8,7 @@
     { "source": "/api/articles", "destination": "/api/articles/index.js" },
     { "source": "/api/rates", "destination": "/api/rates/index.js" },
     { "source": "/api/dolar", "destination": "/api/dolar/index.js" },
+    { "source": "/api/acled", "destination": "/api/acled/index.js" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [

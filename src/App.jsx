@@ -2523,7 +2523,7 @@ function TabConflictividad() {
           <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Fuente: OVCS · Informe Anual 2025 · 2.219 protestas documentadas</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
-          {[{id:"resumen",label:"Resumen"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"}].map(s => (
+          {[{id:"resumen",label:"Resumen"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:9, fontFamily:font, padding:"6px 12px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
@@ -2700,6 +2700,214 @@ function TabConflictividad() {
           })}
         </div>
       </>)}
+
+      {seccion === "acled" && <AcledSection />}
+    </div>
+  );
+}
+
+function AcledSection() {
+  const [events, setEvents] = useState([]);
+  const [cast, setCast] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState("all");
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true);
+      // Fetch events
+      try {
+        const res = await fetch("/api/acled?type=events&limit=500", { signal: AbortSignal.timeout(15000) });
+        if (res.ok) {
+          const data = await res.json();
+          const evts = data.data || data || [];
+          if (Array.isArray(evts)) setEvents(evts);
+        } else {
+          const err = await res.json().catch(() => ({}));
+          setError(err.error || `HTTP ${res.status}`);
+        }
+      } catch (e) { setError(e.message); }
+
+      // Fetch CAST predictions
+      try {
+        const res = await fetch("/api/acled?type=cast", { signal: AbortSignal.timeout(15000) });
+        if (res.ok) {
+          const data = await res.json();
+          const preds = data.data || data || [];
+          if (Array.isArray(preds)) setCast(preds);
+        }
+      } catch {}
+      setLoading(false);
+    }
+    if (IS_DEPLOYED) load();
+    else { setLoading(false); setError("ACLED requiere deploy en Vercel"); }
+  }, []);
+
+  const EVENT_COLORS = {
+    "Protests":"#4C9F38", "Riots":"#FCC30B", "Battles":"#E5243B",
+    "Violence against civilians":"#dc2626", "Explosions/Remote violence":"#f97316",
+    "Strategic developments":"#0A97D9"
+  };
+
+  const filtered = filter === "all" ? events : events.filter(e => e.event_type === filter);
+  const sortedEvents = [...filtered].sort((a,b) => b.event_date?.localeCompare(a.event_date));
+
+  // KPIs
+  const totalEvents = events.length;
+  const totalFatal = events.reduce((s,e) => s + (parseInt(e.fatalities)||0), 0);
+  const byType = {};
+  events.forEach(e => { byType[e.event_type] = (byType[e.event_type]||0) + 1; });
+  const thisWeek = events.filter(e => {
+    const d = new Date(e.event_date);
+    const now = new Date();
+    return (now - d) < 7 * 24 * 3600 * 1000;
+  }).length;
+
+  // Weekly aggregation for chart
+  const weeklyData = {};
+  events.forEach(e => {
+    const d = new Date(e.event_date);
+    const weekStart = new Date(d); weekStart.setDate(d.getDate() - d.getDay());
+    const wk = weekStart.toISOString().slice(0,10);
+    if (!weeklyData[wk]) weeklyData[wk] = { d:wk, total:0, types:{} };
+    weeklyData[wk].total++;
+    weeklyData[wk].types[e.event_type] = (weeklyData[wk].types[e.event_type]||0) + 1;
+  });
+  const weekly = Object.values(weeklyData).sort((a,b) => a.d.localeCompare(b.d));
+
+  if (loading) return <div style={{ textAlign:"center", padding:40, color:MUTED, fontFamily:font, fontSize:11 }}>Conectando con ACLED...</div>;
+  if (error) return <Card><div style={{ color:"#E5243B", fontSize:11, fontFamily:font }}>⚠ {error}</div></Card>;
+
+  return (
+    <div>
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
+        <div style={{ width:6, height:6, borderRadius:"50%", background:"#22c55e", animation:"pulse 2s infinite" }} />
+        <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+          ACLED · Armed Conflict Location & Event Data · Venezuela {new Date().getFullYear()} · Actualiza cada lunes
+        </span>
+      </div>
+
+      {/* KPIs */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:10, marginBottom:14 }}>
+        <Card accent="#E5243B">
+          <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Eventos totales</div>
+          <div style={{ fontSize:24, fontWeight:800, color:"#E5243B", fontFamily:"'Playfair Display',serif" }}>{totalEvents}</div>
+          <div style={{ fontSize:8, color:MUTED }}>En {new Date().getFullYear()}</div>
+        </Card>
+        <Card accent="#dc2626">
+          <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Fatalidades</div>
+          <div style={{ fontSize:24, fontWeight:800, color:"#dc2626", fontFamily:"'Playfair Display',serif" }}>{totalFatal}</div>
+          <div style={{ fontSize:8, color:MUTED }}>Acumulado</div>
+        </Card>
+        <Card accent="#f59e0b">
+          <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Esta semana</div>
+          <div style={{ fontSize:24, fontWeight:800, color:"#f59e0b", fontFamily:"'Playfair Display',serif" }}>{thisWeek}</div>
+          <div style={{ fontSize:8, color:MUTED }}>Últimos 7 días</div>
+        </Card>
+        <Card accent="#4C9F38">
+          <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Tipos</div>
+          <div style={{ fontSize:24, fontWeight:800, color:"#4C9F38", fontFamily:"'Playfair Display',serif" }}>{Object.keys(byType).length}</div>
+          <div style={{ fontSize:8, color:MUTED }}>Categorías activas</div>
+        </Card>
+      </div>
+
+      {/* By type breakdown */}
+      <Card>
+        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>Eventos por tipo</div>
+        <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:10 }}>
+          <button onClick={() => setFilter("all")} style={{ fontSize:8, fontFamily:font, padding:"3px 8px", border:`1px solid ${filter==="all"?ACCENT:BORDER}`, background:filter==="all"?ACCENT:"transparent", color:filter==="all"?"#fff":MUTED, cursor:"pointer" }}>Todos ({totalEvents})</button>
+          {Object.entries(byType).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
+            <button key={t} onClick={() => setFilter(t)} style={{ fontSize:8, fontFamily:font, padding:"3px 8px", border:`1px solid ${filter===t?(EVENT_COLORS[t]||ACCENT):BORDER}`, background:filter===t?`${EVENT_COLORS[t]||ACCENT}20`:"transparent", color:EVENT_COLORS[t]||MUTED, cursor:"pointer" }}>
+              {t} ({c})
+            </button>
+          ))}
+        </div>
+        {/* Bar chart by type */}
+        {Object.entries(byType).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
+          <div key={t} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
+            <span style={{ fontSize:8, fontFamily:font, color:EVENT_COLORS[t]||MUTED, minWidth:160 }}>{t}</span>
+            <div style={{ flex:1, height:14, background:`${BORDER}40`, position:"relative" }}>
+              <div style={{ width:`${(c/totalEvents)*100}%`, height:"100%", background:EVENT_COLORS[t]||ACCENT, opacity:0.7 }} />
+              <span style={{ position:"absolute", right:4, top:1, fontSize:8, fontFamily:font, color:TEXT }}>{c}</span>
+            </div>
+          </div>
+        ))}
+      </Card>
+
+      {/* Weekly timeline chart */}
+      {weekly.length > 2 && (
+        <Card>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>Eventos por semana</div>
+          <svg width="100%" viewBox={`0 0 700 160`} style={{ display:"block" }}>
+            {weekly.map((w,i) => {
+              const maxW = Math.max(...weekly.map(w => w.total));
+              const bw = Math.max(4, (650/(weekly.length))-2);
+              const x = 40 + i * (650/weekly.length);
+              const h = (w.total / maxW) * 120;
+              return (
+                <g key={i}>
+                  <rect x={x} y={130-h} width={bw} height={h} fill={ACCENT} opacity={0.7} rx={1}>
+                    <title>{w.d}: {w.total} eventos</title>
+                  </rect>
+                  {i % Math.max(1,Math.floor(weekly.length/8)) === 0 && (
+                    <text x={x+bw/2} y={148} textAnchor="middle" fontSize={7} fill={MUTED} fontFamily={font}>
+                      {new Date(w.d+"T00:00").toLocaleDateString("es",{day:"numeric",month:"short"})}
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+        </Card>
+      )}
+
+      {/* CAST Predictions */}
+      {cast.length > 0 && (
+        <Card>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
+            🔮 CAST — Predicciones de conflicto · Próximos 6 meses
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:8 }}>
+            {cast.slice(0,12).map((p,i) => (
+              <div key={i} style={{ padding:8, background:BG3, border:`1px solid ${BORDER}`, fontSize:9 }}>
+                <div style={{ fontWeight:600, color:TEXT, marginBottom:4 }}>{p.admin1 || p.country || "Venezuela"}</div>
+                <div style={{ display:"flex", gap:8, fontFamily:font, color:MUTED }}>
+                  {p.total_forecast != null && <span>Previsto: <span style={{ color:"#f59e0b", fontWeight:600 }}>{Math.round(p.total_forecast)}</span></span>}
+                  {p.total_observed != null && <span>Observado: <span style={{ color:TEXT }}>{p.total_observed}</span></span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Recent events table */}
+      <Card>
+        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
+          Eventos recientes · {filter === "all" ? "Todos" : filter} · Mostrando {Math.min(25, sortedEvents.length)} de {sortedEvents.length}
+        </div>
+        <div style={{ maxHeight:400, overflowY:"auto" }}>
+          {sortedEvents.slice(0,25).map((e,i) => (
+            <div key={i} style={{ padding:"8px 0", borderBottom:`1px solid ${BORDER}30`, display:"flex", gap:10, alignItems:"flex-start" }}>
+              <div style={{ minWidth:65, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
+              <span style={{ fontSize:7, fontFamily:font, padding:"2px 5px", background:`${EVENT_COLORS[e.event_type]||ACCENT}20`, color:EVENT_COLORS[e.event_type]||ACCENT, border:`1px solid ${EVENT_COLORS[e.event_type]||ACCENT}30`, whiteSpace:"nowrap" }}>
+                {e.sub_event_type || e.event_type}
+              </span>
+              {parseInt(e.fatalities) > 0 && (
+                <span style={{ fontSize:7, fontFamily:font, padding:"2px 5px", background:"#dc262620", color:"#dc2626", border:"1px solid #dc262630" }}>
+                  💀 {e.fatalities}
+                </span>
+              )}
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:9, color:TEXT }}>{e.location}{e.admin1 ? `, ${e.admin1}` : ""}</div>
+                <div style={{ fontSize:8, color:MUTED, marginTop:2, lineHeight:1.5 }}>{(e.notes||"").slice(0,200)}{(e.notes||"").length > 200 ? "..." : ""}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
     </div>
   );
 }
