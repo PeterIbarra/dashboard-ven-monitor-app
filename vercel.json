@@ -1,4 +1,7 @@
 {
+  "functions": {
+    "api/cron/index.js": { "maxDuration": 60 }
+  },
   "rewrites": [
     { "source": "/api/gdelt", "destination": "/api/gdelt/index.js" },
     { "source": "/api/ioda", "destination": "/api/ioda/index.js" },

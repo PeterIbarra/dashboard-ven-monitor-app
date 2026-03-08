@@ -5,12 +5,74 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SECRET = process.env.SUPABASE_SECRET_KEY;
 
 const RSS_SOURCES = [
+  // ── Medios oficialistas ──
+  { name:"VTV", feed:"https://www.vtv.gob.ve/feed/", type:"news" },
+  { name:"AVN", feed:"https://www.avn.info.ve/rss", type:"news" },
+  { name:"Correo del Orinoco", feed:"https://www.correodelorinoco.gob.ve/feed/", type:"news" },
+  { name:"RNV", feed:"https://www.rnv.gob.ve/feed/", type:"news" },
+  { name:"MIPPCI", feed:"https://mippci.gob.ve/feed/", type:"news" },
+  { name:"TeleSUR", feed:"https://www.telesurtv.net/rss.xml", type:"news" },
+  { name:"TeleSUR Noticias", feed:"https://www.telesurtv.net/news/rss.xml", type:"news" },
+  { name:"TeleSUR Análisis", feed:"https://www.telesurtv.net/analysis/rss.xml", type:"news" },
+  // ── Medios independientes / críticos ──
   { name:"Efecto Cocuyo", feed:"https://efectococuyo.com/feed/", type:"news" },
-  { name:"El Pitazo", feed:"https://elpitazo.net/feed/", type:"news" },
   { name:"Runrunes", feed:"https://runrun.es/feed/", type:"news" },
+  { name:"El Diario", feed:"https://eldiario.com/feed/", type:"news" },
+  { name:"El Pitazo", feed:"https://elpitazo.net/feed/", type:"news" },
+  { name:"Armando.Info", feed:"https://armando.info/feed/", type:"news" },
   { name:"Tal Cual", feed:"https://talcualdigital.com/feed/", type:"news" },
   { name:"El Estímulo", feed:"https://elestimulo.com/feed/", type:"news" },
-  { name:"Caracas Chronicles", feed:"https://www.caracaschronicles.com/feed/", type:"news" },
+  { name:"Crónica Uno", feed:"https://cronica.uno/feed/", type:"news" },
+  { name:"Analitica", feed:"https://analitica.com/feed/", type:"news" },
+  { name:"Prodavinci", feed:"https://prodavinci.com/feed/", type:"news" },
+  { name:"Caracas Chronicles", feed:"https://caracaschronicles.com/feed/", type:"news" },
+  { name:"Radio Fe y Alegría", feed:"https://radiofeyalegrianoticias.com/feed/", type:"news" },
+  // ── Medios generalistas ──
+  { name:"El Nacional", feed:"https://www.elnacional.com/feed/", type:"news" },
+  { name:"La Patilla", feed:"https://www.lapatilla.com/feed/", type:"news" },
+  { name:"Caraota Digital", feed:"https://www.caraotadigital.net/feed/", type:"news" },
+  { name:"Alberto News", feed:"https://albertonews.com/feed/", type:"news" },
+  { name:"Maduradas", feed:"https://maduradas.com/feed/", type:"news" },
+  { name:"Impacto Venezuela", feed:"https://impactovenezuela.com/feed/", type:"news" },
+  { name:"Noticiero Digital", feed:"https://noticierodigital.com/feed/", type:"news" },
+  { name:"Últimas Noticias", feed:"https://ultimasnoticias.com.ve/feed/", type:"news" },
+  { name:"El Universal", feed:"https://www.eluniversal.com/rss/", type:"news" },
+  { name:"2001 Online", feed:"https://2001online.com/feed/", type:"news" },
+  // ── Medios regionales ──
+  { name:"El Impulso", feed:"https://elimpulso.com/feed/", type:"news" },
+  { name:"Nuevo Día", feed:"https://nuevodia.com.ve/feed/", type:"news" },
+  { name:"Informe21", feed:"https://informe21.com/feed/", type:"news" },
+  { name:"Entorno Inteligente", feed:"https://entornointeligente.com/feed/", type:"news" },
+  { name:"Diario La Región", feed:"https://diariolaregion.net/feed/", type:"news" },
+  { name:"Diario de los Andes", feed:"https://diariodelosandes.com/feed/", type:"news" },
+  { name:"Diario Avance", feed:"https://diarioavance.com/feed/", type:"news" },
+  { name:"La Nación", feed:"https://lanacionweb.com/feed/", type:"news" },
+  { name:"La Nación Deportes", feed:"https://lanaciondeportes.com/feed/", type:"news" },
+  { name:"La Verdad de Monagas", feed:"https://laverdaddemonagas.com/feed/", type:"news" },
+  { name:"Periódico de Monagas", feed:"https://elperiodicodemonagas.com.ve/feed/", type:"news" },
+  { name:"El Aragüeño", feed:"https://elaragueno.com.ve/feed/", type:"news" },
+  { name:"El Clarín", feed:"https://elclarinweb.com/feed/", type:"news" },
+  { name:"Diario La Voz", feed:"https://diariolavoz.net/feed/", type:"news" },
+  // ── Medios internacionales ──
+  { name:"Reuters Américas", feed:"https://www.reuters.com/world/americas/rss", type:"news" },
+  { name:"BBC Lat Am", feed:"https://feeds.bbci.co.uk/news/world/latin_america/rss.xml", type:"news" },
+  { name:"NYT World", feed:"https://rss.nytimes.com/services/xml/rss/nyt/World.xml", type:"news" },
+  { name:"Al Jazeera", feed:"https://www.aljazeera.com/xml/rss/all.xml", type:"news" },
+  { name:"The Guardian VE", feed:"https://www.theguardian.com/world/venezuela/rss", type:"news" },
+  { name:"Infobae Venezuela", feed:"https://www.infobae.com/america/venezuela/rss/", type:"news" },
+  { name:"El País Venezuela", feed:"https://elpais.com/rss/america/venezuela.xml", type:"news" },
+  { name:"France24 Venezuela", feed:"https://www.france24.com/es/venezuela/rss", type:"news" },
+  // ── Especializados / análisis ──
+  { name:"Venezuela Analysis", feed:"https://venezuelanalysis.com/feed/", type:"news" },
+  { name:"Banca y Negocios", feed:"https://www.bancaynegocios.com/feed/", type:"news" },
+  { name:"Petroguía", feed:"https://petroguia.com/feed/", type:"news" },
+  { name:"Contrapunto", feed:"https://contrapunto.com/feed/", type:"news" },
+  { name:"Descifrado", feed:"https://descifrado.com/feed/", type:"news" },
+  // ── Google News aggregator ──
+  { name:"Google News VE", feed:"https://news.google.com/rss/search?q=venezuela", type:"news" },
+  { name:"Google News VE Economía", feed:"https://news.google.com/rss/search?q=venezuela+economia", type:"news" },
+  { name:"Google News VE Política", feed:"https://news.google.com/rss/search?q=venezuela+politica", type:"news" },
+  // ── Fact-checkers ──
   { name:"Cocuyo Chequea", feed:"https://efectococuyo.com/cocuyo-chequea/feed/", type:"factcheck" },
   { name:"Cotejo.info", feed:"https://cotejo.info/feed/", type:"factcheck" },
   { name:"EsPaja", feed:"https://espaja.com/feed/", type:"factcheck" },
@@ -124,24 +186,31 @@ module.exports = async function handler(req, res) {
     errors.push(`Rates: ${e.message}`);
   }
 
-  // ── 2. Fetch and save RSS articles ──
-  for (const src of RSS_SOURCES) {
-    try {
-      const response = await fetch(src.feed, {
-        signal: AbortSignal.timeout(8000),
-        headers: { "User-Agent": "PNUD-Monitor/1.0", Accept: "application/rss+xml, application/xml, text/xml" },
-      });
-      if (!response.ok) { errors.push(`${src.name}: HTTP ${response.status}`); continue; }
-      const xml = await response.text();
-      const articles = parseRSS(xml, src.name, src.type).slice(0, 10);
-      if (articles.length > 0) {
-        const result = await upsertToSupabase(articles);
-        if (result.ok) totalInserted += articles.length;
-        else errors.push(`${src.name}: Supabase ${result.status} ${result.text}`);
+  // ── 2. Fetch and save RSS articles (parallel batches of 10) ──
+  const BATCH_SIZE = 10;
+  for (let b = 0; b < RSS_SOURCES.length; b += BATCH_SIZE) {
+    const batch = RSS_SOURCES.slice(b, b + BATCH_SIZE);
+    const results = await Promise.allSettled(batch.map(async (src) => {
+      try {
+        const response = await fetch(src.feed, {
+          signal: AbortSignal.timeout(6000),
+          headers: { "User-Agent": "PNUD-Monitor/1.0", Accept: "application/rss+xml, application/xml, text/xml" },
+        });
+        if (!response.ok) { errors.push(`${src.name}: HTTP ${response.status}`); return 0; }
+        const xml = await response.text();
+        const articles = parseRSS(xml, src.name, src.type).slice(0, 8);
+        if (articles.length > 0) {
+          const result = await upsertToSupabase(articles);
+          if (result.ok) return articles.length;
+          else { errors.push(`${src.name}: Supabase ${result.status}`); return 0; }
+        }
+        return 0;
+      } catch (e) {
+        errors.push(`${src.name}: ${e.message}`);
+        return 0;
       }
-    } catch (e) {
-      errors.push(`${src.name}: ${e.message}`);
-    }
+    }));
+    results.forEach(r => { if (r.status === "fulfilled") totalInserted += r.value; });
   }
 
   return res.status(200).json({
