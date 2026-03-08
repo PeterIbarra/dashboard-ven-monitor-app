@@ -13,49 +13,56 @@ export default async function handler(req, res) {
   };
 
   try {
-    // Brent history: from Jan 1, 2025 to now
-    const fromEpoch = Math.floor(new Date("2025-01-01").getTime() / 1000);
-    const toEpoch = Math.floor(Date.now() / 1000);
-    const [brentRes, wtiRes, gasRes, brentHistoryRes] = await Promise.all([
+    // Fetch latest prices
+    const [brentRes, wtiRes, gasRes] = await Promise.all([
       fetchJson(`${API_BASE}/prices/latest?by_code=BRENT_CRUDE_USD`, headers),
       fetchJson(`${API_BASE}/prices/latest?by_code=WTI_USD`, headers),
       fetchJson(`${API_BASE}/prices/latest?by_code=NATURAL_GAS_USD`, headers),
-      fetchJson(`${API_BASE}/prices?by_code=BRENT_CRUDE_USD&by_period[from]=${fromEpoch}&by_period[to]=${toEpoch}`, headers),
     ]);
 
     const brent = brentRes?.data || null;
     const wti = wtiRes?.data || null;
     const natgas = gasRes?.data || null;
 
+    // Fetch Brent history with fallback: past_year → past_month → past_week
+    let brentHistoryRes = await fetchJson(`${API_BASE}/prices/past_year?by_code=BRENT_CRUDE_USD`, headers, 15000);
+    let histPeriod = "year";
+    if (!brentHistoryRes?.data?.prices?.length) {
+      brentHistoryRes = await fetchJson(`${API_BASE}/prices/past_month?by_code=BRENT_CRUDE_USD`, headers, 10000);
+      histPeriod = "month";
+    }
+    if (!brentHistoryRes?.data?.prices?.length) {
+      brentHistoryRes = await fetchJson(`${API_BASE}/prices/past_week?by_code=BRENT_CRUDE_USD`, headers);
+      histPeriod = "week";
+    }
+
     let brentHistory = [];
-    if (brentHistoryRes?.data?.prices && Array.isArray(brentHistoryRes.data.prices)) {
-      const raw = brentHistoryRes.data.prices
+    const histData = brentHistoryRes?.data?.prices || brentHistoryRes?.data;
+    if (Array.isArray(histData) && histData.length > 0) {
+      const raw = histData
+        .filter(p => p.price != null)
         .map(p => ({ price: p.price, time: p.created_at }))
         .sort((a, b) => new Date(a.time) - new Date(b.time));
 
-      // Downsample to ~1 point per day (max ~400 points for ~15 months)
-      if (raw.length > 400) {
-        const step = Math.ceil(raw.length / 365);
-        brentHistory = raw.filter((_, i) => i % step === 0);
-        // Always include the last point
-        if (brentHistory[brentHistory.length - 1] !== raw[raw.length - 1]) {
-          brentHistory.push(raw[raw.length - 1]);
-        }
-      } else {
-        brentHistory = raw;
-      }
+      // Downsample server-side: group by date, take last price per day
+      const byDay = new Map();
+      raw.forEach(p => {
+        const day = p.time ? p.time.split("T")[0] : "";
+        if (day) byDay.set(day, p);
+      });
+      brentHistory = Array.from(byDay.values());
     }
 
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=120");
-    return res.status(200).json({ brent, wti, natgas, brentHistory, fetchedAt: new Date().toISOString() });
+    return res.status(200).json({ brent, wti, natgas, brentHistory, histPeriod, fetchedAt: new Date().toISOString() });
   } catch (e) {
     return res.status(502).json({ error: e.message, fetchedAt: new Date().toISOString() });
   }
 }
 
-async function fetchJson(url, headers) {
+async function fetchJson(url, headers, timeout = 8000) {
   try {
-    const response = await fetch(url, { headers, signal: AbortSignal.timeout(8000) });
+    const response = await fetch(url, { headers, signal: AbortSignal.timeout(timeout) });
     if (!response.ok) return null;
     return await response.json();
   } catch {

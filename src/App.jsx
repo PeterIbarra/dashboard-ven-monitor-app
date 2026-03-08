@@ -85,21 +85,114 @@ const TENSIONS = [
   { level:"red", text:"Agenda electoral: Rubio condiciona · Sin calendario · Caso Magalli Meda" },
 ];
 
+const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6"];
+
 const INDICATORS = [
-  { dim:"Energético", icon:"⚡", name:"Exportaciones de crudo", sem:"green", val:"~800 kbd ↑60.6%", trend:"up" },
-  { dim:"Energético", icon:"⚡", name:"Ventas petroleras", sem:"green", val:"Proy. USD 6.000M", trend:"up" },
-  { dim:"Energético", icon:"⚡", name:"Licencias OFAC", sem:"green", val:"FAQ 1238 Cuba", trend:"flat" },
-  { dim:"Energético", icon:"⚡", name:"Infraestructura refinación", sem:"red", val:"<20% capacidad", trend:"flat" },
-  { dim:"Político", icon:"🏛", name:"Ley de Amnistía", sem:"green", val:"4.203 sol. · 568 verif.", trend:"up" },
-  { dim:"Político", icon:"🏛", name:"Excarcelaciones verificadas", sem:"yellow", val:"126 verificadas", trend:"flat" },
-  { dim:"Político", icon:"🏛", name:"Cohesión FANB", sem:"yellow", val:"Cuba sale · SOUTHCOM", trend:"down" },
-  { dim:"Político", icon:"🏛", name:"Agenda electoral", sem:"red", val:"Sin fecha · Rubio exige", trend:"up" },
-  { dim:"Económico", icon:"📊", name:"Brecha cambiaria", sem:"red", val:"52,6% — límite umbral", trend:"up" },
-  { dim:"Económico", icon:"📊", name:"Salario mínimo", sem:"red", val:"47 meses sin ajuste", trend:"flat" },
-  { dim:"Económico", icon:"📊", name:"PIB proyectado", sem:"green", val:"10,4–15,2%", trend:"up" },
-  { dim:"Internacional", icon:"🌐", name:"Normalización diplomática", sem:"green", val:"Tajani · Petro 14 mar", trend:"up" },
-  { dim:"Internacional", icon:"🌐", name:"FMI", sem:"yellow", val:"Intensa Fragilidad · >180%", trend:"up" },
-  { dim:"Internacional", icon:"🌐", name:"China/Rusia", sem:"yellow", val:"Cuba retira asesores", trend:"down" },
+  // ── ENERGÉTICO ──
+  { dim:"Energético", icon:"⚡", esc:"E3", name:"Exportaciones de crudo", desc:"Volumen semanal bajo licencias OFAC",
+    umbral:"Sostenimiento >750 kbd. Caída <600 kbd activa alerta.",
+    hist:[["green","up","~500 kbd"],["green","up","~620 kbd"],["green","up","~700 kbd"],["green","up","~740 kbd"],["green","up","~770 kbd"],["green","up","~800 kbd ↑60.6%"]] },
+  { dim:"Energético", icon:"⚡", esc:"E3", name:"Ventas petroleras (ingresos)", desc:"Acuerdos bajo GL49 y GL50/50A",
+    umbral:"Flujo regular a banca PDVSA. Interrupción >2 sem activa E2.",
+    hist:[["yellow","flat","En negociación"],["yellow","up","Acuerdos Vitol/Trafigura"],["green","up","Proy. USD 3-4B"],["green","up","Contratos activos"],["green","up","India + EE.UU."],["green","up","Proy. USD 6.000M"]] },
+  { dim:"Energético", icon:"⚡", esc:"E3", name:"Licencias OFAC activas", desc:"GL49, GL50, GL50A — cobertura operativa",
+    umbral:"Revocación activa E2/E4. FAQ 1238 incluye Cuba condicionado.",
+    hist:[["green","flat","GL49 activa"],["green","flat","GL49 + GL50"],["green","flat","Sin cambios"],["green","flat","Sin cambios"],["green","flat","GL50/50A vigentes"],["green","flat","FAQ 1238 Cuba"]] },
+  { dim:"Energético", icon:"⚡", esc:"E3", name:"Producción Chevron", desc:"Operaciones directas en bloques venezolanos",
+    umbral:"Expansión confirma E3. Suspensión reactiva E2.",
+    hist:[["yellow","flat","Operación básica"],["yellow","up","Autorización ampliada"],["green","up","Incremento confirmado"],["green","up","Ampliación activa"],["yellow","flat","Revisión 19 contratos"],["yellow","up","Expansión anunciada"]] },
+  { dim:"Energético", icon:"⚡", esc:"E2", name:"Infraestructura de refinación", desc:"Capacidad operativa refinerías nacionales",
+    umbral:"Operación <25% capacidad instalada. Mantenimiento diferido.",
+    hist:[["red","flat","<20% capacidad"],["red","flat","Sin mejora"],["red","flat","Mantenimiento pendiente"],["red","flat","Exportación compensa"],["red","flat","Crítica pero estable"],["red","flat","Sin cambio"]] },
+  { dim:"Energético", icon:"⚡", esc:"E2", name:"Taladros activos", desc:"Operaciones de perforación nuevas",
+    umbral:"<30 taladros activos. Recuperación <5% anual vs 2014.",
+    hist:[["red","flat","Bajo histórico"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","Sin variación"]] },
+
+  // ── POLÍTICO ──
+  { dim:"Político", icon:"🏛", esc:"E3", name:"Ley de Amnistía", desc:"Operativización y verificación independiente",
+    umbral:"Brecha oficial vs. verificado. >50% sin verificar activa E4.",
+    hist:[["yellow","flat","Anunciada"],["yellow","up","Aprobada AN"],["yellow","up","Primeras excarcelaciones"],["green","up","Comisión operativa"],["green","up","1.200+ beneficiados"],["green","up","4.203 sol. · 568 verif."]] },
+  { dim:"Político", icon:"🏛", esc:"E3", name:"Excarcelaciones verificadas", desc:"Foro Penal: presos políticos activos",
+    umbral:"Ritmo <20/sem o reversión activa E4.",
+    hist:[["yellow","flat","0 verificadas"],["yellow","up","12 verificadas"],["yellow","up","45 verificadas"],["yellow","up","78 verificadas"],["yellow","up","108 verificadas"],["yellow","flat","126 verif. · 568 activos"]] },
+  { dim:"Político", icon:"🏛", esc:"E4", name:"Cohesión FANB", desc:"Señales de fractura o lealtad institucional",
+    umbral:"Fractura visible = E4/E2 inmediato.",
+    hist:[["yellow","flat","Sin señales fractura"],["yellow","flat","Sin señales fractura"],["yellow","flat","Ajustes menores"],["yellow","down","Presión cooperación EE.UU."],["yellow","down","Cubanos retirándose"],["yellow","down","Cubanos salen · SOUTHCOM"]] },
+  { dim:"Político", icon:"🏛", esc:"E3", name:"Reorganización del Ejecutivo", desc:"Capacidad de gestión institucional",
+    umbral:"Reconfiguración técnica → E1. Política → E4.",
+    hist:[["yellow","flat","Maduro removido"],["yellow","up","Delcy consolida"],["green","up","Gabinete activo"],["green","up","Estructura operativa"],["green","up","Cancillería reestructurada"],["green","up","Poder Ciudadano: encargados"]] },
+  { dim:"Político", icon:"🏛", esc:"E1", name:"Agenda electoral", desc:"Calendario y compromisos electorales concretos",
+    umbral:"Anuncio formal de fecha = E1 gana probabilidad.",
+    hist:[["red","flat","Sin agenda"],["red","flat","Sin agenda"],["yellow","flat","Señales vagas"],["yellow","up","Rubio: legitimación req."],["yellow","up","Presión EE.UU. activa"],["yellow","up","Rubio reitera exigencia"]] },
+  { dim:"Político", icon:"🏛", esc:"E4", name:"Marcos restrictivos vigentes", desc:"Leyes de odio, terrorismo, delitos de expresión",
+    umbral:"Activación contra oposición = E4. Derogación = E1.",
+    hist:[["red","flat","Ley Odio vigente"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Stalin exige derogar"]] },
+
+  // ── ECONÓMICO ──
+  { dim:"Económico", icon:"📊", esc:"E2", name:"Brecha cambiaria", desc:"Diferencial BCV vs. mercado paralelo",
+    umbral:"Brecha >55% activa E2. <30% fortalece E3.",
+    hist:[["green","flat","~15%"],["green","flat","~18%"],["yellow","down","~28%"],["yellow","down","~35%"],["yellow","down","~46%"],["yellow","down","52,6% · 631 vs 414"]] },
+  { dim:"Económico", icon:"📊", esc:"E2", name:"Inflación", desc:"Tasa mensual proyectada",
+    umbral:"Retorno a >30% mensual activa E2.",
+    hist:[["yellow","flat","~12% mensual"],["yellow","flat","~10% mensual"],["yellow","up","~8% mensual"],["yellow","up","Desacelerando"],["yellow","up","~6% proyectado"],["yellow","up","FMI: tres dígitos anual"]] },
+  { dim:"Económico", icon:"📊", esc:"E2", name:"Ingresos de la población", desc:"Salario mínimo y poder adquisitivo real",
+    umbral:"47 meses sin ajuste. Ingreso ~USD 270 vs canasta USD 550.",
+    hist:[["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","47 meses sin ajuste"],["red","flat","Ajuste prometido"]] },
+  { dim:"Económico", icon:"📊", esc:"E2", name:"Sistema eléctrico", desc:"Disponibilidad y frecuencia de cortes",
+    umbral:"Cortes >4h/día en zonas urbanas activa presión social.",
+    hist:[["red","flat","Cortes frecuentes"],["red","flat","Sin mejora"],["red","flat","Sin mejora"],["red","flat","Sin mejora"],["red","flat","Crítico"],["red","flat","Crítico · sin inversión"]] },
+  { dim:"Económico", icon:"📊", esc:"E3", name:"Percepción dirección del país", desc:"Encuestas de opinión pública",
+    umbral:">60% percepción positiva sostiene E3.",
+    hist:[["yellow","flat","~35% positivo"],["yellow","up","~40% positivo"],["yellow","up","~44% positivo"],["green","up","~48% positivo"],["green","up","~50% positivo"],["green","up","51,5% mejor s/ Maduro"]] },
+
+  // ── INTERNACIONAL ──
+  { dim:"Internacional", icon:"🌐", esc:"E3", name:"Cooperación EE.UU.–Venezuela", desc:"Nivel operativo de acuerdos bilaterales",
+    umbral:"Ruptura = E4/E2. Profundización = E1.",
+    hist:[["yellow","up","Negociaciones iniciales"],["yellow","up","Petróleo fluye"],["green","up","SOUTHCOM reunión"],["green","up","Visitas técnicas"],["green","up","Plan 3 fases"],["green","up","Trump \"nuevo amigo\""]] },
+  { dim:"Internacional", icon:"🌐", esc:"E3", name:"Sanciones UE", desc:"Estado de sanciones europeas",
+    umbral:"Levantamiento parcial fortalece E3.",
+    hist:[["red","flat","Sanciones plenas"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["yellow","up","Señales apertura"],["yellow","up","Diálogo España"],["yellow","up","España propone levantar"]] },
+  { dim:"Internacional", icon:"🌐", esc:"E3", name:"China y Rusia", desc:"Balanza estratégica en contexto acercamiento EE.UU.",
+    umbral:"Ruptura con China/Rusia por presión EE.UU. fragiliza E3.",
+    hist:[["green","flat","Alineación plena"],["green","flat","Sin cambio"],["green","down","Señales tensión"],["yellow","down","Rebalanceo activo"],["yellow","down","Reducción presencia rusa"],["yellow","down","Cuba retira asesores"]] },
+  { dim:"Internacional", icon:"🌐", esc:"E1", name:"FMI y reinserción financiera", desc:"Diálogo con IFIs y acceso a mercados",
+    umbral:"Acuerdo FMI = E1 clave. 'Intensa Fragilidad' sostiene E2.",
+    hist:[["red","flat","Fragmentación total"],["red","flat","Sin diálogo"],["red","flat","Sin diálogo"],["yellow","up","Señales apertura"],["yellow","up","Reuniones técnicas"],["yellow","up","FMI: Intensa Fragilidad"]] },
+  { dim:"Internacional", icon:"🌐", esc:"E3", name:"Normalización diplomática", desc:"Reapertura embajadas y relaciones bilaterales",
+    umbral:"Reapertura embajada EE.UU. = E1/E3 consolidado.",
+    hist:[["yellow","flat","Limitada"],["yellow","up","Señales apertura"],["green","up","Múltiples contactos"],["green","up","Visitas ministros"],["green","up","Cancillería reestructurada"],["green","up","Tajani · Petro-Delcy 14 mar"]] },
+];
+
+// Señales por escenario (solo semana más reciente)
+const SCENARIO_SIGNALS = [
+  { esc:"E1", signals:[
+    { name:"Exportaciones bajo licencias", sem:"green", val:"~800 kbd sostenido" },
+    { name:"Inyección divisas a banca", sem:"green", val:"Subastas BCV USD 70M/sem" },
+    { name:"Excarcelaciones parciales", sem:"yellow", val:"126 verificadas acumuladas" },
+    { name:"Discurso estabilidad dominante", sem:"green", val:"Trump \"nuevo amigo\"" },
+    { name:"Cooperación SOUTHCOM", sem:"green", val:"Plan 3 fases activo" },
+    { name:"Brecha cambiaria bajo control", sem:"yellow", val:"52,6% — límite umbral" },
+    { name:"Optimismo opinión pública >70%", sem:"yellow", val:"51,5% actual" },
+    { name:"Servicios mínimos operativos", sem:"green", val:"Operativos (deficitarios)" },
+    { name:"Cambios normativos (Amnistía)", sem:"green", val:"Amnistía operativa" },
+  ]},
+  { esc:"E2", signals:[
+    { name:"Fracturas internas visibles", sem:"yellow", val:"Renuncias Poder Ciudadano" },
+    { name:"Reducción efectiva de coerción", sem:"yellow", val:"Caso Magalli Meda (16 armados)" },
+    { name:"Mayor rol multilateral", sem:"yellow", val:"Sin reingreso formal" },
+  ]},
+  { esc:"E4", signals:[
+    { name:"Calendario electoral", sem:"red", val:"Sin fecha · Rubio exige" },
+    { name:"Reforma marcos restrictivos", sem:"red", val:"Sin reforma · Stalin exige" },
+    { name:"Fallas servicios críticos", sem:"yellow", val:"Deficitario pero controlado" },
+    { name:"Fractura de la FANB", sem:"yellow", val:"Presión SOUTHCOM · Cuba sale" },
+    { name:"Shock económico no absorbido", sem:"yellow", val:"Brecha 52,6% · riesgo latente" },
+    { name:"Violencia difusa / pérdida territorial", sem:"red", val:"ELN/colectivos activos" },
+    { name:"Migración acelerada", sem:"red", val:"Flujo continúa" },
+    { name:"Militarización funciones civiles", sem:"yellow", val:"Parcial · bajo monitoreo" },
+    { name:"Discurso securitario endurecido", sem:"yellow", val:"Paralelo a discurso apertura" },
+    { name:"Detenciones selectivas nuevas", sem:"red", val:"Caso Magalli Meda" },
+  ]},
 ];
 
 const GDELT_ANNOTATIONS = [
@@ -938,60 +1031,378 @@ function TabMatriz({ week, setWeek }) {
 }
 
 function TabMonitor() {
-  const [view, setView] = useState("dim");
+  const [seccion, setSeccion] = useState("indicadores");
+  const [expanded, setExpanded] = useState(null);
   const dims = [...new Set(INDICATORS.map(i=>i.dim))];
   const grouped = dims.map(d => ({ dim:d, icon:INDICATORS.find(i=>i.dim===d).icon, inds:INDICATORS.filter(i=>i.dim===d) }));
 
-  const semLabel = { green:"Verde", yellow:"Amarillo", red:"Rojo" };
-  const trendIcon = { up:"↑", down:"↓", flat:"→" };
-  const trendColor = { up:"#22c55e", down:"#ef4444", flat:MUTED };
+  const trendIconMap = { up:"↑", down:"↓", flat:"→", stable:"→" };
+  const trendColorMap = { up:"#22c55e", down:"#ef4444", flat:MUTED, stable:MUTED };
 
-  const counts = { green:INDICATORS.filter(i=>i.sem==="green").length, yellow:INDICATORS.filter(i=>i.sem==="yellow").length, red:INDICATORS.filter(i=>i.sem==="red").length };
+  // Count latest semaforos
+  const latest = INDICATORS.map(ind => ind.hist[ind.hist.length-1][0]);
+  const counts = { green:latest.filter(s=>s==="green").length, yellow:latest.filter(s=>s==="yellow").length, red:latest.filter(s=>s==="red").length };
+  const total = counts.green + counts.yellow + counts.red;
 
   return (
     <div>
-      {/* Summary */}
+      {/* Header + toggle */}
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14, flexWrap:"wrap" }}>
+        <span style={{ fontSize:14 }}>🚦</span>
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:13, fontWeight:600, color:TEXT }}>Monitor de Señales — {INDICATORS.length} indicadores · {MONITOR_WEEKS.length} semanas</div>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Semáforos, umbrales y señales por escenario</div>
+        </div>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+          {[{id:"indicadores",label:"Indicadores"},{id:"senales",label:"Señales E1/E2/E4"},{id:"noticias",label:"Noticias"},{id:"factcheck",label:"Verificación"}].map(s => (
+            <button key={s.id} onClick={() => setSeccion(s.id)}
+              style={{ fontSize:9, fontFamily:font, padding:"6px 14px", border:"none",
+                background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED,
+                cursor:"pointer", letterSpacing:"0.08em" }}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Summary cards */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:16 }}>
-        {[{label:"Verde",count:counts.green,color:"green",desc:"Confirmados / estables"},
+        {[{label:"Verde",count:counts.green,color:"green",desc:"Estables / confirmados"},
           {label:"Amarillo",count:counts.yellow,color:"yellow",desc:"En monitoreo"},
           {label:"Rojo",count:counts.red,color:"red",desc:"Alerta activa"},
-          {label:"Dominante",count:"E3·50%",color:ACCENT,desc:"Continuidad negociada"}
+          {label:"Total",count:total,color:ACCENT,desc:`${dims.length} dimensiones`}
         ].map((c,i) => (
-          <Card key={i} accent={typeof c.color==="string" && c.color.startsWith("#")?c.color:SEM[c.color]}>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>{c.label}</div>
-            <div style={{ fontSize:22, fontWeight:800, color:typeof c.color==="string" && c.color.startsWith("#")?c.color:SEM[c.color], fontFamily:"'Syne',sans-serif" }}>{c.count}</div>
-            <div style={{ fontSize:9, color:MUTED, marginTop:4 }}>{c.desc}</div>
+          <Card key={i} accent={typeof c.color==="string"&&c.color.startsWith("#")?c.color:SEM[c.color]}>
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>{c.label}</div>
+            <div style={{ fontSize:22, fontWeight:800, color:typeof c.color==="string"&&c.color.startsWith("#")?c.color:SEM[c.color], fontFamily:"'Syne',sans-serif" }}>{c.count}</div>
+            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>{c.desc}</div>
           </Card>
         ))}
       </div>
 
-      {/* Table */}
-      {grouped.map(g => (
+      {/* ── INDICADORES ── */}
+      {seccion === "indicadores" && grouped.map(g => (
         <div key={g.dim} style={{ marginBottom:20 }}>
           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
             <span style={{ fontSize:14 }}>{g.icon}</span>
             <span style={{ fontSize:12, fontWeight:700, fontFamily:"'Syne',sans-serif", color:ACCENT, letterSpacing:"0.1em", textTransform:"uppercase" }}>{g.dim}</span>
             <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{g.inds.length} indicadores</span>
           </div>
-          <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
-            {g.inds.map((ind,j) => (
-              <div key={j} style={{ display:"grid", gridTemplateColumns:"1fr 140px 80px 40px", gap:8, padding:"8px 0", borderBottom:`1px solid ${BORDER}40`, alignItems:"center" }}>
-                <div>
-                  <div style={{ fontSize:11, fontWeight:600, color:TEXT }}>{ind.name}</div>
+          {g.inds.map((ind,j) => {
+            const last = ind.hist[ind.hist.length-1];
+            const sem = last[0], trend = last[1], val = last[2];
+            const isExpanded = expanded === `${g.dim}-${j}`;
+            return (
+              <div key={j} style={{ borderBottom:`1px solid ${BORDER}30` }}>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 100px auto 80px 40px", gap:8, padding:"8px 0", alignItems:"center",
+                  cursor:"pointer" }} onClick={() => setExpanded(isExpanded ? null : `${g.dim}-${j}`)}>
+                  <div>
+                    <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                      <span style={{ fontSize:11, fontWeight:600, color:TEXT }}>{ind.name}</span>
+                      <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${SC[ind.esc.charAt(1)]||ACCENT}15`,
+                        color:SC[ind.esc.charAt(1)]||ACCENT, border:`1px solid ${SC[ind.esc.charAt(1)]||ACCENT}30`, letterSpacing:"0.08em" }}>
+                        {ind.esc}
+                      </span>
+                    </div>
+                  </div>
+                  {/* History dots */}
+                  <div style={{ display:"flex", gap:3, alignItems:"center" }}>
+                    {ind.hist.map((h,k) => (
+                      <div key={k} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
+                        <div style={{ width:7, height:7, borderRadius:"50%", background:SEM[h[0]],
+                          boxShadow:k===ind.hist.length-1?`0 0 4px ${SEM[h[0]]}`:"none",
+                          opacity:0.4+(k/ind.hist.length)*0.6 }} />
+                        {k===ind.hist.length-1 && <div style={{ fontSize:5, color:MUTED }}>{MONITOR_WEEKS[k]}</div>}
+                      </div>
+                    ))}
+                  </div>
+                  {/* Current value */}
+                  <div style={{ fontSize:10, fontFamily:font, color:SEM[sem], maxWidth:150, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{val}</div>
+                  {/* Semaforo */}
+                  <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                    <SemDot color={sem} size={7} />
+                    <span style={{ fontSize:9, fontFamily:font, color:SEM[sem] }}>{{green:"Verde",yellow:"Amarillo",red:"Rojo"}[sem]}</span>
+                  </div>
+                  {/* Trend */}
+                  <div style={{ fontSize:14, fontWeight:700, color:trendColorMap[trend], textAlign:"center" }}>
+                    {trendIconMap[trend]}
+                  </div>
                 </div>
-                <div style={{ fontSize:10, fontFamily:font, color:SEM[ind.sem] }}>{ind.val}</div>
+                {/* Expanded detail */}
+                {isExpanded && (
+                  <div style={{ padding:"4px 0 12px 16px", borderLeft:`2px solid ${SC[ind.esc.charAt(1)]||ACCENT}30` }}>
+                    <div style={{ fontSize:10, color:"#94a3b8", marginBottom:6 }}>{ind.desc}</div>
+                    <div style={{ fontSize:9, fontFamily:font, color:"#eab308", marginBottom:8, padding:"4px 8px", background:"rgba(234,179,8,0.06)", border:"1px solid rgba(234,179,8,0.15)", display:"inline-block" }}>
+                      ⚠ {ind.umbral}
+                    </div>
+                    <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Historial</div>
+                    <div style={{ display:"flex", gap:6 }}>
+                      {ind.hist.map((h,k) => (
+                        <div key={k} style={{ fontSize:9, padding:"3px 8px", background:`${SEM[h[0]]}10`, border:`1px solid ${SEM[h[0]]}25`,
+                          color:SEM[h[0]], fontFamily:font, whiteSpace:"nowrap" }}>
+                          <span style={{ color:MUTED, marginRight:4 }}>{MONITOR_WEEKS[k]}</span>{h[2]}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ))}
+
+      {/* ── SEÑALES POR ESCENARIO ── */}
+      {seccion === "senales" && SCENARIO_SIGNALS.map(group => {
+        const sc = SCENARIOS.find(s => s.id === parseInt(group.esc.charAt(1)));
+        const gCounts = { green:group.signals.filter(s=>s.sem==="green").length, yellow:group.signals.filter(s=>s.sem==="yellow").length, red:group.signals.filter(s=>s.sem==="red").length };
+        return (
+          <div key={group.esc} style={{ marginBottom:20 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${sc?.color||BORDER}40` }}>
+              <span style={{ fontSize:12, fontWeight:700, color:sc?.color, fontFamily:"'Syne',sans-serif" }}>
+                {group.esc}: {sc?.name}
+              </span>
+              <div style={{ marginLeft:"auto", display:"flex", gap:6 }}>
+                {[["green",gCounts.green],["yellow",gCounts.yellow],["red",gCounts.red]].filter(([,c])=>c>0).map(([col,cnt]) => (
+                  <span key={col} style={{ fontSize:9, fontFamily:font, color:SEM[col] }}>{cnt} {{green:"✓",yellow:"⚠",red:"✗"}[col]}</span>
+                ))}
+              </div>
+            </div>
+            {group.signals.map((sig,i) => (
+              <div key={i} style={{ display:"grid", gridTemplateColumns:"1fr 180px 80px", gap:8, padding:"6px 0", borderBottom:`1px solid ${BORDER}30`, alignItems:"center" }}>
+                <span style={{ fontSize:11, color:TEXT }}>{sig.name}</span>
+                <span style={{ fontSize:10, fontFamily:font, color:SEM[sig.sem] }}>{sig.val}</span>
                 <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-                  <SemDot color={ind.sem} size={7} />
-                  <span style={{ fontSize:9, fontFamily:font, color:SEM[ind.sem] }}>{semLabel[ind.sem]}</span>
-                </div>
-                <div style={{ fontSize:14, fontWeight:700, color:trendColor[ind.trend], textAlign:"center" }}>
-                  {trendIcon[ind.trend]}
+                  <SemDot color={sig.sem} size={7} />
+                  <span style={{ fontSize:9, fontFamily:font, color:SEM[sig.sem] }}>{{green:"Activa",yellow:"Parcial",red:"Bloqueada"}[sig.sem]}</span>
                 </div>
               </div>
             ))}
           </div>
+        );
+      })}
+
+      {/* ── NOTICIAS ── */}
+      {seccion === "noticias" && <MonitorNoticias />}
+
+      {/* ── VERIFICACIÓN ── */}
+      {seccion === "factcheck" && <MonitorFactCheck />}
+    </div>
+  );
+}
+
+function MonitorNoticias() {
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("all");
+  const [source, setSource] = useState("loading");
+
+  useEffect(() => {
+    async function fetchNews() {
+      if (IS_DEPLOYED) {
+        try {
+          const res = await fetch("/api/news", { signal: AbortSignal.timeout(12000) });
+          if (res.ok) { const data = await res.json(); if (data.news?.length) { setNews(data.news); setSource("live"); setLoading(false); return; } }
+        } catch {}
+      }
+      // Fallback: CORS proxy to one RSS feed
+      for (const proxyFn of CORS_PROXIES) {
+        try {
+          const res = await fetch(proxyFn("https://efectococuyo.com/feed/"), { signal: AbortSignal.timeout(6000) });
+          if (res.ok) {
+            const xml = await res.text();
+            const items = [];
+            const regex = /<item>[\s\S]*?<title><!\[CDATA\[(.*?)\]\]><\/title>[\s\S]*?<link>(.*?)<\/link>[\s\S]*?<pubDate>(.*?)<\/pubDate>[\s\S]*?<\/item>/gi;
+            let m; while ((m = regex.exec(xml)) !== null && items.length < 10) {
+              items.push({ title:m[1], link:m[2], date:m[3], source:"Efecto Cocuyo", tags:["E3"], desc:"" });
+            }
+            if (items.length) { setNews(items); setSource("partial"); setLoading(false); return; }
+          }
+        } catch { continue; }
+      }
+      setSource("offline"); setLoading(false);
+    }
+    fetchNews();
+  }, []);
+
+  const escColors = { E1:"#4C9F38", E2:"#E5243B", E3:"#0A97D9", E4:"#FCC30B" };
+  const filtered = filter === "all" ? news : news.filter(n => n.tags?.includes(filter));
+
+  return (
+    <div>
+      {/* Filter */}
+      <div style={{ display:"flex", gap:6, marginBottom:12, alignItems:"center", flexWrap:"wrap" }}>
+        <Badge color={source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
+          {source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
+        </Badge>
+        {["all","E1","E2","E3","E4"].map(f => (
+          <button key={f} onClick={() => setFilter(f)}
+            style={{ fontSize:9, fontFamily:font, padding:"3px 10px", border:`1px solid ${f==="all"?BORDER:escColors[f]||BORDER}`,
+              background:filter===f?(f==="all"?ACCENT:escColors[f]):"transparent",
+              color:filter===f?"#fff":(f==="all"?MUTED:escColors[f]||MUTED), cursor:"pointer", borderRadius:0 }}>
+            {f === "all" ? "Todas" : f}
+          </button>
+        ))}
+        <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{filtered.length} noticias</span>
+      </div>
+      {/* News list */}
+      {loading ? (
+        <Card><div style={{ textAlign:"center", padding:30, color:MUTED, fontSize:10, fontFamily:font }}>
+          Cargando noticias de Venezuela...
+        </div></Card>
+      ) : filtered.length === 0 ? (
+        <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:10 }}>No se encontraron noticias</div></Card>
+      ) : (
+        <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
+          {filtered.map((n,i) => (
+            <a key={i} href={n.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration:"none" }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:12, padding:"10px 0", borderBottom:`1px solid ${BORDER}30`,
+                cursor:"pointer" }}
+                onMouseEnter={e=>e.currentTarget.style.background=`${BG3}`}
+                onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                <div>
+                  <div style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:4 }}>{n.title}</div>
+                  <div style={{ display:"flex", gap:6, alignItems:"center", flexWrap:"wrap" }}>
+                    <span style={{ fontSize:8, fontFamily:font, color:ACCENT }}>{n.source}</span>
+                    {n.date && <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>
+                      {new Date(n.date).toLocaleDateString("es",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
+                    </span>}
+                    {n.tags?.map((t,k) => (
+                      <span key={k} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
+                        color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
+                    ))}
+                  </div>
+                  {n.desc && <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.4 }}>{n.desc}</div>}
+                </div>
+                <span style={{ fontSize:9, color:ACCENT, fontFamily:font, whiteSpace:"nowrap" }}>↗</span>
+              </div>
+            </a>
+          ))}
         </div>
-      ))}
+      )}
+      <div style={{ fontSize:7, fontFamily:font, color:`${MUTED}60`, marginTop:10 }}>
+        Fuentes: Efecto Cocuyo · El Pitazo · Runrunes · Tal Cual · El Estímulo · Caracas Chronicles · Tags por keywords
+      </div>
+    </div>
+  );
+}
+
+function MonitorFactCheck() {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [source, setSource] = useState("loading");
+
+  const FACTCHECK_SOURCES = [
+    { name:"Cazamos Fake News", handle:"@cazamosfakenews", url:"https://cazamosfakenews.com", color:"#ef4444" },
+    { name:"Cotejo.info", handle:"@cotejoinfo", url:"https://cotejo.info", color:"#3b82f6" },
+    { name:"EsPaja", handle:"@EsPaja", url:"https://espaja.com", color:"#f59e0b" },
+    { name:"Cocuyo Chequea", handle:"@cocuyochequea", url:"https://efectococuyo.com/cocuyo-chequea/", color:"#22c55e" },
+    { name:"Provea", handle:"@_provea", url:"https://provea.org", color:"#9333ea" },
+  ];
+
+  const escColors = { E1:"#4C9F38", E2:"#E5243B", E3:"#0A97D9", E4:"#FCC30B" };
+
+  useEffect(() => {
+    async function fetchFactCheck() {
+      // Try Vercel serverless (same endpoint as news, returns factcheck separately)
+      if (IS_DEPLOYED) {
+        try {
+          const res = await fetch("/api/news", { signal: AbortSignal.timeout(12000) });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.factcheck?.length) { setArticles(data.factcheck); setSource("live"); setLoading(false); return; }
+          }
+        } catch {}
+      }
+      // CORS proxy fallback — try Cotejo.info
+      for (const proxyFn of CORS_PROXIES) {
+        try {
+          const res = await fetch(proxyFn("https://cotejo.info/feed/"), { signal: AbortSignal.timeout(6000) });
+          if (res.ok) {
+            const xml = await res.text();
+            const items = [];
+            const regex = /<item>[\s\S]*?<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>[\s\S]*?<link>(.*?)<\/link>[\s\S]*?(?:<pubDate>(.*?)<\/pubDate>)?[\s\S]*?<\/item>/gi;
+            let m; while ((m = regex.exec(xml)) !== null && items.length < 10) {
+              const t = m[1].replace(/<[^>]*>/g,"").trim();
+              items.push({ title:t, link:m[2], date:m[3]||"", source:"Cotejo.info", tags:["E3"], desc:"" });
+            }
+            if (items.length) { setArticles(items); setSource("partial"); setLoading(false); return; }
+          }
+        } catch { continue; }
+      }
+      setSource("offline"); setLoading(false);
+    }
+    fetchFactCheck();
+  }, []);
+
+  return (
+    <div>
+      {/* Source cards */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:8, marginBottom:16 }}>
+        {FACTCHECK_SOURCES.map((s,i) => (
+          <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration:"none" }}>
+            <div style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`2px solid ${s.color}`, padding:"10px 12px",
+              cursor:"pointer", transition:"border-color 0.2s" }}
+              onMouseEnter={e=>e.currentTarget.style.borderColor=s.color}
+              onMouseLeave={e=>e.currentTarget.style.borderColor=BORDER}>
+              <div style={{ fontSize:10, fontWeight:600, color:s.color, marginBottom:2 }}>{s.name}</div>
+              <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>{s.handle}</div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {/* Live feed header */}
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+        <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>
+          🔍 Verificaciones recientes
+        </span>
+        <Badge color={source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
+          {source==="live"?"EN VIVO · RSS":source==="partial"?"PARCIAL":"OFFLINE"}
+        </Badge>
+        <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{articles.length} artículos</span>
+      </div>
+
+      {/* Articles */}
+      {loading ? (
+        <Card><div style={{ textAlign:"center", padding:30, color:MUTED, fontSize:10, fontFamily:font }}>
+          Cargando verificaciones de hechos...
+        </div></Card>
+      ) : articles.length === 0 ? (
+        <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:10 }}>
+          No se pudieron cargar verificaciones. Visita los sitios directamente.
+        </div></Card>
+      ) : (
+        <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
+          {articles.map((a,i) => (
+            <a key={i} href={a.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration:"none" }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:12, padding:"10px 0", borderBottom:`1px solid ${BORDER}30`,
+                cursor:"pointer" }}
+                onMouseEnter={e=>e.currentTarget.style.background=BG3}
+                onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                <div>
+                  <div style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:4 }}>{a.title}</div>
+                  <div style={{ display:"flex", gap:6, alignItems:"center", flexWrap:"wrap" }}>
+                    <span style={{ fontSize:8, fontFamily:font, color:FACTCHECK_SOURCES.find(s=>s.name===a.source)?.color||ACCENT, fontWeight:600 }}>{a.source}</span>
+                    {a.date && <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>
+                      {new Date(a.date).toLocaleDateString("es",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
+                    </span>}
+                    {a.tags?.map((t,k) => (
+                      <span key={k} style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${escColors[t]||ACCENT}15`,
+                        color:escColors[t]||ACCENT, border:`1px solid ${escColors[t]||ACCENT}30` }}>{t}</span>
+                    ))}
+                  </div>
+                  {a.desc && <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.4 }}>{a.desc}</div>}
+                </div>
+                <span style={{ fontSize:9, color:ACCENT, fontFamily:font }}>↗</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+      <div style={{ fontSize:7, fontFamily:font, color:`${MUTED}60`, marginTop:10 }}>
+        Fuentes RSS en vivo: Cazamos Fake News · Cotejo.info · EsPaja · Cocuyo Chequea · Provea · Tags automáticos por keywords
+      </div>
     </div>
   );
 }
@@ -1330,6 +1741,10 @@ function BrentChart({ history: rawHistory }) {
   const history = Array.from(byDay.values());
   if (history.length < 2) return null;
 
+  const firstDate = history[0]?.time ? new Date(history[0].time).toLocaleDateString("es",{month:"short",year:"numeric"}) : "";
+  const lastDate = history[history.length-1]?.time ? new Date(history[history.length-1].time).toLocaleDateString("es",{month:"short",year:"numeric"}) : "";
+  const chartLabel = `Brent Crude · ${firstDate} — ${lastDate} · ${history.length} puntos`;
+
   const prices = history.map(h => h.price);
   const min = Math.min(...prices);
   const max = Math.max(...prices);
@@ -1353,7 +1768,7 @@ function BrentChart({ history: rawHistory }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-            Brent Crude · Desde enero 2025
+            {chartLabel}
           </span>
           <Badge color="#22c55e">EN VIVO</Badge>
         </div>
@@ -1425,7 +1840,7 @@ function LivePriceCards() {
       // Try our Vercel serverless function first (has API key server-side)
       if (IS_DEPLOYED) {
         try {
-          const res = await fetch("/api/oil-prices", { signal: AbortSignal.timeout(10000) });
+          const res = await fetch("/api/oil-prices", { signal: AbortSignal.timeout(20000) });
           if (res.ok) {
             const data = await res.json();
             if (data.brent || data.wti || data.natgas) {
