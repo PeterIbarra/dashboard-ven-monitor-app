@@ -12,13 +12,48 @@ const SCENARIOS = [
 ];
 
 const WEEKS = [
-  { label:"3–15 ene", short:"S1", probs:[{sc:1,v:5},{sc:2,v:45},{sc:3,v:40},{sc:4,v:10}], xy:{x:0.43,y:0.44} },
-  { label:"16–22 ene", short:"S2", probs:[{sc:1,v:15},{sc:2,v:25},{sc:3,v:50},{sc:4,v:10}], xy:{x:0.25,y:0.28} },
-  { label:"23–29 ene", short:"S3", probs:[{sc:1,v:20},{sc:2,v:10},{sc:3,v:60},{sc:4,v:10}], xy:{x:0.21,y:0.33} },
-  { label:"30e–5f", short:"S4", probs:[{sc:1,v:30},{sc:2,v:5},{sc:3,v:50},{sc:4,v:15}], xy:{x:0.19,y:0.35} },
-  { label:"6–13 feb", short:"S5", probs:[{sc:1,v:30},{sc:2,v:5},{sc:3,v:45},{sc:4,v:20}], xy:{x:0.18,y:0.40} },
-  { label:"13–20 feb", short:"S6", probs:[{sc:1,v:35},{sc:2,v:15},{sc:3,v:40},{sc:4,v:10}], xy:{x:0.17,y:0.46} },
-  { label:"20–27 feb", short:"S7", probs:[{sc:1,v:30},{sc:2,v:10},{sc:3,v:50},{sc:4,v:10}], xy:{x:0.16,y:0.48} },
+  { label:"3–15 ene", short:"S1", probs:[{sc:1,v:5,t:"flat"},{sc:2,v:45,t:"flat"},{sc:3,v:40,t:"flat"},{sc:4,v:10,t:"flat"}], xy:{x:0.43,y:0.44},
+    sem:{g:2,y:4,r:7},
+    kpis:{ energia:{exportaciones:"Interrumpidas",ingresos:"—",licencias:"En proceso",cambio:"—"}, economico:{inflacion:"567% (2025)",ingresos_pob:"< USD 300",electricidad:"Sin datos",pib:"—"}, opinion:{direccion:"—",elecciones:"93.5% rechaza trans. chav.",mcm:"—",eeuu:"47%"} },
+    tensiones:[{l:"red",t:"<b>Operativo 3 ene:</b> Captura de Maduro. Alta fragilidad institucional."},{l:"red",t:"<b>Exportaciones:</b> Interrupción casi total primeros días."},{l:"yellow",t:"<b>Excarcelaciones:</b> 101 confirmadas, 14 periodistas."}],
+    lectura:"El operativo del 3 de enero inaugura el ciclo en condiciones de fragilidad máxima. La captura de Maduro por fuerzas estadounidenses genera un shock institucional sin precedentes: las exportaciones petroleras se interrumpen casi totalmente en los primeros días, la opacidad sobre víctimas del operativo es elevada, y las restricciones a la prensa extranjera configuran un entorno de alta incertidumbre. E2 (Colapso y fragmentación) domina con 45% porque el riesgo de desintegración institucional es real — pero la rápida designación de Delcy Rodríguez como autoridad interina, avalada por el TSJ y reconocida funcionalmente por Washington, impide que el vacío de poder se convierta en crisis terminal. Las 101 excarcelaciones confirmadas, incluidos 14 periodistas, son la primera señal de distensión selectiva. El 47% de aprobación interna a la operación estadounidense y el 79% de opinión favorable hacia Delcy (Hinterlaces) revelan que la ciudadanía procesa el shock con pragmatismo más que con rechazo. E3 (Continuidad negociada) ya está al 40%, emergiendo como alternativa viable si el flujo petrolero se restablece. La clave de esta semana es que el operativo no desencadenó el colapso que muchos anticipaban: la cohesión civil-militar se preservó, la continuidad institucional condicionada fue avalada, y las primeras señales de cooperación energética con EE.UU. aparecen hacia el final del período.",
+    trendSc:3, trendDrivers:["Estabilización post-operativo: continuidad institucional bajo tutela EE.UU.","Exportaciones petroleras reactivándose; orden ejecutiva Trump protege ingresos","Excarcelaciones graduales señalan distensión selectiva"] },
+  { label:"16–22 ene", short:"S2", probs:[{sc:1,v:15,t:"up"},{sc:2,v:25,t:"down"},{sc:3,v:50,t:"up"},{sc:4,v:10,t:"flat"}], xy:{x:0.25,y:0.28},
+    sem:{g:3,y:5,r:5},
+    kpis:{ energia:{exportaciones:"En recuperación",ingresos:"Divisas a banca",licencias:"LG-46 en proceso",cambio:"Relativa estabilidad"}, economico:{inflacion:"Alta (3 dígitos)",ingresos_pob:"< USD 300",electricidad:"Sin datos",pib:"—"}, opinion:{direccion:"—",elecciones:"—",mcm:"51.6% prefiere MCM",eeuu:"47%"} },
+    tensiones:[{l:"yellow",t:"<b>Doble canal EE.UU.:</b> Reconocimiento a Delcy + interlocución MCM."},{l:"yellow",t:"<b>DDHH:</b> Excarcelaciones + nuevas detenciones simultáneas."},{l:"green",t:"<b>Divisas:</b> Flujo hacia banca privada iniciado."}],
+    lectura:"La semana del 16 al 22 de enero marca el punto de inflexión decisivo del ciclo: el tránsito desde la fragilidad máxima hacia la estabilización incipiente. Tres hitos cambian estructuralmente el mapa de riesgos. La visita a Caracas del Director de la CIA John Ratcliffe establece que el vínculo bilateral tiene profundidad de inteligencia, no solo económica. La Licencia General 46 de la OFAC crea por primera vez un marco normativo claro para la cooperación energética bilateral. Y la reapertura del espacio aéreo normaliza el vínculo a nivel cotidiano. E3 sube a 50% dominante porque el acoplamiento energético-financiero ya tiene mecanismos concretos funcionando: USD 300 millones colocados a través de banca privada, BCV publica tipo de cambio oficial por primera vez desde agosto 2024. El doble canal estratégico de Washington — reconocer a Delcy para energía y seguridad, mantener interlocución con MCM sin trasladarle control — es un diseño deliberado, no una contradicción. E2 cae a 25% porque el riesgo de colapso se desvanece al regularizarse las exportaciones. La reestructuración de 28 cargos intermedios de la FANB, manteniendo intacta la cúpula, es señal de control preventivo sin ruptura.",
+    trendSc:3, trendDrivers:["LG-46 OFAC: marco normativo para cooperación energética bilateral","Doble canal EE.UU.: reconocimiento a Delcy + interlocución con MCM","USD 300M en divisas a banca privada consolidan el esquema financiero"] },
+  { label:"23–29 ene", short:"S3", probs:[{sc:1,v:20,t:"up"},{sc:2,v:10,t:"down"},{sc:3,v:60,t:"up"},{sc:4,v:10,t:"flat"}], xy:{x:0.21,y:0.33},
+    sem:{g:5,y:5,r:3},
+    kpis:{ energia:{exportaciones:"~800 kbd (+60.6%)",ingresos:"Divisas regulares",licencias:"LG-46 emitida",cambio:"Estabilizando"}, economico:{inflacion:"Alta (3 dígitos)",ingresos_pob:"< USD 300",electricidad:"Afectaciones",pib:"Proy. al alza"}, opinion:{direccion:"—",elecciones:"Reunión Rubio–MCM",mcm:"78% intención voto",eeuu:"—"} },
+    tensiones:[{l:"green",t:"<b>LG-46:</b> Licencia OFAC emitida — hito operativo clave."},{l:"green",t:"<b>Reforma Hidrocarburos:</b> Cambio más profundo en 50 años."},{l:"yellow",t:"<b>Agenda electoral:</b> Sin fechas. Presión opositora activa."}],
+    lectura:"E3 consolida su probabilidad más alta del ciclo — 60% — porque el esquema de estabilización deja de ser promesa y se convierte en mecanismo operativo verificable. La LG-46 está efectiva: Vitol carga ~460.000 barriles de nafta pesada desde Houston reactivando la producción de la Faja del Orinoco. Las exportaciones supervisadas se incrementan sostenidamente. La reforma a la Ley Orgánica de Hidrocarburos — aprobada en segunda discusión — representa el cambio estructural más profundo en el sector petrolero venezolano en 50 años. La reunión Rubio-MCM en Washington institucionaliza el doble canal hacia la transición, y la Ley de Amnistía entra en primera discusión. El 78.3% de intención de voto por MCM configura la base opositora más sólida del ciclo. Sin embargo, Washington es explícito en sus reservas sobre el retorno inmediato de MCM: Rubio compara el proceso con la transición española post-Franco — 'los cambios profundos requieren tiempo'. E2 cae a 10% porque sin interrupción del esquema petrolero-financiero, el riesgo de fragmentación está estructuralmente contenido.",
+    trendSc:1, trendDrivers:["MCM con 78.3% intención de voto: base opositora más sólida del ciclo","Reunión Rubio-MCM institucionaliza el canal hacia transición","Ley de Amnistía en primera discusión: apertura política avanza"] },
+  { label:"30e–5f", short:"S4", probs:[{sc:1,v:30,t:"up"},{sc:2,v:5,t:"down"},{sc:3,v:50,t:"down"},{sc:4,v:15,t:"up"}], xy:{x:0.19,y:0.35},
+    sem:{g:5,y:5,r:3},
+    kpis:{ energia:{exportaciones:"~800 kbd",ingresos:"USD >800M acum.",licencias:"LG-46 operativa",cambio:"420–430 VEB/USD"}, economico:{inflacion:"~200% proy.",ingresos_pob:"69.5% < USD 300",electricidad:"Deterioro",pib:"10.4–15.2% proy."}, opinion:{direccion:"—",elecciones:"93.5% rechaza trans.",mcm:"78.3%",eeuu:"—"} },
+    tensiones:[{l:"yellow",t:"<b>Amnistía 1ª discusión:</b> Arts. 7–13 diferidos."},{l:"yellow",t:"<b>Excarcelaciones:</b> Patrón con medidas cautelares."},{l:"red",t:"<b>FANB:</b> Reafirma lealtad al Proyecto Bolivariano."}],
+    lectura:"Primera tensión sistémica del ciclo de estabilización. E3 cede levemente a 50%, E1 sube a 30% y E4 gana terreno hasta 15%. La contradicción central es entre la aceleración de la normalización energético-diplomática — ampliación de licencias OFAC, bonos soberanos al alza, trayectoria hacia 800K bpd — y la resistencia del Ejecutivo a las aperturas políticas que esa misma lógica comienza a demandar. El cierre de El Helicoide como centro policial es presentado como señal de apertura, pero 949 personas detenidas por motivos políticos al 21 de enero contextualizan la señal. La FANB reafirma el 4 de febrero su lealtad al Proyecto Bolivariano. Jorge Rodríguez descarta públicamente elecciones inmediatas. El 93.5% de rechazo a una transición chavista y el 78.3% de intención de voto por MCM representan una demanda que E3 no puede ignorar indefinidamente. 14 jefes de Estado europeos presionan hacia un cronograma electoral. Trump propone reunir a representantes del chavismo y la oposición. E4 sube a 15% por acumulación de señales de control discrecional: aplazamiento del proceso contra Maduro, opacidad en cooperación con autoridades de Álex Saab y Raúl Gorrín.",
+    trendSc:1, trendDrivers:["93.5% rechaza transición chavista: presión social máxima hacia cambio","MCM con 78.3%: mandato popular claro hacia transición","14 jefes de Estado europeos refuerzan presión hacia elecciones"] },
+  { label:"6–13 feb", short:"S5", probs:[{sc:1,v:30,t:"flat"},{sc:2,v:5,t:"flat"},{sc:3,v:45,t:"down"},{sc:4,v:20,t:"up"}], xy:{x:0.18,y:0.40},
+    sem:{g:6,y:6,r:4},
+    kpis:{ energia:{exportaciones:"~800 kbd · EE.UU.",ingresos:"USD >1.000M",licencias:"GL49+GL50/50A",cambio:"420–430 VEB/USD"}, economico:{inflacion:"174% proy. 2026",ingresos_pob:"69.5% < USD 300",electricidad:"14.8h sin suministro",pib:"10.4–15.2%"}, opinion:{direccion:"80% (Hinterlaces)",elecciones:"67% votaría MCM",mcm:"Alta",eeuu:">90% respalda"} },
+    tensiones:[{l:"yellow",t:"<b>Amnistía 2ª discusión:</b> Diferida arts. 7–13."},{l:"red",t:"<b>Excarcelaciones:</b> 897 oficial vs 430 ONG — brecha >50%."},{l:"yellow",t:"<b>Visita Chris Wright:</b> Agenda energética de largo plazo."}],
+    lectura:"La semana de mayor ambigüedad estructural del ciclo. E3 continúa dominante al 45% pero la distancia sobre E1 se reduce (30%) y E4 sube a 20%, configurando el mapa más distribuido. Tres dinámicas operan simultáneamente sin converger. La visita del secretario de Energía Chris Wright consolida la cooperación de largo plazo: GL49, GL46A, GL48 y GL50 operativas, con BP, Chevron, Eni, Repsol y Shell autorizadas bajo condiciones estrictas. Repsol obtiene autorización para extraer crudo. 50 millones de barriles hacia Houston confirman escala real. Pero la Ley de Amnistía revela sus límites: la segunda discusión es diferida para los artículos 7 al 13 — los más sensibles. El patrón de excarcelaciones con medidas cautelares genera percepción de reversibilidad. La brecha entre 897 liberaciones oficiales y ~430 verificadas por ONG mantiene activa la disputa narrativa. E4 sube por señales específicas de control discrecional: Delcy reafirma en NBC la legitimidad formal de Maduro pese a su detención, mientras ejerce conducción interina — un equilibrio retórico que revela la fragilidad del marco político subyacente.",
+    trendSc:1, trendDrivers:["67% votaría por MCM (Financial Times): demanda electoral sostenida","75% percibe país en dirección correcta: base de expectativa","Hoja de ruta EE.UU. de tres fases incluye 'transición' como fase 3"] },
+  { label:"13–20 feb", short:"S6", probs:[{sc:1,v:35,t:"up"},{sc:2,v:15,t:"flat"},{sc:3,v:40,t:"down"},{sc:4,v:10,t:"down"}], xy:{x:0.17,y:0.46},
+    sem:{g:9,y:8,r:5},
+    kpis:{ energia:{exportaciones:"~800 kbd · ↑60.6%",ingresos:"USD >1.000M · ac. USD 5.000M",licencias:"GL49+GL50/50A plenas",cambio:"420–430 VEB/USD"}, economico:{inflacion:"174% (vs 567% 2025)",ingresos_pob:"69.5% < USD 300",electricidad:"14.8h sin suministro",pib:"10.4–15.2%"}, opinion:{direccion:"75% dirección correcta",elecciones:"2/3 exige elecciones",mcm:"52% favorabilidad",eeuu:">90% respalda"} },
+    tensiones:[{l:"green",t:"<b>Ley de Amnistía:</b> Promulgada 19 feb."},{l:"yellow",t:"<b>FANB:</b> Tensiones. Demandas de oxigenación. Padrino 12 años."},{l:"yellow",t:"<b>Excarcelaciones:</b> 895 oficial vs 383 verif."},{l:"red",t:"<b>Electoral:</b> Sin fecha. 2/3 exige. EE.UU.: 9–10 meses."}],
+    lectura:"La promulgación de la Ley de Amnistía el 19 de febrero es el hito normativo más significativo desde la operación de enero: por primera vez el marco legal reconoce formalmente a los perseguidos políticos de 26 años y establece mecanismos de extinción de acciones penales, civiles y disciplinarias. E1 alcanza su punto más alto del ciclo — 35% — porque la promulgación abre un vector de institucionalización que antes era solo retórico. Dos tercios de la población exige elecciones este año. La encuesta Atlantic Council-Gold Glove muestra que el 75% percibe el país en dirección correcta, pero con una paradoja estructural: la prioridad es la economía sobre la democracia en proporción 8:1. Las tensiones en la FANB — reportaje de El País sobre malestar por continuidad de la cúpula, Padrino López 12 años en el cargo — revelan que la estabilización tiene costos internos que aún no se procesan. España propone ante la UE levantar sanciones a Delcy, Qatar visita Caracas, el FMI señala disposición a iniciar contactos. El sector energético se confirma como ancla: EIA proyecta retorno a 1.1-1.2M bpd hacia mediados de 2026. Pero la brecha entre cifras oficiales de amnistía (895) y verificadas por ONG (383) es la expresión más concreta de que E3 y E4 coexisten: apertura selectiva y control discrecional operan simultáneamente.",
+    trendSc:3, trendDrivers:["Amnistía promulgada: vector de institucionalización consolidado","Sector energético como ancla: EIA proyecta 1.1-1.2M bpd","Presión por cronograma electoral crece pero sin catalizar ruptura"] },
+  { label:"20–27 feb", short:"S7", probs:[{sc:1,v:30,t:"down"},{sc:2,v:10,t:"flat"},{sc:3,v:50,t:"up"},{sc:4,v:10,t:"flat"}], xy:{x:0.16,y:0.48},
+    sem:{g:6,y:7,r:5},
+    kpis:{ energia:{exportaciones:"~800 kbd · VLCC",ingresos:"Proy. USD 6.000M",licencias:"GL49+GL50/50A · FAQ 1238",cambio:"Mdo 631 / BCV 414 Bs/$"}, economico:{inflacion:"3 dígitos · FMI",ingresos_pob:"Canasta 550 vs 270 USD",electricidad:"Sin datos nuevos",pib:"Ancla petrolera"}, opinion:{direccion:"51,5% mejor s/ Maduro",elecciones:"Rubio: req. elecciones",mcm:"MCM +28 imagen neta",eeuu:"62,4% valora EE.UU."} },
+    tensiones:[{l:"green",t:"<b>Amnistía operativa:</b> 4.203 solicitudes · Trump: \"nuevo amigo y socio\"."},{l:"green",t:"<b>Petróleo:</b> ~800K bpd · Vitol/Trafigura · Eni USD 3B."},{l:"yellow",t:"<b>Brecha cambiaria:</b> 52,6% ↑6,5pp · 47 meses sin ajuste."},{l:"yellow",t:"<b>Poder Ciudadano:</b> Renuncias Saab/Ruiz · plazo 30 días."},{l:"red",t:"<b>Electoral:</b> Rubio condiciona · Caso Magalli Meda."}],
+    lectura:"E3 se consolida en su nivel más alto del ciclo — 50% — a través del hecho simbólico más significativo del período: Donald Trump califica a Venezuela como 'nuevo amigo y socio' en el Estado de la Unión, con Enrique Márquez presente en el hemiciclo. La coexistencia de ambas referencias condensa la lógica del doble canal que ha estructurado toda la relación bilateral desde enero. Las exportaciones se sitúan en ~800.000 bpd, Vitol y Trafigura tienen tres buques fletados para marzo, refinerías indias incrementan compras usando VLCC, y la proyección de ingresos alcanza USD 6.000 millones. La amnistía pasa de aprobada a operativa: 4.203 solicitudes procesadas, 3.231 libertades plenas en el primer corte. El Poder Ciudadano se reconfigura con renuncias de Saab y Ruiz. Colombia activa el canal diplomático con Petro-Delcy para el 14 de marzo.\n\nSin embargo, el mapa no es de consolidación lineal sino de consolidación con tensiones no resueltas. E1 baja a 30% porque no hay compromisos electorales concretos: Rubio afirma que la legitimación electoral es requisito para inversión, pero el Ejecutivo no anuncia calendario. La disputa de cifras sobre amnistía es aguda: Foro Penal registra 568 presos verificados frente a 4.151 oficiales. El caso Magalli Meda — 16 hombres armados en 6 camionetas — revela que la coerción paralela al discurso de reconciliación no ha sido desmantelada. La brecha cambiaria supera el 52.6%, el salario mínimo lleva 47 meses sin cambios, y el FMI clasifica a Venezuela en 'Intensa Fragilidad'. La coexistencia de los cuatro escenarios en tensión — y no la desaparición de los riesgos — es la característica definitoria del momento.",
+    trendSc:3, trendDrivers:["Trump 'nuevo amigo y socio': acoplamiento EE.UU. sin precedentes","~800K bpd + USD 6B consolidan ancla energética","Amnistía operativa refuerza narrativa de reconciliación como pilar"] },
 ];
 
 const KPIS_LATEST = {
@@ -449,69 +484,155 @@ function ConflictividadChart() {
 // TAB VIEWS
 // ═══════════════════════════════════════════════════════════════
 
+function Sparkline({ scId, currentWeek }) {
+  const vals = WEEKS.map(w => w.probs.find(p=>p.sc===scId)?.v || 0);
+  const max = Math.max(...vals, 1);
+  const W = 80, H = 24;
+  const color = SC[scId];
+  const pts = vals.map((v,i) => `${(i/(vals.length-1))*W},${H-(v/max)*H}`).join(" ");
+  return (
+    <svg width={W} height={H} style={{ display:"block", overflow:"visible" }}>
+      <polyline points={pts} fill="none" stroke={color} strokeWidth={1.2} strokeLinejoin="round" opacity={0.6} />
+      {currentWeek < vals.length && (
+        <circle cx={(currentWeek/(vals.length-1))*W} cy={H-(vals[currentWeek]/max)*H} r={2.5} fill={color} />
+      )}
+    </svg>
+  );
+}
+
 function TabDashboard({ week }) {
   const wk = WEEKS[week];
+  const prevWk = week > 0 ? WEEKS[week-1] : null;
   const dom = wk.probs.reduce((a,b) => a.v > b.v ? a : b);
   const domSc = SCENARIOS.find(s=>s.id===dom.sc);
+  const trendIcon = { up:"↑", down:"↓", flat:"→" };
+  const trendColor = { up:"#22c55e", down:"#ef4444", flat:MUTED };
+  const trendLabel = { up:"Al alza", down:"A la baja", flat:"Estable" };
+  const semTotal = wk.sem.g + wk.sem.y + wk.sem.r || 1;
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-      {/* Scenario cards */}
+    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+      {/* ── ROW 1: Scenario Hero Cards ── */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:1, background:BORDER, border:`1px solid ${BORDER}` }}>
         {wk.probs.map(p => {
           const sc = SCENARIOS.find(s=>s.id===p.sc);
           const isDom = p.sc === dom.sc;
+          const delta = prevWk ? p.v - (prevWk.probs.find(pp=>pp.sc===p.sc)?.v||0) : null;
           return (
-            <div key={p.sc} style={{ background:isDom?BG3:BG2, padding:"16px 18px", borderTop:`3px solid ${sc.color}` }}>
+            <div key={p.sc} style={{ background:isDom?BG3:BG2, padding:"14px 16px", borderTop:`3px solid ${sc.color}` }}>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:4, display:"flex", alignItems:"center", gap:6 }}>
                 E{sc.id}
                 {isDom && <Badge color={sc.color}>Dominante</Badge>}
               </div>
-              <div style={{ fontSize:13, fontWeight:600, color:sc.color, marginBottom:8 }}>{sc.name}</div>
-              <div style={{ fontSize:28, fontWeight:900, color:sc.color, fontFamily:"'Playfair Display',serif", lineHeight:1 }}>{p.v}%</div>
-              <div style={{ height:3, background:`${BORDER}`, marginTop:8 }}>
+              <div style={{ fontSize:12, fontWeight:600, color:sc.color, marginBottom:6, lineHeight:1.2 }}>{sc.name}</div>
+              <div style={{ display:"flex", alignItems:"flex-end", gap:8, marginBottom:6 }}>
+                <span style={{ fontSize:26, fontWeight:900, color:sc.color, fontFamily:"'Playfair Display',serif", lineHeight:1 }}>{p.v}%</span>
+                {delta !== null && delta !== 0 && (
+                  <span style={{ fontSize:10, fontFamily:font, fontWeight:600, color:delta>0?"#22c55e":"#ef4444", marginBottom:2 }}>
+                    {delta>0?"▲":"▼"}{Math.abs(delta)}pp
+                  </span>
+                )}
+              </div>
+              <div style={{ height:3, background:BORDER, marginBottom:6 }}>
                 <div style={{ height:3, background:sc.color, width:`${p.v}%`, transition:"width 0.5s" }} />
+              </div>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <span style={{ fontSize:9, fontFamily:font, color:trendColor[p.t] }}>
+                  {trendIcon[p.t]} {trendLabel[p.t]}
+                </span>
+                <Sparkline scId={p.sc} currentWeek={week} />
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* KPIs + ISV + Matrix */}
-      <div style={{ display:"grid", gridTemplateColumns:"200px 1fr 240px", gap:16 }}>
-        <Card><ISVGauge /></Card>
+      {/* ── ROW 2: KPIs + Semáforo ── */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 200px", gap:12 }}>
+
+        {/* KPIs por dimensión — de la semana activa */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:1, background:BORDER, border:`1px solid ${BORDER}` }}>
-          {[{title:"Energético",icon:"⚡",data:KPIS_LATEST.energia},{title:"Político",icon:"🏛",data:KPIS_LATEST.politico},{title:"Opinión",icon:"🗳",data:KPIS_LATEST.opinion}].map((sec,i) => (
+          {[
+            {title:"Energético",icon:"⚡",rows:[
+              {k:"Exportaciones",v:wk.kpis.energia.exportaciones},
+              {k:"Ingresos",v:wk.kpis.energia.ingresos},
+              {k:"Licencias OFAC",v:wk.kpis.energia.licencias},
+              {k:"Tipo de cambio",v:wk.kpis.energia.cambio},
+            ]},
+            {title:"Económico",icon:"📊",rows:[
+              {k:"Inflación proy.",v:wk.kpis.economico.inflacion},
+              {k:"Ingresos pob.",v:wk.kpis.economico.ingresos_pob},
+              {k:"Electricidad",v:wk.kpis.economico.electricidad},
+              {k:"PIB 2026",v:wk.kpis.economico.pib},
+            ]},
+            {title:"Opinión",icon:"🗳",rows:[
+              {k:"Dirección país",v:wk.kpis.opinion.direccion},
+              {k:"Dem. electoral",v:wk.kpis.opinion.elecciones},
+              {k:"MCM / liderazgo",v:wk.kpis.opinion.mcm},
+              {k:"Respaldo EE.UU.",v:wk.kpis.opinion.eeuu},
+            ]},
+          ].map((sec,i) => (
             <div key={i} style={{ background:BG2, padding:"14px 16px" }}>
-              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, borderBottom:`1px solid ${BORDER}`, paddingBottom:6 }}>
+              <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
                 {sec.icon} {sec.title}
               </div>
-              {sec.data.map((k,j) => (
+              {sec.rows.map((r,j) => (
                 <div key={j} style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6, gap:8 }}>
-                  <span style={{ fontSize:10, color:"#7a9ab0" }}>{k.k}</span>
-                  <span style={{ fontSize:11, fontFamily:font, fontWeight:500, color:k.c, whiteSpace:"nowrap" }}>{k.v}</span>
+                  <span style={{ fontSize:10, color:"#5a8aaa" }}>{r.k}</span>
+                  <span style={{ fontSize:10, fontFamily:font, fontWeight:500, color:r.v==="—"?`${MUTED}60`:TEXT, whiteSpace:"nowrap", textAlign:"right", maxWidth:140, overflow:"hidden", textOverflow:"ellipsis" }}>{r.v}</span>
                 </div>
               ))}
             </div>
           ))}
         </div>
+
+        {/* Semáforo resumen */}
         <Card>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:8 }}>
-            📍 Posición en la matriz
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+            🚦 Señales
           </div>
-          <MiniMatrix weekIdx={week} />
+          {[{label:"Verde",count:wk.sem.g,color:"green"},
+            {label:"Amarillo",count:wk.sem.y,color:"yellow"},
+            {label:"Rojo",count:wk.sem.r,color:"red"}
+          ].map((s,i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+              <span style={{ fontSize:18, fontWeight:700, fontFamily:font, color:SEM[s.color], width:24, textAlign:"right" }}>{s.count}</span>
+              <span style={{ fontSize:9, color:SEM[s.color], width:46, letterSpacing:"0.06em", textTransform:"uppercase" }}>{s.label}</span>
+              <div style={{ flex:1, height:5, background:BORDER, borderRadius:2 }}>
+                <div style={{ height:5, background:SEM[s.color], width:`${(s.count/semTotal)*100}%`, borderRadius:2, transition:"width 0.4s" }} />
+              </div>
+            </div>
+          ))}
+          <div style={{ marginTop:10, paddingTop:10, borderTop:`1px solid ${BORDER}`, textAlign:"center" }}>
+            <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Dominante</div>
+            <div style={{ fontSize:16, fontWeight:800, color:domSc.color, fontFamily:"'Syne',sans-serif" }}>E{domSc.id} · {dom.v}%</div>
+            <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>{domSc.short}</div>
+          </div>
         </Card>
       </div>
 
-      {/* Tensions */}
+      {/* ── ROW 3: Lectura rápida ── */}
+      {wk.lectura && (
+        <div style={{ background:`linear-gradient(135deg, ${domSc.color}08, transparent)`, border:`1px solid ${domSc.color}18`, padding:"14px 18px" }}>
+          <div style={{ fontSize:8, fontFamily:font, color:domSc.color, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:6 }}>
+            Lectura de la semana · {wk.label}
+          </div>
+          <div style={{ fontSize:11, color:"#94a3b8", lineHeight:1.7, fontStyle:"italic" }}>
+            {wk.lectura}
+          </div>
+        </div>
+      )}
+
+      {/* ── ROW 4: Tensiones activas ── */}
       <Card>
-        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, borderBottom:`1px solid ${BORDER}`, paddingBottom:6 }}>
+        <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, paddingBottom:5, borderBottom:`1px solid ${BORDER}` }}>
           ⚠ Tensiones activas · {wk.label}
         </div>
-        {TENSIONS.map((t,i) => (
-          <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:8, paddingBottom:8, borderBottom:i<TENSIONS.length-1?`1px solid ${BORDER}`:"none" }}>
-            <SemDot color={t.level} />
-            <span style={{ fontSize:11, color:"#7a9ab0", lineHeight:1.5 }} dangerouslySetInnerHTML={{ __html:t.text }} />
+        {wk.tensiones.map((t,i) => (
+          <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:7, paddingBottom:7, borderBottom:i<wk.tensiones.length-1?`1px solid ${BORDER}40`:"none" }}>
+            <SemDot color={t.l} />
+            <span style={{ fontSize:10, color:"#7a9ab0", lineHeight:1.6 }} dangerouslySetInnerHTML={{ __html:t.t }} />
           </div>
         ))}
       </Card>
@@ -519,70 +640,290 @@ function TabDashboard({ week }) {
   );
 }
 
-function TabMatriz({ week }) {
-  const [sel, setSel] = useState(3);
-  const wk = WEEKS[week];
-  const dom = wk.probs.reduce((a,b)=>a.v>b.v?a:b);
+// Drivers/Signals for the latest week (S7) — for sidebar detail
+const WEEK_DRIVERS = {
+  1: { label:"Media", drivers:["Rubio: legitimación electoral = requisito inversión","60,3% considera país más democrático","España propone levantar sanciones a Delcy","Disputa cifras amnistía: 568 verif. vs 4.151 oficiales"], signals:["Calendario electoral verificable","Listados consolidados de amnistía","Designaciones Poder Ciudadano con perfil técnico","Reunión Petro-Delcy con declaración conjunta"] },
+  2: { label:"Contenida", drivers:["Brecha cambiaria 52,6% ↑6,5pp semanal","47 meses sin ajuste salarial · canasta USD 550","FMI: deuda >180% PIB · Intensa Fragilidad","Corrupción: 56,7% problema principal"], signals:["Brecha >55% sin intervención BCV","Movilizaciones gremiales","Retraso en ingresos petroleros proyectados","Fractura relación EE.UU. / suspensión licencias"] },
+  3: { label:"Alta (dominante)", drivers:["Trump: \"nuevo amigo y socio\" · Estado de la Unión","~800K bpd · Vitol/Trafigura 3 buques · USD 6.000M proy.","Amnistía operativa: 4.203 solicitudes · 3.231 libertades","SOUTHCOM plan 3 fases · 71.000 kg asistencia médica","62,4% valora influencia EE.UU. · 51,5% país mejor","Eni USD 3B compensación · Shell gas · Petro-Delcy 14 mar"], signals:["Flujo sostenido exportaciones India + EE.UU.","Plan SOUTHCOM: segunda visita Donovan","Excarcelaciones ampliadas con listas públicas","Estabilización brecha cambiaria","Designaciones Poder Ciudadano en plazo 30 días"] },
+  4: { label:"Media-baja", drivers:["135 de 179 excarcelaciones en Caracas (inequidad territorial)","Caso Magalli Meda: 16 armados, 6 camionetas","11.000+ bajo medidas restrictivas (Foro Penal)","Poder Ciudadano: designaciones encargadas","Destitución embajadora Nicaragua sin explicación"], signals:["Suspensión de excarcelaciones","Operativos contra opositores","Discurso confrontativo (Cabello)","Poder Ciudadano: control sin pluralismo"] },
+};
+
+function FullMatrix({ weekIdx, onClickWeek, onArrowClick }) {
+  const W=560, H=400;
+  const wk = WEEKS[weekIdx];
+  const dom = wk.probs.reduce((a,b) => a.v>b.v?a:b);
+  const domSc = SCENARIOS.find(s=>s.id===dom.sc);
+  const trendSc = SCENARIOS.find(s=>s.id===(wk.trendSc||dom.sc));
+  const trendColor = trendSc.color;
+
+  // Trail points
+  const trail = WEEKS.slice(0, weekIdx+1).map((w,i) => ({
+    px: w.xy.x * W, py: (1-w.xy.y) * H, idx: i,
+    dom: SCENARIOS.find(s=>s.id===w.probs.reduce((a,b)=>a.v>b.v?a:b).sc),
+  }));
+  const cur = trail[trail.length-1];
+
+  // Compute drift direction based on trend scenario's quadrant center
+  const trendTargets = { 1:{x:W*0.2,y:H*0.2}, 2:{x:W*0.8,y:H*0.2}, 3:{x:W*0.2,y:H*0.8}, 4:{x:W*0.8,y:H*0.8} };
+  const target = trendTargets[wk.trendSc||dom.sc];
+  let dx = target.x - cur.px, dy = target.y - cur.py;
+  const mag = Math.sqrt(dx*dx + dy*dy);
+  const arrowLen = Math.min(mag * 0.35, 60);
+  if (mag > 1) { dx = (dx/mag)*arrowLen; dy = (dy/mag)*arrowLen; }
+  const arrowEnd = { x: cur.px + dx, y: cur.py + dy };
+  const isSameSc = (wk.trendSc||dom.sc) === dom.sc;
 
   return (
-    <div style={{ display:"grid", gridTemplateColumns:"1fr 300px", gap:16 }}>
-      <div>
-        <div style={{ border:`1px solid ${BORDER}`, marginBottom:16 }}>
-          <MiniMatrix weekIdx={week} />
-        </div>
-        {/* Probability bars */}
-        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-          {wk.probs.map(p => {
-            const sc = SCENARIOS.find(s=>s.id===p.sc);
-            return (
-              <div key={p.sc} style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={()=>setSel(p.sc)}>
-                <span style={{ fontSize:10, fontFamily:font, color:sc.color, width:20 }}>E{sc.id}</span>
-                <div style={{ flex:1, height:6, background:BORDER, borderRadius:2 }}>
-                  <div style={{ height:6, background:sc.color, width:`${p.v}%`, borderRadius:2, transition:"width 0.4s" }} />
+    <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block", background:BG }}>
+      <defs>
+        <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill={trendColor} opacity="0.8" />
+        </marker>
+      </defs>
+      {/* Quadrants */}
+      <rect x={0} y={0} width={W/2} height={H/2} fill="rgba(76,159,56,0.05)" />
+      <rect x={W/2} y={0} width={W/2} height={H/2} fill="rgba(229,36,59,0.05)" />
+      <rect x={0} y={H/2} width={W/2} height={H/2} fill="rgba(10,151,217,0.05)" />
+      <rect x={W/2} y={H/2} width={W/2} height={H/2} fill="rgba(252,195,11,0.05)" />
+      {/* Axes */}
+      <line x1={W/2} y1={0} x2={W/2} y2={H} stroke={BORDER} strokeWidth={1} />
+      <line x1={0} y1={H/2} x2={W} y2={H/2} stroke={BORDER} strokeWidth={1} />
+      {/* Grid */}
+      <line x1={W/4} y1={0} x2={W/4} y2={H} stroke={BORDER} strokeWidth={0.5} strokeDasharray="3 4" opacity={0.4} />
+      <line x1={3*W/4} y1={0} x2={3*W/4} y2={H} stroke={BORDER} strokeWidth={0.5} strokeDasharray="3 4" opacity={0.4} />
+      <line x1={0} y1={H/4} x2={W} y2={H/4} stroke={BORDER} strokeWidth={0.5} strokeDasharray="3 4" opacity={0.4} />
+      <line x1={0} y1={3*H/4} x2={W} y2={3*H/4} stroke={BORDER} strokeWidth={0.5} strokeDasharray="3 4" opacity={0.4} />
+      {/* Quadrant labels */}
+      <text x={12} y={16} fontSize={8} fill={MUTED} fontFamily={font} opacity={0.6}>CAMBIO SIN VIOLENCIA</text>
+      <text x={W/2+12} y={16} fontSize={8} fill={MUTED} fontFamily={font} opacity={0.6}>CAMBIO CAÓTICO</text>
+      <text x={12} y={H-8} fontSize={8} fill={MUTED} fontFamily={font} opacity={0.6}>ESTABILIDAD SIN TRANSFORMACIÓN</text>
+      <text x={W/2+12} y={H-8} fontSize={8} fill={MUTED} fontFamily={font} opacity={0.6}>VIOLENCIA SIN CAMBIO</text>
+      {/* Scenario labels */}
+      <text x={16} y={50} fontSize={9} fontWeight={700} fill="#4C9F38" fontFamily="'Syne',sans-serif">E1: Transición pacífica</text>
+      <text x={W/2+16} y={50} fontSize={9} fontWeight={700} fill="#E5243B" fontFamily="'Syne',sans-serif">E2: Colapso y fragmentación</text>
+      <text x={16} y={H/2+40} fontSize={9} fontWeight={700} fill="#0A97D9" fontFamily="'Syne',sans-serif">E3: Continuidad negociada</text>
+      <text x={W/2+16} y={H/2+40} fontSize={9} fontWeight={700} fill="#FCC30B" fontFamily="'Syne',sans-serif">E4: Resistencia coercitiva</text>
+      {/* Trail segments */}
+      {trail.slice(1).map((p,i) => {
+        const prev = trail[i];
+        const alpha = 0.15 + ((i+1)/trail.length)*0.6;
+        return <line key={i} x1={prev.px} y1={prev.py} x2={p.px} y2={p.py} stroke={p.dom.color} strokeWidth={1.5} strokeDasharray="5 3" opacity={alpha} />;
+      })}
+      {/* Ghost dots */}
+      {trail.slice(0,-1).map((p,i) => (
+        <g key={i} style={{ cursor:"pointer" }} onClick={() => onClickWeek && onClickWeek(p.idx)}>
+          <circle cx={p.px} cy={p.py} r={12} fill="transparent" />
+          <circle cx={p.px} cy={p.py} r={5} fill={p.dom.color} opacity={0.2 + (i/trail.length)*0.4} />
+          <text x={p.px} y={p.py-9} textAnchor="middle" fontSize={7} fill={p.dom.color} fontFamily={font} opacity={0.5}>{WEEKS[p.idx].short}</text>
+        </g>
+      ))}
+      {/* ── TREND ARROW ── */}
+      <line x1={cur.px} y1={cur.py} x2={arrowEnd.x} y2={arrowEnd.y}
+        stroke={trendColor} strokeWidth={2.5} strokeDasharray="5 3" opacity={0.7} markerEnd="url(#arrowhead)" />
+      {/* Arrow label */}
+      <text x={arrowEnd.x + (dx > 0 ? 8 : -8)} y={arrowEnd.y - 6}
+        textAnchor={dx >= 0 ? "start" : "end"} fontSize={8} fill={trendColor} fontFamily={font} fontWeight={700} opacity={0.85}>
+        {isSameSc ? `→ E${trendSc.id}` : `↑ E${trendSc.id}`}
+      </text>
+      {/* Arrow hover target (invisible, wide for easy clicking) */}
+      <line x1={cur.px} y1={cur.py} x2={arrowEnd.x} y2={arrowEnd.y}
+        stroke="transparent" strokeWidth={24} style={{ cursor:"pointer" }}
+        onClick={() => onArrowClick && onArrowClick()} />
+      {/* Active point (on top of arrow) */}
+      <circle cx={cur.px} cy={cur.py} r={16} fill={domSc.color} opacity={0.08} />
+      <circle cx={cur.px} cy={cur.py} r={10} fill={domSc.color} opacity={0.15} />
+      <circle cx={cur.px} cy={cur.py} r={6} fill={domSc.color} opacity={0.9} />
+      <text x={cur.px} y={cur.py+3} textAnchor="middle" fontSize={7} fontWeight={700} fill={BG} fontFamily={font}>E{domSc.id}</text>
+      <text x={cur.px} y={cur.py-14} textAnchor="middle" fontSize={8} fill={domSc.color} fontFamily={font} fontWeight={700}>{wk.short}</text>
+      {/* Axis labels */}
+      <text x={W/2} y={H-2} textAnchor="middle" fontSize={7} fill={MUTED} fontFamily={font} letterSpacing="0.1em">VIOLENCIA →</text>
+      <text x={4} y={H/2} fontSize={7} fill={MUTED} fontFamily={font} letterSpacing="0.1em" transform={`rotate(-90,8,${H/2})`}>CAMBIO ↑</text>
+    </svg>
+  );
+}
+
+function TabMatriz({ week, setWeek }) {
+  const [sel, setSel] = useState(3);
+  const [showTrend, setShowTrend] = useState(false);
+  const wk = WEEKS[week];
+  const prevWk = week > 0 ? WEEKS[week-1] : null;
+  const dom = wk.probs.reduce((a,b)=>a.v>b.v?a:b);
+  const domSc = SCENARIOS.find(s=>s.id===dom.sc);
+  const selDrivers = WEEK_DRIVERS[sel] || {};
+  const trendSc = SCENARIOS.find(s=>s.id===(wk.trendSc||dom.sc));
+  const trendDriversList = wk.trendDrivers || [];
+  const isSameTrend = (wk.trendSc||dom.sc) === dom.sc;
+  const trendIconMap = { up:"↑", down:"↓", flat:"→" };
+  const trendColorMap = { up:"#22c55e", down:"#ef4444", flat:MUTED };
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+      {/* ── ROW 1: Matrix + Sidebar ── */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:14 }}>
+
+        {/* Matrix SVG */}
+        <div>
+          <div style={{ border:`1px solid ${BORDER}`, position:"relative" }}>
+            <FullMatrix weekIdx={week} onClickWeek={setWeek} onArrowClick={() => setShowTrend(!showTrend)} />
+          </div>
+
+          {/* ── TREND PANEL (appears when arrow is clicked) ── */}
+          {showTrend && (
+            <div style={{ marginTop:8, background:`linear-gradient(135deg, ${trendSc.color}0a, transparent)`,
+              border:`1px solid ${trendSc.color}25`, padding:"14px 18px", position:"relative" }}>
+              <button onClick={() => setShowTrend(false)}
+                style={{ position:"absolute", top:8, right:12, background:"transparent", border:"none",
+                  color:MUTED, cursor:"pointer", fontSize:14, fontFamily:font }}>×</button>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+                <span style={{ fontSize:16 }}>{isSameTrend ? "→" : "↑"}</span>
+                <div>
+                  <div style={{ fontSize:9, fontFamily:font, color:trendSc.color, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:700 }}>
+                    {isSameTrend ? "CONSOLIDANDO" : "PRESIÓN HACIA TRANSICIÓN"}
+                  </div>
+                  <div style={{ fontSize:12, fontWeight:700, color:TEXT }}>
+                    E{trendSc.id}: {trendSc.name}
+                  </div>
                 </div>
-                <span style={{ fontSize:11, fontFamily:font, color:sc.color, width:30, textAlign:"right" }}>{p.v}%</span>
+                <span style={{ marginLeft:"auto", fontSize:11, fontFamily:font, color:trendSc.color, fontWeight:700 }}>
+                  {wk.probs.find(p=>p.sc===trendSc.id)?.v}%
+                </span>
+              </div>
+              <div style={{ fontSize:9, fontFamily:font, color:trendSc.color, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>
+                Factores que empujan en esta dirección
+              </div>
+              {trendDriversList.map((d,i) => (
+                <div key={i} style={{ display:"flex", gap:8, marginBottom:5, fontSize:10, color:"#94a3b8", lineHeight:1.6 }}>
+                  <span style={{ color:trendSc.color, flexShrink:0 }}>›</span>{d}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Probability bars below matrix */}
+          <div style={{ marginTop:12, display:"flex", flexDirection:"column", gap:6 }}>
+            {wk.probs.map(p => {
+              const sc = SCENARIOS.find(s=>s.id===p.sc);
+              const delta = prevWk ? p.v - (prevWk.probs.find(pp=>pp.sc===p.sc)?.v||0) : null;
+              return (
+                <div key={p.sc} style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", padding:"3px 0" }} onClick={()=>setSel(p.sc)}>
+                  <span style={{ fontSize:10, fontFamily:font, color:sc.color, width:22, fontWeight:sel===p.sc?700:400 }}>E{sc.id}</span>
+                  <div style={{ flex:1, height:6, background:BORDER, borderRadius:2 }}>
+                    <div style={{ height:6, background:sc.color, width:`${p.v}%`, borderRadius:2, transition:"width 0.4s", opacity:sel===p.sc?1:0.6 }} />
+                  </div>
+                  <span style={{ fontSize:11, fontFamily:font, color:sc.color, width:32, textAlign:"right", fontWeight:700 }}>{p.v}%</span>
+                  {delta !== null && delta !== 0 && (
+                    <span style={{ fontSize:9, fontFamily:font, color:delta>0?"#22c55e":"#ef4444", width:32 }}>
+                      {delta>0?"+":""}{delta}pp
+                    </span>
+                  )}
+                  <span style={{ fontSize:9, color:trendColorMap[p.t] }}>{trendIconMap[p.t]}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Sidebar: Scenario cards + detail */}
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {SCENARIOS.map(sc => {
+            const p = wk.probs.find(p=>p.sc===sc.id);
+            const isActive = sel === sc.id;
+            return (
+              <div key={sc.id} onClick={()=>setSel(sc.id)}
+                style={{ background:isActive?`${sc.color}08`:BG2, border:`1px solid ${isActive?sc.color:BORDER}`, borderLeft:`3px solid ${sc.color}`,
+                  padding:"10px 14px", cursor:"pointer", transition:"all 0.2s" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:3 }}>
+                  <span style={{ fontSize:9, fontFamily:font, color:sc.color, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:700 }}>
+                    E{sc.id} {p.sc===dom.sc?"· DOMINANTE":""}
+                  </span>
+                  <span style={{ fontSize:13, fontFamily:font, fontWeight:700, color:sc.color }}>{p.v}%</span>
+                </div>
+                <div style={{ fontSize:11, fontWeight:600, color:isActive?TEXT:`${TEXT}90`, lineHeight:1.3 }}>{sc.name}</div>
               </div>
             );
           })}
-        </div>
-        {/* Weekly evolution */}
-        <div style={{ marginTop:16, border:`1px solid ${BORDER}`, padding:12 }}>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10 }}>
-            Evolución de probabilidades
-          </div>
-          <div style={{ display:"flex", gap:2, alignItems:"flex-end", height:80 }}>
-            {WEEKS.map((w,i) => (
-              <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", gap:1, alignItems:"center" }}>
-                <div style={{ display:"flex", flexDirection:"column", gap:1, width:"100%", alignItems:"center" }}>
-                  {w.probs.slice().sort((a,b)=>b.v-a.v).map(p => (
-                    <div key={p.sc} style={{ width:"80%", height:Math.max(2, p.v*0.6), background:SC[p.sc], borderRadius:1, opacity:i===week?1:0.5 }} />
-                  ))}
+
+          {/* Detail panel for selected scenario */}
+          <div style={{ background:BG3, border:`1px solid ${BORDER}`, padding:"14px 16px", flex:1 }}>
+            <div style={{ fontSize:9, fontFamily:"'Syne',sans-serif", fontWeight:700, color:SC[sel], letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+              E{sel} — {SCENARIOS.find(s=>s.id===sel)?.name}
+            </div>
+            {selDrivers.drivers && (
+              <>
+                <div style={{ fontSize:8, fontFamily:font, color:SC[sel], letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
+                  Drivers estructurales
                 </div>
-                <span style={{ fontSize:7, fontFamily:font, color:i===week?ACCENT:MUTED, marginTop:4 }}>{w.short}</span>
-              </div>
-            ))}
+                {selDrivers.drivers.map((d,i) => (
+                  <div key={i} style={{ display:"flex", gap:6, marginBottom:4, fontSize:10, color:"#94a3b8", lineHeight:1.5 }}>
+                    <span style={{ color:`${SC[sel]}80`, flexShrink:0 }}>›</span>{d}
+                  </div>
+                ))}
+              </>
+            )}
+            {selDrivers.signals && (
+              <>
+                <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginTop:10, marginBottom:6 }}>
+                  Señales de activación
+                </div>
+                {selDrivers.signals.map((s,i) => (
+                  <div key={i} style={{ display:"flex", gap:6, marginBottom:4, fontSize:10, color:"#6b7280", lineHeight:1.5 }}>
+                    <span style={{ color:`${MUTED}80`, flexShrink:0 }}>›</span>{s}
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         </div>
       </div>
-      {/* Sidebar */}
-      <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-        {SCENARIOS.map(sc => {
-          const p = wk.probs.find(p=>p.sc===sc.id);
-          return (
-            <Card key={sc.id} style={{ cursor:"pointer", borderColor:sel===sc.id?sc.color:BORDER, borderLeft:`3px solid ${sc.color}` }}
-              onClick={()=>setSel(sc.id)}>
-              <div style={{ fontSize:9, fontFamily:font, color:sc.color, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:4 }}>
-                Escenario {sc.id}
+
+      {/* ── ROW 2: Weekly evolution chart ── */}
+      <div style={{ border:`1px solid ${BORDER}`, padding:"14px 16px" }}>
+        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:12 }}>
+          Evolución de probabilidades por semana
+        </div>
+        <div style={{ display:"flex", gap:3, alignItems:"flex-end", height:90 }}>
+          {WEEKS.map((w,i) => (
+            <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", cursor:"pointer" }}
+              onClick={() => setWeek && setWeek(i)}>
+              {/* Stacked bars */}
+              <div style={{ display:"flex", flexDirection:"column", gap:1, width:"85%", alignItems:"center" }}>
+                {w.probs.slice().sort((a,b)=>b.v-a.v).map(p => (
+                  <div key={p.sc} style={{ width:"100%", height:Math.max(2, p.v*0.7), background:SC[p.sc], borderRadius:1,
+                    opacity:i===week?1:0.4, transition:"opacity 0.2s" }} />
+                ))}
               </div>
-              <div style={{ fontSize:12, fontWeight:600, color:TEXT, marginBottom:4 }}>{sc.name}</div>
-              <div style={{ display:"flex", justifyContent:"space-between", fontSize:10, fontFamily:font }}>
-                <span style={{ color:MUTED }}>{p.v}%</span>
-                <span style={{ color:p.sc===dom.sc?sc.color:MUTED }}>{p.sc===dom.sc?"● Dominante":"—"}</span>
-              </div>
-            </Card>
-          );
-        })}
+              {/* Label */}
+              <span style={{ fontSize:8, fontFamily:font, color:i===week?ACCENT:MUTED, marginTop:6, fontWeight:i===week?700:400 }}>
+                {w.short}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div style={{ display:"flex", gap:14, marginTop:10, justifyContent:"center" }}>
+          {SCENARIOS.map(sc => (
+            <div key={sc.id} style={{ display:"flex", alignItems:"center", gap:5, fontSize:9, color:MUTED }}>
+              <span style={{ width:8, height:8, background:sc.color, borderRadius:1, flexShrink:0 }} />
+              E{sc.id}: {sc.short}
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* ── ROW 3: Lectura analítica ── */}
+      {wk.lectura && (
+        <div style={{ background:`linear-gradient(135deg, ${domSc.color}06, transparent)`, border:`1px solid ${domSc.color}15`, padding:"16px 20px" }}>
+          <div style={{ display:"flex", alignItems:"baseline", gap:12, marginBottom:10 }}>
+            <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase" }}>
+              Lectura analítica · {wk.label}
+            </span>
+            <span style={{ fontSize:11, fontWeight:700, color:domSc.color }}>E{domSc.id}: {domSc.name} · {dom.v}%</span>
+          </div>
+          <div style={{ fontSize:11, color:"#94a3b8", lineHeight:1.75, fontStyle:"italic" }}>
+            {wk.lectura}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -776,38 +1117,236 @@ function TabGdelt() {
   );
 }
 
-function TabPolymarket() {
+function TradingViewWidget({ symbol, title, height=220 }) {
+  const containerId = useMemo(() => `tv-${symbol.replace(/[^a-zA-Z0-9]/g,"")}-${Math.random().toString(36).slice(2,8)}`, [symbol]);
+  
+  useEffect(() => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+    const script = document.createElement("script");
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      symbol, width:"100%", height, locale:"es", dateRange:"1M",
+      colorTheme:"dark", isTransparent:true, autosize:false,
+      largeChartUrl:"", chartOnly:false, noTimeScale:false,
+    });
+    container.appendChild(script);
+  }, [symbol, containerId, height]);
+
   return (
-    <div>
-      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
-        <span style={{ fontSize:14 }}>🔮</span>
+    <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"8px 10px", overflow:"hidden" }}>
+      <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{title}</div>
+      <div id={containerId} style={{ width:"100%", height }} />
+    </div>
+  );
+}
+
+function MereyEstimator() {
+  const [brentPrice, setBrentPrice] = useState(72.5);
+  const [discount, setDiscount] = useState(12);
+  const merey = Math.max(0, brentPrice - discount);
+  const revenue800k = (merey * 800000 / 1e6).toFixed(1);
+  const revenueYear = (merey * 800000 * 365 / 1e9).toFixed(1);
+  
+  return (
+    <Card accent="#FCC30B">
+      <div style={{ fontSize:9, fontFamily:font, color:"#FCC30B", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>
+        Estimador Merey venezolano
+      </div>
+      <div style={{ fontSize:9, color:MUTED, marginBottom:10, lineHeight:1.5 }}>
+        El crudo Merey 16° API no tiene feed público. Se estima como Brent menos descuento por gravedad y riesgo país.
+      </div>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:12 }}>
         <div>
-          <div style={{ fontSize:13, fontWeight:600, color:TEXT }}>Mercados de Predicción — Polymarket</div>
-          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
-            Contratos activos relacionados con Venezuela · Precios = probabilidad implícita del mercado
-          </div>
+          <label style={{ fontSize:8, fontFamily:font, color:MUTED, display:"block", marginBottom:4, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+            Brent (USD/bbl)
+          </label>
+          <input type="number" value={brentPrice} onChange={e => setBrentPrice(+e.target.value)}
+            style={{ width:"100%", padding:"6px 10px", fontSize:13, fontFamily:font, fontWeight:700,
+              background:BG, border:`1px solid ${BORDER}`, color:"#22c55e", outline:"none" }} />
+        </div>
+        <div>
+          <label style={{ fontSize:8, fontFamily:font, color:MUTED, display:"block", marginBottom:4, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+            Descuento (USD)
+          </label>
+          <input type="number" value={discount} onChange={e => setDiscount(+e.target.value)}
+            style={{ width:"100%", padding:"6px 10px", fontSize:13, fontFamily:font, fontWeight:700,
+              background:BG, border:`1px solid ${BORDER}`, color:"#ef4444", outline:"none" }} />
+          <div style={{ fontSize:7, color:MUTED, marginTop:3 }}>Rango típico: 10-15 (abierto) · 18-25 (sanciones)</div>
         </div>
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
-        {POLYMARKET_SLUGS.map((m,i) => (
-          <Card key={i}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-              <span style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.3 }}>{m.title}</span>
-              <a href={`https://polymarket.com/event/${m.slug}`} target="_blank" rel="noopener noreferrer"
-                style={{ fontSize:9, color:ACCENT, textDecoration:"none", fontFamily:font }}>↗</a>
-            </div>
-            <iframe
-              src={`https://embed.polymarket.com/market.html?market=${m.slug}&theme=dark&features=volume,chart&width=380`}
-              style={{ width:"100%", height:360, border:"none", borderRadius:4 }}
-              sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-              title={m.title}
-            />
-          </Card>
-        ))}
+      <div style={{ background:BG, border:`1px solid ${BORDER}`, padding:"12px 14px", display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12 }}>
+        <div style={{ textAlign:"center" }}>
+          <div style={{ fontSize:22, fontWeight:900, color:"#FCC30B", fontFamily:"'Playfair Display',serif" }}>${merey.toFixed(1)}</div>
+          <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Merey est. /bbl</div>
+        </div>
+        <div style={{ textAlign:"center" }}>
+          <div style={{ fontSize:22, fontWeight:900, color:ACCENT, fontFamily:"'Playfair Display',serif" }}>${revenue800k}M</div>
+          <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Ingreso diario 800K bpd</div>
+        </div>
+        <div style={{ textAlign:"center" }}>
+          <div style={{ fontSize:22, fontWeight:900, color:"#22c55e", fontFamily:"'Playfair Display',serif" }}>${revenueYear}B</div>
+          <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Proyección anualizada</div>
+        </div>
       </div>
-      <div style={{ marginTop:12, fontSize:9, fontFamily:font, color:MUTED, textAlign:"center" }}>
-        Fuente: Polymarket · Los precios reflejan probabilidades implícitas del mercado, no predicciones
+      <div style={{ fontSize:8, color:MUTED, marginTop:8, lineHeight:1.5, fontStyle:"italic" }}>
+        Merey = Brent − descuento · Producción actual ~800K bpd · Compradores: India (Reliance, BPCL, HPCL), Vitol, Trafigura, Valero, Phillips 66
       </div>
+    </Card>
+  );
+}
+
+function TabMercados() {
+  const [seccion, setSeccion] = useState("petroleo");
+
+  return (
+    <div>
+      {/* Header + section toggle */}
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14, flexWrap:"wrap" }}>
+        <span style={{ fontSize:14 }}>📈</span>
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:13, fontWeight:600, color:TEXT }}>Mercados — Petróleo · Commodities · Predicción</div>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
+            Indicadores de mercado relevantes para el análisis de contexto Venezuela
+          </div>
+        </div>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+          {[{id:"petroleo",label:"Petróleo",icon:"🛢"},{id:"macro",label:"Macro",icon:"💱"},{id:"prediccion",label:"Predicción",icon:"🔮"}].map(s => (
+            <button key={s.id} onClick={() => setSeccion(s.id)}
+              style={{ fontSize:9, fontFamily:font, padding:"6px 14px", border:"none",
+                background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED,
+                cursor:"pointer", letterSpacing:"0.08em", display:"flex", alignItems:"center", gap:4 }}>
+              <span style={{ fontSize:11 }}>{s.icon}</span>{s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── PETRÓLEO ── */}
+      {seccion === "petroleo" && (
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          {/* TradingView widgets row */}
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+            <TradingViewWidget symbol="ICEEUR:BRN1!" title="Brent Crude" />
+            <TradingViewWidget symbol="NYMEX:CL1!" title="WTI Crude" />
+            <TradingViewWidget symbol="NYMEX:NG1!" title="Natural Gas" />
+          </div>
+
+          {/* Merey estimator */}
+          <MereyEstimator />
+
+          {/* Context cards */}
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+            <Card accent="#22c55e">
+              <div style={{ fontSize:10, fontWeight:600, color:"#22c55e", marginBottom:6 }}>Exportaciones Venezuela</div>
+              <div style={{ fontSize:18, fontWeight:900, color:"#22c55e", fontFamily:"'Playfair Display',serif" }}>~800K bpd</div>
+              <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.5 }}>
+                Destino: India (Reliance, BPCL, HPCL-Mittal), EE.UU. (Valero, Phillips 66, Citgo). 
+                VLCC de hasta 2M barriles. Vitol/Trafigura 3 buques marzo.
+              </div>
+            </Card>
+            <Card accent={ACCENT}>
+              <div style={{ fontSize:10, fontWeight:600, color:ACCENT, marginBottom:6 }}>Licencias OFAC activas</div>
+              <div style={{ fontSize:11, fontWeight:700, color:ACCENT, fontFamily:font }}>GL49 · GL50 · GL50A</div>
+              <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.5 }}>
+                FAQ 1238: marco regulado para licencias a Cuba condicionado. 
+                BP, Chevron, Eni, Repsol, Shell autorizadas bajo ley EE.UU.
+                19 contratos en revisión de solvencia.
+              </div>
+            </Card>
+            <Card accent="#ef4444">
+              <div style={{ fontSize:10, fontWeight:600, color:"#ef4444", marginBottom:6 }}>Infraestructura</div>
+              <div style={{ fontSize:11, fontWeight:700, color:"#ef4444", fontFamily:font }}>&lt;20% capacidad refinación</div>
+              <div style={{ fontSize:9, color:MUTED, marginTop:4, lineHeight:1.5 }}>
+                Paraguaná: 5 de 9 unidades (~287K bpd). 
+                2-4 taladros activos (vs 100+ históricos).
+                Inversión requerida: +USD 100B para alcanzar 3-4 Mbpd en 10 años.
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* ── MACRO ── */}
+      {seccion === "macro" && (
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+            <TradingViewWidget symbol="TVC:DXY" title="Índice Dólar (DXY)" />
+            <TradingViewWidget symbol="ECONOMICS:VEINR" title="Inflación Venezuela" />
+            <TradingViewWidget symbol="FX:USDCOP" title="USD/COP (ref. frontera)" />
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+            <Card accent="#eab308">
+              <div style={{ fontSize:10, fontWeight:600, color:"#eab308", marginBottom:6 }}>Brecha cambiaria Venezuela</div>
+              <div style={{ display:"flex", gap:20, marginTop:8 }}>
+                <div>
+                  <div style={{ fontSize:20, fontWeight:900, color:"#eab308", fontFamily:"'Playfair Display',serif" }}>52,6%</div>
+                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>Brecha 25 feb</div>
+                </div>
+                <div>
+                  <div style={{ fontSize:14, fontWeight:700, color:TEXT, fontFamily:font }}>631,68</div>
+                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>Mercado Bs/$</div>
+                </div>
+                <div>
+                  <div style={{ fontSize:14, fontWeight:700, color:ACCENT, fontFamily:font }}>414,05</div>
+                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>BCV oficial Bs/$</div>
+                </div>
+              </div>
+              <div style={{ fontSize:9, color:MUTED, marginTop:8, lineHeight:1.5 }}>
+                ↑6,5pp semanal · Subastas BCV USD 70M insuficientes · ~USD 30M a banca pública · Tasa promedio subastas: 540 Bs/$
+              </div>
+            </Card>
+            <Card accent="#ef4444">
+              <div style={{ fontSize:10, fontWeight:600, color:"#ef4444", marginBottom:6 }}>FMI: "Intensa Fragilidad"</div>
+              <div style={{ display:"flex", gap:20, marginTop:8 }}>
+                <div>
+                  <div style={{ fontSize:20, fontWeight:900, color:"#ef4444", fontFamily:"'Playfair Display',serif" }}>&gt;180%</div>
+                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>Deuda/PIB</div>
+                </div>
+                <div>
+                  <div style={{ fontSize:14, fontWeight:700, color:"#eab308", fontFamily:font }}>174%</div>
+                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>Inflación proy. 2026</div>
+                </div>
+                <div>
+                  <div style={{ fontSize:14, fontWeight:700, color:"#22c55e", fontFamily:font }}>10-15%</div>
+                  <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>PIB proy. 2026</div>
+                </div>
+              </div>
+              <div style={{ fontSize:9, color:MUTED, marginTop:8, lineHeight:1.5 }}>
+                47 meses sin ajuste salarial · Canasta básica USD 550 vs ingreso ~USD 270 · 69.5% con ingresos &lt;USD 300
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* ── PREDICCIÓN ── */}
+      {seccion === "prediccion" && (
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+            {POLYMARKET_SLUGS.map((m,i) => (
+              <Card key={i}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                  <span style={{ fontSize:11, fontWeight:600, color:TEXT, lineHeight:1.3 }}>{m.title}</span>
+                  <a href={`https://polymarket.com/event/${m.slug}`} target="_blank" rel="noopener noreferrer"
+                    style={{ fontSize:9, color:ACCENT, textDecoration:"none", fontFamily:font }}>↗</a>
+                </div>
+                <iframe
+                  src={`https://embed.polymarket.com/market.html?market=${m.slug}&theme=dark&features=volume,chart&width=380`}
+                  style={{ width:"100%", height:340, border:"none", borderRadius:4 }}
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+                  title={m.title}
+                />
+              </Card>
+            ))}
+          </div>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, textAlign:"center" }}>
+            Fuente: Polymarket · Precios = probabilidad implícita del mercado · No son predicciones
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1122,7 +1661,7 @@ const TABS = [
   { id:"gdelt", label:"GDELT", icon:"📡" },
   { id:"conflictividad", label:"Conflictividad", icon:"✊" },
   { id:"ioda", label:"IODA", icon:"🌐" },
-  { id:"polymarket", label:"Polymarket", icon:"🔮" },
+  { id:"mercados", label:"Mercados", icon:"📈" },
 ];
 
 export default function MonitorPNUD() {
@@ -1173,12 +1712,12 @@ export default function MonitorPNUD() {
       {/* CONTENT */}
       <div style={{ maxWidth:1300, margin:"0 auto", padding:"20px 20px 60px" }}>
         {tab === "dashboard" && <TabDashboard week={week} />}
-        {tab === "matriz" && <TabMatriz week={week} />}
+        {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
         {tab === "gdelt" && <TabGdelt />}
         {tab === "conflictividad" && <TabConflictividad />}
         {tab === "ioda" && <TabIODA />}
-        {tab === "polymarket" && <TabPolymarket />}
+        {tab === "mercados" && <TabMercados />}
       </div>
 
       {/* FOOTER */}
