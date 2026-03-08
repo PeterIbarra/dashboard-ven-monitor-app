@@ -2706,7 +2706,7 @@ function TabConflictividad() {
   );
 }
 
-function LeafletMap({ events, EC }) {
+function LeafletMap({ events, EC, TR }) {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const markersRef = useRef(null);
@@ -2763,7 +2763,7 @@ function LeafletMap({ events, EC }) {
       circle.bindPopup(
         `<div style="font-family:monospace;font-size:11px;max-width:250px">` +
         `<b>${e.event_date}</b><br>` +
-        `<span style="color:${color};font-weight:bold">${e.sub_event_type || e.event_type}</span><br>` +
+        `<span style="color:${color};font-weight:bold">${TR[e.sub_event_type]||TR[e.event_type]||e.sub_event_type||e.event_type}</span><br>` +
         `📍 ${e.location}${e.admin1 ? `, ${e.admin1}` : ""}<br>` +
         (fatal > 0 ? `💀 <b>${fatal} fatalidades</b><br>` : "") +
         (e.actor1 ? `👤 ${e.actor1}<br>` : "") +
@@ -2817,6 +2817,31 @@ function AcledSection() {
   }, []);
 
   const EC = { "Protests":"#4C9F38","Riots":"#FCC30B","Battles":"#E5243B","Violence against civilians":"#dc2626","Explosions/Remote violence":"#f97316","Strategic developments":"#0A97D9" };
+
+  // Spanish translations
+  const TR = {
+    // Event types
+    "Protests":"Protestas","Riots":"Disturbios","Battles":"Batallas",
+    "Violence against civilians":"Violencia contra civiles",
+    "Explosions/Remote violence":"Explosiones/Violencia remota",
+    "Strategic developments":"Desarrollos estratégicos",
+    // Sub-event types
+    "Peaceful protest":"Protesta pacífica","Protest with intervention":"Protesta con intervención",
+    "Excessive force against protesters":"Fuerza excesiva contra manifestantes",
+    "Violent demonstration":"Manifestación violenta","Mob violence":"Violencia de multitud",
+    "Armed clash":"Enfrentamiento armado","Attack":"Ataque",
+    "Abduction/forced disappearance":"Secuestro/desaparición forzada",
+    "Sexual violence":"Violencia sexual","Arrests":"Detenciones",
+    "Change to group/activity":"Cambio de grupo/actividad",
+    "Disrupted weapons use":"Uso de armas frustrado","Grenade":"Granada",
+    "Shelling/artillery/missile attack":"Bombardeo/artillería/misil",
+    "Air/drone strike":"Ataque aéreo/dron","Looting/property destruction":"Saqueo/destrucción",
+    "Government regains territory":"Gobierno recupera territorio",
+    "Non-state actor overtakes territory":"Actor no estatal toma territorio",
+    "Agreement":"Acuerdo","Headquarters or base established":"Base establecida",
+    "Other":"Otro",
+  };
+  const trad = (s) => TR[s] || s;
 
   const byType = {}, byAdmin = {}, byActor = {};
   let totalFatal = 0, totalExposure = 0;
@@ -2929,7 +2954,7 @@ function AcledSection() {
               })()}
             </svg>
             <div style={{ display:"flex", gap:10, justifyContent:"center", marginTop:4 }}>
-              {typeOrder.map(t => <span key={t} style={{ fontSize:7, fontFamily:font, color:EC[t] }}>■ {t}</span>)}
+              {typeOrder.map(t => <span key={t} style={{ fontSize:7, fontFamily:font, color:EC[t] }}>■ {trad(t)}</span>)}
             </div>
           </Card>
         )}
@@ -2954,7 +2979,7 @@ function AcledSection() {
               {wkEvents.slice(0,15).map((e,i) => (
                 <div key={i} style={{ padding:"5px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
                   <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
-                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>{e.sub_event_type||e.event_type}</span>
+                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
                   {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
                   <div style={{ flex:1 }}><div style={{ fontSize:8, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
                     <div style={{ fontSize:7, color:MUTED, marginTop:1, lineHeight:1.4 }}>{(e.notes||"").slice(0,180)}{(e.notes||"").length>180?"...":""}</div></div>
@@ -2978,7 +3003,7 @@ function AcledSection() {
                   opacity:filter!=="all"&&!filter.startsWith("week:")&&!isActive?0.3:1, padding:"2px 4px",
                   background:isActive?`${EC[t]}15`:"transparent", border:isActive?`1px solid ${EC[t]}30`:"1px solid transparent" }}
                   onClick={() => { setFilter(isActive?"all":t); setAcledPage(1); }}>
-                  <span style={{ fontSize:8, fontFamily:font, color:EC[t]||MUTED, minWidth:140 }}>{t}</span>
+                  <span style={{ fontSize:8, fontFamily:font, color:EC[t]||MUTED, minWidth:140 }}>{trad(t)}</span>
                   <div style={{ flex:1, height:14, background:`${BORDER}30`, position:"relative" }}>
                     <div style={{ width:`${(c/events.length)*100}%`, height:"100%", background:EC[t]||ACCENT, opacity:isActive?1:0.7 }} />
                     <span style={{ position:"absolute", right:4, top:1, fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
@@ -3059,7 +3084,7 @@ function AcledSection() {
               {tPage.map((e,i) => (
                 <div key={i} style={{ padding:"5px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
                   <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
-                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, whiteSpace:"nowrap" }}>{e.sub_event_type||e.event_type}</span>
+                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
                   {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
                   <div style={{ flex:1 }}><div style={{ fontSize:8, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
                     {e.actor1 && <div style={{ fontSize:7, color:ACCENT, marginTop:1 }}>{e.actor1}</div>}
@@ -3087,7 +3112,7 @@ function AcledSection() {
                 <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Tipos de evento</div>
                 {Object.entries(aTypes).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
                   <div key={t} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
-                    <span style={{ fontSize:7, fontFamily:font, color:EC[t]||MUTED, minWidth:130 }}>{t}</span>
+                    <span style={{ fontSize:7, fontFamily:font, color:EC[t]||MUTED, minWidth:130 }}>{trad(t)}</span>
                     <div style={{ flex:1, height:10, background:`${BORDER}30`, position:"relative" }}>
                       <div style={{ width:`${(c/aEvents.length)*100}%`, height:"100%", background:EC[t]||ACCENT, opacity:0.7 }} />
                     </div>
@@ -3120,7 +3145,7 @@ function AcledSection() {
               {aPage.map((e,i) => (
                 <div key={i} style={{ padding:"5px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
                   <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
-                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, whiteSpace:"nowrap" }}>{e.sub_event_type||e.event_type}</span>
+                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
                   {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 4px", background:"#dc262615", color:"#dc2626" }}>💀{e.fatalities}</span>}
                   <div style={{ flex:1 }}><div style={{ fontSize:8, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
                     <div style={{ fontSize:7, color:MUTED, marginTop:1, lineHeight:1.4 }}>{(e.notes||"").slice(0,180)}{(e.notes||"").length>180?"...":""}</div></div>
@@ -3230,7 +3255,7 @@ function AcledSection() {
                 <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Tipos en {stateFilter}</div>
                 {Object.entries(stTypes).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
                   <div key={t} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
-                    <span style={{ fontSize:7, fontFamily:font, color:EC[t]||MUTED, minWidth:130 }}>{t}</span>
+                    <span style={{ fontSize:7, fontFamily:font, color:EC[t]||MUTED, minWidth:130 }}>{trad(t)}</span>
                     <div style={{ flex:1, height:12, background:`${BORDER}30`, position:"relative" }}>
                       <div style={{ width:`${(c/stEvents.length)*100}%`, height:"100%", background:EC[t]||ACCENT, opacity:0.8 }} />
                       <span style={{ position:"absolute", right:3, top:0, fontSize:7, fontFamily:font, color:TEXT }}>{c}</span>
@@ -3270,7 +3295,7 @@ function AcledSection() {
                 <div key={i} style={{ padding:"6px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
                   <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
                   <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>
-                    {e.sub_event_type||e.event_type}
+                    {trad(e.sub_event_type||e.event_type)}
                   </span>
                   {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:"#dc262615", color:"#dc2626", border:"1px solid #dc262625" }}>💀{e.fatalities}</span>}
                   <div style={{ flex:1 }}>
@@ -3303,7 +3328,7 @@ function AcledSection() {
             <button onClick={() => setFilter("all")} style={{ fontSize:7, fontFamily:font, padding:"2px 6px", border:`1px solid ${filter==="all"?ACCENT:BORDER}`, background:filter==="all"?ACCENT:"transparent", color:filter==="all"?"#fff":MUTED, cursor:"pointer" }}>Todos</button>
             {typeOrder.map(t => <button key={t} onClick={() => setFilter(filter===t?"all":t)} style={{ fontSize:7, fontFamily:font, padding:"2px 6px", border:`1px solid ${filter===t?EC[t]:BORDER}`, background:filter===t?`${EC[t]}20`:"transparent", color:EC[t], cursor:"pointer" }}>{t}</button>)}
           </div>
-          <LeafletMap events={filtered} EC={EC} />
+          <LeafletMap events={filtered} EC={EC} TR={TR} />
           <div style={{ display:"flex", gap:10, justifyContent:"center", marginTop:6 }}>
             {typeOrder.map(t => <span key={t} style={{ fontSize:7, fontFamily:font, color:EC[t] }}>● {t}</span>)}
             <span style={{ fontSize:7, fontFamily:font, color:MUTED }}>· Tamaño = fatalidades</span>
@@ -3485,7 +3510,7 @@ function AcledSection() {
                           <div style={{ marginBottom:8 }}>
                             {Object.entries(stTypes).sort((a,b) => b[1]-a[1]).map(([t,c]) => (
                               <div key={t} style={{ display:"flex", alignItems:"center", gap:4, marginBottom:2 }}>
-                                <span style={{ fontSize:7, fontFamily:font, color:EC[t]||MUTED, minWidth:100 }}>{t}</span>
+                                <span style={{ fontSize:7, fontFamily:font, color:EC[t]||MUTED, minWidth:100 }}>{trad(t)}</span>
                                 <div style={{ flex:1, height:8, background:`${BORDER}30` }}>
                                   <div style={{ width:`${(c/stEvents.length)*100}%`, height:"100%", background:EC[t]||ACCENT, opacity:0.7 }} />
                                 </div>
@@ -3498,7 +3523,7 @@ function AcledSection() {
                           {stEvents.slice(0,5).map((e,i) => (
                             <div key={i} style={{ padding:"3px 0", borderBottom:`1px solid ${BORDER}15`, fontSize:8 }}>
                               <span style={{ color:MUTED, fontFamily:font }}>{e.event_date}</span>
-                              <span style={{ color:EC[e.event_type]||ACCENT, marginLeft:6 }}>{e.sub_event_type||e.event_type}</span>
+                              <span style={{ color:EC[e.event_type]||ACCENT, marginLeft:6 }}>{trad(e.sub_event_type||e.event_type)}</span>
                               {parseInt(e.fatalities)>0 && <span style={{ color:"#dc2626", marginLeft:4 }}>💀{e.fatalities}</span>}
                               <div style={{ fontSize:7, color:MUTED, marginTop:1 }}>{e.location}</div>
                             </div>
@@ -3524,7 +3549,7 @@ function AcledSection() {
       {acledView === "events" && (<>
         <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:8 }}>
           <button onClick={() => { setFilter("all"); setAcledPage(1); }} style={{ fontSize:7, fontFamily:font, padding:"3px 7px", border:`1px solid ${filter==="all"?ACCENT:BORDER}`, background:filter==="all"?ACCENT:"transparent", color:filter==="all"?"#fff":MUTED, cursor:"pointer" }}>Todos ({events.length})</button>
-          {typeOrder.map(t => <button key={t} onClick={() => { setFilter(filter===t?"all":t); setAcledPage(1); }} style={{ fontSize:7, fontFamily:font, padding:"3px 7px", border:`1px solid ${filter===t?EC[t]:BORDER}`, background:filter===t?`${EC[t]}20`:"transparent", color:EC[t], cursor:"pointer" }}>{t} ({byType[t]})</button>)}
+          {typeOrder.map(t => <button key={t} onClick={() => { setFilter(filter===t?"all":t); setAcledPage(1); }} style={{ fontSize:7, fontFamily:font, padding:"3px 7px", border:`1px solid ${filter===t?EC[t]:BORDER}`, background:filter===t?`${EC[t]}20`:"transparent", color:EC[t], cursor:"pointer" }}>{trad(t)} ({byType[t]})</button>)}
         </div>
         {actorFilter !== "all" && <div style={{ fontSize:8, fontFamily:font, color:ACCENT, marginBottom:8, cursor:"pointer" }} onClick={() => setActorFilter("all")}>Filtro actor: <strong>{actorFilter}</strong> ✕</div>}
         {stateFilter !== "all" && <div style={{ fontSize:8, fontFamily:font, color:"#f59e0b", marginBottom:8, cursor:"pointer" }} onClick={() => setStateFilter("all")}>Filtro estado: <strong>{stateFilter}</strong> ✕</div>}
@@ -3543,7 +3568,7 @@ function AcledSection() {
               {page.map((e,i) => (
                 <div key={i} style={{ padding:"7px 0", borderBottom:`1px solid ${BORDER}20`, display:"flex", gap:8, alignItems:"flex-start" }}>
                   <div style={{ minWidth:62, fontSize:8, fontFamily:font, color:MUTED }}>{e.event_date}</div>
-                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>{e.sub_event_type||e.event_type}</span>
+                  <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${EC[e.event_type]||ACCENT}15`, color:EC[e.event_type]||ACCENT, border:`1px solid ${EC[e.event_type]||ACCENT}25`, whiteSpace:"nowrap" }}>{trad(e.sub_event_type||e.event_type)}</span>
                   {parseInt(e.fatalities)>0 && <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:"#dc262615", color:"#dc2626", border:"1px solid #dc262625" }}>💀{e.fatalities}</span>}
                   <div style={{ flex:1 }}>
                     <div style={{ fontSize:9, color:TEXT }}>{e.location}{e.admin1?`, ${e.admin1}`:""}</div>
