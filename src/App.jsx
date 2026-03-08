@@ -1146,8 +1146,97 @@ function OilPriceTicker() {
   );
 }
 
+function BrentChart({ history }) {
+  const [hover, setHover] = useState(null);
+  if (!history || history.length < 2) return null;
+
+  const prices = history.map(h => h.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+  const W = 700, H = 140, padL = 45, padR = 10, padT = 10, padB = 25;
+  const cW = W - padL - padR, cH = H - padT - padB;
+
+  const toX = (i) => padL + (i / (history.length - 1)) * cW;
+  const toY = (v) => padT + cH - ((v - min) / range) * cH;
+
+  const pathD = history.map((h, i) => `${i === 0 ? "M" : "L"}${toX(i)},${toY(h.price)}`).join(" ");
+  const areaD = pathD + ` L${toX(history.length - 1)},${padT + cH} L${toX(0)},${padT + cH} Z`;
+
+  const first = prices[0], last = prices[prices.length - 1];
+  const delta = last - first;
+  const deltaPct = ((delta / first) * 100).toFixed(2);
+  const isUp = delta >= 0;
+
+  return (
+    <Card>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+            Brent Crude · 7 días
+          </span>
+          <Badge color="#22c55e">EN VIVO</Badge>
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          <span style={{ fontSize: 18, fontWeight: 900, color: "#22c55e", fontFamily: "'Playfair Display',serif" }}>
+            ${last.toFixed(2)}
+          </span>
+          <span style={{ fontSize: 11, fontFamily: font, fontWeight: 600, color: isUp ? "#22c55e" : "#ef4444" }}>
+            {isUp ? "▲" : "▼"} ${Math.abs(delta).toFixed(2)} ({isUp ? "+" : ""}{deltaPct}%)
+          </span>
+        </div>
+      </div>
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const mx = (e.clientX - rect.left) / rect.width * W;
+          const idx = Math.round(((mx - padL) / cW) * (history.length - 1));
+          if (idx >= 0 && idx < history.length) setHover(idx);
+        }}
+        onMouseLeave={() => setHover(null)}>
+        {/* Grid */}
+        {[0, 0.25, 0.5, 0.75, 1].map(f => (
+          <g key={f}>
+            <line x1={padL} y1={padT + f * cH} x2={padL + cW} y2={padT + f * cH} stroke="rgba(255,255,255,0.04)" />
+            <text x={padL - 4} y={padT + f * cH + 3} textAnchor="end" fontSize={7} fill={MUTED} fontFamily={font}>
+              {(max - f * range).toFixed(1)}
+            </text>
+          </g>
+        ))}
+        {/* Area + Line */}
+        <path d={areaD} fill="rgba(34,197,94,0.08)" />
+        <path d={pathD} fill="none" stroke="#22c55e" strokeWidth={1.8} />
+        {/* X labels */}
+        {history.filter((_, i) => i % Math.max(1, Math.floor(history.length / 7)) === 0).map((h) => {
+          const idx = history.indexOf(h);
+          const d = new Date(h.time);
+          return (
+            <text key={idx} x={toX(idx)} y={H - 4} textAnchor="middle" fontSize={7} fill={MUTED} fontFamily={font}>
+              {d.toLocaleDateString("es", { month: "short", day: "numeric" })}
+            </text>
+          );
+        })}
+        {/* Hover */}
+        {hover !== null && hover < history.length && (
+          <>
+            <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT + cH} stroke="rgba(255,255,255,0.15)" />
+            <circle cx={toX(hover)} cy={toY(history[hover].price)} r={3.5} fill="#22c55e" />
+          </>
+        )}
+      </svg>
+      {hover !== null && hover < history.length && (
+        <div style={{ fontSize: 9, fontFamily: font, color: MUTED, marginTop: 4, display: "flex", gap: 12 }}>
+          <span>{new Date(history[hover].time).toLocaleString("es", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+          <span style={{ color: "#22c55e", fontWeight: 700 }}>${history[hover].price.toFixed(2)}</span>
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function LivePriceCards() {
   const [prices, setPrices] = useState(null);
+  const [brentHistory, setBrentHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("loading");
 
@@ -1156,11 +1245,12 @@ function LivePriceCards() {
       // Try our Vercel serverless function first (has API key server-side)
       if (IS_DEPLOYED) {
         try {
-          const res = await fetch("/api/oil-prices", { signal: AbortSignal.timeout(8000) });
+          const res = await fetch("/api/oil-prices", { signal: AbortSignal.timeout(10000) });
           if (res.ok) {
             const data = await res.json();
-            if (data.brent || data.wti) {
+            if (data.brent || data.wti || data.natgas) {
               setPrices(data);
+              if (data.brentHistory) setBrentHistory(data.brentHistory);
               setSource("live");
               setLoading(false);
               return;
@@ -1171,18 +1261,30 @@ function LivePriceCards() {
       // Try direct API with CORS proxy (for Claude artifact / local dev)
       for (const proxyFn of CORS_PROXIES) {
         try {
-          const res = await fetch(proxyFn("https://api.oilpriceapi.com/v1/prices/latest"), {
-            headers: { Authorization: "Token ee08dc36b7a3ff883080dfe426bffd6ed1a392b53d3818c60a57c84b50858f93", "Content-Type": "application/json" },
-            signal: AbortSignal.timeout(6000),
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data?.data) { setPrices({ raw: data.data }); setSource("live"); setLoading(false); return; }
+          const [brentRes, wtiRes, gasRes] = await Promise.all([
+            fetch(proxyFn("https://api.oilpriceapi.com/v1/prices/latest?by_code=BRENT_CRUDE_USD"), {
+              headers: { Authorization: "Token ee08dc36b7a3ff883080dfe426bffd6ed1a392b53d3818c60a57c84b50858f93" },
+              signal: AbortSignal.timeout(6000),
+            }).then(r => r.ok ? r.json() : null).catch(() => null),
+            fetch(proxyFn("https://api.oilpriceapi.com/v1/prices/latest?by_code=WTI_USD"), {
+              headers: { Authorization: "Token ee08dc36b7a3ff883080dfe426bffd6ed1a392b53d3818c60a57c84b50858f93" },
+              signal: AbortSignal.timeout(6000),
+            }).then(r => r.ok ? r.json() : null).catch(() => null),
+            fetch(proxyFn("https://api.oilpriceapi.com/v1/prices/latest?by_code=NATURAL_GAS_USD"), {
+              headers: { Authorization: "Token ee08dc36b7a3ff883080dfe426bffd6ed1a392b53d3818c60a57c84b50858f93" },
+              signal: AbortSignal.timeout(6000),
+            }).then(r => r.ok ? r.json() : null).catch(() => null),
+          ]);
+          if (brentRes?.data || wtiRes?.data || gasRes?.data) {
+            setPrices({ brent: brentRes?.data, wti: wtiRes?.data, natgas: gasRes?.data });
+            setSource("live");
+            setLoading(false);
+            return;
           }
-        } catch {}
+        } catch { continue; }
       }
       // Fallback static
-      setPrices({ brent:{price:72.50}, wti:{price:68.80}, natgas:{price:3.85} });
+      setPrices({ brent: { price: 72.50 }, wti: { price: 68.80 }, natgas: { price: 3.85 } });
       setSource("static");
       setLoading(false);
     }
@@ -1192,43 +1294,53 @@ function LivePriceCards() {
   const extract = (obj) => {
     if (!obj) return null;
     if (typeof obj === "number") return obj;
-    if (obj.price) return typeof obj.price === "number" ? obj.price : parseFloat(obj.price);
+    if (obj.price != null) return typeof obj.price === "number" ? obj.price : parseFloat(obj.price);
     return null;
   };
 
-  const brent = extract(prices?.brent) || extract(prices?.raw) || 72.50;
+  const brent = extract(prices?.brent) || 72.50;
   const wti = extract(prices?.wti) || 68.80;
   const natgas = extract(prices?.natgas) || 3.85;
+  const brentTime = prices?.brent?.created_at || prices?.brent?.timestamp || null;
+  const wtiTime = prices?.wti?.created_at || prices?.wti?.timestamp || null;
+  const natgasTime = prices?.natgas?.created_at || prices?.natgas?.timestamp || null;
+
+  const fmtTime = (t) => t ? new Date(t).toLocaleString("es", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
 
   const items = [
-    { label:"Brent Crude", value:brent, unit:"USD/bbl", color:"#22c55e", desc:"Referencia internacional · Mar del Norte" },
-    { label:"WTI Crude", value:wti, unit:"USD/bbl", color:"#38bdf8", desc:"Referencia EE.UU. · Cushing, Oklahoma" },
-    { label:"Natural Gas", value:natgas, unit:"USD/MMBtu", color:"#f59e0b", desc:"Henry Hub · Referencia gas natural" },
+    { label: "Brent Crude", value: brent, unit: "USD/bbl", color: "#22c55e", desc: "Referencia internacional", time: brentTime },
+    { label: "WTI Crude", value: wti, unit: "USD/bbl", color: "#38bdf8", desc: "Referencia EE.UU.", time: wtiTime },
+    { label: "Natural Gas", value: natgas, unit: "USD/MMBtu", color: "#f59e0b", desc: "Henry Hub", time: natgasTime },
   ];
 
   return (
-    <div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {/* Price cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
         {loading ? (
-          <div style={{ gridColumn:"1/-1", textAlign:"center", padding:20, color:MUTED, fontSize:10, fontFamily:font }}>
+          <div style={{ gridColumn: "1/-1", textAlign: "center", padding: 20, color: MUTED, fontSize: 10, fontFamily: font }}>
             Conectando con OilPriceAPI...
           </div>
-        ) : items.map((item,i) => (
+        ) : items.map((item, i) => (
           <Card key={i} accent={item.color}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
-              <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>{item.label}</span>
-              {i === 0 && <Badge color={source==="live"?"#22c55e":"#eab308"}>{source==="live"?"EN VIVO":"ESTÁTICO"}</Badge>}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase" }}>{item.label}</span>
+              {i === 0 && <Badge color={source === "live" ? "#22c55e" : "#eab308"}>{source === "live" ? "EN VIVO" : "ESTÁTICO"}</Badge>}
             </div>
-            <div style={{ fontSize:26, fontWeight:900, color:item.color, fontFamily:"'Playfair Display',serif", lineHeight:1 }}>
+            <div style={{ fontSize: 28, fontWeight: 900, color: item.color, fontFamily: "'Playfair Display',serif", lineHeight: 1 }}>
               ${item.value.toFixed(2)}
             </div>
-            <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginTop:6 }}>{item.unit} · {item.desc}</div>
+            <div style={{ fontSize: 9, fontFamily: font, color: MUTED, marginTop: 6 }}>{item.unit} · {item.desc}</div>
+            {item.time && <div style={{ fontSize: 7, fontFamily: font, color: `${MUTED}80`, marginTop: 3 }}>{fmtTime(item.time)}</div>}
           </Card>
         ))}
       </div>
+      {/* Brent chart */}
+      {brentHistory.length > 2 && <BrentChart history={brentHistory} />}
+      {/* Fallback notice */}
       {!loading && source === "static" && (
-        <div style={{ fontSize:8, fontFamily:font, color:"#eab308", marginTop:6, textAlign:"center" }}>
-          ⚠ Precios de referencia estáticos — los precios en vivo requieren deploy en Vercel con API key configurada
+        <div style={{ fontSize: 8, fontFamily: font, color: "#eab308", textAlign: "center" }}>
+          ⚠ Precios de referencia estáticos — en vivo requiere deploy en Vercel con OILPRICE_API_KEY
         </div>
       )}
     </div>
