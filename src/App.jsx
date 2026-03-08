@@ -1817,7 +1817,7 @@ function TVMarketQuotes({ title, height=350, groups }) {
       symbolsGroups: groups,
       showSymbolLogo: true,
       isTransparent: true,
-      colorTheme: "dark",
+      colorTheme: "light",
       locale: "es",
     });
     wrapper.appendChild(script);
@@ -1835,6 +1835,7 @@ function TVMarketQuotes({ title, height=350, groups }) {
 }
 
 function MarketOverviewWidget() {
+  const mob = useIsMobile();
   const containerRef = useCallback((node) => {
     if (!node) return;
     node.innerHTML = "";
@@ -1848,7 +1849,7 @@ function MarketOverviewWidget() {
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js";
     script.async = true;
     script.innerHTML = JSON.stringify({
-      colorTheme: "dark",
+      colorTheme: "light",
       dateRange: "1M",
       showChart: true,
       locale: "es",
@@ -1860,10 +1861,10 @@ function MarketOverviewWidget() {
       showFloatingTooltip: true,
       plotLineColorGrowing: "rgba(34,197,94,1)",
       plotLineColorFalling: "rgba(239,68,68,1)",
-      gridLineColor: "rgba(26,48,80,0.5)",
-      scaleFontColor: "rgba(74,112,144,1)",
-      belowLineFillColorGrowing: "rgba(34,197,94,0.06)",
-      belowLineFillColorFalling: "rgba(239,68,68,0.06)",
+      gridLineColor: "rgba(200,210,220,0.5)",
+      scaleFontColor: "rgba(90,106,122,1)",
+      belowLineFillColorGrowing: "rgba(34,197,94,0.08)",
+      belowLineFillColorFalling: "rgba(239,68,68,0.08)",
       belowLineFillColorGrowingBottom: "rgba(34,197,94,0)",
       belowLineFillColorFallingBottom: "rgba(239,68,68,0)",
       symbolActiveColor: "rgba(10,151,217,0.12)",
@@ -1965,7 +1966,7 @@ function OilPriceTicker() {
     // Create the OilPriceAPI ticker div
     const div = document.createElement("div");
     div.id = "oilpriceapi-ticker";
-    div.setAttribute("data-theme", "dark");
+    div.setAttribute("data-theme", "light");
     div.setAttribute("data-commodities", "BRENT,WTI,NATURAL_GAS");
     div.setAttribute("data-layout", "horizontal");
     node.appendChild(div);
@@ -2204,6 +2205,7 @@ function LivePriceCards() {
 
 
 function MereyEstimator() {
+  const mob = useIsMobile();
   const [brentPrice, setBrentPrice] = useState(72.5);
   const [discount, setDiscount] = useState(12);
   const merey = Math.max(0, brentPrice - discount);
@@ -2345,7 +2347,7 @@ function TabMercados() {
                     style={{ fontSize:12, color:ACCENT, textDecoration:"none", fontFamily:font }}>↗</a>
                 </div>
                 <iframe
-                  src={`https://embed.polymarket.com/market.html?market=${m.slug}&theme=dark&features=volume,chart&width=380`}
+                  src={`https://embed.polymarket.com/market.html?market=${m.slug}&theme=light&features=volume,chart&width=380`}
                   style={{ width:"100%", height:300, border:"none", borderRadius:4 }}
                   sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
                   title={m.title}
