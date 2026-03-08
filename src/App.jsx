@@ -1297,6 +1297,60 @@ function MonitorNoticias() {
   );
 }
 
+function XTimelines({ handles }) {
+  const [active, setActive] = useState(0);
+  const containerRef = useCallback((node) => {
+    if (!node) return;
+    // Load Twitter widget script
+    if (!window.twttr) {
+      const script = document.createElement("script");
+      script.src = "https://platform.twitter.com/widgets.js";
+      script.async = true;
+      script.charset = "utf-8";
+      document.head.appendChild(script);
+    }
+    // Re-render widgets when they become visible
+    const timer = setTimeout(() => {
+      if (window.twttr?.widgets) window.twttr.widgets.load(node);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [active]);
+
+  return (
+    <div style={{ marginBottom:16 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+        <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>
+          𝕏 Timelines en vivo
+        </span>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, marginLeft:"auto" }}>
+          {handles.map((h,i) => (
+            <button key={i} onClick={() => setActive(i)}
+              style={{ fontSize:8, fontFamily:font, padding:"4px 10px", border:"none",
+                background:active===i?h.color:"transparent", color:active===i?"#fff":MUTED,
+                cursor:"pointer" }}>
+              {h.name.length > 12 ? h.name.slice(0,12)+"…" : h.name}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div ref={containerRef} style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"8px", minHeight:400, overflow:"hidden" }}>
+        {handles.map((h,i) => (
+          <div key={h.handle} style={{ display:active===i?"block":"none" }}>
+            <a className="twitter-timeline"
+              href={`https://twitter.com/${h.handle}`}
+              data-theme="dark"
+              data-chrome="noheader nofooter noborders transparent"
+              data-height="400"
+              data-tweet-limit="5">
+              Cargando @{h.handle}...
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function MonitorFactCheck() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1361,6 +1415,9 @@ function MonitorFactCheck() {
           </a>
         ))}
       </div>
+
+      {/* Twitter Timelines */}
+      <XTimelines handles={FACTCHECK_SOURCES.map(s => ({ handle:s.handle.replace("@",""), name:s.name, color:s.color }))} />
 
       {/* Live feed header */}
       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
