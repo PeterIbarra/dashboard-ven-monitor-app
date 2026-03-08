@@ -70,18 +70,18 @@ function parseRSS(xml, sourceName, type) {
 }
 
 async function upsertToSupabase(articles) {
-  // Upsert by link (unique constraint)
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/articles`, {
+  // Insert with on_conflict to handle duplicates by link
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?on_conflict=link`, {
     method: "POST",
     headers: {
       apikey: SUPABASE_SECRET,
       Authorization: `Bearer ${SUPABASE_SECRET}`,
       "Content-Type": "application/json",
-      Prefer: "resolution=merge-duplicates",
+      Prefer: "resolution=merge-duplicates,return=minimal",
     },
     body: JSON.stringify(articles),
   });
-  return { ok: res.ok, status: res.status };
+  return { ok: res.ok, status: res.status, text: res.ok ? "" : await res.text().catch(() => "") };
 }
 
 module.exports = async function handler(req, res) {
@@ -104,7 +104,7 @@ module.exports = async function handler(req, res) {
       if (articles.length > 0) {
         const result = await upsertToSupabase(articles);
         if (result.ok) totalInserted += articles.length;
-        else errors.push(`${src.name}: Supabase ${result.status}`);
+        else errors.push(`${src.name}: Supabase ${result.status} ${result.text}`);
       }
     } catch (e) {
       errors.push(`${src.name}: ${e.message}`);
