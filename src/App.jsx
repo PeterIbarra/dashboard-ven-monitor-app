@@ -116,10 +116,14 @@ const GDELT_ANNOTATIONS = [
 ];
 
 const POLYMARKET_SLUGS = [
-  { slug:"will-venezuela-become-51st-state", title:"¿Venezuela 51° estado?" },
-  { slug:"will-mara-corina-machado-enter-venezuela-by-march-31-426-698-771", title:"¿MCM entra a Venezuela antes del 31 mar?" },
-  { slug:"will-delcy-rodrguez-be-the-leader-of-venezuela-end-of-2026", title:"¿Delcy líder a fin de 2026?" },
-  { slug:"will-the-us-embassy-in-venezuela-reopen-by-march-31", title:"¿Embajada EE.UU. reabre antes del 31 mar?" },
+  { slug:"venezuela-leader-end-of-2026", title:"¿Quién lidera Venezuela a fin de 2026?" },
+  { slug:"will-mara-corina-machado-enter-venezuela-by-january-31", title:"¿MCM entra a Venezuela?" },
+  { slug:"will-the-us-invade-venezuela-in-2025", title:"¿EE.UU. invade Venezuela?" },
+  { slug:"another-us-strike-on-venezuela-by", title:"¿Otro operativo EE.UU. en Venezuela?" },
+  { slug:"venezuela-presidential-election-scheduled-by", title:"¿Elecciones presidenciales programadas?" },
+  { slug:"delcy-rodrguez-out-as-leader-of-venezuela-by", title:"¿Delcy Rodríguez sale del poder?" },
+  { slug:"venezuela-coup-attempt-by-january-31-428", title:"¿Intento de golpe en Venezuela?" },
+  { slug:"will-venezuelan-crude-oil-production-reach-barrels-per-day-in-2026", title:"¿Producción petrolera alcanza meta 2026?" },
 ];
 
 const CONF_HISTORICO = [
@@ -1117,6 +1121,118 @@ function TabGdelt() {
   );
 }
 
+function MarketOverviewWidget() {
+  const containerRef = useCallback((node) => {
+    if (!node) return;
+    node.innerHTML = "";
+    const wrapper = document.createElement("div");
+    wrapper.className = "tradingview-widget-container";
+    const widgetDiv = document.createElement("div");
+    widgetDiv.className = "tradingview-widget-container__widget";
+    wrapper.appendChild(widgetDiv);
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js";
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      colorTheme: "dark",
+      dateRange: "1M",
+      showChart: true,
+      locale: "es",
+      width: "100%",
+      height: "660",
+      largeChartUrl: "",
+      isTransparent: true,
+      showSymbolLogo: true,
+      showFloatingTooltip: true,
+      plotLineColorGrowing: "rgba(34,197,94,1)",
+      plotLineColorFalling: "rgba(239,68,68,1)",
+      gridLineColor: "rgba(26,48,80,0.5)",
+      scaleFontColor: "rgba(74,112,144,1)",
+      belowLineFillColorGrowing: "rgba(34,197,94,0.06)",
+      belowLineFillColorFalling: "rgba(239,68,68,0.06)",
+      belowLineFillColorGrowingBottom: "rgba(34,197,94,0)",
+      belowLineFillColorFallingBottom: "rgba(239,68,68,0)",
+      symbolActiveColor: "rgba(10,151,217,0.12)",
+      tabs: [
+        {
+          title: "Commodity",
+          symbols: [
+            { s: "ICEEUR:BRN1!", d: "Brent Crude" },
+            { s: "NYMEX:CL1!", d: "WTI Crude" },
+            { s: "NYMEX:NG1!", d: "Natural Gas" },
+            { s: "COMEX:GC1!", d: "Gold" },
+            { s: "COMEX:SI1!", d: "Silver" },
+            { s: "NYMEX:HG1!", d: "Copper" },
+          ]
+        },
+        {
+          title: "Index",
+          symbols: [
+            { s: "FOREXCOM:SPXUSD", d: "S&P 500" },
+            { s: "FOREXCOM:NSXUSD", d: "NASDAQ" },
+            { s: "FOREXCOM:DJI", d: "Dow Jones" },
+            { s: "INDEX:DAX", d: "DAX" },
+            { s: "TVC:DXY", d: "Dólar Index (DXY)" },
+            { s: "TVC:VIX", d: "Volatilidad (VIX)" },
+          ]
+        },
+        {
+          title: "Stocks",
+          symbols: [
+            { s: "NYSE:XOM", d: "Exxon Mobil" },
+            { s: "NYSE:CVX", d: "Chevron" },
+            { s: "NYSE:SHEL", d: "Shell" },
+            { s: "NYSE:E", d: "Eni" },
+            { s: "BME:REP", d: "Repsol" },
+            { s: "NYSE:BP", d: "BP" },
+          ]
+        },
+        {
+          title: "Forex",
+          symbols: [
+            { s: "FX_IDC:EURUSD", d: "EUR/USD" },
+            { s: "FX_IDC:USDCOP", d: "USD/COP" },
+            { s: "FX_IDC:USDBRL", d: "USD/BRL" },
+            { s: "FX_IDC:USDMXN", d: "USD/MXN" },
+            { s: "FX_IDC:USDCNY", d: "USD/CNY" },
+            { s: "FX_IDC:USDRUB", d: "USD/RUB" },
+          ]
+        },
+        {
+          title: "Crypto",
+          symbols: [
+            { s: "BITSTAMP:BTCUSD", d: "Bitcoin" },
+            { s: "BITSTAMP:ETHUSD", d: "Ethereum" },
+            { s: "BINANCE:USDTDAI", d: "USDT/DAI" },
+            { s: "COINBASE:SOLUSD", d: "Solana" },
+          ]
+        },
+        {
+          title: "Bond",
+          symbols: [
+            { s: "TVC:US10Y", d: "US 10Y Treasury" },
+            { s: "TVC:US02Y", d: "US 2Y Treasury" },
+            { s: "TVC:US30Y", d: "US 30Y Treasury" },
+            { s: "TVC:DE10Y", d: "Germany 10Y Bund" },
+          ]
+        },
+      ]
+    });
+    wrapper.appendChild(script);
+    node.appendChild(wrapper);
+  }, []);
+
+  return (
+    <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: "12px", minHeight: 400 }}>
+      <div style={{ fontSize: 8, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>
+        🌍 Mercados globales · TradingView · Commodity · Index · Stocks · Forex · Crypto · Bond
+      </div>
+      <div ref={containerRef} />
+    </div>
+  );
+}
+
 function OilPriceTicker() {
   const tickerRef = useCallback((node) => {
     if (!node) return;
@@ -1420,7 +1536,7 @@ function TabMercados() {
           </div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
-          {[{id:"petroleo",label:"Petróleo",icon:"🛢"},{id:"prediccion",label:"Predicción",icon:"🔮"}].map(s => (
+          {[{id:"petroleo",label:"Petróleo",icon:"🛢"},{id:"global",label:"Global",icon:"🌍"},{id:"prediccion",label:"Predicción",icon:"🔮"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:9, fontFamily:font, padding:"6px 14px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED,
@@ -1475,6 +1591,9 @@ function TabMercados() {
         </div>
       )}
 
+      {/* ── GLOBAL MARKETS ── */}
+      {seccion === "global" && <MarketOverviewWidget />}
+
       {/* ── PREDICCIÓN ── */}
       {seccion === "prediccion" && (
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
@@ -1488,7 +1607,7 @@ function TabMercados() {
                 </div>
                 <iframe
                   src={`https://embed.polymarket.com/market.html?market=${m.slug}&theme=dark&features=volume,chart&width=380`}
-                  style={{ width:"100%", height:340, border:"none", borderRadius:4 }}
+                  style={{ width:"100%", height:300, border:"none", borderRadius:4 }}
                   sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
                   title={m.title}
                 />

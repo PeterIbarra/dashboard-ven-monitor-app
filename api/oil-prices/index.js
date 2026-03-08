@@ -26,13 +26,20 @@ export default async function handler(req, res) {
 
     let brentHistory = [];
     if (brentHistoryRes?.data?.prices && Array.isArray(brentHistoryRes.data.prices)) {
-      brentHistory = brentHistoryRes.data.prices
+      const raw = brentHistoryRes.data.prices
         .map(p => ({ price: p.price, time: p.created_at }))
         .sort((a, b) => new Date(a.time) - new Date(b.time));
 
-      if (brentHistory.length > 200) {
-        const step = Math.ceil(brentHistory.length / 200);
-        brentHistory = brentHistory.filter((_, i) => i % step === 0);
+      // Downsample to ~1 point per 4 hours (42 points for 7 days)
+      if (raw.length > 50) {
+        const step = Math.ceil(raw.length / 42);
+        brentHistory = raw.filter((_, i) => i % step === 0);
+        // Always include the last point
+        if (brentHistory[brentHistory.length - 1] !== raw[raw.length - 1]) {
+          brentHistory.push(raw[raw.length - 1]);
+        }
+      } else {
+        brentHistory = raw;
       }
     }
 
