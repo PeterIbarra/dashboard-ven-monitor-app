@@ -1360,6 +1360,8 @@ function MonitorFactCheck() {
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("loading");
   const [showTwitter, setShowTwitter] = useState(false);
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 20;
 
   const FACTCHECK_SOURCES = [
     { name:"Cazamos Fake News", handle:"cazamosfakenews", url:"https://www.cazadoresdefakenews.info", color:"#ef4444" },
@@ -1439,18 +1441,19 @@ function MonitorFactCheck() {
       </div>
 
       {/* RSS Articles */}
+      {(() => { const totalPages = Math.ceil(articles.length / PER_PAGE); const paginated = articles.slice((page-1)*PER_PAGE, page*PER_PAGE); return (<>
       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
         <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>📰 Artículos de verificación</span>
         <Badge color={source==="supabase"?"#22c55e":source==="live"?"#22c55e":source==="partial"?"#eab308":"#ef4444"}>
           {source==="supabase"?"EN VIVO":source==="live"?"EN VIVO":source==="partial"?"PARCIAL":"OFFLINE"}
         </Badge>
-        <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{articles.length} artículos</span>
+        <span style={{ fontSize:9, color:MUTED, marginLeft:"auto" }}>{articles.length} artículos · pág {page}/{totalPages||1}</span>
       </div>
       {loading ? (
         <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:10, fontFamily:font }}>Cargando verificaciones...</div></Card>
       ) : articles.length === 0 ? (
         <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:10 }}>Sin artículos. Visita los sitios directamente.</div></Card>
-      ) : articles.map((a,i) => (
+      ) : paginated.map((a,i) => (
         <a key={i} href={a.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration:"none" }}>
           <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:12, padding:"8px 0", borderBottom:`1px solid ${BORDER}30` }}
             onMouseEnter={e=>e.currentTarget.style.background=BG3} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
@@ -1474,6 +1477,22 @@ function MonitorFactCheck() {
           </div>
         </a>
       ))}
+      {totalPages > 1 && (
+        <div style={{ display:"flex", justifyContent:"center", gap:4, marginTop:12 }}>
+          <button onClick={() => setPage(Math.max(1,page-1))} disabled={page===1}
+            style={{ fontSize:9, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
+              background:page===1?"transparent":BG2, color:page===1?`${MUTED}50`:MUTED, cursor:page===1?"default":"pointer" }}>← Anterior</button>
+          {Array.from({length:totalPages},(_,i)=>i+1).map(p => (
+            <button key={p} onClick={() => setPage(p)}
+              style={{ fontSize:9, fontFamily:font, padding:"4px 8px", border:`1px solid ${page===p?ACCENT:BORDER}`,
+                background:page===p?ACCENT:"transparent", color:page===p?"#fff":MUTED, cursor:"pointer", minWidth:28 }}>{p}</button>
+          ))}
+          <button onClick={() => setPage(Math.min(totalPages,page+1))} disabled={page===totalPages}
+            style={{ fontSize:9, fontFamily:font, padding:"4px 12px", border:`1px solid ${BORDER}`,
+              background:page===totalPages?"transparent":BG2, color:page===totalPages?`${MUTED}50`:MUTED, cursor:page===totalPages?"default":"pointer" }}>Siguiente →</button>
+        </div>
+      )}
+      </>); })()}
     </div>
   );
 }
@@ -2512,8 +2531,34 @@ export default function MonitorPNUD() {
   const [tab, setTab] = useState("dashboard");
   const [week, setWeek] = useState(WEEKS.length - 1);
 
+  // Google Translate init
+  useEffect(() => {
+    if (window.googleTranslateElementInit) return;
+    window.googleTranslateElementInit = function() {
+      new window.google.translate.TranslateElement({
+        pageLanguage: 'es',
+        includedLanguages: 'es,en,fr,pt',
+        layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false,
+      }, 'google_translate_element');
+    };
+    const script = document.createElement('script');
+    script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    script.async = true;
+    document.head.appendChild(script);
+  }, []);
+
   return (
     <div style={{ fontFamily:fontSans, background:BG, minHeight:"100vh", color:TEXT }}>
+      <style>{`
+        .goog-te-banner-frame, .skiptranslate > iframe { display:none !important; }
+        body { top:0 !important; }
+        .goog-te-gadget { font-family:${font} !important; font-size:0 !important; }
+        .goog-te-gadget .goog-te-combo { font-family:${font}; font-size:10px; background:${BG2}; border:1px solid ${BORDER}; color:${ACCENT};
+          padding:4px 8px; cursor:pointer; outline:none; }
+        .goog-te-gadget > span { display:none !important; }
+        #google_translate_element { display:inline-block; }
+      `}</style>
       <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap" rel="stylesheet" />
 
       {/* HEADER */}
@@ -2526,6 +2571,7 @@ export default function MonitorPNUD() {
           </div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div id="google_translate_element" />
           <select value={week} onChange={e => setWeek(+e.target.value)}
             style={{ fontFamily:font, fontSize:10, background:BG2, border:`1px solid ${BORDER}`, color:ACCENT,
               padding:"5px 28px 5px 10px", cursor:"pointer", outline:"none",
