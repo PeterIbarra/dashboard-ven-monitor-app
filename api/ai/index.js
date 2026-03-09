@@ -7,8 +7,8 @@ const PROVIDERS = [
     name: "gemini-2.0-flash",
     keyEnv: "GEMINI_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
-      // Try gemini-2.0-flash first, fallback to gemini-1.5-flash if unavailable
-      const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
+      // Try gemini-1.5-flash first (stable free tier), fallback to 2.0-flash
+      const models = ["gemini-1.5-flash", "gemini-2.0-flash"];
       for (const model of models) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const res = await fetch(url, {
