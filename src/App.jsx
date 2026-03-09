@@ -2850,30 +2850,14 @@ function GdeltBilateral() {
   useEffect(() => {
     async function fetchBilateral() {
       try {
-        let result = null;
-        if (IS_DEPLOYED) {
-          const res = await fetch("/api/gdelt?signal=bilateral", { signal: AbortSignal.timeout(12000) });
-          if (res.ok) { const json = await res.json(); if (json.data?.length > 10) result = json.data; }
+        // Use serverless proxy (avoids CORS and rate limiting)
+        const url = IS_DEPLOYED ? "/api/gdelt?signal=bilateral" : null;
+        if (!url) { setLoading(false); return; }
+        const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data?.length > 5) setData(json.data);
         }
-        if (!result) {
-          // Direct fetch via CORS proxy
-          for (const proxyFn of CORS_PROXIES) {
-            try {
-              const toneUrl = proxyFn(`${GDELT_BASE}?query=venezuela+trump+OR+venezuela+USA+OR+venezuela+"united+states"&mode=timelinetone&timespan=${GDELT_TIMESPAN}&format=csv`);
-              const volUrl = proxyFn(`${GDELT_BASE}?query=venezuela+trump+OR+venezuela+USA+OR+venezuela+"united+states"&mode=timelinevol&timespan=${GDELT_TIMESPAN}&format=csv`);
-              const [toneRes, volRes] = await Promise.all([
-                fetch(toneUrl, { signal: AbortSignal.timeout(8000) }).then(r=>r.ok?r.text():""),
-                fetch(volUrl, { signal: AbortSignal.timeout(8000) }).then(r=>r.ok?r.text():""),
-              ]);
-              const toneMap = parseGdeltCsv(toneRes);
-              const volMap = parseGdeltCsv(volRes);
-              const allDates = new Set([...toneMap.keys(), ...volMap.keys()]);
-              result = Array.from(allDates).sort().map(date => ({ date, tone:toneMap.get(date)??null, vol:volMap.get(date)??null }));
-              if (result.length > 10) break;
-            } catch { continue; }
-          }
-        }
-        if (result && result.length > 10) setData(result);
       } catch {}
       setLoading(false);
     }

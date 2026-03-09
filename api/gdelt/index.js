@@ -7,8 +7,8 @@ module.exports = async function handler(req, res) {
     instability: `${GDELT_BASE}?query=venezuela+(protest+OR+conflict+OR+crisis+OR+violence+OR+unrest)&mode=timelinevol&timespan=120d&format=csv`,
     tone: `${GDELT_BASE}?query=venezuela&mode=timelinetone&timespan=120d&format=csv`,
     artvolnorm: `${GDELT_BASE}?query=venezuela&mode=timelinevol&timespan=120d&format=csv`,
-    bilateral_tone: `${GDELT_BASE}?query=venezuela+trump+OR+venezuela+USA+OR+venezuela+"united+states"&mode=timelinetone&timespan=120d&format=csv`,
-    bilateral_vol: `${GDELT_BASE}?query=venezuela+trump+OR+venezuela+USA+OR+venezuela+"united+states"&mode=timelinevol&timespan=120d&format=csv`,
+    bilateral_tone: `${GDELT_BASE}?query=venezuela+trump&mode=timelinetone&timespan=120d&format=csv`,
+    bilateral_vol: `${GDELT_BASE}?query=venezuela+trump&mode=timelinevol&timespan=120d&format=csv`,
   };
 
   // If specific signal requested
