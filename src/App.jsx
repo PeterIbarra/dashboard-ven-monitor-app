@@ -1043,8 +1043,79 @@ function TabSitrep({ liveData = {} }) {
   const [aiAnalysis, setAiAnalysis] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
+  const [dailyBrief, setDailyBrief] = useState("");
+  const [briefLoading, setBriefLoading] = useState(false);
+  const [briefProvider, setBriefProvider] = useState("");
+  const [briefError, setBriefError] = useState("");
 
   const wk = WEEKS[sitrepWeek] || WEEKS[WEEKS.length - 1];
+
+  // ── Daily Brief generator ──
+  const generateDailyBrief = async () => {
+    setBriefLoading(true); setBriefError(""); setDailyBrief("");
+    const dom = wk.probs.reduce((a,b) => a.v > b.v ? a : b);
+    const domSc = SCENARIOS.find(s=>s.id===dom.sc);
+    const amnistia = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
+
+    // Fetch fresh headlines from Google News RSS
+    let freshHeadlines = [];
+    if (IS_DEPLOYED) {
+      try {
+        const headRes = await fetch("/api/gdelt?signal=headlines", { signal: AbortSignal.timeout(10000) });
+        if (headRes.ok) {
+          const headJson = await headRes.json();
+          freshHeadlines = (headJson.articles || [])
+            .filter(a => a.title && a.title.length > 20)
+            .slice(0, 8)
+            .map(a => ({ title: a.title, source: a.source }));
+        }
+      } catch {}
+    }
+
+    const briefData = {
+      fecha: new Date().toLocaleDateString("es", { weekday:"long", day:"numeric", month:"long", year:"numeric" }),
+      escenarioDominante: `${domSc?.name} (E${dom.sc}) al ${dom.v}%`,
+      dolar: liveData?.dolar || null,
+      petroleo: liveData?.oil || null,
+      titularesRSS: liveData?.news?.slice(0, 5) || [],
+      noticiasGoogleNews: freshHeadlines,
+      amnistia: amnistia ? { gobLibertades: amnistia.gob.libertades || amnistia.gob.excarcelados, fpVerificados: amnistia.fp.verificados, presos: amnistia.fp.detenidos } : null,
+      tensionesRojas: wk.tensiones.filter(t=>t.l==="red").map(t=>t.t.replace(/<[^>]+>/g,"")).slice(0, 2),
+    };
+
+    const prompt = `Eres un analista del PNUD Venezuela. Genera un DAILY BRIEF de máximo 3 párrafos cortos (150-200 palabras total) para hoy ${briefData.fecha}.
+
+DATOS DISPONIBLES:
+${JSON.stringify(briefData, null, 1)}
+
+INSTRUCCIONES:
+1. Primer párrafo: Estado actual — escenario dominante y dato más relevante del día (dólar, petróleo o titular).
+2. Segundo párrafo: Contexto rápido — amnistía, tensiones, o cualquier cambio notable.
+3. Tercer párrafo: Sintetiza las noticias más relevantes del día sobre Venezuela (usa noticiasGoogleNews como fuente principal y titularesRSS como complemento). Menciona los hechos concretos, no el nombre de la fuente.
+4. Tono: profesional pero conciso, tipo cable de agencia. Sin bullet points.
+5. NO inventes datos. Usa SOLO lo proporcionado.
+6. Ignora completamente titulares que no se relacionen directamente con Venezuela.`;
+
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, max_tokens: 500 }),
+        signal: AbortSignal.timeout(35000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.text) { setDailyBrief(data.text); setBriefProvider(data.provider || ""); }
+        else { setBriefError("Respuesta vacía del proveedor de IA"); }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setBriefError(errData.error || `Error ${res.status}`);
+      }
+    } catch (e) {
+      setBriefError(e.message || "Error de conexión");
+    }
+    setBriefLoading(false);
+  };
 
   // ── AI Analysis generator ──
   const generateAiAnalysis = async () => {
@@ -1299,6 +1370,12 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
         </div>
         <div style={{ flex:1 }} />
         {/* Action buttons */}
+        <button onClick={generateDailyBrief} disabled={briefLoading}
+          style={{ fontSize:mob?10:11, fontFamily:font, padding:mob?"5px 10px":"6px 14px",
+            background:briefLoading?BG3:`linear-gradient(135deg, #0e7490, #0891b2)`, color:briefLoading?MUTED:"#fff",
+            border:"none", cursor:briefLoading?"wait":"pointer", letterSpacing:"0.06em", transition:"all 0.15s" }}>
+          {briefLoading ? "⏳ Buscando..." : "📰 Daily Brief"}
+        </button>
         <button onClick={generateAiAnalysis} disabled={aiLoading}
           style={{ fontSize:mob?10:11, fontFamily:font, padding:mob?"5px 10px":"6px 14px",
             background:aiLoading?BG3:`linear-gradient(135deg, #8b5cf6, #6d28d9)`, color:aiLoading?MUTED:"#fff",
@@ -1311,6 +1388,35 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
           📥 Descargar SITREP
         </button>
       </div>
+
+      {/* ═══ DAILY BRIEF DISPLAY ═══ */}
+      {(dailyBrief || briefLoading || briefError) && (
+        <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:mob?12:16, marginBottom:14 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:dailyBrief?10:0, flexWrap:"wrap" }}>
+            <span style={{ fontSize:14 }}>📰</span>
+            <div style={{ fontSize:10, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:"#0e7490" }}>Daily Brief</div>
+            {dailyBrief && (
+              <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>
+                {new Date().toLocaleString("es", { hour:"2-digit", minute:"2-digit" })} · hoy
+              </span>
+            )}
+            {briefProvider && (() => {
+              const bc = briefProvider.includes("mistral") ? "#ff6f00" : briefProvider.includes("gemini") ? "#4285f4" : briefProvider.includes("groq")||briefProvider.includes("llama") ? "#f97316" : briefProvider.includes("openrouter")||briefProvider.includes("free") ? "#06b6d4" : "#8b5cf6";
+              const bl = briefProvider.includes("mistral") ? "MISTRAL" : briefProvider.includes("gemini") ? "GEMINI" : briefProvider.includes("groq")||briefProvider.includes("llama") ? "GROQ" : briefProvider.includes("openrouter")||briefProvider.includes("free") ? "OPENROUTER" : "CLAUDE";
+              return <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${bc}15`, color:bc, border:`1px solid ${bc}30`, letterSpacing:"0.08em" }}>{bl}</span>;
+            })()}
+            {briefLoading && <span style={{ fontSize:10, fontFamily:font, color:MUTED, animation:"pulse 1.5s infinite" }}>Buscando noticias y generando brief...</span>}
+          </div>
+          {briefError && (
+            <div style={{ fontSize:12, fontFamily:font, color:"#dc2626", marginTop:6 }}>Error: {briefError}</div>
+          )}
+          {dailyBrief && (
+            <div style={{ fontSize:mob?12:13, fontFamily:fontSans, color:TEXT, lineHeight:1.7, whiteSpace:"pre-wrap" }}>
+              {dailyBrief}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ═══ BRIEFING VIEW ═══ */}
       {viewMode === "briefing" && (
@@ -1411,8 +1517,8 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
             const providerMatch = aiAnalysis.match(/^\[([^\]]+)\]\n\n/);
             const provider = providerMatch ? providerMatch[1] : "claude";
             const displayText = providerMatch ? aiAnalysis.slice(providerMatch[0].length) : aiAnalysis;
-            const badgeColor = provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : "#8b5cf6";
-            const badgeLabel = provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : "CLAUDE";
+            const badgeColor = provider.includes("mistral") ? "#ff6f00" : provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : "#8b5cf6";
+            const badgeLabel = provider.includes("mistral") ? "MISTRAL" : provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : "CLAUDE";
             return (
               <div style={{ ...cardStyle, marginTop:mob?10:14, borderLeft:`3px solid ${badgeColor}`, background:`${badgeColor}08` }}>
                 <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
@@ -1596,8 +1702,8 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
         const providerMatch = aiAnalysis.match(/^\[([^\]]+)\]\n\n/);
         const provider = providerMatch ? providerMatch[1] : "claude";
         const displayText = providerMatch ? aiAnalysis.slice(providerMatch[0].length) : aiAnalysis;
-        const badgeColor = provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : "#8b5cf6";
-        const badgeLabel = provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : "CLAUDE";
+        const badgeColor = provider.includes("mistral") ? "#ff6f00" : provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : "#8b5cf6";
+        const badgeLabel = provider.includes("mistral") ? "MISTRAL" : provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : "CLAUDE";
         return (
         <div style={{ borderBottom:`1px solid ${BORDER}40` }}>
           <div style={{ display:"flex", alignItems:"center", gap:mob?8:12, cursor:"pointer",
@@ -1626,134 +1732,6 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
         padding:"24px 0 8px", letterSpacing:"0.1em", textTransform:"uppercase" }}>
         PNUD Venezuela · Análisis de Contexto Situacional · {d.periodShort} · Uso interno
       </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════
-// DAILY BRIEF — Auto-generated on dashboard load
-// ═══════════════════════════════════════════════════════════════
-
-function DailyBrief({ week, liveData, mob }) {
-  const [brief, setBrief] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [provider, setProvider] = useState("");
-  const [time, setTime] = useState(null);
-  const generated = useRef(false);
-
-  useEffect(() => {
-    if (generated.current || !liveData?.fetched) return;
-    generated.current = true;
-
-    async function generateBrief() {
-      setLoading(true);
-      const wk = WEEKS[week];
-      const dom = wk.probs.reduce((a,b) => a.v > b.v ? a : b);
-      const domSc = SCENARIOS.find(s=>s.id===dom.sc);
-      const amnistia = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
-
-      // Fetch fresh headlines from Google News RSS (last 24h)
-      let freshHeadlines = [];
-      if (IS_DEPLOYED) {
-        try {
-          const headRes = await fetch("/api/gdelt?signal=headlines", { signal: AbortSignal.timeout(10000) });
-          if (headRes.ok) {
-            const headJson = await headRes.json();
-            freshHeadlines = (headJson.articles || [])
-              .filter(a => a.title && a.title.length > 20)
-              .slice(0, 8)
-              .map(a => ({ title: a.title, source: a.source }));
-          }
-        } catch {}
-      }
-
-      const briefData = {
-        fecha: new Date().toLocaleDateString("es", { weekday:"long", day:"numeric", month:"long", year:"numeric" }),
-        escenarioDominante: `${domSc?.name} (E${dom.sc}) al ${dom.v}%`,
-        dolar: liveData?.dolar || null,
-        petroleo: liveData?.oil || null,
-        titularesRSS: liveData?.news?.slice(0, 5) || [],
-        titularesGDELT: freshHeadlines,
-        amnistia: amnistia ? { gobLibertades: amnistia.gob.libertades || amnistia.gob.excarcelados, fpVerificados: amnistia.fp.verificados, presos: amnistia.fp.detenidos } : null,
-        tensionesRojas: wk.tensiones.filter(t=>t.l==="red").map(t=>t.t.replace(/<[^>]+>/g,"")).slice(0, 2),
-      };
-
-      const prompt = `Eres un analista del PNUD Venezuela. Genera un DAILY BRIEF de máximo 3 párrafos cortos (150-200 palabras total) para hoy ${briefData.fecha}.
-
-DATOS DISPONIBLES:
-${JSON.stringify(briefData, null, 1)}
-
-INSTRUCCIONES:
-1. Primer párrafo: Estado actual — escenario dominante y dato más relevante del día (dólar, petróleo o titular).
-2. Segundo párrafo: Contexto rápido — amnistía, tensiones, o cualquier cambio notable.
-3. Tercer párrafo: Sintetiza las noticias más relevantes del día sobre Venezuela (usa titularesGDELT como fuente principal y titularesRSS como complemento). Menciona los hechos concretos, no el nombre de la fuente.
-4. Tono: profesional pero conciso, tipo cable de agencia. Sin bullet points.
-5. NO inventes datos. Usa SOLO lo proporcionado.
-6. Ignora completamente titulares que no se relacionen directamente con Venezuela.`;
-
-      try {
-        let text = "";
-        if (IS_DEPLOYED) {
-          const res = await fetch("/api/ai", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt, max_tokens: 500 }),
-            signal: AbortSignal.timeout(30000),
-          });
-          if (res.ok) {
-            const data = await res.json();
-            text = data.text || "";
-            if (data.provider) setProvider(data.provider);
-          }
-        } else {
-          const res = await fetch("https://api.anthropic.com/v1/messages", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:500, messages:[{role:"user",content:prompt}] }),
-          });
-          if (res.ok) {
-            const data = await res.json();
-            text = data.content?.map(c=>c.text||"").join("\n") || "";
-            setProvider("claude");
-          }
-        }
-        if (text) { setBrief(text); setTime(new Date()); }
-      } catch {}
-      setLoading(false);
-    }
-
-    const timer = setTimeout(generateBrief, 2000);
-    return () => clearTimeout(timer);
-  }, [liveData?.fetched, week]);
-
-  const badgeColor = provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : "#8b5cf6";
-  const badgeLabel = provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : "CLAUDE";
-
-  return (
-    <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:mob?12:16 }}>
-      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:brief?10:0, flexWrap:"wrap" }}>
-        <span style={{ fontSize:14 }}>📰</span>
-        <div style={{ fontSize:10, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:ACCENT }}>Daily Brief</div>
-        {time && (
-          <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>
-            {time.toLocaleString("es", { hour:"2-digit", minute:"2-digit" })} · hoy
-          </span>
-        )}
-        {provider && (
-          <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${badgeColor}15`, color:badgeColor, border:`1px solid ${badgeColor}30`, letterSpacing:"0.08em" }}>
-            {badgeLabel}
-          </span>
-        )}
-        <div style={{ marginLeft:"auto" }}>
-          {loading && <span style={{ fontSize:10, fontFamily:font, color:MUTED, animation:"pulse 1.5s infinite" }}>Generando brief...</span>}
-          {!loading && !brief && <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>Esperando datos...</span>}
-        </div>
-      </div>
-      {brief && (
-        <div style={{ fontSize:mob?12:13, fontFamily:fontSans, color:TEXT, lineHeight:1.7, whiteSpace:"pre-wrap" }}>
-          {brief}
-        </div>
-      )}
     </div>
   );
 }
@@ -2011,9 +1989,6 @@ function TabDashboard({ week, liveData = {} }) {
           </div>
         );
       })()}
-
-      {/* ── ROW 1c: Daily Brief (auto-generated) ── */}
-      <DailyBrief week={week} liveData={liveData} mob={mob} />
 
       {/* ── ROW 2: Amnistía Tracker ── */}
       {(() => {

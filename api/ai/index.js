@@ -1,8 +1,28 @@
 // /api/ai — AI analysis proxy for SITREP generation
-// Cascade: Gemini Flash (free) → Groq Llama (free) → OpenRouter (free) → Anthropic Claude (paid)
+// Cascade: Mistral (free) → Gemini Flash (free) → Groq Llama (free) → OpenRouter (free) → Anthropic Claude (paid)
 // All API keys stay server-side. No CORS issues.
 
 const PROVIDERS = [
+  {
+    name: "mistral-small",
+    keyEnv: "MISTRAL_API_KEY",
+    call: async (prompt, maxTokens, apiKey) => {
+      const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: "mistral-small-latest",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: maxTokens,
+          temperature: 0.7,
+        }),
+        signal: AbortSignal.timeout(30000),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || null;
+    },
+  },
   {
     name: "gemini-2.0-flash",
     keyEnv: "GEMINI_API_KEY",
@@ -118,7 +138,7 @@ module.exports = async function handler(req, res) {
   const available = PROVIDERS.filter(p => process.env[p.keyEnv]);
   if (available.length === 0) {
     return res.status(500).json({
-      error: "No AI API key configured. Set at least one: GEMINI_API_KEY (free), GROQ_API_KEY (free), OPENROUTER_API_KEY (free), or ANTHROPIC_API_KEY (paid).",
+      error: "No AI API key configured. Set at least one: MISTRAL_API_KEY (free), GEMINI_API_KEY (free), GROQ_API_KEY (free), OPENROUTER_API_KEY (free), or ANTHROPIC_API_KEY (paid).",
     });
   }
 
