@@ -99,7 +99,7 @@ Panel dual Gobierno vs Foro Penal con evolución semanal S1–S8:
 
 | Tipo | Medios |
 |------|--------|
-| Noticias | Efecto Cocuyo, El Pitazo, Runrunes, Tal Cual, El Estímulo, AlbertoNews, Caracas Chronicles |
+| Noticias | Efecto Cocuyo, El Pitazo, Runrunes, Tal Cual, El Estímulo, AlbertoNews, Caracas Chronicles, VTV, TeleSur |
 | Fact-check | Cocuyo Chequea, Cotejo.info, EsPaja, Cazamos Fake News, Provea |
 
 ## Funcionalidades del SITREP
