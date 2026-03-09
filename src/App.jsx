@@ -3028,6 +3028,7 @@ function TabGdelt() {
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("loading");
   const [error, setError] = useState(null);
+  const [gdeltView, setGdeltView] = useState("venezuela"); // venezuela | bilateral
 
   const loadData = useCallback(async () => {
     setLoading(true); setError(null); setSource("loading");
@@ -3088,12 +3089,30 @@ function TabGdelt() {
         </div>
       </div>
 
-      {error && (
+      {/* View toggle */}
+      <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, marginBottom:14, width:"fit-content" }}>
+        {[{id:"venezuela",label:"🇻🇪 Venezuela"},{id:"bilateral",label:"🇺🇸↔🇻🇪 Bilateral"}].map(v => (
+          <button key={v.id} onClick={() => setGdeltView(v.id)}
+            style={{ fontSize:mob?10:12, fontFamily:font, padding:mob?"6px 10px":"8px 16px", border:"none",
+              background:gdeltView===v.id?ACCENT:"transparent", color:gdeltView===v.id?"#fff":MUTED,
+              cursor:"pointer", letterSpacing:"0.06em", transition:"all 0.15s" }}>
+            {v.label}
+          </button>
+        ))}
+      </div>
+
+      {error && gdeltView === "venezuela" && (
         <div style={{ fontSize:12, fontFamily:font, color:"#a17d08", padding:"6px 12px",
           background:"rgba(234,179,8,0.08)", border:"1px solid rgba(234,179,8,0.2)", marginBottom:12 }}>
           ⚠ {error}
         </div>
       )}
+
+      {/* ═══ BILATERAL VIEW ═══ */}
+      {gdeltView === "bilateral" && <GdeltBilateral />}
+
+      {/* ═══ VENEZUELA VIEW ═══ */}
+      {gdeltView === "venezuela" && <>
 
       {/* Explanation */}
       <Card accent={ACCENT} style={{ marginBottom:14 }}>
@@ -3187,9 +3206,6 @@ function TabGdelt() {
           </Card>
         </div>
 
-        {/* ── BILATERAL: EE.UU. ↔ Venezuela ── */}
-        <GdeltBilateral />
-
         {/* Footer */}
         <div style={{ marginTop:12, fontSize:10, fontFamily:font, color:`${MUTED}60`, lineHeight:1.8, display:"flex", justifyContent:"space-between" }}>
           <span>📡 Fuente: GDELT Project DOC API v2 · 3 queries paralelas via CORS proxy</span>
@@ -3198,6 +3214,7 @@ function TabGdelt() {
       </>) : (
         <Card><div style={{ color:MUTED, fontSize:14, textAlign:"center", padding:20 }}>No se pudieron obtener datos</div></Card>
       )}
+      </>}
     </div>
   );
 }
