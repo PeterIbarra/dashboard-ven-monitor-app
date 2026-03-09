@@ -1,139 +1,108 @@
-// /api/oil-prices — Petroleum spot prices
-// Primary: EIA API v2 (free, unlimited) — EIA_API_KEY
-// Fallback: OilPriceAPI (500 req/month) — OILPRICE_API_KEY
-// Returns: { brent, wti, natgas, brentHistory[], histPeriod, fetchedAt, source }
+// /api/oil-prices — Petroleum spot prices (hybrid)
+// Live prices: OilPriceAPI (intradía) — OILPRICE_API_KEY
+// Historical chart: EIA API v2 (daily, 365 days, free) — EIA_API_KEY
+// Returns: { brent, wti, natgas, brentHistory[], histPeriod, source, fetchedAt }
 
 const EIA_BASE = "https://api.eia.gov/v2/petroleum/pri/spt/data/";
-
-// EIA series IDs
-const EIA_SERIES = {
-  brent: "RBRTE",    // Europe Brent Spot Price FOB ($/bbl)
-  wti: "RWTC",       // Cushing OK WTI Spot Price FOB ($/bbl)
-  natgas: "RNGWHHD", // Henry Hub Natural Gas Spot Price ($/MMBtu)
-};
+const OIL_BASE = "https://api.oilpriceapi.com/v1";
 
 module.exports = async function handler(req, res) {
   const eiaKey = process.env.EIA_API_KEY;
   const oilKey = process.env.OILPRICE_API_KEY;
 
-  if (!eiaKey && !oilKey) {
-    return res.status(500).json({ error: "No oil API key configured. Set EIA_API_KEY (free) or OILPRICE_API_KEY." });
-  }
-
   try {
-    let result = null;
+    // ── 1. Live prices from OilPriceAPI (intradía) ──
+    let brent = null, wti = null, natgas = null, liveSource = "static";
 
-    // ── Try EIA first (free, unlimited) ──
+    if (oilKey) {
+      const headers = { Authorization: `Token ${oilKey}`, "Content-Type": "application/json" };
+      const [bR, wR, gR] = await Promise.all([
+        fetchJson(`${OIL_BASE}/prices/latest?by_code=BRENT_CRUDE_USD`, 8000, headers),
+        fetchJson(`${OIL_BASE}/prices/latest?by_code=WTI_USD`, 8000, headers),
+        fetchJson(`${OIL_BASE}/prices/latest?by_code=NATURAL_GAS_USD`, 8000, headers),
+      ]);
+      brent = bR?.data || null;
+      wti = wR?.data || null;
+      natgas = gR?.data || null;
+      if (brent || wti) liveSource = "oilpriceapi";
+    }
+
+    // Fallback live prices from EIA if OilPriceAPI unavailable
+    if (!brent && !wti && eiaKey) {
+      const buildUrl = (series) =>
+        `${EIA_BASE}?api_key=${eiaKey}&frequency=daily&data[0]=value&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=1`;
+      const [bR, wR, gR] = await Promise.all([
+        fetchJson(buildUrl("RBRTE")),
+        fetchJson(buildUrl("RWTC")),
+        fetchJson(buildUrl("RNGWHHD")),
+      ]);
+      const extract = (r) => {
+        const d = r?.response?.data?.[0];
+        return d ? { price: parseFloat(d.value), created_at: d.period + "T00:00:00Z" } : null;
+      };
+      brent = extract(bR);
+      wti = extract(wR);
+      natgas = extract(gR);
+      if (brent || wti) liveSource = "eia";
+    }
+
+    // ── 2. Historical chart from EIA (365 days, free, unlimited) ──
+    let brentHistory = [];
+    let histPeriod = "year";
+
     if (eiaKey) {
-      try {
-        result = await fetchEIA(eiaKey);
-      } catch (e) {
-        console.error("EIA error:", e.message);
+      const histUrl = `${EIA_BASE}?api_key=${eiaKey}&frequency=daily&data[0]=value&facets[series][]=RBRTE&sort[0][column]=period&sort[0][direction]=desc&length=365`;
+      const histRes = await fetchJson(histUrl, 15000);
+      const histData = histRes?.response?.data;
+      if (Array.isArray(histData) && histData.length > 0) {
+        brentHistory = histData
+          .filter(d => d.value != null)
+          .map(d => ({ price: parseFloat(d.value), time: d.period + "T00:00:00Z" }))
+          .sort((a, b) => new Date(a.time) - new Date(b.time));
       }
     }
 
-    // ── Fallback to OilPriceAPI ──
-    if (!result && oilKey) {
-      try {
-        result = await fetchOilPriceAPI(oilKey);
-      } catch (e) {
-        console.error("OilPriceAPI error:", e.message);
+    // ── 3. Append today's live price to history ──
+    if (brent?.price && brentHistory.length > 0) {
+      const today = new Date().toISOString().slice(0, 10);
+      const lastHistDate = brentHistory[brentHistory.length - 1]?.time?.slice(0, 10);
+      if (lastHistDate !== today) {
+        brentHistory.push({ price: brent.price, time: today + "T12:00:00Z" });
+      } else {
+        brentHistory[brentHistory.length - 1].price = brent.price;
       }
     }
 
-    if (!result) {
-      return res.status(502).json({ error: "All oil price APIs failed.", fetchedAt: new Date().toISOString() });
+    // Fallback history from OilPriceAPI if no EIA
+    if (brentHistory.length === 0 && oilKey) {
+      const headers = { Authorization: `Token ${oilKey}`, "Content-Type": "application/json" };
+      let histRes = await fetchJson(`${OIL_BASE}/prices/past_year?by_code=BRENT_CRUDE_USD`, 15000, headers);
+      if (!histRes?.data?.prices?.length) {
+        histRes = await fetchJson(`${OIL_BASE}/prices/past_month?by_code=BRENT_CRUDE_USD`, 10000, headers);
+        histPeriod = "month";
+      }
+      const hd = histRes?.data?.prices || histRes?.data;
+      if (Array.isArray(hd) && hd.length > 0) {
+        const byDay = new Map();
+        hd.filter(p => p.price != null).forEach(p => {
+          const day = p.created_at?.split("T")[0] || "";
+          if (day) byDay.set(day, { price: p.price, time: p.created_at });
+        });
+        brentHistory = Array.from(byDay.values()).sort((a, b) => new Date(a.time) - new Date(b.time));
+      }
     }
 
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=120");
-    return res.status(200).json({ ...result, fetchedAt: new Date().toISOString() });
+    return res.status(200).json({
+      brent, wti, natgas,
+      brentHistory, histPeriod,
+      source: liveSource,
+      fetchedAt: new Date().toISOString(),
+    });
   } catch (e) {
     return res.status(502).json({ error: e.message, fetchedAt: new Date().toISOString() });
   }
 };
-
-// ── EIA API v2 ──
-async function fetchEIA(apiKey) {
-  // Fetch latest prices for Brent, WTI, and Natural Gas (last 1 data point each)
-  const buildUrl = (series, length = 1) =>
-    `${EIA_BASE}?api_key=${apiKey}&frequency=daily&data[0]=value&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=${length}`;
-
-  const [brentRes, wtiRes, gasRes, histRes] = await Promise.all([
-    fetchJson(buildUrl(EIA_SERIES.brent, 1)),
-    fetchJson(buildUrl(EIA_SERIES.wti, 1)),
-    fetchJson(buildUrl(EIA_SERIES.natgas, 1)),
-    // Brent history: last 365 days
-    fetchJson(buildUrl(EIA_SERIES.brent, 365), 15000),
-  ]);
-
-  const extractLatest = (res) => {
-    const d = res?.response?.data?.[0];
-    if (!d) return null;
-    return { price: parseFloat(d.value), created_at: d.period + "T00:00:00Z" };
-  };
-
-  const brent = extractLatest(brentRes);
-  const wti = extractLatest(wtiRes);
-  const natgas = extractLatest(gasRes);
-
-  if (!brent && !wti) return null; // EIA failed
-
-  // Build Brent history
-  let brentHistory = [];
-  const histData = histRes?.response?.data;
-  if (Array.isArray(histData) && histData.length > 0) {
-    brentHistory = histData
-      .filter(d => d.value != null)
-      .map(d => ({ price: parseFloat(d.value), time: d.period + "T00:00:00Z" }))
-      .sort((a, b) => new Date(a.time) - new Date(b.time));
-  }
-
-  return {
-    brent, wti, natgas,
-    brentHistory,
-    histPeriod: "year",
-    source: "eia",
-  };
-}
-
-// ── OilPriceAPI (fallback) ──
-async function fetchOilPriceAPI(apiKey) {
-  const API_BASE = "https://api.oilpriceapi.com/v1";
-  const headers = { Authorization: `Token ${apiKey}`, "Content-Type": "application/json" };
-
-  const [brentRes, wtiRes, gasRes] = await Promise.all([
-    fetchJson(`${API_BASE}/prices/latest?by_code=BRENT_CRUDE_USD`, 8000, headers),
-    fetchJson(`${API_BASE}/prices/latest?by_code=WTI_USD`, 8000, headers),
-    fetchJson(`${API_BASE}/prices/latest?by_code=NATURAL_GAS_USD`, 8000, headers),
-  ]);
-
-  const brent = brentRes?.data || null;
-  const wti = wtiRes?.data || null;
-  const natgas = gasRes?.data || null;
-
-  if (!brent && !wti) return null;
-
-  // Brent history with fallback
-  let brentHistoryRes = await fetchJson(`${API_BASE}/prices/past_year?by_code=BRENT_CRUDE_USD`, 15000, headers);
-  let histPeriod = "year";
-  if (!brentHistoryRes?.data?.prices?.length) {
-    brentHistoryRes = await fetchJson(`${API_BASE}/prices/past_month?by_code=BRENT_CRUDE_USD`, 10000, headers);
-    histPeriod = "month";
-  }
-
-  let brentHistory = [];
-  const histData = brentHistoryRes?.data?.prices || brentHistoryRes?.data;
-  if (Array.isArray(histData) && histData.length > 0) {
-    const byDay = new Map();
-    histData.filter(p => p.price != null).forEach(p => {
-      const day = p.created_at?.split("T")[0] || "";
-      if (day) byDay.set(day, { price: p.price, time: p.created_at });
-    });
-    brentHistory = Array.from(byDay.values()).sort((a, b) => new Date(a.time) - new Date(b.time));
-  }
-
-  return { brent, wti, natgas, brentHistory, histPeriod, source: "oilpriceapi" };
-}
 
 async function fetchJson(url, timeout = 8000, headers = {}) {
   try {
