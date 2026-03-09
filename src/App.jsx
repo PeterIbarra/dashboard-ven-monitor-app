@@ -2837,187 +2837,12 @@ function MonitorFactCheck() {
 
 
 
-// ═══════════════════════════════════════════════════════════════
-// GDELT BILATERAL: EE.UU. ↔ Venezuela
-// ═══════════════════════════════════════════════════════════════
-
-function GdeltBilateral() {
-  const mob = useIsMobile();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [hover, setHover] = useState(null);
-
-  useEffect(() => {
-    async function fetchBilateral() {
-      try {
-        // Wait 3 seconds to let the main GDELT queries finish first (avoid rate limiting)
-        await new Promise(r => setTimeout(r, 3000));
-        const url = IS_DEPLOYED ? "/api/gdelt?signal=bilateral" : null;
-        if (!url) { setLoading(false); return; }
-        const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
-        if (res.ok) {
-          const json = await res.json();
-          if (json.data?.length > 5) setData(json.data);
-        }
-      } catch {}
-      setLoading(false);
-    }
-    fetchBilateral();
-  }, []);
-
-  if (loading) return (
-    <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:13 }}>Cargando datos bilaterales EE.UU. ↔ Venezuela...</div></Card>
-  );
-  if (!data) return (
-    <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:13 }}>
-      No se pudieron obtener datos bilaterales GDELT. <span style={{ color:ACCENT, cursor:"pointer" }} onClick={() => { setLoading(true); setTimeout(() => window.location.reload(), 100); }}>Reintentar</span>
-    </div></Card>
-  );
-
-  const W = 700, H = 200, PL = 45, PR = 45, PT = 10, PB = 25;
-  const chartW = W - PL - PR, chartH = H - PT - PB;
-
-  const toneVals = data.map(d => d.tone).filter(v => v !== null);
-  const volVals = data.map(d => d.vol).filter(v => v !== null);
-  const toneMin = Math.min(...toneVals, -6), toneMax = Math.max(...toneVals, 2);
-  const volMax = Math.max(...volVals, 1);
-
-  const toX = (i) => PL + (i / (data.length - 1)) * chartW;
-  const toYTone = (v) => PT + chartH - ((v - toneMin) / (toneMax - toneMin)) * chartH;
-  const toYVol = (v) => PT + chartH - (v / volMax) * chartH;
-
-  // Tone line path
-  const tonePath = data.map((d, i) => d.tone !== null ? `${i === 0 || data[i-1]?.tone === null ? "M" : "L"}${toX(i)},${toYTone(d.tone)}` : "").join("");
-  // Vol area
-  const volPts = data.filter(d => d.vol !== null);
-  const volArea = volPts.length > 2
-    ? `M${toX(data.indexOf(volPts[0]))},${toYVol(0)} ` + volPts.map(d => `L${toX(data.indexOf(d))},${toYVol(d.vol)}`).join(" ") + ` L${toX(data.indexOf(volPts[volPts.length-1]))},${toYVol(0)}Z`
-    : "";
-
-  // Zero line for tone
-  const zeroY = toYTone(0);
-
-  // Stats
-  const recent14 = data.slice(-14);
-  const recentTone = recent14.filter(d=>d.tone!==null).reduce((s,d)=>s+d.tone,0) / (recent14.filter(d=>d.tone!==null).length||1);
-  const allTone = toneVals.reduce((s,v)=>s+v,0) / (toneVals.length||1);
-  const toneShift = recentTone - allTone;
-
-  return (
-    <Card>
-      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
-        <span style={{ fontSize:14 }}>🇺🇸↔🇻🇪</span>
-        <div>
-          <div style={{ fontSize:13, fontWeight:700, color:TEXT }}>Relación Bilateral EE.UU. — Venezuela</div>
-          <div style={{ fontSize:10, fontFamily:font, color:MUTED }}>GDELT DOC API · Tono mediático + volumen de cobertura conjunta · 120 días</div>
-        </div>
-        <div style={{ marginLeft:"auto", display:"flex", gap:8 }}>
-          <div style={{ textAlign:"center" }}>
-            <div style={{ fontSize:16, fontWeight:700, color:recentTone>=0?"#16a34a":"#dc2626", fontFamily:font }}>{recentTone>=0?"+":""}{recentTone.toFixed(1)}</div>
-            <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>Tono 14d</div>
-          </div>
-          <div style={{ textAlign:"center" }}>
-            <div style={{ fontSize:16, fontWeight:700, color:toneShift>=0?"#16a34a":"#dc2626", fontFamily:font }}>{toneShift>=0?"↑":"↓"}{Math.abs(toneShift).toFixed(1)}</div>
-            <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>vs promedio</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Chart */}
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block", overflow:"visible" }}
-        onMouseMove={(e) => {
-          const svg = e.currentTarget; const rect = svg.getBoundingClientRect();
-          const x = ((e.clientX - rect.left) / rect.width) * W;
-          const idx = Math.round(((x - PL) / chartW) * (data.length - 1));
-          setHover(idx >= 0 && idx < data.length ? idx : null);
-        }}
-        onMouseLeave={() => setHover(null)}>
-
-        {/* Zero line */}
-        <line x1={PL} y1={zeroY} x2={PL+chartW} y2={zeroY} stroke={BORDER} strokeWidth={0.5} strokeDasharray="4,3" />
-        <text x={PL-4} y={zeroY+3} fontSize={8} fill={MUTED} textAnchor="end" fontFamily={font}>0</text>
-
-        {/* Volume area */}
-        {volArea && <path d={volArea} fill="#0468B118" />}
-
-        {/* Tone line */}
-        <path d={tonePath} fill="none" stroke={recentTone>=0?"#16a34a":"#dc2626"} strokeWidth={1.8} strokeLinejoin="round" />
-
-        {/* Positive/negative fill under tone line */}
-        {data.map((d,i) => {
-          if (d.tone === null || i === 0) return null;
-          const prev = data[i-1];
-          if (prev?.tone === null) return null;
-          const color = d.tone >= 0 ? "#16a34a" : "#dc2626";
-          return <line key={i} x1={toX(i)} y1={zeroY} x2={toX(i)} y2={toYTone(d.tone)} stroke={color} strokeWidth={1} opacity={0.1} />;
-        })}
-
-        {/* Y axis labels */}
-        <text x={PL-4} y={PT+6} fontSize={7} fill={MUTED} textAnchor="end" fontFamily={font}>{toneMax.toFixed(0)}</text>
-        <text x={PL-4} y={PT+chartH} fontSize={7} fill={MUTED} textAnchor="end" fontFamily={font}>{toneMin.toFixed(0)}</text>
-        <text x={PL+chartW+4} y={PT+6} fontSize={7} fill={MUTED} textAnchor="start" fontFamily={font}>{volMax.toFixed(1)}</text>
-
-        {/* X axis: month labels */}
-        {data.filter((_,i) => i % 30 === 0 || i === data.length-1).map((d,i) => (
-          <text key={i} x={toX(data.indexOf(d))} y={H-2} fontSize={7} fill={MUTED} textAnchor="middle" fontFamily={font}>
-            {d.date?.slice(5,10)}
-          </text>
-        ))}
-
-        {/* Hover */}
-        {hover !== null && data[hover] && (
-          <>
-            <line x1={toX(hover)} y1={PT} x2={toX(hover)} y2={PT+chartH} stroke={ACCENT} strokeWidth={0.5} opacity={0.4} />
-            {data[hover].tone !== null && <circle cx={toX(hover)} cy={toYTone(data[hover].tone)} r={3} fill={data[hover].tone>=0?"#16a34a":"#dc2626"} stroke={BG2} strokeWidth={1.5} />}
-          </>
-        )}
-
-        {/* Annotation: Jan 3 */}
-        {(() => {
-          const jan3Idx = data.findIndex(d => d.date?.includes("2026-01-03") || d.date?.includes("20260103"));
-          if (jan3Idx < 0) return null;
-          return <>
-            <line x1={toX(jan3Idx)} y1={PT} x2={toX(jan3Idx)} y2={PT+chartH} stroke="#dc2626" strokeWidth={0.8} strokeDasharray="3,2" opacity={0.5} />
-            <text x={toX(jan3Idx)+3} y={PT+10} fontSize={7} fill="#dc2626" fontFamily={font}>3 ene</text>
-          </>;
-        })()}
-      </svg>
-
-      {/* Hover tooltip */}
-      {hover !== null && data[hover] && (
-        <div style={{ fontSize:11, fontFamily:font, color:MUTED, display:"flex", gap:12, justifyContent:"center", marginTop:4 }}>
-          <span>{data[hover].date?.slice(0,10)}</span>
-          {data[hover].tone !== null && <span style={{ color:data[hover].tone>=0?"#16a34a":"#dc2626" }}>Tono: {data[hover].tone.toFixed(2)}</span>}
-          {data[hover].vol !== null && <span style={{ color:ACCENT }}>Volumen: {data[hover].vol.toFixed(2)}</span>}
-        </div>
-      )}
-
-      {/* Legend */}
-      <div style={{ display:"flex", gap:16, justifyContent:"center", marginTop:8 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-          <div style={{ width:16, height:2, background:"#16a34a" }} />
-          <span style={{ fontSize:10, color:MUTED }}>Tono bilateral (positivo)</span>
-        </div>
-        <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-          <div style={{ width:16, height:2, background:"#dc2626" }} />
-          <span style={{ fontSize:10, color:MUTED }}>Tono bilateral (negativo)</span>
-        </div>
-        <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-          <div style={{ width:16, height:8, background:"#0468B118", border:`1px solid ${ACCENT}30` }} />
-          <span style={{ fontSize:10, color:MUTED }}>Volumen cobertura conjunta</span>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
 function TabGdelt() {
   const mob = useIsMobile();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("loading");
   const [error, setError] = useState(null);
-  const [gdeltView, setGdeltView] = useState("venezuela"); // venezuela | bilateral
 
   const loadData = useCallback(async () => {
     setLoading(true); setError(null); setSource("loading");
@@ -3078,30 +2903,12 @@ function TabGdelt() {
         </div>
       </div>
 
-      {/* View toggle */}
-      <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, marginBottom:14, width:"fit-content" }}>
-        {[{id:"venezuela",label:"🇻🇪 Venezuela"},{id:"bilateral",label:"🇺🇸↔🇻🇪 Bilateral"}].map(v => (
-          <button key={v.id} onClick={() => setGdeltView(v.id)}
-            style={{ fontSize:mob?10:12, fontFamily:font, padding:mob?"6px 10px":"8px 16px", border:"none",
-              background:gdeltView===v.id?ACCENT:"transparent", color:gdeltView===v.id?"#fff":MUTED,
-              cursor:"pointer", letterSpacing:"0.06em", transition:"all 0.15s" }}>
-            {v.label}
-          </button>
-        ))}
-      </div>
-
-      {error && gdeltView === "venezuela" && (
+      {error && (
         <div style={{ fontSize:12, fontFamily:font, color:"#a17d08", padding:"6px 12px",
           background:"rgba(234,179,8,0.08)", border:"1px solid rgba(234,179,8,0.2)", marginBottom:12 }}>
           ⚠ {error}
         </div>
       )}
-
-      {/* ═══ BILATERAL VIEW ═══ */}
-      {gdeltView === "bilateral" && <GdeltBilateral />}
-
-      {/* ═══ VENEZUELA VIEW ═══ */}
-      {gdeltView === "venezuela" && <>
 
       {/* Explanation */}
       <Card accent={ACCENT} style={{ marginBottom:14 }}>
@@ -3203,7 +3010,6 @@ function TabGdelt() {
       </>) : (
         <Card><div style={{ color:MUTED, fontSize:14, textAlign:"center", padding:20 }}>No se pudieron obtener datos</div></Card>
       )}
-      </>}
     </div>
   );
 }

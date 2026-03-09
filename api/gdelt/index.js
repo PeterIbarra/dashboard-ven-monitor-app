@@ -7,46 +7,9 @@ module.exports = async function handler(req, res) {
     instability: `${GDELT_BASE}?query=venezuela+(protest+OR+conflict+OR+crisis+OR+violence+OR+unrest)&mode=timelinevol&timespan=120d&format=csv`,
     tone: `${GDELT_BASE}?query=venezuela&mode=timelinetone&timespan=120d&format=csv`,
     artvolnorm: `${GDELT_BASE}?query=venezuela&mode=timelinevol&timespan=120d&format=csv`,
-    bilateral_tone: `${GDELT_BASE}?query=venezuela+trump&mode=timelinetone&timespan=120d&format=csv`,
-    bilateral_vol: `${GDELT_BASE}?query=venezuela+trump&mode=timelinevol&timespan=120d&format=csv`,
   };
 
   // If specific signal requested
-  if (signal === "bilateral") {
-    try {
-      // Single query for tone (avoid rate limiting from multiple parallel requests)
-      const wait = (ms) => new Promise(r => setTimeout(r, ms));
-      let toneData = new Map();
-
-      // Try up to 2 times with delay
-      for (let attempt = 0; attempt < 2; attempt++) {
-        if (attempt > 0) await wait(2000); // wait 2s before retry
-        try {
-          const toneRes = await fetch(queries.bilateral_tone, {
-            signal: AbortSignal.timeout(10000),
-            headers: { "User-Agent": "PNUD-Monitor/1.0" },
-          });
-          if (toneRes.ok) {
-            const csv = await toneRes.text();
-            if (!csv.includes("<!") && csv.trim().length > 20) {
-              toneData = parseCsv(csv);
-              if (toneData.size > 5) break;
-            }
-          }
-        } catch {}
-      }
-
-      const merged = Array.from(toneData.entries()).sort(([a],[b]) => a.localeCompare(b)).map(([date, tone]) => ({
-        date, tone, vol: null,
-      }));
-
-      res.setHeader("Cache-Control", "public, s-maxage=7200, stale-while-revalidate=3600");
-      return res.status(200).json({ signal: "bilateral", data: merged, count: merged.length, fetchedAt: new Date().toISOString() });
-    } catch (e) {
-      return res.status(502).json({ error: e.message });
-    }
-  }
-
   if (signal && queries[signal]) {
     try {
       const response = await fetch(queries[signal], { signal: AbortSignal.timeout(8000) });
