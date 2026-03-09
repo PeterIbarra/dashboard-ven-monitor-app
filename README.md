@@ -189,7 +189,8 @@ Para indicadores **nuevos**, usar `null` en semanas anteriores y `addedWeek`:
 
 | Variable | Requerida | Uso |
 |----------|-----------|-----|
-| `OILPRICE_API_KEY` | Sí | API de precios petroleros |
+| `EIA_API_KEY` | Sí | Precios petroleros EIA (gratuito, ilimitado) — [eia.gov/opendata](https://www.eia.gov/opendata/register.php) |
+| `OILPRICE_API_KEY` | Opcional | Fallback: precios petroleros OilPriceAPI (500 req/mes) |
 | `NEWS_API_KEY` | Opcional | NewsAPI para noticias en vivo |
 | `SUPABASE_URL` | Opcional | Base de datos de artículos |
 | `SUPABASE_KEY` | Opcional | Auth Supabase |
