@@ -14,16 +14,34 @@ module.exports = async function handler(req, res) {
   // If specific signal requested
   if (signal === "bilateral") {
     try {
-      const [toneRes, volRes] = await Promise.all([
-        fetch(queries.bilateral_tone, { signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.text() : "").then(t => t.includes("<!") ? new Map() : parseCsv(t)).catch(() => new Map()),
-        fetch(queries.bilateral_vol, { signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.text() : "").then(t => t.includes("<!") ? new Map() : parseCsv(t)).catch(() => new Map()),
-      ]);
-      const allDates = new Set([...toneRes.keys(), ...volRes.keys()]);
-      const merged = Array.from(allDates).sort().map(date => ({
-        date, tone: toneRes.get(date) ?? null, vol: volRes.get(date) ?? null,
+      // Single query for tone (avoid rate limiting from multiple parallel requests)
+      const wait = (ms) => new Promise(r => setTimeout(r, ms));
+      let toneData = new Map();
+
+      // Try up to 2 times with delay
+      for (let attempt = 0; attempt < 2; attempt++) {
+        if (attempt > 0) await wait(2000); // wait 2s before retry
+        try {
+          const toneRes = await fetch(queries.bilateral_tone, {
+            signal: AbortSignal.timeout(10000),
+            headers: { "User-Agent": "PNUD-Monitor/1.0" },
+          });
+          if (toneRes.ok) {
+            const csv = await toneRes.text();
+            if (!csv.includes("<!") && csv.trim().length > 20) {
+              toneData = parseCsv(csv);
+              if (toneData.size > 5) break;
+            }
+          }
+        } catch {}
+      }
+
+      const merged = Array.from(toneData.entries()).sort(([a],[b]) => a.localeCompare(b)).map(([date, tone]) => ({
+        date, tone, vol: null,
       }));
-      res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=1800");
-      return res.status(200).json({ signal: "bilateral", data: merged, fetchedAt: new Date().toISOString() });
+
+      res.setHeader("Cache-Control", "public, s-maxage=7200, stale-while-revalidate=3600");
+      return res.status(200).json({ signal: "bilateral", data: merged, count: merged.length, fetchedAt: new Date().toISOString() });
     } catch (e) {
       return res.status(502).json({ error: e.message });
     }

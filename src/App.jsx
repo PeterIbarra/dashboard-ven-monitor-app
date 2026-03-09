@@ -2850,10 +2850,11 @@ function GdeltBilateral() {
   useEffect(() => {
     async function fetchBilateral() {
       try {
-        // Use serverless proxy (avoids CORS and rate limiting)
+        // Wait 3 seconds to let the main GDELT queries finish first (avoid rate limiting)
+        await new Promise(r => setTimeout(r, 3000));
         const url = IS_DEPLOYED ? "/api/gdelt?signal=bilateral" : null;
         if (!url) { setLoading(false); return; }
-        const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+        const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
         if (res.ok) {
           const json = await res.json();
           if (json.data?.length > 5) setData(json.data);
