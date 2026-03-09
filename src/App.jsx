@@ -1630,7 +1630,119 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
   );
 }
 
-function TabDashboard({ week }) {
+// ═══════════════════════════════════════════════════════════════
+// DAILY BRIEF — Auto-generated on dashboard load
+// ═══════════════════════════════════════════════════════════════
+
+function DailyBrief({ week, liveData, mob }) {
+  const [brief, setBrief] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [provider, setProvider] = useState("");
+  const [time, setTime] = useState(null);
+  const generated = useRef(false);
+
+  useEffect(() => {
+    if (generated.current || !liveData?.fetched) return;
+    generated.current = true;
+
+    async function generateBrief() {
+      setLoading(true);
+      const wk = WEEKS[week];
+      const dom = wk.probs.reduce((a,b) => a.v > b.v ? a : b);
+      const domSc = SCENARIOS.find(s=>s.id===dom.sc);
+      const amnistia = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
+
+      const briefData = {
+        fecha: new Date().toLocaleDateString("es", { weekday:"long", day:"numeric", month:"long", year:"numeric" }),
+        escenarioDominante: `${domSc?.name} (E${dom.sc}) al ${dom.v}%`,
+        dolar: liveData?.dolar || null,
+        petroleo: liveData?.oil || null,
+        titulares: liveData?.news?.slice(0, 5) || [],
+        amnistia: amnistia ? { gobLibertades: amnistia.gob.libertades || amnistia.gob.excarcelados, fpVerificados: amnistia.fp.verificados, presos: amnistia.fp.detenidos } : null,
+        tensionesRojas: wk.tensiones.filter(t=>t.l==="red").map(t=>t.t.replace(/<[^>]+>/g,"")).slice(0, 2),
+      };
+
+      const prompt = `Eres un analista del PNUD Venezuela. Genera un DAILY BRIEF de máximo 3 párrafos cortos (150-200 palabras total) para hoy ${briefData.fecha}.
+
+DATOS DISPONIBLES:
+${JSON.stringify(briefData, null, 1)}
+
+INSTRUCCIONES:
+1. Primer párrafo: Estado actual — escenario dominante y dato más relevante del día (dólar, petróleo o titular).
+2. Segundo párrafo: Contexto rápido — amnistía, tensiones, o cualquier cambio notable.
+3. Tercer párrafo (opcional): Solo si hay titulares relevantes sobre Venezuela, menciónalos brevemente. Ignora titulares que no se relacionen con Venezuela.
+4. Tono: profesional pero conciso, tipo cable de agencia. Sin bullet points.
+5. Si no hay datos en vivo disponibles, enfócate en el escenario y la amnistía.
+6. NO inventes datos. Usa SOLO lo proporcionado.`;
+
+      try {
+        let text = "";
+        if (IS_DEPLOYED) {
+          const res = await fetch("/api/ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt, max_tokens: 500 }),
+            signal: AbortSignal.timeout(30000),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            text = data.text || "";
+            if (data.provider) setProvider(data.provider);
+          }
+        } else {
+          const res = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:500, messages:[{role:"user",content:prompt}] }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            text = data.content?.map(c=>c.text||"").join("\n") || "";
+            setProvider("claude");
+          }
+        }
+        if (text) { setBrief(text); setTime(new Date()); }
+      } catch {}
+      setLoading(false);
+    }
+
+    const timer = setTimeout(generateBrief, 2000);
+    return () => clearTimeout(timer);
+  }, [liveData?.fetched, week]);
+
+  const badgeColor = provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : "#8b5cf6";
+  const badgeLabel = provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : "CLAUDE";
+
+  return (
+    <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:mob?12:16 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:brief?10:0, flexWrap:"wrap" }}>
+        <span style={{ fontSize:14 }}>📰</span>
+        <div style={{ fontSize:10, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:ACCENT }}>Daily Brief</div>
+        {time && (
+          <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>
+            {time.toLocaleString("es", { hour:"2-digit", minute:"2-digit" })} · hoy
+          </span>
+        )}
+        {provider && (
+          <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${badgeColor}15`, color:badgeColor, border:`1px solid ${badgeColor}30`, letterSpacing:"0.08em" }}>
+            {badgeLabel}
+          </span>
+        )}
+        <div style={{ marginLeft:"auto" }}>
+          {loading && <span style={{ fontSize:10, fontFamily:font, color:MUTED, animation:"pulse 1.5s infinite" }}>Generando brief...</span>}
+          {!loading && !brief && <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>Esperando datos...</span>}
+        </div>
+      </div>
+      {brief && (
+        <div style={{ fontSize:mob?12:13, fontFamily:fontSans, color:TEXT, lineHeight:1.7, whiteSpace:"pre-wrap" }}>
+          {brief}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TabDashboard({ week, liveData = {} }) {
   const mob = useIsMobile();
   const wk = WEEKS[week];
   const prevWk = week > 0 ? WEEKS[week-1] : null;
@@ -1681,42 +1793,81 @@ function TabDashboard({ week }) {
 
       {/* ── ROW 1b: Índice de Inestabilidad Compuesto ── */}
       {(() => {
-        // Compute Composite Instability Index (0-100)
+        // ── 13-input Composite Instability Index (0-100) ──
         const e1 = wk.probs.find(p=>p.sc===1)?.v || 0;
         const e2 = wk.probs.find(p=>p.sc===2)?.v || 0;
+        const e3 = wk.probs.find(p=>p.sc===3)?.v || 0;
         const e4 = wk.probs.find(p=>p.sc===4)?.v || 0;
+
+        // Indicators
         const latestInds = INDICATORS.map(ind => ind.hist.filter(h=>h!==null).pop()).filter(Boolean);
         const redCount = latestInds.filter(h=>h[0]==="red").length;
         const totalInds = latestInds.length || 1;
+
+        // Tensions
         const tensRed = wk.tensiones.filter(t=>t.l==="red").length;
         const totalTens = wk.tensiones.length || 1;
-        // Brecha: use 50 as default if no live data available
-        const brechaEst = 50; // updated weekly via indicators
 
-        const raw = (redCount/totalInds)*25 + (e2/100)*20 + (e4/100)*15
-          + (Math.min(brechaEst,100)/100)*15 + (tensRed/totalTens)*15 - (e1/100)*10;
+        // Signals E4+E2 active
+        const sigE4E2 = SCENARIO_SIGNALS.filter(g=>g.esc==="E4"||g.esc==="E2").flatMap(g=>g.signals);
+        const sigActive = sigE4E2.filter(s=>s.sem==="red"||s.sem==="yellow").length;
+        const sigTotal = sigE4E2.length || 1;
+
+        // Live: brecha cambiaria (from liveData, fallback to 50)
+        const brechaLive = liveData?.dolar?.brecha ? parseFloat(liveData.dolar.brecha) : 50;
+
+        // Live: Brent pressure (below $65 = pressure, above $75 = stability)
+        const brentPrice = liveData?.oil?.brent || 75;
+        const brentFactor = brentPrice < 55 ? 100 : brentPrice < 65 ? 70 : brentPrice < 75 ? 30 : brentPrice < 85 ? 10 : 0;
+
+        // OVCS: protests intensity (last month vs max)
+        const lastMonth = CONF_MESES[CONF_MESES.length - 1];
+        const maxProtests = Math.max(...CONF_MESES.map(m=>m.t), 1);
+        const protestPct = lastMonth ? (lastMonth.t / maxProtests) * 100 : 50;
+        const repressionPct = lastMonth?.rep > 0 ? Math.min(lastMonth.rep * 25, 100) : 0;
+
+        // Amnesty: verification gap + political prisoners
+        const amnLatest = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
+        const gobLib = amnLatest?.gob?.libertades || amnLatest?.gob?.excarcelados || 1;
+        const fpVerif = amnLatest?.fp?.verificados || 0;
+        const amnBrechaPct = Math.max(0, (1 - fpVerif / gobLib) * 100);
+        const presosPct = amnLatest?.fp?.detenidos ? Math.min((amnLatest.fp.detenidos / 1000) * 100, 100) : 50;
+
+        // ── FORMULA (weights sum to ~100 with stabilizers) ──
+        const raw = (redCount/totalInds)*12            // Ind. rojos: 12%
+          + (e2/100)*10                                 // E2 Colapso: 10%
+          + (e4/100)*8                                  // E4 Resistencia: 8%
+          + (Math.min(brechaLive,100)/100)*12           // Brecha cambiaria: 12% (LIVE)
+          + (tensRed/totalTens)*8                        // Tensiones rojas: 8%
+          + (sigActive/sigTotal)*8                       // Señales E4+E2: 8%
+          + (brentFactor/100)*5                          // Brent presión: 5% (LIVE)
+          + (protestPct/100)*5                           // Protestas OVCS: 5%
+          + (repressionPct/100)*4                        // Represión OVCS: 4%
+          + (amnBrechaPct/100)*5                         // Brecha amnistía: 5%
+          + (presosPct/100)*3                            // Presos políticos: 3%
+          - (e1/100)*8                                   // E1 Transición: -8% (estabilizador)
+          - (e3/100)*5;                                  // E3 Continuidad: -5% (estabilizador)
         const index = Math.max(0, Math.min(100, Math.round(raw)));
 
-        // Previous week index for delta
+        // Previous week index for delta (simplified: same formula with prev week probs)
         let prevIndex = null;
         if (prevWk) {
-          const pe1 = prevWk.probs.find(p=>p.sc===1)?.v || 0;
-          const pe2 = prevWk.probs.find(p=>p.sc===2)?.v || 0;
-          const pe4 = prevWk.probs.find(p=>p.sc===4)?.v || 0;
-          const pTensRed = prevWk.tensiones.filter(t=>t.l==="red").length;
-          const pTotalTens = prevWk.tensiones.length || 1;
-          const pRaw = (redCount/totalInds)*25 + (pe2/100)*20 + (pe4/100)*15
-            + (Math.min(brechaEst,100)/100)*15 + (pTensRed/pTotalTens)*15 - (pe1/100)*10;
+          const pe1=prevWk.probs.find(p=>p.sc===1)?.v||0, pe2=prevWk.probs.find(p=>p.sc===2)?.v||0;
+          const pe3=prevWk.probs.find(p=>p.sc===3)?.v||0, pe4=prevWk.probs.find(p=>p.sc===4)?.v||0;
+          const pTR=prevWk.tensiones.filter(t=>t.l==="red").length, pTT=prevWk.tensiones.length||1;
+          const pRaw = (redCount/totalInds)*12 + (pe2/100)*10 + (pe4/100)*8
+            + (Math.min(brechaLive,100)/100)*12 + (pTR/pTT)*8 + (sigActive/sigTotal)*8
+            + (brentFactor/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
+            + (amnBrechaPct/100)*5 + (presosPct/100)*3 - (pe1/100)*8 - (pe3/100)*5;
           prevIndex = Math.max(0, Math.min(100, Math.round(pRaw)));
         }
         const delta = prevIndex !== null ? index - prevIndex : null;
 
-        const zone = index <= 25 ? { label:"Estabilidad relativa", color:"#16a34a", bg:"#16a34a" }
-          : index <= 50 ? { label:"Tensión moderada", color:"#ca8a04", bg:"#ca8a04" }
-          : index <= 75 ? { label:"Inestabilidad alta", color:"#f97316", bg:"#f97316" }
-          : { label:"Crisis inminente", color:"#dc2626", bg:"#dc2626" };
+        const zone = index <= 25 ? { label:"Estabilidad relativa", color:"#16a34a" }
+          : index <= 50 ? { label:"Tensión moderada", color:"#ca8a04" }
+          : index <= 75 ? { label:"Inestabilidad alta", color:"#f97316" }
+          : { label:"Crisis inminente", color:"#dc2626" };
 
-        // Thermometer segments
         const segments = [
           { from:0, to:25, color:"#16a34a", label:"Estable" },
           { from:25, to:50, color:"#ca8a04", label:"Tensión" },
@@ -1724,17 +1875,34 @@ function TabDashboard({ week }) {
           { from:75, to:100, color:"#dc2626", label:"Crisis" },
         ];
 
-        // Historical index for sparkline
-        const histIdx = WEEKS.map((w,i) => {
-          const we1 = w.probs.find(p=>p.sc===1)?.v || 0;
-          const we2 = w.probs.find(p=>p.sc===2)?.v || 0;
-          const we4 = w.probs.find(p=>p.sc===4)?.v || 0;
-          const wtr = w.tensiones.filter(t=>t.l==="red").length;
-          const wtt = w.tensiones.length || 1;
-          const wr = (redCount/totalInds)*25 + (we2/100)*20 + (we4/100)*15
-            + (Math.min(brechaEst,100)/100)*15 + (wtr/wtt)*15 - (we1/100)*10;
+        // Historical index for sparkline (simplified per week)
+        const histIdx = WEEKS.map((w) => {
+          const we1=w.probs.find(p=>p.sc===1)?.v||0, we2=w.probs.find(p=>p.sc===2)?.v||0;
+          const we3=w.probs.find(p=>p.sc===3)?.v||0, we4=w.probs.find(p=>p.sc===4)?.v||0;
+          const wtr=w.tensiones.filter(t=>t.l==="red").length, wtt=w.tensiones.length||1;
+          const wr = (redCount/totalInds)*12 + (we2/100)*10 + (we4/100)*8
+            + (Math.min(brechaLive,100)/100)*12 + (wtr/wtt)*8 + (sigActive/sigTotal)*8
+            + (brentFactor/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
+            + (amnBrechaPct/100)*5 + (presosPct/100)*3 - (we1/100)*8 - (we3/100)*5;
           return Math.max(0, Math.min(100, Math.round(wr)));
         });
+
+        // Breakdown items for display
+        const breakdown = [
+          { label:"Ind. rojos", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100), w:"12%" },
+          { label:"Brecha camb.", value:`${brechaLive.toFixed(0)}%`, pct:Math.min(brechaLive,100), w:"12%", live:true },
+          { label:"E2 Colapso", value:`${e2}%`, pct:e2, w:"10%" },
+          { label:"Señales E4/E2", value:`${sigActive}/${sigTotal}`, pct:Math.round(sigActive/sigTotal*100), w:"8%" },
+          { label:"E4 Resistencia", value:`${e4}%`, pct:e4, w:"8%" },
+          { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100), w:"8%" },
+          { label:"Brent", value:`$${brentPrice}`, pct:brentFactor, w:"5%", live:true },
+          { label:"Protestas", value:`${lastMonth?.t||"—"}`, pct:Math.round(protestPct), w:"5%" },
+          { label:"Brecha amnist.", value:`${amnBrechaPct.toFixed(0)}%`, pct:Math.round(amnBrechaPct), w:"5%" },
+          { label:"Represión", value:`${lastMonth?.rep||0}`, pct:Math.round(repressionPct), w:"4%" },
+          { label:"Presos pol.", value:`${amnLatest?.fp?.detenidos||"—"}`, pct:Math.round(presosPct), w:"3%" },
+          { label:"E1 Transición", value:`-${e1}%`, pct:0, w:"-8%", isNeg:true },
+          { label:"E3 Continuidad", value:`-${e3}%`, pct:0, w:"-5%", isNeg:true },
+        ];
 
         return (
           <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"auto 1fr", gap:0, border:`1px solid ${BORDER}`, background:BG2 }}>
@@ -1769,7 +1937,6 @@ function TabDashboard({ week }) {
                   {segments.map((seg,i) => (
                     <div key={i} style={{ flex:1, background:seg.color, opacity:0.2 }} />
                   ))}
-                  {/* Needle / indicator */}
                   <div style={{ position:"absolute", left:`${index}%`, top:-2, transform:"translateX(-50%)", width:4, height:16,
                     background:zone.color, borderRadius:2, boxShadow:`0 0 6px ${zone.color}60`, transition:"left 0.5s" }} />
                 </div>
@@ -1786,17 +1953,13 @@ function TabDashboard({ week }) {
               {/* Breakdown + sparkline */}
               <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:mob?8:16 }}>
                 {/* Breakdown */}
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"3px 10px", fontSize:11, fontFamily:font }}>
-                  {[
-                    { label:"Ind. rojos", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100) },
-                    { label:"E2 Colapso", value:`${e2}%`, pct:e2 },
-                    { label:"E4 Resistencia", value:`${e4}%`, pct:e4 },
-                    { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100) },
-                    { label:"Brecha camb.", value:`~${brechaEst}%`, pct:brechaEst },
-                    { label:"E1 Transición", value:`-${e1}%`, pct:0, isNeg:true },
-                  ].map((item,i) => (
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2px 8px", fontSize:10, fontFamily:font }}>
+                  {breakdown.map((item,i) => (
                     <div key={i} style={{ display:"flex", justifyContent:"space-between", color:item.isNeg?"#16a34a":MUTED, padding:"1px 0" }}>
-                      <span>{item.label}</span>
+                      <span style={{ display:"flex", alignItems:"center", gap:3 }}>
+                        {item.label}
+                        {item.live && <span style={{ width:4, height:4, borderRadius:"50%", background:"#22c55e", animation:"pulse 1.5s infinite" }} />}
+                      </span>
                       <span style={{ fontWeight:600, color:item.isNeg?"#16a34a":item.pct>50?"#dc2626":item.pct>25?"#ca8a04":MUTED }}>{item.value}</span>
                     </div>
                   ))}
@@ -1804,25 +1967,21 @@ function TabDashboard({ week }) {
 
                 {/* Historical sparkline */}
                 <div>
-                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginBottom:4 }}>Evolución semanal</div>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginBottom:4 }}>Evolución semanal · 13 factores</div>
                   <svg width="100%" height={40} viewBox="0 0 200 40" preserveAspectRatio="none" style={{ display:"block" }}>
-                    {/* Zone backgrounds */}
                     <rect x={0} y={0} width={200} height={10} fill="#16a34a" opacity={0.08} />
                     <rect x={0} y={10} width={200} height={10} fill="#ca8a04" opacity={0.08} />
                     <rect x={0} y={20} width={200} height={10} fill="#f97316" opacity={0.08} />
                     <rect x={0} y={30} width={200} height={10} fill="#dc2626" opacity={0.08} />
-                    {/* Line */}
                     <polyline
                       points={histIdx.map((v,i) => `${(i/(Math.max(histIdx.length-1,1)))*200},${40-(v/100)*40}`).join(" ")}
                       fill="none" stroke={zone.color} strokeWidth={2} strokeLinejoin="round"
                     />
-                    {/* Current dot */}
                     <circle
                       cx={(histIdx.length-1)/(Math.max(histIdx.length-1,1))*200}
                       cy={40-(index/100)*40}
                       r={3.5} fill={zone.color} stroke="#fff" strokeWidth={1.5}
                     />
-                    {/* Week labels */}
                     {histIdx.map((v,i) => (
                       <text key={i} x={(i/(Math.max(histIdx.length-1,1)))*200} y={40}
                         fontSize={6} fill={i===histIdx.length-1?zone.color:MUTED} textAnchor="middle" fontFamily={font}>
@@ -1836,6 +1995,9 @@ function TabDashboard({ week }) {
           </div>
         );
       })()}
+
+      {/* ── ROW 1c: Daily Brief (auto-generated) ── */}
+      <DailyBrief week={week} liveData={liveData} mob={mob} />
 
       {/* ── ROW 2: Amnistía Tracker ── */}
       {(() => {
@@ -5790,7 +5952,7 @@ export default function MonitorPNUD() {
 
       {/* CONTENT */}
       <div style={{ maxWidth:1340, margin:"0 auto", padding:mob?"12px 10px 40px":"24px 24px 60px" }}>
-        {tab === "dashboard" && <TabDashboard week={week} />}
+        {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} />}
         {tab === "sitrep" && <TabSitrep liveData={liveData} />}
         {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
