@@ -1111,14 +1111,14 @@ ${Object.keys(liveContext).length > 0 ? JSON.stringify(liveContext, null, 2) : "
 1. Escribe en español profesional, tono institucional PNUD, sin bullet points ni listas.
 2. PRIORIZA los datos del SITREP (escenarios, síntesis, tensiones, actores) como eje narrativo.
 3. USA los indicadores y señales para enriquecer el análisis con datos duros y tendencias.
-4. Si hay DATOS EN VIVO disponibles (dólar, petróleo, titulares), incorpóralos como contexto de mercado actual.
+4. Si hay DATOS EN VIVO disponibles (dólar, petróleo, titulares), incorpóralos como contexto de mercado actual. IMPORTANTE: de los titulares de noticias, usa SOLO los que se refieran directamente a Venezuela o que tengan relación con el contexto venezolano. Ignora titulares sobre otros países o temas no relacionados.
 5. Estructura:
    - Párrafo 1: Panorama general — escenario dominante, probabilidades, tendencia y drivers principales.
    - Párrafo 2: Dinámica energética y económica — exportaciones, petróleo, PIB, recaudación, brecha cambiaria. Usa indicadores de las dimensiones Energético y Económico. Si hay datos en vivo de petróleo o dólar, menciónalos como contexto de mercado.
    - Párrafo 3: Dinámica política interna y DDHH — amnistía (contrasta cifras gobierno vs Foro Penal), presos políticos, cautelares, FANB, marcos restrictivos.
    - Párrafo 4: Factores internacionales — cooperación EE.UU., sanciones UE, FMI, normalización diplomática. Usa señales de E3 y E1.
    - Párrafo 5: Presiones y riesgos — tensiones activas, señales de E4 y E2, indicadores en rojo.
-   - Párrafo 6: Perspectiva de corto plazo — variables críticas a monitorear, escenarios con mayor probabilidad de movimiento. Si hay titulares de noticias en vivo, úsalos para contextualizar.
+   - Párrafo 6: Perspectiva de corto plazo — variables críticas a monitorear, escenarios con mayor probabilidad de movimiento. Si hay titulares de noticias en vivo relacionados con Venezuela, úsalos para contextualizar la coyuntura inmediata.
 6. Sé específico con cifras, nombres propios y datos del período. Menciona indicadores NUEVOS si los hay.
 7. NO inventes datos. Usa EXCLUSIVAMENTE la información proporcionada.
 8. Extensión: 500-700 palabras.`;
