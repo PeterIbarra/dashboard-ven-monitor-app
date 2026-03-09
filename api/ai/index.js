@@ -7,19 +7,29 @@ const PROVIDERS = [
     name: "gemini-2.0-flash",
     keyEnv: "GEMINI_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
-        }),
-        signal: AbortSignal.timeout(30000),
-      });
-      if (!res.ok) return null;
-      const data = await res.json();
-      return data.candidates?.[0]?.content?.parts?.map(p => p.text).join("\n") || null;
+      // Try gemini-2.0-flash first, fallback to gemini-1.5-flash if unavailable
+      const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
+      for (const model of models) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
+          }),
+          signal: AbortSignal.timeout(30000),
+        });
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          console.error(`Gemini ${model} error ${res.status}: ${errText.slice(0, 200)}`);
+          continue; // try next model
+        }
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join("\n");
+        if (text) return text;
+      }
+      return null;
     },
   },
   {
@@ -130,13 +140,18 @@ module.exports = async function handler(req, res) {
           res.setHeader("Cache-Control", "no-store");
           return res.status(200).json({ text, provider: provider.name, generatedAt: new Date().toISOString() });
         }
-        errors.push(`${provider.name}: empty response`);
+        errors.push(`${provider.name}: empty or short response`);
       } catch (err) {
-        errors.push(`${provider.name}: ${err.message}`);
+        const msg = err.name === "TimeoutError" || err.name === "AbortError" ? "timeout 30s" : err.message;
+        errors.push(`${provider.name}: ${msg}`);
       }
     }
 
-    return res.status(502).json({ error: "All AI providers failed.", details: errors });
+    return res.status(502).json({
+      error: "All AI providers failed. Check API keys and quotas in Vercel Environment Variables.",
+      tried: available.map(p => p.name),
+      details: errors,
+    });
   } catch (err) {
     return res.status(502).json({ error: err.message || "Internal proxy error" });
   }
