@@ -1679,6 +1679,164 @@ function TabDashboard({ week }) {
         })}
       </div>
 
+      {/* ── ROW 1b: Índice de Inestabilidad Compuesto ── */}
+      {(() => {
+        // Compute Composite Instability Index (0-100)
+        const e1 = wk.probs.find(p=>p.sc===1)?.v || 0;
+        const e2 = wk.probs.find(p=>p.sc===2)?.v || 0;
+        const e4 = wk.probs.find(p=>p.sc===4)?.v || 0;
+        const latestInds = INDICATORS.map(ind => ind.hist.filter(h=>h!==null).pop()).filter(Boolean);
+        const redCount = latestInds.filter(h=>h[0]==="red").length;
+        const totalInds = latestInds.length || 1;
+        const tensRed = wk.tensiones.filter(t=>t.l==="red").length;
+        const totalTens = wk.tensiones.length || 1;
+        // Brecha: use 50 as default if no live data available
+        const brechaEst = 50; // updated weekly via indicators
+
+        const raw = (redCount/totalInds)*25 + (e2/100)*20 + (e4/100)*15
+          + (Math.min(brechaEst,100)/100)*15 + (tensRed/totalTens)*15 - (e1/100)*10;
+        const index = Math.max(0, Math.min(100, Math.round(raw)));
+
+        // Previous week index for delta
+        let prevIndex = null;
+        if (prevWk) {
+          const pe1 = prevWk.probs.find(p=>p.sc===1)?.v || 0;
+          const pe2 = prevWk.probs.find(p=>p.sc===2)?.v || 0;
+          const pe4 = prevWk.probs.find(p=>p.sc===4)?.v || 0;
+          const pTensRed = prevWk.tensiones.filter(t=>t.l==="red").length;
+          const pTotalTens = prevWk.tensiones.length || 1;
+          const pRaw = (redCount/totalInds)*25 + (pe2/100)*20 + (pe4/100)*15
+            + (Math.min(brechaEst,100)/100)*15 + (pTensRed/pTotalTens)*15 - (pe1/100)*10;
+          prevIndex = Math.max(0, Math.min(100, Math.round(pRaw)));
+        }
+        const delta = prevIndex !== null ? index - prevIndex : null;
+
+        const zone = index <= 25 ? { label:"Estabilidad relativa", color:"#16a34a", bg:"#16a34a" }
+          : index <= 50 ? { label:"Tensión moderada", color:"#ca8a04", bg:"#ca8a04" }
+          : index <= 75 ? { label:"Inestabilidad alta", color:"#f97316", bg:"#f97316" }
+          : { label:"Crisis inminente", color:"#dc2626", bg:"#dc2626" };
+
+        // Thermometer segments
+        const segments = [
+          { from:0, to:25, color:"#16a34a", label:"Estable" },
+          { from:25, to:50, color:"#ca8a04", label:"Tensión" },
+          { from:50, to:75, color:"#f97316", label:"Alta" },
+          { from:75, to:100, color:"#dc2626", label:"Crisis" },
+        ];
+
+        // Historical index for sparkline
+        const histIdx = WEEKS.map((w,i) => {
+          const we1 = w.probs.find(p=>p.sc===1)?.v || 0;
+          const we2 = w.probs.find(p=>p.sc===2)?.v || 0;
+          const we4 = w.probs.find(p=>p.sc===4)?.v || 0;
+          const wtr = w.tensiones.filter(t=>t.l==="red").length;
+          const wtt = w.tensiones.length || 1;
+          const wr = (redCount/totalInds)*25 + (we2/100)*20 + (we4/100)*15
+            + (Math.min(brechaEst,100)/100)*15 + (wtr/wtt)*15 - (we1/100)*10;
+          return Math.max(0, Math.min(100, Math.round(wr)));
+        });
+
+        return (
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"auto 1fr", gap:0, border:`1px solid ${BORDER}`, background:BG2 }}>
+            {/* Left: Big number */}
+            <div style={{ padding:mob?"14px 16px":"18px 24px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+              borderRight:mob?"none":`1px solid ${BORDER}`, borderBottom:mob?`1px solid ${BORDER}`:"none", minWidth:mob?"auto":160 }}>
+              <div style={{ fontSize:9, fontFamily:font, letterSpacing:"0.15em", textTransform:"uppercase", color:MUTED, marginBottom:4 }}>
+                Índice de Inestabilidad
+              </div>
+              <div style={{ display:"flex", alignItems:"flex-end", gap:6 }}>
+                <span style={{ fontSize:mob?40:52, fontWeight:900, fontFamily:"'Playfair Display',serif", color:zone.color, lineHeight:1 }}>
+                  {index}
+                </span>
+                <span style={{ fontSize:14, fontFamily:font, color:MUTED, marginBottom:mob?4:8 }}>/100</span>
+              </div>
+              {delta !== null && delta !== 0 && (
+                <div style={{ fontSize:12, fontFamily:font, color:delta>0?"#dc2626":"#16a34a", marginTop:2 }}>
+                  {delta>0?"▲":"▼"}{Math.abs(delta)}pp vs anterior
+                </div>
+              )}
+              <div style={{ fontSize:11, fontFamily:fontSans, fontWeight:600, color:zone.color, marginTop:4, padding:"2px 10px",
+                background:`${zone.color}12`, border:`1px solid ${zone.color}25` }}>
+                {zone.label}
+              </div>
+            </div>
+
+            {/* Right: Thermometer + breakdown */}
+            <div style={{ padding:mob?"12px 14px":"16px 20px" }}>
+              {/* Thermometer bar */}
+              <div style={{ marginBottom:12 }}>
+                <div style={{ display:"flex", height:12, borderRadius:6, overflow:"hidden", background:BG3, position:"relative" }}>
+                  {segments.map((seg,i) => (
+                    <div key={i} style={{ flex:1, background:seg.color, opacity:0.2 }} />
+                  ))}
+                  {/* Needle / indicator */}
+                  <div style={{ position:"absolute", left:`${index}%`, top:-2, transform:"translateX(-50%)", width:4, height:16,
+                    background:zone.color, borderRadius:2, boxShadow:`0 0 6px ${zone.color}60`, transition:"left 0.5s" }} />
+                </div>
+                <div style={{ display:"flex", marginTop:3 }}>
+                  {segments.map((seg,i) => (
+                    <div key={i} style={{ flex:1, fontSize:8, fontFamily:font, color:index >= seg.from && index <= seg.to ? seg.color : `${MUTED}60`,
+                      fontWeight:index >= seg.from && index <= seg.to ? 700 : 400, textAlign:"center" }}>
+                      {seg.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Breakdown + sparkline */}
+              <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:mob?8:16 }}>
+                {/* Breakdown */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"3px 10px", fontSize:11, fontFamily:font }}>
+                  {[
+                    { label:"Ind. rojos", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100) },
+                    { label:"E2 Colapso", value:`${e2}%`, pct:e2 },
+                    { label:"E4 Resistencia", value:`${e4}%`, pct:e4 },
+                    { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100) },
+                    { label:"Brecha camb.", value:`~${brechaEst}%`, pct:brechaEst },
+                    { label:"E1 Transición", value:`-${e1}%`, pct:0, isNeg:true },
+                  ].map((item,i) => (
+                    <div key={i} style={{ display:"flex", justifyContent:"space-between", color:item.isNeg?"#16a34a":MUTED, padding:"1px 0" }}>
+                      <span>{item.label}</span>
+                      <span style={{ fontWeight:600, color:item.isNeg?"#16a34a":item.pct>50?"#dc2626":item.pct>25?"#ca8a04":MUTED }}>{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Historical sparkline */}
+                <div>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginBottom:4 }}>Evolución semanal</div>
+                  <svg width="100%" height={40} viewBox="0 0 200 40" preserveAspectRatio="none" style={{ display:"block" }}>
+                    {/* Zone backgrounds */}
+                    <rect x={0} y={0} width={200} height={10} fill="#16a34a" opacity={0.08} />
+                    <rect x={0} y={10} width={200} height={10} fill="#ca8a04" opacity={0.08} />
+                    <rect x={0} y={20} width={200} height={10} fill="#f97316" opacity={0.08} />
+                    <rect x={0} y={30} width={200} height={10} fill="#dc2626" opacity={0.08} />
+                    {/* Line */}
+                    <polyline
+                      points={histIdx.map((v,i) => `${(i/(Math.max(histIdx.length-1,1)))*200},${40-(v/100)*40}`).join(" ")}
+                      fill="none" stroke={zone.color} strokeWidth={2} strokeLinejoin="round"
+                    />
+                    {/* Current dot */}
+                    <circle
+                      cx={(histIdx.length-1)/(Math.max(histIdx.length-1,1))*200}
+                      cy={40-(index/100)*40}
+                      r={3.5} fill={zone.color} stroke="#fff" strokeWidth={1.5}
+                    />
+                    {/* Week labels */}
+                    {histIdx.map((v,i) => (
+                      <text key={i} x={(i/(Math.max(histIdx.length-1,1)))*200} y={40}
+                        fontSize={6} fill={i===histIdx.length-1?zone.color:MUTED} textAnchor="middle" fontFamily={font}>
+                        S{i+1}
+                      </text>
+                    ))}
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* ── ROW 2: Amnistía Tracker ── */}
       {(() => {
         const latest = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
@@ -2679,6 +2837,191 @@ function MonitorFactCheck() {
 
 
 
+// ═══════════════════════════════════════════════════════════════
+// GDELT BILATERAL: EE.UU. ↔ Venezuela
+// ═══════════════════════════════════════════════════════════════
+
+function GdeltBilateral() {
+  const mob = useIsMobile();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [hover, setHover] = useState(null);
+
+  useEffect(() => {
+    async function fetchBilateral() {
+      try {
+        let result = null;
+        if (IS_DEPLOYED) {
+          const res = await fetch("/api/gdelt?signal=bilateral", { signal: AbortSignal.timeout(12000) });
+          if (res.ok) { const json = await res.json(); if (json.data?.length > 10) result = json.data; }
+        }
+        if (!result) {
+          // Direct fetch via CORS proxy
+          for (const proxyFn of CORS_PROXIES) {
+            try {
+              const toneUrl = proxyFn(`${GDELT_BASE}?query=(venezuela) (united states OR USA OR Trump OR Washington)&mode=timelinetone&timespan=${GDELT_TIMESPAN}&format=csv`);
+              const volUrl = proxyFn(`${GDELT_BASE}?query=(venezuela) (united states OR USA OR Trump OR Washington)&mode=timelinevol&timespan=${GDELT_TIMESPAN}&format=csv`);
+              const [toneRes, volRes] = await Promise.all([
+                fetch(toneUrl, { signal: AbortSignal.timeout(8000) }).then(r=>r.ok?r.text():""),
+                fetch(volUrl, { signal: AbortSignal.timeout(8000) }).then(r=>r.ok?r.text():""),
+              ]);
+              const toneMap = parseGdeltCsv(toneRes);
+              const volMap = parseGdeltCsv(volRes);
+              const allDates = new Set([...toneMap.keys(), ...volMap.keys()]);
+              result = Array.from(allDates).sort().map(date => ({ date, tone:toneMap.get(date)??null, vol:volMap.get(date)??null }));
+              if (result.length > 10) break;
+            } catch { continue; }
+          }
+        }
+        if (result && result.length > 10) setData(result);
+      } catch {}
+      setLoading(false);
+    }
+    fetchBilateral();
+  }, []);
+
+  if (loading) return (
+    <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:13 }}>Cargando datos bilaterales EE.UU. ↔ Venezuela...</div></Card>
+  );
+  if (!data) return null; // silently skip if no data
+
+  const W = 700, H = 200, PL = 45, PR = 45, PT = 10, PB = 25;
+  const chartW = W - PL - PR, chartH = H - PT - PB;
+
+  const toneVals = data.map(d => d.tone).filter(v => v !== null);
+  const volVals = data.map(d => d.vol).filter(v => v !== null);
+  const toneMin = Math.min(...toneVals, -6), toneMax = Math.max(...toneVals, 2);
+  const volMax = Math.max(...volVals, 1);
+
+  const toX = (i) => PL + (i / (data.length - 1)) * chartW;
+  const toYTone = (v) => PT + chartH - ((v - toneMin) / (toneMax - toneMin)) * chartH;
+  const toYVol = (v) => PT + chartH - (v / volMax) * chartH;
+
+  // Tone line path
+  const tonePath = data.map((d, i) => d.tone !== null ? `${i === 0 || data[i-1]?.tone === null ? "M" : "L"}${toX(i)},${toYTone(d.tone)}` : "").join("");
+  // Vol area
+  const volPts = data.filter(d => d.vol !== null);
+  const volArea = volPts.length > 2
+    ? `M${toX(data.indexOf(volPts[0]))},${toYVol(0)} ` + volPts.map(d => `L${toX(data.indexOf(d))},${toYVol(d.vol)}`).join(" ") + ` L${toX(data.indexOf(volPts[volPts.length-1]))},${toYVol(0)}Z`
+    : "";
+
+  // Zero line for tone
+  const zeroY = toYTone(0);
+
+  // Stats
+  const recent14 = data.slice(-14);
+  const recentTone = recent14.filter(d=>d.tone!==null).reduce((s,d)=>s+d.tone,0) / (recent14.filter(d=>d.tone!==null).length||1);
+  const allTone = toneVals.reduce((s,v)=>s+v,0) / (toneVals.length||1);
+  const toneShift = recentTone - allTone;
+
+  return (
+    <Card>
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
+        <span style={{ fontSize:14 }}>🇺🇸↔🇻🇪</span>
+        <div>
+          <div style={{ fontSize:13, fontWeight:700, color:TEXT }}>Relación Bilateral EE.UU. — Venezuela</div>
+          <div style={{ fontSize:10, fontFamily:font, color:MUTED }}>GDELT DOC API · Tono mediático + volumen de cobertura conjunta · 120 días</div>
+        </div>
+        <div style={{ marginLeft:"auto", display:"flex", gap:8 }}>
+          <div style={{ textAlign:"center" }}>
+            <div style={{ fontSize:16, fontWeight:700, color:recentTone>=0?"#16a34a":"#dc2626", fontFamily:font }}>{recentTone>=0?"+":""}{recentTone.toFixed(1)}</div>
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>Tono 14d</div>
+          </div>
+          <div style={{ textAlign:"center" }}>
+            <div style={{ fontSize:16, fontWeight:700, color:toneShift>=0?"#16a34a":"#dc2626", fontFamily:font }}>{toneShift>=0?"↑":"↓"}{Math.abs(toneShift).toFixed(1)}</div>
+            <div style={{ fontSize:8, fontFamily:font, color:MUTED }}>vs promedio</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Chart */}
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block", overflow:"visible" }}
+        onMouseMove={(e) => {
+          const svg = e.currentTarget; const rect = svg.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * W;
+          const idx = Math.round(((x - PL) / chartW) * (data.length - 1));
+          setHover(idx >= 0 && idx < data.length ? idx : null);
+        }}
+        onMouseLeave={() => setHover(null)}>
+
+        {/* Zero line */}
+        <line x1={PL} y1={zeroY} x2={PL+chartW} y2={zeroY} stroke={BORDER} strokeWidth={0.5} strokeDasharray="4,3" />
+        <text x={PL-4} y={zeroY+3} fontSize={8} fill={MUTED} textAnchor="end" fontFamily={font}>0</text>
+
+        {/* Volume area */}
+        {volArea && <path d={volArea} fill="#0468B118" />}
+
+        {/* Tone line */}
+        <path d={tonePath} fill="none" stroke={recentTone>=0?"#16a34a":"#dc2626"} strokeWidth={1.8} strokeLinejoin="round" />
+
+        {/* Positive/negative fill under tone line */}
+        {data.map((d,i) => {
+          if (d.tone === null || i === 0) return null;
+          const prev = data[i-1];
+          if (prev?.tone === null) return null;
+          const color = d.tone >= 0 ? "#16a34a" : "#dc2626";
+          return <line key={i} x1={toX(i)} y1={zeroY} x2={toX(i)} y2={toYTone(d.tone)} stroke={color} strokeWidth={1} opacity={0.1} />;
+        })}
+
+        {/* Y axis labels */}
+        <text x={PL-4} y={PT+6} fontSize={7} fill={MUTED} textAnchor="end" fontFamily={font}>{toneMax.toFixed(0)}</text>
+        <text x={PL-4} y={PT+chartH} fontSize={7} fill={MUTED} textAnchor="end" fontFamily={font}>{toneMin.toFixed(0)}</text>
+        <text x={PL+chartW+4} y={PT+6} fontSize={7} fill={MUTED} textAnchor="start" fontFamily={font}>{volMax.toFixed(1)}</text>
+
+        {/* X axis: month labels */}
+        {data.filter((_,i) => i % 30 === 0 || i === data.length-1).map((d,i) => (
+          <text key={i} x={toX(data.indexOf(d))} y={H-2} fontSize={7} fill={MUTED} textAnchor="middle" fontFamily={font}>
+            {d.date?.slice(5,10)}
+          </text>
+        ))}
+
+        {/* Hover */}
+        {hover !== null && data[hover] && (
+          <>
+            <line x1={toX(hover)} y1={PT} x2={toX(hover)} y2={PT+chartH} stroke={ACCENT} strokeWidth={0.5} opacity={0.4} />
+            {data[hover].tone !== null && <circle cx={toX(hover)} cy={toYTone(data[hover].tone)} r={3} fill={data[hover].tone>=0?"#16a34a":"#dc2626"} stroke={BG2} strokeWidth={1.5} />}
+          </>
+        )}
+
+        {/* Annotation: Jan 3 */}
+        {(() => {
+          const jan3Idx = data.findIndex(d => d.date?.includes("2026-01-03") || d.date?.includes("20260103"));
+          if (jan3Idx < 0) return null;
+          return <>
+            <line x1={toX(jan3Idx)} y1={PT} x2={toX(jan3Idx)} y2={PT+chartH} stroke="#dc2626" strokeWidth={0.8} strokeDasharray="3,2" opacity={0.5} />
+            <text x={toX(jan3Idx)+3} y={PT+10} fontSize={7} fill="#dc2626" fontFamily={font}>3 ene</text>
+          </>;
+        })()}
+      </svg>
+
+      {/* Hover tooltip */}
+      {hover !== null && data[hover] && (
+        <div style={{ fontSize:11, fontFamily:font, color:MUTED, display:"flex", gap:12, justifyContent:"center", marginTop:4 }}>
+          <span>{data[hover].date?.slice(0,10)}</span>
+          {data[hover].tone !== null && <span style={{ color:data[hover].tone>=0?"#16a34a":"#dc2626" }}>Tono: {data[hover].tone.toFixed(2)}</span>}
+          {data[hover].vol !== null && <span style={{ color:ACCENT }}>Volumen: {data[hover].vol.toFixed(2)}</span>}
+        </div>
+      )}
+
+      {/* Legend */}
+      <div style={{ display:"flex", gap:16, justifyContent:"center", marginTop:8 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+          <div style={{ width:16, height:2, background:"#16a34a" }} />
+          <span style={{ fontSize:10, color:MUTED }}>Tono bilateral (positivo)</span>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+          <div style={{ width:16, height:2, background:"#dc2626" }} />
+          <span style={{ fontSize:10, color:MUTED }}>Tono bilateral (negativo)</span>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+          <div style={{ width:16, height:8, background:"#0468B118", border:`1px solid ${ACCENT}30` }} />
+          <span style={{ fontSize:10, color:MUTED }}>Volumen cobertura conjunta</span>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 function TabGdelt() {
   const mob = useIsMobile();
   const [data, setData] = useState(null);
@@ -2843,6 +3186,9 @@ function TabGdelt() {
             </div>
           </Card>
         </div>
+
+        {/* ── BILATERAL: EE.UU. ↔ Venezuela ── */}
+        <GdeltBilateral />
 
         {/* Footer */}
         <div style={{ marginTop:12, fontSize:10, fontFamily:font, color:`${MUTED}60`, lineHeight:1.8, display:"flex", justifyContent:"space-between" }}>

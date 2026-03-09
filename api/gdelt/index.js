@@ -7,9 +7,28 @@ module.exports = async function handler(req, res) {
     instability: `${GDELT_BASE}?query=venezuela+(protest+OR+conflict+OR+crisis+OR+violence+OR+unrest)&mode=timelinevol&timespan=120d&format=csv`,
     tone: `${GDELT_BASE}?query=venezuela&mode=timelinetone&timespan=120d&format=csv`,
     artvolnorm: `${GDELT_BASE}?query=venezuela&mode=timelinevol&timespan=120d&format=csv`,
+    bilateral_tone: `${GDELT_BASE}?query=(venezuela) (united states OR USA OR Trump OR Washington)&mode=timelinetone&timespan=120d&format=csv`,
+    bilateral_vol: `${GDELT_BASE}?query=(venezuela) (united states OR USA OR Trump OR Washington)&mode=timelinevol&timespan=120d&format=csv`,
   };
 
   // If specific signal requested
+  if (signal === "bilateral") {
+    try {
+      const [toneRes, volRes] = await Promise.all([
+        fetch(queries.bilateral_tone, { signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.text() : "").then(t => t.includes("<!") ? new Map() : parseCsv(t)).catch(() => new Map()),
+        fetch(queries.bilateral_vol, { signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.text() : "").then(t => t.includes("<!") ? new Map() : parseCsv(t)).catch(() => new Map()),
+      ]);
+      const allDates = new Set([...toneRes.keys(), ...volRes.keys()]);
+      const merged = Array.from(allDates).sort().map(date => ({
+        date, tone: toneRes.get(date) ?? null, vol: volRes.get(date) ?? null,
+      }));
+      res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=1800");
+      return res.status(200).json({ signal: "bilateral", data: merged, fetchedAt: new Date().toISOString() });
+    } catch (e) {
+      return res.status(502).json({ error: e.message });
+    }
+  }
+
   if (signal && queries[signal]) {
     try {
       const response = await fetch(queries[signal], { signal: AbortSignal.timeout(8000) });
