@@ -316,6 +316,23 @@ const CURATED_FACTCHECK = [
   { title:"MCM Índice 106,84/137 pts — metodología MassBehaviorResearch verificada", date:"2026-03-06", source:"Cotejo.info", scenarios:["E1"], dims:["Político"], week:"S8", verdict:"Confirmado" },
 ];
 
+// ═══════════════════════════════════════════════════════════════
+// AMNISTÍA TRACKER — Datos duales: Gobierno vs Foro Penal
+// Se actualiza con cada SITREP semanal
+// ═══════════════════════════════════════════════════════════════
+
+const AMNISTIA_TRACKER = [
+  // { week, label, gobierno (cifras oficiales), fp (Foro Penal verificado), detenidos (FP), cautelares, militares, hito }
+  { week:"S1", label:"3–15 ene", gob:{ solicitudes:null, libertades:null, excarcelados:101 }, fp:{ verificados:0, detenidos:null }, hito:"Primeras 101 excarcelaciones (14 periodistas)" },
+  { week:"S2", label:"16–22 ene", gob:{ solicitudes:null, libertades:null, excarcelados:400 }, fp:{ verificados:12, detenidos:null }, hito:"Rodríguez: '400 excarcelaciones'. FP: 12 verificadas" },
+  { week:"S3", label:"23–29 ene", gob:{ solicitudes:null, libertades:null, excarcelados:null }, fp:{ verificados:45, detenidos:null }, hito:"Ley de Amnistía en primera discusión" },
+  { week:"S4", label:"30e–5f", gob:{ solicitudes:null, libertades:null, excarcelados:null }, fp:{ verificados:78, detenidos:949 }, hito:"Amnistía arts. 7-13 diferidos. Cierre El Helicoide" },
+  { week:"S5", label:"6–13 feb", gob:{ solicitudes:null, libertades:897, excarcelados:448 }, fp:{ verificados:108, detenidos:626 }, hito:"Amnistía 2ª discusión. Brecha: 897 vs ~430" },
+  { week:"S6", label:"13–20 feb", gob:{ solicitudes:null, libertades:895, excarcelados:448 }, fp:{ verificados:126, detenidos:568 }, hito:"Ley promulgada 19 feb. 895 oficial vs 383 verif." },
+  { week:"S7", label:"20–27 feb", gob:{ solicitudes:4203, libertades:3231, excarcelados:null }, fp:{ verificados:126, detenidos:568 }, hito:"Amnistía operativa: 4.203 solicitudes procesadas" },
+  { week:"S8", label:"27f–6m", gob:{ solicitudes:9060, libertades:5628, excarcelados:245, cautelares:5383, militares:31 }, fp:{ verificados:670, detenidos:568 }, hito:"9.060 solicitudes · FP: 670 excarcelaciones verificadas (8 mar)" },
+];
+
 const GDELT_ANNOTATIONS = [
   { date:"2026-01-03", tier:"CRITICAL", label:"Operación EE.UU. / Maduro capturado", tierEs:"CRÍTICO" },
   { date:"2026-01-05", tier:"HIGH", label:"Delcy Rodríguez juramentada", tierEs:"ALTA" },
@@ -1613,7 +1630,96 @@ function TabDashboard({ week }) {
         })}
       </div>
 
-      {/* ── ROW 2: KPIs + Semáforo ── */}
+      {/* ── ROW 2: Amnistía Tracker ── */}
+      {(() => {
+        const latest = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
+        const prev = AMNISTIA_TRACKER.length > 1 ? AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 2] : null;
+        const gobLib = latest.gob.libertades || latest.gob.excarcelados || 0;
+        const fpVerif = latest.fp.verificados || 0;
+        const brecha = gobLib && fpVerif ? Math.round((1 - fpVerif / gobLib) * 100) : null;
+        const fpDelta = prev?.fp?.verificados ? fpVerif - prev.fp.verificados : null;
+        return (
+          <Card>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+              <div style={{ fontSize:10, fontFamily:font, color:ACCENT, letterSpacing:"0.15em", textTransform:"uppercase" }}>
+                📋 Ley de Amnistía · Tracker Dual
+              </div>
+              <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Act. {latest.label}</div>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"1fr 1fr 1fr 1fr", gap:mob?6:8, marginBottom:12 }}>
+              {[
+                { v:latest.gob.solicitudes?.toLocaleString() || "—", l:"Solicitudes", sub:"Gobierno", c:ACCENT },
+                { v:latest.gob.libertades?.toLocaleString() || latest.gob.excarcelados?.toLocaleString() || "—", l:"Libertades plenas", sub:"Gobierno", c:"#16a34a" },
+                { v:fpVerif.toLocaleString(), l:"Excarcelaciones verif.", sub:"Foro Penal", c:"#ca8a04", delta:fpDelta },
+                { v:latest.fp.detenidos?.toLocaleString() || "—", l:"Presos políticos", sub:"Foro Penal", c:"#dc2626" },
+              ].map((item, i) => (
+                <div key={i} style={{ background:BG3, padding:mob?8:12, textAlign:"center" }}>
+                  <div style={{ fontFamily:fontSans, fontSize:mob?18:24, fontWeight:700, color:item.c }}>
+                    {item.v}
+                    {item.delta && item.delta > 0 && <span style={{ fontSize:11, color:"#16a34a", marginLeft:4 }}>+{item.delta}</span>}
+                  </div>
+                  <div style={{ fontFamily:font, fontSize:mob?7:8, letterSpacing:"0.08em", color:MUTED, textTransform:"uppercase" }}>{item.l}</div>
+                  <div style={{ fontFamily:font, fontSize:mob?7:8, color:item.c, opacity:0.7 }}>{item.sub}</div>
+                </div>
+              ))}
+            </div>
+            {brecha !== null && (
+              <div style={{ marginBottom:12, padding:mob?"8px 10px":"10px 14px", background:`#dc262608`, border:`1px solid #dc262620` }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
+                  <span style={{ fontSize:11, fontFamily:font, color:"#dc2626", letterSpacing:"0.1em", textTransform:"uppercase" }}>Brecha verificación</span>
+                  <span style={{ fontSize:16, fontFamily:fontSans, fontWeight:700, color:"#dc2626" }}>{brecha}%</span>
+                </div>
+                <div style={{ height:6, background:BORDER, borderRadius:3 }}>
+                  <div style={{ height:6, borderRadius:3, background:`linear-gradient(90deg, #16a34a ${100-brecha}%, #dc2626 ${100-brecha}%)`, width:"100%" }} />
+                </div>
+                <div style={{ display:"flex", justifyContent:"space-between", marginTop:4 }}>
+                  <span style={{ fontSize:9, fontFamily:font, color:"#16a34a" }}>Foro Penal: {fpVerif.toLocaleString()}</span>
+                  <span style={{ fontSize:9, fontFamily:font, color:ACCENT }}>Gobierno: {gobLib.toLocaleString()}</span>
+                </div>
+              </div>
+            )}
+            <div style={{ display:"flex", gap:2, alignItems:"flex-end", height:50, marginBottom:8 }}>
+              {AMNISTIA_TRACKER.map((w, i) => {
+                const gVal = w.gob.libertades || w.gob.excarcelados || 0;
+                const fVal = w.fp.verificados || 0;
+                const maxVal = Math.max(...AMNISTIA_TRACKER.map(t => Math.max(t.gob.libertades||t.gob.excarcelados||0, 1)));
+                const gH = Math.max(2, (gVal / maxVal) * 45);
+                const fH = Math.max(2, (fVal / maxVal) * 45);
+                const isLast = i === AMNISTIA_TRACKER.length - 1;
+                return (
+                  <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:1 }}>
+                    <div style={{ display:"flex", gap:1, alignItems:"flex-end", width:"100%" }}>
+                      <div style={{ flex:1, height:gH, background:ACCENT, opacity:isLast?1:0.4, borderRadius:"2px 0 0 0", transition:"height 0.3s" }} />
+                      <div style={{ flex:1, height:fH, background:"#ca8a04", opacity:isLast?1:0.4, borderRadius:"0 2px 0 0", transition:"height 0.3s" }} />
+                    </div>
+                    <span style={{ fontSize:7, fontFamily:font, color:isLast?ACCENT:MUTED }}>{w.week}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display:"flex", gap:12, alignItems:"center", flexWrap:"wrap" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                <div style={{ width:8, height:8, background:ACCENT, borderRadius:1 }} />
+                <span style={{ fontSize:10, color:MUTED }}>Gobierno</span>
+              </div>
+              <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                <div style={{ width:8, height:8, background:"#ca8a04", borderRadius:1 }} />
+                <span style={{ fontSize:10, color:MUTED }}>Foro Penal</span>
+              </div>
+              {latest.gob.militares && (
+                <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:"auto" }}>
+                  {latest.gob.militares} militares · {latest.gob.cautelares?.toLocaleString() || "—"} cautelares
+                </span>
+              )}
+            </div>
+            <div style={{ marginTop:8, paddingTop:8, borderTop:`1px solid ${BORDER}40`, fontSize:11, color:MUTED, fontStyle:"italic", lineHeight:1.4 }}>
+              {latest.hito}
+            </div>
+          </Card>
+        );
+      })()}
+
+      {/* ── ROW 3: KPIs + Semáforo ── */}
       <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 200px", gap:12 }}>
 
         {/* KPIs por dimensión — de la semana activa */}
@@ -3046,6 +3152,9 @@ function LivePriceCards() {
       setLoading(false);
     }
     fetchPrices();
+    // Auto-refresh every 5 minutes
+    const iv = setInterval(fetchPrices, 300000);
+    return () => clearInterval(iv);
   }, []);
 
   const extract = (obj) => {
@@ -5101,15 +5210,25 @@ function TabMacro() {
     }
 
     fetchAll();
+    // Auto-refresh live rates every 5 minutes
     const iv = setInterval(() => {
-      fetch("https://ve.dolarapi.com/v1/dolares", { signal: AbortSignal.timeout(8000) })
+      const liveUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
+      fetch(liveUrl, { signal: AbortSignal.timeout(8000) })
         .then(r => r.ok ? r.json() : null).then(data => {
-          if (!data) return;
+          if (!data || !Array.isArray(data)) return;
           const o = data.find(d => d.fuente === "oficial"), p = data.find(d => d.fuente === "paralelo");
           const bcv = o?.promedio, par = p?.promedio;
-          if (bcv && par) setDolar({ bcv, par, brecha: ((par-bcv)/bcv)*100, updated: new Date().toISOString() });
+          if (bcv && par) {
+            setDolar({ bcv, par, brecha: ((par-bcv)/bcv)*100, updated: new Date().toISOString() });
+            // Update today's point in history
+            const today = new Date().toISOString().slice(0,10);
+            setRateHistory(prev => {
+              const filtered = prev.filter(h => h.d !== today);
+              return [...filtered, { d:today, bcv, par, usdt:par*1.02, brecha:((par-bcv)/bcv)*100 }].sort((a,b) => a.d.localeCompare(b.d));
+            });
+          }
         }).catch(() => {});
-    }, 120000);
+    }, 300000); // 5 minutes
     return () => clearInterval(iv);
   }, []);
 
@@ -5132,7 +5251,7 @@ function TabMacro() {
         <span style={{ fontSize:16 }}>💵</span>
         <div style={{ flex:1 }}>
           <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Macroeconomía — Venezuela</div>
-          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Tipo de cambio en vivo · Indicadores macroeconómicos · Mercado cambiario</div>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Tipo de cambio en vivo · Actualiza cada 5 min · Mercado cambiario</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {[{id:"cambio",label:"Tipo de cambio"},{id:"indicadores",label:"Indicadores"},{id:"charts",label:"Gráficos"}].map(s => (
