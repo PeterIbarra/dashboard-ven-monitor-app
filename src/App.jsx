@@ -1652,12 +1652,28 @@ function DailyBrief({ week, liveData, mob }) {
       const domSc = SCENARIOS.find(s=>s.id===dom.sc);
       const amnistia = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
 
+      // Fetch fresh headlines from Google News RSS (last 24h)
+      let freshHeadlines = [];
+      if (IS_DEPLOYED) {
+        try {
+          const headRes = await fetch("/api/gdelt?signal=headlines", { signal: AbortSignal.timeout(10000) });
+          if (headRes.ok) {
+            const headJson = await headRes.json();
+            freshHeadlines = (headJson.articles || [])
+              .filter(a => a.title && a.title.length > 20)
+              .slice(0, 8)
+              .map(a => ({ title: a.title, source: a.source }));
+          }
+        } catch {}
+      }
+
       const briefData = {
         fecha: new Date().toLocaleDateString("es", { weekday:"long", day:"numeric", month:"long", year:"numeric" }),
         escenarioDominante: `${domSc?.name} (E${dom.sc}) al ${dom.v}%`,
         dolar: liveData?.dolar || null,
         petroleo: liveData?.oil || null,
-        titulares: liveData?.news?.slice(0, 5) || [],
+        titularesRSS: liveData?.news?.slice(0, 5) || [],
+        titularesGDELT: freshHeadlines,
         amnistia: amnistia ? { gobLibertades: amnistia.gob.libertades || amnistia.gob.excarcelados, fpVerificados: amnistia.fp.verificados, presos: amnistia.fp.detenidos } : null,
         tensionesRojas: wk.tensiones.filter(t=>t.l==="red").map(t=>t.t.replace(/<[^>]+>/g,"")).slice(0, 2),
       };
@@ -1670,10 +1686,10 @@ ${JSON.stringify(briefData, null, 1)}
 INSTRUCCIONES:
 1. Primer párrafo: Estado actual — escenario dominante y dato más relevante del día (dólar, petróleo o titular).
 2. Segundo párrafo: Contexto rápido — amnistía, tensiones, o cualquier cambio notable.
-3. Tercer párrafo (opcional): Solo si hay titulares relevantes sobre Venezuela, menciónalos brevemente. Ignora titulares que no se relacionen con Venezuela.
+3. Tercer párrafo: Sintetiza las noticias más relevantes del día sobre Venezuela (usa titularesGDELT como fuente principal y titularesRSS como complemento). Menciona los hechos concretos, no el nombre de la fuente.
 4. Tono: profesional pero conciso, tipo cable de agencia. Sin bullet points.
-5. Si no hay datos en vivo disponibles, enfócate en el escenario y la amnistía.
-6. NO inventes datos. Usa SOLO lo proporcionado.`;
+5. NO inventes datos. Usa SOLO lo proporcionado.
+6. Ignora completamente titulares que no se relacionen directamente con Venezuela.`;
 
       try {
         let text = "";
