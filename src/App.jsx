@@ -2859,8 +2859,8 @@ function GdeltBilateral() {
           // Direct fetch via CORS proxy
           for (const proxyFn of CORS_PROXIES) {
             try {
-              const toneUrl = proxyFn(`${GDELT_BASE}?query=(venezuela) (united states OR USA OR Trump OR Washington)&mode=timelinetone&timespan=${GDELT_TIMESPAN}&format=csv`);
-              const volUrl = proxyFn(`${GDELT_BASE}?query=(venezuela) (united states OR USA OR Trump OR Washington)&mode=timelinevol&timespan=${GDELT_TIMESPAN}&format=csv`);
+              const toneUrl = proxyFn(`${GDELT_BASE}?query=venezuela+trump+OR+venezuela+USA+OR+venezuela+"united+states"&mode=timelinetone&timespan=${GDELT_TIMESPAN}&format=csv`);
+              const volUrl = proxyFn(`${GDELT_BASE}?query=venezuela+trump+OR+venezuela+USA+OR+venezuela+"united+states"&mode=timelinevol&timespan=${GDELT_TIMESPAN}&format=csv`);
               const [toneRes, volRes] = await Promise.all([
                 fetch(toneUrl, { signal: AbortSignal.timeout(8000) }).then(r=>r.ok?r.text():""),
                 fetch(volUrl, { signal: AbortSignal.timeout(8000) }).then(r=>r.ok?r.text():""),
@@ -2883,7 +2883,11 @@ function GdeltBilateral() {
   if (loading) return (
     <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:13 }}>Cargando datos bilaterales EE.UU. ↔ Venezuela...</div></Card>
   );
-  if (!data) return null; // silently skip if no data
+  if (!data) return (
+    <Card><div style={{ textAlign:"center", padding:20, color:MUTED, fontSize:13 }}>
+      No se pudieron obtener datos bilaterales GDELT. <span style={{ color:ACCENT, cursor:"pointer" }} onClick={() => { setLoading(true); setTimeout(() => window.location.reload(), 100); }}>Reintentar</span>
+    </div></Card>
+  );
 
   const W = 700, H = 200, PL = 45, PR = 45, PT = 10, PB = 25;
   const chartW = W - PL - PR, chartH = H - PT - PB;
