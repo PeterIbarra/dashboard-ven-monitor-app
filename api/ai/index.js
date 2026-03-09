@@ -123,9 +123,16 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { prompt, max_tokens = 1500 } = req.body || {};
-    if (!prompt || typeof prompt !== "string" || prompt.length < 10) {
-      return res.status(400).json({ error: "Missing or invalid 'prompt' in request body." });
+    // Parse body — Vercel may pass it as string or object depending on runtime
+    let body = req.body;
+    if (typeof body === "string") {
+      try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    if (!body || typeof body !== "object") body = {};
+
+    const { prompt, max_tokens = 1500 } = body;
+    if (!prompt || typeof prompt !== "string" || prompt.length < 5) {
+      return res.status(400).json({ error: "Missing or invalid 'prompt' in request body.", receivedType: typeof req.body, bodyKeys: Object.keys(body) });
     }
 
     const safeMaxTokens = Math.min(Math.max(parseInt(max_tokens) || 1500, 100), 4000);
