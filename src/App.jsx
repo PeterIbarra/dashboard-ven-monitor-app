@@ -1032,7 +1032,7 @@ const SITREP_ALL = [
 // TAB: SITREP
 // ═══════════════════════════════════════════════════════════════
 
-function TabSitrep() {
+function TabSitrep({ liveData = {} }) {
   const mob = useIsMobile();
   const [sitrepWeek, setSitrepWeek] = useState(SITREP_ALL.length - 1);
   const d = SITREP_ALL[sitrepWeek];
@@ -1049,6 +1049,8 @@ function TabSitrep() {
   // ── AI Analysis generator ──
   const generateAiAnalysis = async () => {
     setAiLoading(true); setAiError(""); setAiAnalysis("");
+
+    // ── PRIORITY 1: SITREP + WEEKS (core analysis) ──
     const weekData = {
       periodo: d.period,
       escenarios: wk.probs.map(p => { const sc = SCENARIOS.find(s=>s.id===p.sc); return { nombre:sc?.name, prob:p.v, tendencia:p.t }; }),
@@ -1058,21 +1060,68 @@ function TabSitrep() {
       tensiones: wk.tensiones.map(t => t.t.replace(/<[^>]+>/g,"")),
       kpis: wk.kpis,
       semaforo: wk.sem,
+      lecturaAnalitica: wk.lectura?.slice(0, 600) || "",
+      actores: d.actores?.map(a => ({ nombre:a.name, items:a.items.slice(0,3) })) || [],
     };
-    const prompt = `Eres un analista político-económico senior del PNUD especializado en Venezuela. Con base en los siguientes datos del período ${d.period}, genera un análisis narrativo de contexto situacional de 4-5 párrafos.
 
-DATOS DEL PERÍODO:
+    // ── PRIORITY 2: Indicadores y señales ──
+    const lastIndicators = INDICATORS.map(ind => {
+      const last = ind.hist.filter(h => h !== null).pop();
+      if (!last) return null;
+      return { dim:ind.dim, nombre:ind.name, semaforo:last[0], tendencia:last[1], valor:last[2], escenario:ind.esc, nuevo:!!ind.addedWeek };
+    }).filter(Boolean);
+
+    const signals = SCENARIO_SIGNALS.map(g => ({
+      escenario: "E" + (SCENARIOS.find(s=>s.id===parseInt(g.esc.charAt(1)))?.id || g.esc),
+      senales: g.signals.map(s => ({ nombre:s.name, estado:s.sem, valor:s.val, nuevo:!!s.isNew }))
+    }));
+
+    // ── PRIORITY 3: Amnistía ──
+    const amnistia = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
+    const amnistiaData = amnistia ? {
+      gobierno: amnistia.gob,
+      foroPenal: amnistia.fp,
+      hito: amnistia.hito,
+    } : null;
+
+    // ── CONTEXT: Live data from shared state ──
+    const liveContext = {};
+    if (liveData?.dolar) liveContext.dolar = liveData.dolar;
+    if (liveData?.oil) liveContext.petroleo = liveData.oil;
+    if (liveData?.news?.length) liveContext.titulares = liveData.news;
+
+    const prompt = `Eres un analista político-económico senior del PNUD especializado en Venezuela. Genera un análisis narrativo de contexto situacional de 5-6 párrafos para el período ${d.period}.
+
+═══ DATOS PRINCIPALES DEL PERÍODO (prioridad máxima) ═══
 ${JSON.stringify(weekData, null, 2)}
 
-INSTRUCCIONES:
-1. Escribe en español profesional, tono institucional PNUD, sin bullet points.
-2. Primer párrafo: panorama general del período y escenario dominante.
-3. Segundo párrafo: dinámica energética y económica.
-4. Tercer párrafo: dinámica política interna y DDHH.
-5. Cuarto párrafo: factores internacionales y geopolíticos.
-6. Párrafo final: perspectiva de corto plazo y variables críticas a monitorear.
-7. Sé específico con datos, cifras y nombres propios del período.
-8. No inventes datos. Usa solo la información proporcionada.`;
+═══ INDICADORES DEL MONITOR (28 indicadores, 4 dimensiones) ═══
+${JSON.stringify(lastIndicators, null, 1)}
+
+═══ SEÑALES POR ESCENARIO (32 señales activas) ═══
+${JSON.stringify(signals, null, 1)}
+
+═══ AMNISTÍA: GOBIERNO vs FORO PENAL ═══
+${amnistiaData ? JSON.stringify(amnistiaData, null, 2) : "No disponible"}
+
+═══ DATOS EN VIVO (mercados y contexto actual) ═══
+${Object.keys(liveContext).length > 0 ? JSON.stringify(liveContext, null, 2) : "No disponible en este momento"}
+
+═══ INSTRUCCIONES ═══
+1. Escribe en español profesional, tono institucional PNUD, sin bullet points ni listas.
+2. PRIORIZA los datos del SITREP (escenarios, síntesis, tensiones, actores) como eje narrativo.
+3. USA los indicadores y señales para enriquecer el análisis con datos duros y tendencias.
+4. Si hay DATOS EN VIVO disponibles (dólar, petróleo, titulares), incorpóralos como contexto de mercado actual.
+5. Estructura:
+   - Párrafo 1: Panorama general — escenario dominante, probabilidades, tendencia y drivers principales.
+   - Párrafo 2: Dinámica energética y económica — exportaciones, petróleo, PIB, recaudación, brecha cambiaria. Usa indicadores de las dimensiones Energético y Económico. Si hay datos en vivo de petróleo o dólar, menciónalos como contexto de mercado.
+   - Párrafo 3: Dinámica política interna y DDHH — amnistía (contrasta cifras gobierno vs Foro Penal), presos políticos, cautelares, FANB, marcos restrictivos.
+   - Párrafo 4: Factores internacionales — cooperación EE.UU., sanciones UE, FMI, normalización diplomática. Usa señales de E3 y E1.
+   - Párrafo 5: Presiones y riesgos — tensiones activas, señales de E4 y E2, indicadores en rojo.
+   - Párrafo 6: Perspectiva de corto plazo — variables críticas a monitorear, escenarios con mayor probabilidad de movimiento. Si hay titulares de noticias en vivo, úsalos para contextualizar.
+6. Sé específico con cifras, nombres propios y datos del período. Menciona indicadores NUEVOS si los hay.
+7. NO inventes datos. Usa EXCLUSIVAMENTE la información proporcionada.
+8. Extensión: 500-700 palabras.`;
 
     try {
       let text = "";
@@ -1081,7 +1130,7 @@ INSTRUCCIONES:
         const res = await fetch("/api/ai", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt, max_tokens: 1500 }),
+          body: JSON.stringify({ prompt, max_tokens: 2000 }),
           signal: AbortSignal.timeout(40000),
         });
         if (!res.ok) {
@@ -1098,7 +1147,7 @@ INSTRUCCIONES:
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             model: "claude-sonnet-4-20250514",
-            max_tokens: 1500,
+            max_tokens: 2000,
             messages: [{ role: "user", content: prompt }],
           }),
         });
@@ -2309,16 +2358,19 @@ function MonitorNoticias() {
   const [page, setPage] = useState(1);
   const PER_PAGE = 20;
 
+  const BLOCKED_SOURCES = ["2001 Online", "2001Online", "2001online"];
+
   useEffect(() => {
+    const filterBlocked = (articles) => articles.filter(a => !BLOCKED_SOURCES.some(b => (a.source||"").toLowerCase().includes(b.toLowerCase())));
     async function fetchNews() {
       if (IS_DEPLOYED) {
         try {
           const res = await fetch("/api/articles?type=news&limit=30", { signal: AbortSignal.timeout(8000) });
-          if (res.ok) { const data = await res.json(); if (data.articles?.length) { setLiveNews(data.articles.map(a => ({...a, date:a.published_at, isLive:true}))); setSource("supabase"); setLoading(false); return; } }
+          if (res.ok) { const data = await res.json(); if (data.articles?.length) { setLiveNews(filterBlocked(data.articles.map(a => ({...a, date:a.published_at, isLive:true})))); setSource("supabase"); setLoading(false); return; } }
         } catch {}
         try {
           const res = await fetch("/api/news", { signal: AbortSignal.timeout(12000) });
-          if (res.ok) { const data = await res.json(); if (data.news?.length) { setLiveNews(data.news.map(n => ({...n, isLive:true}))); setSource("live"); setLoading(false); return; } }
+          if (res.ok) { const data = await res.json(); if (data.news?.length) { setLiveNews(filterBlocked(data.news.map(n => ({...n, isLive:true})))); setSource("live"); setLoading(false); return; } }
         } catch {}
       }
       setSource("curated"); setLoading(false);
@@ -5460,6 +5512,44 @@ export default function MonitorPNUD() {
   const [week, setWeek] = useState(WEEKS.length - 1);
   const mob = useIsMobile();
 
+  // ── Shared live data (fetched once, available to all tabs including AI) ──
+  const [liveData, setLiveData] = useState({ dolar:null, oil:null, gdeltSummary:null, news:null, fetched:false });
+
+  useEffect(() => {
+    async function fetchLiveData() {
+      const results = { dolar:null, oil:null, gdeltSummary:null, news:null, fetched:true };
+      try {
+        // Dolar
+        const dolarUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
+        const dRes = await fetch(dolarUrl, { signal:AbortSignal.timeout(8000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+        if (dRes && Array.isArray(dRes)) {
+          const o = dRes.find(d=>d.fuente==="oficial"), p = dRes.find(d=>d.fuente==="paralelo");
+          if (o?.promedio || p?.promedio) results.dolar = { bcv:o?.promedio, paralelo:p?.promedio, brecha: o?.promedio && p?.promedio ? (((p.promedio-o.promedio)/o.promedio)*100).toFixed(1)+"%" : null };
+        }
+      } catch {}
+      try {
+        // Oil prices
+        const oilUrl = IS_DEPLOYED ? "/api/oil-prices" : null;
+        if (oilUrl) {
+          const oRes = await fetch(oilUrl, { signal:AbortSignal.timeout(12000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          if (oRes) results.oil = { brent:oRes.brent?.price, wti:oRes.wti?.price, gas:oRes.natgas?.price };
+        }
+      } catch {}
+      try {
+        // News headlines (top 5)
+        const newsUrl = IS_DEPLOYED ? "/api/news" : null;
+        if (newsUrl) {
+          const nRes = await fetch(newsUrl, { signal:AbortSignal.timeout(8000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          if (nRes?.news?.length) results.news = nRes.news.slice(0,5).map(n => n.title || n.headline || "").filter(Boolean);
+        }
+      } catch {}
+      setLiveData(results);
+    }
+    fetchLiveData();
+    const iv = setInterval(fetchLiveData, 300000); // refresh every 5 min
+    return () => clearInterval(iv);
+  }, []);
+
   // Google Translate init
   useEffect(() => {
     if (window.googleTranslateElementInit) return;
@@ -5543,7 +5633,7 @@ export default function MonitorPNUD() {
       {/* CONTENT */}
       <div style={{ maxWidth:1340, margin:"0 auto", padding:mob?"12px 10px 40px":"24px 24px 60px" }}>
         {tab === "dashboard" && <TabDashboard week={week} />}
-        {tab === "sitrep" && <TabSitrep />}
+        {tab === "sitrep" && <TabSitrep liveData={liveData} />}
         {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
         {tab === "gdelt" && <TabGdelt />}

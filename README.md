@@ -2,217 +2,218 @@
 
 **PNUD Venezuela · Análisis Estratégico · Uso interno**
 
-Dashboard de monitoreo en tiempo real del proceso de estabilización venezolano post-3 de enero de 2026. Integra análisis de escenarios, indicadores semafóricos, señales por escenario, SITREPs semanales, datos de medios internacionales (GDELT), conectividad a internet (IODA), mercados energéticos y condiciones macroeconómicas.
+Dashboard de monitoreo en tiempo real del proceso de estabilización venezolano post-3 de enero de 2026. Integra análisis de escenarios, indicadores semafóricos, señales por escenario, SITREPs semanales, tracker de amnistía, datos de medios internacionales (GDELT), conectividad (IODA), mercados energéticos y condiciones macroeconómicas.
 
 ## Arquitectura
 
 ```
 monitor-pnud/
 ├── src/
-│   ├── App.jsx              # Aplicación completa (single-file, ~330 KB)
+│   ├── App.jsx              # Aplicación completa (single-file, ~340 KB)
 │   └── main.jsx             # Entry point React
 ├── api/                     # Vercel Serverless Functions
+│   ├── ai/index.js          # Proxy IA: Gemini → Groq → OpenRouter → Claude
 │   ├── gdelt/index.js       # Proxy GDELT DOC API v2 (3 señales)
 │   ├── ioda/index.js        # Proxy IODA API v2 (Georgia Tech)
-│   ├── oil-prices/index.js  # Precios petroleros (Brent, WTI, Gas)
-│   ├── news/index.js        # Noticias Venezuela (NewsAPI)
+│   ├── oil-prices/index.js  # Híbrido: OilPriceAPI (live) + EIA (histórico)
+│   ├── news/index.js        # RSS: 7 medios + 5 fact-checkers
 │   ├── articles/index.js    # Artículos (Supabase)
 │   ├── rates/index.js       # Tipo de cambio VES/USD
-│   ├── dolar/index.js       # Dólar paralelo
+│   ├── dolar/index.js       # Dólar: paralelo + oficial (dual fetch)
 │   ├── acled/index.js       # Datos de conflictividad (ACLED)
 │   └── cron/index.js        # Cron: sincronización automática
-├── index.html               # HTML shell
-├── vercel.json              # Config: rewrites + CORS + cron
-├── vite.config.mjs          # Vite + React
+├── index.html
+├── vercel.json              # Config: rewrites + CORS + cron + maxDuration
+├── vite.config.mjs
 └── package.json
 ```
 
 ## Tabs del Dashboard
 
-| # | Tab | Icono | Descripción | Fuente de datos |
-|---|-----|-------|-------------|-----------------|
-| 1 | **Dashboard** | 📊 | Vista ejecutiva: KPIs, semáforo, tensiones, probabilidades | Datos internos (WEEKS, KPIS_LATEST, TENSIONS) |
-| 2 | **SITREP** | 📋 | Análisis de Contexto Situacional semanal — 8 semanas navegables con selector | SITREP_ALL (8 informes, S1–S8) |
-| 3 | **Matriz** | 🎯 | Matriz de escenarios 2×2 (violencia × cambio), trayectoria, probabilidades, lectura analítica | WEEKS (xy, probs, lectura, trendSc) |
-| 4 | **Monitor** | 🚦 | 28 indicadores semafóricos con historial S1–S8, 32 señales E1/E2/E3/E4, noticias, verificación | INDICATORS, SCENARIO_SIGNALS, /api/news |
-| 5 | **Medios** | 📡 | GDELT: volumen de artículos, tono mediático, índice de inestabilidad — 120 días | /api/gdelt → GDELT DOC API v2 |
-| 6 | **Conflictividad** | ✊ | OVCS 2025: protestas por mes, tipo (DCP/DESCA), servicios públicos, estados, represión | Datos internos (CONF_*) + /api/acled |
-| 7 | **Internet** | 🌐 | IODA: conectividad de red en Venezuela, detección de cortes | /api/ioda → Georgia Tech |
-| 8 | **Mercados** | 📈 | Precios del petróleo (Brent/WTI/Gas), Polymarket (11 contratos), bonos | /api/oil-prices + Polymarket embeds |
-| 9 | **Macro VEN** | 💵 | Tipo de cambio BCV vs paralelo, brecha cambiaria, indicadores macro | /api/rates + /api/dolar |
+| # | Tab | Icono | Descripción | Fuente | Auto-refresh |
+|---|-----|-------|-------------|--------|--------------|
+| 1 | **Dashboard** | 📊 | Escenarios, Amnistía Tracker, KPIs, semáforo, tensiones | Datos internos | — |
+| 2 | **SITREP** | 📋 | Análisis semanal (8 semanas), Briefing, Análisis IA, documento descargable | SITREP_ALL + IA | — |
+| 3 | **Matriz** | 🎯 | Matriz 2×2 (violencia × cambio), trayectoria, probabilidades | WEEKS | — |
+| 4 | **Monitor** | 🚦 | 28 indicadores + 32 señales + noticias + verificación | INDICATORS + /api/news | — |
+| 5 | **Medios** | 📡 | GDELT: volumen, tono, inestabilidad — 120 días | /api/gdelt | — |
+| 6 | **Conflictividad** | ✊ | OVCS 2025 + ACLED: protestas, estados, represión | CONF_* + /api/acled | — |
+| 7 | **Internet** | 🌐 | IODA: conectividad, detección de cortes | /api/ioda | — |
+| 8 | **Mercados** | 📈 | Petróleo (Brent/WTI/Gas), Polymarket, bonos | /api/oil-prices | 5 min |
+| 9 | **Macro VEN** | 💵 | Tipo de cambio BCV vs paralelo, brecha, indicadores macro | /api/dolar + /api/rates | 5 min |
 
 ## Modelo de datos
 
 ### 4 Escenarios
 
-| ID | Escenario | Color | Cuadrante en Matriz |
-|----|-----------|-------|---------------------|
-| E1 | Transición política pacífica | 🟢 Verde | Top-left (cambio alto, violencia baja) |
-| E2 | Colapso y fragmentación | 🔴 Rojo | Top-right (cambio alto, violencia alta) |
-| E3 | Continuidad negociada | 🔵 Azul | Bottom-left (cambio bajo, violencia baja) |
-| E4 | Resistencia coercitiva | 🟡 Amarillo | Bottom-right (cambio bajo, violencia alta) |
-
-### Coordenadas XY de la Matriz
-
-Las coordenadas `xy` de cada semana se calculan como **centroide ponderado** por probabilidades:
-
-```
-x = Σ(prob_i × center_x_i) / 100    → eje de violencia (0=baja, 1=alta)
-y = Σ(prob_i × center_y_i) / 100    → eje de cambio (0=bajo, 1=alto)
-
-Centros: E1(0.25, 0.75)  E2(0.75, 0.75)  E3(0.25, 0.25)  E4(0.75, 0.25)
-```
+| ID | Escenario | Color | Cuadrante |
+|----|-----------|-------|-----------|
+| E1 | Transición política pacífica | 🟢 Verde | Top-left |
+| E2 | Colapso y fragmentación | 🔴 Rojo | Top-right |
+| E3 | Continuidad negociada | 🔵 Azul | Bottom-left |
+| E4 | Resistencia coercitiva | 🟡 Amarillo | Bottom-right |
 
 ### Evolución de probabilidades (S1–S8)
 
 ```
-Semana       E1-Trans  E2-Colapso  E3-Continuidad  E4-Resistencia  Dominante
-─────────────────────────────────────────────────────────────────────────────
-S1  3–15 ene     5%       45%          40%             10%          E2 (45%)
-S2  16–22 ene   15%       25%          50%             10%          E3 (50%)
-S3  23–29 ene   20%       10%          60%             10%          E3 (60%)
-S4  30e–5f      30%        5%          50%             15%          E3 (50%)
-S5  6–13 feb    30%        5%          45%             20%          E3 (45%)
-S6  13–20 feb   35%       15%          40%             10%          E3 (40%)
-S7  20–27 feb   35%       12%          43%             10%          E3 (43%)
-S8  27f–6m      38%       12%          40%             10%          E3 (40%) ●
+Semana       E1    E2    E3    E4    Dominante
+S1  3–15 ene  5%   45%   40%   10%   E2 (45%)
+S2  16–22 ene 15%   25%   50%   10%   E3 (50%)
+S3  23–29 ene 20%   10%   60%   10%   E3 (60%)
+S4  30e–5f    30%    5%   50%   15%   E3 (50%)
+S5  6–13 feb  30%    5%   45%   20%   E3 (45%)
+S6  13–20 feb 35%   15%   40%   10%   E3 (40%)
+S7  20–27 feb 35%   12%   43%   10%   E3 (43%)
+S8  27f–6m    38%   12%   40%   10%   E3 (40%) ●
 ```
-
-> **S8**: E3 (40%) y E1 (38%) coexisten a solo 2pp de distancia — la más estrecha del ciclo.
 
 ### 28 Indicadores del Monitor
 
-Organizados en 4 dimensiones con historial semafórico de 8 semanas:
+| Dimensión | Indicadores | Nuevos (S8) |
+|-----------|-------------|-------------|
+| ⚡ Energético | 8 | Recaudación fiscal, Apertura minera |
+| 🏛 Político | 8 | Cautelares vigentes, Liderazgo opositor |
+| 📊 Económico | 6 | PIB trimestral |
+| 🌐 Internacional | 6 | Presión legislativa EE.UU. |
 
-| Dimensión | Indicadores | Nuevos (S8) | Ejemplos |
-|-----------|-------------|-------------|----------|
-| ⚡ Energético | 8 | 2 | Exportaciones, ventas, licencias OFAC, refinación, taladros, **recaudación fiscal**, **minería** |
-| 🏛 Político | 8 | 2 | Amnistía, excarcelaciones, FANB, ejecutivo, agenda electoral, marcos restrictivos, **cautelares**, **liderazgo opositor** |
-| 📊 Económico | 6 | 1 | Brecha cambiaria, inflación, ingresos, electricidad, percepción, **PIB trimestral** |
-| 🌐 Internacional | 6 | 1 | Cooperación EE.UU., sanciones UE, China/Rusia, FMI, normalización, **presión legislativa** |
-
-Indicadores nuevos se marcan con badge **NUEVO** y muestran dots grises en semanas donde no existían.
+Indicadores nuevos muestran badge **NUEVO**. Semanas anteriores sin dato muestran dot gris.
 
 ### 32 Señales por Escenario
 
-| Escenario | Señales | Nuevas (S8) | Ejemplo clave |
-|-----------|---------|-------------|---------------|
-| E3 Continuidad | 9 | 2 | 788 kbd récord, PIB +7.07%, SENIAT +78% |
-| E1 Transición | 9 | 6 | MCM 106.84 pts, 66% exige elecciones, H.R. 7674 |
-| E4 Resistencia | 7 | 3 | 568 presos, >11.000 cautelares, concentración territorial |
-| E2 Colapso | 7 | 1 | Brecha >50%, inflación 174%, 14.8h sin electricidad |
+| Escenario | Señales | Nuevas (S8) |
+|-----------|---------|-------------|
+| E3 Continuidad | 9 | PIB +7.07%, SENIAT +78% |
+| E1 Transición | 9 | MCM 106.84 pts, H.R. 7674, Ramos Allup, apertura minera, Vamos Venezuela, retorno MCM |
+| E4 Resistencia | 7 | Concentración territorial, >11.000 cautelares, oficialismo bajo |
+| E2 Colapso | 7 | Pérdida mercado chino |
 
-Señales nuevas se marcan con badge **NUEVO**.
+### Amnistía Tracker (Dashboard)
 
-## Actualización semanal (protocolo SITREP)
+Panel dual Gobierno vs Foro Penal con evolución semanal S1–S8:
+- **Gobierno**: Solicitudes, libertades plenas, cautelares, militares
+- **Foro Penal**: Excarcelaciones verificadas, presos políticos activos
+- **Brecha de verificación**: Barra visual con % de diferencia
+- **Mini-chart**: Barras duales por semana
 
-Cuando llega un nuevo Análisis de Contexto Situacional + Matriz de Escenarios, se actualiza `src/App.jsx`:
+### Fuentes de noticias (RSS)
 
-### 1. WEEKS — Nueva semana
+| Tipo | Medios |
+|------|--------|
+| Noticias | Efecto Cocuyo, El Pitazo, Runrunes, Tal Cual, El Estímulo, AlbertoNews, Caracas Chronicles |
+| Fact-check | Cocuyo Chequea, Cotejo.info, EsPaja, Cazamos Fake News, Provea |
 
-```javascript
-// Agregar al final del array WEEKS[]
-{ label:"FECHA", short:"S9",
-  probs:[{sc:1,v:XX,t:"up|down|flat"},{sc:2,v:XX,...},{sc:3,v:XX,...},{sc:4,v:XX,...}],
-  xy:{x:CALC,y:CALC},  // centroide ponderado (ver fórmula arriba)
-  sem:{g:N,y:N,r:N},   // conteo semáforo de tensiones (green, yellow, red)
-  kpis:{ energia:{...}, economico:{...}, opinion:{...} },
-  tensiones:[{l:"green|yellow|red", t:"<b>Título:</b> Detalle."}],
-  lectura:"Texto analítico del período...",
-  trendSc:N,            // escenario al que empuja la tendencia (1-4)
-  trendDrivers:["Factor 1","Factor 2","Factor 3"]
-}
-```
+## Funcionalidades del SITREP
 
-### 2. SITREP_ALL — Nuevo informe semanal
+### Vista Briefing (📌)
+Resumen ejecutivo de una página: barras de probabilidades, puntos clave, semáforo, tendencia, actores, síntesis, análisis IA.
 
-```javascript
-// Agregar al final del array SITREP_ALL[]
-{ period:"Fecha completa", periodShort:"Fecha corta",
-  keyPoints:[{tag, color, title, text}, ...],  // 3 puntos clave
-  sintesis:"Párrafo analítico principal...",
-  actores:[
-    {name:"EE.UU.", items:[...]},
-    {name:"Gobierno Interino", items:[...]},
-    {name:"Oposición", items:[...]},
-    {name:"Internacional", items:[...]}
-  ],
-  // Secciones opcionales (detalle expandido — solo semana actual):
-  nacional: { amnistia:{solicitudes,libertadesPlenas,...}, rodriguez:[...], allup:"...", mcmAgenda:[...] },
-  economia: { kpis:[{value,label,color},...], empresas:[{empresa,desarrollo},...] },
-  escenarios: [{name, prob, color, text}, ...],
-  comentarios: [{tag, color, title, text}, ...]
-}
-```
+### Generador de documento (📥)
+Compila datos de la semana y genera HTML descargable con formato PNUD. Incluye análisis IA si fue generado. Imprimible a PDF con Ctrl+P.
 
-> Las secciones detalladas (`nacional`, `economia`, `escenarios`, `comentarios`) solo se renderizan cuando existen. Las semanas anteriores muestran el formato compacto (síntesis + actores).
+### Análisis IA (🤖)
+Genera análisis narrativo de 5-6 párrafos usando **todos los datos del dashboard**:
 
-### 3. INDICATORS — Acumular historial
+| Fuente | Prioridad | Datos que recibe |
+|--------|-----------|------------------|
+| WEEKS + SITREP_ALL | 🔴 Máxima | Escenarios, probabilidades, tendencia, drivers, síntesis, tensiones, KPIs, actores, lectura analítica |
+| INDICATORS | 🟡 Alta | 28 indicadores con semáforo, tendencia, valor, badge NUEVO |
+| SCENARIO_SIGNALS | 🟡 Alta | 32 señales por E1/E2/E3/E4 con estado y badge NUEVO |
+| AMNISTIA_TRACKER | 🟡 Alta | Gobierno vs Foro Penal + hito del período |
+| Dólar (live) | 🟢 Contexto | BCV, paralelo, brecha % |
+| Petróleo (live) | 🟢 Contexto | Brent, WTI, Gas en USD |
+| Noticias (live) | 🟢 Contexto | Top 5 titulares del día |
 
-Para indicadores existentes, agregar entrada al final de `hist[]`:
-```javascript
-hist:[...existente, ["green|yellow|red", "up|down|flat", "Valor textual"]]
-```
+**Cascada de proveedores IA** (serverless `/api/ai`):
 
-Para indicadores **nuevos**, usar `null` en semanas anteriores y `addedWeek`:
-```javascript
-{ dim:"Dimensión", icon:"⚡", esc:"E1-4", name:"Nombre",
-  desc:"Descripción", umbral:"Regla de umbral...",
-  addedWeek:9,  // semana de introducción → badge NUEVO
-  hist:[null,null,null,null,null,null,null,null, ["green","up","Valor"]]
-}
-```
+| Proveedor | Key | Costo | Análisis/día |
+|-----------|-----|-------|--------------|
+| Gemini 1.5 Flash | `GEMINI_API_KEY` | Gratis | ~150-200 |
+| Groq Llama 3.3 70B | `GROQ_API_KEY` | Gratis | ~80-100 |
+| OpenRouter Free | `OPENROUTER_API_KEY` | Gratis | 50 |
+| Claude Sonnet 4 | `ANTHROPIC_API_KEY` | Pago | Ilimitado |
 
-### 4. Estructuras auxiliares a actualizar
+Basta configurar **una sola key**. Si un proveedor falla, salta al siguiente automáticamente. Badge dinámico: azul GEMINI, naranja GROQ, cyan OPENROUTER, violeta CLAUDE.
 
-| Estructura | Descripción |
-|------------|-------------|
-| `KPIS_LATEST` | KPIs destacados en el header del Dashboard |
-| `TENSIONS` | Lista de tensiones con semáforo para el Dashboard |
-| `SCENARIO_SIGNALS` | Señales por escenario E1/E2/E3/E4 en el Monitor |
-| `GDELT_ANNOTATIONS` | Eventos clave marcados en el timeline de medios |
-| `MONITOR_WEEKS` | Array de labels `["S1","S2",...,"S9"]` — debe coincidir con `hist.length` |
+### API de petróleo (híbrida)
 
-### 5. Gestión de etiquetas NUEVO
-
-```javascript
-// Señales nuevas del período actual:
-{ name:"Señal nueva", sem:"green", val:"Descripción", isNew:true }
-
-// Indicadores nuevos del período actual:
-{ ..., addedWeek:9, hist:[null,...,null, ["green","up","Valor"]] }
-```
-
-> **En el siguiente SITREP**: quitar `isNew:true` de las señales de la semana anterior y ponerlos solo en las nuevas. Los `addedWeek` se mantienen permanentemente (marcan cuándo se introdujo cada indicador).
+| Componente | Fuente | Uso |
+|------------|--------|-----|
+| Tarjetas (precio actual) | OilPriceAPI | Intradía, en vivo |
+| Gráfico histórico | EIA (gov) | 365 días, diario, ilimitado |
+| Punto de hoy en gráfico | OilPriceAPI | Se inyecta al final del historial EIA |
 
 ## Variables de entorno (Vercel)
 
 | Variable | Requerida | Uso |
 |----------|-----------|-----|
-| `EIA_API_KEY` | Sí | Precios petroleros EIA (gratuito, ilimitado) — [eia.gov/opendata](https://www.eia.gov/opendata/register.php) |
-| `OILPRICE_API_KEY` | Opcional | Fallback: precios petroleros OilPriceAPI (500 req/mes) |
-| `NEWS_API_KEY` | Opcional | NewsAPI para noticias en vivo |
-| `SUPABASE_URL` | Opcional | Base de datos de artículos |
-| `SUPABASE_KEY` | Opcional | Auth Supabase |
-| `ACLED_API_KEY` | Opcional | Datos de conflictividad ACLED |
+| `EIA_API_KEY` | Sí | Gráfico petróleo (gratuito, ilimitado) — [eia.gov/opendata](https://www.eia.gov/opendata/register.php) |
+| `OILPRICE_API_KEY` | Opcional | Precios petróleo intradía (500 req/mes) |
 | `GEMINI_API_KEY` | Opcional | 🤖 IA: Gemini Flash (gratuito) — [aistudio.google.com](https://aistudio.google.com) |
 | `GROQ_API_KEY` | Opcional | 🤖 IA: Groq Llama 3.3 70B (gratuito) — [console.groq.com](https://console.groq.com) |
 | `OPENROUTER_API_KEY` | Opcional | 🤖 IA: OpenRouter modelos free (gratuito) — [openrouter.ai](https://openrouter.ai) |
 | `ANTHROPIC_API_KEY` | Opcional | 🤖 IA: Claude Sonnet (pago) — [console.anthropic.com](https://console.anthropic.com) |
+| `NEWS_API_KEY` | Opcional | NewsAPI para noticias en vivo |
+| `SUPABASE_URL` | Opcional | Base de datos de artículos |
+| `SUPABASE_KEY` | Opcional | Auth Supabase |
+| `ACLED_API_KEY` | Opcional | Datos de conflictividad ACLED |
+
+> **Obtener keys gratuitas**: [aistudio.google.com](https://aistudio.google.com) (Gemini) · [console.groq.com](https://console.groq.com) (Groq) · [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys) (OpenRouter) · [eia.gov/opendata](https://www.eia.gov/opendata/register.php) (EIA). Ninguna requiere tarjeta de crédito.
+
+## Actualización semanal (protocolo SITREP)
+
+Editar `src/App.jsx`:
+
+### 1. WEEKS — Nueva semana
+
+```javascript
+{ label:"FECHA", short:"S9",
+  probs:[{sc:1,v:XX,t:"up|down|flat"},{sc:2,v:XX,...},{sc:3,v:XX,...},{sc:4,v:XX,...}],
+  xy:{x:CALC,y:CALC},  // centroide ponderado
+  sem:{g:N,y:N,r:N},   // semáforo tensiones
+  kpis:{ energia:{...}, economico:{...}, opinion:{...} },
+  tensiones:[{l:"green|yellow|red", t:"<b>Título:</b> Detalle."}],
+  lectura:"Texto analítico...",
+  trendSc:N, trendDrivers:["Factor 1","Factor 2","Factor 3"]
+}
+```
+
+### 2. SITREP_ALL — Nuevo informe
+
+```javascript
+{ period:"Fecha larga", periodShort:"Fecha corta",
+  keyPoints:[{tag, color, title, text}],
+  sintesis:"...", actores:[{name, items:[...]}],
+  // Opcionales: nacional, economia, escenarios, comentarios
+}
+```
+
+### 3. INDICATORS — Acumular historial
+
+Existentes: agregar al final de `hist[]`. Nuevos: `addedWeek:N`, `hist:[null,...,["color","trend","valor"]]`
+
+### 4. AMNISTIA_TRACKER — Nueva entrada
+
+```javascript
+{ week:"S9", label:"...",
+  gob:{ solicitudes:N, libertades:N, excarcelados:N, cautelares:N, militares:N },
+  fp:{ verificados:N, detenidos:N },
+  hito:"Descripción del hito del período"
+}
+```
+
+### 5. Estructuras auxiliares
+
+`KPIS_LATEST`, `TENSIONS`, `SCENARIO_SIGNALS` (quitar `isNew` anterior, poner en nuevas), `GDELT_ANNOTATIONS`, `MONITOR_WEEKS`
 
 ## Deploy
 
 ```bash
-# 1. Subir a GitHub
 cd monitor-pnud
-git init && git add . && git commit -m "Monitor PNUD v3"
+git init && git add . && git commit -m "Monitor PNUD v4"
 git remote add origin https://github.com/TU_USUARIO/monitor-pnud.git
 git push -u origin main
-
-# 2. Conectar en vercel.com → Add New Project → Seleccionar repo
-#    Framework: Vite (autodetect) → Deploy
-
-# 3. Configurar Environment Variables en Vercel Dashboard → Settings
+# Vercel: Add New Project → Seleccionar repo → Deploy
+# Configurar Environment Variables en Settings
 ```
 
 ## Desarrollo local
@@ -223,75 +224,25 @@ npm run dev
 # → http://localhost:5173
 ```
 
-> En desarrollo local, las APIs serverless (`/api/*`) no están disponibles. El dashboard usa proxies CORS como fallback para GDELT y muestra datos mock donde las APIs no responden.
-
 ## Stack técnico
 
-- **Frontend**: React 18 + Vite 5 (single-file architecture, ~330 KB)
+- **Frontend**: React 18 + Vite 5 (single-file, ~340 KB)
 - **Hosting**: Vercel (Edge + Serverless Functions)
-- **APIs externas**: GDELT, IODA (Georgia Tech), OilPrice API, NewsAPI, ACLED, Polymarket
+- **APIs externas**: EIA, OilPriceAPI, GDELT, IODA, DolarAPI, NewsAPI, ACLED, Polymarket
+- **IA**: Gemini Flash / Groq Llama / OpenRouter / Claude (cascada con fallback)
 - **Diseño**: Space Mono + DM Sans, paleta PNUD (#0468B1), fully responsive
 
 ## Créditos
 
-- **GDELT Project**: [gdeltproject.org](https://www.gdeltproject.org/) — Monitoreo global de medios
+- **EIA**: [eia.gov](https://www.eia.gov/) — U.S. Energy Information Administration
+- **GDELT**: [gdeltproject.org](https://www.gdeltproject.org/) — Monitoreo global de medios
 - **IODA**: [ioda.inetintel.cc.gatech.edu](https://ioda.inetintel.cc.gatech.edu/) — Georgia Tech
 - **OVCS**: [observatoriodeconflictos.org.ve](https://www.observatoriodeconflictos.org.ve/) — Conflictividad social
 - **Polymarket**: [polymarket.com](https://polymarket.com) — Mercados de predicción
 - **ACLED**: [acleddata.com](https://acleddata.com/) — Datos de conflicto armado
+- **Foro Penal**: [@ForoPenal](https://twitter.com/ForoPenal) — Excarcelaciones verificadas
 - **Umbral**: [umbral.watch](https://umbral.watch) — Pablo Hernández Borges
 
 ---
 
 *Monitor de Contexto Situacional · PNUD Venezuela · Análisis Estratégico · Marzo 2026*
-
-## Funcionalidades avanzadas del SITREP
-
-El tab SITREP integra tres herramientas además del informe semanal:
-
-### Vista Briefing (📌)
-
-Botón en el toolbar del SITREP que cambia a un **briefing de una página** tipo resumen ejecutivo, mostrando en una sola vista:
-
-- Barras de probabilidades por escenario con tendencia
-- Puntos clave del período compactos
-- Semáforo de tensiones (verde/amarillo/rojo)
-- Tendencia dominante con drivers
-- Actores principales (top 2 items cada uno)
-- Síntesis del período
-- Análisis IA si fue generado
-
-Ideal para presentaciones rápidas o impresión en una página.
-
-### Generador de documento (📥 Descargar SITREP)
-
-Botón que compila los datos de la semana seleccionada y genera un **archivo HTML descargable** con formato PNUD que incluye:
-
-- Header con gradiente azul y branding PNUD
-- Puntos clave del período
-- Tabla de escenarios con probabilidades y tendencias
-- Síntesis del período
-- Semáforo de tensiones
-- Dinámicas por actor
-- Análisis narrativo IA (si fue generado previamente)
-- Footer institucional
-
-El archivo HTML es imprimible, compatible con `Ctrl+P` → PDF, y se auto-nombra con el período (ej: `SITREP_27_feb_6_mar_2026.html`).
-
-### SITREP con IA (🤖 Análisis IA)
-
-Botón que llama a la API de Claude (Sonnet 4) directamente desde el dashboard para generar un **análisis narrativo automatizado** de 4-5 párrafos basado en los datos reales de la semana:
-
-1. Panorama general y escenario dominante
-2. Dinámica energética y económica
-3. Dinámica política interna y DDHH
-4. Factores internacionales y geopolíticos
-5. Perspectiva de corto plazo y variables críticas
-
-El análisis se genera en español profesional con tono institucional PNUD, usando exclusivamente los datos del período seleccionado (no inventa datos). Se muestra tanto en la vista Briefing como se incluye en el documento descargable.
-
-> **En Vercel**: `/api/ai` prueba proveedores en cascada: Gemini → Groq → OpenRouter → Claude. Basta con configurar **una sola key** (recomendada: `GEMINI_API_KEY` por ser gratuita y estable). Si un proveedor falla, pasa al siguiente automáticamente.
->
-> **En Claude.ai**: las llamadas van directas a la API de Anthropic (el entorno inyecta la autenticación).
->
-> **Obtener keys gratuitas**: [aistudio.google.com](https://aistudio.google.com) (Gemini) · [console.groq.com](https://console.groq.com) (Groq) · [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys) (OpenRouter). Ninguna requiere tarjeta de crédito.

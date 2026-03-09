@@ -33,7 +33,6 @@ const RSS_SOURCES = [
   { name:"Maduradas", feed:"https://maduradas.com/feed/", type:"news" },
   { name:"Noticiero Digital", feed:"https://noticierodigital.com/feed/", type:"news" },
   { name:"Últimas Noticias", feed:"https://ultimasnoticias.com.ve/feed/", type:"news" },
-  { name:"2001 Online", feed:"https://2001online.com/feed/", type:"news" },
   // ── Medios regionales ──
   { name:"Correo del Caroní", feed:"https://correodelcaroni.com/feed/", type:"news" },
   { name:"Nuevo Día", feed:"https://nuevodia.com.ve/feed/", type:"news" },

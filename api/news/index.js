@@ -6,6 +6,7 @@ const RSS_SOURCES = [
   { name:"Runrunes", feed:"https://runrun.es/feed/", lang:"es", type:"news" },
   { name:"Tal Cual", feed:"https://talcualdigital.com/feed/", lang:"es", type:"news" },
   { name:"El Estímulo", feed:"https://elestimulo.com/feed/", lang:"es", type:"news" },
+  { name:"AlbertoNews", feed:"https://albertonews.com/feed/", lang:"es", type:"news" },
   { name:"Caracas Chronicles", feed:"https://www.caracaschronicles.com/feed/", lang:"en", type:"news" },
   // Fact-check sources
   { name:"Cocuyo Chequea", feed:"https://efectococuyo.com/cocuyo-chequea/feed/", lang:"es", type:"factcheck" },

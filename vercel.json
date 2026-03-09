@@ -3,6 +3,12 @@
     "api/cron/index.js": { "maxDuration": 60 },
     "api/ai/index.js": { "maxDuration": 45 }
   },
+  "crons": [
+    {
+      "path": "/api/cron",
+      "schedule": "0 */4 * * *"
+    }
+  ],
   "rewrites": [
     { "source": "/api/gdelt", "destination": "/api/gdelt/index.js" },
     { "source": "/api/ioda", "destination": "/api/ioda/index.js" },
