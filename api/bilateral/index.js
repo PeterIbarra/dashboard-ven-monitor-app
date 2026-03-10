@@ -10,7 +10,7 @@ module.exports = async function handler(req, res) {
   try {
     const response = await fetch(url, {
       signal: AbortSignal.timeout(12000),
-      headers: { "User-Agent": "PNUD-Monitor/1.0" },
+      headers: { "User-Agent": "PNUD-Monitor/1.0", "Cache-Control": "no-cache" },
     });
 
     if (!response.ok) {
@@ -27,7 +27,7 @@ module.exports = async function handler(req, res) {
     const v = latest.v || 0;
     const level = v > 2.0 ? "CRITICAL" : v > 1.0 ? "HIGH" : v > 0.5 ? "ELEVATED" : v > 0 ? "MODERATE" : "LOW";
 
-    res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=900");
+    res.setHeader("Cache-Control", "public, s-maxage=600, stale-while-revalidate=300, must-revalidate");
     return res.status(200).json({
       latest: { ...latest, level },
       history: data.map(d => ({ t: d.t, v: d.v, sentiment: d.sentiment, conflict: d.conflictCount, total: d.totalArticles, interp: d.interpolated })),

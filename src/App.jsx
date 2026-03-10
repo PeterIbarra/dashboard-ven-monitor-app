@@ -385,6 +385,14 @@ const CONF_HISTORICO = [
   {y:2025,p:2219,h:"MÍNIMO HISTÓRICO. Captura Maduro ene 2026."},
 ];
 
+// ═══ Venezuela Oil Production — Manual OPEC MOMR data (auto-replaced by EIA when available) ═══
+const VEN_PRODUCTION_MANUAL = [
+  { time:"2025-10-15T00:00:00Z", value:1010, source:"OPEC MOMR" },
+  { time:"2025-11-15T00:00:00Z", value:960, source:"OPEC MOMR" },
+  { time:"2025-12-15T00:00:00Z", value:917, source:"OPEC MOMR" },
+  { time:"2026-01-15T00:00:00Z", value:830, source:"OPEC MOMR" },
+];
+
 const CONF_MESES = [
   {m:"Ene",t:401,desca:96,dcp:305,rep:36,hecho:"Rechazo juramentación. Colectivos en 17 protestas."},
   {m:"Feb",t:170,desca:107,dcp:63,rep:0,hecho:"Ruta por la Justicia y la Libertad."},
@@ -4099,9 +4107,32 @@ function BrentChart({ history: rawHistory, forecast = [] }) {
 // VENEZUELA PRODUCTION CHART — Monthly crude oil production (EIA/OPEC)
 // ═══════════════════════════════════════════════════════════════
 
-function VenProductionChart({ data }) {
+function VenProductionChart({ data: apiData }) {
   const [hover, setHover] = useState(null);
+
+  // Merge API data with manual OPEC MOMR data
+  // Manual data only fills gaps — if EIA already has the month, EIA wins
+  const merged = (() => {
+    const byMonth = new Map();
+    // API data first (authoritative)
+    (apiData || []).forEach(d => {
+      const month = d.time.slice(0, 7); // "YYYY-MM"
+      byMonth.set(month, { ...d, source: "EIA" });
+    });
+    // Manual data fills gaps only
+    VEN_PRODUCTION_MANUAL.forEach(d => {
+      const month = d.time.slice(0, 7);
+      if (!byMonth.has(month)) {
+        byMonth.set(month, { value: d.value, time: d.time, source: d.source || "OPEC MOMR" });
+      }
+    });
+    return Array.from(byMonth.values()).sort((a, b) => new Date(a.time) - new Date(b.time));
+  })();
+
+  const data = merged;
   if (!data || data.length < 3) return null;
+
+  const manualCount = data.filter(d => d.source !== "EIA").length;
 
   const values = data.map(d => d.value);
   const min = Math.min(...values) * 0.9;
@@ -4190,9 +4221,14 @@ function VenProductionChart({ data }) {
           const y = toY(d.value);
           const h = PT + cH - y;
           const isHovered = hover === i;
+          const isManual = d.source !== "EIA";
           const color = d.value >= thresh1M ? "#22c55e" : d.value >= thresh788 ? ACCENT : "#f97316";
           return (
-            <rect key={i} x={x} y={y} width={barW} height={Math.max(h, 0.5)} fill={color} opacity={isHovered ? 0.9 : 0.5} rx={0.5} />
+            <g key={i}>
+              <rect x={x} y={y} width={barW} height={Math.max(h, 0.5)} fill={color} opacity={isHovered ? 0.9 : isManual ? 0.7 : 0.5} rx={0.5}
+                strokeDasharray={isManual ? "2,1" : "none"} stroke={isManual ? color : "none"} strokeWidth={isManual ? 0.5 : 0} />
+              {isManual && <text x={x + barW/2} y={y - 2} fontSize={4} fill={color} textAnchor="middle" fontFamily={font}>OPEC</text>}
+            </g>
           );
         })}
 
@@ -4221,17 +4257,19 @@ function VenProductionChart({ data }) {
           const tooltipW = 90;
           const tooltipX = hx > W * 0.65 ? hx - tooltipW - 8 : hx + 8;
           const tooltipY = Math.max(Math.min(hy - 18, PT + cH - 38), PT);
+          const isManual = d.source !== "EIA";
           return (
             <>
               <line x1={hx} y1={PT} x2={hx} y2={PT + cH} stroke={ACCENT} strokeWidth={0.5} opacity={0.3} />
               <circle cx={hx} cy={hy} r={3} fill={ACCENT} stroke="#fff" strokeWidth={1.5} />
-              <rect x={tooltipX} y={tooltipY} width={tooltipW} height={30} rx={2} fill={BG2} stroke={BORDER} strokeWidth={0.5} opacity={0.95} />
+              <rect x={tooltipX} y={tooltipY} width={tooltipW} height={isManual ? 36 : 30} rx={2} fill={BG2} stroke={BORDER} strokeWidth={0.5} opacity={0.95} />
               <text x={tooltipX + 4} y={tooltipY + 11} fontSize={6} fill={MUTED} fontFamily={font}>
                 {dt.toLocaleDateString("es", { month: "long", year: "numeric" })}
               </text>
               <text x={tooltipX + 4} y={tooltipY + 23} fontSize={8} fill={ACCENT} fontFamily={font} fontWeight="700">
                 {d.value.toFixed(0)} kbd ({d.value >= 1000 ? (d.value / 1000).toFixed(2) + "M" : d.value.toFixed(0) + "K"} bpd)
               </text>
+              {isManual && <text x={tooltipX + 4} y={tooltipY + 32} fontSize={5} fill="#eab308" fontFamily={font}>Fuente: {d.source} (pendiente EIA)</text>}
             </>
           );
         })()}
@@ -4252,7 +4290,7 @@ function VenProductionChart({ data }) {
         ))}
       </div>
       <div style={{ fontSize: 8, fontFamily: font, color: `${MUTED}50`, marginTop: 4, textAlign: "center" }}>
-        Fuente: U.S. Energy Information Administration (EIA) / OPEC Secondary Sources · Actualización mensual
+        Fuente: EIA / OPEC Secondary Sources · Actualización mensual{manualCount > 0 ? ` · ${manualCount} punto${manualCount>1?"s":""} OPEC MOMR (pendiente EIA)` : ""}
       </div>
     </Card>
   );
@@ -6933,7 +6971,7 @@ export default function MonitorPNUD() {
       } catch {}
       try {
         // Bilateral Threat Index (PizzINT/GDELT)
-        const bilUrl = IS_DEPLOYED ? "/api/bilateral" : null;
+        const bilUrl = IS_DEPLOYED ? `/api/bilateral?_t=${Math.floor(Date.now()/600000)}` : null;
         if (bilUrl) {
           const bRes = await fetch(bilUrl, { signal:AbortSignal.timeout(12000) }).then(r=>r.ok?r.json():null).catch(()=>null);
           if (bRes?.latest) results.bilateral = bRes;
