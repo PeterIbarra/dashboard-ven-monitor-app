@@ -98,6 +98,38 @@ const PROVIDERS = [
     },
   },
   {
+    name: "huggingface/qwen-2.5-72b",
+    keyEnv: "HF_API_KEY",
+    call: async (prompt, maxTokens, apiKey) => {
+      const res = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2.5-72B-Instruct", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          inputs: prompt,
+          parameters: { max_new_tokens: maxTokens, temperature: 0.7, return_full_text: false },
+        }),
+        signal: AbortSignal.timeout(45000),
+      });
+      if (!res.ok) {
+        // Try fallback model if Qwen is unavailable
+        const res2 = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            inputs: prompt,
+            parameters: { max_new_tokens: maxTokens, temperature: 0.7, return_full_text: false },
+          }),
+          signal: AbortSignal.timeout(45000),
+        });
+        if (!res2.ok) return null;
+        const data2 = await res2.json();
+        return Array.isArray(data2) ? (data2[0]?.generated_text || null) : (data2.generated_text || null);
+      }
+      const data = await res.json();
+      return Array.isArray(data) ? (data[0]?.generated_text || null) : (data.generated_text || null);
+    },
+  },
+  {
     name: "claude-sonnet-4",
     keyEnv: "ANTHROPIC_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
@@ -138,7 +170,7 @@ module.exports = async function handler(req, res) {
   const available = PROVIDERS.filter(p => process.env[p.keyEnv]);
   if (available.length === 0) {
     return res.status(500).json({
-      error: "No AI API key configured. Set at least one: MISTRAL_API_KEY (free), GEMINI_API_KEY (free), GROQ_API_KEY (free), OPENROUTER_API_KEY (free), or ANTHROPIC_API_KEY (paid).",
+      error: "No AI API key configured. Set at least one: MISTRAL_API_KEY (free), GEMINI_API_KEY (free), GROQ_API_KEY (free), OPENROUTER_API_KEY (free), HF_API_KEY (free), or ANTHROPIC_API_KEY (paid).",
     });
   }
 

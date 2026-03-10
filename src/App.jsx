@@ -1057,51 +1057,69 @@ function TabSitrep({ liveData = {} }) {
     const domSc = SCENARIOS.find(s=>s.id===dom.sc);
     const amnistia = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
 
-    // Fetch fresh headlines from Google News RSS
-    let freshHeadlines = [];
+    // Fetch fresh headlines from Google News RSS (3 dimensions)
+    let newsPolitica = [], newsEconomia = [], newsInternacional = [];
     if (IS_DEPLOYED) {
       try {
-        const headRes = await fetch("/api/gdelt?signal=headlines", { signal: AbortSignal.timeout(10000) });
+        const headRes = await fetch("/api/gdelt?signal=headlines", { signal: AbortSignal.timeout(12000) });
         if (headRes.ok) {
-          const headJson = await headRes.json();
-          freshHeadlines = (headJson.articles || [])
-            .filter(a => a.title && a.title.length > 20)
-            .slice(0, 8)
-            .map(a => ({ title: a.title, source: a.source }));
+          const h = await headRes.json();
+          newsPolitica = (h.politica || []).filter(a => a.title?.length > 20).slice(0, 6);
+          newsEconomia = (h.economia || []).filter(a => a.title?.length > 20).slice(0, 6);
+          newsInternacional = (h.internacional || []).filter(a => a.title?.length > 20).slice(0, 6);
         }
       } catch {}
     }
 
-    const briefData = {
-      fecha: new Date().toLocaleDateString("es", { weekday:"long", day:"numeric", month:"long", year:"numeric" }),
-      escenarioDominante: `${domSc?.name} (E${dom.sc}) al ${dom.v}%`,
-      dolar: liveData?.dolar || null,
-      petroleo: liveData?.oil || null,
-      titularesRSS: liveData?.news?.slice(0, 5) || [],
-      noticiasGoogleNews: freshHeadlines,
-      amnistia: amnistia ? { gobLibertades: amnistia.gob.libertades || amnistia.gob.excarcelados, fpVerificados: amnistia.fp.verificados, presos: amnistia.fp.detenidos } : null,
-      tensionesRojas: wk.tensiones.filter(t=>t.l==="red").map(t=>t.t.replace(/<[^>]+>/g,"")).slice(0, 2),
-    };
+    // RSS headlines as supplement
+    const rssHeadlines = (liveData?.news || []).slice(0, 8).map(n => ({
+      title: n.title || n.titulo || "", source: n.source || n.fuente || ""
+    })).filter(n => n.title.length > 15);
 
-    const prompt = `Eres un analista del PNUD Venezuela. Genera un DAILY BRIEF de máximo 3 párrafos cortos (150-200 palabras total) para hoy ${briefData.fecha}.
+    const fecha = new Date().toLocaleDateString("es", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
 
-DATOS DISPONIBLES:
-${JSON.stringify(briefData, null, 1)}
+    const prompt = `Eres un analista senior del PNUD Venezuela. Genera un DAILY BRIEF para hoy ${fecha}.
 
-INSTRUCCIONES:
-1. Primer párrafo: Estado actual — escenario dominante y dato más relevante del día (dólar, petróleo o titular).
-2. Segundo párrafo: Contexto rápido — amnistía, tensiones, o cualquier cambio notable.
-3. Tercer párrafo: Sintetiza las noticias más relevantes del día sobre Venezuela (usa noticiasGoogleNews como fuente principal y titularesRSS como complemento). Menciona los hechos concretos, no el nombre de la fuente.
-4. Tono: profesional pero conciso, tipo cable de agencia. Sin bullet points.
-5. NO inventes datos. Usa SOLO lo proporcionado.
-6. Ignora completamente titulares que no se relacionen directamente con Venezuela.`;
+═══ CONTEXTO ANALÍTICO ═══
+Escenario dominante: ${domSc?.name} (E${dom.sc}) al ${dom.v}%
+Escenarios: ${wk.probs.map(p => `E${p.sc}: ${p.v}%`).join(", ")}
+${liveData?.dolar ? `Dólar BCV: ${liveData.dolar.bcv || "—"} Bs | Paralelo: ${liveData.dolar.paralelo || "—"} Bs | Brecha: ${liveData.dolar.brecha || "—"}%` : ""}
+${liveData?.oil ? `Petróleo Brent: $${liveData.oil.brent || "—"} | WTI: $${liveData.oil.wti || "—"}` : ""}
+${amnistia ? `Amnistía — Gobierno: ${amnistia.gob.libertades || amnistia.gob.excarcelados} libertades | Foro Penal: ${amnistia.fp.verificados} verificadas | Presos: ${amnistia.fp.detenidos}` : ""}
+${wk.tensiones.filter(t=>t.l==="red").length > 0 ? `Tensiones rojas: ${wk.tensiones.filter(t=>t.l==="red").map(t=>t.t.replace(/<[^>]+>/g,"")).join("; ")}` : ""}
+
+═══ NOTICIAS FRESCAS (últimas 24h) ═══
+
+📌 POLÍTICA:
+${newsPolitica.map(a => `• "${a.title}" [${a.source}]`).join("\n") || "Sin noticias recientes"}
+
+📌 ECONOMÍA / ENERGÍA:
+${newsEconomia.map(a => `• "${a.title}" [${a.source}]`).join("\n") || "Sin noticias recientes"}
+
+📌 INTERNACIONAL / GEOPOLÍTICA:
+${newsInternacional.map(a => `• "${a.title}" [${a.source}]`).join("\n") || "Sin noticias recientes"}
+
+📌 RSS MONITOR PNUD (complementarias):
+${rssHeadlines.map(a => `• "${a.title}" [${a.source}]`).join("\n") || "Sin noticias RSS"}
+
+═══ INSTRUCCIONES ═══
+1. Escribe 3-4 párrafos (250-350 palabras total), uno por dimensión:
+   - POLÍTICO: Sintetiza las noticias políticas más relevantes. Conecta con el escenario dominante.
+   - ECONÓMICO: Incluye datos de mercado (dólar, petróleo) y noticias económicas.
+   - INTERNACIONAL: Sintetiza noticias geopolíticas y su impacto en Venezuela.
+2. CITA las fuentes entre corchetes [Fuente] después de cada dato o hecho. Ejemplo: "El gobierno anunció nuevas medidas [Reuters]."
+3. Usa SOLO las noticias proporcionadas. NO inventes hechos ni fuentes.
+4. Ignora completamente titulares que no se relacionen con Venezuela.
+5. Si no hay noticias en alguna dimensión, omite ese párrafo.
+6. Tono: analítico, profesional, tipo cable diplomático. Sin bullet points.
+7. Al final, una línea de cierre con la valoración general del día en relación al escenario dominante.`;
 
     try {
       const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, max_tokens: 500 }),
-        signal: AbortSignal.timeout(35000),
+        body: JSON.stringify({ prompt, max_tokens: 800 }),
+        signal: AbortSignal.timeout(40000),
       });
       if (res.ok) {
         const data = await res.json();
@@ -1517,8 +1535,8 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
             const providerMatch = aiAnalysis.match(/^\[([^\]]+)\]\n\n/);
             const provider = providerMatch ? providerMatch[1] : "claude";
             const displayText = providerMatch ? aiAnalysis.slice(providerMatch[0].length) : aiAnalysis;
-            const badgeColor = provider.includes("mistral") ? "#ff6f00" : provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : "#8b5cf6";
-            const badgeLabel = provider.includes("mistral") ? "MISTRAL" : provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : "CLAUDE";
+            const badgeColor = provider.includes("mistral") ? "#ff6f00" : provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "#ffbf00" : "#8b5cf6";
+            const badgeLabel = provider.includes("mistral") ? "MISTRAL" : provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "HUGGINGFACE" : "CLAUDE";
             return (
               <div style={{ ...cardStyle, marginTop:mob?10:14, borderLeft:`3px solid ${badgeColor}`, background:`${badgeColor}08` }}>
                 <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
@@ -1702,8 +1720,8 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
         const providerMatch = aiAnalysis.match(/^\[([^\]]+)\]\n\n/);
         const provider = providerMatch ? providerMatch[1] : "claude";
         const displayText = providerMatch ? aiAnalysis.slice(providerMatch[0].length) : aiAnalysis;
-        const badgeColor = provider.includes("mistral") ? "#ff6f00" : provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : "#8b5cf6";
-        const badgeLabel = provider.includes("mistral") ? "MISTRAL" : provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : "CLAUDE";
+        const badgeColor = provider.includes("mistral") ? "#ff6f00" : provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "#ffbf00" : "#8b5cf6";
+        const badgeLabel = provider.includes("mistral") ? "MISTRAL" : provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "HUGGINGFACE" : "CLAUDE";
         return (
         <div style={{ borderBottom:`1px solid ${BORDER}40` }}>
           <div style={{ display:"flex", alignItems:"center", gap:mob?8:12, cursor:"pointer",
