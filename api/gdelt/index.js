@@ -11,16 +11,25 @@ module.exports = async function handler(req, res) {
 
   // If specific signal requested
   if (signal === "headlines") {
-    // Fetch fresh headlines from 3 Google News RSS queries (political, economic, geopolitical)
+    // Fetch fresh headlines from Google News RSS — 6 queries covering ES + EN sources
     try {
-      const gnBase = "https://news.google.com/rss/search?hl=es-419&gl=VE&ceid=VE:es-419&q=";
+      const gnES = "https://news.google.com/rss/search?hl=es-419&gl=VE&ceid=VE:es-419&q=";
+      const gnEN = "https://news.google.com/rss/search?hl=en&gl=US&ceid=US:en&q=";
       const queries = [
-        { dim: "politica", q: "venezuela+política+OR+amnistía+OR+elecciones+OR+oposición+OR+Maduro" },
-        { dim: "economia", q: "venezuela+petróleo+OR+economía+OR+sanciones+OR+dólar+OR+PDVSA" },
-        { dim: "internacional", q: "venezuela+EEUU+OR+Trump+OR+internacional+OR+diplomacia+OR+sanciones" },
+        // Spanish queries
+        { dim: "politica", url: gnES + encodeURIComponent("venezuela+política+OR+amnistía+OR+elecciones+OR+oposición+OR+Maduro"), max: 6 },
+        { dim: "economia", url: gnES + encodeURIComponent("venezuela+petróleo+OR+economía+OR+sanciones+OR+dólar+OR+PDVSA"), max: 6 },
+        { dim: "internacional", url: gnES + encodeURIComponent("venezuela+EEUU+OR+Trump+OR+internacional+OR+diplomacia+OR+petróleo"), max: 6 },
+        // English queries — premium international sources
+        { dim: "intl_en", url: gnEN + encodeURIComponent("venezuela"), max: 8 },
+        { dim: "energy_en", url: gnEN + encodeURIComponent("venezuela oil OR sanctions OR PDVSA OR crude"), max: 5 },
+        { dim: "politics_en", url: gnEN + encodeURIComponent("venezuela Maduro OR opposition OR elections OR amnesty OR Trump"), max: 5 },
       ];
 
-      function parseGnRss(xml) {
+      // Premium sources to prioritize
+      const premiumSources = ["reuters", "bloomberg", "wsj", "wall street journal", "washington post", "cnn", "bbc", "abc", "associated press", "ap news", "france 24", "el país", "nyt", "new york times", "the guardian", "financial times", "dw"];
+
+      function parseGnRss(xml, maxItems) {
         const articles = [];
         const items = xml.split("<item>").slice(1);
         for (const item of items) {
@@ -30,45 +39,61 @@ module.exports = async function handler(req, res) {
           const source = (item.match(/<source[^>]*>(.*?)<\/source>/) || [])[1] || "";
           const cleanTitle = title.replace(/<!\[CDATA\[|\]\]>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
           if (cleanTitle && cleanTitle.length > 15) {
-            articles.push({ title: cleanTitle, url: link.trim(), source, date: pubDate });
+            const isPremium = premiumSources.some(ps => source.toLowerCase().includes(ps));
+            articles.push({ title: cleanTitle, url: link.trim(), source, date: pubDate, premium: isPremium });
           }
-          if (articles.length >= 8) break;
+          if (articles.length >= maxItems) break;
         }
-        return articles;
+        // Sort premium sources first
+        return articles.sort((a, b) => (b.premium ? 1 : 0) - (a.premium ? 1 : 0));
       }
 
       const results = await Promise.all(
         queries.map(async (q) => {
           try {
-            const r = await fetch(gnBase + encodeURIComponent(q.q), {
+            const r = await fetch(q.url, {
               signal: AbortSignal.timeout(10000),
               headers: { "User-Agent": "PNUD-Monitor/1.0" },
             });
             if (!r.ok) return { dim: q.dim, articles: [] };
             const xml = await r.text();
-            return { dim: q.dim, articles: parseGnRss(xml) };
+            return { dim: q.dim, articles: parseGnRss(xml, q.max) };
           } catch { return { dim: q.dim, articles: [] }; }
         })
       );
 
-      // Deduplicate by title similarity
+      // Merge EN results into the main dimensions
+      const politicaES = results.find(r => r.dim === "politica")?.articles || [];
+      const economiaES = results.find(r => r.dim === "economia")?.articles || [];
+      const intlES = results.find(r => r.dim === "internacional")?.articles || [];
+      const intlEN = results.find(r => r.dim === "intl_en")?.articles || [];
+      const energyEN = results.find(r => r.dim === "energy_en")?.articles || [];
+      const politicsEN = results.find(r => r.dim === "politics_en")?.articles || [];
+
+      // Merge: ES first, then EN premium sources
+      const politicaMerged = [...politicaES, ...politicsEN];
+      const economiaMerged = [...economiaES, ...energyEN];
+      const intlMerged = [...intlES, ...intlEN];
+
+      // Deduplicate by title similarity across all
       const seen = new Set();
-      const allArticles = [];
-      for (const r of results) {
-        for (const a of r.articles) {
-          const key = a.title.toLowerCase().slice(0, 50);
-          if (!seen.has(key)) {
-            seen.add(key);
-            allArticles.push({ ...a, dim: r.dim });
-          }
-        }
-      }
+      const dedup = (arr) => arr.filter(a => {
+        const key = a.title.toLowerCase().slice(0, 40);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+      const politica = dedup(politicaMerged);
+      const economia = dedup(economiaMerged);
+      const internacional = dedup(intlMerged);
+      const allArticles = [...politica.map(a => ({...a, dim:"politica"})), ...economia.map(a => ({...a, dim:"economia"})), ...internacional.map(a => ({...a, dim:"internacional"}))];
 
       res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=900");
       return res.status(200).json({
-        politica: results.find(r => r.dim === "politica")?.articles || [],
-        economia: results.find(r => r.dim === "economia")?.articles || [],
-        internacional: results.find(r => r.dim === "internacional")?.articles || [],
+        politica,
+        economia,
+        internacional,
         all: allArticles,
         count: allArticles.length,
         source: "google-news-rss",
