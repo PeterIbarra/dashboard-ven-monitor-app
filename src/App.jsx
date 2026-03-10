@@ -2349,8 +2349,8 @@ function TabDashboard({ week, liveData = {} }) {
                         if (i < 3) return null;
                         return { i, avg: histIdx.slice(i - 3, i + 1).reduce((s,v) => s + v, 0) / 4 };
                       }).filter(Boolean);
-                      const ma4Path = ma4.map((m, j) => `${j===0?"M":"L"}${(m.i/(Math.max(histIdx.length-1,1)))*200},${40-(m.avg/100)*40}`).join(" ");
-                      return <polyline points={ma4Path.replace(/[ML]/g,"")} fill="none" stroke="#22d3ee" strokeWidth={1.5} strokeLinejoin="round" opacity={0.7} />;
+                      const pts = ma4.map(m => `${(m.i/(Math.max(histIdx.length-1,1)))*200},${40-(m.avg/100)*40}`).join(" ");
+                      return <polyline points={pts} fill="none" stroke="#22d3ee" strokeWidth={1.5} strokeLinejoin="round" opacity={0.7} />;
                     })()}
                     <polyline
                       points={histIdx.map((v,i) => `${(i/(Math.max(histIdx.length-1,1)))*200},${40-(v/100)*40}`).join(" ")}
