@@ -1805,28 +1805,28 @@ function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, 
       {yTicks.map((yv, i) => (
         <g key={i}>
           <line x1={PL} y1={toY(yv)} x2={PL+cW} y2={toY(yv)} stroke={BORDER} strokeWidth={0.3} />
-          <text x={PL-4} y={toY(yv)+3} fontSize={7} fill={MUTED} textAnchor="end" fontFamily={font}>{yv.toFixed(1)}</text>
+          <text x={PL-4} y={toY(yv)+2} fontSize={5.5} fill={MUTED} textAnchor="end" fontFamily={font}>{yv.toFixed(1)}</text>
         </g>
       ))}
 
       {/* Threshold lines */}
       <line x1={PL} y1={y1sigma} x2={PL+cW} y2={y1sigma} stroke="#eab308" strokeWidth={0.7} strokeDasharray="4,3" opacity={0.5} />
-      <text x={PL+cW+3} y={y1sigma+3} fontSize={6} fill="#eab308" fontFamily={font}>1.0σ</text>
+      <text x={PL+cW+3} y={y1sigma+2} fontSize={5} fill="#eab308" fontFamily={font}>1.0σ</text>
       <line x1={PL} y1={y2sigma} x2={PL+cW} y2={y2sigma} stroke="#ef4444" strokeWidth={0.7} strokeDasharray="4,3" opacity={0.5} />
-      <text x={PL+cW+3} y={y2sigma+3} fontSize={6} fill="#ef4444" fontFamily={font}>2.0σ</text>
+      <text x={PL+cW+3} y={y2sigma+2} fontSize={5} fill="#ef4444" fontFamily={font}>2.0σ</text>
 
       {/* Area fill */}
       <path d={areaPath} fill={`${cfg.color}12`} />
 
       {/* Main line */}
-      <path d={linePath} fill="none" stroke={cfg.color} strokeWidth={2} strokeLinejoin="round" />
+      <path d={linePath} fill="none" stroke={cfg.color} strokeWidth={1.5} strokeLinejoin="round" />
 
       {/* X date labels */}
       {dateLabels.map((d, i) => {
         const idx = chartData.indexOf(d);
         const dateStr = d.t ? new Date(d.t).toLocaleDateString("es", { day:"numeric", month:"short" }) : "";
         return (
-          <text key={i} x={toX(idx)} y={H-2} fontSize={7} fill={MUTED} textAnchor="middle" fontFamily={font}>
+          <text key={i} x={toX(idx)} y={H-2} fontSize={5.5} fill={MUTED} textAnchor="middle" fontFamily={font}>
             {dateStr}
           </text>
         );
@@ -1839,22 +1839,22 @@ function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, 
         const hy = toY(d.v);
         const dateStr = d.t ? new Date(d.t).toLocaleDateString("es", { day:"numeric", month:"short", year:"numeric" }) : "";
         const hLevel = d.v > 2.0 ? "CRÍTICO" : d.v > 1.0 ? "ALTO" : d.v > 0.5 ? "ELEVADO" : d.v > 0 ? "MODERADO" : "BAJO";
-        const tooltipX = hx > W/2 ? hx - 130 : hx + 10;
+        const tooltipX = hx > W/2 ? hx - 105 : hx + 8;
         return (
           <>
-            <line x1={hx} y1={PT} x2={hx} y2={PT+cH} stroke={cfg.color} strokeWidth={0.8} opacity={0.4} />
-            <circle cx={hx} cy={hy} r={4} fill={cfg.color} stroke="#fff" strokeWidth={2} />
+            <line x1={hx} y1={PT} x2={hx} y2={PT+cH} stroke={cfg.color} strokeWidth={0.6} opacity={0.3} />
+            <circle cx={hx} cy={hy} r={3} fill={cfg.color} stroke="#fff" strokeWidth={1.5} />
             {/* Tooltip box */}
-            <rect x={tooltipX} y={Math.max(hy - 38, PT)} width={120} height={50} rx={3} fill={BG2} stroke={BORDER} strokeWidth={0.5} opacity={0.95} />
-            <text x={tooltipX+6} y={Math.max(hy - 38, PT)+12} fontSize={8} fill={MUTED} fontFamily={font}>{dateStr}</text>
-            <text x={tooltipX+6} y={Math.max(hy - 38, PT)+24} fontSize={10} fill={cfg.color} fontFamily={font} fontWeight="700">Índice: {d.v.toFixed(2)}σ · {hLevel}</text>
-            <text x={tooltipX+6} y={Math.max(hy - 38, PT)+35} fontSize={8} fill={MUTED} fontFamily={font}>Sent: {(d.sentiment||0).toFixed(1)} · Conflicto: {d.conflict||"—"} · Art: {d.total||"—"}</text>
+            <rect x={tooltipX} y={Math.max(hy - 28, PT)} width={98} height={36} rx={2} fill={BG2} stroke={BORDER} strokeWidth={0.5} opacity={0.95} />
+            <text x={tooltipX+4} y={Math.max(hy - 28, PT)+9} fontSize={6} fill={MUTED} fontFamily={font}>{dateStr}</text>
+            <text x={tooltipX+4} y={Math.max(hy - 28, PT)+19} fontSize={7} fill={cfg.color} fontFamily={font} fontWeight="700">{d.v.toFixed(2)}σ · {hLevel}</text>
+            <text x={tooltipX+4} y={Math.max(hy - 28, PT)+28} fontSize={5.5} fill={MUTED} fontFamily={font}>Sent: {(d.sentiment||0).toFixed(1)} · Conf: {d.conflict||"—"} · Art: {d.total||"—"}</text>
           </>
         );
       })()}
 
       {/* Current dot (latest) */}
-      <circle cx={toX(chartData.length-1)} cy={toY(chartData[chartData.length-1].v)} r={4} fill={cfg.color} stroke="#fff" strokeWidth={2}>
+      <circle cx={toX(chartData.length-1)} cy={toY(chartData[chartData.length-1].v)} r={3} fill={cfg.color} stroke="#fff" strokeWidth={1.5}>
         <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite" />
       </circle>
     </svg>
@@ -2327,7 +2327,7 @@ function TabDashboard({ week, liveData = {} }) {
         );
       })()}
 
-      {/* ── ROW 1c: Índice de Amenaza Bilateral EE.UU.–Venezuela ── */}
+      {/* ── ROW 1c: Conflictividad Bilateral EE.UU.–Venezuela ── */}
       {liveData?.bilateral?.latest && (() => {
         const bil = liveData.bilateral;
         const lat = bil.latest;
@@ -2350,7 +2350,7 @@ function TabDashboard({ week, liveData = {} }) {
         const chartData = hist.filter(d => !d.interp && d.v != null).slice(-90);
         const maxV = Math.max(...chartData.map(d=>d.v), 2.5);
         const minV = Math.min(...chartData.map(d=>d.v), 0);
-        const W = 600, H = 110, PL = 30, PR = 10, PT = 5, PB = 16;
+        const W = 600, H = 85, PL = 25, PR = 10, PT = 4, PB = 14;
         const cW = W - PL - PR, cH = H - PT - PB;
         const toX = (i) => PL + (i / (chartData.length - 1)) * cW;
         const toY = (val) => PT + cH - ((val - minV) / (maxV - minV)) * cH;
@@ -2365,7 +2365,7 @@ function TabDashboard({ week, liveData = {} }) {
                 <span style={{ fontSize:9, color:MUTED }}>→</span>
                 <span style={{ fontSize:14 }}>🇻🇪</span>
                 <div>
-                  <div style={{ fontSize:10, fontFamily:font, fontWeight:700, color:TEXT, letterSpacing:"0.03em" }}>Amenaza Bilateral</div>
+                  <div style={{ fontSize:10, fontFamily:font, fontWeight:700, color:TEXT, letterSpacing:"0.03em" }}>Conflictividad Bilateral</div>
                   <div style={{ fontSize:7, fontFamily:font, color:MUTED }}>PizzINT/GDELT · {chartData.length}d</div>
                 </div>
               </div>
