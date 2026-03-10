@@ -1839,16 +1839,20 @@ function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, 
         const hy = toY(d.v);
         const dateStr = d.t ? new Date(d.t).toLocaleDateString("es", { day:"numeric", month:"short", year:"numeric" }) : "";
         const hLevel = d.v > 2.0 ? "CRÍTICO" : d.v > 1.0 ? "ALTO" : d.v > 0.5 ? "ELEVADO" : d.v > 0 ? "MODERADO" : "BAJO";
-        const tooltipX = hx > W/2 ? hx - 105 : hx + 8;
+        const tooltipW = 88;
+        const tooltipH = 40;
+        const tooltipX = hx > W * 0.65 ? hx - tooltipW - 8 : hx + 8;
+        const tooltipY = Math.max(Math.min(hy - tooltipH/2, PT + cH - tooltipH), PT);
         return (
           <>
             <line x1={hx} y1={PT} x2={hx} y2={PT+cH} stroke={cfg.color} strokeWidth={0.6} opacity={0.3} />
             <circle cx={hx} cy={hy} r={3} fill={cfg.color} stroke="#fff" strokeWidth={1.5} />
             {/* Tooltip box */}
-            <rect x={tooltipX} y={Math.max(hy - 28, PT)} width={98} height={36} rx={2} fill={BG2} stroke={BORDER} strokeWidth={0.5} opacity={0.95} />
-            <text x={tooltipX+4} y={Math.max(hy - 28, PT)+9} fontSize={6} fill={MUTED} fontFamily={font}>{dateStr}</text>
-            <text x={tooltipX+4} y={Math.max(hy - 28, PT)+19} fontSize={7} fill={cfg.color} fontFamily={font} fontWeight="700">{d.v.toFixed(2)}σ · {hLevel}</text>
-            <text x={tooltipX+4} y={Math.max(hy - 28, PT)+28} fontSize={5.5} fill={MUTED} fontFamily={font}>Sent: {(d.sentiment||0).toFixed(1)} · Conf: {d.conflict||"—"} · Art: {d.total||"—"}</text>
+            <rect x={tooltipX} y={tooltipY} width={tooltipW} height={tooltipH} rx={2} fill={BG2} stroke={BORDER} strokeWidth={0.5} opacity={0.95} />
+            <text x={tooltipX+4} y={tooltipY+9} fontSize={5.5} fill={MUTED} fontFamily={font}>{dateStr}</text>
+            <text x={tooltipX+4} y={tooltipY+18} fontSize={7} fill={cfg.color} fontFamily={font} fontWeight="700">{d.v.toFixed(2)}σ · {hLevel}</text>
+            <text x={tooltipX+4} y={tooltipY+26} fontSize={5} fill={MUTED} fontFamily={font}>Sent: {(d.sentiment||0).toFixed(1)} · Conf: {d.conflict||"—"}</text>
+            <text x={tooltipX+4} y={tooltipY+33} fontSize={5} fill={MUTED} fontFamily={font}>Artículos: {d.total||"—"}</text>
           </>
         );
       })()}
