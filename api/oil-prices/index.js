@@ -92,10 +92,42 @@ module.exports = async function handler(req, res) {
       }
     }
 
+    // ── 4. STEO Forecast (monthly, free) ──
+    let steoForecast = [];
+    if (eiaKey) {
+      try {
+        const steoUrl = `https://api.eia.gov/v2/steo/data/?api_key=${eiaKey}&frequency=monthly&data[0]=value&facets[seriesId][]=BREPUUS&start=${new Date().toISOString().slice(0,7)}&end=2027-12&sort[0][column]=period&sort[0][direction]=asc&length=24`;
+        const steoRes = await fetchJson(steoUrl, 10000);
+        const steoData = steoRes?.response?.data;
+        if (Array.isArray(steoData) && steoData.length > 0) {
+          steoForecast = steoData
+            .filter(d => d.value != null)
+            .map(d => ({ price: parseFloat(d.value), time: d.period + "-15T00:00:00Z" }))
+            .sort((a, b) => new Date(a.time) - new Date(b.time));
+        }
+      } catch {}
+    }
+
+    // ── 5. Venezuela crude oil production (EIA International / OPEC secondary) ──
+    let venProduction = [];
+    if (eiaKey) {
+      try {
+        const venUrl = `https://api.eia.gov/v2/international/data/?api_key=${eiaKey}&frequency=monthly&data[0]=value&facets[activityId][]=1&facets[productId][]=57&facets[countryRegionId][]=VEN&facets[unit][]=TBPD&sort[0][column]=period&sort[0][direction]=desc&length=120`;
+        const venRes = await fetchJson(venUrl, 12000);
+        const venData = venRes?.response?.data;
+        if (Array.isArray(venData) && venData.length > 0) {
+          venProduction = venData
+            .filter(d => d.value != null && d.value > 0)
+            .map(d => ({ value: parseFloat(d.value), time: d.period + "-15T00:00:00Z" }))
+            .sort((a, b) => new Date(a.time) - new Date(b.time));
+        }
+      } catch {}
+    }
+
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=120");
     return res.status(200).json({
       brent, wti, natgas,
-      brentHistory, histPeriod,
+      brentHistory, steoForecast, venProduction, histPeriod,
       source: liveSource,
       fetchedAt: new Date().toISOString(),
     });

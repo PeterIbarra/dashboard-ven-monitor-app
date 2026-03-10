@@ -3804,7 +3804,7 @@ function OilPriceTicker() {
   );
 }
 
-function BrentChart({ history: rawHistory }) {
+function BrentChart({ history: rawHistory, forecast = [] }) {
   const [hover, setHover] = useState(null);
   if (!rawHistory || rawHistory.length < 2) return null;
 
@@ -3817,22 +3817,44 @@ function BrentChart({ history: rawHistory }) {
   const history = Array.from(byDay.values());
   if (history.length < 2) return null;
 
+  // Combine history + forecast for Y axis scaling
+  const allPrices = [...history.map(h => h.price), ...forecast.map(f => f.price)];
   const firstDate = history[0]?.time ? new Date(history[0].time).toLocaleDateString("es",{month:"short",year:"numeric"}) : "";
+  const lastForecastDate = forecast.length > 0 ? new Date(forecast[forecast.length-1].time).toLocaleDateString("es",{month:"short",year:"numeric"}) : "";
   const lastDate = history[history.length-1]?.time ? new Date(history[history.length-1].time).toLocaleDateString("es",{month:"short",year:"numeric"}) : "";
-  const chartLabel = `Brent Crude · ${firstDate} — ${lastDate} · ${history.length} puntos`;
+  const chartLabel = forecast.length > 0
+    ? `Brent Crude · ${firstDate} — ${lastForecastDate} · ${history.length} pts + ${forecast.length} pronóstico EIA`
+    : `Brent Crude · ${firstDate} — ${lastDate} · ${history.length} puntos`;
 
   const prices = history.map(h => h.price);
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
+  const min = Math.min(...allPrices);
+  const max = Math.max(...allPrices);
   const range = max - min || 1;
+  
+  // Extend chart width to accommodate forecast
+  const totalPoints = history.length + (forecast.length > 0 ? Math.round(forecast.length * 4) : 0); // ~4 days per month forecast point
   const W = 700, H = 140, padL = 45, padR = 10, padT = 10, padB = 25;
   const cW = W - padL - padR, cH = H - padT - padB;
 
-  const toX = (i) => padL + (i / (history.length - 1)) * cW;
+  const toX = (i) => padL + (i / (totalPoints - 1)) * cW;
   const toY = (v) => padT + cH - ((v - min) / range) * cH;
 
   const pathD = history.map((h, i) => `${i === 0 ? "M" : "L"}${toX(i)},${toY(h.price)}`).join(" ");
   const areaD = pathD + ` L${toX(history.length - 1)},${padT + cH} L${toX(0)},${padT + cH} Z`;
+
+  // Forecast path (dashed, starting from last historical point)
+  let forecastPathD = "";
+  let forecastAreaD = "";
+  if (forecast.length > 0) {
+    const lastHistX = toX(history.length - 1);
+    const lastHistY = toY(history[history.length - 1].price);
+    const forecastPts = forecast.map((f, i) => {
+      const fi = history.length + Math.round((i + 1) * 4); // ~4 days spacing per month
+      return { x: toX(fi), y: toY(f.price), price: f.price, time: f.time };
+    });
+    forecastPathD = `M${lastHistX},${lastHistY} ` + forecastPts.map(p => `L${p.x},${p.y}`).join(" ");
+    forecastAreaD = `M${lastHistX},${padT + cH} L${lastHistX},${lastHistY} ` + forecastPts.map(p => `L${p.x},${p.y}`).join(" ") + ` L${forecastPts[forecastPts.length-1].x},${padT + cH} Z`;
+  }
 
   const first = prices[0], last = prices[prices.length - 1];
   const delta = last - first;
@@ -3874,9 +3896,31 @@ function BrentChart({ history: rawHistory }) {
             </text>
           </g>
         ))}
-        {/* Area + Line */}
+        {/* Area + Line (historical) */}
         <path d={areaD} fill="rgba(34,197,94,0.08)" />
         <path d={pathD} fill="none" stroke="#22c55e" strokeWidth={1.8} />
+
+        {/* Forecast overlay (EIA STEO) */}
+        {forecastPathD && <>
+          <path d={forecastAreaD} fill="rgba(234,179,8,0.06)" />
+          <path d={forecastPathD} fill="none" stroke="#eab308" strokeWidth={1.5} strokeDasharray="5,3" />
+          {/* Forecast dots with labels */}
+          {forecast.map((f, i) => {
+            const fi = history.length + Math.round((i + 1) * 4);
+            const fx = toX(fi);
+            const fy = toY(f.price);
+            return (
+              <g key={i}>
+                <circle cx={fx} cy={fy} r={2.5} fill="#eab308" stroke="#fff" strokeWidth={1} />
+                {i % 3 === 0 && <text x={fx} y={fy - 6} fontSize={6} fill="#eab308" textAnchor="middle" fontFamily={font}>${f.price.toFixed(0)}</text>}
+              </g>
+            );
+          })}
+          {/* Divider line between historical and forecast */}
+          <line x1={toX(history.length - 1)} y1={padT} x2={toX(history.length - 1)} y2={padT + cH}
+            stroke="#eab308" strokeWidth={0.5} strokeDasharray="2,3" opacity={0.5} />
+          <text x={toX(history.length - 1) + 3} y={padT + 8} fontSize={6} fill="#eab308" fontFamily={font}>Pronóstico EIA →</text>
+        </>}
         {/* X labels */}
         {history.filter((_, i) => i % Math.max(1, Math.floor(history.length / 7)) === 0).map((h) => {
           const idx = history.indexOf(h);
@@ -3901,6 +3945,182 @@ function BrentChart({ history: rawHistory }) {
           <span style={{ color: "#22c55e", fontWeight: 700 }}>${history[hover].price.toFixed(2)}</span>
         </div>
       )}
+      {/* Legend */}
+      {forecast.length > 0 && (
+        <div style={{ display:"flex", gap:14, justifyContent:"center", marginTop:4 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+            <div style={{ width:16, height:2, background:"#22c55e" }} />
+            <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Precio histórico (EIA)</span>
+          </div>
+          <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+            <div style={{ width:16, height:2, background:"#eab308", borderTop:"1px dashed #eab308" }} />
+            <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Pronóstico EIA (STEO mensual)</span>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VENEZUELA PRODUCTION CHART — Monthly crude oil production (EIA/OPEC)
+// ═══════════════════════════════════════════════════════════════
+
+function VenProductionChart({ data }) {
+  const [hover, setHover] = useState(null);
+  if (!data || data.length < 3) return null;
+
+  const values = data.map(d => d.value);
+  const min = Math.min(...values) * 0.9;
+  const max = Math.max(...values) * 1.05;
+  const range = max - min || 1;
+  const latest = data[data.length - 1];
+  const prev = data.length > 1 ? data[data.length - 2] : null;
+  const delta = prev ? latest.value - prev.value : 0;
+  const deltaPct = prev ? ((delta / prev.value) * 100).toFixed(1) : "0";
+  const peak = Math.max(...values);
+  const trough = Math.min(...values);
+
+  const firstDate = new Date(data[0].time).toLocaleDateString("es", { month: "short", year: "numeric" });
+  const lastDate = new Date(latest.time).toLocaleDateString("es", { month: "short", year: "numeric" });
+
+  const W = 700, H = 150, PL = 50, PR = 10, PT = 10, PB = 25;
+  const cW = W - PL - PR, cH = H - PT - PB;
+  const toX = (i) => PL + (i / (data.length - 1)) * cW;
+  const toY = (v) => PT + cH - ((v - min) / range) * cH;
+
+  // Bar width
+  const barW = Math.max(1, (cW / data.length) * 0.7);
+
+  // Key thresholds
+  const thresh1M = 1000;
+  const thresh788 = 788; // Current SITREP level
+
+  return (
+    <Card>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+            🇻🇪 Producción Petrolera Venezuela · {firstDate} — {lastDate} · {data.length} meses
+          </span>
+          <Badge color={ACCENT}>EIA/OPEC</Badge>
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          <span style={{ fontSize: 18, fontWeight: 900, color: ACCENT, fontFamily: "'Playfair Display',serif" }}>
+            {latest.value.toFixed(0)}
+          </span>
+          <span style={{ fontSize: 10, fontFamily: font, color: MUTED }}>kbd</span>
+          <span style={{ fontSize: 11, fontFamily: font, fontWeight: 600, color: delta >= 0 ? "#22c55e" : "#ef4444" }}>
+            {delta >= 0 ? "▲" : "▼"} {Math.abs(delta).toFixed(0)} ({delta >= 0 ? "+" : ""}{deltaPct}%)
+          </span>
+        </div>
+      </div>
+
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block", cursor: "crosshair" }}
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const mx = (e.clientX - rect.left) / rect.width * W;
+          const idx = Math.round(((mx - PL) / cW) * (data.length - 1));
+          if (idx >= 0 && idx < data.length) setHover(idx);
+        }}
+        onMouseLeave={() => setHover(null)}>
+
+        {/* Y grid + labels */}
+        {[0, 0.25, 0.5, 0.75, 1].map(f => (
+          <g key={f}>
+            <line x1={PL} y1={PT + f * cH} x2={PL + cW} y2={PT + f * cH} stroke="rgba(0,0,0,0.05)" />
+            <text x={PL - 4} y={PT + f * cH + 3} textAnchor="end" fontSize={7} fill={MUTED} fontFamily={font}>
+              {(max - f * range).toFixed(0)}
+            </text>
+          </g>
+        ))}
+
+        {/* 1M threshold line */}
+        {thresh1M >= min && thresh1M <= max && (
+          <>
+            <line x1={PL} y1={toY(thresh1M)} x2={PL + cW} y2={toY(thresh1M)} stroke="#22c55e" strokeWidth={0.7} strokeDasharray="4,3" opacity={0.5} />
+            <text x={PL + cW + 3} y={toY(thresh1M) + 3} fontSize={6} fill="#22c55e" fontFamily={font}>1M bpd</text>
+          </>
+        )}
+
+        {/* Current 788 kbd level */}
+        {thresh788 >= min && thresh788 <= max && (
+          <>
+            <line x1={PL} y1={toY(thresh788)} x2={PL + cW} y2={toY(thresh788)} stroke="#f97316" strokeWidth={0.7} strokeDasharray="3,3" opacity={0.4} />
+            <text x={PL + cW + 3} y={toY(thresh788) + 3} fontSize={6} fill="#f97316" fontFamily={font}>788</text>
+          </>
+        )}
+
+        {/* Bars */}
+        {data.map((d, i) => {
+          const x = toX(i) - barW / 2;
+          const y = toY(d.value);
+          const h = PT + cH - y;
+          const isHovered = hover === i;
+          const color = d.value >= thresh1M ? "#22c55e" : d.value >= thresh788 ? ACCENT : "#f97316";
+          return (
+            <rect key={i} x={x} y={y} width={barW} height={Math.max(h, 0.5)} fill={color} opacity={isHovered ? 0.9 : 0.5} rx={0.5} />
+          );
+        })}
+
+        {/* Trend line overlay */}
+        <polyline
+          points={data.map((d, i) => `${toX(i)},${toY(d.value)}`).join(" ")}
+          fill="none" stroke={ACCENT} strokeWidth={1.2} opacity={0.6} />
+
+        {/* X labels */}
+        {data.filter((_, i) => i % Math.max(1, Math.floor(data.length / 8)) === 0).map((d) => {
+          const idx = data.indexOf(d);
+          const dt = new Date(d.time);
+          return (
+            <text key={idx} x={toX(idx)} y={H - 4} textAnchor="middle" fontSize={7} fill={MUTED} fontFamily={font}>
+              {dt.toLocaleDateString("es", { month: "short", year: "2-digit" })}
+            </text>
+          );
+        })}
+
+        {/* Hover */}
+        {hover !== null && hover < data.length && (() => {
+          const d = data[hover];
+          const hx = toX(hover);
+          const hy = toY(d.value);
+          const dt = new Date(d.time);
+          const tooltipW = 90;
+          const tooltipX = hx > W * 0.65 ? hx - tooltipW - 8 : hx + 8;
+          const tooltipY = Math.max(Math.min(hy - 18, PT + cH - 38), PT);
+          return (
+            <>
+              <line x1={hx} y1={PT} x2={hx} y2={PT + cH} stroke={ACCENT} strokeWidth={0.5} opacity={0.3} />
+              <circle cx={hx} cy={hy} r={3} fill={ACCENT} stroke="#fff" strokeWidth={1.5} />
+              <rect x={tooltipX} y={tooltipY} width={tooltipW} height={30} rx={2} fill={BG2} stroke={BORDER} strokeWidth={0.5} opacity={0.95} />
+              <text x={tooltipX + 4} y={tooltipY + 11} fontSize={6} fill={MUTED} fontFamily={font}>
+                {dt.toLocaleDateString("es", { month: "long", year: "numeric" })}
+              </text>
+              <text x={tooltipX + 4} y={tooltipY + 23} fontSize={8} fill={ACCENT} fontFamily={font} fontWeight="700">
+                {d.value.toFixed(0)} kbd ({d.value >= 1000 ? (d.value / 1000).toFixed(2) + "M" : d.value.toFixed(0) + "K"} bpd)
+              </text>
+            </>
+          );
+        })()}
+      </svg>
+
+      {/* Stats row */}
+      <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 6 }}>
+        {[
+          { label: "Último", value: `${latest.value.toFixed(0)} kbd`, color: ACCENT },
+          { label: "Máximo", value: `${peak.toFixed(0)} kbd`, color: "#22c55e" },
+          { label: "Mínimo", value: `${trough.toFixed(0)} kbd`, color: "#ef4444" },
+          { label: "Meses", value: data.length.toString(), color: MUTED },
+        ].map((s, i) => (
+          <div key={i} style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 7, fontFamily: font, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase" }}>{s.label}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, fontFamily: font, color: s.color }}>{s.value}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontSize: 8, fontFamily: font, color: `${MUTED}50`, marginTop: 4, textAlign: "center" }}>
+        Fuente: U.S. Energy Information Administration (EIA) / OPEC Secondary Sources · Actualización mensual
+      </div>
     </Card>
   );
 }
@@ -3908,6 +4128,8 @@ function BrentChart({ history: rawHistory }) {
 function LivePriceCards() {
   const [prices, setPrices] = useState(null);
   const [brentHistory, setBrentHistory] = useState([]);
+  const [steoForecast, setSteoForecast] = useState([]);
+  const [venProduction, setVenProduction] = useState([]);
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("loading");
 
@@ -3922,6 +4144,8 @@ function LivePriceCards() {
             if (data.brent || data.wti || data.natgas) {
               setPrices(data);
               if (data.brentHistory) setBrentHistory(data.brentHistory);
+              if (data.steoForecast) setSteoForecast(data.steoForecast);
+              if (data.venProduction) setVenProduction(data.venProduction);
               setSource("live");
               setLoading(false);
               return;
@@ -4010,7 +4234,8 @@ function LivePriceCards() {
         ))}
       </div>
       {/* Brent chart */}
-      {brentHistory.length > 2 && <BrentChart history={brentHistory} />}
+      {brentHistory.length > 2 && <BrentChart history={brentHistory} forecast={steoForecast} />}
+      {venProduction.length > 2 && <VenProductionChart data={venProduction} />}
       {/* Fallback notice */}
       {!loading && source === "static" && (
         <div style={{ fontSize: 8, fontFamily: font, color: "#a17d08", textAlign: "center" }}>
