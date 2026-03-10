@@ -1760,6 +1760,108 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
 }
 
 // ═══════════════════════════════════════════════════════════════
+// BILATERAL CHART — Interactive hover chart for PizzINT data
+// ═══════════════════════════════════════════════════════════════
+
+function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, cH, toX, toY, mob }) {
+  const [hover, setHover] = useState(null);
+  if (!chartData || chartData.length < 2) return null;
+
+  // Threshold Y positions
+  const y1sigma = toY(1.0);
+  const y2sigma = toY(2.0);
+
+  // Area path
+  const areaPath = `M${toX(0)},${PT+cH} ${chartData.map((d,i) => `L${toX(i)},${toY(d.v)}`).join(" ")} L${toX(chartData.length-1)},${PT+cH}Z`;
+  // Line path
+  const linePath = chartData.map((d,i) => `${i===0?"M":"L"}${toX(i)},${toY(d.v)}`).join(" ");
+
+  // Date labels (every ~15 days)
+  const step = Math.max(Math.floor(chartData.length / 6), 1);
+  const dateLabels = chartData.filter((_,i) => i % step === 0 || i === chartData.length - 1);
+
+  // Y axis labels
+  const yTicks = [];
+  for (let yv = Math.ceil(minV * 2) / 2; yv <= maxV; yv += 0.5) {
+    yTicks.push(yv);
+  }
+
+  return (
+    <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block", overflow:"visible", cursor:"crosshair" }}
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * W;
+        const idx = Math.round(((x - PL) / cW) * (chartData.length - 1));
+        setHover(idx >= 0 && idx < chartData.length ? idx : null);
+      }}
+      onMouseLeave={() => setHover(null)}>
+
+      {/* Zone backgrounds */}
+      {y2sigma > PT && <rect x={PL} y={PT} width={cW} height={Math.max(y2sigma - PT, 0)} fill="#ef4444" opacity={0.04} />}
+      <rect x={PL} y={y2sigma} width={cW} height={Math.max(y1sigma - y2sigma, 0)} fill="#f97316" opacity={0.04} />
+      <rect x={PL} y={y1sigma} width={cW} height={Math.max(PT + cH - y1sigma, 0)} fill="#10b981" opacity={0.04} />
+
+      {/* Y grid + labels */}
+      {yTicks.map((yv, i) => (
+        <g key={i}>
+          <line x1={PL} y1={toY(yv)} x2={PL+cW} y2={toY(yv)} stroke={BORDER} strokeWidth={0.3} />
+          <text x={PL-4} y={toY(yv)+3} fontSize={7} fill={MUTED} textAnchor="end" fontFamily={font}>{yv.toFixed(1)}</text>
+        </g>
+      ))}
+
+      {/* Threshold lines */}
+      <line x1={PL} y1={y1sigma} x2={PL+cW} y2={y1sigma} stroke="#eab308" strokeWidth={0.7} strokeDasharray="4,3" opacity={0.5} />
+      <text x={PL+cW+3} y={y1sigma+3} fontSize={6} fill="#eab308" fontFamily={font}>1.0σ</text>
+      <line x1={PL} y1={y2sigma} x2={PL+cW} y2={y2sigma} stroke="#ef4444" strokeWidth={0.7} strokeDasharray="4,3" opacity={0.5} />
+      <text x={PL+cW+3} y={y2sigma+3} fontSize={6} fill="#ef4444" fontFamily={font}>2.0σ</text>
+
+      {/* Area fill */}
+      <path d={areaPath} fill={`${cfg.color}12`} />
+
+      {/* Main line */}
+      <path d={linePath} fill="none" stroke={cfg.color} strokeWidth={2} strokeLinejoin="round" />
+
+      {/* X date labels */}
+      {dateLabels.map((d, i) => {
+        const idx = chartData.indexOf(d);
+        const dateStr = d.t ? new Date(d.t).toLocaleDateString("es", { day:"numeric", month:"short" }) : "";
+        return (
+          <text key={i} x={toX(idx)} y={H-2} fontSize={7} fill={MUTED} textAnchor="middle" fontFamily={font}>
+            {dateStr}
+          </text>
+        );
+      })}
+
+      {/* Hover interaction */}
+      {hover !== null && chartData[hover] && (() => {
+        const d = chartData[hover];
+        const hx = toX(hover);
+        const hy = toY(d.v);
+        const dateStr = d.t ? new Date(d.t).toLocaleDateString("es", { day:"numeric", month:"short", year:"numeric" }) : "";
+        const hLevel = d.v > 2.0 ? "CRÍTICO" : d.v > 1.0 ? "ALTO" : d.v > 0.5 ? "ELEVADO" : d.v > 0 ? "MODERADO" : "BAJO";
+        const tooltipX = hx > W/2 ? hx - 130 : hx + 10;
+        return (
+          <>
+            <line x1={hx} y1={PT} x2={hx} y2={PT+cH} stroke={cfg.color} strokeWidth={0.8} opacity={0.4} />
+            <circle cx={hx} cy={hy} r={4} fill={cfg.color} stroke="#fff" strokeWidth={2} />
+            {/* Tooltip box */}
+            <rect x={tooltipX} y={Math.max(hy - 38, PT)} width={120} height={50} rx={3} fill={BG2} stroke={BORDER} strokeWidth={0.5} opacity={0.95} />
+            <text x={tooltipX+6} y={Math.max(hy - 38, PT)+12} fontSize={8} fill={MUTED} fontFamily={font}>{dateStr}</text>
+            <text x={tooltipX+6} y={Math.max(hy - 38, PT)+24} fontSize={10} fill={cfg.color} fontFamily={font} fontWeight="700">Índice: {d.v.toFixed(2)}σ · {hLevel}</text>
+            <text x={tooltipX+6} y={Math.max(hy - 38, PT)+35} fontSize={8} fill={MUTED} fontFamily={font}>Sent: {(d.sentiment||0).toFixed(1)} · Conflicto: {d.conflict||"—"} · Art: {d.total||"—"}</text>
+          </>
+        );
+      })()}
+
+      {/* Current dot (latest) */}
+      <circle cx={toX(chartData.length-1)} cy={toY(chartData[chartData.length-1].v)} r={4} fill={cfg.color} stroke="#fff" strokeWidth={2}>
+        <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite" />
+      </circle>
+    </svg>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
 // NEWS ALERTS — Classify headlines by relevance/urgency
 // ═══════════════════════════════════════════════════════════════
 
@@ -2225,14 +2327,15 @@ function TabDashboard({ week, liveData = {} }) {
         );
       })()}
 
-      {/* ── ROW 1c: Bilateral Threat Index (PizzINT/GDELT) ── */}
+      {/* ── ROW 1c: Índice de Amenaza Bilateral EE.UU.–Venezuela ── */}
       {liveData?.bilateral?.latest && (() => {
         const bil = liveData.bilateral;
         const lat = bil.latest;
         const v = lat.v || 0;
         const level = lat.level || "LOW";
         const sentiment = lat.sentiment || 0;
-        const conflictRatio = lat.total > 0 ? ((lat.conflict || 0) / lat.total * 100) : 0;
+        const conflictCount = lat.conflict || lat.conflictCount || 0;
+        const totalArticles = lat.total || lat.totalArticles || 0;
         const hist = bil.history || [];
 
         const levelConfig = {
@@ -2244,104 +2347,84 @@ function TabDashboard({ week, liveData = {} }) {
         };
         const cfg = levelConfig[level] || levelConfig.MODERATE;
 
-        // Sparkline from history
-        const sparkData = hist.filter(d => !d.interp).slice(-60);
-        const maxV = Math.max(...sparkData.map(d=>d.v), 2);
-        const minV = Math.min(...sparkData.map(d=>d.v), 0);
+        const chartData = hist.filter(d => !d.interp && d.v != null).slice(-90);
+        const maxV = Math.max(...chartData.map(d=>d.v), 2.5);
+        const minV = Math.min(...chartData.map(d=>d.v), 0);
+        const W = 600, H = 160, PL = 35, PR = 10, PT = 8, PB = 20;
+        const cW = W - PL - PR, cH = H - PT - PB;
+        const toX = (i) => PL + (i / (chartData.length - 1)) * cW;
+        const toY = (val) => PT + cH - ((val - minV) / (maxV - minV)) * cH;
 
         return (
-          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"auto 1fr", gap:0, border:`1px solid ${BORDER}`, background:BG2 }}>
-            {/* Left: Big number */}
-            <div style={{ padding:mob?"12px 14px":"16px 22px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-              borderRight:mob?"none":`1px solid ${BORDER}`, borderBottom:mob?`1px solid ${BORDER}`:"none", minWidth:mob?"auto":150 }}>
-              <div style={{ fontSize:8, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:MUTED, marginBottom:2 }}>
-                🇺🇸↔🇻🇪 Threat Index
+          <div style={{ border:`1px solid ${BORDER}`, background:BG2 }}>
+            {/* Header row */}
+            <div style={{ display:"flex", alignItems:"center", gap:8, padding:mob?"10px 12px":"12px 16px", borderBottom:`1px solid ${BORDER}40` }}>
+              <span style={{ fontSize:18 }}>🇺🇸</span>
+              <span style={{ fontSize:12, color:MUTED }}>→</span>
+              <span style={{ fontSize:18 }}>🇻🇪</span>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:12, fontFamily:font, fontWeight:700, color:TEXT, letterSpacing:"0.04em" }}>
+                  Índice de Amenaza Bilateral
+                </div>
+                <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>
+                  Indicadores geopolíticos bilaterales · PizzINT/GDELT · ~{chartData.length} días
+                </div>
               </div>
-              <div style={{ display:"flex", alignItems:"flex-end", gap:4 }}>
-                <span style={{ fontSize:mob?34:44, fontWeight:900, fontFamily:"'Playfair Display',serif", color:cfg.color, lineHeight:1 }}>
+              <div style={{ textAlign:"right" }}>
+                <div style={{ fontSize:mob?22:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:cfg.color, lineHeight:1 }}>
                   {v.toFixed(2)}
-                </span>
-                <span style={{ fontSize:11, fontFamily:font, color:MUTED, marginBottom:mob?3:6 }}>σ</span>
+                </div>
+                <div style={{ fontSize:9, fontFamily:fontSans, fontWeight:700, color:cfg.color, padding:"1px 6px",
+                  background:`${cfg.color}15`, border:`1px solid ${cfg.color}30`, display:"inline-block", marginTop:2 }}>
+                  {cfg.label}
+                </div>
               </div>
-              <div style={{ fontSize:10, fontFamily:fontSans, fontWeight:700, color:cfg.color, marginTop:3, padding:"2px 8px",
-                background:`${cfg.color}15`, border:`1px solid ${cfg.color}30`, letterSpacing:"0.06em" }}>
-                {cfg.label}
-              </div>
-              <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginTop:3, textAlign:"center" }}>{cfg.desc}</div>
             </div>
 
-            {/* Right: Chart + breakdown */}
-            <div style={{ padding:mob?"10px 12px":"14px 18px" }}>
+            {/* 4 KPI cards row */}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:0, borderBottom:`1px solid ${BORDER}40` }}>
+              {[
+                { label:"Índice Actual", value:v.toFixed(2), color:cfg.color },
+                { label:"Sentimiento", value:sentiment.toFixed(2), color:sentiment<-4?"#dc2626":sentiment<-2?"#ca8a04":"#16a34a" },
+                { label:"Eventos Conflicto", value:conflictCount.toString(), color:conflictCount>100?"#dc2626":conflictCount>50?"#ca8a04":TEXT },
+                { label:"Artículos Hoy", value:totalArticles.toString(), color:TEXT },
+              ].map((kpi, i) => (
+                <div key={i} style={{ padding:mob?"8px 6px":"10px 14px", textAlign:"center",
+                  borderRight:i<3?`1px solid ${BORDER}40`:"none" }}>
+                  <div style={{ fontSize:8, fontFamily:font, letterSpacing:"0.1em", textTransform:"uppercase", color:MUTED, marginBottom:3 }}>
+                    {kpi.label}
+                  </div>
+                  <div style={{ fontSize:mob?18:22, fontWeight:800, fontFamily:"'Playfair Display',serif", color:kpi.color, lineHeight:1 }}>
+                    {kpi.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Interactive chart */}
+            <div style={{ padding:mob?"8px 6px":"10px 12px" }}>
+              <BilateralChart chartData={chartData} cfg={cfg} maxV={maxV} minV={minV} W={W} H={H} PL={PL} PR={PR} PT={PT} PB={PB} cW={cW} cH={cH} toX={toX} toY={toY} mob={mob} />
               {/* Level bar */}
-              <div style={{ marginBottom:10 }}>
-                <div style={{ display:"flex", height:8, borderRadius:4, overflow:"hidden", background:BG3, position:"relative" }}>
-                  {Object.entries(levelConfig).map(([k,c],i) => (
+              <div style={{ marginTop:8 }}>
+                <div style={{ display:"flex", height:6, borderRadius:3, overflow:"hidden", background:BG3, position:"relative" }}>
+                  {Object.entries(levelConfig).map(([k,c]) => (
                     <div key={k} style={{ flex:1, background:c.color, opacity:0.2 }} />
                   ))}
                   <div style={{ position:"absolute", left:`${Math.min(v/4*100, 100)}%`, top:-1, transform:"translateX(-50%)",
-                    width:4, height:10, background:cfg.color, borderRadius:2, boxShadow:`0 0 5px ${cfg.color}60`, transition:"left 0.5s" }} />
+                    width:4, height:8, background:cfg.color, borderRadius:2, boxShadow:`0 0 5px ${cfg.color}60`, transition:"left 0.5s" }} />
                 </div>
                 <div style={{ display:"flex", marginTop:2 }}>
                   {Object.entries(levelConfig).map(([k,c]) => (
                     <div key={k} style={{ flex:1, fontSize:7, fontFamily:font, textAlign:"center",
-                      color:k===level?c.color:`${MUTED}50`, fontWeight:k===level?700:400 }}>
+                      color:k===level?c.color:`${MUTED}40`, fontWeight:k===level?700:400 }}>
                       {c.label}
                     </div>
                   ))}
                 </div>
               </div>
-
-              {/* Sparkline + KPIs */}
-              <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:mob?6:14 }}>
-                {/* KPIs */}
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"3px 8px", fontSize:10, fontFamily:font }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", color:MUTED }}>
-                    <span>Índice</span>
-                    <span style={{ fontWeight:700, color:cfg.color }}>{v.toFixed(2)}σ</span>
-                  </div>
-                  <div style={{ display:"flex", justifyContent:"space-between", color:MUTED }}>
-                    <span>Sentimiento</span>
-                    <span style={{ fontWeight:600, color:sentiment<-4?"#dc2626":sentiment<-2?"#ca8a04":"#16a34a" }}>{sentiment.toFixed(1)}</span>
-                  </div>
-                  <div style={{ display:"flex", justifyContent:"space-between", color:MUTED }}>
-                    <span>Art. conflicto</span>
-                    <span style={{ fontWeight:600, color:conflictRatio>50?"#dc2626":conflictRatio>30?"#ca8a04":MUTED }}>{conflictRatio.toFixed(0)}%</span>
-                  </div>
-                  <div style={{ display:"flex", justifyContent:"space-between", color:MUTED }}>
-                    <span>Art. totales</span>
-                    <span style={{ fontWeight:600, color:TEXT }}>{lat.total || "—"}</span>
-                  </div>
-                  <div style={{ display:"flex", justifyContent:"space-between", color:MUTED, gridColumn:"1 / -1" }}>
-                    <span>Baseline 2017–hoy</span>
-                    <span style={{ fontWeight:600 }}>μ=0.14 · σ=1.15</span>
-                  </div>
-                </div>
-
-                {/* Sparkline */}
-                <div>
-                  <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginBottom:3 }}>Últimos {sparkData.length} días · PizzINT/GDELT</div>
-                  <svg width="100%" height={45} viewBox="0 0 200 45" preserveAspectRatio="none" style={{ display:"block" }}>
-                    {/* Zone backgrounds */}
-                    <rect x={0} y={45-45*(1/maxV)} width={200} height={45*(1/maxV)*0.5} fill="#eab308" opacity={0.06} />
-                    <rect x={0} y={45-45*(2/maxV)} width={200} height={45*(1/maxV)} fill="#f97316" opacity={0.06} />
-                    <rect x={0} y={0} width={200} height={45-45*(2/maxV)} fill="#ef4444" opacity={0.06} />
-                    {/* Threshold lines */}
-                    <line x1={0} y1={45-45*(1/maxV)} x2={200} y2={45-45*(1/maxV)} stroke="#eab308" strokeWidth={0.5} strokeDasharray="3,3" opacity={0.4} />
-                    <line x1={0} y1={45-45*(2/maxV)} x2={200} y2={45-45*(2/maxV)} stroke="#ef4444" strokeWidth={0.5} strokeDasharray="3,3" opacity={0.4} />
-                    {/* Area fill */}
-                    <path d={`M0,45 ${sparkData.map((d,i) => `L${(i/(sparkData.length-1))*200},${45-((d.v-minV)/(maxV-minV))*42}`).join(" ")} L200,45Z`}
-                      fill={`${cfg.color}15`} />
-                    {/* Line */}
-                    <polyline
-                      points={sparkData.map((d,i) => `${(i/(sparkData.length-1))*200},${45-((d.v-minV)/(maxV-minV))*42}`).join(" ")}
-                      fill="none" stroke={cfg.color} strokeWidth={1.5} strokeLinejoin="round" />
-                    {/* Current dot */}
-                    {sparkData.length > 0 && (
-                      <circle cx={200} cy={45-((sparkData[sparkData.length-1].v-minV)/(maxV-minV))*42}
-                        r={3} fill={cfg.color} stroke="#fff" strokeWidth={1.5} />
-                    )}
-                  </svg>
-                </div>
+              <div style={{ fontSize:8, fontFamily:font, color:`${MUTED}60`, marginTop:6, display:"flex", justifyContent:"space-between" }}>
+                <span>EE.UU. → Venezuela es {cfg.desc.toLowerCase()} (~{v.toFixed(1)}σ sobre baseline 2017–presente: μ=0.14 · σ=1.15)</span>
+                <span>Fuente: PizzINT / GDELT</span>
               </div>
             </div>
           </div>
