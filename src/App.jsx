@@ -2350,81 +2350,70 @@ function TabDashboard({ week, liveData = {} }) {
         const chartData = hist.filter(d => !d.interp && d.v != null).slice(-90);
         const maxV = Math.max(...chartData.map(d=>d.v), 2.5);
         const minV = Math.min(...chartData.map(d=>d.v), 0);
-        const W = 600, H = 160, PL = 35, PR = 10, PT = 8, PB = 20;
+        const W = 600, H = 110, PL = 30, PR = 10, PT = 5, PB = 16;
         const cW = W - PL - PR, cH = H - PT - PB;
         const toX = (i) => PL + (i / (chartData.length - 1)) * cW;
         const toY = (val) => PT + cH - ((val - minV) / (maxV - minV)) * cH;
 
         return (
           <div style={{ border:`1px solid ${BORDER}`, background:BG2 }}>
-            {/* Header row */}
-            <div style={{ display:"flex", alignItems:"center", gap:8, padding:mob?"10px 12px":"12px 16px", borderBottom:`1px solid ${BORDER}40` }}>
-              <span style={{ fontSize:18 }}>🇺🇸</span>
-              <span style={{ fontSize:12, color:MUTED }}>→</span>
-              <span style={{ fontSize:18 }}>🇻🇪</span>
-              <div style={{ flex:1 }}>
-                <div style={{ fontSize:12, fontFamily:font, fontWeight:700, color:TEXT, letterSpacing:"0.04em" }}>
-                  Índice de Amenaza Bilateral
-                </div>
-                <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>
-                  Indicadores geopolíticos bilaterales · PizzINT/GDELT · ~{chartData.length} días
-                </div>
-              </div>
-              <div style={{ textAlign:"right" }}>
-                <div style={{ fontSize:mob?22:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:cfg.color, lineHeight:1 }}>
-                  {v.toFixed(2)}
-                </div>
-                <div style={{ fontSize:9, fontFamily:fontSans, fontWeight:700, color:cfg.color, padding:"1px 6px",
-                  background:`${cfg.color}15`, border:`1px solid ${cfg.color}30`, display:"inline-block", marginTop:2 }}>
-                  {cfg.label}
+            {/* Header + KPIs combined row */}
+            <div style={{ display:"flex", alignItems:"center", gap:0, borderBottom:`1px solid ${BORDER}40` }}>
+              {/* Title */}
+              <div style={{ display:"flex", alignItems:"center", gap:5, padding:mob?"6px 8px":"8px 12px", borderRight:`1px solid ${BORDER}40`, minWidth:mob?"auto":180 }}>
+                <span style={{ fontSize:14 }}>🇺🇸</span>
+                <span style={{ fontSize:9, color:MUTED }}>→</span>
+                <span style={{ fontSize:14 }}>🇻🇪</span>
+                <div>
+                  <div style={{ fontSize:10, fontFamily:font, fontWeight:700, color:TEXT, letterSpacing:"0.03em" }}>Amenaza Bilateral</div>
+                  <div style={{ fontSize:7, fontFamily:font, color:MUTED }}>PizzINT/GDELT · {chartData.length}d</div>
                 </div>
               </div>
-            </div>
-
-            {/* 4 KPI cards row */}
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:0, borderBottom:`1px solid ${BORDER}40` }}>
+              {/* 4 KPIs inline */}
               {[
-                { label:"Índice Actual", value:v.toFixed(2), color:cfg.color },
-                { label:"Sentimiento", value:sentiment.toFixed(2), color:sentiment<-4?"#dc2626":sentiment<-2?"#ca8a04":"#16a34a" },
-                { label:"Eventos Conflicto", value:conflictCount.toString(), color:conflictCount>100?"#dc2626":conflictCount>50?"#ca8a04":TEXT },
-                { label:"Artículos Hoy", value:totalArticles.toString(), color:TEXT },
+                { label:"Índice", value:v.toFixed(2), unit:"σ", color:cfg.color },
+                { label:"Sentimiento", value:sentiment.toFixed(1), unit:"", color:sentiment<-4?"#dc2626":sentiment<-2?"#ca8a04":"#16a34a" },
+                { label:"Conflicto", value:conflictCount.toString(), unit:"", color:conflictCount>100?"#dc2626":conflictCount>50?"#ca8a04":TEXT },
+                { label:"Artículos", value:totalArticles.toString(), unit:"", color:TEXT },
               ].map((kpi, i) => (
-                <div key={i} style={{ padding:mob?"8px 6px":"10px 14px", textAlign:"center",
-                  borderRight:i<3?`1px solid ${BORDER}40`:"none" }}>
-                  <div style={{ fontSize:8, fontFamily:font, letterSpacing:"0.1em", textTransform:"uppercase", color:MUTED, marginBottom:3 }}>
-                    {kpi.label}
-                  </div>
-                  <div style={{ fontSize:mob?18:22, fontWeight:800, fontFamily:"'Playfair Display',serif", color:kpi.color, lineHeight:1 }}>
-                    {kpi.value}
+                <div key={i} style={{ flex:1, padding:mob?"5px 4px":"6px 8px", textAlign:"center", borderRight:i<3?`1px solid ${BORDER}40`:"none" }}>
+                  <div style={{ fontSize:7, fontFamily:font, letterSpacing:"0.08em", textTransform:"uppercase", color:MUTED }}>{kpi.label}</div>
+                  <div style={{ fontSize:mob?14:16, fontWeight:800, fontFamily:"'Playfair Display',serif", color:kpi.color, lineHeight:1, marginTop:1 }}>
+                    {kpi.value}<span style={{ fontSize:8, fontWeight:400 }}>{kpi.unit}</span>
                   </div>
                 </div>
               ))}
+              {/* Level badge */}
+              <div style={{ padding:mob?"5px 6px":"6px 10px", textAlign:"center" }}>
+                <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.08em" }}>NIVEL</div>
+                <div style={{ fontSize:11, fontFamily:fontSans, fontWeight:700, color:cfg.color, marginTop:1 }}>{cfg.label}</div>
+              </div>
             </div>
 
-            {/* Interactive chart */}
-            <div style={{ padding:mob?"8px 6px":"10px 12px" }}>
+            {/* Compact chart */}
+            <div style={{ padding:mob?"4px 4px":"6px 8px" }}>
               <BilateralChart chartData={chartData} cfg={cfg} maxV={maxV} minV={minV} W={W} H={H} PL={PL} PR={PR} PT={PT} PB={PB} cW={cW} cH={cH} toX={toX} toY={toY} mob={mob} />
               {/* Level bar */}
-              <div style={{ marginTop:8 }}>
-                <div style={{ display:"flex", height:6, borderRadius:3, overflow:"hidden", background:BG3, position:"relative" }}>
+              <div style={{ marginTop:4 }}>
+                <div style={{ display:"flex", height:4, borderRadius:2, overflow:"hidden", background:BG3, position:"relative" }}>
                   {Object.entries(levelConfig).map(([k,c]) => (
                     <div key={k} style={{ flex:1, background:c.color, opacity:0.2 }} />
                   ))}
                   <div style={{ position:"absolute", left:`${Math.min(v/4*100, 100)}%`, top:-1, transform:"translateX(-50%)",
-                    width:4, height:8, background:cfg.color, borderRadius:2, boxShadow:`0 0 5px ${cfg.color}60`, transition:"left 0.5s" }} />
+                    width:3, height:6, background:cfg.color, borderRadius:1, boxShadow:`0 0 4px ${cfg.color}60`, transition:"left 0.5s" }} />
                 </div>
-                <div style={{ display:"flex", marginTop:2 }}>
+                <div style={{ display:"flex", marginTop:1 }}>
                   {Object.entries(levelConfig).map(([k,c]) => (
-                    <div key={k} style={{ flex:1, fontSize:7, fontFamily:font, textAlign:"center",
+                    <div key={k} style={{ flex:1, fontSize:6, fontFamily:font, textAlign:"center",
                       color:k===level?c.color:`${MUTED}40`, fontWeight:k===level?700:400 }}>
                       {c.label}
                     </div>
                   ))}
                 </div>
               </div>
-              <div style={{ fontSize:8, fontFamily:font, color:`${MUTED}60`, marginTop:6, display:"flex", justifyContent:"space-between" }}>
-                <span>EE.UU. → Venezuela es {cfg.desc.toLowerCase()} (~{v.toFixed(1)}σ sobre baseline 2017–presente: μ=0.14 · σ=1.15)</span>
-                <span>Fuente: PizzINT / GDELT</span>
+              <div style={{ fontSize:7, fontFamily:font, color:`${MUTED}50`, marginTop:3, display:"flex", justifyContent:"space-between" }}>
+                <span>~{v.toFixed(1)}σ sobre baseline 2017–hoy (μ=0.14 · σ=1.15)</span>
+                <span>PizzINT / GDELT</span>
               </div>
             </div>
           </div>
