@@ -2,18 +2,21 @@
 
 **PNUD Venezuela · Análisis Estratégico · Uso interno**
 
-Dashboard de monitoreo en tiempo real del proceso de estabilización venezolano post-3 de enero de 2026. Integra análisis de escenarios, indicadores semafóricos, señales por escenario, SITREPs semanales, tracker de amnistía, datos de medios internacionales (GDELT), conectividad (IODA), mercados energéticos y condiciones macroeconómicas.
+Dashboard de monitoreo en tiempo real del proceso de estabilización venezolano post-3 de enero de 2026. Integra análisis de escenarios, índice de inestabilidad compuesto (14 factores), conflictividad bilateral EE.UU.–Venezuela (PizzINT/GDELT), tracker de amnistía, indicadores semafóricos, señales por escenario, SITREPs semanales con análisis IA, Daily Brief con noticias frescas, alertas en vivo por umbral, clasificación inteligente de noticias, datos de medios internacionales (GDELT), conectividad (IODA), mercados energéticos y condiciones macroeconómicas.
+
+**Live**: https://dashboard-ven-monitor-app.vercel.app/
 
 ## Arquitectura
 
 ```
 monitor-pnud/
 ├── src/
-│   ├── App.jsx              # Aplicación completa (single-file, ~340 KB)
+│   ├── App.jsx              # Aplicación completa (single-file, ~400 KB)
 │   └── main.jsx             # Entry point React
-├── api/                     # Vercel Serverless Functions
-│   ├── ai/index.js          # Proxy IA: Gemini → Groq → OpenRouter → Claude
-│   ├── gdelt/index.js       # Proxy GDELT DOC API v2 (3 señales)
+├── api/                     # Vercel Serverless Functions (12 endpoints)
+│   ├── ai/index.js          # Proxy IA: Mistral → Gemini → Groq → OpenRouter → HuggingFace → Claude
+│   ├── bilateral/index.js   # Proxy PizzINT/GDELT bilateral threat index (USA↔VEN)
+│   ├── gdelt/index.js       # Proxy GDELT DOC API v2 (3 señales + Google News RSS headlines)
 │   ├── ioda/index.js        # Proxy IODA API v2 (Georgia Tech)
 │   ├── oil-prices/index.js  # Híbrido: OilPriceAPI (live) + EIA (histórico)
 │   ├── news/index.js        # RSS: 7 medios + 5 fact-checkers
@@ -21,7 +24,8 @@ monitor-pnud/
 │   ├── rates/index.js       # Tipo de cambio VES/USD
 │   ├── dolar/index.js       # Dólar: paralelo + oficial (dual fetch)
 │   ├── acled/index.js       # Datos de conflictividad (ACLED)
-│   └── cron/index.js        # Cron: sincronización automática
+│   ├── cron/index.js        # Cron: sincronización diaria 6:00 UTC
+│   └── bilateral/index.js   # PizzINT bilateral threat index
 ├── index.html
 ├── vercel.json              # Config: rewrites + CORS + cron + maxDuration
 ├── vite.config.mjs
@@ -30,19 +34,80 @@ monitor-pnud/
 
 ## Tabs del Dashboard
 
-| # | Tab | Icono | Descripción | Fuente | Auto-refresh |
-|---|-----|-------|-------------|--------|--------------|
-| 1 | **Dashboard** | 📊 | Escenarios, Amnistía Tracker, KPIs, semáforo, tensiones | Datos internos | — |
-| 2 | **SITREP** | 📋 | Análisis semanal (8 semanas), Briefing, Análisis IA, documento descargable | SITREP_ALL + IA | — |
-| 3 | **Matriz** | 🎯 | Matriz 2×2 (violencia × cambio), trayectoria, probabilidades | WEEKS | — |
-| 4 | **Monitor** | 🚦 | 28 indicadores + 32 señales + noticias + verificación | INDICATORS + /api/news | — |
-| 5 | **Medios** | 📡 | GDELT: volumen, tono, inestabilidad — 120 días | /api/gdelt | — |
-| 6 | **Conflictividad** | ✊ | OVCS 2025 + ACLED: protestas, estados, represión | CONF_* + /api/acled | — |
-| 7 | **Internet** | 🌐 | IODA: conectividad, detección de cortes | /api/ioda | — |
-| 8 | **Mercados** | 📈 | Petróleo (Brent/WTI/Gas), Polymarket, bonos | /api/oil-prices | 5 min |
-| 9 | **Macro VEN** | 💵 | Tipo de cambio BCV vs paralelo, brecha, indicadores macro | /api/dolar + /api/rates | 5 min |
+| # | Tab | Descripción | Fuentes | Auto-refresh |
+|---|-----|-------------|---------|--------------|
+| 1 | **Dashboard** | Alertas en vivo, escenarios, índice de inestabilidad (14 factores), conflictividad bilateral, amnistía tracker, KPIs, semáforo, tensiones, alertas inteligentes de noticias | Datos internos + APIs en vivo + IA | 5 min |
+| 2 | **SITREP** | Análisis semanal (8 semanas), Briefing, Daily Brief con Google News, Análisis IA, documento descargable | SITREP_ALL + Google News RSS + IA | — |
+| 3 | **Matriz** | Matriz 2×2 (violencia × cambio), trayectoria, probabilidades | WEEKS | — |
+| 4 | **Monitor** | 28 indicadores + 32 señales + noticias + verificación | INDICATORS + /api/news | — |
+| 5 | **Medios** | GDELT: volumen, tono, inestabilidad — 120 días | /api/gdelt | — |
+| 6 | **Conflictividad** | OVCS 2025 + ACLED: protestas, estados, represión | CONF_* + /api/acled | — |
+| 7 | **Internet** | IODA: conectividad, detección de cortes | /api/ioda | — |
+| 8 | **Mercados** | Petróleo (Brent/WTI/Gas), Polymarket, bonos | /api/oil-prices | 5 min |
+| 9 | **Macro VEN** | Tipo de cambio BCV vs paralelo, brecha, indicadores macro | /api/dolar + /api/rates | 5 min |
 
-## Modelo de datos
+## Dashboard: Componentes en Tiempo Real
+
+### Alertas en Vivo por Umbral (ROW 0)
+
+| Dato | 🔴 Crítico | 🟡 Seguimiento | Fuente |
+|------|-----------|----------------|--------|
+| Brecha cambiaria | >55% | >45% | /api/dolar |
+| Dólar paralelo | >700 Bs | >600 Bs | /api/dolar |
+| Brent | <$60 | <$65 | /api/oil-prices |
+| WTI | <$55 | <$60 | /api/oil-prices |
+| Bilateral 🇺🇸🇻🇪 | >2.0σ | >1.0σ | /api/bilateral |
+
+### Índice de Inestabilidad Compuesto (14 factores)
+
+| # | Input | Peso | Fuente | Actualización |
+|---|-------|------|--------|---------------|
+| 1 | Indicadores en rojo | 11% | INDICATORS | Semanal |
+| 2 | Brecha cambiaria | 11% | /api/dolar | **5 min** |
+| 3 | E2 Colapso | 9% | WEEKS | Semanal |
+| 4 | Señales E4+E2 activas | 7% | SCENARIO_SIGNALS | Semanal |
+| 5 | E4 Resistencia | 7% | WEEKS | Semanal |
+| 6 | Tensiones rojas | 7% | WEEKS | Semanal |
+| 7 | Bilateral 🇺🇸🇻🇪 | 5% | /api/bilateral | **Diario** |
+| 8 | Brent presión | 5% | /api/oil-prices | **5 min** |
+| 9 | Protestas OVCS | 5% | CONF_MESES | Mensual |
+| 10 | Brecha amnistía | 5% | AMNISTIA_TRACKER | Semanal |
+| 11 | Represión OVCS | 4% | CONF_MESES | Mensual |
+| 12 | Presos políticos | 3% | AMNISTIA_TRACKER | Semanal |
+| 13 | E1 Transición | -6% | WEEKS | Semanal (resta) |
+| 14 | E3 Continuidad | -3% | WEEKS | Semanal (resta) |
+
+Zonas: 0-25 Estabilidad · 26-50 Tensión moderada · 51-75 Inestabilidad alta · 76-100 Crisis inminente
+
+### Conflictividad Bilateral 🇺🇸→🇻🇪 (PizzINT/GDELT)
+
+Panel interactivo con datos de PizzINT. KPIs: Índice (σ), Sentimiento, Eventos Conflicto, Artículos. Gráfica ~90 días con hover. Niveles: BAJO · MODERADO · ELEVADO · ALTO · CRÍTICO. Baseline μ=0.14, σ=1.15 (2017–presente).
+
+### Alertas Inteligentes de Noticias (IA)
+
+Genera automáticamente al cargar: Google News RSS (3 dimensiones) + RSS internos → IA clasifica 🔴/🟡/🟢 por dimensión.
+
+## Cascada de Proveedores IA (6 proveedores)
+
+| # | Proveedor | Modelo | Key | Costo |
+|---|-----------|--------|-----|-------|
+| 1 | 🟠 Mistral | mistral-small-latest | `MISTRAL_API_KEY` | Gratis (~1B tok/mes) |
+| 2 | 🔵 Gemini | gemini-1.5-flash | `GEMINI_API_KEY` | Gratis |
+| 3 | 🟤 Groq | llama-3.3-70b | `GROQ_API_KEY` | Gratis |
+| 4 | 🟦 OpenRouter | llama-3.1-8b:free | `OPENROUTER_API_KEY` | Gratis |
+| 5 | 🟡 HuggingFace | Qwen2.5-72B / Mistral-7B | `HF_API_KEY` | Gratis |
+| 6 | 🟣 Claude | claude-sonnet-4 | `ANTHROPIC_API_KEY` | Pago |
+
+Consumo estimado: ~247K tokens/mes. Con Mistral gratis alcanza para ~4.000 meses.
+
+## SITREP: Daily Brief + Análisis IA
+
+- **📰 Daily Brief**: Noticias frescas (Google News 3 dimensiones) + datos de mercado + amnistía → 3-4 párrafos con citas [Fuente]
+- **🤖 Análisis IA**: Todos los datos del dashboard → 5-6 párrafos analíticos (500-700 palabras)
+- **📌 Briefing**: Resumen ejecutivo de una página
+- **📥 Descargar**: HTML con formato PNUD, imprimible a PDF
+
+## Modelo de Datos
 
 ### 4 Escenarios
 
@@ -53,7 +118,7 @@ monitor-pnud/
 | E3 | Continuidad negociada | 🔵 Azul | Bottom-left |
 | E4 | Resistencia coercitiva | 🟡 Amarillo | Bottom-right |
 
-### Evolución de probabilidades (S1–S8)
+### Probabilidades S1–S8
 
 ```
 Semana       E1    E2    E3    E4    Dominante
@@ -64,184 +129,90 @@ S4  30e–5f    30%    5%   50%   15%   E3 (50%)
 S5  6–13 feb  30%    5%   45%   20%   E3 (45%)
 S6  13–20 feb 35%   15%   40%   10%   E3 (40%)
 S7  20–27 feb 35%   12%   43%   10%   E3 (43%)
-S8  27f–6m    38%   12%   40%   10%   E3 (40%) ●
+S8  27f–6m    38%   12%   40%   10%   E3 (40%)
 ```
 
-### 28 Indicadores del Monitor
+### 28 Indicadores · 32 Señales · Amnistía Tracker
 
-| Dimensión | Indicadores | Nuevos (S8) |
-|-----------|-------------|-------------|
-| ⚡ Energético | 8 | Recaudación fiscal, Apertura minera |
-| 🏛 Político | 8 | Cautelares vigentes, Liderazgo opositor |
-| 📊 Económico | 6 | PIB trimestral |
-| 🌐 Internacional | 6 | Presión legislativa EE.UU. |
+- Indicadores: 4 dimensiones (Energético, Político, Económico, Internacional)
+- Señales: agrupadas por E1/E2/E3/E4
+- Amnistía S8: Gobierno 5.628 libertades vs Foro Penal 670 verificadas (brecha ~88%)
 
-Indicadores nuevos muestran badge **NUEVO**. Semanas anteriores sin dato muestran dot gris.
+## Serverless API Routes (12 endpoints)
 
-### 32 Señales por Escenario
+| Route | Fuente | Cache |
+|-------|--------|-------|
+| `/api/ai` | Mistral/Gemini/Groq/OpenRouter/HF/Claude | — |
+| `/api/bilateral` | PizzINT (pizzint.watch) | 2h |
+| `/api/gdelt` | GDELT DOC API v2 | 1h |
+| `/api/gdelt?signal=headlines` | Google News RSS (3 queries) | 30 min |
+| `/api/oil-prices` | OilPriceAPI + EIA | 5 min / 1h |
+| `/api/dolar` | pydolarvenezuela.org | 5 min |
+| `/api/ioda` | Georgia Tech IODA | 1h |
+| `/api/news` | 60+ RSS feeds | 30 min |
+| `/api/acled` | ACLED | 1h |
+| `/api/articles` | Supabase | — |
+| `/api/rates` | Varios | 1h |
+| `/api/cron` | RSS → Supabase | Diario 6:00 UTC |
 
-| Escenario | Señales | Nuevas (S8) |
-|-----------|---------|-------------|
-| E3 Continuidad | 9 | PIB +7.07%, SENIAT +78% |
-| E1 Transición | 9 | MCM 106.84 pts, H.R. 7674, Ramos Allup, apertura minera, Vamos Venezuela, retorno MCM |
-| E4 Resistencia | 7 | Concentración territorial, >11.000 cautelares, oficialismo bajo |
-| E2 Colapso | 7 | Pérdida mercado chino |
-
-### Amnistía Tracker (Dashboard)
-
-Panel dual Gobierno vs Foro Penal con evolución semanal S1–S8:
-- **Gobierno**: Solicitudes, libertades plenas, cautelares, militares
-- **Foro Penal**: Excarcelaciones verificadas, presos políticos activos
-- **Brecha de verificación**: Barra visual con % de diferencia
-- **Mini-chart**: Barras duales por semana
-
-### Fuentes de noticias (RSS)
-
-| Tipo | Medios |
-|------|--------|
-| Noticias | Efecto Cocuyo, El Pitazo, Runrunes, Tal Cual, El Estímulo, AlbertoNews, Caracas Chronicles |
-| Fact-check | Cocuyo Chequea, Cotejo.info, EsPaja, Cazamos Fake News, Provea |
-
-## Funcionalidades del SITREP
-
-### Vista Briefing (📌)
-Resumen ejecutivo de una página: barras de probabilidades, puntos clave, semáforo, tendencia, actores, síntesis, análisis IA.
-
-### Generador de documento (📥)
-Compila datos de la semana y genera HTML descargable con formato PNUD. Incluye análisis IA si fue generado. Imprimible a PDF con Ctrl+P.
-
-### Análisis IA (🤖)
-Genera análisis narrativo de 5-6 párrafos usando **todos los datos del dashboard**:
-
-| Fuente | Prioridad | Datos que recibe |
-|--------|-----------|------------------|
-| WEEKS + SITREP_ALL | 🔴 Máxima | Escenarios, probabilidades, tendencia, drivers, síntesis, tensiones, KPIs, actores, lectura analítica |
-| INDICATORS | 🟡 Alta | 28 indicadores con semáforo, tendencia, valor, badge NUEVO |
-| SCENARIO_SIGNALS | 🟡 Alta | 32 señales por E1/E2/E3/E4 con estado y badge NUEVO |
-| AMNISTIA_TRACKER | 🟡 Alta | Gobierno vs Foro Penal + hito del período |
-| Dólar (live) | 🟢 Contexto | BCV, paralelo, brecha % |
-| Petróleo (live) | 🟢 Contexto | Brent, WTI, Gas en USD |
-| Noticias (live) | 🟢 Contexto | Top 5 titulares del día |
-
-**Cascada de proveedores IA** (serverless `/api/ai`):
-
-| Proveedor | Key | Costo | Análisis/día |
-|-----------|-----|-------|--------------|
-| Gemini 1.5 Flash | `GEMINI_API_KEY` | Gratis | ~150-200 |
-| Groq Llama 3.3 70B | `GROQ_API_KEY` | Gratis | ~80-100 |
-| OpenRouter Free | `OPENROUTER_API_KEY` | Gratis | 50 |
-| Claude Sonnet 4 | `ANTHROPIC_API_KEY` | Pago | Ilimitado |
-
-Basta configurar **una sola key**. Si un proveedor falla, salta al siguiente automáticamente. Badge dinámico: azul GEMINI, naranja GROQ, cyan OPENROUTER, violeta CLAUDE.
-
-### API de petróleo (híbrida)
-
-| Componente | Fuente | Uso |
-|------------|--------|-----|
-| Tarjetas (precio actual) | OilPriceAPI | Intradía, en vivo |
-| Gráfico histórico | EIA (gov) | 365 días, diario, ilimitado |
-| Punto de hoy en gráfico | OilPriceAPI | Se inyecta al final del historial EIA |
-
-## Variables de entorno (Vercel)
+## Variables de Entorno (Vercel)
 
 | Variable | Requerida | Uso |
 |----------|-----------|-----|
-| `EIA_API_KEY` | Sí | Gráfico petróleo (gratuito, ilimitado) — [eia.gov/opendata](https://www.eia.gov/opendata/register.php) |
-| `OILPRICE_API_KEY` | Opcional | Precios petróleo intradía (500 req/mes) |
-| `GEMINI_API_KEY` | Opcional | 🤖 IA: Gemini Flash (gratuito) — [aistudio.google.com](https://aistudio.google.com) |
-| `GROQ_API_KEY` | Opcional | 🤖 IA: Groq Llama 3.3 70B (gratuito) — [console.groq.com](https://console.groq.com) |
-| `OPENROUTER_API_KEY` | Opcional | 🤖 IA: OpenRouter modelos free (gratuito) — [openrouter.ai](https://openrouter.ai) |
-| `ANTHROPIC_API_KEY` | Opcional | 🤖 IA: Claude Sonnet (pago) — [console.anthropic.com](https://console.anthropic.com) |
-| `NEWS_API_KEY` | Opcional | NewsAPI para noticias en vivo |
-| `SUPABASE_URL` | Opcional | Base de datos de artículos |
-| `SUPABASE_KEY` | Opcional | Auth Supabase |
-| `ACLED_API_KEY` | Opcional | Datos de conflictividad ACLED |
+| `EIA_API_KEY` | Sí | Gráfico petróleo — [eia.gov/opendata](https://www.eia.gov/opendata/register.php) |
+| `MISTRAL_API_KEY` | Recomendada | IA Mistral (gratis) — [console.mistral.ai](https://console.mistral.ai) |
+| `GEMINI_API_KEY` | Opcional | IA Gemini (gratis) — [aistudio.google.com](https://aistudio.google.com) |
+| `GROQ_API_KEY` | Opcional | IA Groq (gratis) — [console.groq.com](https://console.groq.com) |
+| `OPENROUTER_API_KEY` | Opcional | IA OpenRouter (gratis) — [openrouter.ai](https://openrouter.ai) |
+| `HF_API_KEY` | Opcional | IA HuggingFace (gratis) — [huggingface.co](https://huggingface.co/settings/tokens) |
+| `ANTHROPIC_API_KEY` | Opcional | IA Claude (pago) — [console.anthropic.com](https://console.anthropic.com) |
+| `OILPRICE_API_KEY` | Opcional | Precios petróleo intradía |
+| `SUPABASE_URL` | Opcional | Base de datos artículos |
+| `SUPABASE_SECRET_KEY` | Opcional | Auth Supabase |
+| `ACLED_API_KEY` | Opcional | Datos conflictividad |
 
-> **Obtener keys gratuitas**: [aistudio.google.com](https://aistudio.google.com) (Gemini) · [console.groq.com](https://console.groq.com) (Groq) · [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys) (OpenRouter) · [eia.gov/opendata](https://www.eia.gov/opendata/register.php) (EIA). Ninguna requiere tarjeta de crédito.
-
-## Actualización semanal (protocolo SITREP)
+## Actualización Semanal (Protocolo SITREP)
 
 Editar `src/App.jsx`:
 
-### 1. WEEKS — Nueva semana
-
-```javascript
-{ label:"FECHA", short:"S9",
-  probs:[{sc:1,v:XX,t:"up|down|flat"},{sc:2,v:XX,...},{sc:3,v:XX,...},{sc:4,v:XX,...}],
-  xy:{x:CALC,y:CALC},  // centroide ponderado
-  sem:{g:N,y:N,r:N},   // semáforo tensiones
-  kpis:{ energia:{...}, economico:{...}, opinion:{...} },
-  tensiones:[{l:"green|yellow|red", t:"<b>Título:</b> Detalle."}],
-  lectura:"Texto analítico...",
-  trendSc:N, trendDrivers:["Factor 1","Factor 2","Factor 3"]
-}
-```
-
-### 2. SITREP_ALL — Nuevo informe
-
-```javascript
-{ period:"Fecha larga", periodShort:"Fecha corta",
-  keyPoints:[{tag, color, title, text}],
-  sintesis:"...", actores:[{name, items:[...]}],
-  // Opcionales: nacional, economia, escenarios, comentarios
-}
-```
-
-### 3. INDICATORS — Acumular historial
-
-Existentes: agregar al final de `hist[]`. Nuevos: `addedWeek:N`, `hist:[null,...,["color","trend","valor"]]`
-
-### 4. AMNISTIA_TRACKER — Nueva entrada
-
-```javascript
-{ week:"S9", label:"...",
-  gob:{ solicitudes:N, libertades:N, excarcelados:N, cautelares:N, militares:N },
-  fp:{ verificados:N, detenidos:N },
-  hito:"Descripción del hito del período"
-}
-```
-
-### 5. Estructuras auxiliares
-
-`KPIS_LATEST`, `TENSIONS`, `SCENARIO_SIGNALS` (quitar `isNew` anterior, poner en nuevas), `GDELT_ANNOTATIONS`, `MONITOR_WEEKS`
+1. **WEEKS** — Nueva semana (probs, xy, sem, kpis, tensiones, lectura, trendSc)
+2. **SITREP_ALL** — Nuevo informe (period, keyPoints, sintesis, actores)
+3. **INDICATORS** — Acumular hist[]. Nuevos: addedWeek:N
+4. **AMNISTIA_TRACKER** — Nueva entrada (gob + fp + hito)
+5. **SCENARIO_SIGNALS** — Actualizar sem/val. Nuevas: isNew:true
+6. **CONF_MESES** — Agregar mes (cuando salga informe OVCS)
+7. **Auxiliares**: KPIS_LATEST, TENSIONS, GDELT_ANNOTATIONS, MONITOR_WEEKS
 
 ## Deploy
 
 ```bash
 cd monitor-pnud
-git init && git add . && git commit -m "Monitor PNUD v4"
-git remote add origin https://github.com/TU_USUARIO/monitor-pnud.git
+git init && git add . && git commit -m "Monitor PNUD"
+git remote add origin https://github.com/USER/monitor-pnud.git
 git push -u origin main
-# Vercel: Add New Project → Seleccionar repo → Deploy
-# Configurar Environment Variables en Settings
+# Vercel: New Project → repo → Deploy → Settings → Env vars
 ```
 
-## Desarrollo local
+## Stack
 
-```bash
-npm install
-npm run dev
-# → http://localhost:5173
-```
-
-## Stack técnico
-
-- **Frontend**: React 18 + Vite 5 (single-file, ~340 KB)
-- **Hosting**: Vercel (Edge + Serverless Functions)
-- **APIs externas**: EIA, OilPriceAPI, GDELT, IODA, DolarAPI, NewsAPI, ACLED, Polymarket
-- **IA**: Gemini Flash / Groq Llama / OpenRouter / Claude (cascada con fallback)
-- **Diseño**: Space Mono + DM Sans, paleta PNUD (#0468B1), fully responsive
+- **Frontend**: React 18 + Vite 5 (single-file ~400 KB)
+- **Hosting**: Vercel (Edge + Serverless)
+- **APIs**: PizzINT, GDELT, EIA, OilPriceAPI, IODA, DolarAPI, Google News RSS, ACLED, Polymarket
+- **IA**: Mistral / Gemini / Groq / OpenRouter / HuggingFace / Claude (cascada 6 proveedores)
+- **Diseño**: Space Mono + DM Sans, paleta PNUD (#0468B1), responsive
 
 ## Créditos
 
-- **EIA**: [eia.gov](https://www.eia.gov/) — U.S. Energy Information Administration
+- **PizzINT/PolyPulse**: [pizzint.watch](https://www.pizzint.watch/) — Bilateral threat index
+- **EIA**: [eia.gov](https://www.eia.gov/) — Energy Information Administration
 - **GDELT**: [gdeltproject.org](https://www.gdeltproject.org/) — Monitoreo global de medios
 - **IODA**: [ioda.inetintel.cc.gatech.edu](https://ioda.inetintel.cc.gatech.edu/) — Georgia Tech
 - **OVCS**: [observatoriodeconflictos.org.ve](https://www.observatoriodeconflictos.org.ve/) — Conflictividad social
 - **Polymarket**: [polymarket.com](https://polymarket.com) — Mercados de predicción
-- **ACLED**: [acleddata.com](https://acleddata.com/) — Datos de conflicto armado
+- **ACLED**: [acleddata.com](https://acleddata.com/) — Datos de conflicto
 - **Foro Penal**: [@ForoPenal](https://twitter.com/ForoPenal) — Excarcelaciones verificadas
 - **Umbral**: [umbral.watch](https://umbral.watch) — Pablo Hernández Borges
+- **Google News**: RSS público — Titulares frescos
 
 ---
 
