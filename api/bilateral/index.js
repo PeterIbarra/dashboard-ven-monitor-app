@@ -27,7 +27,7 @@ module.exports = async function handler(req, res) {
     const v = latest.v || 0;
     const level = v > 2.0 ? "CRITICAL" : v > 1.0 ? "HIGH" : v > 0.5 ? "ELEVATED" : v > 0 ? "MODERATE" : "LOW";
 
-    res.setHeader("Cache-Control", "public, s-maxage=7200, stale-while-revalidate=3600");
+    res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=900");
     return res.status(200).json({
       latest: { ...latest, level },
       history: data.map(d => ({ t: d.t, v: d.v, sentiment: d.sentiment, conflict: d.conflictCount, total: d.totalArticles, interp: d.interpolated })),
