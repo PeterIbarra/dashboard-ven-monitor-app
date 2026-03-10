@@ -1782,6 +1782,15 @@ function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, 
   // Line path
   const linePath = chartData.map((d,i) => `${i===0?"M":"L"}${toX(i)},${toY(d.v)}`).join(" ");
 
+  // MA 30 days
+  const ma30 = chartData.map((_, i) => {
+    if (i < 29) return null;
+    const slice = chartData.slice(i - 29, i + 1);
+    const avg = slice.reduce((s, d) => s + d.v, 0) / slice.length;
+    return { i, avg };
+  }).filter(Boolean);
+  const ma30Path = ma30.map((m, j) => `${j === 0 ? "M" : "L"}${toX(m.i)},${toY(m.avg)}`).join(" ");
+
   // Date labels (every ~15 days)
   const step = Math.max(Math.floor(chartData.length / 6), 1);
   const dateLabels = chartData.filter((_,i) => i % step === 0 || i === chartData.length - 1);
@@ -1827,6 +1836,10 @@ function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, 
       {/* Main line */}
       <path d={linePath} fill="none" stroke={cfg.color} strokeWidth={1.5} strokeLinejoin="round" />
 
+      {/* MA 30 line */}
+      {ma30Path && <path d={ma30Path} fill="none" stroke="#22d3ee" strokeWidth={1.2} strokeLinejoin="round" opacity={0.7} />}
+      {ma30.length > 0 && <text x={toX(ma30[ma30.length-1].i)+3} y={toY(ma30[ma30.length-1].avg)+3} fontSize={5} fill="#22d3ee" fontFamily={font}>MA30</text>}
+
       {/* X date labels */}
       {dateLabels.map((d, i) => {
         const idx = chartData.indexOf(d);
@@ -1845,20 +1858,23 @@ function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, 
         const hy = toY(d.v);
         const dateStr = d.t ? new Date(d.t).toLocaleDateString("es", { day:"numeric", month:"short", year:"numeric" }) : "";
         const hLevel = d.v > 2.0 ? "CRÍTICO" : d.v > 1.0 ? "ALTO" : d.v > 0.5 ? "ELEVADO" : d.v > 0 ? "MODERADO" : "BAJO";
-        const tooltipW = 88;
-        const tooltipH = 40;
+        const ma30Val = ma30.find(m => m.i === hover);
+        const tooltipW = 92;
+        const tooltipH = ma30Val ? 47 : 40;
         const tooltipX = hx > W * 0.65 ? hx - tooltipW - 8 : hx + 8;
         const tooltipY = Math.max(Math.min(hy - tooltipH/2, PT + cH - tooltipH), PT);
         return (
           <>
             <line x1={hx} y1={PT} x2={hx} y2={PT+cH} stroke={cfg.color} strokeWidth={0.6} opacity={0.3} />
             <circle cx={hx} cy={hy} r={3} fill={cfg.color} stroke="#fff" strokeWidth={1.5} />
+            {ma30Val && <circle cx={hx} cy={toY(ma30Val.avg)} r={2.5} fill="#22d3ee" stroke="#fff" strokeWidth={1} />}
             {/* Tooltip box */}
             <rect x={tooltipX} y={tooltipY} width={tooltipW} height={tooltipH} rx={2} fill={BG2} stroke={BORDER} strokeWidth={0.5} opacity={0.95} />
             <text x={tooltipX+4} y={tooltipY+9} fontSize={5.5} fill={MUTED} fontFamily={font}>{dateStr}</text>
             <text x={tooltipX+4} y={tooltipY+18} fontSize={7} fill={cfg.color} fontFamily={font} fontWeight="700">{d.v.toFixed(2)}σ · {hLevel}</text>
             <text x={tooltipX+4} y={tooltipY+26} fontSize={5} fill={MUTED} fontFamily={font}>Sent: {(d.sentiment||0).toFixed(1)} · Conf: {d.conflict||"—"}</text>
             <text x={tooltipX+4} y={tooltipY+33} fontSize={5} fill={MUTED} fontFamily={font}>Artículos: {d.total||"—"}</text>
+            {ma30Val && <text x={tooltipX+4} y={tooltipY+41} fontSize={5} fill="#22d3ee" fontFamily={font}>MA30: {ma30Val.avg.toFixed(2)}σ</text>}
           </>
         );
       })()}
@@ -2309,12 +2325,33 @@ function TabDashboard({ week, liveData = {} }) {
 
                 {/* Historical sparkline */}
                 <div>
-                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginBottom:4 }}>Evolución semanal · 14 factores</div>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginBottom:4, display:"flex", justifyContent:"space-between" }}>
+                    <span>Evolución semanal · 14 factores</span>
+                    <span style={{ display:"flex", gap:8 }}>
+                      <span style={{ display:"flex", alignItems:"center", gap:2 }}>
+                        <span style={{ display:"inline-block", width:10, height:2, background:zone.color }} />
+                        <span style={{ fontSize:7 }}>Índice</span>
+                      </span>
+                      <span style={{ display:"flex", alignItems:"center", gap:2 }}>
+                        <span style={{ display:"inline-block", width:10, height:2, background:"#22d3ee" }} />
+                        <span style={{ fontSize:7 }}>MA4</span>
+                      </span>
+                    </span>
+                  </div>
                   <svg width="100%" height={40} viewBox="0 0 200 40" preserveAspectRatio="none" style={{ display:"block" }}>
                     <rect x={0} y={0} width={200} height={10} fill="#16a34a" opacity={0.08} />
                     <rect x={0} y={10} width={200} height={10} fill="#ca8a04" opacity={0.08} />
                     <rect x={0} y={20} width={200} height={10} fill="#f97316" opacity={0.08} />
                     <rect x={0} y={30} width={200} height={10} fill="#dc2626" opacity={0.08} />
+                    {/* MA4 (4 semanas ≈ 30 días) */}
+                    {histIdx.length >= 4 && (() => {
+                      const ma4 = histIdx.map((_, i) => {
+                        if (i < 3) return null;
+                        return { i, avg: histIdx.slice(i - 3, i + 1).reduce((s,v) => s + v, 0) / 4 };
+                      }).filter(Boolean);
+                      const ma4Path = ma4.map((m, j) => `${j===0?"M":"L"}${(m.i/(Math.max(histIdx.length-1,1)))*200},${40-(m.avg/100)*40}`).join(" ");
+                      return <polyline points={ma4Path.replace(/[ML]/g,"")} fill="none" stroke="#22d3ee" strokeWidth={1.5} strokeLinejoin="round" opacity={0.7} />;
+                    })()}
                     <polyline
                       points={histIdx.map((v,i) => `${(i/(Math.max(histIdx.length-1,1)))*200},${40-(v/100)*40}`).join(" ")}
                       fill="none" stroke={zone.color} strokeWidth={2} strokeLinejoin="round"
