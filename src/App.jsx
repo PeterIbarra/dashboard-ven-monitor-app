@@ -3883,7 +3883,7 @@ function BrentChart({ history: rawHistory, forecast = [] }) {
         onMouseMove={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           const mx = (e.clientX - rect.left) / rect.width * W;
-          const idx = Math.round(((mx - padL) / cW) * (history.length - 1));
+          const idx = Math.round(((mx - padL) / cW) * (totalPoints - 1));
           if (idx >= 0 && idx < history.length) setHover(idx);
         }}
         onMouseLeave={() => setHover(null)}>
