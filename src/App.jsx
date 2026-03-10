@@ -2365,8 +2365,8 @@ function TabDashboard({ week, liveData = {} }) {
           const wAmn = AMNISTIA_TRACKER[Math.min(wi, AMNISTIA_TRACKER.length-1)];
           const wGobLib = wAmn?.gob?.libertades || wAmn?.gob?.excarcelados || 1;
           const wFpVer = wAmn?.fp?.verificados || 0;
-          const wAmnBrecha = wGobLib > 0 ? Math.min((1 - wFpVer / wGobLib) * 100, 100) : 50;
-          const wPresos = Math.min((wAmn?.fp?.detenidos || 300) / 1500 * 100, 100);
+          const wAmnBrecha = (wGobLib > wFpVer && wGobLib > 1) ? Math.max(0, Math.min((1 - wFpVer / wGobLib) * 100, 100)) : 50;
+          const wPresos = Math.min(Math.max((wAmn?.fp?.detenidos || 300) / 1500 * 100, 0), 100);
           // Per-week semaforo for indicator proxy
           const wSem = w.sem || { g:0, y:0, r:0 };
           const wRedProxy = wSem.r || 0;
