@@ -2232,15 +2232,29 @@ function TabDashboard({ week, liveData = {} }) {
           { from:75, to:100, color:"#dc2626", label:"Crisis" },
         ];
 
-        // Historical index for sparkline (simplified per week)
-        const histIdx = WEEKS.map((w) => {
+        // Historical index for sparkline — use per-week data where available
+        const histIdx = WEEKS.map((w, wi) => {
           const we1=w.probs.find(p=>p.sc===1)?.v||0, we2=w.probs.find(p=>p.sc===2)?.v||0;
           const we3=w.probs.find(p=>p.sc===3)?.v||0, we4=w.probs.find(p=>p.sc===4)?.v||0;
           const wtr=w.tensiones.filter(t=>t.l==="red").length, wtt=w.tensiones.length||1;
-          const wr = (redCount/totalInds)*11 + (we2/100)*9 + (we4/100)*7
-            + (Math.min(brechaLive,100)/100)*11 + (wtr/wtt)*7 + (sigActive/sigTotal)*7
-            + (brentFactor/100)*5 + (bilPct/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
-            + (amnBrechaPct/100)*5 + (presosPct/100)*3 - (we1/100)*6 - (we3/100)*3;
+          // Per-week amnesty brecha
+          const wAmn = AMNISTIA_TRACKER[Math.min(wi, AMNISTIA_TRACKER.length-1)];
+          const wGobLib = wAmn?.gob?.libertades || wAmn?.gob?.excarcelados || 1;
+          const wFpVer = wAmn?.fp?.verificados || 0;
+          const wAmnBrecha = wGobLib > 0 ? Math.min((1 - wFpVer / wGobLib) * 100, 100) : 50;
+          const wPresos = Math.min((wAmn?.fp?.detenidos || 300) / 1500 * 100, 100);
+          // Per-week semaforo for indicator proxy
+          const wSem = w.sem || { g:0, y:0, r:0 };
+          const wRedProxy = wSem.r || 0;
+          const wTotalSem = (wSem.g||0) + (wSem.y||0) + (wSem.r||0) || 1;
+          // Use current-week live values only for current week, approximate for historical
+          const wBrecha = (wi === WEEKS.length - 1) ? brechaLive : Math.max(20, 55 - we1 * 0.5 + we2 * 0.3);
+          const wBrent = (wi === WEEKS.length - 1) ? brentFactor : 50;
+          const wBil = (wi === WEEKS.length - 1) ? bilPct : Math.min(we2 * 1.5 + we4 * 0.5, 100);
+          const wr = (wRedProxy/wTotalSem)*11 + (we2/100)*9 + (we4/100)*7
+            + (Math.min(wBrecha,100)/100)*11 + (wtr/wtt)*7 + (sigActive/sigTotal)*7
+            + (wBrent/100)*5 + (wBil/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
+            + (wAmnBrecha/100)*5 + (wPresos/100)*3 - (we1/100)*6 - (we3/100)*3;
           return Math.max(0, Math.min(100, Math.round(wr)));
         });
 
