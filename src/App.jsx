@@ -1940,6 +1940,13 @@ function TabDashboard({ week, liveData = {} }) {
           else if (wti < 60) liveAlerts.push({ name:"WTI", val:`$${wti.toFixed(2)}`, umbral:"WTI en zona de presión (<$60)", level:"yellow" });
         }
 
+        // Bilateral Threat Index
+        if (liveData?.bilateral?.latest?.v) {
+          const bilV = liveData.bilateral.latest.v;
+          if (bilV > 2.0) liveAlerts.push({ name:"Bilateral 🇺🇸🇻🇪", val:`${bilV.toFixed(2)}σ`, umbral:"Índice bilateral CRÍTICO (>2σ) — crisis activa en relación EE.UU.-Venezuela", level:"red" });
+          else if (bilV > 1.0) liveAlerts.push({ name:"Bilateral 🇺🇸🇻🇪", val:`${bilV.toFixed(2)}σ`, umbral:"Índice bilateral ALTO (>1σ) — tensión significativa", level:"yellow" });
+        }
+
         if (liveAlerts.length === 0) return null;
 
         const reds = liveAlerts.filter(a => a.level === "red");
@@ -2049,20 +2056,25 @@ function TabDashboard({ week, liveData = {} }) {
         const amnBrechaPct = Math.max(0, (1 - fpVerif / gobLib) * 100);
         const presosPct = amnLatest?.fp?.detenidos ? Math.min((amnLatest.fp.detenidos / 1000) * 100, 100) : 50;
 
-        // ── FORMULA (weights sum to ~100 with stabilizers) ──
-        const raw = (redCount/totalInds)*12            // Ind. rojos: 12%
-          + (e2/100)*10                                 // E2 Colapso: 10%
-          + (e4/100)*8                                  // E4 Resistencia: 8%
-          + (Math.min(brechaLive,100)/100)*12           // Brecha cambiaria: 12% (LIVE)
-          + (tensRed/totalTens)*8                        // Tensiones rojas: 8%
-          + (sigActive/sigTotal)*8                       // Señales E4+E2: 8%
+        // Bilateral Threat Index (PizzINT/GDELT) — LIVE
+        const bilV = liveData?.bilateral?.latest?.v || 0;
+        const bilPct = Math.min(bilV / 4 * 100, 100); // 0-4σ mapped to 0-100%
+
+        // ── FORMULA (14 inputs, weights sum to ~100 with stabilizers) ──
+        const raw = (redCount/totalInds)*11            // Ind. rojos: 11%
+          + (e2/100)*9                                  // E2 Colapso: 9%
+          + (e4/100)*7                                  // E4 Resistencia: 7%
+          + (Math.min(brechaLive,100)/100)*11           // Brecha cambiaria: 11% (LIVE)
+          + (tensRed/totalTens)*7                        // Tensiones rojas: 7%
+          + (sigActive/sigTotal)*7                       // Señales E4+E2: 7%
           + (brentFactor/100)*5                          // Brent presión: 5% (LIVE)
+          + (bilPct/100)*5                               // Bilateral Threat: 5% (LIVE)
           + (protestPct/100)*5                           // Protestas OVCS: 5%
           + (repressionPct/100)*4                        // Represión OVCS: 4%
           + (amnBrechaPct/100)*5                         // Brecha amnistía: 5%
           + (presosPct/100)*3                            // Presos políticos: 3%
-          - (e1/100)*8                                   // E1 Transición: -8% (estabilizador)
-          - (e3/100)*5;                                  // E3 Continuidad: -5% (estabilizador)
+          - (e1/100)*6                                   // E1 Transición: -6% (estabilizador)
+          - (e3/100)*3;                                  // E3 Continuidad: -3% (estabilizador)
         const index = Math.max(0, Math.min(100, Math.round(raw)));
 
         // Previous week index for delta (simplified: same formula with prev week probs)
@@ -2071,10 +2083,10 @@ function TabDashboard({ week, liveData = {} }) {
           const pe1=prevWk.probs.find(p=>p.sc===1)?.v||0, pe2=prevWk.probs.find(p=>p.sc===2)?.v||0;
           const pe3=prevWk.probs.find(p=>p.sc===3)?.v||0, pe4=prevWk.probs.find(p=>p.sc===4)?.v||0;
           const pTR=prevWk.tensiones.filter(t=>t.l==="red").length, pTT=prevWk.tensiones.length||1;
-          const pRaw = (redCount/totalInds)*12 + (pe2/100)*10 + (pe4/100)*8
-            + (Math.min(brechaLive,100)/100)*12 + (pTR/pTT)*8 + (sigActive/sigTotal)*8
-            + (brentFactor/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
-            + (amnBrechaPct/100)*5 + (presosPct/100)*3 - (pe1/100)*8 - (pe3/100)*5;
+          const pRaw = (redCount/totalInds)*11 + (pe2/100)*9 + (pe4/100)*7
+            + (Math.min(brechaLive,100)/100)*11 + (pTR/pTT)*7 + (sigActive/sigTotal)*7
+            + (brentFactor/100)*5 + (bilPct/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
+            + (amnBrechaPct/100)*5 + (presosPct/100)*3 - (pe1/100)*6 - (pe3/100)*3;
           prevIndex = Math.max(0, Math.min(100, Math.round(pRaw)));
         }
         const delta = prevIndex !== null ? index - prevIndex : null;
@@ -2096,28 +2108,29 @@ function TabDashboard({ week, liveData = {} }) {
           const we1=w.probs.find(p=>p.sc===1)?.v||0, we2=w.probs.find(p=>p.sc===2)?.v||0;
           const we3=w.probs.find(p=>p.sc===3)?.v||0, we4=w.probs.find(p=>p.sc===4)?.v||0;
           const wtr=w.tensiones.filter(t=>t.l==="red").length, wtt=w.tensiones.length||1;
-          const wr = (redCount/totalInds)*12 + (we2/100)*10 + (we4/100)*8
-            + (Math.min(brechaLive,100)/100)*12 + (wtr/wtt)*8 + (sigActive/sigTotal)*8
-            + (brentFactor/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
-            + (amnBrechaPct/100)*5 + (presosPct/100)*3 - (we1/100)*8 - (we3/100)*5;
+          const wr = (redCount/totalInds)*11 + (we2/100)*9 + (we4/100)*7
+            + (Math.min(brechaLive,100)/100)*11 + (wtr/wtt)*7 + (sigActive/sigTotal)*7
+            + (brentFactor/100)*5 + (bilPct/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
+            + (amnBrechaPct/100)*5 + (presosPct/100)*3 - (we1/100)*6 - (we3/100)*3;
           return Math.max(0, Math.min(100, Math.round(wr)));
         });
 
         // Breakdown items for display
         const breakdown = [
-          { label:"Ind. rojos", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100), w:"12%" },
-          { label:"Brecha camb.", value:`${brechaLive.toFixed(0)}%`, pct:Math.min(brechaLive,100), w:"12%", live:true },
-          { label:"E2 Colapso", value:`${e2}%`, pct:e2, w:"10%" },
-          { label:"Señales E4/E2", value:`${sigActive}/${sigTotal}`, pct:Math.round(sigActive/sigTotal*100), w:"8%" },
-          { label:"E4 Resistencia", value:`${e4}%`, pct:e4, w:"8%" },
-          { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100), w:"8%" },
+          { label:"Ind. rojos", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100), w:"11%" },
+          { label:"Brecha camb.", value:`${brechaLive.toFixed(0)}%`, pct:Math.min(brechaLive,100), w:"11%", live:true },
+          { label:"E2 Colapso", value:`${e2}%`, pct:e2, w:"9%" },
+          { label:"Señales E4/E2", value:`${sigActive}/${sigTotal}`, pct:Math.round(sigActive/sigTotal*100), w:"7%" },
+          { label:"E4 Resistencia", value:`${e4}%`, pct:e4, w:"7%" },
+          { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100), w:"7%" },
+          { label:"Bilateral 🇺🇸🇻🇪", value:`${bilV.toFixed(1)}σ`, pct:Math.round(bilPct), w:"5%", live:true },
           { label:"Brent", value:`$${brentPrice}`, pct:brentFactor, w:"5%", live:true },
           { label:"Protestas", value:`${lastMonth?.t||"—"}`, pct:Math.round(protestPct), w:"5%" },
           { label:"Brecha amnist.", value:`${amnBrechaPct.toFixed(0)}%`, pct:Math.round(amnBrechaPct), w:"5%" },
           { label:"Represión", value:`${lastMonth?.rep||0}`, pct:Math.round(repressionPct), w:"4%" },
           { label:"Presos pol.", value:`${amnLatest?.fp?.detenidos||"—"}`, pct:Math.round(presosPct), w:"3%" },
-          { label:"E1 Transición", value:`-${e1}%`, pct:0, w:"-8%", isNeg:true },
-          { label:"E3 Continuidad", value:`-${e3}%`, pct:0, w:"-5%", isNeg:true },
+          { label:"E1 Transición", value:`-${e1}%`, pct:0, w:"-6%", isNeg:true },
+          { label:"E3 Continuidad", value:`-${e3}%`, pct:0, w:"-3%", isNeg:true },
         ];
 
         return (
@@ -2183,7 +2196,7 @@ function TabDashboard({ week, liveData = {} }) {
 
                 {/* Historical sparkline */}
                 <div>
-                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginBottom:4 }}>Evolución semanal · 13 factores</div>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginBottom:4 }}>Evolución semanal · 14 factores</div>
                   <svg width="100%" height={40} viewBox="0 0 200 40" preserveAspectRatio="none" style={{ display:"block" }}>
                     <rect x={0} y={0} width={200} height={10} fill="#16a34a" opacity={0.08} />
                     <rect x={0} y={10} width={200} height={10} fill="#ca8a04" opacity={0.08} />
@@ -2204,6 +2217,129 @@ function TabDashboard({ week, liveData = {} }) {
                         S{i+1}
                       </text>
                     ))}
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ── ROW 1c: Bilateral Threat Index (PizzINT/GDELT) ── */}
+      {liveData?.bilateral?.latest && (() => {
+        const bil = liveData.bilateral;
+        const lat = bil.latest;
+        const v = lat.v || 0;
+        const level = lat.level || "LOW";
+        const sentiment = lat.sentiment || 0;
+        const conflictRatio = lat.total > 0 ? ((lat.conflict || 0) / lat.total * 100) : 0;
+        const hist = bil.history || [];
+
+        const levelConfig = {
+          LOW: { color:"#10b981", label:"BAJO", desc:"Relación bilateral estable" },
+          MODERATE: { color:"#22d3ee", label:"MODERADO", desc:"Actividad mediática normal" },
+          ELEVATED: { color:"#eab308", label:"ELEVADO", desc:"Tensión bilateral en aumento" },
+          HIGH: { color:"#f97316", label:"ALTO", desc:"Tensión bilateral significativa" },
+          CRITICAL: { color:"#ef4444", label:"CRÍTICO", desc:"Crisis bilateral activa" },
+        };
+        const cfg = levelConfig[level] || levelConfig.MODERATE;
+
+        // Sparkline from history
+        const sparkData = hist.filter(d => !d.interp).slice(-60);
+        const maxV = Math.max(...sparkData.map(d=>d.v), 2);
+        const minV = Math.min(...sparkData.map(d=>d.v), 0);
+
+        return (
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"auto 1fr", gap:0, border:`1px solid ${BORDER}`, background:BG2 }}>
+            {/* Left: Big number */}
+            <div style={{ padding:mob?"12px 14px":"16px 22px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+              borderRight:mob?"none":`1px solid ${BORDER}`, borderBottom:mob?`1px solid ${BORDER}`:"none", minWidth:mob?"auto":150 }}>
+              <div style={{ fontSize:8, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:MUTED, marginBottom:2 }}>
+                🇺🇸↔🇻🇪 Threat Index
+              </div>
+              <div style={{ display:"flex", alignItems:"flex-end", gap:4 }}>
+                <span style={{ fontSize:mob?34:44, fontWeight:900, fontFamily:"'Playfair Display',serif", color:cfg.color, lineHeight:1 }}>
+                  {v.toFixed(2)}
+                </span>
+                <span style={{ fontSize:11, fontFamily:font, color:MUTED, marginBottom:mob?3:6 }}>σ</span>
+              </div>
+              <div style={{ fontSize:10, fontFamily:fontSans, fontWeight:700, color:cfg.color, marginTop:3, padding:"2px 8px",
+                background:`${cfg.color}15`, border:`1px solid ${cfg.color}30`, letterSpacing:"0.06em" }}>
+                {cfg.label}
+              </div>
+              <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginTop:3, textAlign:"center" }}>{cfg.desc}</div>
+            </div>
+
+            {/* Right: Chart + breakdown */}
+            <div style={{ padding:mob?"10px 12px":"14px 18px" }}>
+              {/* Level bar */}
+              <div style={{ marginBottom:10 }}>
+                <div style={{ display:"flex", height:8, borderRadius:4, overflow:"hidden", background:BG3, position:"relative" }}>
+                  {Object.entries(levelConfig).map(([k,c],i) => (
+                    <div key={k} style={{ flex:1, background:c.color, opacity:0.2 }} />
+                  ))}
+                  <div style={{ position:"absolute", left:`${Math.min(v/4*100, 100)}%`, top:-1, transform:"translateX(-50%)",
+                    width:4, height:10, background:cfg.color, borderRadius:2, boxShadow:`0 0 5px ${cfg.color}60`, transition:"left 0.5s" }} />
+                </div>
+                <div style={{ display:"flex", marginTop:2 }}>
+                  {Object.entries(levelConfig).map(([k,c]) => (
+                    <div key={k} style={{ flex:1, fontSize:7, fontFamily:font, textAlign:"center",
+                      color:k===level?c.color:`${MUTED}50`, fontWeight:k===level?700:400 }}>
+                      {c.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sparkline + KPIs */}
+              <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:mob?6:14 }}>
+                {/* KPIs */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"3px 8px", fontSize:10, fontFamily:font }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", color:MUTED }}>
+                    <span>Índice</span>
+                    <span style={{ fontWeight:700, color:cfg.color }}>{v.toFixed(2)}σ</span>
+                  </div>
+                  <div style={{ display:"flex", justifyContent:"space-between", color:MUTED }}>
+                    <span>Sentimiento</span>
+                    <span style={{ fontWeight:600, color:sentiment<-4?"#dc2626":sentiment<-2?"#ca8a04":"#16a34a" }}>{sentiment.toFixed(1)}</span>
+                  </div>
+                  <div style={{ display:"flex", justifyContent:"space-between", color:MUTED }}>
+                    <span>Art. conflicto</span>
+                    <span style={{ fontWeight:600, color:conflictRatio>50?"#dc2626":conflictRatio>30?"#ca8a04":MUTED }}>{conflictRatio.toFixed(0)}%</span>
+                  </div>
+                  <div style={{ display:"flex", justifyContent:"space-between", color:MUTED }}>
+                    <span>Art. totales</span>
+                    <span style={{ fontWeight:600, color:TEXT }}>{lat.total || "—"}</span>
+                  </div>
+                  <div style={{ display:"flex", justifyContent:"space-between", color:MUTED, gridColumn:"1 / -1" }}>
+                    <span>Baseline 2017–hoy</span>
+                    <span style={{ fontWeight:600 }}>μ=0.14 · σ=1.15</span>
+                  </div>
+                </div>
+
+                {/* Sparkline */}
+                <div>
+                  <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginBottom:3 }}>Últimos {sparkData.length} días · PizzINT/GDELT</div>
+                  <svg width="100%" height={45} viewBox="0 0 200 45" preserveAspectRatio="none" style={{ display:"block" }}>
+                    {/* Zone backgrounds */}
+                    <rect x={0} y={45-45*(1/maxV)} width={200} height={45*(1/maxV)*0.5} fill="#eab308" opacity={0.06} />
+                    <rect x={0} y={45-45*(2/maxV)} width={200} height={45*(1/maxV)} fill="#f97316" opacity={0.06} />
+                    <rect x={0} y={0} width={200} height={45-45*(2/maxV)} fill="#ef4444" opacity={0.06} />
+                    {/* Threshold lines */}
+                    <line x1={0} y1={45-45*(1/maxV)} x2={200} y2={45-45*(1/maxV)} stroke="#eab308" strokeWidth={0.5} strokeDasharray="3,3" opacity={0.4} />
+                    <line x1={0} y1={45-45*(2/maxV)} x2={200} y2={45-45*(2/maxV)} stroke="#ef4444" strokeWidth={0.5} strokeDasharray="3,3" opacity={0.4} />
+                    {/* Area fill */}
+                    <path d={`M0,45 ${sparkData.map((d,i) => `L${(i/(sparkData.length-1))*200},${45-((d.v-minV)/(maxV-minV))*42}`).join(" ")} L200,45Z`}
+                      fill={`${cfg.color}15`} />
+                    {/* Line */}
+                    <polyline
+                      points={sparkData.map((d,i) => `${(i/(sparkData.length-1))*200},${45-((d.v-minV)/(maxV-minV))*42}`).join(" ")}
+                      fill="none" stroke={cfg.color} strokeWidth={1.5} strokeLinejoin="round" />
+                    {/* Current dot */}
+                    {sparkData.length > 0 && (
+                      <circle cx={200} cy={45-((sparkData[sparkData.length-1].v-minV)/(maxV-minV))*42}
+                        r={3} fill={cfg.color} stroke="#fff" strokeWidth={1.5} />
+                    )}
                   </svg>
                 </div>
               </div>
@@ -6050,11 +6186,11 @@ export default function MonitorPNUD() {
   const mob = useIsMobile();
 
   // ── Shared live data (fetched once, available to all tabs including AI) ──
-  const [liveData, setLiveData] = useState({ dolar:null, oil:null, gdeltSummary:null, news:null, fetched:false });
+  const [liveData, setLiveData] = useState({ dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, fetched:false });
 
   useEffect(() => {
     async function fetchLiveData() {
-      const results = { dolar:null, oil:null, gdeltSummary:null, news:null, fetched:true };
+      const results = { dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, fetched:true };
       try {
         // Dolar
         const dolarUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
@@ -6078,6 +6214,14 @@ export default function MonitorPNUD() {
         if (newsUrl) {
           const nRes = await fetch(newsUrl, { signal:AbortSignal.timeout(8000) }).then(r=>r.ok?r.json():null).catch(()=>null);
           if (nRes?.news?.length) results.news = nRes.news.slice(0,5).map(n => n.title || n.headline || "").filter(Boolean);
+        }
+      } catch {}
+      try {
+        // Bilateral Threat Index (PizzINT/GDELT)
+        const bilUrl = IS_DEPLOYED ? "/api/bilateral" : null;
+        if (bilUrl) {
+          const bRes = await fetch(bilUrl, { signal:AbortSignal.timeout(12000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          if (bRes?.latest) results.bilateral = bRes;
         }
       } catch {}
       setLiveData(results);
