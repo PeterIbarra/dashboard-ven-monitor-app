@@ -1759,6 +1759,141 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
   );
 }
 
+// ═══════════════════════════════════════════════════════════════
+// NEWS ALERTS — Classify headlines by relevance/urgency
+// ═══════════════════════════════════════════════════════════════
+
+function NewsAlerts({ liveData, mob }) {
+  const [alerts, setAlerts] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [provider, setProvider] = useState("");
+  const generated = useRef(false);
+
+  useEffect(() => {
+    if (generated.current || !liveData?.fetched) return;
+    generated.current = true;
+
+    async function classifyNews() {
+      setLoading(true);
+
+      // Gather headlines from RSS + Google News
+      let googleNews = [];
+      if (IS_DEPLOYED) {
+        try {
+          const res = await fetch("/api/gdelt?signal=headlines", { signal: AbortSignal.timeout(12000) });
+          if (res.ok) {
+            const h = await res.json();
+            googleNews = (h.all || []).filter(a => a.title?.length > 20).slice(0, 15);
+          }
+        } catch {}
+      }
+
+      const rssNews = (liveData?.news || []).slice(0, 10).map(n => ({
+        title: n.title || n.titulo || "", source: n.source || n.fuente || ""
+      })).filter(n => n.title.length > 15);
+
+      const allHeadlines = [
+        ...googleNews.map(a => `"${a.title}" [${a.source}]`),
+        ...rssNews.map(a => `"${a.title}" [${a.source}]`)
+      ];
+
+      if (allHeadlines.length < 3) { setLoading(false); return; }
+
+      const prompt = `Eres un sistema de alerta del PNUD Venezuela. Clasifica estos titulares de noticias según su relevancia para el monitoreo de Venezuela.
+
+TITULARES:
+${allHeadlines.map((h,i) => `${i+1}. ${h}`).join("\n")}
+
+INSTRUCCIONES:
+1. Responde SOLO en formato JSON válido, sin markdown ni backticks.
+2. Clasifica SOLO titulares directamente relacionados con Venezuela (política, economía, geopolítica, DDHH, energía, migración).
+3. Ignora completamente titulares sobre otros países o temas no venezolanos.
+4. Cada alerta tiene: "nivel" (🔴/🟡/🟢), "titular", "fuente", "dimension" (POLÍTICO/ECONÓMICO/INTERNACIONAL/DDHH/ENERGÍA), "impacto" (1 frase corta de por qué es relevante).
+5. 🔴 = Evento urgente que podría mover escenarios. 🟡 = Desarrollo relevante para seguimiento. 🟢 = Contexto informativo.
+6. Máximo 8 alertas. Prioriza las más relevantes.
+7. Formato exacto:
+[{"nivel":"🔴","titular":"...","fuente":"...","dimension":"...","impacto":"..."}]`;
+
+      try {
+        if (IS_DEPLOYED) {
+          const res = await fetch("/api/ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt, max_tokens: 600 }),
+            signal: AbortSignal.timeout(35000),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.provider) setProvider(data.provider);
+            if (data.text) {
+              try {
+                const clean = data.text.replace(/```json\s?|```/g, "").trim();
+                const parsed = JSON.parse(clean);
+                if (Array.isArray(parsed) && parsed.length > 0) setAlerts(parsed.slice(0, 8));
+              } catch {
+                // Try to extract JSON array from text
+                const match = data.text.match(/\[[\s\S]*\]/);
+                if (match) {
+                  try { const p = JSON.parse(match[0]); if (Array.isArray(p)) setAlerts(p.slice(0, 8)); } catch {}
+                }
+              }
+            }
+          }
+        }
+      } catch {}
+      setLoading(false);
+    }
+
+    const timer = setTimeout(classifyNews, 4000);
+    return () => clearTimeout(timer);
+  }, [liveData?.fetched]);
+
+  if (!alerts && !loading) return null;
+
+  const nivelColor = { "🔴":"#dc2626", "🟡":"#ca8a04", "🟢":"#16a34a" };
+  const nivelBg = { "🔴":"#dc262608", "🟡":"#ca8a0408", "🟢":"#16a34a08" };
+  const dimColor = { "POLÍTICO":"#7c3aed", "ECONÓMICO":"#0e7490", "INTERNACIONAL":"#0468B1", "DDHH":"#dc2626", "ENERGÍA":"#ca8a04" };
+
+  const badgeColor = provider.includes("mistral") ? "#ff6f00" : provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "#ffbf00" : "#8b5cf6";
+  const badgeLabel = provider.includes("mistral") ? "MISTRAL" : provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "HUGGINGFACE" : "CLAUDE";
+
+  return (
+    <Card>
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, flexWrap:"wrap" }}>
+        <span style={{ fontSize:14 }}>🔔</span>
+        <span style={{ fontSize:10, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:TEXT, fontWeight:700 }}>Alertas de Noticias</span>
+        {provider && (
+          <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${badgeColor}15`, color:badgeColor, border:`1px solid ${badgeColor}30`, letterSpacing:"0.08em" }}>{badgeLabel}</span>
+        )}
+        <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Google News + RSS · Clasificación IA</span>
+        {loading && <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Clasificando noticias...</span>}
+      </div>
+      {alerts && alerts.map((a, i) => (
+        <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:8, padding:"6px 0",
+          borderTop:i>0?`1px solid ${BORDER}30`:"none", background:nivelBg[a.nivel] || "transparent" }}>
+          <span style={{ fontSize:14, flexShrink:0, marginTop:1 }}>{a.nivel}</span>
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ fontSize:12, fontFamily:fontSans, color:TEXT, lineHeight:1.4 }}>
+              {a.titular}
+              <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:6 }}>[{a.fuente}]</span>
+            </div>
+            <div style={{ display:"flex", gap:6, marginTop:3, alignItems:"center", flexWrap:"wrap" }}>
+              {a.dimension && (
+                <span style={{ fontSize:8, fontFamily:font, padding:"1px 6px", letterSpacing:"0.06em",
+                  color:dimColor[a.dimension] || MUTED, background:`${dimColor[a.dimension] || MUTED}12`,
+                  border:`1px solid ${dimColor[a.dimension] || MUTED}25` }}>
+                  {a.dimension}
+                </span>
+              )}
+              {a.impacto && <span style={{ fontSize:10, fontFamily:font, color:MUTED, fontStyle:"italic" }}>{a.impacto}</span>}
+            </div>
+          </div>
+        </div>
+      ))}
+    </Card>
+  );
+}
+
 function TabDashboard({ week, liveData = {} }) {
   const mob = useIsMobile();
   const wk = WEEKS[week];
@@ -1772,6 +1907,70 @@ function TabDashboard({ week, liveData = {} }) {
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+      {/* ── ROW 0: Alertas en Vivo por Umbral ── */}
+      {(() => {
+        const liveAlerts = [];
+
+        // Brecha cambiaria
+        if (liveData?.dolar?.brecha) {
+          const brecha = parseFloat(liveData.dolar.brecha);
+          if (brecha > 55) liveAlerts.push({ name:"Brecha cambiaria", val:`${brecha.toFixed(1)}%`, umbral:"Brecha >55% activa presión E2 — riesgo de colapso económico", level:"red" });
+          else if (brecha > 45) liveAlerts.push({ name:"Brecha cambiaria", val:`${brecha.toFixed(1)}%`, umbral:"Brecha acercándose a zona crítica (>55%)", level:"yellow" });
+        }
+
+        // Dólar paralelo
+        if (liveData?.dolar?.paralelo) {
+          const paralelo = parseFloat(liveData.dolar.paralelo);
+          if (paralelo > 700) liveAlerts.push({ name:"Dólar paralelo", val:`${paralelo.toFixed(0)} Bs`, umbral:"Paralelo >700 Bs genera presión social y erosión salarial", level:"red" });
+          else if (paralelo > 600) liveAlerts.push({ name:"Dólar paralelo", val:`${paralelo.toFixed(0)} Bs`, umbral:"Paralelo en zona de presión (>600 Bs)", level:"yellow" });
+        }
+
+        // Brent
+        if (liveData?.oil?.brent) {
+          const brent = parseFloat(liveData.oil.brent);
+          if (brent < 60) liveAlerts.push({ name:"Brent", val:`$${brent.toFixed(2)}`, umbral:"Brent <$60 presiona ingresos petroleros — riesgo fiscal E2", level:"red" });
+          else if (brent < 65) liveAlerts.push({ name:"Brent", val:`$${brent.toFixed(2)}`, umbral:"Brent <$65 reduce margen fiscal venezolano", level:"yellow" });
+        }
+
+        // WTI
+        if (liveData?.oil?.wti) {
+          const wti = parseFloat(liveData.oil.wti);
+          if (wti < 55) liveAlerts.push({ name:"WTI", val:`$${wti.toFixed(2)}`, umbral:"WTI <$55 señal de debilidad en mercado energético", level:"red" });
+          else if (wti < 60) liveAlerts.push({ name:"WTI", val:`$${wti.toFixed(2)}`, umbral:"WTI en zona de presión (<$60)", level:"yellow" });
+        }
+
+        if (liveAlerts.length === 0) return null;
+
+        const reds = liveAlerts.filter(a => a.level === "red");
+
+        return (
+          <div style={{ border:`1px solid ${reds.length > 0 ? "#dc262640" : "#ca8a0440"}`,
+            background:reds.length > 0 ? "#dc262608" : "#ca8a0408", padding:mob?"10px 12px":"12px 16px" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:liveAlerts.length > 1 ? 8 : 0, flexWrap:"wrap" }}>
+              <span style={{ fontSize:14 }}>{reds.length > 0 ? "🚨" : "⚠️"}</span>
+              <span style={{ fontSize:10, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase",
+                color:reds.length > 0 ? "#dc2626" : "#ca8a04", fontWeight:700 }}>
+                {liveAlerts.length} alerta{liveAlerts.length>1?"s":""} en vivo
+              </span>
+              <span style={{ width:6, height:6, borderRadius:"50%", background:"#22c55e", animation:"pulse 1.5s infinite" }} />
+              <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Datos en tiempo real · cada 5 min</span>
+            </div>
+            {liveAlerts.map((a, i) => (
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:8, padding:"4px 0",
+                borderTop:i>0?`1px solid ${BORDER}30`:"none", fontSize:12, fontFamily:font }}>
+                <span style={{ width:7, height:7, borderRadius:"50%", flexShrink:0,
+                  background:a.level==="red"?"#dc2626":"#ca8a04",
+                  boxShadow:a.level==="red"?"0 0 4px #dc262660":"none",
+                  animation:a.level==="red"?"pulse 1.5s infinite":"none" }} />
+                <span style={{ color:a.level==="red"?"#dc2626":"#ca8a04", fontWeight:700, minWidth:mob?90:130 }}>{a.name}</span>
+                <span style={{ color:TEXT, fontWeight:600, minWidth:60 }}>{a.val}</span>
+                <span style={{ color:MUTED, fontSize:11, flex:1 }}>{a.umbral}</span>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
 
       {/* ── ROW 1: Scenario Hero Cards ── */}
       <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:1, background:BORDER, border:`1px solid ${BORDER}` }}>
@@ -2190,6 +2389,10 @@ function TabDashboard({ week, liveData = {} }) {
           </div>
         ))}
       </Card>
+
+      {/* ── ROW 5: Alertas Inteligentes de Noticias ── */}
+      <NewsAlerts liveData={liveData} mob={mob} />
+
     </div>
   );
 }
