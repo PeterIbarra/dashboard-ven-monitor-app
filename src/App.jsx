@@ -1266,8 +1266,9 @@ ${Object.keys(liveContext).length > 0 ? JSON.stringify(liveContext, null, 2) : "
     } finally { setAiLoading(false); }
   };
 
-  // ── Document generator ──
+// ── Document generator ──
   const generateDocument = (mode = "html") => {
+  const generateDocument = async (mode = "html") => {
     const escRows = wk.probs.map(p => {
       const sc = SCENARIOS.find(s=>s.id===p.sc);
       return `<tr><td style="padding:8px;border-bottom:1px solid #d0d7e0;font-weight:600;color:${sc?.color}">${sc?.name}</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;text-align:center;font-size:18px;font-weight:700;color:${sc?.color}">${p.v}%</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;color:#5a6a7a">${{up:"↑ Subiendo",down:"↓ Bajando",flat:"→ Estable"}[p.t]}</td></tr>`;
@@ -1309,9 +1310,132 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
       if (win) {
         win.addEventListener("load", () => {
           setTimeout(() => win.print(), 500);
+      const sanitize = (text = "") => text
+        .toString()
+        .replace(/<[^>]*>/g, " ")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[“”]/g, '"')
+        .replace(/[‘’]/g, "'")
+        .replace(/[–—]/g, "-")
+        .replace(/[^\x20-\x7E\n]/g, " ")
+        .replace(/[()\\]/g, "\\$&")
+        .replace(/\s+/g, " ")
+        .trim();
+      const wrapLine = (text, maxChars = 92) => {
+        const words = sanitize(text).split(" ");
+        const lines = [];
+        let line = "";
+        words.forEach((word) => {
+          if (!word) return;
+          const next = line ? `${line} ${word}` : word;
+          if (next.length <= maxChars) {
+            line = next;
+          } else {
+            if (line) lines.push(line);
+            line = word;
+          }
         });
+        if (line) lines.push(line);
+        return lines;
+      };
+
+      const contentLines = [
+        "SITREP Semanal",
+        d.period,
+        "",
+        "Puntos Clave del Periodo",
+        ...d.keyPoints.flatMap((kp) => wrapLine(`${kp.tag}: ${kp.title}. ${kp.text}`)),
+        "",
+        "Escenarios - Probabilidades",
+        ...wk.probs.flatMap((p) => {
+          const sc = SCENARIOS.find((s) => s.id === p.sc);
+          const trend = { up: "Subiendo", down: "Bajando", flat: "Estable" }[p.t];
+          return wrapLine(`${sc?.name || "Escenario"}: ${p.v}% (${trend})`);
+        }),
+        "",
+        "Sintesis",
+        ...wrapLine(d.sintesis),
+        "",
+        "Semaforo de Tensiones",
+        ...wk.tensiones.flatMap((t) => wrapLine(`- ${t.t}`)),
+        "",
+        "Dinamicas por Actor",
+        ...d.actores.flatMap((a) => [a.name, ...a.items.map((item) => `- ${item}`)]).flatMap((line) => wrapLine(line)),
+      ];
+
+      if (aiAnalysis) {
+        contentLines.push("", "Analisis Narrativo (IA)", ...wrapLine(aiAnalysis));
       }
+
+      const linesPerPage = 44;
+      const pages = [];
+      for (let i = 0; i < contentLines.length; i += linesPerPage) {
+        pages.push(contentLines.slice(i, i + linesPerPage));
+      }
+
+      let objectNumber = 1;
+      const objects = [];
+      const pageObjects = [];
+
+      const fontObj = objectNumber++;
+      objects.push({ id: fontObj, body: "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>" });
+
+      const contentObjIds = pages.map(() => objectNumber++);
+      const pageObjIds = pages.map(() => objectNumber++);
+      const pagesObj = objectNumber++;
+      const catalogObj = objectNumber++;
+
+      pages.forEach((page, idx) => {
+        const textOps = ["BT", "/F1 11 Tf", "50 792 Td", "14 TL"];
+        page.forEach((line, lineIdx) => {
+          const safeLine = sanitize(line);
+          if (lineIdx === 0) textOps.push(`(${safeLine}) Tj`);
+          else textOps.push(`T* (${safeLine}) Tj`);
+        });
+        textOps.push("ET");
+        const stream = textOps.join("\n");
+        objects.push({
+          id: contentObjIds[idx],
+          body: `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
+        });
+      });
+
+      pageObjIds.forEach((id, idx) => {
+        const body = `<< /Type /Page /Parent ${pagesObj} 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 ${fontObj} 0 R >> >> /Contents ${contentObjIds[idx]} 0 R >>`;
+        objects.push({ id, body });
+        pageObjects.push(`${id} 0 R`);
+      });
+
+      objects.push({ id: pagesObj, body: `<< /Type /Pages /Kids [${pageObjects.join(" ")}] /Count ${pageObjIds.length} >>` });
+      objects.push({ id: catalogObj, body: `<< /Type /Catalog /Pages ${pagesObj} 0 R >>` });
+
+      objects.sort((a, b) => a.id - b.id);
+
+      let pdfContent = "%PDF-1.4\n";
+      const offsets = [0];
+      objects.forEach((obj) => {
+        offsets[obj.id] = pdfContent.length;
+        pdfContent += `${obj.id} 0 obj\n${obj.body}\nendobj\n`;
+      });
+      const xrefOffset = pdfContent.length;
+      pdfContent += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+      for (let i = 1; i <= objects.length; i += 1) {
+        const off = String(offsets[i] || 0).padStart(10, "0");
+        pdfContent += `${off} 00000 n \n`;
+      }
+      pdfContent += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogObj} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+
+      const pdfBlob = new Blob([pdfContent], { type: "application/pdf" });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const a = document.createElement("a");
+      a.href = pdfUrl;
+      a.download = `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
+      a.click();
+      URL.revokeObjectURL(pdfUrl);
     } else {
+      const blob = new Blob([html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
       const a = document.createElement("a"); a.href = url;
       a.download = `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g,"_")}.html`;
       a.click(); URL.revokeObjectURL(url);
