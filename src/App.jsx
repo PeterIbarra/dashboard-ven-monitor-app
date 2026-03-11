@@ -1319,21 +1319,32 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
       const parsed = parser.parseFromString(html, "text/html");
       const exportRoot = document.createElement("div");
       exportRoot.style.position = "fixed";
-      exportRoot.style.left = "-99999px";
+      exportRoot.style.left = "0";
       exportRoot.style.top = "0";
       exportRoot.style.width = "900px";
+      exportRoot.style.opacity = "0";
+      exportRoot.style.pointerEvents = "none";
+      exportRoot.style.zIndex = "-1";
       exportRoot.style.background = "#fff";
       exportRoot.innerHTML = parsed.body.innerHTML;
 
       try {
         document.body.appendChild(exportRoot);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         const html2pdf = await loadHtml2Pdf();
         await html2pdf()
           .set({
             filename: `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`,
             margin: [0, 0, 0, 0],
             image: { type: "jpeg", quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, logging: false },
+            html2canvas: {
+              scale: 2,
+              useCORS: true,
+              logging: false,
+              windowWidth: exportRoot.scrollWidth,
+              windowHeight: exportRoot.scrollHeight,
+              backgroundColor: "#ffffff",
+            },
             jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
             pagebreak: { mode: ["css", "legacy"] },
           })
