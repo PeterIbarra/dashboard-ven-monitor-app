@@ -386,11 +386,13 @@ const CONF_HISTORICO = [
 ];
 
 // ═══ Venezuela Oil Production — Manual OPEC MOMR data (auto-replaced by EIA when available) ═══
+// Source: OPEC Monthly Oil Market Reports (Secondary Sources)
+// MOMR Jan 2026 (ref 3), MOMR Feb 2026 (ref 2), MOMR Mar 2026 (ref 1)
 const VEN_PRODUCTION_MANUAL = [
-  { time:"2025-10-15T00:00:00Z", value:1010, source:"OPEC MOMR" },
-  { time:"2025-11-15T00:00:00Z", value:960, source:"OPEC MOMR" },
-  { time:"2025-12-15T00:00:00Z", value:917, source:"OPEC MOMR" },
-  { time:"2026-01-15T00:00:00Z", value:830, source:"OPEC MOMR" },
+  { time:"2025-11-15T00:00:00Z", value:956, source:"OPEC MOMR Ene 2026" },
+  { time:"2025-12-15T00:00:00Z", value:917, source:"OPEC MOMR Feb 2026" },
+  { time:"2026-01-15T00:00:00Z", value:830, source:"OPEC MOMR Feb 2026" },
+  { time:"2026-02-15T00:00:00Z", value:903, source:"OPEC MOMR Mar 2026" },
 ];
 
 const CONF_MESES = [
@@ -1265,7 +1267,7 @@ ${Object.keys(liveContext).length > 0 ? JSON.stringify(liveContext, null, 2) : "
   };
 
   // ── Document generator ──
-  const generateDocument = () => {
+  const generateDocument = (mode = "html") => {
     const escRows = wk.probs.map(p => {
       const sc = SCENARIOS.find(s=>s.id===p.sc);
       return `<tr><td style="padding:8px;border-bottom:1px solid #d0d7e0;font-weight:600;color:${sc?.color}">${sc?.name}</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;text-align:center;font-size:18px;font-weight:700;color:${sc?.color}">${p.v}%</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;color:#5a6a7a">${{up:"↑ Subiendo",down:"↓ Bajando",flat:"→ Estable"}[p.t]}</td></tr>`;
@@ -1300,9 +1302,20 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
 
     const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url;
-    a.download = `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g,"_")}.html`;
-    a.click(); URL.revokeObjectURL(url);
+
+    if (mode === "pdf") {
+      // Open in new window and trigger print (save as PDF)
+      const win = window.open(url, "_blank");
+      if (win) {
+        win.addEventListener("load", () => {
+          setTimeout(() => win.print(), 500);
+        });
+      }
+    } else {
+      const a = document.createElement("a"); a.href = url;
+      a.download = `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g,"_")}.html`;
+      a.click(); URL.revokeObjectURL(url);
+    }
   };
 
   const toggle = (id) => setExpandedSection(prev => prev === id ? null : id);
@@ -1417,7 +1430,14 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
         <button onClick={generateDocument}
           style={{ fontSize:mob?10:11, fontFamily:font, padding:mob?"5px 10px":"6px 14px",
             background:ACCENT, color:"#fff", border:"none", cursor:"pointer", letterSpacing:"0.06em" }}>
-          📥 Descargar SITREP
+          📥 HTML
+        </button>
+        <button onClick={() => {
+          generateDocument("pdf");
+        }}
+          style={{ fontSize:mob?10:11, fontFamily:font, padding:mob?"5px 10px":"6px 14px",
+            background:"#dc2626", color:"#fff", border:"none", cursor:"pointer", letterSpacing:"0.06em" }}>
+          📄 PDF
         </button>
       </div>
 
@@ -6603,8 +6623,10 @@ function TabMacro() {
     { k:"Deuda externa", v:">$150B", c:"#E5243B", s:"FMI: >180% del PIB · en default" },
     { k:"Salario mínimo", v:"130 Bs", c:"#E5243B", s:"~$0.30 al paralelo · 47+ meses sin ajuste" },
     { k:"Canasta alimentaria", v:"~$550", c:"#f59e0b", s:"CENDA · ingreso promedio ~$270" },
-    { k:"Producción petrolera", v:"~800 kbd", c:"#22c55e", s:"↑60% interanual · meta 1M bpd" },
+    { k:"Producción petrolera", v:"903 kbd", c:"#22c55e", s:"Feb 2026 · OPEC MOMR fuentes sec. · ↑80 kbd vs ene" },
     { k:"Liquidez monetaria", v:"Expansión", c:"#f59e0b", s:"BCV inyecta vía subastas semanales" },
+    { k:"Crudo Merey", v:"$52.31/b", c:"#f59e0b", s:"Feb 2026 · Cesta OPEC · ↑$9.10 vs ene" },
+    { k:"Plataformas (Rigs)", v:"2", c:"#E5243B", s:"Ene 2026 · Mínimo operativo · OPEC" },
   ];
 
   return (
