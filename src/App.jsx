@@ -1301,84 +1301,42 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
 </div></body></html>`;
 
     if (mode === "pdf") {
-      const loadHtml2Pdf = () => {
-        if (window.html2pdf) return Promise.resolve(window.html2pdf);
-        if (window.__html2pdfLoader) return window.__html2pdfLoader;
-        window.__html2pdfLoader = new Promise((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-          script.async = true;
-          script.onload = () => resolve(window.html2pdf);
-          script.onerror = () => reject(new Error("No se pudo cargar html2pdf"));
-          document.head.appendChild(script);
-        });
-        return window.__html2pdfLoader;
+      const frame = document.createElement("iframe");
+      frame.style.position = "fixed";
+      frame.style.right = "0";
+      frame.style.bottom = "0";
+      frame.style.width = "0";
+      frame.style.height = "0";
+      frame.style.border = "0";
+      frame.setAttribute("aria-hidden", "true");
+
+      const cleanup = () => {
+        setTimeout(() => frame.remove(), 300);
       };
 
-      const parser = new DOMParser();
-      const parsed = parser.parseFromString(html, "text/html");
-      const exportRoot = document.createElement("div");
-      exportRoot.style.position = "fixed";
-      exportRoot.style.left = "-10000px";
-      exportRoot.style.top = "0";
-      exportRoot.style.width = "900px";
-      exportRoot.style.minHeight = "1px";
-      exportRoot.style.pointerEvents = "none";
-      exportRoot.style.background = "#fff";
-      exportRoot.style.overflow = "hidden";
-      exportRoot.innerHTML = `<style>${parsed.head.querySelector("style")?.innerHTML || ""}</style>${parsed.body.innerHTML}`;
-
-      try {
-        document.body.appendChild(exportRoot);
-        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-        const images = Array.from(exportRoot.querySelectorAll("img"));
-        await Promise.all(images.map((img) => {
-          if (img.complete) return Promise.resolve();
-          return new Promise((resolve) => {
-            img.onload = resolve;
-            img.onerror = resolve;
-          });
-        }));
-
-        const html2pdf = await loadHtml2Pdf();
-        const exporter = html2pdf().set({
-          filename: `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`,
-          margin: [12, 12, 12, 12],
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            scrollX: 0,
-            scrollY: 0,
-            backgroundColor: "#ffffff",
-          },
-          jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["css", "legacy", "avoid-all"] },
-        }).from(exportRoot);
-
-        await exporter.save();
-      } catch (err) {
-        const blob = new Blob([html], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        const win = window.open(url, "_blank");
-        if (win) {
-          win.addEventListener("load", () => {
-            setTimeout(() => win.print(), 300);
-          });
+      frame.onload = () => {
+        const win = frame.contentWindow;
+        if (!win) {
+          cleanup();
+          return;
         }
-      } finally {
-        exportRoot.remove();
-      }
-      pdfContent += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogObj} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
 
-      const pdfBlob = new Blob([pdfContent], { type: "application/pdf" });
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      const a = document.createElement("a");
-      a.href = pdfUrl;
-      a.download = `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
-      a.click();
-      URL.revokeObjectURL(pdfUrl);
+        setTimeout(() => {
+          win.focus();
+          win.print();
+          cleanup();
+        }, 250);
+      };
+
+      document.body.appendChild(frame);
+      const doc = frame.contentDocument;
+      if (!doc) {
+        cleanup();
+        return;
+      }
+      doc.open();
+      doc.write(html);
+      doc.close();
     } else {
       const blob = new Blob([html], { type: "text/html" });
       const url = URL.createObjectURL(blob);
