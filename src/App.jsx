@@ -1267,7 +1267,7 @@ ${Object.keys(liveContext).length > 0 ? JSON.stringify(liveContext, null, 2) : "
   };
 
   // ── Document generator ──
-  const generateDocument = (mode = "html") => {
+  const generateDocument = async (mode = "html") => {
     const escRows = wk.probs.map(p => {
       const sc = SCENARIOS.find(s=>s.id===p.sc);
       return `<tr><td style="padding:8px;border-bottom:1px solid #d0d7e0;font-weight:600;color:${sc?.color}">${sc?.name}</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;text-align:center;font-size:18px;font-weight:700;color:${sc?.color}">${p.v}%</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;color:#5a6a7a">${{up:"↑ Subiendo",down:"↓ Bajando",flat:"→ Estable"}[p.t]}</td></tr>`;
@@ -1300,18 +1300,79 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
 <div style="text-align:center;font-family:'Space Mono',monospace;font-size:10px;color:#5a6a7a80;padding:24px 0;letter-spacing:0.1em;text-transform:uppercase;border-top:1px solid #d0d7e0;margin-top:32px">PNUD Venezuela · Monitor de Contexto Situacional · ${d.periodShort} · Uso interno</div>
 </div></body></html>`;
 
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-
     if (mode === "pdf") {
-      // Open in new window and trigger print (save as PDF)
-      const win = window.open(url, "_blank");
-      if (win) {
-        win.addEventListener("load", () => {
-          setTimeout(() => win.print(), 500);
+      const loadHtml2Pdf = () => {
+        if (window.html2pdf) return Promise.resolve(window.html2pdf);
+        if (window.__html2pdfLoader) return window.__html2pdfLoader;
+        window.__html2pdfLoader = new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+          script.async = true;
+          script.onload = () => resolve(window.html2pdf);
+          script.onerror = () => reject(new Error("No se pudo cargar html2pdf"));
+          document.head.appendChild(script);
         });
+        return window.__html2pdfLoader;
+      };
+
+      const parser = new DOMParser();
+      const parsed = parser.parseFromString(html, "text/html");
+      const exportRoot = document.createElement("div");
+      exportRoot.style.position = "fixed";
+      exportRoot.style.left = "-10000px";
+      exportRoot.style.top = "0";
+      exportRoot.style.width = "900px";
+      exportRoot.style.minHeight = "1px";
+      exportRoot.style.pointerEvents = "none";
+      exportRoot.style.background = "#fff";
+      exportRoot.style.overflow = "hidden";
+      exportRoot.innerHTML = `<style>${parsed.head.querySelector("style")?.innerHTML || ""}</style>${parsed.body.innerHTML}`;
+
+      try {
+        document.body.appendChild(exportRoot);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const images = Array.from(exportRoot.querySelectorAll("img"));
+        await Promise.all(images.map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        }));
+
+        const html2pdf = await loadHtml2Pdf();
+        const exporter = html2pdf().set({
+          filename: `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`,
+          margin: [12, 12, 12, 12],
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            backgroundColor: "#ffffff",
+          },
+          jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["css", "legacy", "avoid-all"] },
+        }).from(exportRoot);
+
+        await exporter.save();
+      } catch (err) {
+        const blob = new Blob([html], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const win = window.open(url, "_blank");
+        if (win) {
+          win.addEventListener("load", () => {
+            setTimeout(() => win.print(), 300);
+          });
+        }
+      } finally {
+        exportRoot.remove();
       }
     } else {
+      const blob = new Blob([html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
       const a = document.createElement("a"); a.href = url;
       a.download = `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g,"_")}.html`;
       a.click(); URL.revokeObjectURL(url);
