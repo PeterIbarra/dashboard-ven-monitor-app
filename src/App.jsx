@@ -1266,8 +1266,7 @@ ${Object.keys(liveContext).length > 0 ? JSON.stringify(liveContext, null, 2) : "
     } finally { setAiLoading(false); }
   };
 
-// ── Document generator ──
-  const generateDocument = (mode = "html") => {
+  // ── Document generator ──
   const generateDocument = async (mode = "html") => {
     const escRows = wk.probs.map(p => {
       const sc = SCENARIOS.find(s=>s.id===p.sc);
@@ -1301,15 +1300,7 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
 <div style="text-align:center;font-family:'Space Mono',monospace;font-size:10px;color:#5a6a7a80;padding:24px 0;letter-spacing:0.1em;text-transform:uppercase;border-top:1px solid #d0d7e0;margin-top:32px">PNUD Venezuela · Monitor de Contexto Situacional · ${d.periodShort} · Uso interno</div>
 </div></body></html>`;
 
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-
     if (mode === "pdf") {
-      // Open in new window and trigger print (save as PDF)
-      const win = window.open(url, "_blank");
-      if (win) {
-        win.addEventListener("load", () => {
-          setTimeout(() => win.print(), 500);
       const sanitize = (text = "") => text
         .toString()
         .replace(/<[^>]*>/g, " ")
