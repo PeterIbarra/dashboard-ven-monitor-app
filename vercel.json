@@ -1,8 +1,7 @@
 {
   "functions": {
     "api/cron/index.js": { "maxDuration": 60 },
-    "api/ai/index.js": { "maxDuration": 45 },
-    "api/trends/index.js": { "maxDuration": 60 }
+    "api/ai/index.js": { "maxDuration": 45 }
   },
   "crons": [
     {
@@ -22,7 +21,7 @@
     { "source": "/api/ai", "destination": "/api/ai/index.js" },
     { "source": "/api/bilateral", "destination": "/api/bilateral/index.js" },
     { "source": "/api/polymarket", "destination": "/api/polymarket/index.js" },
-    { "source": "/api/trends", "destination": "/api/trends/index.js" },
+    { "source": "/api/socioeconomic", "destination": "/api/socioeconomic/index.js" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [
