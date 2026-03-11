@@ -1362,6 +1362,15 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
       } finally {
         exportRoot.remove();
       }
+      pdfContent += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogObj} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+
+      const pdfBlob = new Blob([pdfContent], { type: "application/pdf" });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const a = document.createElement("a");
+      a.href = pdfUrl;
+      a.download = `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
+      a.click();
+      URL.revokeObjectURL(pdfUrl);
     } else {
       const blob = new Blob([html], { type: "text/html" });
       const url = URL.createObjectURL(blob);
