@@ -1267,7 +1267,7 @@ ${Object.keys(liveContext).length > 0 ? JSON.stringify(liveContext, null, 2) : "
   };
 
   // ── Document generator ──
-  const generateDocument = async (mode = "html") => {
+  const generateDocument = (mode = "html") => {
     const escRows = wk.probs.map(p => {
       const sc = SCENARIOS.find(s=>s.id===p.sc);
       return `<tr><td style="padding:8px;border-bottom:1px solid #d0d7e0;font-weight:600;color:${sc?.color}">${sc?.name}</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;text-align:center;font-size:18px;font-weight:700;color:${sc?.color}">${p.v}%</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;color:#5a6a7a">${{up:"↑ Subiendo",down:"↓ Bajando",flat:"→ Estable"}[p.t]}</td></tr>`;
@@ -1300,88 +1300,18 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
 <div style="text-align:center;font-family:'Space Mono',monospace;font-size:10px;color:#5a6a7a80;padding:24px 0;letter-spacing:0.1em;text-transform:uppercase;border-top:1px solid #d0d7e0;margin-top:32px">PNUD Venezuela · Monitor de Contexto Situacional · ${d.periodShort} · Uso interno</div>
 </div></body></html>`;
 
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+
     if (mode === "pdf") {
-      const loadHtml2Pdf = () => {
-        if (window.html2pdf) return Promise.resolve(window.html2pdf);
-        if (window.__html2pdfLoader) return window.__html2pdfLoader;
-        window.__html2pdfLoader = new Promise((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-          script.async = true;
-          script.onload = () => resolve(window.html2pdf);
-          script.onerror = () => reject(new Error("No se pudo cargar html2pdf"));
-          document.head.appendChild(script);
+      // Open in new window and trigger print (save as PDF)
+      const win = window.open(url, "_blank");
+      if (win) {
+        win.addEventListener("load", () => {
+          setTimeout(() => win.print(), 500);
         });
-        return window.__html2pdfLoader;
-      };
-
-      const parser = new DOMParser();
-      const parsed = parser.parseFromString(html, "text/html");
-      const exportRoot = document.createElement("div");
-      exportRoot.style.position = "fixed";
-      exportRoot.style.left = "-10000px";
-      exportRoot.style.top = "0";
-      exportRoot.style.width = "900px";
-      exportRoot.style.minHeight = "1px";
-      exportRoot.style.pointerEvents = "none";
-      exportRoot.style.background = "#fff";
-      exportRoot.style.overflow = "hidden";
-      exportRoot.innerHTML = `<style>${parsed.head.querySelector("style")?.innerHTML || ""}</style>${parsed.body.innerHTML}`;
-
-      try {
-        document.body.appendChild(exportRoot);
-        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-        const images = Array.from(exportRoot.querySelectorAll("img"));
-        await Promise.all(images.map((img) => {
-          if (img.complete) return Promise.resolve();
-          return new Promise((resolve) => {
-            img.onload = resolve;
-            img.onerror = resolve;
-          });
-        }));
-
-        const html2pdf = await loadHtml2Pdf();
-        const exporter = html2pdf().set({
-          filename: `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`,
-          margin: [12, 12, 12, 12],
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            scrollX: 0,
-            scrollY: 0,
-            backgroundColor: "#ffffff",
-          },
-          jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["css", "legacy", "avoid-all"] },
-        }).from(exportRoot);
-
-        await exporter.save();
-      } catch (err) {
-        const blob = new Blob([html], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        const win = window.open(url, "_blank");
-        if (win) {
-          win.addEventListener("load", () => {
-            setTimeout(() => win.print(), 300);
-          });
-        }
-      } finally {
-        exportRoot.remove();
       }
-      pdfContent += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogObj} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
-
-      const pdfBlob = new Blob([pdfContent], { type: "application/pdf" });
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      const a = document.createElement("a");
-      a.href = pdfUrl;
-      a.download = `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
-      a.click();
-      URL.revokeObjectURL(pdfUrl);
     } else {
-      const blob = new Blob([html], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
       const a = document.createElement("a"); a.href = url;
       a.download = `SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g,"_")}.html`;
       a.click(); URL.revokeObjectURL(url);
@@ -4856,7 +4786,7 @@ function TabConflictividad() {
           <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Fuente: OVCS · Informe Anual 2025 · 2.219 protestas documentadas</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
-          {[{id:"resumen",label:"Resumen"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
+          {[{id:"resumen",label:"Resumen"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"ovcs-live",label:"OVCS Live"},{id:"acled",label:"ACLED"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:12, fontFamily:font, padding:"6px 12px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
@@ -5034,7 +4964,290 @@ function TabConflictividad() {
         </div>
       </>)}
 
+      {seccion === "ovcs-live" && <OVCSLiveSection />}
+
       {seccion === "acled" && <AcledSection />}
+    </div>
+  );
+}
+
+// ── OVCS LIVE SECTION ─────────────────────────────────────────
+function OVCSLiveSection() {
+  const mob = useIsMobile();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [source, setSource] = useState("loading");
+  const [viewMode, setViewMode] = useState("kpis"); // kpis | tweets | motives
+
+  useEffect(() => {
+    async function fetchOVCS() {
+      // Uses /api/news?source=ovcs (same serverless, no extra slot)
+      const urls = IS_DEPLOYED
+        ? ["/api/news?source=ovcs"]
+        : CORS_PROXIES.map(fn => fn("https://rss.xcancel.com/OVCSocial/rss"));
+
+      for (const url of urls) {
+        try {
+          const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
+          if (!res.ok) continue;
+          const json = await res.json();
+          if (json.tweets && json.tweets.length > 0) {
+            setData(json);
+            setSource(json.source || "live");
+            setLoading(false);
+            return;
+          }
+        } catch { continue; }
+      }
+      setError("No se pudo conectar con Nitter/xcancel. Las instancias pueden estar temporalmente caídas.");
+      setLoading(false);
+    }
+    fetchOVCS();
+  }, []);
+
+  const motiveColors = {
+    "Servicios básicos": "#ef4444", "Laboral": "#f59e0b", "Vivienda": "#8b5cf6",
+    "Salud": "#ec4899", "Educación": "#06b6d4", "Transporte": "#14b8a6",
+    "Alimentación": "#f97316", "Seguridad": "#6366f1", "Derechos políticos": "#0A97D9",
+    "Tierras": "#84cc16", "Telecomunicaciones": "#a855f7", "Ambiental": "#22c55e",
+  };
+
+  if (loading) return (
+    <Card>
+      <div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:14, fontFamily:font }}>
+        <div style={{ fontSize:20, marginBottom:8 }}>📡</div>
+        Conectando con @OVCSocial vía Nitter...
+        <div style={{ fontSize:11, marginTop:6, color:`${MUTED}80` }}>
+          Probando: rss.xcancel.com → xcancel.com → nitter.net
+        </div>
+      </div>
+    </Card>
+  );
+
+  if (error || !data) return (
+    <Card>
+      <div style={{ textAlign:"center", padding:"30px 20px" }}>
+        <div style={{ fontSize:24, marginBottom:10 }}>📡</div>
+        <div style={{ fontSize:13, fontWeight:600, color:TEXT, marginBottom:8 }}>
+          Feed OVCS no disponible
+        </div>
+        <div style={{ fontSize:13, color:MUTED, lineHeight:1.6, maxWidth:500, margin:"0 auto", marginBottom:16 }}>
+          {error || "Las instancias de Nitter están temporalmente caídas. Puedes consultar directamente:"}
+        </div>
+        <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
+          <a href="https://x.com/OVCSocial" target="_blank" rel="noopener noreferrer"
+            style={{ fontSize:13, fontFamily:font, color:"#1d9bf0", textDecoration:"none", padding:"6px 14px", border:"1px solid rgba(29,155,240,0.3)", borderRadius:4 }}>
+            𝕏 @OVCSocial
+          </a>
+          <a href="https://xcancel.com/OVCSocial" target="_blank" rel="noopener noreferrer"
+            style={{ fontSize:13, fontFamily:font, color:ACCENT, textDecoration:"none", padding:"6px 14px", border:`1px solid ${ACCENT}30`, borderRadius:4 }}>
+            ↗ xcancel.com
+          </a>
+        </div>
+      </div>
+    </Card>
+  );
+
+  const { kpis, tweets, protestTweets, totalTweets } = data;
+  const protestPct = totalTweets > 0 ? ((protestTweets / totalTweets) * 100).toFixed(0) : 0;
+  const maxMotive = kpis.topMotives.length > 0 ? Math.max(...kpis.topMotives.map(m => m.count)) : 1;
+  const maxState = kpis.topStates.length > 0 ? Math.max(...kpis.topStates.map(s => s.count)) : 1;
+
+  return (
+    <div>
+      {/* Header bar */}
+      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:14, flexWrap:"wrap" }}>
+        <div style={{ width:8, height:8, borderRadius:"50%", background:"#22c55e", boxShadow:"0 0 6px #22c55e", animation:"pulse 2s infinite" }} />
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:14, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em" }}>
+            OVCS LIVE — @OVCSocial
+          </div>
+          <div style={{ fontSize:11, fontFamily:font, color:MUTED }}>
+            Fuente: Nitter RSS ({source}) · {totalTweets} tweets · {protestTweets} sobre protestas · Act: {new Date(data.fetchedAt).toLocaleTimeString("es-VE", { hour:"2-digit", minute:"2-digit" })}
+          </div>
+        </div>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+          {[{id:"kpis",label:"KPIs"},{id:"motives",label:"Motivos"},{id:"tweets",label:"Tweets"}].map(v => (
+            <button key={v.id} onClick={() => setViewMode(v.id)}
+              style={{ fontSize:11, fontFamily:font, padding:"4px 10px", border:"none",
+                background:viewMode===v.id?"#E5243B":"transparent", color:viewMode===v.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
+              {v.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── KPI CARDS ── */}
+      {viewMode === "kpis" && (<>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:10, marginBottom:16 }}>
+          {[
+            { k:"Tweets totales", v:totalTweets, c:ACCENT, s:`${protestPct}% mencionan protestas` },
+            { k:"Menciones protesta", v:protestTweets, c:"#E5243B", s:"Filtro: protestas, marchas, cierres" },
+            { k:"Cifras extraídas", v:kpis.totalProtests > 0 ? kpis.totalProtests.toLocaleString("es") : "—", c:"#f59e0b", s:kpis.totalProtests > 0 ? "Números citados en tweets" : "Sin cifras numéricas" },
+            { k:"Estados activos", v:kpis.topStates.length, c:"#8b5cf6", s:kpis.topStates.length > 0 ? kpis.topStates.slice(0,3).map(s=>s.state).join(", ") : "Sin geolocalización" },
+          ].map((d,i) => (
+            <Card key={i} accent={d.c}>
+              <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{d.k}</div>
+              <div style={{ fontSize:22, fontWeight:800, color:d.c, fontFamily:"'Syne',sans-serif" }}>{d.v}</div>
+              <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>{d.s}</div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Top States bar chart */}
+        {kpis.topStates.length > 0 && (
+          <Card accent="#8b5cf6">
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+              Estados con más menciones de protestas
+            </div>
+            {kpis.topStates.map((s, i) => (
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                <div style={{ width:100, fontSize:12, fontFamily:font, color:TEXT, textAlign:"right", flexShrink:0 }}>{s.state}</div>
+                <div style={{ flex:1, height:16, background:`${BORDER}40`, borderRadius:2, overflow:"hidden" }}>
+                  <div style={{ width:`${(s.count/maxState)*100}%`, height:"100%", background:"linear-gradient(90deg, #8b5cf6, #a78bfa)", borderRadius:2, transition:"width 0.5s ease" }} />
+                </div>
+                <div style={{ width:30, fontSize:12, fontFamily:font, color:"#8b5cf6", fontWeight:700, textAlign:"right" }}>{s.count}</div>
+              </div>
+            ))}
+          </Card>
+        )}
+
+        {/* Latest numbers extracted */}
+        {kpis.latestNumbers.length > 0 && (
+          <Card accent="#f59e0b" style={{ marginTop:12 }}>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+              Cifras extraídas de tweets recientes
+            </div>
+            {kpis.latestNumbers.map((n, i) => (
+              <div key={i} style={{ padding:"8px 0", borderBottom:i < kpis.latestNumbers.length - 1 ? `1px solid ${BORDER}30` : "none" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4, flexWrap:"wrap" }}>
+                  <span style={{ fontSize:18, fontWeight:800, color:"#f59e0b", fontFamily:"'Syne',sans-serif" }}>{n.number.toLocaleString("es")}</span>
+                  {n.motives.map((m, j) => (
+                    <span key={j} style={{ fontSize:10, fontFamily:font, padding:"1px 6px", borderRadius:10, background:`${motiveColors[m] || MUTED}18`, color:motiveColors[m] || MUTED }}>{m}</span>
+                  ))}
+                  {n.states.map((s, j) => (
+                    <span key={j} style={{ fontSize:10, fontFamily:font, padding:"1px 6px", borderRadius:10, background:"#8b5cf618", color:"#8b5cf6" }}>📍 {s}</span>
+                  ))}
+                </div>
+                <div style={{ fontSize:12, color:MUTED, lineHeight:1.5 }}>{n.text}</div>
+                <div style={{ fontSize:10, color:`${MUTED}80`, marginTop:2 }}>
+                  {n.date ? new Date(n.date).toLocaleDateString("es-VE", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : ""}
+                </div>
+              </div>
+            ))}
+          </Card>
+        )}
+      </>)}
+
+      {/* ── MOTIVES VIEW ── */}
+      {viewMode === "motives" && (<>
+        {kpis.topMotives.length > 0 ? (
+          <Card accent="#E5243B">
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:12, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+              Motivos de protesta — Frecuencia en tweets de @OVCSocial
+            </div>
+            {kpis.topMotives.map((m, i) => {
+              const color = motiveColors[m.motive] || MUTED;
+              return (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+                  <div style={{ width:8, height:8, borderRadius:"50%", background:color, flexShrink:0 }} />
+                  <div style={{ width:130, fontSize:13, fontFamily:font, color:TEXT, flexShrink:0 }}>{m.motive}</div>
+                  <div style={{ flex:1, height:20, background:`${BORDER}40`, borderRadius:3, overflow:"hidden" }}>
+                    <div style={{ width:`${(m.count/maxMotive)*100}%`, height:"100%", background:`linear-gradient(90deg, ${color}cc, ${color})`, borderRadius:3, transition:"width 0.5s ease", display:"flex", alignItems:"center", justifyContent:"flex-end", paddingRight:6 }}>
+                      {m.count > 1 && <span style={{ fontSize:10, color:"#fff", fontWeight:700, fontFamily:font }}>{m.count}</span>}
+                    </div>
+                  </div>
+                  <div style={{ width:24, fontSize:12, fontFamily:font, color, fontWeight:700, textAlign:"right" }}>{m.count}</div>
+                </div>
+              );
+            })}
+          </Card>
+        ) : (
+          <Card><div style={{ textAlign:"center", padding:30, color:MUTED, fontSize:13 }}>No se detectaron motivos específicos en los tweets recientes.</div></Card>
+        )}
+
+        {/* Daily activity */}
+        {kpis.daily.length > 0 && (
+          <Card accent="#22c55e" style={{ marginTop:12 }}>
+            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+              Actividad diaria — Tweets sobre protestas
+            </div>
+            <div style={{ display:"flex", alignItems:"flex-end", gap:4, height:80, paddingBottom:20, position:"relative" }}>
+              {kpis.daily.map((d, i) => {
+                const maxD = Math.max(...kpis.daily.map(x => x.count));
+                const pct = maxD > 0 ? (d.count / maxD) * 100 : 0;
+                return (
+                  <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", height:"100%" }}>
+                    <div style={{ fontSize:9, fontFamily:font, color:"#22c55e", marginBottom:2 }}>{d.count}</div>
+                    <div style={{ width:"100%", height:`${Math.max(pct, 4)}%`, background:"linear-gradient(180deg, #22c55e, #16a34a)", borderRadius:"2px 2px 0 0" }} />
+                    <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginTop:4, transform:"rotate(-45deg)", transformOrigin:"top center", whiteSpace:"nowrap" }}>
+                      {new Date(d.date).toLocaleDateString("es-VE", { day:"numeric", month:"short" })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        )}
+      </>)}
+
+      {/* ── TWEETS VIEW ── */}
+      {viewMode === "tweets" && (
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {tweets.filter(t => t.isProtest).length === 0 ? (
+            <Card><div style={{ textAlign:"center", padding:30, color:MUTED, fontSize:13 }}>No se encontraron tweets sobre protestas en el feed actual.</div></Card>
+          ) : tweets.filter(t => t.isProtest).slice(0, 20).map((t, i) => (
+            <Card key={i} accent={t.numbers.length > 0 ? "#f59e0b" : "#E5243B"}>
+              <div style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
+                <div style={{ fontSize:18, flexShrink:0 }}>{t.numbers.length > 0 ? "📊" : "✊"}</div>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:13, color:TEXT, lineHeight:1.6, marginBottom:6, wordBreak:"break-word" }}>
+                    {t.text.length > 280 ? t.text.substring(0, 280) + "..." : t.text}
+                  </div>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:4, marginBottom:6 }}>
+                    {t.motives.map((m, j) => (
+                      <span key={j} style={{ fontSize:10, fontFamily:font, padding:"1px 6px", borderRadius:10, background:`${motiveColors[m] || MUTED}15`, color:motiveColors[m] || MUTED }}>{m}</span>
+                    ))}
+                    {t.states.map((s, j) => (
+                      <span key={`s${j}`} style={{ fontSize:10, fontFamily:font, padding:"1px 6px", borderRadius:10, background:"#8b5cf615", color:"#8b5cf6" }}>📍 {s}</span>
+                    ))}
+                    {t.numbers.map((n, j) => (
+                      <span key={`n${j}`} style={{ fontSize:10, fontFamily:font, padding:"1px 6px", borderRadius:10, background:"#f59e0b15", color:"#f59e0b", fontWeight:700 }}>#{n.toLocaleString("es")}</span>
+                    ))}
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, fontSize:10, color:`${MUTED}80` }}>
+                    <span>{t.date ? new Date(t.date).toLocaleDateString("es-VE", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : ""}</span>
+                    {t.link && <a href={t.link} target="_blank" rel="noopener noreferrer" style={{ color:"#1d9bf0", textDecoration:"none", fontSize:10, fontFamily:font }}>Ver en 𝕏 ↗</a>}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+
+          {tweets.filter(t => !t.isProtest).length > 0 && (
+            <div style={{ marginTop:12 }}>
+              <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8, paddingBottom:4, borderBottom:`1px solid ${BORDER}30` }}>
+                Otros tweets recientes de @OVCSocial
+              </div>
+              {tweets.filter(t => !t.isProtest).slice(0, 10).map((t, i) => (
+                <div key={i} style={{ padding:"8px 0", borderBottom:`1px solid ${BORDER}20`, fontSize:12, color:MUTED, lineHeight:1.5 }}>
+                  {t.text.length > 200 ? t.text.substring(0, 200) + "..." : t.text}
+                  <span style={{ marginLeft:8, fontSize:10, color:`${MUTED}60` }}>
+                    {t.date ? new Date(t.date).toLocaleDateString("es-VE", { day:"numeric", month:"short" }) : ""}
+                  </span>
+                  {t.link && <a href={t.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft:6, color:"#1d9bf0", textDecoration:"none", fontSize:10, fontFamily:font }}>↗</a>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Footer */}
+      <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}60`, marginTop:12, textAlign:"center", lineHeight:1.5 }}>
+        Datos extraídos de @OVCSocial vía Nitter RSS · KPIs por análisis de texto (regex) · Verificar con informes oficiales OVCS
+      </div>
     </div>
   );
 }
