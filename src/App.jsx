@@ -6357,7 +6357,7 @@ function TabMacro() {
       // Try Supabase (accumulated daily history)
       if (IS_DEPLOYED) {
         try {
-          const res = await fetch("/api/rates?limit=365", { signal: AbortSignal.timeout(6000) });
+          const res = await fetch("/api/dolar?type=supabase&limit=365", { signal: AbortSignal.timeout(6000) });
           if (res.ok) {
             const data = await res.json();
             if (data.rates?.length > 0) {
