@@ -438,6 +438,37 @@ const CONF_MESES = [
   {m:"Dic",t:123,desca:74,dcp:49,rep:1,hecho:"Reclamos bajos aguinaldos."},
 ];
 
+// ── Weekly Conflict Data 2026 (from SITREP) ──
+const CONF_SEMANAL = [
+  { week:"S1", label:"3–15 ene", protestas:28, estados:8, reprimidas:3,
+    motivos:["Rechazo operativo 3 ene","Servicios básicos","Presos políticos"],
+    hecho:"Post-operativo. Protestas reactivas. Colectivos activos." },
+  { week:"S2", label:"16–22 ene", protestas:22, estados:6, reprimidas:1,
+    motivos:["Servicios básicos","Derechos laborales","Electricidad"],
+    hecho:"Baja intensidad. Estabilización post-shock." },
+  { week:"S3", label:"23–29 ene", protestas:18, estados:7, reprimidas:0,
+    motivos:["Derechos laborales","Vivienda","Agua potable"],
+    hecho:"Mínimo del ciclo. Expectativa por Ley Hidrocarburos." },
+  { week:"S4", label:"30e–5f", protestas:25, estados:9, reprimidas:2,
+    motivos:["Salarios","Servicios básicos","Participación política"],
+    hecho:"FANB reafirma lealtad. Amnistía 1ª discusión diferida." },
+  { week:"S5", label:"6–13 feb", protestas:30, estados:11, reprimidas:1,
+    motivos:["Salarios","Electricidad","Presos políticos","Justicia"],
+    hecho:"Visita Chris Wright. 14.8h sin suministro eléctrico." },
+  { week:"S6", label:"13–20 feb", protestas:35, estados:12, reprimidas:2,
+    motivos:["Salarios","Jubilaciones","Electricidad","Servicios"],
+    hecho:"Amnistía promulgada. Tensiones FANB: Padrino 12 años." },
+  { week:"S7", label:"20–27 feb", protestas:32, estados:10, reprimidas:1,
+    motivos:["Salarios","Servicios básicos","Brecha cambiaria"],
+    hecho:"Trump 'nuevo amigo'. Brecha cambiaria 52.6%." },
+  { week:"S8", label:"28f–5m", protestas:38, estados:14, reprimidas:1,
+    motivos:["Salarios","Jubilaciones","Pensiones","Educación"],
+    hecho:"Relaciones EE.UU.-VEN restablecidas. Presión salarial crece." },
+  { week:"S9", label:"6–13 mar", protestas:65, estados:23, reprimidas:0,
+    motivos:["Aumento salarial","Jubilaciones","Pensiones","Laborales"],
+    hecho:"RÉCORD: 39 movilizaciones 12/03 en 23 estados. Inflación 617%." },
+];
+
 const CONF_DERECHOS = [
   {d:"Participación política",cat:"DCP",p:648,pct:29.2},{d:"Derechos laborales",cat:"DESCA",p:573,pct:25.8},
   {d:"Vivienda/hábitat",cat:"DESCA",p:556,pct:25.1},{d:"Justicia",cat:"DCP",p:504,pct:22.7},
@@ -2513,7 +2544,7 @@ function TabDashboard({ week, liveData = {} }) {
         })}
       </div>
 
-      {/* ── ROW 1b: Índice de Inestabilidad Compuesto (15 factores) ── */}
+      {/* ── ROW 1b: Índice de Inestabilidad Compuesto (17 factores) ── */}
       {(() => {
         // ── 13-input Composite Instability Index (0-100) ──
         const e1 = wk.probs.find(p=>p.sc===1)?.v || 0;
@@ -2542,11 +2573,18 @@ function TabDashboard({ week, liveData = {} }) {
         const brentPrice = liveData?.oil?.brent || 75;
         const brentFactor = brentPrice < 55 ? 100 : brentPrice < 65 ? 70 : brentPrice < 75 ? 30 : brentPrice < 85 ? 10 : 0;
 
-        // OVCS: protests intensity (last month vs max)
-        const lastMonth = CONF_MESES[CONF_MESES.length - 1];
-        const maxProtests = Math.max(...CONF_MESES.map(m=>m.t), 1);
-        const protestPct = lastMonth ? (lastMonth.t / maxProtests) * 100 : 50;
-        const repressionPct = lastMonth?.rep > 0 ? Math.min(lastMonth.rep * 25, 100) : 0;
+        // Protests: weekly SITREP data (CONF_SEMANAL) — more current than monthly OVCS
+        const lastWeekConf = CONF_SEMANAL[CONF_SEMANAL.length - 1];
+        const maxWeekProtests = Math.max(...CONF_SEMANAL.map(w => w.protestas), 1);
+        const protestPct = lastWeekConf ? (lastWeekConf.protestas / maxWeekProtests) * 100 : 50;
+        // Territorial spread: 23/24 estados = almost national = high instability signal
+        const spreadPct = lastWeekConf ? (lastWeekConf.estados / 24) * 100 : 30;
+        const repressionPct = lastWeekConf?.reprimidas > 0 ? Math.min(lastWeekConf.reprimidas * 25, 100) : 0;
+        // Monthly trend: sum last 4 weeks of CONF_SEMANAL, compare to 2025 monthly average
+        const last4Weeks = CONF_SEMANAL.slice(-4);
+        const monthlyTotal = last4Weeks.reduce((s, w) => s + w.protestas, 0);
+        const avg2025Monthly = CONF_MESES.reduce((s, m) => s + m.t, 0) / CONF_MESES.length; // ~185
+        const monthlyTrendPct = avg2025Monthly > 0 ? Math.min((monthlyTotal / avg2025Monthly) * 100, 150) : 50; // >100 = escalating vs 2025
 
         // Amnesty: verification gap + political prisoners
         const amnLatest = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
@@ -2563,19 +2601,21 @@ function TabDashboard({ week, liveData = {} }) {
         const icgRaw = liveData?.cohesion?.index ?? null;
         const icgInverted = icgRaw != null ? Math.max(0, 100 - icgRaw) : null; // 100-ICG: 0=full cohesion, 100=no cohesion
 
-        // ── FORMULA (15 inputs, weights sum to ~100 with stabilizers) ──
-        const raw = (redCount/totalInds)*11            // Ind. rojos: 11%
-          + (e2/100)*9                                  // E2 Colapso: 9%
+        // ── FORMULA (17 inputs, weights sum to ~100 with stabilizers) ──
+        const raw = (redCount/totalInds)*10            // Ind. rojos: 10%
+          + (e2/100)*8                                  // E2 Colapso: 8%
           + (e4/100)*7                                  // E4 Resistencia: 7%
-          + (Math.min(brechaLive,100)/100)*11           // Brecha cambiaria: 11% (LIVE)
-          + (tensRed/totalTens)*7                        // Tensiones rojas: 7%
-          + (sigActive/sigTotal)*7                       // Señales E4+E2: 7%
-          + (brentFactor/100)*5                          // Brent presión: 5% (LIVE)
+          + (Math.min(brechaLive,100)/100)*10           // Brecha cambiaria: 10% (LIVE)
+          + (tensRed/totalTens)*6                        // Tensiones rojas: 6%
+          + (sigActive/sigTotal)*6                       // Señales E4+E2: 6%
+          + (brentFactor/100)*4                          // Brent presión: 4% (LIVE)
           + (bilPct/100)*5                               // Bilateral Threat: 5% (LIVE)
           + ((icgInverted != null ? icgInverted : 50)/100)*5  // Cohesión GOB (inv): 5% (LIVE)
-          + (protestPct/100)*5                           // Protestas OVCS: 5%
-          + (repressionPct/100)*4                        // Represión OVCS: 4%
-          + (amnBrechaPct/100)*5                         // Brecha amnistía: 5%
+          + (protestPct/100)*5                           // Protestas semanal: 5% (SITREP)
+          + (spreadPct/100)*4                            // Cobertura territorial: 4% (SITREP)
+          + (Math.min(monthlyTrendPct,150)/150)*3        // Tendencia mensual: 3% (vs 2025)
+          + (repressionPct/100)*3                        // Represión: 3%
+          + (amnBrechaPct/100)*4                         // Brecha amnistía: 4%
           + (presosPct/100)*3                            // Presos políticos: 3%
           - (e1/100)*6                                   // E1 Transición: -6% (estabilizador)
           - (e3/100)*3;                                  // E3 Continuidad: -3% (estabilizador)
@@ -2587,11 +2627,11 @@ function TabDashboard({ week, liveData = {} }) {
           const pe1=prevWk.probs.find(p=>p.sc===1)?.v||0, pe2=prevWk.probs.find(p=>p.sc===2)?.v||0;
           const pe3=prevWk.probs.find(p=>p.sc===3)?.v||0, pe4=prevWk.probs.find(p=>p.sc===4)?.v||0;
           const pTR=prevWk.tensiones.filter(t=>t.l==="red").length, pTT=prevWk.tensiones.length||1;
-          const pRaw = (redCount/totalInds)*11 + (pe2/100)*9 + (pe4/100)*7
-            + (Math.min(brechaLive,100)/100)*11 + (pTR/pTT)*7 + (sigActive/sigTotal)*7
-            + (brentFactor/100)*5 + (bilPct/100)*5 + ((icgInverted != null ? icgInverted : 50)/100)*5
-            + (protestPct/100)*5 + (repressionPct/100)*4
-            + (amnBrechaPct/100)*5 + (presosPct/100)*3 - (pe1/100)*6 - (pe3/100)*3;
+          const pRaw = (redCount/totalInds)*10 + (pe2/100)*8 + (pe4/100)*7
+            + (Math.min(brechaLive,100)/100)*10 + (pTR/pTT)*6 + (sigActive/sigTotal)*6
+            + (brentFactor/100)*4 + (bilPct/100)*5 + ((icgInverted != null ? icgInverted : 50)/100)*5
+            + (protestPct/100)*5 + (spreadPct/100)*4 + (Math.min(monthlyTrendPct,150)/150)*3 + (repressionPct/100)*3
+            + (amnBrechaPct/100)*4 + (presosPct/100)*3 - (pe1/100)*6 - (pe3/100)*3;
           prevIndex = Math.max(0, Math.min(100, Math.round(pRaw)));
         }
         const delta = prevIndex !== null ? index - prevIndex : null;
@@ -2627,29 +2667,41 @@ function TabDashboard({ week, liveData = {} }) {
           const wBrecha = (wi === WEEKS.length - 1) ? brechaLive : Math.max(20, 55 - we1 * 0.5 + we2 * 0.3);
           const wBrent = (wi === WEEKS.length - 1) ? brentFactor : 50;
           const wBil = (wi === WEEKS.length - 1) ? bilPct : Math.min(we2 * 1.5 + we4 * 0.5, 100);
-          const wIcg = (wi === WEEKS.length - 1 && icgInverted != null) ? icgInverted : 50; // approximate for historical
-          const wr = (wRedProxy/wTotalSem)*11 + (we2/100)*9 + (we4/100)*7
-            + (Math.min(wBrecha,100)/100)*11 + (wtr/wtt)*7 + (sigActive/sigTotal)*7
-            + (wBrent/100)*5 + (wBil/100)*5 + (wIcg/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
-            + (wAmnBrecha/100)*5 + (wPresos/100)*3 - (we1/100)*6 - (we3/100)*3;
+          const wIcg = (wi === WEEKS.length - 1 && icgInverted != null) ? icgInverted : 50;
+          // Per-week protest data from CONF_SEMANAL
+          const wConf = CONF_SEMANAL[Math.min(wi, CONF_SEMANAL.length - 1)];
+          const wProtestPct = wConf ? (wConf.protestas / Math.max(...CONF_SEMANAL.map(c=>c.protestas), 1)) * 100 : 50;
+          const wSpreadPct = wConf ? (wConf.estados / 24) * 100 : 30;
+          const wReprPct = wConf?.reprimidas > 0 ? Math.min(wConf.reprimidas * 25, 100) : 0;
+          // Monthly trend for this week's position — sum 4 weeks ending at wi
+          const wMonthSlice = CONF_SEMANAL.slice(Math.max(0, wi - 3), wi + 1);
+          const wMonthTotal = wMonthSlice.reduce((s, c) => s + c.protestas, 0);
+          const wMonthlyTrend = avg2025Monthly > 0 ? Math.min((wMonthTotal / avg2025Monthly) * 100, 150) : 50;
+          const wr = (wRedProxy/wTotalSem)*10 + (we2/100)*8 + (we4/100)*7
+            + (Math.min(wBrecha,100)/100)*10 + (wtr/wtt)*6 + (sigActive/sigTotal)*6
+            + (wBrent/100)*4 + (wBil/100)*5 + (wIcg/100)*5 + (wProtestPct/100)*5 + (wSpreadPct/100)*4
+            + (Math.min(wMonthlyTrend,150)/150)*3 + (wReprPct/100)*3
+            + (wAmnBrecha/100)*4 + (wPresos/100)*3 - (we1/100)*6 - (we3/100)*3;
           return Math.max(0, Math.min(100, Math.round(wr)));
         });
 
         // Breakdown items for display
         const breakdown = [
-          { label:"Ind. rojos", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100), w:"11%" },
-          { label:"Brecha camb.", value:`${brechaLive.toFixed(0)}%`, pct:Math.min(brechaLive,100), w:"11%", live:true },
-          { label:"E2 Colapso", value:`${e2}%`, pct:e2, w:"9%" },
-          { label:"Señales E4/E2", value:`${sigActive}/${sigTotal}`, pct:Math.round(sigActive/sigTotal*100), w:"7%" },
+          { label:"Ind. rojos", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100), w:"10%" },
+          { label:"Brecha camb.", value:`${brechaLive.toFixed(0)}%`, pct:Math.min(brechaLive,100), w:"10%", live:true },
+          { label:"E2 Colapso", value:`${e2}%`, pct:e2, w:"8%" },
           { label:"E4 Resistencia", value:`${e4}%`, pct:e4, w:"7%" },
-          { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100), w:"7%" },
+          { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100), w:"6%" },
+          { label:"Señales E4/E2", value:`${sigActive}/${sigTotal}`, pct:Math.round(sigActive/sigTotal*100), w:"6%" },
+          { label:"Protestas sem.", value:`${lastWeekConf?.protestas||"—"}`, pct:Math.round(protestPct), w:"5%" },
           { label:"Bilateral 🇺🇸🇻🇪", value:`${bilV.toFixed(1)}σ`, pct:Math.round(bilPct), w:"5%", live:true },
-          { label:"Brent", value:`$${brentPrice}`, pct:brentFactor, w:"5%", live:true },
-          { label:"Protestas", value:`${lastMonth?.t||"—"}`, pct:Math.round(protestPct), w:"5%" },
-          { label:"Brecha amnist.", value:`${amnBrechaPct.toFixed(0)}%`, pct:Math.round(amnBrechaPct), w:"5%" },
-          { label:"Represión", value:`${lastMonth?.rep||0}`, pct:Math.round(repressionPct), w:"4%" },
-          { label:"Presos pol.", value:`${amnLatest?.fp?.detenidos||"—"}`, pct:Math.round(presosPct), w:"3%" },
           { label:"Cohesión GOB 🏛", value:icgRaw != null ? `${icgRaw}` : "—", pct:icgInverted != null ? Math.round(icgInverted) : 50, w:"5%", live:true },
+          { label:"Cobertura terr.", value:`${lastWeekConf?.estados||"—"}/24`, pct:Math.round(spreadPct), w:"4%" },
+          { label:"Brent", value:`$${brentPrice}`, pct:brentFactor, w:"4%", live:true },
+          { label:"Brecha amnist.", value:`${amnBrechaPct.toFixed(0)}%`, pct:Math.round(amnBrechaPct), w:"4%" },
+          { label:"Tend. mensual", value:`${monthlyTotal} (4sem)`, pct:Math.round(Math.min(monthlyTrendPct,150)/1.5), w:"3%" },
+          { label:"Represión", value:`${lastWeekConf?.reprimidas||0}`, pct:Math.round(repressionPct), w:"3%" },
+          { label:"Presos pol.", value:`${amnLatest?.fp?.detenidos||"—"}`, pct:Math.round(presosPct), w:"3%" },
           { label:"E1 Transición", value:`-${e1}%`, pct:0, w:"-6%", isNeg:true },
           { label:"E3 Continuidad", value:`-${e3}%`, pct:0, w:"-3%", isNeg:true },
         ];
@@ -4997,7 +5049,7 @@ function EstadosMap() {
 
 function TabConflictividad() {
   const mob = useIsMobile();
-  const [seccion, setSeccion] = useState("resumen");
+  const [seccion, setSeccion] = useState("semanal26");
 
   const maxMes = Math.max(...CONF_MESES.map(m=>m.t));
   const maxEst = Math.max(...CONF_ESTADOS.map(e=>e.p));
@@ -5014,7 +5066,7 @@ function TabConflictividad() {
           <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Fuente: OVCS · Informe Anual 2025 · 2.219 protestas documentadas</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
-          {[{id:"resumen",label:"Resumen"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
+          {[{id:"semanal26",label:"Semanal 2026"},{id:"resumen",label:"Resumen 2025"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:12, fontFamily:font, padding:"6px 12px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
@@ -5023,6 +5075,146 @@ function TabConflictividad() {
           ))}
         </div>
       </div>
+
+      {/* ── SEMANAL 2026 ── */}
+      {seccion === "semanal26" && (() => {
+        const latest = CONF_SEMANAL[CONF_SEMANAL.length - 1];
+        const prev = CONF_SEMANAL.length > 1 ? CONF_SEMANAL[CONF_SEMANAL.length - 2] : null;
+        const maxP = Math.max(...CONF_SEMANAL.map(w => w.protestas), 1);
+        const maxE = Math.max(...CONF_SEMANAL.map(w => w.estados), 1);
+        const totalAcum = CONF_SEMANAL.reduce((s, w) => s + w.protestas, 0);
+        const deltaP = prev ? latest.protestas - prev.protestas : null;
+        const deltaPct = prev && prev.protestas > 0 ? Math.round(((latest.protestas - prev.protestas) / prev.protestas) * 100) : null;
+
+        return (<>
+          {/* KPI row */}
+          <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(5,1fr)", gap:10, marginBottom:16 }}>
+            <Card accent={latest.protestas > 50 ? "#dc2626" : latest.protestas > 30 ? "#ca8a04" : "#16a34a"}>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Protestas semana</div>
+              <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
+                <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:latest.protestas > 50 ? "#dc2626" : latest.protestas > 30 ? "#ca8a04" : TEXT }}>{latest.protestas}</span>
+                {deltaP != null && deltaP !== 0 && (
+                  <span style={{ fontSize:12, fontFamily:font, color:deltaP > 0 ? "#dc2626" : "#16a34a", fontWeight:600 }}>
+                    {deltaP > 0 ? "▲" : "▼"}{Math.abs(deltaP)} ({deltaPct > 0 ? "+" : ""}{deltaPct}%)
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize:10, color:MUTED }}>{latest.label}</div>
+            </Card>
+            <Card>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Estados</div>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:latest.estados > 18 ? "#dc2626" : TEXT }}>{latest.estados}</span>
+              <div style={{ fontSize:10, color:MUTED }}>de 24 entidades</div>
+            </Card>
+            <Card>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Reprimidas</div>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:latest.reprimidas > 0 ? "#dc2626" : "#16a34a" }}>{latest.reprimidas}</span>
+              <div style={{ fontSize:10, color:MUTED }}>esta semana</div>
+            </Card>
+            <Card>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Acumulado 2026</div>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:ACCENT }}>{totalAcum}</span>
+              <div style={{ fontSize:10, color:MUTED }}>S1–{latest.week}</div>
+            </Card>
+            <Card>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Prom. semanal</div>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:TEXT }}>{Math.round(totalAcum / CONF_SEMANAL.length)}</span>
+              <div style={{ fontSize:10, color:MUTED }}>protestas/semana</div>
+            </Card>
+          </div>
+
+          {/* Hecho clave de la semana */}
+          <div style={{ background:`linear-gradient(135deg, #dc262608, transparent)`, border:"1px solid #dc262620", padding:"10px 14px", marginBottom:16 }}>
+            <div style={{ fontSize:10, fontFamily:font, color:"#dc2626", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Hecho clave · {latest.label}</div>
+            <div style={{ fontSize:13, color:TEXT, lineHeight:1.6 }}>{latest.hecho}</div>
+          </div>
+
+          {/* Motivos de la semana */}
+          <Card style={{ marginBottom:16 }}>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>Motivos principales · {latest.label}</div>
+            <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+              {latest.motivos.map((m, i) => (
+                <span key={i} style={{ fontSize:12, padding:"4px 12px", background:`${ACCENT}10`, color:ACCENT, border:`1px solid ${ACCENT}25`, borderRadius:20, fontFamily:font }}>{m}</span>
+              ))}
+            </div>
+          </Card>
+
+          {/* Evolución semanal — gráfica de barras */}
+          <Card style={{ marginBottom:16 }}>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:12 }}>Evolución semanal · Protestas S1 → {latest.week}</div>
+            <div style={{ display:"flex", gap:3, alignItems:"flex-end", height:140 }}>
+              {CONF_SEMANAL.map((w, i) => {
+                const h = Math.max(4, (w.protestas / maxP) * 120);
+                const isLast = i === CONF_SEMANAL.length - 1;
+                const barColor = w.protestas > 50 ? "#dc2626" : w.protestas > 30 ? "#ca8a04" : ACCENT;
+                return (
+                  <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
+                    <span style={{ fontSize:9, fontFamily:font, fontWeight:isLast ? 700 : 400, color:isLast ? barColor : MUTED }}>{w.protestas}</span>
+                    <div style={{ width:"100%", height:h, background:barColor, opacity:isLast ? 1 : 0.5, borderRadius:"3px 3px 0 0", transition:"height 0.3s", position:"relative" }}>
+                      {isLast && <div style={{ position:"absolute", top:-2, left:"50%", transform:"translateX(-50%)", width:6, height:6, borderRadius:"50%", background:barColor, boxShadow:`0 0 6px ${barColor}` }} />}
+                    </div>
+                    <span style={{ fontSize:8, fontFamily:font, color:isLast ? barColor : MUTED, fontWeight:isLast ? 700 : 400 }}>{w.week}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* Estados por semana — sparkline horizontal */}
+          <Card style={{ marginBottom:16 }}>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:12 }}>Cobertura territorial · Estados con protestas</div>
+            <div style={{ display:"flex", gap:3, alignItems:"flex-end", height:80 }}>
+              {CONF_SEMANAL.map((w, i) => {
+                const h = Math.max(4, (w.estados / 24) * 70);
+                const isLast = i === CONF_SEMANAL.length - 1;
+                const barColor = w.estados > 18 ? "#dc2626" : w.estados > 12 ? "#ca8a04" : "#0e7490";
+                return (
+                  <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
+                    <span style={{ fontSize:9, fontFamily:font, fontWeight:isLast ? 700 : 400, color:isLast ? barColor : MUTED }}>{w.estados}</span>
+                    <div style={{ width:"100%", height:h, background:barColor, opacity:isLast ? 1 : 0.5, borderRadius:"3px 3px 0 0" }} />
+                    <span style={{ fontSize:8, fontFamily:font, color:isLast ? barColor : MUTED, fontWeight:isLast ? 700 : 400 }}>{w.week}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display:"flex", justifyContent:"space-between", marginTop:8, fontSize:10, fontFamily:font, color:MUTED }}>
+              <span>Cobertura: {latest.estados}/24 estados ({Math.round(latest.estados/24*100)}%)</span>
+              <span>{latest.estados > 18 ? "⚠ Alcance nacional" : latest.estados > 12 ? "Alcance multi-regional" : "Alcance regional"}</span>
+            </div>
+          </Card>
+
+          {/* Table: all weeks */}
+          <Card>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>Detalle semanal · Ciclo 2026</div>
+            <div style={{ overflowX:"auto" }}>
+              <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12, fontFamily:font }}>
+                <thead>
+                  <tr style={{ borderBottom:`2px solid ${BORDER}` }}>
+                    {["Semana","Período","Protestas","Estados","Repr.","Hecho clave"].map(h => (
+                      <th key={h} style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontSize:10, letterSpacing:"0.08em", textTransform:"uppercase" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {CONF_SEMANAL.map((w, i) => {
+                    const isLast = i === CONF_SEMANAL.length - 1;
+                    return (
+                      <tr key={i} style={{ borderBottom:`1px solid ${BORDER}30`, background:isLast ? `${ACCENT}06` : "transparent" }}>
+                        <td style={{ padding:"6px 8px", fontWeight:isLast ? 700 : 400, color:isLast ? ACCENT : TEXT }}>{w.week}</td>
+                        <td style={{ padding:"6px 8px", color:MUTED }}>{w.label}</td>
+                        <td style={{ padding:"6px 8px", fontWeight:600, color:w.protestas > 50 ? "#dc2626" : w.protestas > 30 ? "#ca8a04" : TEXT }}>{w.protestas}</td>
+                        <td style={{ padding:"6px 8px", color:w.estados > 18 ? "#dc2626" : TEXT }}>{w.estados}/24</td>
+                        <td style={{ padding:"6px 8px", color:w.reprimidas > 0 ? "#dc2626" : "#16a34a" }}>{w.reprimidas}</td>
+                        <td style={{ padding:"6px 8px", color:MUTED, fontSize:11, maxWidth:250, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{w.hecho}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </>);
+      })()}
 
       {/* ── RESUMEN ── */}
       {seccion === "resumen" && (<>
