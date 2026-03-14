@@ -60,176 +60,185 @@ const WEEKS = [
     tensiones:[{l:"green",t:"<b>Energía:</b> Exportaciones 788 kbd · récord 7 años Puerto José · SENIAT +78%."},{l:"green",t:"<b>Diplomacia:</b> Relaciones EE.UU.–VEN restablecidas. Trump: \"escenario perfecto\"."},{l:"green",t:"<b>Amnistía:</b> 9.060 solicitudes · 5.628 libertades plenas · 31 militares."},{l:"yellow",t:"<b>E1 a 2pp de E3:</b> MCM retorno inminente · 66% exige elecciones · H.R. 7674."},{l:"yellow",t:"<b>Brecha social:</b> Salario USD 256 vs canasta USD 550 · >47 meses sin ajuste."},{l:"red",t:"<b>Electoral:</b> Sin fecha. 568 presos. >11.000 cautelares vigentes."}],
     lectura:"E3 se mantiene como escenario dominante al 40%, pero la distancia con E1 (38%) se reduce a apenas 2 puntos porcentuales — la más estrecha desde el inicio del período de análisis. Tres anclas simultáneas sostienen E3: la expansión energética récord (Venezuela duplica exportaciones a 788.000 bpd, acercándose al nivel más alto en el Puerto de José en siete años), el PIB creció 7,07% en Q4 2025 y la recaudación SENIAT se incrementó un 78% en febrero. El marco regulatorio OFAC consolidado (GL49, GL50/50A, GL129A, Monómeros renovada hasta 2028) crea seguridad jurídica para Exxon, Shell, Gold Reserve y Ecopetrol. Washington sigue priorizando la recuperación energética sobre la agenda electoral.\n\nSin embargo, E1 sube a 38% (+3pp) impulsado por el retorno inminente de MCM con agenda de tres prioridades, su liderazgo consolidado (106,84/137 puntos en el Índice MassBehaviorResearch), el respaldo de Ramos Allup, y la exigencia electoral del 66% de la población. El proyecto H.R. 7674 en el Congreso EE.UU. demanda una estrategia de transición en 180 días. La apertura minera (Gold Reserve, Ecopetrol) amplía el marco de reformas. E2 baja a 12% (-3pp) por la solidez del repunte energético y el PIB confirmado. E4 se mantiene latente en 10%. La brecha entre el pragmatismo transaccional de EE.UU. y las expectativas electorales internas es la tensión estructural del período.",
     trendSc:1, trendDrivers:["MCM lidera con 106,84/137 pts; retorno inminente con agenda estructurada","66% exige elecciones; H.R. 7674 en Congreso EE.UU.","Apertura minera + Gold Reserve + Ecopetrol: señal de reformas ampliadas"] },
+  // S9: 06–13 marzo 2026
+  { label:"6–13m", short:"S9", probs:[{sc:1,v:33,t:"down"},{sc:2,v:10,t:"down"},{sc:3,v:42,t:"up"},{sc:4,v:15,t:"up"}], xy:{x:0.38,y:0.46},
+    sem:{g:9,y:5,r:5},
+    kpis:{ energia:{exportaciones:"1.021 kbd feb. (+10,5%)",ingresos:"GL-51 oro · USD 100M 1er cargamento",licencias:"GL49+GL50/50A+GL51",cambio:"Merey USD 52,31/bbl (+9,10)"}, economico:{inflacion:"617% anualizada (BCV)",ingresos_pob:"USD 300 vs canasta 425–622",electricidad:"Sin datos nuevos",pib:"Proy. dos dígitos 2026"}, opinion:{direccion:"Reconocimiento EE.UU. a Rodríguez",elecciones:"Washington señala 2027",mcm:"Trump aconseja no regresar",eeuu:"\"Nuevo socio energético\""} },
+    tensiones:[{l:"green",t:"<b>Energía:</b> Producción supera 1M bpd por primera vez. Chevron, Shell, Repsol amplían inversiones >EUR 1.000M."},{l:"green",t:"<b>Diplomacia:</b> Trump reconoce formalmente a Rodríguez como «único interlocutor legítimo». GL-51 oro operativa."},{l:"green",t:"<b>Minería:</b> Primer cargamento oro USD 100M a EE.UU. Decreto 5.266 absorción Minerven. Ley de Minas primera discusión."},{l:"yellow",t:"<b>Conflictividad laboral:</b> 39 movilizaciones en 23 estados el 12/03. Mayor jornada del año. Superaron piquetes PNB."},{l:"yellow",t:"<b>Inflación:</b> BCV publica 51,9% acumulado ene-feb (617% anualizada). 70% población <USD 300 vs canasta USD 425-622."},{l:"red",t:"<b>DDHH:</b> 508 presos políticos (Foro Penal). ONU: 87 nuevas detenciones post-3 enero, 14 periodistas."}],
+    lectura:"E3 se consolida como escenario dominante al 42% (+2pp), impulsado por el reconocimiento formal de EE.UU. al gobierno de Rodríguez como «único interlocutor legítimo» — el hecho de mayor impacto estructural de la semana y de todo el período post-3 de enero. La producción petrolera superó por primera vez el millón de barriles diarios (1.021.000 bpd en febrero, +10,5%), la GL-51 habilitó el oro venezolano, y el primer cargamento aurífero de USD 100M fue entregado a EE.UU. Chevron, Shell y Repsol consolidan inversiones sin precedentes.\n\nE1 retrocede a 33% (-5pp): Washington priorizó estabilidad sobre transición acelerada. Trump aconsejó a MCM no regresar y señaló elecciones hacia 2027, reduciendo su margen de acción. E4 sube a 15% (+5pp) por la escalada laboral del 12 de marzo — 39 movilizaciones en 23 estados, la mayor jornada del año — y las tensiones en designaciones del Poder Ciudadano. E2 baja a 10% (-2pp), contenido por la solidez del acuerdo bilateral.\n\nEl equilibrio es funcional pero frágil: depende de que la redistribución del boom energético comience a materializarse antes de que la conflictividad laboral supere el umbral político. La inflación anualizada del 617% (BCV oficial) confirma que la estabilización macroeconómica no se ha consolidado.",
+    trendSc:3, trendDrivers:["Reconocimiento formal EE.UU. a Rodríguez: «único interlocutor legítimo»","Producción supera 1M bpd + GL-51 oro + USD 100M primer cargamento","39 movilizaciones laborales en 23 estados: mayor jornada del año"] },
 ];
 
 const KPIS_LATEST = {
   energia: [
-    { k:"Exportaciones feb.", v:"788 kbd", c:"#22c55e" },
-    { k:"Crudo +10%", v:"Proy. USD 100/bbl", c:"#22c55e" },
-    { k:"Licencias OFAC", v:"GL49+GL50/50A+129A", c:"#38bdf8" },
-    { k:"Recaudación SENIAT", v:"+78% vs enero", c:"#22c55e" },
+    { k:"Producción feb.", v:"1.021 kbd", c:"#22c55e" },
+    { k:"Crudo Merey", v:"USD 52,31/bbl", c:"#22c55e" },
+    { k:"Licencias OFAC", v:"GL49+GL50/50A+GL51", c:"#38bdf8" },
+    { k:"Oro a EE.UU.", v:"USD 100M (1er carg.)", c:"#22c55e" },
   ],
   politico: [
-    { k:"Amnistía", v:"9.060 solicitudes", c:"#22c55e" },
-    { k:"Libertades plenas", v:"5.628", c:"#22c55e" },
-    { k:"Presos políticos", v:"568 (Foro Penal)", c:"#ef4444" },
-    { k:"Relaciones EE.UU.", v:"Restablecidas", c:"#22c55e" },
+    { k:"Amnistía", v:"7.727 beneficiados", c:"#22c55e" },
+    { k:"Excarcelaciones verif.", v:"670 (Foro Penal)", c:"#22c55e" },
+    { k:"Presos políticos", v:"508 (Foro Penal)", c:"#ef4444" },
+    { k:"Reconocimiento EE.UU.", v:"Rodríguez legítima", c:"#22c55e" },
   ],
   opinion: [
     { k:"MCM liderazgo", v:"106,84/137 pts", c:"#22c55e" },
-    { k:"Exigen elecciones", v:"66%", c:"#a17d08" },
-    { k:"Brecha social", v:"256 vs 550 USD", c:"#ef4444" },
-    { k:"Sin ajuste salarial", v:">47 meses", c:"#ef4444" },
+    { k:"Elecciones", v:"Washington: 2027", c:"#a17d08" },
+    { k:"Conflictividad 12/03", v:"39 movilizaciones", c:"#ef4444" },
+    { k:"Inflación anualizada", v:"617% (BCV)", c:"#ef4444" },
   ],
 };
 
 const TENSIONS = [
-  { level:"green", text:"Exportaciones récord: 788 kbd feb. · Puerto José nivel más alto en 7 años" },
-  { level:"green", text:"PIB +7,07% Q4 2025 · Recaudación SENIAT +78% · Crudo +10% por Irán" },
-  { level:"green", text:"Relaciones diplomáticas EE.UU.–VEN restablecidas · Exxon, Shell, Gold Reserve entran" },
-  { level:"green", text:"Amnistía: 9.060 solicitudes · 5.628 libertades plenas · 31 militares" },
-  { level:"yellow", text:"E1 a solo 2pp de E3: MCM retorno + 66% exige elecciones + H.R. 7674" },
-  { level:"yellow", text:"Brecha social: salario USD 256 vs canasta USD 550 · >47 meses sin ajuste" },
-  { level:"red", text:"568 presos (Foro Penal) · >11.000 cautelares · Sin calendario electoral" },
+  { level:"green", text:"Producción petrolera supera 1M bpd (1.021 kbd feb.) · Chevron, Shell, Repsol amplían inversiones" },
+  { level:"green", text:"Trump reconoce formalmente a Rodríguez como «único interlocutor legítimo» de Venezuela" },
+  { level:"green", text:"GL-51 oro operativa · Primer cargamento USD 100M a EE.UU. · Decreto 5.266 absorción Minerven" },
+  { level:"green", text:"Amnistía: 7.727 beneficiados · 670 excarcelaciones verificadas · Guanipa sobreseído" },
+  { level:"yellow", text:"Conflictividad laboral: 39 movilizaciones en 23 estados (12/03) · Mayor jornada del año" },
+  { level:"yellow", text:"Inflación 617% anualizada (BCV oficial) · 70% población <USD 300 vs canasta USD 425-622" },
+  { level:"red", text:"508 presos políticos · ONU: 87 nuevas detenciones post-3 enero · 14 periodistas detenidos" },
+  { level:"red", text:"MCM marginalizada: Trump aconseja no regresar · Elecciones diferidas a 2027" },
 ];
 
-const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8"];
+const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9"];
 
 const INDICATORS = [
   // ── ENERGÉTICO ──
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Exportaciones de crudo", desc:"Volumen semanal bajo licencias OFAC",
     umbral:"Sostenimiento >750 kbd. Caída <600 kbd activa alerta.",
-    hist:[["green","up","~500 kbd"],["green","up","~620 kbd"],["green","up","~700 kbd"],["green","up","~740 kbd"],["green","up","~770 kbd"],["green","up","~800 kbd ↑60.6%"],["green","up","~800 kbd · VLCC"],["green","up","788 kbd · récord 7 años"]] },
+    hist:[["green","up","~500 kbd"],["green","up","~620 kbd"],["green","up","~700 kbd"],["green","up","~740 kbd"],["green","up","~770 kbd"],["green","up","~800 kbd ↑60.6%"],["green","up","~800 kbd · VLCC"],["green","up","788 kbd · récord 7 años"],["green","up","1.021 kbd (+10,5%)"]] },
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Ventas petroleras (ingresos)", desc:"Acuerdos bajo GL49 y GL50/50A",
     umbral:"Flujo regular a banca PDVSA. Interrupción >2 sem activa E2.",
-    hist:[["yellow","flat","En negociación"],["yellow","up","Acuerdos Vitol/Trafigura"],["green","up","Proy. USD 3-4B"],["green","up","Contratos activos"],["green","up","India + EE.UU."],["green","up","Proy. USD 6.000M"],["green","up","Proy. USD 6.000M"],["green","up","+USD 24-120M/mes · crudo +10%"]] },
+    hist:[["yellow","flat","En negociación"],["yellow","up","Acuerdos Vitol/Trafigura"],["green","up","Proy. USD 3-4B"],["green","up","Contratos activos"],["green","up","India + EE.UU."],["green","up","Proy. USD 6.000M"],["green","up","Proy. USD 6.000M"],["green","up","+USD 24-120M/mes · crudo +10%"],["green","up","Merey $52,31 (+$9,10)"]] },
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Licencias OFAC activas", desc:"GL49, GL50, GL50A — cobertura operativa",
     umbral:"Revocación activa E2/E4. FAQ 1238 incluye Cuba condicionado.",
-    hist:[["green","flat","GL49 activa"],["green","flat","GL49 + GL50"],["green","flat","Sin cambios"],["green","flat","Sin cambios"],["green","flat","GL50/50A vigentes"],["green","flat","FAQ 1238 Cuba"],["green","flat","GL49+GL50/50A+FAQ1238"],["green","up","GL129A Rosneft · Monómeros 2028"]] },
+    hist:[["green","flat","GL49 activa"],["green","flat","GL49 + GL50"],["green","flat","Sin cambios"],["green","flat","Sin cambios"],["green","flat","GL50/50A vigentes"],["green","flat","FAQ 1238 Cuba"],["green","flat","GL49+GL50/50A+FAQ1238"],["green","up","GL129A Rosneft · Monómeros 2028"],["green","up","GL49+50/50A+GL51"]] },
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Producción Chevron / Majors", desc:"Operaciones de empresas occidentales en bloques venezolanos",
     umbral:"Expansión confirma E3. Suspensión reactiva E2.",
-    hist:[["yellow","flat","Operación básica"],["yellow","up","Autorización ampliada"],["green","up","Incremento confirmado"],["green","up","Ampliación activa"],["yellow","flat","Revisión 19 contratos"],["yellow","up","Expansión anunciada"],["yellow","up","Expansión anunciada"],["green","up","Exxon equipo · Shell acuerdos"]] },
+    hist:[["yellow","flat","Operación básica"],["yellow","up","Autorización ampliada"],["green","up","Incremento confirmado"],["green","up","Ampliación activa"],["yellow","flat","Revisión 19 contratos"],["yellow","up","Expansión anunciada"],["yellow","up","Expansión anunciada"],["green","up","Exxon equipo · Shell acuerdos"],["green","up","Chevron+Shell+Repsol"]] },
   { dim:"Energético", icon:"⚡", esc:"E2", name:"Infraestructura de refinación", desc:"Capacidad operativa refinerías nacionales",
     umbral:"Operación <25% capacidad instalada. Mantenimiento diferido.",
-    hist:[["red","flat","<20% capacidad"],["red","flat","Sin mejora"],["red","flat","Mantenimiento pendiente"],["red","flat","Exportación compensa"],["red","flat","Crítica pero estable"],["yellow","up","~35% capacidad (Reuters)"],["yellow","flat","~35% capacidad"],["yellow","flat","~35% capacidad"]] },
+    hist:[["red","flat","<20% capacidad"],["red","flat","Sin mejora"],["red","flat","Mantenimiento pendiente"],["red","flat","Exportación compensa"],["red","flat","Crítica pero estable"],["yellow","up","~35% capacidad (Reuters)"],["yellow","flat","~35% capacidad"],["yellow","flat","~35% capacidad"],["yellow","flat","Sin datos nuevos"]] },
   { dim:"Energético", icon:"⚡", esc:"E2", name:"Taladros activos", desc:"Operaciones de perforación nuevas",
     umbral:"<30 taladros activos. Recuperación <5% anual vs 2014.",
-    hist:[["red","flat","Bajo histórico"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","2-4 activos (Monaldi)"],["red","flat","2-4 activos"],["red","flat","2-4 activos"]] },
+    hist:[["red","flat","Bajo histórico"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","2-4 activos (Monaldi)"],["red","flat","2-4 activos"],["red","flat","2-4 activos"],["green","up","Tendencia al alza"]] },
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Recaudación fiscal", desc:"SENIAT y flujo tributario asociado al repunte energético",
     umbral:"Caída >20% mensual activa E2. Crecimiento sostenido confirma E3.", addedWeek:8,
-    hist:[null,null,null,null,null,null,null,["green","up","+78% SENIAT feb. vs enero"]] },
+    hist:[null,null,null,null,null,null,null,["green","up","+78% SENIAT feb. vs enero"],["green","up","SENIAT +78% acum."]] },
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Apertura sector minero", desc:"Reformas y licencias para inversión extranjera en minería",
     umbral:"Aprobación reforma + inversiones verificables = E3 consolidado.", addedWeek:8,
-    hist:[null,null,null,null,null,null,null,["green","up","Gold Reserve · reforma legislativa"]] },
+    hist:[null,null,null,null,null,null,null,["green","up","Gold Reserve · reforma legislativa"],["green","up","GL-51 · Dec.5266 · Ley Minas"]] },
 
   // ── POLÍTICO ──
   { dim:"Político", icon:"🏛", esc:"E3", name:"Ley de Amnistía", desc:"Operativización y verificación independiente",
     umbral:"Brecha oficial vs. verificado. >50% sin verificar activa E4.",
-    hist:[["yellow","flat","Anunciada"],["yellow","up","Aprobada AN"],["yellow","up","Primeras excarcelaciones"],["green","up","Comisión operativa"],["green","up","1.200+ beneficiados"],["green","up","Promulgada 19 feb"],["green","up","4.203 sol. · 3.231 plenas"],["green","up","9.060 sol. · 5.628 plenas"]] },
+    hist:[["yellow","flat","Anunciada"],["yellow","up","Aprobada AN"],["yellow","up","Primeras excarcelaciones"],["green","up","Comisión operativa"],["green","up","1.200+ beneficiados"],["green","up","Promulgada 19 feb"],["green","up","4.203 sol. · 3.231 plenas"],["green","up","9.060 sol. · 5.628 plenas"],["green","up","7.727 beneficiados"]] },
   { dim:"Político", icon:"🏛", esc:"E3", name:"Excarcelaciones verificadas", desc:"Foro Penal: presos políticos activos",
     umbral:"Ritmo <20/sem o reversión activa E4.",
-    hist:[["yellow","flat","0 verificadas"],["yellow","up","12 verificadas"],["yellow","up","45 verificadas"],["yellow","up","78 verificadas"],["yellow","up","108 verificadas"],["yellow","flat","383 verif. · 895 oficial"],["yellow","up","568 activos (FP)"],["yellow","up","568 presos · 245 liberados"]] },
+    hist:[["yellow","flat","0 verificadas"],["yellow","up","12 verificadas"],["yellow","up","45 verificadas"],["yellow","up","78 verificadas"],["yellow","up","108 verificadas"],["yellow","flat","383 verif. · 895 oficial"],["yellow","up","568 activos (FP)"],["yellow","up","568 presos · 245 liberados"],["yellow","flat","670 verif. / 508 presos"]] },
   { dim:"Político", icon:"🏛", esc:"E4", name:"Cautelares vigentes", desc:"Personas bajo medidas restrictivas no resueltas",
     umbral:">10.000 cautelares sin resolver activa E4.", addedWeek:8,
-    hist:[null,null,null,null,null,null,null,["red","flat",">11.000 personas"]] },
+    hist:[null,null,null,null,null,null,null,["red","flat",">11.000 personas"],["red","flat",">11.000 + 87 nuevas ONU"]] },
   { dim:"Político", icon:"🏛", esc:"E4", name:"Cohesión FANB", desc:"Señales de fractura o lealtad institucional",
     umbral:"Fractura visible = E4/E2 inmediato.",
-    hist:[["yellow","flat","Sin señales fractura"],["yellow","flat","Sin señales fractura"],["yellow","flat","Ajustes menores"],["yellow","down","Presión cooperación EE.UU."],["yellow","down","Cubanos retirándose"],["yellow","down","Padrino 12 años · malestar"],["yellow","flat","Sin señales nuevas"],["yellow","flat","Sin señales nuevas"]] },
+    hist:[["yellow","flat","Sin señales fractura"],["yellow","flat","Sin señales fractura"],["yellow","flat","Ajustes menores"],["yellow","down","Presión cooperación EE.UU."],["yellow","down","Cubanos retirándose"],["yellow","down","Padrino 12 años · malestar"],["yellow","flat","Sin señales nuevas"],["yellow","flat","Sin señales nuevas"],["yellow","flat","SOUTHCOM patrulla 6/03"]] },
   { dim:"Político", icon:"🏛", esc:"E3", name:"Reorganización del Ejecutivo", desc:"Capacidad de gestión institucional",
     umbral:"Reconfiguración técnica → E1. Política → E4.",
-    hist:[["yellow","flat","Maduro removido"],["yellow","up","Delcy consolida"],["green","up","Gabinete activo"],["green","up","Estructura operativa"],["green","up","Cancillería reestructurada"],["green","up","Poder Ciudadano: encargados"],["green","up","Poder Ciudadano: 30 días"],["green","up","Relaciones diplomáticas plenas"]] },
+    hist:[["yellow","flat","Maduro removido"],["yellow","up","Delcy consolida"],["green","up","Gabinete activo"],["green","up","Estructura operativa"],["green","up","Cancillería reestructurada"],["green","up","Poder Ciudadano: encargados"],["green","up","Poder Ciudadano: 30 días"],["green","up","Relaciones diplomáticas plenas"],["green","up","Min. Hidrocarburos Henao"]] },
   { dim:"Político", icon:"🏛", esc:"E1", name:"Agenda electoral", desc:"Calendario y compromisos electorales concretos",
     umbral:"Anuncio formal de fecha = E1 gana probabilidad.",
-    hist:[["red","flat","Sin agenda"],["red","flat","Sin agenda"],["yellow","flat","Señales vagas"],["yellow","up","Rubio: legitimación req."],["yellow","up","Presión EE.UU. activa"],["yellow","up","2/3 exige elecciones"],["yellow","up","Rubio reitera exigencia"],["yellow","up","66% exige · H.R. 7674"]] },
+    hist:[["red","flat","Sin agenda"],["red","flat","Sin agenda"],["yellow","flat","Señales vagas"],["yellow","up","Rubio: legitimación req."],["yellow","up","Presión EE.UU. activa"],["yellow","up","2/3 exige elecciones"],["yellow","up","Rubio reitera exigencia"],["yellow","up","66% exige · H.R. 7674"],["red","down","Washington: 2027"]] },
   { dim:"Político", icon:"🏛", esc:"E4", name:"Marcos restrictivos vigentes", desc:"Leyes de odio, terrorismo, delitos de expresión",
     umbral:"Activación contra oposición = E4. Derogación = E1.",
-    hist:[["red","flat","Ley Odio vigente"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Stalin exige derogar"],["yellow","up","J.Rodríguez: revisión Ley Odio"]] },
+    hist:[["red","flat","Ley Odio vigente"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Stalin exige derogar"],["yellow","up","J.Rodríguez: revisión Ley Odio"],["red","flat","Sin cambios"]] },
   { dim:"Político", icon:"🏛", esc:"E1", name:"Liderazgo opositor", desc:"Índice de liderazgo y capacidad de articulación opositora",
     umbral:"MCM >100 pts consolida E1. Fragmentación debilita.", addedWeek:8,
-    hist:[null,null,null,null,null,null,null,["green","up","MCM 106,84/137 · Guanipa 102"]] },
+    hist:[null,null,null,null,null,null,null,["green","up","MCM 106,84/137 · Guanipa 102"],["yellow","down","MCM marginalizada"]] },
 
   // ── ECONÓMICO ──
   { dim:"Económico", icon:"📊", esc:"E2", name:"Brecha cambiaria", desc:"Diferencial BCV vs. mercado paralelo",
     umbral:"Brecha >55% activa E2. <30% fortalece E3.",
-    hist:[["green","flat","~15%"],["green","flat","~18%"],["yellow","down","~28%"],["yellow","down","~35%"],["yellow","down","~46%"],["yellow","down","~46%"],["yellow","down","52,6% · 631 vs 414"],["yellow","flat",">50% · persistente"]] },
+    hist:[["green","flat","~15%"],["green","flat","~18%"],["yellow","down","~28%"],["yellow","down","~35%"],["yellow","down","~46%"],["yellow","down","~46%"],["yellow","down","52,6% · 631 vs 414"],["yellow","flat",">50% · persistente"],["red","up","BCV 414 / Par 622"]] },
   { dim:"Económico", icon:"📊", esc:"E2", name:"Inflación", desc:"Tasa mensual proyectada",
     umbral:"Retorno a >30% mensual activa E2.",
-    hist:[["yellow","flat","~12% mensual"],["yellow","flat","~10% mensual"],["yellow","up","~8% mensual"],["yellow","up","Desacelerando"],["yellow","up","~6% proyectado"],["yellow","up","174% proy. anual (UCAB)"],["yellow","flat","FMI: tres dígitos anual"],["yellow","flat","174% proy. 2026"]] },
+    hist:[["yellow","flat","~12% mensual"],["yellow","flat","~10% mensual"],["yellow","up","~8% mensual"],["yellow","up","Desacelerando"],["yellow","up","~6% proyectado"],["yellow","up","174% proy. anual (UCAB)"],["yellow","flat","FMI: tres dígitos anual"],["yellow","flat","174% proy. 2026"],["red","up","617% anualizada (BCV)"]] },
   { dim:"Económico", icon:"📊", esc:"E2", name:"Ingresos de la población", desc:"Salario mínimo y poder adquisitivo real",
     umbral:"47 meses sin ajuste. Ingreso ~USD 256 vs canasta USD 550.",
-    hist:[["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","47 meses sin ajuste"],["red","flat","69,5% < USD 300"],["red","flat","Canasta 550 vs 270"],["red","flat","USD 256 vs canasta 550"]] },
+    hist:[["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","47 meses sin ajuste"],["red","flat","69,5% < USD 300"],["red","flat","Canasta 550 vs 270"],["red","flat","USD 256 vs canasta 550"],["red","flat","70% <USD 300"]] },
   { dim:"Económico", icon:"📊", esc:"E2", name:"Sistema eléctrico", desc:"Disponibilidad y frecuencia de cortes",
     umbral:"Cortes >4h/día en zonas urbanas activa presión social.",
-    hist:[["red","flat","Cortes frecuentes"],["red","flat","Sin mejora"],["red","flat","Sin mejora"],["red","flat","Sin mejora"],["red","flat","Crítico"],["red","flat","14,8h sin suministro"],["red","flat","Crítico · sin inversión"],["red","flat","14,8h sin suministro"]] },
+    hist:[["red","flat","Cortes frecuentes"],["red","flat","Sin mejora"],["red","flat","Sin mejora"],["red","flat","Sin mejora"],["red","flat","Crítico"],["red","flat","14,8h sin suministro"],["red","flat","Crítico · sin inversión"],["red","flat","14,8h sin suministro"],["yellow","flat","Sin datos nuevos"]] },
   { dim:"Económico", icon:"📊", esc:"E3", name:"Percepción dirección del país", desc:"Encuestas de opinión pública",
     umbral:">60% percepción positiva sostiene E3.",
-    hist:[["yellow","flat","~35% positivo"],["yellow","up","~40% positivo"],["yellow","up","~44% positivo"],["green","up","~48% positivo"],["green","up","~50% positivo"],["green","up","75% dirección correcta"],["green","flat","51,5% mejor s/ Maduro"],["green","flat",">50% dirección correcta"]] },
+    hist:[["yellow","flat","~35% positivo"],["yellow","up","~40% positivo"],["yellow","up","~44% positivo"],["green","up","~48% positivo"],["green","up","~50% positivo"],["green","up","75% dirección correcta"],["green","flat","51,5% mejor s/ Maduro"],["green","flat",">50% dirección correcta"],["yellow","flat","Reconocimiento EE.UU."]] },
   { dim:"Económico", icon:"📊", esc:"E3", name:"PIB trimestral", desc:"Crecimiento económico confirmado",
     umbral:"Crecimiento positivo sostiene E3. Contracción activa E2.", addedWeek:8,
-    hist:[null,null,null,null,null,null,null,["green","up","+7,07% Q4 2025"]] },
+    hist:[null,null,null,null,null,null,null,["green","up","+7,07% Q4 2025"],["green","flat","Proy. 2 dígitos 2026"]] },
 
   // ── INTERNACIONAL ──
   { dim:"Internacional", icon:"🌐", esc:"E3", name:"Cooperación EE.UU.–Venezuela", desc:"Nivel operativo de acuerdos bilaterales",
     umbral:"Ruptura = E4/E2. Profundización = E1.",
-    hist:[["yellow","up","Negociaciones iniciales"],["yellow","up","Petróleo fluye"],["green","up","SOUTHCOM reunión"],["green","up","Visitas técnicas"],["green","up","Plan 3 fases"],["green","up","Chris Wright visita"],["green","up","Trump \"nuevo amigo\""],["green","up","Relaciones restablecidas"]] },
+    hist:[["yellow","up","Negociaciones iniciales"],["yellow","up","Petróleo fluye"],["green","up","SOUTHCOM reunión"],["green","up","Visitas técnicas"],["green","up","Plan 3 fases"],["green","up","Chris Wright visita"],["green","up","Trump \"nuevo amigo\""],["green","up","Relaciones restablecidas"],["green","up","Reconocimiento formal"]] },
   { dim:"Internacional", icon:"🌐", esc:"E3", name:"Sanciones UE", desc:"Estado de sanciones europeas",
     umbral:"Levantamiento parcial fortalece E3.",
-    hist:[["red","flat","Sanciones plenas"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["yellow","up","Señales apertura"],["yellow","up","Diálogo España"],["yellow","up","España propone levantar"],["yellow","up","España propone levantar"],["yellow","up","España: solicitud ante UE"]] },
+    hist:[["red","flat","Sanciones plenas"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["yellow","up","Señales apertura"],["yellow","up","Diálogo España"],["yellow","up","España propone levantar"],["yellow","up","España propone levantar"],["yellow","up","España: solicitud ante UE"],["yellow","flat","Sin cambios"]] },
   { dim:"Internacional", icon:"🌐", esc:"E3", name:"China y Rusia", desc:"Balanza estratégica en contexto acercamiento EE.UU.",
     umbral:"Ruptura con China/Rusia por presión EE.UU. fragiliza E3.",
-    hist:[["green","flat","Alineación plena"],["green","flat","Sin cambio"],["green","down","Señales tensión"],["yellow","down","Rebalanceo activo"],["yellow","down","Reducción presencia rusa"],["yellow","down","Cuba retira asesores"],["yellow","down","Cuba retira asesores"],["yellow","flat","China: cooperación bilateral"]] },
+    hist:[["green","flat","Alineación plena"],["green","flat","Sin cambio"],["green","down","Señales tensión"],["yellow","down","Rebalanceo activo"],["yellow","down","Reducción presencia rusa"],["yellow","down","Cuba retira asesores"],["yellow","down","Cuba retira asesores"],["yellow","flat","China: cooperación bilateral"],["yellow","flat","GL-51 excluye Rusia"]] },
   { dim:"Internacional", icon:"🌐", esc:"E1", name:"FMI y reinserción financiera", desc:"Diálogo con IFIs y acceso a mercados",
     umbral:"Acuerdo FMI = E1 clave. 'Intensa Fragilidad' sostiene E2.",
-    hist:[["red","flat","Fragmentación total"],["red","flat","Sin diálogo"],["red","flat","Sin diálogo"],["yellow","up","Señales apertura"],["yellow","up","Reuniones técnicas"],["yellow","up","FMI: Intensa Fragilidad"],["yellow","up","FMI: Intensa Fragilidad"],["yellow","up","FMI: disposición si solicita"]] },
+    hist:[["red","flat","Fragmentación total"],["red","flat","Sin diálogo"],["red","flat","Sin diálogo"],["yellow","up","Señales apertura"],["yellow","up","Reuniones técnicas"],["yellow","up","FMI: Intensa Fragilidad"],["yellow","up","FMI: Intensa Fragilidad"],["yellow","up","FMI: disposición si solicita"],["yellow","flat","Sin avances nuevos"]] },
   { dim:"Internacional", icon:"🌐", esc:"E3", name:"Normalización diplomática", desc:"Reapertura embajadas y relaciones bilaterales",
     umbral:"Reapertura embajada EE.UU. = E1/E3 consolidado.",
     hist:[["yellow","flat","Limitada"],["yellow","up","Señales apertura"],["green","up","Múltiples contactos"],["green","up","Visitas ministros"],["green","up","Cancillería reestructurada"],["green","up","Tajani · Qatar"],["green","up","Petro-Delcy 14 mar"],["green","up","Burgum visita · Nahuel Gallo"]] },
   { dim:"Internacional", icon:"🌐", esc:"E1", name:"Presión legislativa EE.UU.", desc:"Proyectos de ley y condicionalidades del Congreso",
     umbral:"Aprobación legislativa condiciona E3 y empuja E1.", addedWeek:8,
-    hist:[null,null,null,null,null,null,null,["yellow","up","H.R. 7674 · transición 180 días"]] },
+    hist:[null,null,null,null,null,null,null,["yellow","up","H.R. 7674 · transición 180 días"],["yellow","flat","H.R. 7674 vigente"]] },
 ];
 
 // Señales por escenario (solo semana más reciente)
 const SCENARIO_SIGNALS = [
   { esc:"E3", signals:[
-    { name:"Exportaciones récord feb.", sem:"green", val:"788 kbd · Puerto José récord 7 años" },
-    { name:"PIB Q4 2025", sem:"green", val:"+7,07% confirmado", isNew:true },
-    { name:"Recaudación fiscal", sem:"green", val:"SENIAT +78% feb. vs enero", isNew:true },
-    { name:"Marco OFAC consolidado", sem:"green", val:"GL49+GL50/50A+GL129A · Monómeros 2028" },
-    { name:"Inversión internacional", sem:"green", val:"Exxon, Shell, Gold Reserve, Ecopetrol" },
-    { name:"Trump reconoce a Delcy", sem:"green", val:"\"Presidenta electa\" · cooperación plena" },
-    { name:"Amnistía operativa", sem:"green", val:"9.060 solicitudes · 5.628 libertades" },
-    { name:"Flujo divisas a banca", sem:"yellow", val:"30–45 días de consolidación" },
-    { name:"Brecha cambiaria", sem:"yellow", val:">50% persistente · riesgo estructural" },
+    { name:"Producción supera 1M bpd", sem:"green", val:"1.021 kbd feb. (+10,5%)", isNew:true },
+    { name:"Reconocimiento formal EE.UU.", sem:"green", val:"Rodríguez = «único interlocutor legítimo»", isNew:true },
+    { name:"GL-51 oro operativa", sem:"green", val:"Primer cargamento USD 100M entregado", isNew:true },
+    { name:"Inversión internacional", sem:"green", val:"Chevron (Ayacucho 8) + Shell (Carito) + Repsol (+200%)" },
+    { name:"Marco OFAC consolidado", sem:"green", val:"GL49+GL50/50A+GL51 · oro+crudo+gas" },
+    { name:"Ley de Minas primera discusión", sem:"green", val:"Concesiones 30 años · arbitraje intl.", isNew:true },
+    { name:"Decreto 5.266 · Min. Hidrocarburos", sem:"green", val:"Minerven absorbida · Paula Henao designada", isNew:true },
+    { name:"Amnistía operativa", sem:"green", val:"7.727 beneficiados · Guanipa sobreseído" },
+    { name:"Brecha cambiaria", sem:"yellow", val:">40% persistente · riesgo estructural" },
+    { name:"Gasoducto Ricaurte con Colombia", sem:"green", val:"225 km · 500M pies cúbicos · en reparación", isNew:true },
   ]},
   { esc:"E1", signals:[
-    { name:"MCM liderazgo consolidado", sem:"green", val:"106,84/137 pts · retorno inminente", isNew:true },
-    { name:"Exigencia electoral", sem:"green", val:"66% exige elecciones este año" },
-    { name:"H.R. 7674 Congreso EE.UU.", sem:"green", val:"Estrategia transición en 180 días", isNew:true },
-    { name:"Ramos Allup respalda MCM", sem:"green", val:"AD Resistencia se alinea", isNew:true },
-    { name:"Apertura minera", sem:"green", val:"Gold Reserve + reforma legislativa", isNew:true },
-    { name:"Fracción Vamos Venezuela", sem:"yellow", val:"Comité recibe Fiscal y Defensor", isNew:true },
-    { name:"Calendario electoral", sem:"red", val:"Sin fecha · EE.UU. prioriza economía" },
-    { name:"Retorno MCM", sem:"yellow", val:"Anunciado pero no concretado", isNew:true },
-    { name:"Marcos restrictivos", sem:"yellow", val:"Ley Odio en revisión — no derogada" },
+    { name:"MCM liderazgo consolidado", sem:"green", val:"106,84/137 pts · agenda internacional activa" },
+    { name:"EE.UU. declara objetivo transición", sem:"green", val:"\"Condiciones para gobierno democrático\"", isNew:true },
+    { name:"H.R. 7674 Congreso EE.UU.", sem:"green", val:"Estrategia transición en 180 días" },
+    { name:"Excarcelaciones verificadas", sem:"green", val:"670 (FP) · Guanipa sobreseído · Dávila libre" },
+    { name:"Candidatura Fiscal técnica", sem:"yellow", val:"Dra. Vásquez (UCAB/UNIMET) respaldada", isNew:true },
+    { name:"Bancada Libertad autónoma", sem:"yellow", val:"Salvó voto en Ley de Minas" },
+    { name:"Calendario electoral", sem:"red", val:"Washington: 2027 · MCM no regresar aún", isNew:true },
+    { name:"Retorno MCM", sem:"red", val:"Trump aconsejó no regresar · sin fecha", isNew:true },
+    { name:"Marcos restrictivos", sem:"yellow", val:"Sin cambios — Ley Odio vigente" },
   ]},
   { esc:"E4", signals:[
-    { name:"Brecha cifras amnistía", sem:"yellow", val:"568 presos (FP) vs 5.628 oficiales" },
-    { name:"Concentración territorial", sem:"yellow", val:"135/179 excarcelaciones en Caracas", isNew:true },
-    { name:">11.000 cautelares vigentes", sem:"red", val:"Medidas restrictivas masivas", isNew:true },
-    { name:"Tensiones FANB", sem:"yellow", val:"Malestar por cúpula · Padrino 12 años" },
-    { name:"58% percibe deterioro seguridad", sem:"yellow", val:"Desde el 3 de enero" },
+    { name:"Escalada conflictividad laboral", sem:"red", val:"39 movilizaciones 23 estados (12/03)", isNew:true },
+    { name:"508 presos políticos", sem:"red", val:"Foro Penal 9 mar · sistema coercitivo activo" },
+    { name:"ONU: 87 nuevas detenciones", sem:"red", val:"14 periodistas · 27 civiles post-3 enero", isNew:true },
+    { name:">11.000 cautelares vigentes", sem:"red", val:"Medidas restrictivas masivas" },
+    { name:"Tensiones Poder Ciudadano", sem:"yellow", val:"PUD: «acuerdos opacos» en designaciones", isNew:true },
+    { name:"SOUTHCOM patrulla costas", sem:"yellow", val:"F-35/P-8/KC-46 el 6/03", isNew:true },
     { name:"Concentración poder civil", sem:"yellow", val:"J. Rodríguez · D. Rodríguez · Cabello" },
-    { name:"Oficialismo bajo en liderazgo", sem:"yellow", val:"Delcy 25,3 · Diosdado 10,6 · JR 7,1", isNew:true },
   ]},
   { esc:"E2", signals:[
-    { name:"Brecha cambiaria >50%", sem:"yellow", val:"Diferencial estructural persistente" },
-    { name:"Inflación ~174% proyectada", sem:"yellow", val:"Tres dígitos anual 2026" },
-    { name:"69,5% ingresos < USD 300", sem:"red", val:"Canasta USD 550 vs ingreso USD 256" },
-    { name:"Sistema eléctrico", sem:"red", val:"14,8h sin suministro promedio" },
-    { name:">47 meses sin ajuste salarial", sem:"red", val:"Presión social latente" },
-    { name:"Pérdida mercado chino", sem:"yellow", val:"No compensada plenamente", isNew:true },
-    { name:"Dependencia licencias OFAC", sem:"yellow", val:"Reversibilidad como riesgo" },
+    { name:"Inflación 617% anualizada", sem:"red", val:"BCV publica tras 1 año de opacidad", isNew:true },
+    { name:"70% población <USD 300", sem:"red", val:"Canasta USD 425-622 vs ingreso real" },
+    { name:"Brecha salarial estructural", sem:"red", val:"39 protestas por salario el 12/03", isNew:true },
+    { name:"Sistema eléctrico", sem:"red", val:"Sin datos nuevos · deterioro crónico" },
+    { name:"Dependencia licencias OFAC", sem:"yellow", val:"GL-51 excluye Rusia/Irán/DPRK/Cuba" },
+    { name:"Heterogeneidad oposición", sem:"yellow", val:"MCM vs Capriles vs Márquez · CenGente distancia", isNew:true },
+    { name:"Dependencia factor externo", sem:"yellow", val:"Estabilidad depende de Washington" },
   ]},
 ];
 
@@ -314,6 +323,19 @@ const CURATED_FACTCHECK = [
   { title:"568 presos políticos (Foro Penal) vs 5.628 libertades plenas oficiales — brecha estructural", date:"2026-03-05", source:"Foro Penal", scenarios:["E4"], dims:["Político"], week:"S8", verdict:"Discrepancia" },
   { title:">11.000 personas bajo medidas cautelares vigentes según estimaciones de ONG", date:"2026-03-06", source:"Provea", scenarios:["E4"], dims:["Político"], week:"S8", verdict:"Confirmado" },
   { title:"MCM Índice 106,84/137 pts — metodología MassBehaviorResearch verificada", date:"2026-03-06", source:"Cotejo.info", scenarios:["E1"], dims:["Político"], week:"S8", verdict:"Confirmado" },
+  // S9: 6-13 marzo
+  { title:"Trump reconoce formalmente a Rodríguez como «único interlocutor legítimo» de Venezuela", date:"2026-03-07", source:"White House / Dept. of State", scenarios:["E3"], dims:["Internacional","Político"], week:"S9" },
+  { title:"OFAC emite GL-51: habilita transacciones con oro venezolano para entidades estadounidenses", date:"2026-03-08", source:"OFAC/Tesoro", scenarios:["E3"], dims:["Energético","Internacional"], week:"S9" },
+  { title:"Primer cargamento de oro venezolano valorado en USD 100M entregado a EE.UU.", date:"2026-03-08", source:"Dept. Interior", scenarios:["E3"], dims:["Energético"], week:"S9" },
+  { title:"Producción petrolera alcanza 1.021.000 bpd en febrero — supera 1M bpd por primera vez", date:"2026-03-10", source:"PDVSA/OPEP", scenarios:["E3"], dims:["Energético"], week:"S9" },
+  { title:"Shell firma acuerdos para Carito y Pirital; Repsol anuncia +200% a 2028 (>EUR 1.000M)", date:"2026-03-10", source:"Reuters", scenarios:["E3"], dims:["Energético"], week:"S9" },
+  { title:"Decreto 5.266: absorción de Minerven por la CVM. Ley de Minas en primera discusión", date:"2026-03-11", source:"AN/Gaceta Oficial", scenarios:["E3"], dims:["Energético","Político"], week:"S9" },
+  { title:"39 movilizaciones laborales en 23 estados el 12/03 — mayor jornada de protesta del año", date:"2026-03-12", source:"OVCS/Prensa", scenarios:["E4"], dims:["Social"], week:"S9" },
+  { title:"BCV publica inflación: 51,9% acumulado ene-feb (617% anualizada) tras un año de opacidad", date:"2026-03-13", source:"BCV", scenarios:["E2"], dims:["Económico"], week:"S9" },
+  { title:"MCM se reúne con Trump en la Casa Blanca (cortesía); Trump aconseja no regresar aún", date:"2026-03-09", source:"White House", scenarios:["E1"], dims:["Internacional","Político"], week:"S9" },
+  { title:"Foro Penal: 508 presos políticos al 9 de marzo; ONU reporta 87 nuevas detenciones", date:"2026-03-09", source:"Foro Penal / ONU", scenarios:["E4"], dims:["Político"], week:"S9" },
+  { title:"AN aprueba 7.727 beneficiados por Ley de Amnistía; Guanipa sobreseído; Dávila libre", date:"2026-03-13", source:"AN/Foro Penal", scenarios:["E1","E3"], dims:["Político"], week:"S9" },
+  { title:"SOUTHCOM realiza patrulla aérea F-35/P-8/KC-46 frente a costas venezolanas", date:"2026-03-06", source:"SOUTHCOM", scenarios:["E4"], dims:["Internacional"], week:"S9" },
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -331,6 +353,7 @@ const AMNISTIA_TRACKER = [
   { week:"S6", label:"13–20 feb", gob:{ solicitudes:null, libertades:895, excarcelados:448 }, fp:{ verificados:126, detenidos:568 }, hito:"Ley promulgada 19 feb. 895 oficial vs 383 verif." },
   { week:"S7", label:"20–27 feb", gob:{ solicitudes:4203, libertades:3231, excarcelados:null }, fp:{ verificados:126, detenidos:568 }, hito:"Amnistía operativa: 4.203 solicitudes procesadas" },
   { week:"S8", label:"27f–6m", gob:{ solicitudes:9060, libertades:5628, excarcelados:245, cautelares:5383, militares:31 }, fp:{ verificados:670, detenidos:568 }, hito:"9.060 solicitudes · FP: 670 excarcelaciones verificadas (8 mar)" },
+  { week:"S9", label:"6–13m", gob:{ solicitudes:null, libertades:7727, excarcelados:null, cautelares:null, militares:null }, fp:{ verificados:670, detenidos:508 }, hito:"7.727 beneficiados Ley de Amnistía · 508 presos políticos · Guanipa sobreseído · Dávila libertad plena" },
 ];
 
 const GDELT_ANNOTATIONS = [
@@ -350,6 +373,11 @@ const GDELT_ANNOTATIONS = [
   { date:"2026-03-02", tier:"MEDIUM", label:"Visita Doug Burgum — energía y minería", tierEs:"MEDIA" },
   { date:"2026-03-04", tier:"MEDIUM", label:"MCM anuncia retorno a Venezuela", tierEs:"MEDIA" },
   { date:"2026-03-05", tier:"MEDIUM", label:"Crudo +10% por tensión Irán", tierEs:"MEDIA" },
+  { date:"2026-03-07", tier:"HIGH", label:"Trump reconoce a Rodríguez como interlocutor legítimo", tierEs:"ALTA" },
+  { date:"2026-03-08", tier:"MEDIUM", label:"GL-51 oro · Primer cargamento USD 100M a EE.UU.", tierEs:"MEDIA" },
+  { date:"2026-03-10", tier:"MEDIUM", label:"Producción supera 1M bpd · Shell y Repsol amplían", tierEs:"MEDIA" },
+  { date:"2026-03-12", tier:"HIGH", label:"39 movilizaciones laborales en 23 estados", tierEs:"ALTA" },
+  { date:"2026-03-13", tier:"MEDIUM", label:"BCV: inflación 617% anualizada · Ley de Minas 1ra discusión", tierEs:"MEDIA" },
 ];
 
 const POLYMARKET_SLUGS = [
@@ -391,8 +419,8 @@ const CONF_HISTORICO = [
 const VEN_PRODUCTION_MANUAL = [
   { time:"2025-11-15T00:00:00Z", value:956, source:"OPEC MOMR Ene 2026" },
   { time:"2025-12-15T00:00:00Z", value:917, source:"OPEC MOMR Feb 2026" },
-  { time:"2026-01-15T00:00:00Z", value:830, source:"OPEC MOMR Feb 2026" },
-  { time:"2026-02-15T00:00:00Z", value:903, source:"OPEC MOMR Mar 2026" },
+  { time:"2026-01-15T00:00:00Z", value:924, source:"OPEC MOMR Mar 2026" },
+  { time:"2026-02-15T00:00:00Z", value:1021, source:"PDVSA / SITREP S9 (OPEP sec.: 903)" },
 ];
 
 const CONF_MESES = [
@@ -1042,6 +1070,56 @@ const SITREP_ALL = [
       { tag:"Factor 3", color:"#dc2626", title:"Fragilidad estructural persiste", text:"Salario USD 256 vs canasta USD 550. Inflación 174%. 69,5% bajo USD 300. Déficit servicios públicos. Principal vector de inestabilidad social." },
     ],
   },
+  // S9: 6–13 marzo 2026
+  { period:"6 – 13 de marzo de 2026", periodShort:"6–13 mar 2026",
+    keyPoints:[
+      { tag:"Diplomacia", color:"#0468B1", title:"Trump reconoce formalmente a Rodríguez", text:"Trump designa al gobierno de Delcy Rodríguez como «único interlocutor legítimo de Venezuela» y lo califica como «nuevo socio energético». El reconocimiento fue notificado al tribunal federal de Nueva York, debilitando la defensa legal de Maduro. Washington señala elecciones hacia 2027." },
+      { tag:"Energía", color:"#ca8a04", title:"Venezuela supera 1 millón de barriles diarios", text:"Producción alcanza 1.021.000 bpd en febrero (+10,5%). GL-51 habilita oro venezolano; primer cargamento de USD 100M entregado a EE.UU. Chevron negocia Ayacucho 8, Shell firma Carito/Pirital, Repsol anuncia +200% a 2028 (>EUR 1.000M)." },
+      { tag:"Social", color:"#E5243B", title:"Mayor jornada de protesta laboral del año", text:"El 12 de marzo: 39 movilizaciones coordinadas en 23 estados exigiendo aumento salarial. Superaron piquetes de la PNB. BCV publica inflación del 617% anualizada. 70% de la población percibe menos de USD 300 vs. canasta de USD 425-622." },
+      { tag:"Oposición", color:"#8b5cf6", title:"MCM marginalizada por Washington", text:"Trump recibió a MCM «como cortesía» en la Casa Blanca y le aconsejó no regresar aún. Señaló elecciones hacia 2027. MCM realizó agenda internacional intensa (Kast, Milei, Felipe VI) sin modificar la prioridad estratégica de Washington." },
+    ],
+    sintesis:"E3 se consolida al 42% (+2pp) por el reconocimiento formal de EE.UU. al gobierno de Rodríguez — el hecho de mayor impacto estructural del período post-3 enero. La producción supera 1M bpd, la GL-51 habilita el oro, y Chevron/Shell/Repsol amplían inversiones. E1 retrocede a 33% (-5pp): Washington prioriza estabilidad sobre transición. E4 sube a 15% (+5pp) por la escalada laboral del 12 de marzo (39 movilizaciones, 23 estados). E2 baja a 10%, contenido por solidez del acuerdo bilateral.",
+    actores:[
+      { name:"EE.UU.", items:["Trump reconoce a Rodríguez como «único interlocutor legítimo»","GL-51 oro: primer cargamento USD 100M entregado","Burgum visitó Caracas — reuniones sector minero","SOUTHCOM patrulla F-35/P-8/KC-46 frente a costas (6/03)","Trump aconseja a MCM no regresar; elecciones 2027","Negocia extradición de Alex Saab (Miami)"] },
+      { name:"Gobierno Interino", items:["7.727 beneficiados Ley de Amnistía","Decreto 5.266: absorción Minerven por CVM","Nueva Ministra Hidrocarburos: Paula Henao","Ley de Minas primera discusión — concesiones 30 años","Acuerdo gasoducto Ricaurte con Colombia","Producción 1.021 kbd (+10,5%) — supera 1M bpd"] },
+      { name:"Oposición", items:["MCM: reunión breve con Trump (cortesía) + agenda Chile (Kast, Milei, Felipe VI)","Bancada Libertad salvó voto en Ley de Minas","PUD alerta sobre «acuerdos opacos» en Poder Ciudadano","Guanipa sobreseído · Williams Dávila libertad plena","Capriles defiende posición de Libertad","Centrados en la Gente marca distancia de Márquez"] },
+      { name:"Sociedad", items:["12 de marzo: 39 movilizaciones en 23 estados — pico del año","65 protestas totales en la semana (prom. 16/día)","Demanda central: aumento salarial","Gremios, sindicatos, jubilados y pensionados","Superaron piquetes de la PNB","Diputados acompañaron demandas (Stalin González)"] },
+    ],
+    nacional: {
+      amnistia: { solicitudes:null, libertadesPlenas:7727, privadosLiberados:null, cautelares:null, militares:null },
+      rodriguez: [
+        { title:"Reconocimiento formal de EE.UU.", text:"Trump designa a Rodríguez como «único interlocutor legítimo de Venezuela». Notificación al tribunal federal de NY." },
+        { title:"Decreto N.° 5.266", text:"Absorción de Minerven por la Corporación Venezolana de Minería. Ministro Héctor José Silva a cargo." },
+        { title:"Nueva Ministra de Hidrocarburos", text:"Ingeniera Paula Henao, con más de dos décadas en PDVSA, designada para dirigir la política petrolera." },
+        { title:"Crecimiento proyectado", text:"Proyectó crecimiento de dos dígitos para 2026 en la Expo Fedecámaras Portuguesa." },
+      ],
+    },
+    economia: {
+      kpis: [
+        { value:"1.021 kbd", label:"Producción petrolera feb. (+10,5%)", color:"#0468B1" },
+        { value:"GL-51", label:"Licencia oro venezolano para EE.UU.", color:"#16a34a" },
+        { value:"617%", label:"Inflación anualizada (BCV oficial)", color:"#E5243B" },
+        { value:"$52,31", label:"Merey 16° API (USD/bbl, +$9,10)", color:"#ca8a04" },
+      ],
+      empresas: [
+        { empresa:"Chevron", desarrollo:"Negocia expansión de Petropiar hacia bloque Ayacucho 8." },
+        { empresa:"Shell", desarrollo:"Firma acuerdos para campos Carito y Pirital en Monagas Norte." },
+        { empresa:"Repsol", desarrollo:"Plan +50% en 2026, +200% en 2028 con inversiones >EUR 1.000M." },
+        { empresa:"PDVSA", desarrollo:"Reparación gasoducto binacional Antonio Ricaurte (225 km) con Colombia." },
+      ],
+    },
+    escenarios: [
+      { name:"Continuidad Negociada", prob:"42%", color:"#0468B1", text:"Reconocimiento formal EE.UU. + producción 1M bpd + GL-51 + inversiones Chevron/Shell/Repsol + Ley de Minas." },
+      { name:"Transición Política Pacífica", prob:"33%", color:"#2d8a30", text:"Diferida por Washington: elecciones 2027. MCM marginalizada pero activa internacionalmente. E1 estructuralmente activo." },
+      { name:"Resistencia Coercitiva", prob:"15%", color:"#ca8a04", text:"Sube por escalada laboral 12/03 (39 protestas, 23 estados) + tensiones Poder Ciudadano + 508 presos + 87 nuevas detenciones ONU." },
+      { name:"Colapso y Fragmentación", prob:"10%", color:"#dc2626", text:"Contenido por solidez del acuerdo EE.UU.–Venezuela. Riesgo: inflación 617% + brecha salarial estructural." },
+    ],
+    comentarios: [
+      { tag:"Factor 1", color:"#16a34a", title:"Reconocimiento formal cierra la ambigüedad", text:"El hecho estructurante de la semana: la legitimidad internacional del gobierno interino queda anclada a la cooperación energética, no al origen democrático. Produce estabilidad de corto plazo pero no resuelve tensiones de fondo." },
+      { tag:"Factor 2", color:"#E5243B", title:"Conflictividad laboral cruza umbral cualitativo", text:"39 movilizaciones coordinadas en 23 estados no son reacción espontánea sino organización gremial con capacidad nacional. Si escala, la presión salarial pasa de variable social a variable política de primer orden." },
+      { tag:"Factor 3", color:"#ca8a04", title:"Sostenibilidad del esquema en tres factores", text:"(1) Traducir el boom energético en mejoras salariales antes de que la conflictividad escale; (2) designaciones en Poder Ciudadano que muestren apertura real; (3) manejo del retorno de MCM sin fricciones con Washington." },
+    ],
+  },
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -1639,10 +1717,10 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
               <div style={{ fontFamily:fontSans, fontSize:mob?13:14, fontWeight:600, color:TEXT, marginBottom:12 }}>Balance Comisión de Seguimiento</div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
                 {[
-                  { v:d.nacional.amnistia.solicitudes.toLocaleString(), l:"Solicitudes recibidas", c:ACCENT },
-                  { v:d.nacional.amnistia.libertadesPlenas.toLocaleString(), l:"Libertades plenas", c:"#16a34a" },
-                  { v:d.nacional.amnistia.privadosLiberados, l:"Privados liberados", c:TEXT },
-                  { v:d.nacional.amnistia.cautelares.toLocaleString(), l:"Con cautelares", c:TEXT },
+                  { v:d.nacional.amnistia.solicitudes?.toLocaleString() || "—", l:"Solicitudes recibidas", c:ACCENT },
+                  { v:d.nacional.amnistia.libertadesPlenas?.toLocaleString() || "—", l:"Libertades plenas", c:"#16a34a" },
+                  { v:d.nacional.amnistia.privadosLiberados?.toLocaleString() || "—", l:"Privados liberados", c:TEXT },
+                  { v:d.nacional.amnistia.cautelares?.toLocaleString() || "—", l:"Con cautelares", c:TEXT },
                 ].map((item, i) => (
                   <div key={i} style={{ background:BG3, padding:mob?10:14, textAlign:"center" }}>
                     <div style={{ fontFamily:fontSans, fontSize:mob?22:28, fontWeight:700, color:item.c }}>{item.v}</div>
@@ -4786,7 +4864,7 @@ function TabConflictividad() {
           <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Fuente: OVCS · Informe Anual 2025 · 2.219 protestas documentadas</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
-          {[{id:"resumen",label:"Resumen"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"ovcs-live",label:"OVCS Live"},{id:"acled",label:"ACLED"}].map(s => (
+          {[{id:"resumen",label:"Resumen"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:12, fontFamily:font, padding:"6px 12px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
@@ -4964,290 +5042,7 @@ function TabConflictividad() {
         </div>
       </>)}
 
-      {seccion === "ovcs-live" && <OVCSLiveSection />}
-
       {seccion === "acled" && <AcledSection />}
-    </div>
-  );
-}
-
-// ── OVCS LIVE SECTION ─────────────────────────────────────────
-function OVCSLiveSection() {
-  const mob = useIsMobile();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [source, setSource] = useState("loading");
-  const [viewMode, setViewMode] = useState("kpis"); // kpis | tweets | motives
-
-  useEffect(() => {
-    async function fetchOVCS() {
-      // Uses /api/news?source=ovcs (same serverless, no extra slot)
-      const urls = IS_DEPLOYED
-        ? ["/api/news?source=ovcs"]
-        : CORS_PROXIES.map(fn => fn("https://rss.xcancel.com/OVCSocial/rss"));
-
-      for (const url of urls) {
-        try {
-          const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
-          if (!res.ok) continue;
-          const json = await res.json();
-          if (json.tweets && json.tweets.length > 0) {
-            setData(json);
-            setSource(json.source || "live");
-            setLoading(false);
-            return;
-          }
-        } catch { continue; }
-      }
-      setError("No se pudo conectar con Nitter/xcancel. Las instancias pueden estar temporalmente caídas.");
-      setLoading(false);
-    }
-    fetchOVCS();
-  }, []);
-
-  const motiveColors = {
-    "Servicios básicos": "#ef4444", "Laboral": "#f59e0b", "Vivienda": "#8b5cf6",
-    "Salud": "#ec4899", "Educación": "#06b6d4", "Transporte": "#14b8a6",
-    "Alimentación": "#f97316", "Seguridad": "#6366f1", "Derechos políticos": "#0A97D9",
-    "Tierras": "#84cc16", "Telecomunicaciones": "#a855f7", "Ambiental": "#22c55e",
-  };
-
-  if (loading) return (
-    <Card>
-      <div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:14, fontFamily:font }}>
-        <div style={{ fontSize:20, marginBottom:8 }}>📡</div>
-        Conectando con @OVCSocial vía Nitter...
-        <div style={{ fontSize:11, marginTop:6, color:`${MUTED}80` }}>
-          Probando: rss.xcancel.com → xcancel.com → nitter.net
-        </div>
-      </div>
-    </Card>
-  );
-
-  if (error || !data) return (
-    <Card>
-      <div style={{ textAlign:"center", padding:"30px 20px" }}>
-        <div style={{ fontSize:24, marginBottom:10 }}>📡</div>
-        <div style={{ fontSize:13, fontWeight:600, color:TEXT, marginBottom:8 }}>
-          Feed OVCS no disponible
-        </div>
-        <div style={{ fontSize:13, color:MUTED, lineHeight:1.6, maxWidth:500, margin:"0 auto", marginBottom:16 }}>
-          {error || "Las instancias de Nitter están temporalmente caídas. Puedes consultar directamente:"}
-        </div>
-        <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
-          <a href="https://x.com/OVCSocial" target="_blank" rel="noopener noreferrer"
-            style={{ fontSize:13, fontFamily:font, color:"#1d9bf0", textDecoration:"none", padding:"6px 14px", border:"1px solid rgba(29,155,240,0.3)", borderRadius:4 }}>
-            𝕏 @OVCSocial
-          </a>
-          <a href="https://xcancel.com/OVCSocial" target="_blank" rel="noopener noreferrer"
-            style={{ fontSize:13, fontFamily:font, color:ACCENT, textDecoration:"none", padding:"6px 14px", border:`1px solid ${ACCENT}30`, borderRadius:4 }}>
-            ↗ xcancel.com
-          </a>
-        </div>
-      </div>
-    </Card>
-  );
-
-  const { kpis, tweets, protestTweets, totalTweets } = data;
-  const protestPct = totalTweets > 0 ? ((protestTweets / totalTweets) * 100).toFixed(0) : 0;
-  const maxMotive = kpis.topMotives.length > 0 ? Math.max(...kpis.topMotives.map(m => m.count)) : 1;
-  const maxState = kpis.topStates.length > 0 ? Math.max(...kpis.topStates.map(s => s.count)) : 1;
-
-  return (
-    <div>
-      {/* Header bar */}
-      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:14, flexWrap:"wrap" }}>
-        <div style={{ width:8, height:8, borderRadius:"50%", background:"#22c55e", boxShadow:"0 0 6px #22c55e", animation:"pulse 2s infinite" }} />
-        <div style={{ flex:1 }}>
-          <div style={{ fontSize:14, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em" }}>
-            OVCS LIVE — @OVCSocial
-          </div>
-          <div style={{ fontSize:11, fontFamily:font, color:MUTED }}>
-            Fuente: Nitter RSS ({source}) · {totalTweets} tweets · {protestTweets} sobre protestas · Act: {new Date(data.fetchedAt).toLocaleTimeString("es-VE", { hour:"2-digit", minute:"2-digit" })}
-          </div>
-        </div>
-        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
-          {[{id:"kpis",label:"KPIs"},{id:"motives",label:"Motivos"},{id:"tweets",label:"Tweets"}].map(v => (
-            <button key={v.id} onClick={() => setViewMode(v.id)}
-              style={{ fontSize:11, fontFamily:font, padding:"4px 10px", border:"none",
-                background:viewMode===v.id?"#E5243B":"transparent", color:viewMode===v.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
-              {v.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── KPI CARDS ── */}
-      {viewMode === "kpis" && (<>
-        <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:10, marginBottom:16 }}>
-          {[
-            { k:"Tweets totales", v:totalTweets, c:ACCENT, s:`${protestPct}% mencionan protestas` },
-            { k:"Menciones protesta", v:protestTweets, c:"#E5243B", s:"Filtro: protestas, marchas, cierres" },
-            { k:"Cifras extraídas", v:kpis.totalProtests > 0 ? kpis.totalProtests.toLocaleString("es") : "—", c:"#f59e0b", s:kpis.totalProtests > 0 ? "Números citados en tweets" : "Sin cifras numéricas" },
-            { k:"Estados activos", v:kpis.topStates.length, c:"#8b5cf6", s:kpis.topStates.length > 0 ? kpis.topStates.slice(0,3).map(s=>s.state).join(", ") : "Sin geolocalización" },
-          ].map((d,i) => (
-            <Card key={i} accent={d.c}>
-              <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{d.k}</div>
-              <div style={{ fontSize:22, fontWeight:800, color:d.c, fontFamily:"'Syne',sans-serif" }}>{d.v}</div>
-              <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>{d.s}</div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Top States bar chart */}
-        {kpis.topStates.length > 0 && (
-          <Card accent="#8b5cf6">
-            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
-              Estados con más menciones de protestas
-            </div>
-            {kpis.topStates.map((s, i) => (
-              <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-                <div style={{ width:100, fontSize:12, fontFamily:font, color:TEXT, textAlign:"right", flexShrink:0 }}>{s.state}</div>
-                <div style={{ flex:1, height:16, background:`${BORDER}40`, borderRadius:2, overflow:"hidden" }}>
-                  <div style={{ width:`${(s.count/maxState)*100}%`, height:"100%", background:"linear-gradient(90deg, #8b5cf6, #a78bfa)", borderRadius:2, transition:"width 0.5s ease" }} />
-                </div>
-                <div style={{ width:30, fontSize:12, fontFamily:font, color:"#8b5cf6", fontWeight:700, textAlign:"right" }}>{s.count}</div>
-              </div>
-            ))}
-          </Card>
-        )}
-
-        {/* Latest numbers extracted */}
-        {kpis.latestNumbers.length > 0 && (
-          <Card accent="#f59e0b" style={{ marginTop:12 }}>
-            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
-              Cifras extraídas de tweets recientes
-            </div>
-            {kpis.latestNumbers.map((n, i) => (
-              <div key={i} style={{ padding:"8px 0", borderBottom:i < kpis.latestNumbers.length - 1 ? `1px solid ${BORDER}30` : "none" }}>
-                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4, flexWrap:"wrap" }}>
-                  <span style={{ fontSize:18, fontWeight:800, color:"#f59e0b", fontFamily:"'Syne',sans-serif" }}>{n.number.toLocaleString("es")}</span>
-                  {n.motives.map((m, j) => (
-                    <span key={j} style={{ fontSize:10, fontFamily:font, padding:"1px 6px", borderRadius:10, background:`${motiveColors[m] || MUTED}18`, color:motiveColors[m] || MUTED }}>{m}</span>
-                  ))}
-                  {n.states.map((s, j) => (
-                    <span key={j} style={{ fontSize:10, fontFamily:font, padding:"1px 6px", borderRadius:10, background:"#8b5cf618", color:"#8b5cf6" }}>📍 {s}</span>
-                  ))}
-                </div>
-                <div style={{ fontSize:12, color:MUTED, lineHeight:1.5 }}>{n.text}</div>
-                <div style={{ fontSize:10, color:`${MUTED}80`, marginTop:2 }}>
-                  {n.date ? new Date(n.date).toLocaleDateString("es-VE", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : ""}
-                </div>
-              </div>
-            ))}
-          </Card>
-        )}
-      </>)}
-
-      {/* ── MOTIVES VIEW ── */}
-      {viewMode === "motives" && (<>
-        {kpis.topMotives.length > 0 ? (
-          <Card accent="#E5243B">
-            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:12, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
-              Motivos de protesta — Frecuencia en tweets de @OVCSocial
-            </div>
-            {kpis.topMotives.map((m, i) => {
-              const color = motiveColors[m.motive] || MUTED;
-              return (
-                <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
-                  <div style={{ width:8, height:8, borderRadius:"50%", background:color, flexShrink:0 }} />
-                  <div style={{ width:130, fontSize:13, fontFamily:font, color:TEXT, flexShrink:0 }}>{m.motive}</div>
-                  <div style={{ flex:1, height:20, background:`${BORDER}40`, borderRadius:3, overflow:"hidden" }}>
-                    <div style={{ width:`${(m.count/maxMotive)*100}%`, height:"100%", background:`linear-gradient(90deg, ${color}cc, ${color})`, borderRadius:3, transition:"width 0.5s ease", display:"flex", alignItems:"center", justifyContent:"flex-end", paddingRight:6 }}>
-                      {m.count > 1 && <span style={{ fontSize:10, color:"#fff", fontWeight:700, fontFamily:font }}>{m.count}</span>}
-                    </div>
-                  </div>
-                  <div style={{ width:24, fontSize:12, fontFamily:font, color, fontWeight:700, textAlign:"right" }}>{m.count}</div>
-                </div>
-              );
-            })}
-          </Card>
-        ) : (
-          <Card><div style={{ textAlign:"center", padding:30, color:MUTED, fontSize:13 }}>No se detectaron motivos específicos en los tweets recientes.</div></Card>
-        )}
-
-        {/* Daily activity */}
-        {kpis.daily.length > 0 && (
-          <Card accent="#22c55e" style={{ marginTop:12 }}>
-            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
-              Actividad diaria — Tweets sobre protestas
-            </div>
-            <div style={{ display:"flex", alignItems:"flex-end", gap:4, height:80, paddingBottom:20, position:"relative" }}>
-              {kpis.daily.map((d, i) => {
-                const maxD = Math.max(...kpis.daily.map(x => x.count));
-                const pct = maxD > 0 ? (d.count / maxD) * 100 : 0;
-                return (
-                  <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", height:"100%" }}>
-                    <div style={{ fontSize:9, fontFamily:font, color:"#22c55e", marginBottom:2 }}>{d.count}</div>
-                    <div style={{ width:"100%", height:`${Math.max(pct, 4)}%`, background:"linear-gradient(180deg, #22c55e, #16a34a)", borderRadius:"2px 2px 0 0" }} />
-                    <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginTop:4, transform:"rotate(-45deg)", transformOrigin:"top center", whiteSpace:"nowrap" }}>
-                      {new Date(d.date).toLocaleDateString("es-VE", { day:"numeric", month:"short" })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
-        )}
-      </>)}
-
-      {/* ── TWEETS VIEW ── */}
-      {viewMode === "tweets" && (
-        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-          {tweets.filter(t => t.isProtest).length === 0 ? (
-            <Card><div style={{ textAlign:"center", padding:30, color:MUTED, fontSize:13 }}>No se encontraron tweets sobre protestas en el feed actual.</div></Card>
-          ) : tweets.filter(t => t.isProtest).slice(0, 20).map((t, i) => (
-            <Card key={i} accent={t.numbers.length > 0 ? "#f59e0b" : "#E5243B"}>
-              <div style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
-                <div style={{ fontSize:18, flexShrink:0 }}>{t.numbers.length > 0 ? "📊" : "✊"}</div>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontSize:13, color:TEXT, lineHeight:1.6, marginBottom:6, wordBreak:"break-word" }}>
-                    {t.text.length > 280 ? t.text.substring(0, 280) + "..." : t.text}
-                  </div>
-                  <div style={{ display:"flex", flexWrap:"wrap", gap:4, marginBottom:6 }}>
-                    {t.motives.map((m, j) => (
-                      <span key={j} style={{ fontSize:10, fontFamily:font, padding:"1px 6px", borderRadius:10, background:`${motiveColors[m] || MUTED}15`, color:motiveColors[m] || MUTED }}>{m}</span>
-                    ))}
-                    {t.states.map((s, j) => (
-                      <span key={`s${j}`} style={{ fontSize:10, fontFamily:font, padding:"1px 6px", borderRadius:10, background:"#8b5cf615", color:"#8b5cf6" }}>📍 {s}</span>
-                    ))}
-                    {t.numbers.map((n, j) => (
-                      <span key={`n${j}`} style={{ fontSize:10, fontFamily:font, padding:"1px 6px", borderRadius:10, background:"#f59e0b15", color:"#f59e0b", fontWeight:700 }}>#{n.toLocaleString("es")}</span>
-                    ))}
-                  </div>
-                  <div style={{ display:"flex", alignItems:"center", gap:8, fontSize:10, color:`${MUTED}80` }}>
-                    <span>{t.date ? new Date(t.date).toLocaleDateString("es-VE", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : ""}</span>
-                    {t.link && <a href={t.link} target="_blank" rel="noopener noreferrer" style={{ color:"#1d9bf0", textDecoration:"none", fontSize:10, fontFamily:font }}>Ver en 𝕏 ↗</a>}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-
-          {tweets.filter(t => !t.isProtest).length > 0 && (
-            <div style={{ marginTop:12 }}>
-              <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8, paddingBottom:4, borderBottom:`1px solid ${BORDER}30` }}>
-                Otros tweets recientes de @OVCSocial
-              </div>
-              {tweets.filter(t => !t.isProtest).slice(0, 10).map((t, i) => (
-                <div key={i} style={{ padding:"8px 0", borderBottom:`1px solid ${BORDER}20`, fontSize:12, color:MUTED, lineHeight:1.5 }}>
-                  {t.text.length > 200 ? t.text.substring(0, 200) + "..." : t.text}
-                  <span style={{ marginLeft:8, fontSize:10, color:`${MUTED}60` }}>
-                    {t.date ? new Date(t.date).toLocaleDateString("es-VE", { day:"numeric", month:"short" }) : ""}
-                  </span>
-                  {t.link && <a href={t.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft:6, color:"#1d9bf0", textDecoration:"none", fontSize:10, fontFamily:font }}>↗</a>}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Footer */}
-      <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}60`, marginTop:12, textAlign:"center", lineHeight:1.5 }}>
-        Datos extraídos de @OVCSocial vía Nitter RSS · KPIs por análisis de texto (regex) · Verificar con informes oficiales OVCS
-      </div>
     </div>
   );
 }
