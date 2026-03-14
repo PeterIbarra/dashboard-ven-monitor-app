@@ -1086,7 +1086,7 @@ const SITREP_ALL = [
       { name:"Sociedad", items:["12 de marzo: 39 movilizaciones en 23 estados — pico del año","65 protestas totales en la semana (prom. 16/día)","Demanda central: aumento salarial","Gremios, sindicatos, jubilados y pensionados","Superaron piquetes de la PNB","Diputados acompañaron demandas (Stalin González)"] },
     ],
     nacional: {
-      amnistia: { solicitudes:null, libertadesPlenas:7727, privadosLiberados:null, cautelares:null, militares:null },
+      amnistia: { solicitudes:null, libertadesPlenas:7727, privadosLiberados:null, cautelares:null, militares:null, fpVerificados:670, fpDetenidos:508, fpNota:"Foro Penal 9 mar: 670 excarcelaciones verificadas · 508 presos políticos activos · ONU: 87 nuevas detenciones post-3 enero" },
       rodriguez: [
         { title:"Reconocimiento formal de EE.UU.", text:"Trump designa a Rodríguez como «único interlocutor legítimo de Venezuela». Notificación al tribunal federal de NY." },
         { title:"Decreto N.° 5.266", text:"Absorción de Minerven por la Corporación Venezolana de Minería. Ministro Héctor José Silva a cargo." },
@@ -1717,9 +1717,9 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
               <div style={{ fontFamily:fontSans, fontSize:mob?13:14, fontWeight:600, color:TEXT, marginBottom:12 }}>Balance Comisión de Seguimiento</div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
                 {[
-                  { v:d.nacional.amnistia.solicitudes?.toLocaleString() || "—", l:"Solicitudes recibidas", c:ACCENT },
+                  { v:d.nacional.amnistia.solicitudes?.toLocaleString() || d.nacional.amnistia.fpDetenidos?.toLocaleString() || "—", l:d.nacional.amnistia.solicitudes ? "Solicitudes recibidas" : "Presos políticos (FP)", c:d.nacional.amnistia.solicitudes ? ACCENT : "#dc2626" },
                   { v:d.nacional.amnistia.libertadesPlenas?.toLocaleString() || "—", l:"Libertades plenas", c:"#16a34a" },
-                  { v:d.nacional.amnistia.privadosLiberados?.toLocaleString() || "—", l:"Privados liberados", c:TEXT },
+                  { v:d.nacional.amnistia.privadosLiberados?.toLocaleString() || d.nacional.amnistia.fpVerificados?.toLocaleString() || "—", l:d.nacional.amnistia.privadosLiberados ? "Privados liberados" : "Excarcelaciones verif. (FP)", c:d.nacional.amnistia.privadosLiberados ? TEXT : "#ca8a04" },
                   { v:d.nacional.amnistia.cautelares?.toLocaleString() || "—", l:"Con cautelares", c:TEXT },
                 ].map((item, i) => (
                   <div key={i} style={{ background:BG3, padding:mob?10:14, textAlign:"center" }}>
@@ -1728,9 +1728,16 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
                   </div>
                 ))}
               </div>
+              {d.nacional.amnistia.fpNota && (
+                <div style={{ fontFamily:fontSans, fontSize:mob?10:11, color:MUTED, marginTop:10, padding:"6px 8px", background:BG3, borderLeft:`3px solid #ca8a04` }}>
+                  📋 {d.nacional.amnistia.fpNota}
+                </div>
+              )}
+              {d.nacional.amnistia.militares && (
               <div style={{ fontFamily:fontSans, fontSize:mob?10:11, color:MUTED, marginTop:10 }}>
                 Excarcelación de <strong style={{ color:TEXT }}>{d.nacional.amnistia.militares} militares</strong> en el marco de la amnistía.
               </div>
+              )}
             </div>
             <div style={cardStyle}>
               <div style={tagStyle(ACCENT)}>Asamblea Nacional — Jorge Rodríguez</div>
