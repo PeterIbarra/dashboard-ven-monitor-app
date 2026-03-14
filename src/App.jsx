@@ -2459,15 +2459,19 @@ function TabDashboard({ week, liveData = {} }) {
         // Brent
         if (liveData?.oil?.brent) {
           const brent = parseFloat(liveData.oil.brent);
-          if (brent < 60) liveAlerts.push({ name:"Brent", val:`$${brent.toFixed(2)}`, umbral:"Brent <$60 presiona ingresos petroleros — riesgo fiscal E2", level:"red" });
-          else if (brent < 65) liveAlerts.push({ name:"Brent", val:`$${brent.toFixed(2)}`, umbral:"Brent <$65 reduce margen fiscal venezolano", level:"yellow" });
+          if (brent < 60) liveAlerts.push({ name:"Brent ⬇", val:`$${brent.toFixed(2)}`, umbral:"Brent <$60 presiona ingresos petroleros — riesgo fiscal E2", level:"red" });
+          else if (brent < 65) liveAlerts.push({ name:"Brent ⬇", val:`$${brent.toFixed(2)}`, umbral:"Brent <$65 reduce margen fiscal venezolano", level:"yellow" });
+          else if (brent > 95) liveAlerts.push({ name:"Brent ⬆", val:`$${brent.toFixed(2)}`, umbral:"Brent >$95 — ingresos récord pero posible shock geopolítico (Ormuz/Irán)", level:"red" });
+          else if (brent > 85) liveAlerts.push({ name:"Brent ⬆", val:`$${brent.toFixed(2)}`, umbral:"Brent >$85 — favorable para ingresos VEN, monitorear volatilidad", level:"yellow" });
         }
 
         // WTI
         if (liveData?.oil?.wti) {
           const wti = parseFloat(liveData.oil.wti);
-          if (wti < 55) liveAlerts.push({ name:"WTI", val:`$${wti.toFixed(2)}`, umbral:"WTI <$55 señal de debilidad en mercado energético", level:"red" });
-          else if (wti < 60) liveAlerts.push({ name:"WTI", val:`$${wti.toFixed(2)}`, umbral:"WTI en zona de presión (<$60)", level:"yellow" });
+          if (wti < 55) liveAlerts.push({ name:"WTI ⬇", val:`$${wti.toFixed(2)}`, umbral:"WTI <$55 señal de debilidad en mercado energético", level:"red" });
+          else if (wti < 60) liveAlerts.push({ name:"WTI ⬇", val:`$${wti.toFixed(2)}`, umbral:"WTI en zona de presión (<$60)", level:"yellow" });
+          else if (wti > 90) liveAlerts.push({ name:"WTI ⬆", val:`$${wti.toFixed(2)}`, umbral:"WTI >$90 — tensión en mercado energético global, ingresos VEN al alza", level:"red" });
+          else if (wti > 80) liveAlerts.push({ name:"WTI ⬆", val:`$${wti.toFixed(2)}`, umbral:"WTI >$80 — favorable para Venezuela, monitorear causa del alza", level:"yellow" });
         }
 
         // Bilateral Threat Index
