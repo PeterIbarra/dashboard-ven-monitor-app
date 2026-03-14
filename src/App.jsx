@@ -2684,7 +2684,7 @@ function TabDashboard({ week, liveData = {} }) {
         const gobLib = latest.gob.libertades || latest.gob.excarcelados || 0;
         const fpVerif = latest.fp.verificados || 0;
         const brecha = gobLib && fpVerif ? Math.round((1 - fpVerif / gobLib) * 100) : null;
-        const fpDelta = prev?.fp?.verificados ? fpVerif - prev.fp.verificados : null;
+        const fpDelta = (prev?.fp?.verificados && fpVerif !== prev.fp.verificados) ? fpVerif - prev.fp.verificados : null;
         return (
           <Card>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
@@ -2702,8 +2702,7 @@ function TabDashboard({ week, liveData = {} }) {
               ].map((item, i) => (
                 <div key={i} style={{ background:BG3, padding:mob?8:12, textAlign:"center" }}>
                   <div style={{ fontFamily:fontSans, fontSize:mob?18:24, fontWeight:700, color:item.c }}>
-                    {item.v}
-                    {item.delta && item.delta > 0 && <span style={{ fontSize:11, color:"#16a34a", marginLeft:4 }}>+{item.delta}</span>}
+                    {item.v}{item.delta != null && item.delta > 0 ? <span style={{ fontSize:11, color:"#16a34a", marginLeft:4, display:"inline" }}> +{item.delta}</span> : null}
                   </div>
                   <div style={{ fontFamily:font, fontSize:mob?7:8, letterSpacing:"0.08em", color:MUTED, textTransform:"uppercase" }}>{item.l}</div>
                   <div style={{ fontFamily:font, fontSize:mob?7:8, color:item.c, opacity:0.7 }}>{item.sub}</div>
