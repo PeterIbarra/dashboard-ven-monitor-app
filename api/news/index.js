@@ -214,22 +214,87 @@ async function fetchPolymarketSignal() {
   return null;
 }
 
-// ── HEURISTIC STATUS — when Mistral doesn't classify ──
-function heuristicStatus(mentions, tone) {
+// ── HEURISTIC STATUS — smarter logic using relative tone + mention patterns ──
+function heuristicStatus(mentions, tone, avgTone, avgMentions) {
   if (mentions === 0) return "SILENCIO";
-  // Tone: negative = conflictive coverage, but for government actors negative tone is normal
-  // High mentions + very negative tone = potential tension
-  if (mentions > 20 && tone != null && tone < -5) return "TENSION";
-  if (mentions > 10) return "ALINEADO"; // Active in media = likely participating in government
-  if (mentions > 0 && tone != null && tone > -3) return "NEUTRO";
+
+  // Compare actor's tone vs group average — divergence = tension signal
+  const toneDelta = (tone != null && avgTone != null) ? tone - avgTone : 0;
+  const mentionRatio = avgMentions > 0 ? mentions / avgMentions : 1;
+
+  // Very negative tone AND significantly worse than group = TENSION
+  if (tone != null && tone < -5 && toneDelta < -1.5) return "TENSION";
+  // Dramatically fewer mentions than average = something is off
+  if (mentionRatio < 0.15 && mentions < 5) return "SILENCIO";
+  // Significantly less visible than peers = potential distance
+  if (mentionRatio < 0.3) return "NEUTRO";
+  // Much more negative than average = potential friction
+  if (toneDelta < -2) return "NEUTRO";
+  // Active with tone close to group norm = aligned
+  if (mentionRatio > 0.5 && (toneDelta > -1.5 || tone == null)) return "ALINEADO";
   return "NEUTRO";
 }
 
+// ── SYSTEMIC SIGNALS — broader chavismo/government cohesion queries ──
+const SYSTEMIC_QUERIES = [
+  { id: "psuv", name: "PSUV", query: "PSUV Venezuela partido" },
+  { id: "chavismo", name: "Chavismo", query: "chavismo Venezuela unidad OR fractura OR división" },
+  { id: "colectivos", name: "Colectivos", query: "colectivos Venezuela armados" },
+  { id: "gobernadores", name: "Gobernadores chavistas", query: "gobernadores Venezuela PSUV gobierno regional" },
+  { id: "militares", name: "Sector militar", query: "militares Venezuela generales CEOFANB GNB" },
+];
+
+async function fetchSystemicSignals() {
+  const results = [];
+  for (const sq of SYSTEMIC_QUERIES) {
+    try {
+      const query = encodeURIComponent(sq.query);
+      // Fetch tone
+      const toneUrl = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=timelinetone&timespan=7d&format=csv`;
+      const tRes = await fetch(toneUrl, { signal: AbortSignal.timeout(6000) });
+      let tone = null;
+      if (tRes.ok) {
+        const csv = await tRes.text();
+        const lines = csv.trim().split("\n").slice(1);
+        let sum = 0, count = 0;
+        for (const line of lines) {
+          const val = parseFloat(line.split(",").pop());
+          if (!isNaN(val)) { sum += val; count++; }
+        }
+        if (count > 0) tone = sum / count;
+      }
+      // Fetch volume
+      const volUrl = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=timelinevol&timespan=7d&format=csv`;
+      const vRes = await fetch(volUrl, { signal: AbortSignal.timeout(6000) });
+      let volume = 0;
+      if (vRes.ok) {
+        const csv = await vRes.text();
+        const lines = csv.trim().split("\n").slice(1);
+        for (const line of lines) {
+          const val = parseFloat(line.split(",").pop());
+          if (!isNaN(val)) volume += val;
+        }
+      }
+      results.push({ id: sq.id, name: sq.name, tone, volume: Math.round(volume) });
+    } catch {
+      results.push({ id: sq.id, name: sq.name, tone: null, volume: 0 });
+    }
+  }
+  return results;
+}
+
 // ── SCORING ENGINE ──
-function computeCohesionScore(actorResults, gdeltTones, gdeltMentions, polymarket, sitrepOverride) {
-  // === 1. AI Alignment Score (30%) ===
+function computeCohesionScore(actorResults, gdeltTones, gdeltMentions, polymarket, sitrepOverride, systemicSignals) {
+  // === 1. AI Alignment Score (25%) ===
   let aiScore = 50;
   const classifications = actorResults.filter(a => a.classification);
+
+  // Compute group averages for heuristic
+  const allTones = Object.values(gdeltTones).filter(v => v !== null);
+  const avgTone = allTones.length > 0 ? allTones.reduce((a,b)=>a+b,0)/allTones.length : null;
+  const allMentions = Object.values(gdeltMentions);
+  const avgMentions = allMentions.length > 0 ? allMentions.reduce((a,b)=>a+b,0)/allMentions.length : 0;
+
   if (classifications.length > 0) {
     const alignmentValues = { ALINEADO: 100, NEUTRO: 50, TENSION: 0 };
     const total = classifications.reduce((sum, a) => {
@@ -240,8 +305,7 @@ function computeCohesionScore(actorResults, gdeltTones, gdeltMentions, polymarke
     const totalConf = classifications.reduce((s, a) => s + (a.classification.confidence ?? 0.5), 0);
     aiScore = totalConf > 0 ? total / totalConf : 50;
   } else {
-    // Fallback: use heuristic status from mentions + tone
-    const heuristics = actorResults.map(a => heuristicStatus(a.mentions, a.tone));
+    const heuristics = actorResults.map(a => heuristicStatus(a.mentions, a.tone, avgTone, avgMentions));
     const hValues = { ALINEADO: 100, NEUTRO: 50, TENSION: 0, SILENCIO: 30 };
     const hTotal = heuristics.reduce((s, h) => s + (hValues[h] ?? 50), 0);
     aiScore = hTotal / heuristics.length;
@@ -257,40 +321,62 @@ function computeCohesionScore(actorResults, gdeltTones, gdeltMentions, polymarke
     toneDivScore = Math.max(0, Math.min(100, 100 - divergence * 10));
   }
 
-  // === 3. Mention Count / Silence (15%) ===
+  // === 3. Mention Count / Silence (10%) ===
   let silenceScore = 75;
   const mentionValues = Object.entries(gdeltMentions);
   if (mentionValues.length > 0) {
-    const avgMentions = mentionValues.reduce((s, [, v]) => s + v, 0) / mentionValues.length;
-    const threshold = Math.max(avgMentions * 0.15, 3); // at least 3 mentions to not be "silent"
+    const threshold = Math.max(avgMentions * 0.15, 3);
     const silentActors = mentionValues.filter(([, v]) => v < threshold).length;
     silenceScore = Math.max(20, 100 - silentActors * 12);
   }
 
-  // === 4. Polymarket Delta (10%) ===
+  // === 4. Systemic Cohesion (10%) — broader chavismo signals ===
+  let systemicScore = 50;
+  if (systemicSignals && systemicSignals.length > 0) {
+    const sysTones = systemicSignals.filter(s => s.tone != null).map(s => s.tone);
+    if (sysTones.length >= 2) {
+      // Average systemic tone: more negative = more conflict coverage = lower cohesion
+      const sysAvg = sysTones.reduce((a,b) => a+b, 0) / sysTones.length;
+      // Map: tone -8 or worse = 0 (no cohesion), tone 0 = 100 (full cohesion)
+      systemicScore = Math.max(0, Math.min(100, (sysAvg + 8) / 8 * 100));
+      // Divergence between systemic topics
+      const sysDivergence = Math.max(...sysTones) - Math.min(...sysTones);
+      if (sysDivergence > 3) systemicScore *= 0.8; // penalty for divergent signals
+    }
+    // Chavismo fracture keywords would pull score down
+    const fracturaSignal = systemicSignals.find(s => s.id === "chavismo");
+    if (fracturaSignal && fracturaSignal.tone != null && fracturaSignal.tone < -6) {
+      systemicScore *= 0.7; // heavy penalty
+    }
+  }
+
+  // === 5. Polymarket Delta (10%) ===
   let polyScore = 50;
   if (polymarket?.price != null) {
     polyScore = polymarket.price * 100;
   }
 
-  // === 5. SITREP Override (30%) ===
+  // === 6. SITREP Override (30%) ===
   const sitrepScore = sitrepOverride ?? null;
 
   // === COMPOSITE ===
   let composite;
   if (sitrepScore !== null) {
-    composite = aiScore * 0.30 + sitrepScore * 0.30 + toneDivScore * 0.15 + silenceScore * 0.15 + polyScore * 0.10;
+    // With SITREP: AI 25% + SITREP 30% + Tone 10% + Silence 5% + Systemic 10% + Poly 10% + leftover to SITREP
+    composite = aiScore*0.25 + sitrepScore*0.30 + toneDivScore*0.10 + silenceScore*0.05 + systemicScore*0.10 + polyScore*0.10 + sitrepScore*0.10;
   } else {
-    composite = aiScore * 0.43 + toneDivScore * 0.21 + silenceScore * 0.21 + polyScore * 0.15;
+    // Without SITREP: AI 35% + Tone 15% + Silence 10% + Systemic 15% + Poly 10% + default 50*0.15
+    composite = aiScore*0.35 + toneDivScore*0.15 + silenceScore*0.10 + systemicScore*0.15 + polyScore*0.10 + 50*0.15;
   }
 
   return {
     composite: Math.round(Math.max(0, Math.min(100, composite))),
     components: {
-      aiAlignment: { score: Math.round(aiScore), weight: sitrepScore !== null ? 0.30 : 0.43 },
-      gdeltToneDivergence: { score: Math.round(toneDivScore), weight: sitrepScore !== null ? 0.15 : 0.21 },
-      mentionSilence: { score: Math.round(silenceScore), weight: sitrepScore !== null ? 0.15 : 0.21 },
-      polymarketDelta: { score: Math.round(polyScore), weight: sitrepScore !== null ? 0.10 : 0.15 },
+      aiAlignment: { score: Math.round(aiScore), weight: sitrepScore !== null ? 0.25 : 0.35 },
+      gdeltToneDivergence: { score: Math.round(toneDivScore), weight: sitrepScore !== null ? 0.10 : 0.15 },
+      mentionSilence: { score: Math.round(silenceScore), weight: sitrepScore !== null ? 0.05 : 0.10 },
+      systemicCohesion: { score: Math.round(systemicScore), weight: sitrepScore !== null ? 0.10 : 0.15 },
+      polymarketDelta: { score: Math.round(polyScore), weight: 0.10 },
       sitrepValidation: sitrepScore !== null ? { score: sitrepScore, weight: 0.30 } : null,
     },
     hasSitrep: sitrepScore !== null,
@@ -327,9 +413,10 @@ async function handleCohesion(req, res) {
       };
     });
 
-    const [actorResults, polymarket] = await Promise.all([
+    const [actorResults, polymarket, systemicSignals] = await Promise.all([
       Promise.all(actorPromises),
       fetchPolymarketSignal(),
+      fetchSystemicSignals(),
     ]);
 
     const gdeltTones = {};
@@ -339,15 +426,21 @@ async function handleCohesion(req, res) {
       gdeltMentions[r.actor] = r.mentions;
     }
 
-    const scoring = computeCohesionScore(actorResults, gdeltTones, gdeltMentions, polymarket, sitrepOverride);
+    // Compute group averages for heuristic
+    const allTones = Object.values(gdeltTones).filter(v => v !== null);
+    const avgTone = allTones.length > 0 ? allTones.reduce((a,b)=>a+b,0)/allTones.length : null;
+    const allMentions = Object.values(gdeltMentions);
+    const avgMentions = allMentions.length > 0 ? allMentions.reduce((a,b)=>a+b,0)/allMentions.length : 0;
 
-    // Build actor semaphore — use Mistral if available, else heuristic
+    const scoring = computeCohesionScore(actorResults, gdeltTones, gdeltMentions, polymarket, sitrepOverride, systemicSignals);
+
+    // Build actor semaphore — use Mistral if available, else heuristic with group context
     const actorSemaphore = actorResults.map(r => {
       let status;
       if (r.classification) {
         status = r.classification.alignment;
       } else {
-        status = heuristicStatus(r.mentions, r.tone);
+        status = heuristicStatus(r.mentions, r.tone, avgTone, avgMentions);
       }
       return {
         actor: r.actor,
@@ -369,6 +462,7 @@ async function handleCohesion(req, res) {
       components: scoring.components,
       hasSitrep: scoring.hasSitrep,
       actors: actorSemaphore,
+      systemic: systemicSignals,
       polymarket: polymarket ? { price: polymarket.price, question: polymarket.question } : null,
       fetchedAt: new Date().toISOString(),
       engine: skipAI ? "gdelt+heuristic" : (MISTRAL_API_KEY ? "mistral+gdelt" : "gdelt+heuristic"),

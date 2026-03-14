@@ -2366,6 +2366,7 @@ function CohesionMiniWidget({ liveData = {} }) {
                   aiAlignment:{name:"IA Mistral",color:"#8b5cf6"},
                   gdeltToneDivergence:{name:"Tono GDELT",color:"#0e7490"},
                   mentionSilence:{name:"Menciones",color:"#f59e0b"},
+                  systemicCohesion:{name:"Chavismo",color:"#dc2626"},
                   polymarketDelta:{name:"Polymarket",color:"#3b82f6"},
                   sitrepValidation:{name:"SITREP",color:"#16a34a"},
                 }[key]||{name:key,color:MUTED};
@@ -7267,6 +7268,7 @@ function TabCohesion({ liveData = {} }) {
             aiAlignment:{name:"Alineación IA (Mistral)",icon:"🤖",color:"#8b5cf6"},
             gdeltToneDivergence:{name:"Divergencia Tono GDELT",icon:"📡",color:"#0e7490"},
             mentionSilence:{name:"Silencio mediático",icon:"🔇",color:"#f59e0b"},
+            systemicCohesion:{name:"Cohesión Chavismo",icon:"🔴",color:"#dc2626"},
             polymarketDelta:{name:"Señal Polymarket",icon:"📊",color:"#3b82f6"},
             sitrepValidation:{name:"Validación SITREP",icon:"📋",color:"#16a34a"},
           };
