@@ -173,12 +173,12 @@ async function fetchGdeltMentionCount(actorName) {
   }
 }
 
-// Polymarket — try multiple Venezuela-related slugs
+// Polymarket — find Delcy-specific price from Venezuela events
 async function fetchPolymarketSignal() {
   const slugs = [
+    "venezuela-leader-end-of-2026",
     "will-delcy-rodrguez-be-the-leader-of-venezuela-end-of-2026",
     "delcy-rodrguez-out-as-leader-of-venezuela-by",
-    "venezuela-leader-end-of-2026",
   ];
   for (const slug of slugs) {
     try {
@@ -188,16 +188,26 @@ async function fetchPolymarketSignal() {
       );
       if (!res.ok) continue;
       const data = await res.json();
-      const market = data?.[0]?.markets?.[0];
-      if (market) {
-        const price = parseFloat(market.lastTradePrice) || parseFloat(market.bestBid) || null;
-        if (price != null) {
-          return {
-            price,
-            slug: market.slug || slug,
-            question: market.question || data?.[0]?.title || "Delcy líder",
-          };
-        }
+      const event = data?.[0];
+      if (!event?.markets?.length) continue;
+
+      // For multi-outcome: find Delcy's specific market
+      const delcyMarket = event.markets.find(m =>
+        (m.question || m.groupItemTitle || "").toLowerCase().includes("delcy")
+      );
+      // For single-outcome: use first market
+      const market = delcyMarket || event.markets[0];
+      const price = parseFloat(market.lastTradePrice) || parseFloat(market.bestBid) || null;
+
+      if (price != null) {
+        // For "out as leader" markets, invert: high "out" price = low cohesion signal
+        const isOutMarket = slug.includes("out-as-leader");
+        return {
+          price: isOutMarket ? 1 - price : price,
+          slug: market.slug || slug,
+          question: delcyMarket ? (delcyMarket.question || delcyMarket.groupItemTitle || "Delcy líder") : (market.question || event.title || "Venezuela líder"),
+          raw: price,
+        };
       }
     } catch { continue; }
   }

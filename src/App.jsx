@@ -7091,7 +7091,9 @@ function TabCohesion({ liveData = {} }) {
     async function fetchCohesion() {
       if (IS_DEPLOYED) {
         try {
-          const res = await fetch(`/api/news?source=cohesion&_t=${Date.now()}`, { signal: AbortSignal.timeout(30000) });
+          const latestSitrep = [...ICG_HISTORY].reverse().find(h => h.sitrep && h.score != null);
+          const sitrepParam = latestSitrep ? `&sitrep=${latestSitrep.score}` : "";
+          const res = await fetch(`/api/news?source=cohesion${sitrepParam}&_t=${Date.now()}`, { signal: AbortSignal.timeout(30000) });
           if (res.ok) { const json = await res.json(); if (json.index != null) { setData(json); setLoading(false); return; } }
         } catch (e) { setError(e.message); }
       }
@@ -7704,7 +7706,10 @@ export default function MonitorPNUD() {
       } catch {}
       try {
         // Government Cohesion Index (ICG)
-        const cohUrl = IS_DEPLOYED ? `/api/news?source=cohesion&_t=${Math.floor(Date.now()/600000)}` : null;
+        // Get latest SITREP score from ICG_HISTORY for cohesion anchor
+        const latestSitrep = [...ICG_HISTORY].reverse().find(h => h.sitrep && h.score != null);
+        const sitrepParam = latestSitrep ? `&sitrep=${latestSitrep.score}` : "";
+        const cohUrl = IS_DEPLOYED ? `/api/news?source=cohesion${sitrepParam}&_t=${Math.floor(Date.now()/600000)}` : null;
         if (cohUrl) {
           const cRes = await fetch(cohUrl, { signal:AbortSignal.timeout(15000) }).then(r=>r.ok?r.json():null).catch(()=>null);
           if (cRes?.index != null) results.cohesion = cRes;
