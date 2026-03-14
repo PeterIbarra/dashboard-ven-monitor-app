@@ -7072,7 +7072,7 @@ const ICG_HISTORY = [
   { week:"S6", score:65, sitrep:true, note:"Tensiones FANB: Padrino 12 años. Presión oxigenación" },
   { week:"S7", score:70, sitrep:true, note:"Poder Ciudadano: renuncias Saab/Ruiz. Trump 'amigo'" },
   { week:"S8", score:66, sitrep:true, note:"Brecha entre discurso amnistía y control paralelo" },
-  { week:"S9", score:null, sitrep:false, note:"Pendiente actualización" },
+  { week:"S9", score:72, sitrep:true, note:"Reconocimiento formal EE.UU. + 39 protestas 23 estados" },
 ];
 
 function TabCohesion({ liveData = {} }) {
