@@ -7704,7 +7704,7 @@ export default function MonitorPNUD() {
       } catch {}
       try {
         // Government Cohesion Index (ICG)
-        const cohUrl = IS_DEPLOYED ? `/api/news?source=cohesion&skipai=true&_t=${Math.floor(Date.now()/600000)}` : null;
+        const cohUrl = IS_DEPLOYED ? `/api/news?source=cohesion&_t=${Math.floor(Date.now()/600000)}` : null;
         if (cohUrl) {
           const cRes = await fetch(cohUrl, { signal:AbortSignal.timeout(15000) }).then(r=>r.ok?r.json():null).catch(()=>null);
           if (cRes?.index != null) results.cohesion = cRes;
