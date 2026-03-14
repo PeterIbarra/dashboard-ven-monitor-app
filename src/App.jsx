@@ -2259,6 +2259,138 @@ INSTRUCCIONES:
   );
 }
 
+function CohesionMiniWidget({ liveData = {} }) {
+  const mob = useIsMobile();
+  const [hover, setHover] = useState(false);
+  const [hoverActor, setHoverActor] = useState(null);
+
+  const data = liveData?.cohesion || null;
+
+  const statusColor = {ALINEADO:"#16a34a",NEUTRO:"#ca8a04",TENSION:"#dc2626",SILENCIO:"#6b7280"};
+  const statusLabel = {ALINEADO:"Alineado",NEUTRO:"Neutro",TENSION:"Tensión",SILENCIO:"Silencio"};
+
+  if (!data) {
+    return (
+      <div style={{ border:`1px solid ${BORDER}`, background:BG2, padding:"10px 14px", display:"flex", alignItems:"center", gap:10 }}>
+        <span style={{ fontSize:14 }}>🏛</span>
+        <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>COHESIÓN DE GOBIERNO · Cargando...</span>
+        <span style={{ width:6, height:6, borderRadius:"50%", background:MUTED, animation:"pulse 1.5s infinite", marginLeft:"auto" }} />
+      </div>
+    );
+  }
+
+  const score = data.index;
+  const level = data.level;
+  const levelColor = {ALTA:"#16a34a",MEDIA:"#ca8a04",BAJA:"#f97316",CRITICA:"#dc2626"};
+  const col = levelColor[level] || MUTED;
+  const aligned = data.actors?.filter(a => a.status === "ALINEADO").length || 0;
+  const tension = data.actors?.filter(a => a.status === "TENSION").length || 0;
+  const actors = data.actors || [];
+
+  return (
+    <div style={{ border:`1px solid ${BORDER}`, background:BG2 }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => { setHover(false); setHoverActor(null); }}>
+      {/* Compact header row */}
+      <div style={{ display:"flex", alignItems:"center", gap:0, cursor:"pointer" }}>
+        {/* Left: Score */}
+        <div style={{ padding:mob?"8px 10px":"10px 14px", display:"flex", alignItems:"center", gap:8, borderRight:`1px solid ${BORDER}40`, minWidth:mob?"auto":160 }}>
+          <span style={{ fontSize:14 }}>🏛</span>
+          <div>
+            <div style={{ fontSize:8, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:MUTED }}>Cohesión de Gobierno</div>
+            <div style={{ display:"flex", alignItems:"baseline", gap:4, marginTop:1 }}>
+              <span style={{ fontSize:mob?20:26, fontWeight:900, fontFamily:"'Playfair Display',serif", color:col, lineHeight:1 }}>{score}</span>
+              <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>/100</span>
+            </div>
+          </div>
+        </div>
+        {/* Mini thermometer */}
+        <div style={{ flex:1, padding:mob?"6px 8px":"8px 14px" }}>
+          <div style={{ position:"relative", height:10, background:"linear-gradient(to right, #dc2626, #f97316, #ca8a04, #16a34a)", borderRadius:4, overflow:"hidden" }}>
+            {[25,50,75].map(v => <div key={v} style={{ position:"absolute", left:`${v}%`, top:0, bottom:0, width:1, background:"rgba(255,255,255,0.3)" }} />)}
+            <div style={{ position:"absolute", left:`${score}%`, top:"50%", transform:"translate(-50%,-50%)", width:8, height:8, borderRadius:"50%", background:"#fff", border:`2px solid ${col}`, boxShadow:`0 0 4px ${col}` }} />
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", fontSize:7, fontFamily:font, color:`${MUTED}60`, marginTop:2 }}>
+            <span>Crítica</span><span>Baja</span><span>Media</span><span>Alta</span>
+          </div>
+        </div>
+        {/* Actor dots + level badge */}
+        <div style={{ padding:mob?"6px 8px":"8px 14px", display:"flex", alignItems:"center", gap:8 }}>
+          <div style={{ display:"flex", gap:2 }}>
+            {actors.map(a => (
+              <span key={a.actor} title={`${a.name}: ${statusLabel[a.status]||a.status}`}
+                onMouseEnter={() => setHoverActor(a.actor)}
+                style={{ width:7, height:7, borderRadius:"50%", background:statusColor[a.status]||BORDER,
+                  transition:"transform 0.15s", transform:hoverActor===a.actor?"scale(1.6)":"scale(1)" }} />
+            ))}
+          </div>
+          <div style={{ fontSize:10, fontFamily:fontSans, fontWeight:700, color:col, padding:"1px 8px",
+            background:`${col}12`, border:`1px solid ${col}25` }}>{level}</div>
+        </div>
+      </div>
+
+      {/* Expanded on hover */}
+      {hover && actors.length > 0 && (
+        <div style={{ padding:mob?"8px 10px":"10px 14px", borderTop:`1px solid ${BORDER}40`, animation:"fadeSlide 0.2s ease" }}>
+          <style>{`@keyframes fadeSlide { from { opacity:0; transform:translateY(-4px) } to { opacity:1; transform:translateY(0) } }`}</style>
+          {/* Actor grid */}
+          <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:5, marginBottom:8 }}>
+            {actors.map(a => {
+              const sc = statusColor[a.status]||MUTED;
+              const isHov = hoverActor===a.actor;
+              return (
+                <div key={a.actor}
+                  onMouseEnter={() => setHoverActor(a.actor)}
+                  onMouseLeave={() => setHoverActor(null)}
+                  style={{ background:isHov?`${sc}08`:BG3, borderLeft:`3px solid ${sc}`, padding:"6px 8px",
+                    borderRadius:3, transition:"all 0.15s" }}>
+                  <div style={{ fontSize:10, fontWeight:600, color:TEXT, lineHeight:1.2,
+                    whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{a.name}</div>
+                  <div style={{ display:"flex", alignItems:"center", gap:3, marginTop:2 }}>
+                    <span style={{ width:5, height:5, borderRadius:"50%", background:sc }} />
+                    <span style={{ fontSize:9, fontFamily:font, color:sc, fontWeight:600 }}>{statusLabel[a.status]||a.status}</span>
+                    {a.mentions!=null && <span style={{ fontSize:8, fontFamily:font, color:MUTED, marginLeft:"auto" }}>{a.mentions}m</span>}
+                  </div>
+                  {isHov && a.evidence && (
+                    <div style={{ fontSize:9, color:MUTED, marginTop:3, lineHeight:1.3 }}>{a.evidence}</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          {/* Component bars compact */}
+          {data.components && (
+            <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:4 }}>
+              {Object.entries(data.components).filter(([,v])=>v).map(([key,comp]) => {
+                const meta = {
+                  aiAlignment:{name:"IA Mistral",color:"#8b5cf6"},
+                  gdeltToneDivergence:{name:"Tono GDELT",color:"#0e7490"},
+                  mentionSilence:{name:"Menciones",color:"#f59e0b"},
+                  polymarketDelta:{name:"Polymarket",color:"#3b82f6"},
+                  sitrepValidation:{name:"SITREP",color:"#16a34a"},
+                }[key]||{name:key,color:MUTED};
+                return (
+                  <div key={key} style={{ display:"flex", alignItems:"center", gap:4 }}>
+                    <span style={{ fontSize:9, fontFamily:font, color:MUTED, width:70, flexShrink:0 }}>{meta.name}</span>
+                    <div style={{ flex:1, height:4, background:BG3, borderRadius:2, overflow:"hidden" }}>
+                      <div style={{ width:`${Math.max(2,comp.score)}%`, height:"100%", background:meta.color, borderRadius:2 }} />
+                    </div>
+                    <span style={{ fontSize:9, fontFamily:font, fontWeight:600, color:meta.color, width:20, textAlign:"right" }}>{comp.score}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          <div style={{ fontSize:8, fontFamily:font, color:`${MUTED}50`, marginTop:6, display:"flex", justifyContent:"space-between" }}>
+            <span>{aligned}✓ alineados · {tension}⚠ tensión · {data.engine||"—"}</span>
+            <span>{new Date(data.fetchedAt).toLocaleString("es-VE",{timeZone:"America/Caracas",hour:"2-digit",minute:"2-digit"})}</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TabDashboard({ week, liveData = {} }) {
   const mob = useIsMobile();
   const wk = WEEKS[week];
@@ -2380,7 +2512,7 @@ function TabDashboard({ week, liveData = {} }) {
         })}
       </div>
 
-      {/* ── ROW 1b: Índice de Inestabilidad Compuesto ── */}
+      {/* ── ROW 1b: Índice de Inestabilidad Compuesto (15 factores) ── */}
       {(() => {
         // ── 13-input Composite Instability Index (0-100) ──
         const e1 = wk.probs.find(p=>p.sc===1)?.v || 0;
@@ -2426,7 +2558,11 @@ function TabDashboard({ week, liveData = {} }) {
         const bilV = liveData?.bilateral?.latest?.v || 0;
         const bilPct = Math.min(bilV / 4 * 100, 100); // 0-4σ mapped to 0-100%
 
-        // ── FORMULA (14 inputs, weights sum to ~100 with stabilizers) ──
+        // Government Cohesion Index (ICG) — LIVE (inverted: low cohesion = high instability)
+        const icgRaw = liveData?.cohesion?.index ?? null;
+        const icgInverted = icgRaw != null ? Math.max(0, 100 - icgRaw) : null; // 100-ICG: 0=full cohesion, 100=no cohesion
+
+        // ── FORMULA (15 inputs, weights sum to ~100 with stabilizers) ──
         const raw = (redCount/totalInds)*11            // Ind. rojos: 11%
           + (e2/100)*9                                  // E2 Colapso: 9%
           + (e4/100)*7                                  // E4 Resistencia: 7%
@@ -2435,6 +2571,7 @@ function TabDashboard({ week, liveData = {} }) {
           + (sigActive/sigTotal)*7                       // Señales E4+E2: 7%
           + (brentFactor/100)*5                          // Brent presión: 5% (LIVE)
           + (bilPct/100)*5                               // Bilateral Threat: 5% (LIVE)
+          + ((icgInverted != null ? icgInverted : 50)/100)*5  // Cohesión GOB (inv): 5% (LIVE)
           + (protestPct/100)*5                           // Protestas OVCS: 5%
           + (repressionPct/100)*4                        // Represión OVCS: 4%
           + (amnBrechaPct/100)*5                         // Brecha amnistía: 5%
@@ -2451,7 +2588,8 @@ function TabDashboard({ week, liveData = {} }) {
           const pTR=prevWk.tensiones.filter(t=>t.l==="red").length, pTT=prevWk.tensiones.length||1;
           const pRaw = (redCount/totalInds)*11 + (pe2/100)*9 + (pe4/100)*7
             + (Math.min(brechaLive,100)/100)*11 + (pTR/pTT)*7 + (sigActive/sigTotal)*7
-            + (brentFactor/100)*5 + (bilPct/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
+            + (brentFactor/100)*5 + (bilPct/100)*5 + ((icgInverted != null ? icgInverted : 50)/100)*5
+            + (protestPct/100)*5 + (repressionPct/100)*4
             + (amnBrechaPct/100)*5 + (presosPct/100)*3 - (pe1/100)*6 - (pe3/100)*3;
           prevIndex = Math.max(0, Math.min(100, Math.round(pRaw)));
         }
@@ -2488,9 +2626,10 @@ function TabDashboard({ week, liveData = {} }) {
           const wBrecha = (wi === WEEKS.length - 1) ? brechaLive : Math.max(20, 55 - we1 * 0.5 + we2 * 0.3);
           const wBrent = (wi === WEEKS.length - 1) ? brentFactor : 50;
           const wBil = (wi === WEEKS.length - 1) ? bilPct : Math.min(we2 * 1.5 + we4 * 0.5, 100);
+          const wIcg = (wi === WEEKS.length - 1 && icgInverted != null) ? icgInverted : 50; // approximate for historical
           const wr = (wRedProxy/wTotalSem)*11 + (we2/100)*9 + (we4/100)*7
             + (Math.min(wBrecha,100)/100)*11 + (wtr/wtt)*7 + (sigActive/sigTotal)*7
-            + (wBrent/100)*5 + (wBil/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
+            + (wBrent/100)*5 + (wBil/100)*5 + (wIcg/100)*5 + (protestPct/100)*5 + (repressionPct/100)*4
             + (wAmnBrecha/100)*5 + (wPresos/100)*3 - (we1/100)*6 - (we3/100)*3;
           return Math.max(0, Math.min(100, Math.round(wr)));
         });
@@ -2509,6 +2648,7 @@ function TabDashboard({ week, liveData = {} }) {
           { label:"Brecha amnist.", value:`${amnBrechaPct.toFixed(0)}%`, pct:Math.round(amnBrechaPct), w:"5%" },
           { label:"Represión", value:`${lastMonth?.rep||0}`, pct:Math.round(repressionPct), w:"4%" },
           { label:"Presos pol.", value:`${amnLatest?.fp?.detenidos||"—"}`, pct:Math.round(presosPct), w:"3%" },
+          { label:"Cohesión GOB 🏛", value:icgRaw != null ? `${icgRaw}` : "—", pct:icgInverted != null ? Math.round(icgInverted) : 50, w:"5%", live:true },
           { label:"E1 Transición", value:`-${e1}%`, pct:0, w:"-6%", isNeg:true },
           { label:"E3 Continuidad", value:`-${e3}%`, pct:0, w:"-3%", isNeg:true },
         ];
@@ -2676,6 +2816,9 @@ function TabDashboard({ week, liveData = {} }) {
           </div>
         );
       })()}
+
+      {/* ── ROW 1d: Cohesión de Gobierno (mini) ── */}
+      <CohesionMiniWidget liveData={liveData} />
 
       {/* ── ROW 2: Amnistía Tracker ── */}
       {(() => {
@@ -6915,11 +7058,325 @@ function TradingViewMini({ symbol, height=280 }) {
   return <div id={id} style={{ width:"100%", height }} />;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// TAB: COHESIÓN DE GOBIERNO — Índice de Cohesión del Gobierno (ICG)
+// ═══════════════════════════════════════════════════════════════
+
+const ICG_HISTORY = [
+  { week:"S1", score:82, sitrep:true, note:"Post-operativo: élite cierra filas bajo presión externa" },
+  { week:"S2", score:78, sitrep:true, note:"Delcy consolida. FANB sin señales de fractura" },
+  { week:"S3", score:80, sitrep:true, note:"Gabinete activo. Cohesión institucional alta" },
+  { week:"S4", score:72, sitrep:true, note:"FANB reafirma lealtad pero tensiones internas" },
+  { week:"S5", score:68, sitrep:true, note:"Delcy reafirma legitimidad Maduro. Cabello activo" },
+  { week:"S6", score:65, sitrep:true, note:"Tensiones FANB: Padrino 12 años. Presión oxigenación" },
+  { week:"S7", score:70, sitrep:true, note:"Poder Ciudadano: renuncias Saab/Ruiz. Trump 'amigo'" },
+  { week:"S8", score:66, sitrep:true, note:"Brecha entre discurso amnistía y control paralelo" },
+  { week:"S9", score:null, sitrep:false, note:"Pendiente actualización" },
+];
+
+function TabCohesion({ liveData = {} }) {
+  const mob = useIsMobile();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [expanded, setExpanded] = useState(null);
+
+  // Use liveData if already loaded, otherwise fetch directly, fallback to mock
+  useEffect(() => {
+    if (liveData?.cohesion) {
+      setData(liveData.cohesion);
+      setLoading(false);
+      return;
+    }
+    async function fetchCohesion() {
+      if (IS_DEPLOYED) {
+        try {
+          const res = await fetch(`/api/news?source=cohesion&_t=${Date.now()}`, { signal: AbortSignal.timeout(30000) });
+          if (res.ok) { const json = await res.json(); if (json.index != null) { setData(json); setLoading(false); return; } }
+        } catch (e) { setError(e.message); }
+      }
+      // Fallback: mock data so the tab always renders
+      setData({
+        index:66, level:"MEDIA",
+        components:{
+          aiAlignment:{score:62,weight:0.30}, gdeltToneDivergence:{score:70,weight:0.15},
+          mentionSilence:{score:75,weight:0.15}, polymarketDelta:{score:55,weight:0.10},
+          sitrepValidation:{score:66,weight:0.30},
+        },
+        hasSitrep:true,
+        actors:[
+          {actor:"delcy",name:"Delcy Rodríguez",status:"ALINEADO",confidence:0.88,evidence:"Conduce relaciones bilaterales y agenda legislativa",signals:["Reconocida por Trump","Firma Amnistía"],mentions:45,tone:-2.1,topHeadlines:[]},
+          {actor:"jrodriguez",name:"Jorge Rodríguez",status:"ALINEADO",confidence:0.82,evidence:"Dirige AN. Legislación activa",signals:["Ley Amnistía","Ley Hidrocarburos"],mentions:32,tone:-1.8,topHeadlines:[]},
+          {actor:"cabello",name:"Diosdado Cabello",status:"NEUTRO",confidence:0.65,evidence:"Perfil mediático reducido. Sin confrontación pública",signals:["Baja visibilidad","Sin declaraciones divergentes"],mentions:18,tone:-3.5,topHeadlines:[]},
+          {actor:"fanb",name:"Fuerza Armada Nacional Bolivariana (FANB)",status:"TENSION",confidence:0.72,evidence:"Reafirma lealtad institucional pero presiones de oxigenación",signals:["Demandas internas","Cubanos retirándose"],mentions:28,tone:-4.2,topHeadlines:[]},
+          {actor:"padrino",name:"Vladimir Padrino López",status:"TENSION",confidence:0.68,evidence:"12 años en el cargo. Señales de malestar por continuidad de cúpula",signals:["Padrino 12 años","Reportaje El País"],mentions:15,tone:-3.8,topHeadlines:[]},
+          {actor:"arreaza",name:"Jorge Arreaza",status:"NEUTRO",confidence:0.55,evidence:"Perfil bajo post-reestructuración. Sin señales claras",signals:["Baja visibilidad reciente"],mentions:10,tone:-2.5,topHeadlines:[]},
+          {actor:"maduroguerra",name:"Nicolás Maduro Guerra",status:"NEUTRO",confidence:0.50,evidence:"Baja exposición mediática desde captura del padre",signals:["Sin rol público visible"],mentions:8,tone:-3.0,topHeadlines:[]},
+          {actor:"an",name:"Asamblea Nacional",status:"ALINEADO",confidence:0.85,evidence:"Legislando activamente bajo dirección de J.Rodríguez",signals:["Amnistía operativa","Poder Ciudadano"],mentions:38,tone:-1.5,topHeadlines:[]},
+        ],
+        polymarket:{price:0.29,question:"Delcy líder fin de 2026"},
+        fetchedAt:new Date().toISOString(), engine:"mock",
+      });
+      setLoading(false);
+    }
+    fetchCohesion();
+  }, [liveData?.cohesion]);
+
+  const statusColor = {ALINEADO:"#16a34a",NEUTRO:"#ca8a04",TENSION:"#dc2626",SILENCIO:"#6b7280"};
+  const statusIcon = {ALINEADO:"✓",NEUTRO:"◉",TENSION:"⚠",SILENCIO:"○"};
+  const statusLabel = {ALINEADO:"Alineado",NEUTRO:"Neutro",TENSION:"Tensión",SILENCIO:"Silencio"};
+  const levelColor = {ALTA:"#16a34a",MEDIA:"#ca8a04",BAJA:"#f97316",CRITICA:"#dc2626"};
+
+  const historyData = ICG_HISTORY.map((h,i) => ({
+    ...h, score: i===ICG_HISTORY.length-1 && data?.index ? data.index : h.score,
+  })).filter(h => h.score !== null);
+
+  if (loading) {
+    return (
+      <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:16, padding:60 }}>
+        <div style={{ width:40, height:40, border:`3px solid ${BORDER}`, borderTopColor:ACCENT, borderRadius:"50%", animation:"pulse 1s linear infinite" }} />
+        <div style={{ fontFamily:font, fontSize:13, color:MUTED, letterSpacing:"0.1em" }}>CALCULANDO ÍNDICE DE COHESIÓN...</div>
+        <div style={{ fontFamily:font, fontSize:11, color:`${MUTED}80` }}>Analizando 8 actores · GDELT · Polymarket · Mistral IA</div>
+      </div>
+    );
+  }
+
+  if (!data) return <Card><div style={{ color:MUTED, fontFamily:font, fontSize:13, textAlign:"center", padding:20 }}>Error cargando índice{error && `: ${error}`}</div></Card>;
+
+  const score = data.index;
+  const level = data.level;
+  const col = levelColor[level] || MUTED;
+  const actors = data.actors || [];
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+      {/* KPI ROW */}
+      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"1fr 1fr 1fr 1fr", gap:12 }}>
+        <Card accent={col}>
+          <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>Índice de Cohesión</div>
+          <div style={{ display:"flex", alignItems:"baseline", gap:8 }}>
+            <span style={{ fontSize:42, fontWeight:800, fontFamily:font, color:col, lineHeight:1 }}>{score}</span>
+            <span style={{ fontSize:14, fontFamily:font, color:col }}>/ 100</span>
+          </div>
+          <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:6 }}>
+            <span style={{ width:8, height:8, borderRadius:"50%", background:col, boxShadow:`0 0 6px ${col}` }} />
+            <span style={{ fontSize:13, fontFamily:font, fontWeight:600, color:col }}>{level}</span>
+          </div>
+        </Card>
+        <Card>
+          <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>Actores alineados</div>
+          <div style={{ fontSize:32, fontWeight:700, fontFamily:font, color:"#16a34a", lineHeight:1 }}>
+            {actors.filter(a=>a.status==="ALINEADO").length}<span style={{ fontSize:16, color:MUTED }}> / {actors.length}</span>
+          </div>
+          <div style={{ display:"flex", gap:4, marginTop:8 }}>
+            {actors.map(a => <span key={a.actor} style={{ width:20, height:6, borderRadius:3, background:statusColor[a.status]||BORDER }} />)}
+          </div>
+        </Card>
+        <Card>
+          <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>Delcy líder (PM)</div>
+          <div style={{ fontSize:32, fontWeight:700, fontFamily:font, color:ACCENT, lineHeight:1 }}>
+            {data.polymarket?.price!=null ? `${(data.polymarket.price*100).toFixed(0)}%` : "—"}
+          </div>
+          <div style={{ fontSize:11, fontFamily:font, color:MUTED, marginTop:6 }}>Polymarket · Probabilidad implícita</div>
+        </Card>
+        <Card>
+          <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>Motor</div>
+          <div style={{ fontSize:14, fontWeight:600, fontFamily:font, color:TEXT, lineHeight:1.3 }}>{data.hasSitrep?"SITREP + IA":"Solo IA"}</div>
+          <div style={{ fontSize:11, fontFamily:font, color:MUTED, marginTop:6, lineHeight:1.4 }}>
+            {data.engine==="mistral+gdelt"?"Mistral + GDELT + Polymarket":data.engine==="gdelt-only"?"GDELT + Polymarket":"Datos en carga"}
+          </div>
+          <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}80`, marginTop:4 }}>
+            {new Date(data.fetchedAt).toLocaleString("es-VE",{timeZone:"America/Caracas"})}
+          </div>
+        </Card>
+      </div>
+
+      {/* THERMOMETER */}
+      <Card>
+        <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:12 }}>Termómetro de Cohesión</div>
+        <div style={{ position:"relative", height:40, background:"linear-gradient(to right, #dc2626, #f97316, #ca8a04, #16a34a)", borderRadius:6, overflow:"hidden" }}>
+          {[25,50,75].map(v => <div key={v} style={{ position:"absolute", left:`${v}%`, top:0, bottom:0, width:1, background:"rgba(255,255,255,0.4)" }} />)}
+          <div style={{ position:"absolute", left:`${score}%`, top:-4, transform:"translateX(-50%)", width:0, height:0, borderLeft:"8px solid transparent", borderRight:"8px solid transparent", borderTop:`10px solid ${TEXT}` }} />
+          <div style={{ position:"absolute", left:`${score}%`, bottom:-4, transform:"translateX(-50%)", width:0, height:0, borderLeft:"8px solid transparent", borderRight:"8px solid transparent", borderBottom:`10px solid ${TEXT}` }} />
+          <div style={{ position:"absolute", left:8, top:"50%", transform:"translateY(-50%)", fontSize:9, fontFamily:font, color:"#fff", fontWeight:700, textShadow:"0 1px 2px rgba(0,0,0,0.5)" }}>CRÍTICA</div>
+          <div style={{ position:"absolute", left:"27%", top:"50%", transform:"translateY(-50%)", fontSize:9, fontFamily:font, color:"#fff", fontWeight:700, textShadow:"0 1px 2px rgba(0,0,0,0.5)" }}>BAJA</div>
+          <div style={{ position:"absolute", left:"52%", top:"50%", transform:"translateY(-50%)", fontSize:9, fontFamily:font, color:"#fff", fontWeight:700, textShadow:"0 1px 2px rgba(0,0,0,0.5)" }}>MEDIA</div>
+          <div style={{ position:"absolute", right:8, top:"50%", transform:"translateY(-50%)", fontSize:9, fontFamily:font, color:"#fff", fontWeight:700, textShadow:"0 1px 2px rgba(0,0,0,0.5)" }}>ALTA</div>
+        </div>
+        <div style={{ display:"flex", justifyContent:"space-between", marginTop:4, fontSize:9, fontFamily:font, color:MUTED }}>
+          <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+        </div>
+      </Card>
+
+      {/* ACTOR SEMAPHORE */}
+      <Card>
+        <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:14 }}>Semáforo por Actor</div>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"repeat(auto-fill, minmax(180px, 1fr))", gap:10 }}>
+          {actors.map(a => {
+            const isExp = expanded===a.actor;
+            const ac = statusColor[a.status]||MUTED;
+            return (
+              <div key={a.actor} onClick={()=>setExpanded(isExp?null:a.actor)}
+                style={{ background:BG3, border:`1px solid ${isExp?ac:BORDER}`, borderRadius:8, padding:"14px 12px",
+                  cursor:"pointer", transition:"all 0.2s", borderLeft:`4px solid ${ac}` }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
+                  <span style={{ fontSize:13, fontWeight:600, color:TEXT }}>{a.name}</span>
+                  <span style={{ fontSize:16, color:ac }}>{statusIcon[a.status]}</span>
+                </div>
+                <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+                  <span style={{ width:8, height:8, borderRadius:"50%", background:ac, boxShadow:`0 0 4px ${ac}` }} />
+                  <span style={{ fontSize:12, fontFamily:font, fontWeight:600, color:ac }}>{statusLabel[a.status]}</span>
+                  {a.confidence!=null && <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:"auto" }}>{(a.confidence*100).toFixed(0)}%</span>}
+                </div>
+                {isExp && (
+                  <div style={{ marginTop:10, borderTop:`1px solid ${BORDER}`, paddingTop:10 }}>
+                    {a.evidence && <div style={{ fontSize:12, color:TEXT, lineHeight:1.5, marginBottom:6 }}>{a.evidence}</div>}
+                    {a.signals?.length>0 && (
+                      <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginBottom:6 }}>
+                        {a.signals.map((s,i) => <span key={i} style={{ fontSize:10, fontFamily:font, padding:"2px 6px", background:`${ac}15`, color:ac, border:`1px solid ${ac}30`, borderRadius:10 }}>{s}</span>)}
+                      </div>
+                    )}
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, fontSize:11, fontFamily:font, color:MUTED }}>
+                      <div>Menciones 7d: <span style={{ color:TEXT, fontWeight:600 }}>{a.mentions}</span></div>
+                      <div>Tono GDELT: <span style={{ color:a.tone!=null&&a.tone<-3?"#dc2626":a.tone!=null&&a.tone<-1?"#ca8a04":"#16a34a", fontWeight:600 }}>{a.tone?.toFixed(1)??"—"}</span></div>
+                    </div>
+                    {a.topHeadlines?.length>0 && (
+                      <div style={{ marginTop:8 }}>
+                        <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginBottom:4 }}>Titulares recientes:</div>
+                        {a.topHeadlines.slice(0,2).map((h,i) => (
+                          <a key={i} href={h.link} target="_blank" rel="noopener noreferrer"
+                            style={{ display:"block", fontSize:11, color:ACCENT, textDecoration:"none", lineHeight:1.4, marginBottom:2 }}>↗ {h.title?.substring(0,80)}</a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* COMPONENTS BREAKDOWN */}
+      <Card>
+        <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:14 }}>Descomposición del Índice</div>
+        {data.components && Object.entries(data.components).filter(([,v])=>v).map(([key,comp]) => {
+          const labels = {
+            aiAlignment:{name:"Alineación IA (Mistral)",icon:"🤖",color:"#8b5cf6"},
+            gdeltToneDivergence:{name:"Divergencia Tono GDELT",icon:"📡",color:"#0e7490"},
+            mentionSilence:{name:"Silencio mediático",icon:"🔇",color:"#f59e0b"},
+            polymarketDelta:{name:"Señal Polymarket",icon:"📊",color:"#3b82f6"},
+            sitrepValidation:{name:"Validación SITREP",icon:"📋",color:"#16a34a"},
+          };
+          const meta = labels[key]||{name:key,icon:"●",color:MUTED};
+          return (
+            <div key={key} style={{ marginBottom:12 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:4 }}>
+                <span style={{ fontSize:12, color:TEXT }}>{meta.icon} {meta.name}</span>
+                <span style={{ fontSize:12, fontFamily:font, fontWeight:700, color:meta.color }}>
+                  {comp.score} <span style={{ fontWeight:400, color:MUTED, fontSize:10 }}>({(comp.weight*100).toFixed(0)}%)</span>
+                </span>
+              </div>
+              <div style={{ height:8, background:BG3, borderRadius:4, overflow:"hidden" }}>
+                <div style={{ width:`${Math.max(2,comp.score)}%`, height:"100%", background:`linear-gradient(90deg, ${meta.color}80, ${meta.color})`, borderRadius:4, transition:"width 0.6s ease" }} />
+              </div>
+            </div>
+          );
+        })}
+      </Card>
+
+      {/* EVOLUTION CHART */}
+      {historyData.length>1 && (
+        <Card>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:12 }}>Evolución ICG · S1 → Actual</div>
+          <CohesionChart data={historyData} />
+        </Card>
+      )}
+
+      {/* METHODOLOGY */}
+      <Card>
+        <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>Metodología</div>
+        <div style={{ fontSize:13, color:TEXT, lineHeight:1.7 }}>
+          El Índice de Cohesión del Gobierno (ICG) mide la alineación interna de la élite gobernante en una escala 0–100. Combina una capa automática diaria (clasificación IA de artículos por actor, divergencia de tono GDELT, detección de silencios mediáticos y señales de Polymarket) con una validación semanal anclada en el SITREP del equipo analítico. Entre actualizaciones semanales, la IA mantiene el pulso diario — ruidoso pero en tiempo real — y cada viernes el SITREP ancla y corrige.
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:10, marginTop:12 }}>
+          <div style={{ background:BG3, padding:"10px 12px", borderRadius:6 }}>
+            <div style={{ fontSize:11, fontFamily:font, color:ACCENT, fontWeight:600, marginBottom:4 }}>Capa Automática (70%)</div>
+            <div style={{ fontSize:11, color:MUTED, lineHeight:1.5 }}>Alineación IA 30% · GDELT Tono 15% · Menciones 15% · Polymarket 10%</div>
+          </div>
+          <div style={{ background:BG3, padding:"10px 12px", borderRadius:6 }}>
+            <div style={{ fontSize:11, fontFamily:font, color:"#16a34a", fontWeight:600, marginBottom:4 }}>Capa SITREP (30%)</div>
+            <div style={{ fontSize:11, color:MUTED, lineHeight:1.5 }}>Votaciones AN · Designaciones · Declaraciones · Tensiones internas</div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Status footer */}
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:10, fontFamily:font, color:`${MUTED}60` }}>
+        <span>{data.engine==="mock" ? "⚠ Datos demo — conectar MISTRAL_API_KEY para datos en vivo" : `Motor: ${data.engine}`}</span>
+        {error && <span style={{ color:"#ca8a04" }}>⚠ {error}</span>}
+      </div>
+    </div>
+  );
+}
+
+function CohesionChart({ data }) {
+  const [hover, setHover] = useState(null);
+  const W=700, H=300, padL=45, padR=20, padT=20, padB=30;
+  const cW=W-padL-padR, cH=H-padT-padB;
+  const toX = (i) => padL + (i/(data.length-1)) * cW;
+  const toY = (v) => padT + cH - (v/100)*cH;
+
+  const pathD = data.map((d,i) => `${i===0?"M":"L"}${toX(i)},${toY(d.score)}`).join(" ");
+  const areaD = pathD + ` L${toX(data.length-1)},${padT+cH} L${toX(0)},${padT+cH} Z`;
+
+  return (
+    <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const mx = (e.clientX-rect.left)/rect.width*W;
+        const idx = Math.round(((mx-padL)/cW)*(data.length-1));
+        if (idx>=0 && idx<data.length) setHover(idx);
+      }}
+      onMouseLeave={() => setHover(null)}>
+      <rect x={padL} y={toY(100)} width={cW} height={toY(75)-toY(100)} fill="#16a34a06" />
+      <rect x={padL} y={toY(75)} width={cW} height={toY(50)-toY(75)} fill="#ca8a0406" />
+      <rect x={padL} y={toY(50)} width={cW} height={toY(25)-toY(50)} fill="#f9731606" />
+      <rect x={padL} y={toY(25)} width={cW} height={toY(0)-toY(25)} fill="#dc262606" />
+      {[25,50,75].map(v => (
+        <g key={v}>
+          <line x1={padL} y1={toY(v)} x2={padL+cW} y2={toY(v)} stroke="rgba(0,0,0,0.06)" strokeDasharray="4 3" />
+          <text x={padL-4} y={toY(v)+3} textAnchor="end" fontSize={8} fill={MUTED} fontFamily={font}>{v}</text>
+        </g>
+      ))}
+      <text x={padL-4} y={toY(0)+3} textAnchor="end" fontSize={8} fill={MUTED} fontFamily={font}>0</text>
+      <text x={padL-4} y={toY(100)+3} textAnchor="end" fontSize={8} fill={MUTED} fontFamily={font}>100</text>
+      <defs><linearGradient id="icgGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={ACCENT} stopOpacity="0.15"/><stop offset="100%" stopColor={ACCENT} stopOpacity="0.02"/></linearGradient></defs>
+      <path d={areaD} fill="url(#icgGrad)" />
+      <path d={pathD} fill="none" stroke={ACCENT} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+      {data.map((d,i) => <circle key={i} cx={toX(i)} cy={toY(d.score)} r={i===data.length-1?5:3} fill={i===data.length-1?ACCENT:BG2} stroke={ACCENT} strokeWidth={2} />)}
+      <circle cx={toX(data.length-1)} cy={toY(data[data.length-1].score)} r={8} fill="none" stroke={ACCENT} strokeWidth={1.5} opacity={0.4} style={{ animation:"pulse 2s ease-in-out infinite" }} />
+      {data.map((d,i) => <text key={i} x={toX(i)} y={H-6} textAnchor="middle" fontSize={9} fill={MUTED} fontFamily={font}>{d.week}</text>)}
+      {hover!=null && hover<data.length && <>
+        <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT+cH} stroke="rgba(0,0,0,0.08)" />
+        <circle cx={toX(hover)} cy={toY(data[hover].score)} r={5} fill={ACCENT} stroke={BG} strokeWidth={2} />
+        <rect x={toX(hover)-45} y={toY(data[hover].score)-32} width={90} height={22} rx={4} fill={TEXT} opacity={0.9} />
+        <text x={toX(hover)} y={toY(data[hover].score)-17} textAnchor="middle" fontSize={11} fill="#fff" fontWeight={700} fontFamily={font}>{data[hover].week}: {data[hover].score}</text>
+        {data[hover].note && <>
+          <rect x={toX(hover)-85} y={toY(data[hover].score)-52} width={170} height={18} rx={3} fill={BG2} stroke={BORDER} />
+          <text x={toX(hover)} y={toY(data[hover].score)-39} textAnchor="middle" fontSize={8} fill={MUTED} fontFamily={font}>{data[hover].note.substring(0,40)}</text>
+        </>}
+      </>}
+    </svg>
+  );
+}
+
 const TABS = [
   { id:"dashboard", label:"Dashboard", icon:"📊" },
   { id:"sitrep", label:"SITREP", icon:"📋" },
   { id:"matriz", label:"Matriz", icon:"🎯" },
   { id:"monitor", label:"Monitor", icon:"🚦" },
+  { id:"cohesion", label:"Cohesión", icon:"🏛" },
   { id:"gdelt", label:"Medios", icon:"📡" },
   { id:"conflictividad", label:"Conflictividad", icon:"✊" },
   { id:"ioda", label:"Internet", icon:"🌐" },
@@ -7207,11 +7664,11 @@ export default function MonitorPNUD() {
   const mob = useIsMobile();
 
   // ── Shared live data (fetched once, available to all tabs including AI) ──
-  const [liveData, setLiveData] = useState({ dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, fetched:false });
+  const [liveData, setLiveData] = useState({ dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, cohesion:null, fetched:false });
 
   useEffect(() => {
     async function fetchLiveData() {
-      const results = { dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, fetched:true };
+      const results = { dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, cohesion:null, fetched:true };
       try {
         // Dolar
         const dolarUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
@@ -7243,6 +7700,14 @@ export default function MonitorPNUD() {
         if (bilUrl) {
           const bRes = await fetch(bilUrl, { signal:AbortSignal.timeout(12000) }).then(r=>r.ok?r.json():null).catch(()=>null);
           if (bRes?.latest) results.bilateral = bRes;
+        }
+      } catch {}
+      try {
+        // Government Cohesion Index (ICG)
+        const cohUrl = IS_DEPLOYED ? `/api/news?source=cohesion&skipai=true&_t=${Math.floor(Date.now()/600000)}` : null;
+        if (cohUrl) {
+          const cRes = await fetch(cohUrl, { signal:AbortSignal.timeout(15000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          if (cRes?.index != null) results.cohesion = cRes;
         }
       } catch {}
       setLiveData(results);
@@ -7341,6 +7806,7 @@ export default function MonitorPNUD() {
         {tab === "sitrep" && <TabSitrep liveData={liveData} />}
         {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
+        {tab === "cohesion" && <TabCohesion liveData={liveData} />}
         {tab === "gdelt" && <TabGdelt />}
         {tab === "conflictividad" && <TabConflictividad />}
         {tab === "ioda" && <TabIODA />}
