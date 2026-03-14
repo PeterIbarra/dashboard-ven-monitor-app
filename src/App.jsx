@@ -7260,6 +7260,103 @@ function TabCohesion({ liveData = {} }) {
         </div>
       </Card>
 
+      {/* SYSTEMIC COHESION — Chavismo as a bloc */}
+      {data.systemic?.length > 0 && (
+        <Card>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:14 }}>
+            🔴 Cohesión Sistémica · Chavismo como Bloque
+          </div>
+          <div style={{ fontSize:12, color:TEXT, lineHeight:1.6, marginBottom:12 }}>
+            Señales GDELT sobre el movimiento chavista, PSUV, colectivos, gobernadores y sector militar amplio. Divergencia alta entre subgrupos = señal de fragmentación.
+          </div>
+          {(() => {
+            const sys = data.systemic;
+            const sysTones = sys.filter(s => s.tone != null).map(s => s.tone);
+            const sysAvg = sysTones.length > 0 ? sysTones.reduce((a,b)=>a+b,0)/sysTones.length : null;
+            const maxVol = Math.max(...sys.map(s=>s.volume), 1);
+
+            const sysStatusColor = (tone) => {
+              if (tone == null) return MUTED;
+              if (tone < -5) return "#dc2626";
+              if (tone < -3) return "#ca8a04";
+              return "#16a34a";
+            };
+            const sysStatusLabel = (tone) => {
+              if (tone == null) return "Sin datos";
+              if (tone < -5) return "Conflictivo";
+              if (tone < -3) return "Tenso";
+              return "Estable";
+            };
+
+            return (
+              <div>
+                {/* KPI row */}
+                <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"1fr 1fr 1fr", gap:8, marginBottom:12 }}>
+                  <div style={{ background:BG3, padding:"8px 12px", borderRadius:6 }}>
+                    <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Tono promedio</div>
+                    <div style={{ fontSize:20, fontWeight:700, fontFamily:font, color:sysStatusColor(sysAvg), lineHeight:1, marginTop:4 }}>
+                      {sysAvg != null ? sysAvg.toFixed(1) : "—"}
+                    </div>
+                    <div style={{ fontSize:10, fontFamily:font, color:sysStatusColor(sysAvg), marginTop:2 }}>{sysStatusLabel(sysAvg)}</div>
+                  </div>
+                  <div style={{ background:BG3, padding:"8px 12px", borderRadius:6 }}>
+                    <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Divergencia</div>
+                    {(() => {
+                      if (sysTones.length < 2) return <div style={{ fontSize:20, fontWeight:700, fontFamily:font, color:MUTED, lineHeight:1, marginTop:4 }}>—</div>;
+                      const div = Math.max(...sysTones) - Math.min(...sysTones);
+                      const divColor = div > 4 ? "#dc2626" : div > 2 ? "#ca8a04" : "#16a34a";
+                      return <>
+                        <div style={{ fontSize:20, fontWeight:700, fontFamily:font, color:divColor, lineHeight:1, marginTop:4 }}>{div.toFixed(1)}</div>
+                        <div style={{ fontSize:10, fontFamily:font, color:divColor, marginTop:2 }}>{div > 4 ? "Alta fractura" : div > 2 ? "Moderada" : "Baja"}</div>
+                      </>;
+                    })()}
+                  </div>
+                  <div style={{ background:BG3, padding:"8px 12px", borderRadius:6 }}>
+                    <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Subgrupos</div>
+                    <div style={{ fontSize:20, fontWeight:700, fontFamily:font, color:TEXT, lineHeight:1, marginTop:4 }}>{sys.length}</div>
+                    <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginTop:2 }}>PSUV · Colectivos · Militares</div>
+                  </div>
+                </div>
+
+                {/* Subgroup cards */}
+                <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr 1fr 1fr", gap:8 }}>
+                  {sys.map(s => {
+                    const sc = sysStatusColor(s.tone);
+                    const volPct = maxVol > 0 ? (s.volume / maxVol) * 100 : 0;
+                    return (
+                      <div key={s.id} style={{ background:BG3, borderLeft:`3px solid ${sc}`, padding:"10px 12px", borderRadius:4 }}>
+                        <div style={{ fontSize:12, fontWeight:600, color:TEXT, marginBottom:4 }}>{s.name}</div>
+                        <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:6 }}>
+                          <span style={{ width:6, height:6, borderRadius:"50%", background:sc }} />
+                          <span style={{ fontSize:10, fontFamily:font, fontWeight:600, color:sc }}>{sysStatusLabel(s.tone)}</span>
+                        </div>
+                        <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginBottom:2 }}>
+                          Tono: <span style={{ color:sc, fontWeight:600 }}>{s.tone != null ? s.tone.toFixed(1) : "—"}</span>
+                        </div>
+                        <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginBottom:4 }}>
+                          Vol. 7d: <span style={{ color:TEXT, fontWeight:600 }}>{s.volume}</span>
+                        </div>
+                        {/* Volume bar */}
+                        <div style={{ height:4, background:BORDER, borderRadius:2, overflow:"hidden" }}>
+                          <div style={{ width:`${volPct}%`, height:"100%", background:sc, borderRadius:2 }} />
+                        </div>
+                        {s.tone != null && sysAvg != null && (
+                          <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginTop:4 }}>
+                            vs promedio: <span style={{ color:s.tone < sysAvg - 1 ? "#dc2626" : s.tone > sysAvg + 1 ? "#16a34a" : MUTED, fontWeight:600 }}>
+                              {(s.tone - sysAvg) > 0 ? "+" : ""}{(s.tone - sysAvg).toFixed(1)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+        </Card>
+      )}
+
       {/* COMPONENTS BREAKDOWN */}
       <Card>
         <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:14 }}>Descomposición del Índice</div>
