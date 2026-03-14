@@ -2477,6 +2477,24 @@ function TabDashboard({ week, liveData = {} }) {
           else if (bilV > 1.0) liveAlerts.push({ name:"Bilateral 🇺🇸🇻🇪", val:`${bilV.toFixed(2)}σ`, umbral:"Índice bilateral ALTO (>1σ) — tensión significativa", level:"yellow" });
         }
 
+        // Conflictividad social (CONF_SEMANAL)
+        if (CONF_SEMANAL.length > 0) {
+          const lastW = CONF_SEMANAL[CONF_SEMANAL.length - 1];
+          const prevW = CONF_SEMANAL.length > 1 ? CONF_SEMANAL[CONF_SEMANAL.length - 2] : null;
+          const accel = prevW && prevW.protestas > 0 ? ((lastW.protestas - prevW.protestas) / prevW.protestas) * 100 : 0;
+
+          // Weekly volume thresholds
+          if (lastW.protestas > 50) liveAlerts.push({ name:"Protestas ✊", val:`${lastW.protestas}/sem`, umbral:`>50 protestas semanales — presión política de primer orden (${lastW.label})`, level:"red" });
+          else if (lastW.protestas > 35) liveAlerts.push({ name:"Protestas ✊", val:`${lastW.protestas}/sem`, umbral:`Escalada sobre promedio del ciclo (>35/sem) — seguimiento activo`, level:"yellow" });
+
+          // Territorial spread thresholds
+          if (lastW.estados > 18) liveAlerts.push({ name:"Cobertura territorial", val:`${lastW.estados}/24`, umbral:`Protestas en ${lastW.estados} estados — alcance casi nacional`, level:"red" });
+          else if (lastW.estados > 12) liveAlerts.push({ name:"Cobertura territorial", val:`${lastW.estados}/24`, umbral:`Protestas en ${lastW.estados} estados — multi-regional`, level:"yellow" });
+
+          // Acceleration trigger: >50% increase week-over-week
+          if (accel > 50) liveAlerts.push({ name:"Aceleración ⚡", val:`+${Math.round(accel)}%`, umbral:`Protestas aumentaron ${Math.round(accel)}% vs semana anterior (${prevW.protestas}→${lastW.protestas}) — escalada rápida`, level: accel > 100 ? "red" : "yellow" });
+        }
+
         if (liveAlerts.length === 0) return null;
 
         const reds = liveAlerts.filter(a => a.level === "red");
