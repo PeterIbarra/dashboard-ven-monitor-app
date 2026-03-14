@@ -7117,7 +7117,14 @@ function TabCohesion({ liveData = {} }) {
           {actor:"maduroguerra",name:"Nicolás Maduro Guerra",status:"NEUTRO",confidence:0.50,evidence:"Baja exposición mediática desde captura del padre",signals:["Sin rol público visible"],mentions:8,tone:-3.0,topHeadlines:[]},
           {actor:"an",name:"Asamblea Nacional",status:"ALINEADO",confidence:0.85,evidence:"Legislando activamente bajo dirección de J.Rodríguez",signals:["Amnistía operativa","Poder Ciudadano"],mentions:38,tone:-1.5,topHeadlines:[]},
         ],
-        polymarket:{price:0.29,question:"Delcy líder fin de 2026"},
+        systemic:[
+          {actor:"psuv",name:"PSUV",status:"ALINEADO",confidence:0.70,evidence:"Partido activo en agenda legislativa y gobernaciones",signals:["Congreso PSUV","Gobernaciones activas"],mentions:25,tone:-2.8,topHeadlines:[]},
+          {actor:"chavismo",name:"Chavismo (movimiento)",status:"NEUTRO",confidence:0.55,evidence:"Cobertura mixta: unidad declarada pero tensiones internas",signals:["Discurso unidad","Señales fractura"],mentions:30,tone:-4.1,topHeadlines:[]},
+          {actor:"colectivos",name:"Colectivos",status:"TENSION",confidence:0.60,evidence:"Actividad reducida. Señales de reconfiguración post-Maduro",signals:["Baja visibilidad","Reconfiguración"],mentions:12,tone:-5.5,topHeadlines:[]},
+          {actor:"gobernadores",name:"Gobernadores chavistas",status:"ALINEADO",confidence:0.65,evidence:"Alineados con ejecutivo central en gestión regional",signals:["Gestión coordinada"],mentions:18,tone:-2.2,topHeadlines:[]},
+          {actor:"militares",name:"Sector militar amplio",status:"NEUTRO",confidence:0.58,evidence:"CEOFANB y GNB sin señales públicas de fractura",signals:["Perfil bajo","Sin pronunciamientos"],mentions:20,tone:-3.9,topHeadlines:[]},
+        ],
+        polymarket:{price:0.57,question:"Delcy líder fin de 2026"},
         fetchedAt:new Date().toISOString(), engine:"mock",
       });
       setLoading(false);
@@ -7260,100 +7267,56 @@ function TabCohesion({ liveData = {} }) {
         </div>
       </Card>
 
-      {/* SYSTEMIC COHESION — Chavismo as a bloc */}
+      {/* SYSTEMIC COHESION — Chavismo as a bloc, same card format as actors */}
       {data.systemic?.length > 0 && (
         <Card>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:14 }}>
             🔴 Cohesión Sistémica · Chavismo como Bloque
           </div>
-          <div style={{ fontSize:12, color:TEXT, lineHeight:1.6, marginBottom:12 }}>
-            Señales GDELT sobre el movimiento chavista, PSUV, colectivos, gobernadores y sector militar amplio. Divergencia alta entre subgrupos = señal de fragmentación.
-          </div>
-          {(() => {
-            const sys = data.systemic;
-            const sysTones = sys.filter(s => s.tone != null).map(s => s.tone);
-            const sysAvg = sysTones.length > 0 ? sysTones.reduce((a,b)=>a+b,0)/sysTones.length : null;
-            const maxVol = Math.max(...sys.map(s=>s.volume), 1);
-
-            const sysStatusColor = (tone) => {
-              if (tone == null) return MUTED;
-              if (tone < -5) return "#dc2626";
-              if (tone < -3) return "#ca8a04";
-              return "#16a34a";
-            };
-            const sysStatusLabel = (tone) => {
-              if (tone == null) return "Sin datos";
-              if (tone < -5) return "Conflictivo";
-              if (tone < -3) return "Tenso";
-              return "Estable";
-            };
-
-            return (
-              <div>
-                {/* KPI row */}
-                <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"1fr 1fr 1fr", gap:8, marginBottom:12 }}>
-                  <div style={{ background:BG3, padding:"8px 12px", borderRadius:6 }}>
-                    <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Tono promedio</div>
-                    <div style={{ fontSize:20, fontWeight:700, fontFamily:font, color:sysStatusColor(sysAvg), lineHeight:1, marginTop:4 }}>
-                      {sysAvg != null ? sysAvg.toFixed(1) : "—"}
-                    </div>
-                    <div style={{ fontSize:10, fontFamily:font, color:sysStatusColor(sysAvg), marginTop:2 }}>{sysStatusLabel(sysAvg)}</div>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"repeat(auto-fill, minmax(180px, 1fr))", gap:10 }}>
+            {data.systemic.map(a => {
+              const isExp = expanded===a.actor;
+              const ac = statusColor[a.status]||MUTED;
+              return (
+                <div key={a.actor} onClick={()=>setExpanded(isExp?null:a.actor)}
+                  style={{ background:BG3, border:`1px solid ${isExp?ac:BORDER}`, borderRadius:8, padding:"14px 12px",
+                    cursor:"pointer", transition:"all 0.2s", borderLeft:`4px solid ${ac}` }}>
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
+                    <span style={{ fontSize:13, fontWeight:600, color:TEXT }}>{a.name}</span>
+                    <span style={{ fontSize:16, color:ac }}>{statusIcon[a.status]}</span>
                   </div>
-                  <div style={{ background:BG3, padding:"8px 12px", borderRadius:6 }}>
-                    <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Divergencia</div>
-                    {(() => {
-                      if (sysTones.length < 2) return <div style={{ fontSize:20, fontWeight:700, fontFamily:font, color:MUTED, lineHeight:1, marginTop:4 }}>—</div>;
-                      const div = Math.max(...sysTones) - Math.min(...sysTones);
-                      const divColor = div > 4 ? "#dc2626" : div > 2 ? "#ca8a04" : "#16a34a";
-                      return <>
-                        <div style={{ fontSize:20, fontWeight:700, fontFamily:font, color:divColor, lineHeight:1, marginTop:4 }}>{div.toFixed(1)}</div>
-                        <div style={{ fontSize:10, fontFamily:font, color:divColor, marginTop:2 }}>{div > 4 ? "Alta fractura" : div > 2 ? "Moderada" : "Baja"}</div>
-                      </>;
-                    })()}
+                  <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+                    <span style={{ width:8, height:8, borderRadius:"50%", background:ac, boxShadow:`0 0 4px ${ac}` }} />
+                    <span style={{ fontSize:12, fontFamily:font, fontWeight:600, color:ac }}>{statusLabel[a.status]}</span>
+                    {a.confidence!=null && <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:"auto" }}>{(a.confidence*100).toFixed(0)}%</span>}
                   </div>
-                  <div style={{ background:BG3, padding:"8px 12px", borderRadius:6 }}>
-                    <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Subgrupos</div>
-                    <div style={{ fontSize:20, fontWeight:700, fontFamily:font, color:TEXT, lineHeight:1, marginTop:4 }}>{sys.length}</div>
-                    <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginTop:2 }}>PSUV · Colectivos · Militares</div>
-                  </div>
-                </div>
-
-                {/* Subgroup cards */}
-                <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr 1fr 1fr", gap:8 }}>
-                  {sys.map(s => {
-                    const sc = sysStatusColor(s.tone);
-                    const volPct = maxVol > 0 ? (s.volume / maxVol) * 100 : 0;
-                    return (
-                      <div key={s.id} style={{ background:BG3, borderLeft:`3px solid ${sc}`, padding:"10px 12px", borderRadius:4 }}>
-                        <div style={{ fontSize:12, fontWeight:600, color:TEXT, marginBottom:4 }}>{s.name}</div>
-                        <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:6 }}>
-                          <span style={{ width:6, height:6, borderRadius:"50%", background:sc }} />
-                          <span style={{ fontSize:10, fontFamily:font, fontWeight:600, color:sc }}>{sysStatusLabel(s.tone)}</span>
+                  {isExp && (
+                    <div style={{ marginTop:10, borderTop:`1px solid ${BORDER}`, paddingTop:10 }}>
+                      {a.evidence && <div style={{ fontSize:12, color:TEXT, lineHeight:1.5, marginBottom:6 }}>{a.evidence}</div>}
+                      {a.signals?.length>0 && (
+                        <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginBottom:6 }}>
+                          {a.signals.map((s,i) => <span key={i} style={{ fontSize:10, fontFamily:font, padding:"2px 6px", background:`${ac}15`, color:ac, border:`1px solid ${ac}30`, borderRadius:10 }}>{s}</span>)}
                         </div>
-                        <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginBottom:2 }}>
-                          Tono: <span style={{ color:sc, fontWeight:600 }}>{s.tone != null ? s.tone.toFixed(1) : "—"}</span>
-                        </div>
-                        <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginBottom:4 }}>
-                          Vol. 7d: <span style={{ color:TEXT, fontWeight:600 }}>{s.volume}</span>
-                        </div>
-                        {/* Volume bar */}
-                        <div style={{ height:4, background:BORDER, borderRadius:2, overflow:"hidden" }}>
-                          <div style={{ width:`${volPct}%`, height:"100%", background:sc, borderRadius:2 }} />
-                        </div>
-                        {s.tone != null && sysAvg != null && (
-                          <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginTop:4 }}>
-                            vs promedio: <span style={{ color:s.tone < sysAvg - 1 ? "#dc2626" : s.tone > sysAvg + 1 ? "#16a34a" : MUTED, fontWeight:600 }}>
-                              {(s.tone - sysAvg) > 0 ? "+" : ""}{(s.tone - sysAvg).toFixed(1)}
-                            </span>
-                          </div>
-                        )}
+                      )}
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, fontSize:11, fontFamily:font, color:MUTED }}>
+                        <div>Menciones 7d: <span style={{ color:TEXT, fontWeight:600 }}>{a.mentions}</span></div>
+                        <div>Tono GDELT: <span style={{ color:a.tone!=null&&a.tone<-3?"#dc2626":a.tone!=null&&a.tone<-1?"#ca8a04":"#16a34a", fontWeight:600 }}>{a.tone?.toFixed(1)??"—"}</span></div>
                       </div>
-                    );
-                  })}
+                      {a.topHeadlines?.length>0 && (
+                        <div style={{ marginTop:8 }}>
+                          <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginBottom:4 }}>Titulares recientes:</div>
+                          {a.topHeadlines.slice(0,2).map((h,i) => (
+                            <a key={i} href={h.link} target="_blank" rel="noopener noreferrer"
+                              style={{ display:"block", fontSize:11, color:ACCENT, textDecoration:"none", lineHeight:1.4, marginBottom:2 }}>↗ {h.title?.substring(0,80)}</a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-            );
-          })()}
+              );
+            })}
+          </div>
         </Card>
       )}
 

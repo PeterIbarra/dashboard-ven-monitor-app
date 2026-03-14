@@ -8,14 +8,21 @@ const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 // ═══════════════════════════════════════════════════════════════
 
 const ACTORS = [
-  { id: "delcy", name: "Delcy Rodríguez", queries: ["Delcy Rodriguez Venezuela", "Delcy Rodriguez gobierno"] },
-  { id: "jrodriguez", name: "Jorge Rodríguez", queries: ["Jorge Rodriguez Asamblea Venezuela", "Jorge Rodriguez AN Venezuela"] },
-  { id: "cabello", name: "Diosdado Cabello", queries: ["Diosdado Cabello Venezuela", "Cabello PSUV"] },
-  { id: "fanb", name: "Fuerza Armada Nacional Bolivariana (FANB)", queries: ["FANB Venezuela militar", "Fuerza Armada Nacional Bolivariana"] },
-  { id: "padrino", name: "Vladimir Padrino López", queries: ["Vladimir Padrino Lopez Venezuela", "Padrino Lopez FANB ministro defensa"] },
-  { id: "arreaza", name: "Jorge Arreaza", queries: ["Jorge Arreaza Venezuela", "Arreaza gobierno Venezuela"] },
-  { id: "maduroguerra", name: "Nicolás Maduro Guerra", queries: ["Nicolas Maduro Guerra Venezuela", "Nicolasito Maduro hijo Venezuela"] },
-  { id: "an", name: "Asamblea Nacional", queries: ["Asamblea Nacional Venezuela ley", "AN Venezuela legislativa"] },
+  // ── Actores Clave (individuales) ──
+  { id: "delcy", name: "Delcy Rodríguez", group: "actor", queries: ["Delcy Rodriguez Venezuela", "Delcy Rodriguez gobierno"] },
+  { id: "jrodriguez", name: "Jorge Rodríguez", group: "actor", queries: ["Jorge Rodriguez Asamblea Venezuela", "Jorge Rodriguez AN Venezuela"] },
+  { id: "cabello", name: "Diosdado Cabello", group: "actor", queries: ["Diosdado Cabello Venezuela", "Cabello PSUV"] },
+  { id: "fanb", name: "Fuerza Armada Nacional Bolivariana (FANB)", group: "actor", queries: ["FANB Venezuela militar", "Fuerza Armada Nacional Bolivariana"] },
+  { id: "padrino", name: "Vladimir Padrino López", group: "actor", queries: ["Vladimir Padrino Lopez Venezuela", "Padrino Lopez FANB ministro defensa"] },
+  { id: "arreaza", name: "Jorge Arreaza", group: "actor", queries: ["Jorge Arreaza Venezuela", "Arreaza gobierno Venezuela"] },
+  { id: "maduroguerra", name: "Nicolás Maduro Guerra", group: "actor", queries: ["Nicolas Maduro Guerra Venezuela", "Nicolasito Maduro hijo Venezuela"] },
+  { id: "an", name: "Asamblea Nacional", group: "actor", queries: ["Asamblea Nacional Venezuela ley", "AN Venezuela legislativa"] },
+  // ── Cohesión Sistémica (chavismo como bloque) ──
+  { id: "psuv", name: "PSUV", group: "systemic", queries: ["PSUV Venezuela partido", "PSUV congreso unidad"] },
+  { id: "chavismo", name: "Chavismo (movimiento)", group: "systemic", queries: ["chavismo Venezuela", "movimiento chavista unidad fractura"] },
+  { id: "colectivos", name: "Colectivos", group: "systemic", queries: ["colectivos Venezuela armados", "colectivos chavistas gobierno"] },
+  { id: "gobernadores", name: "Gobernadores chavistas", group: "systemic", queries: ["gobernadores Venezuela PSUV", "gobernadores chavistas regionales"] },
+  { id: "militares", name: "Sector militar amplio", group: "systemic", queries: ["militares Venezuela generales", "CEOFANB GNB Venezuela DGCIM"] },
 ];
 
 // Google News RSS per actor
@@ -235,118 +242,79 @@ function heuristicStatus(mentions, tone, avgTone, avgMentions) {
   return "NEUTRO";
 }
 
-// ── SYSTEMIC SIGNALS — broader chavismo/government cohesion queries ──
-const SYSTEMIC_QUERIES = [
-  { id: "psuv", name: "PSUV", query: "PSUV Venezuela partido" },
-  { id: "chavismo", name: "Chavismo", query: "chavismo Venezuela unidad OR fractura OR división" },
-  { id: "colectivos", name: "Colectivos", query: "colectivos Venezuela armados" },
-  { id: "gobernadores", name: "Gobernadores chavistas", query: "gobernadores Venezuela PSUV gobierno regional" },
-  { id: "militares", name: "Sector militar", query: "militares Venezuela generales CEOFANB GNB" },
-];
-
-async function fetchSystemicSignals() {
-  const results = [];
-  for (const sq of SYSTEMIC_QUERIES) {
-    try {
-      const query = encodeURIComponent(sq.query);
-      // Fetch tone
-      const toneUrl = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=timelinetone&timespan=7d&format=csv`;
-      const tRes = await fetch(toneUrl, { signal: AbortSignal.timeout(6000) });
-      let tone = null;
-      if (tRes.ok) {
-        const csv = await tRes.text();
-        const lines = csv.trim().split("\n").slice(1);
-        let sum = 0, count = 0;
-        for (const line of lines) {
-          const val = parseFloat(line.split(",").pop());
-          if (!isNaN(val)) { sum += val; count++; }
-        }
-        if (count > 0) tone = sum / count;
-      }
-      // Fetch volume
-      const volUrl = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=timelinevol&timespan=7d&format=csv`;
-      const vRes = await fetch(volUrl, { signal: AbortSignal.timeout(6000) });
-      let volume = 0;
-      if (vRes.ok) {
-        const csv = await vRes.text();
-        const lines = csv.trim().split("\n").slice(1);
-        for (const line of lines) {
-          const val = parseFloat(line.split(",").pop());
-          if (!isNaN(val)) volume += val;
-        }
-      }
-      results.push({ id: sq.id, name: sq.name, tone, volume: Math.round(volume) });
-    } catch {
-      results.push({ id: sq.id, name: sq.name, tone: null, volume: 0 });
-    }
-  }
-  return results;
-}
-
 // ── SCORING ENGINE ──
-function computeCohesionScore(actorResults, gdeltTones, gdeltMentions, polymarket, sitrepOverride, systemicSignals) {
-  // === 1. AI Alignment Score (25%) ===
+function computeCohesionScore(actorResults, gdeltTones, gdeltMentions, polymarket, sitrepOverride) {
+  // Split actors vs systemic for scoring
+  const individualActors = actorResults.filter(a => a.group === "actor");
+  const systemicActors = actorResults.filter(a => a.group === "systemic");
+  // === 1. AI Alignment Score (25%) — individual actors only ===
   let aiScore = 50;
-  const classifications = actorResults.filter(a => a.classification);
+  const indClassifications = individualActors.filter(a => a.classification);
 
-  // Compute group averages for heuristic
-  const allTones = Object.values(gdeltTones).filter(v => v !== null);
-  const avgTone = allTones.length > 0 ? allTones.reduce((a,b)=>a+b,0)/allTones.length : null;
-  const allMentions = Object.values(gdeltMentions);
-  const avgMentions = allMentions.length > 0 ? allMentions.reduce((a,b)=>a+b,0)/allMentions.length : 0;
+  // Compute group averages for heuristic (individual actors only)
+  const indTones = individualActors.map(a => a.tone).filter(v => v !== null);
+  const avgTone = indTones.length > 0 ? indTones.reduce((a,b)=>a+b,0)/indTones.length : null;
+  const indMentions = individualActors.map(a => a.mentions);
+  const avgMentions = indMentions.length > 0 ? indMentions.reduce((a,b)=>a+b,0)/indMentions.length : 0;
 
-  if (classifications.length > 0) {
+  if (indClassifications.length > 0) {
     const alignmentValues = { ALINEADO: 100, NEUTRO: 50, TENSION: 0 };
-    const total = classifications.reduce((sum, a) => {
+    const total = indClassifications.reduce((sum, a) => {
       const val = alignmentValues[a.classification.alignment] ?? 50;
       const conf = a.classification.confidence ?? 0.5;
       return sum + val * conf;
     }, 0);
-    const totalConf = classifications.reduce((s, a) => s + (a.classification.confidence ?? 0.5), 0);
+    const totalConf = indClassifications.reduce((s, a) => s + (a.classification.confidence ?? 0.5), 0);
     aiScore = totalConf > 0 ? total / totalConf : 50;
   } else {
-    const heuristics = actorResults.map(a => heuristicStatus(a.mentions, a.tone, avgTone, avgMentions));
+    const heuristics = individualActors.map(a => heuristicStatus(a.mentions, a.tone, avgTone, avgMentions));
     const hValues = { ALINEADO: 100, NEUTRO: 50, TENSION: 0, SILENCIO: 30 };
     const hTotal = heuristics.reduce((s, h) => s + (hValues[h] ?? 50), 0);
-    aiScore = hTotal / heuristics.length;
+    aiScore = heuristics.length > 0 ? hTotal / heuristics.length : 50;
   }
 
-  // === 2. GDELT Tone Divergence (15%) ===
+  // === 2. GDELT Tone Divergence (15%) — individual actors ===
   let toneDivScore = 75;
-  const toneValues = Object.values(gdeltTones).filter(v => v !== null);
-  if (toneValues.length >= 2) {
-    const maxTone = Math.max(...toneValues);
-    const minTone = Math.min(...toneValues);
-    const divergence = maxTone - minTone;
+  if (indTones.length >= 2) {
+    const divergence = Math.max(...indTones) - Math.min(...indTones);
     toneDivScore = Math.max(0, Math.min(100, 100 - divergence * 10));
   }
 
-  // === 3. Mention Count / Silence (10%) ===
+  // === 3. Mention Count / Silence (10%) — individual actors ===
   let silenceScore = 75;
-  const mentionValues = Object.entries(gdeltMentions);
-  if (mentionValues.length > 0) {
+  if (indMentions.length > 0) {
     const threshold = Math.max(avgMentions * 0.15, 3);
-    const silentActors = mentionValues.filter(([, v]) => v < threshold).length;
+    const silentActors = indMentions.filter(v => v < threshold).length;
     silenceScore = Math.max(20, 100 - silentActors * 12);
   }
 
-  // === 4. Systemic Cohesion (10%) — broader chavismo signals ===
+  // === 4. Systemic Cohesion (10%) — chavismo bloc actors ===
   let systemicScore = 50;
-  if (systemicSignals && systemicSignals.length > 0) {
-    const sysTones = systemicSignals.filter(s => s.tone != null).map(s => s.tone);
-    if (sysTones.length >= 2) {
-      // Average systemic tone: more negative = more conflict coverage = lower cohesion
-      const sysAvg = sysTones.reduce((a,b) => a+b, 0) / sysTones.length;
-      // Map: tone -8 or worse = 0 (no cohesion), tone 0 = 100 (full cohesion)
-      systemicScore = Math.max(0, Math.min(100, (sysAvg + 8) / 8 * 100));
-      // Divergence between systemic topics
-      const sysDivergence = Math.max(...sysTones) - Math.min(...sysTones);
-      if (sysDivergence > 3) systemicScore *= 0.8; // penalty for divergent signals
+  if (systemicActors.length > 0) {
+    // Use Mistral classifications if available
+    const sysClassified = systemicActors.filter(a => a.classification);
+    if (sysClassified.length > 0) {
+      const alignmentValues = { ALINEADO: 100, NEUTRO: 50, TENSION: 0 };
+      const total = sysClassified.reduce((sum, a) => {
+        return sum + (alignmentValues[a.classification.alignment] ?? 50) * (a.classification.confidence ?? 0.5);
+      }, 0);
+      const totalConf = sysClassified.reduce((s, a) => s + (a.classification.confidence ?? 0.5), 0);
+      systemicScore = totalConf > 0 ? total / totalConf : 50;
+    } else {
+      // Heuristic from tone + mentions
+      const sysTones = systemicActors.map(a => a.tone).filter(v => v !== null);
+      if (sysTones.length >= 2) {
+        const sysAvg = sysTones.reduce((a,b) => a+b, 0) / sysTones.length;
+        systemicScore = Math.max(0, Math.min(100, (sysAvg + 8) / 8 * 100));
+        const sysDivergence = Math.max(...sysTones) - Math.min(...sysTones);
+        if (sysDivergence > 3) systemicScore *= 0.8;
+      }
     }
-    // Chavismo fracture keywords would pull score down
-    const fracturaSignal = systemicSignals.find(s => s.id === "chavismo");
-    if (fracturaSignal && fracturaSignal.tone != null && fracturaSignal.tone < -6) {
-      systemicScore *= 0.7; // heavy penalty
+    // Chavismo fracture signal
+    const fracturaActor = systemicActors.find(a => a.actor === "chavismo");
+    if (fracturaActor) {
+      if (fracturaActor.classification?.alignment === "TENSION") systemicScore *= 0.6;
+      else if (fracturaActor.tone != null && fracturaActor.tone < -6) systemicScore *= 0.7;
     }
   }
 
@@ -405,6 +373,7 @@ async function handleCohesion(req, res) {
       return {
         actor: actor.id,
         name: actor.name,
+        group: actor.group || "actor",
         newsCount: news.length,
         topHeadlines: news.slice(0, 3).map(n => ({ title: n.title, link: n.link, date: n.date })),
         tone,
@@ -413,10 +382,9 @@ async function handleCohesion(req, res) {
       };
     });
 
-    const [actorResults, polymarket, systemicSignals] = await Promise.all([
+    const [actorResults, polymarket] = await Promise.all([
       Promise.all(actorPromises),
       fetchPolymarketSignal(),
-      fetchSystemicSignals(),
     ]);
 
     const gdeltTones = {};
@@ -426,15 +394,15 @@ async function handleCohesion(req, res) {
       gdeltMentions[r.actor] = r.mentions;
     }
 
-    // Compute group averages for heuristic
-    const allTones = Object.values(gdeltTones).filter(v => v !== null);
-    const avgTone = allTones.length > 0 ? allTones.reduce((a,b)=>a+b,0)/allTones.length : null;
-    const allMentions = Object.values(gdeltMentions);
-    const avgMentions = allMentions.length > 0 ? allMentions.reduce((a,b)=>a+b,0)/allMentions.length : 0;
+    // Compute group averages for heuristic (individual actors only)
+    const indActors = actorResults.filter(a => a.group === "actor");
+    const indTones = indActors.map(a => a.tone).filter(v => v !== null);
+    const avgTone = indTones.length > 0 ? indTones.reduce((a,b)=>a+b,0)/indTones.length : null;
+    const avgMentions = indActors.length > 0 ? indActors.reduce((s,a) => s+a.mentions, 0)/indActors.length : 0;
 
-    const scoring = computeCohesionScore(actorResults, gdeltTones, gdeltMentions, polymarket, sitrepOverride, systemicSignals);
+    const scoring = computeCohesionScore(actorResults, gdeltTones, gdeltMentions, polymarket, sitrepOverride);
 
-    // Build actor semaphore — use Mistral if available, else heuristic with group context
+    // Build actor semaphore — use Mistral if available, else heuristic
     const actorSemaphore = actorResults.map(r => {
       let status;
       if (r.classification) {
@@ -445,6 +413,7 @@ async function handleCohesion(req, res) {
       return {
         actor: r.actor,
         name: r.name,
+        group: r.group,
         status,
         confidence: r.classification?.confidence ?? null,
         evidence: r.classification?.evidence ?? (r.mentions > 0 ? `${r.mentions} menciones en 7d · tono ${r.tone?.toFixed(1) ?? "N/A"}` : "Sin cobertura mediática detectada"),
@@ -455,14 +424,18 @@ async function handleCohesion(req, res) {
       };
     });
 
+    // Split for response
+    const actors = actorSemaphore.filter(a => a.group === "actor");
+    const systemic = actorSemaphore.filter(a => a.group === "systemic");
+
     res.setHeader("Cache-Control", "public, s-maxage=600, must-revalidate");
     return res.status(200).json({
       index: scoring.composite,
       level: scoring.composite >= 75 ? "ALTA" : scoring.composite >= 50 ? "MEDIA" : scoring.composite >= 25 ? "BAJA" : "CRITICA",
       components: scoring.components,
       hasSitrep: scoring.hasSitrep,
-      actors: actorSemaphore,
-      systemic: systemicSignals,
+      actors,
+      systemic,
       polymarket: polymarket ? { price: polymarket.price, question: polymarket.question } : null,
       fetchedAt: new Date().toISOString(),
       engine: skipAI ? "gdelt+heuristic" : (MISTRAL_API_KEY ? "mistral+gdelt" : "gdelt+heuristic"),
