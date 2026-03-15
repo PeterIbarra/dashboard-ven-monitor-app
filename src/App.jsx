@@ -67,8 +67,8 @@ const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 const GDELT_TIMESPAN = "120d";
 
 // Detect if running on Vercel (has /api routes) vs local/Claude artifact
-const PNUD_LOGO_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 64">' +
-// Pixel art PNUD logo — 8-bit style globe + PNUD letters
+const PNUD_LOGO_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 44" shape-rendering="crispEdges"><rect width="32" height="22" fill="#0468B1"/><rect x="11" y="2" width="10" height="1" fill="white"/><rect x="9" y="3" width="2" height="1" fill="white"/><rect x="21" y="3" width="2" height="1" fill="white"/><rect x="8" y="4" width="1" height="1" fill="white"/><rect x="23" y="4" width="1" height="1" fill="white"/><rect x="7" y="5" width="1" height="3" fill="white"/><rect x="24" y="5" width="1" height="3" fill="white"/><rect x="7" y="8" width="1" height="3" fill="white"/><rect x="24" y="8" width="1" height="3" fill="white"/><rect x="7" y="11" width="1" height="3" fill="white"/><rect x="24" y="11" width="1" height="3" fill="white"/><rect x="8" y="14" width="1" height="1" fill="white"/><rect x="23" y="14" width="1" height="1" fill="white"/><rect x="9" y="15" width="2" height="1" fill="white"/><rect x="21" y="15" width="2" height="1" fill="white"/><rect x="11" y="16" width="10" height="1" fill="white"/><rect x="15" y="3" width="2" height="14" fill="white" opacity="0.5"/><rect x="8" y="9" width="16" height="1" fill="white" opacity="0.5"/><rect x="13" y="4" width="6" height="1" fill="white" opacity="0.4"/><rect x="12" y="5" width="1" height="1" fill="white" opacity="0.4"/><rect x="19" y="5" width="1" height="1" fill="white" opacity="0.4"/><rect x="11" y="6" width="1" height="2" fill="white" opacity="0.4"/><rect x="20" y="6" width="1" height="2" fill="white" opacity="0.4"/><rect x="11" y="10" width="1" height="2" fill="white" opacity="0.4"/><rect x="20" y="10" width="1" height="2" fill="white" opacity="0.4"/><rect x="12" y="13" width="1" height="1" fill="white" opacity="0.4"/><rect x="19" y="13" width="1" height="1" fill="white" opacity="0.4"/><rect x="13" y="14" width="6" height="1" fill="white" opacity="0.4"/><rect x="5" y="5" width="1" height="1" fill="white" opacity="0.6"/><rect x="4" y="6" width="1" height="2" fill="white" opacity="0.6"/><rect x="4" y="8" width="1" height="3" fill="white" opacity="0.6"/><rect x="4" y="11" width="1" height="2" fill="white" opacity="0.6"/><rect x="5" y="13" width="1" height="1" fill="white" opacity="0.6"/><rect x="26" y="5" width="1" height="1" fill="white" opacity="0.6"/><rect x="27" y="6" width="1" height="2" fill="white" opacity="0.6"/><rect x="27" y="8" width="1" height="3" fill="white" opacity="0.6"/><rect x="27" y="11" width="1" height="2" fill="white" opacity="0.6"/><rect x="26" y="13" width="1" height="1" fill="white" opacity="0.6"/><rect x="15" y="17" width="2" height="2" fill="white" opacity="0.5"/><rect x="13" y="18" width="1" height="1" fill="white" opacity="0.4"/><rect x="18" y="18" width="1" height="1" fill="white" opacity="0.4"/><rect y="22" width="32" height="1" fill="#e8ecf0"/><rect y="23" width="15" height="10" fill="#0468B1"/><rect x="17" y="23" width="15" height="10" fill="#0468B1"/><rect y="33" width="32" height="1" fill="#e8ecf0"/><rect y="34" width="15" height="10" fill="#0468B1"/><rect x="17" y="34" width="15" height="10" fill="#0468B1"/><rect x="3" y="25" width="1" height="6" fill="white"/><rect x="4" y="25" width="3" height="1" fill="white"/><rect x="7" y="25" width="1" height="3" fill="white"/><rect x="4" y="28" width="3" height="1" fill="white"/><rect x="20" y="25" width="1" height="6" fill="white"/><rect x="21" y="26" width="1" height="1" fill="white"/><rect x="22" y="27" width="1" height="1" fill="white"/><rect x="23" y="28" width="1" height="1" fill="white"/><rect x="24" y="29" width="1" height="1" fill="white"/><rect x="25" y="25" width="1" height="6" fill="white"/><rect x="3" y="36" width="1" height="6" fill="white"/><rect x="9" y="36" width="1" height="6" fill="white"/><rect x="4" y="41" width="5" height="1" fill="white"/><rect x="20" y="36" width="1" height="6" fill="white"/><rect x="21" y="36" width="3" height="1" fill="white"/><rect x="24" y="37" width="1" height="4" fill="white"/><rect x="21" y="41" width="3" height="1" fill="white"/></svg>';
+const PNUD_LOGO = "data:image/svg+xml," + encodeURIComponent(PNUD_LOGO_SVG);
 // Top: UN globe emblem (simplified pixel grid)
 '<rect width="48" height="34" fill="#0468B1"/>' +
 // Globe outline (pixelated circle)
@@ -130,7 +130,6 @@ const PNUD_LOGO_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 6
 '<rect x="36" y="56" width="2" height="4" fill="white"/>' +
 '<rect x="32" y="60" width="4" height="2" fill="white"/>' +
 '</svg>';
-const PNUD_LOGO = "data:image/svg+xml," + encodeURIComponent(PNUD_LOGO_SVG);
 const IS_DEPLOYED = typeof window !== "undefined" && (window.location.hostname.includes("vercel.app") || window.location.hostname.includes(".") && !window.location.hostname.includes("localhost"));
 
 // ── PDF export helper for chart elements ──
@@ -7897,7 +7896,8 @@ export default function MonitorPNUD() {
       }
       return false;
     };
-    // Phase 1: aggressive retry every 2s for 40s
+    // Phase 1: try immediately, then aggressive retry every 2s for 40s
+    setTimeout(scrapeOilWidget, 500); // first attempt after 500ms
     let attempts = 0;
     const ivFast = setInterval(() => {
       attempts++;
@@ -7929,38 +7929,89 @@ export default function MonitorPNUD() {
       {/* Loading splash — shown until liveData finishes first fetch */}
       {!liveData.fetched && (
         <div style={{ position:"fixed", inset:0, zIndex:99999, background:BG, display:"flex", flexDirection:"column",
-          alignItems:"center", justifyContent:"center", gap:0, animation:"fadeIn 0.3s ease" }}>
-          {/* Logo */}
-          <img src={PNUD_LOGO} alt="PNUD" style={{ height:70, marginBottom:18, animation:"slideDown 0.6s ease" }} />
-          {/* Title */}
-          <div style={{ fontSize:30, fontWeight:900, fontFamily:"'Playfair Display',serif", color:ACCENT,
-            letterSpacing:"0.02em", animation:"slideDown 0.6s ease 0.1s both" }}>
+          alignItems:"center", justifyContent:"center", gap:0 }}>
+          {/* Animated pixel art PNUD logo — builds itself piece by piece */}
+          <div style={{ marginBottom:20, position:"relative" }}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 44" width="96" height="132" shapeRendering="crispEdges">
+              <style>{`
+                .px { opacity:0; animation: pxIn 0.15s ease forwards; }
+                .gl { animation: glowPx 2s ease-in-out infinite alternate; }
+                @keyframes pxIn { from { opacity:0; transform:scale(0); } to { opacity:1; transform:scale(1); } }
+                @keyframes glowPx { 0% { filter:brightness(1); } 100% { filter:brightness(1.3); } }
+                @keyframes globeSpin { 0% { transform:translateX(0); } 50% { transform:translateX(2px); } 100% { transform:translateX(0); } }
+              `}</style>
+              {/* Blue background - fades in first */}
+              <rect width="32" height="22" fill={ACCENT} className="px" style={{animationDelay:"0s"}} />
+              <rect y="23" width="15" height="10" fill={ACCENT} className="px" style={{animationDelay:"0.05s"}} />
+              <rect x="17" y="23" width="15" height="10" fill={ACCENT} className="px" style={{animationDelay:"0.1s"}} />
+              <rect y="34" width="15" height="10" fill={ACCENT} className="px" style={{animationDelay:"0.15s"}} />
+              <rect x="17" y="34" width="15" height="10" fill={ACCENT} className="px" style={{animationDelay:"0.2s"}} />
+              {/* Separators */}
+              <rect y="22" width="32" height="1" fill="#e8ecf0" className="px" style={{animationDelay:"0.25s"}} />
+              <rect y="33" width="32" height="1" fill="#e8ecf0" className="px" style={{animationDelay:"0.25s"}} />
+              {/* Globe outer ring - draws clockwise */}
+              {[
+                [11,2,10,1],[9,3,2,1],[21,3,2,1],[8,4,1,1],[23,4,1,1],
+                [7,5,1,3],[24,5,1,3],[7,8,1,3],[24,8,1,3],[7,11,1,3],[24,11,1,3],
+                [8,14,1,1],[23,14,1,1],[9,15,2,1],[21,15,2,1],[11,16,10,1],
+              ].map(([x,y,w,h],i) => (
+                <rect key={`g${i}`} x={x} y={y} width={w} height={h} fill="white" className="px gl"
+                  style={{animationDelay:`${0.3 + i*0.04}s`}} />
+              ))}
+              {/* Cross lines - appear after globe */}
+              <rect x="15" y="3" width="2" height="14" fill="white" opacity="0.5" className="px" style={{animationDelay:"0.95s"}} />
+              <rect x="8" y="9" width="16" height="1" fill="white" opacity="0.5" className="px" style={{animationDelay:"1.0s"}} />
+              {/* Inner ring */}
+              {[[13,4,6,1],[12,5,1,1],[19,5,1,1],[11,6,1,2],[20,6,1,2],[11,10,1,2],[20,10,1,2],[12,13,1,1],[19,13,1,1],[13,14,6,1]].map(([x,y,w,h],i) => (
+                <rect key={`ir${i}`} x={x} y={y} width={w} height={h} fill="white" opacity="0.4" className="px"
+                  style={{animationDelay:`${1.05 + i*0.03}s`}} />
+              ))}
+              {/* Laurel leaves - sprout outward */}
+              {[[5,5],[4,6],[4,8],[4,11],[5,13],[26,5],[27,6],[27,8],[27,11],[26,13]].map(([x,y],i) => (
+                <rect key={`l${i}`} x={x} y={y} width="1" height={y===6||y===8||y===11?2:1} fill="white" opacity="0.6" className="px"
+                  style={{animationDelay:`${1.35 + i*0.05}s`}} />
+              ))}
+              {/* P N U D letters - type in one by one */}
+              {/* P */}
+              {[[3,25,1,6],[4,25,3,1],[7,25,1,3],[4,28,3,1]].map(([x,y,w,h],i) => (
+                <rect key={`p${i}`} x={x} y={y} width={w} height={h} fill="white" className="px"
+                  style={{animationDelay:`${1.9 + i*0.06}s`}} />
+              ))}
+              {/* N */}
+              {[[20,25,1,6],[21,26,1,1],[22,27,1,1],[23,28,1,1],[24,29,1,1],[25,25,1,6]].map(([x,y,w,h],i) => (
+                <rect key={`n${i}`} x={x} y={y} width={w} height={h} fill="white" className="px"
+                  style={{animationDelay:`${2.2 + i*0.06}s`}} />
+              ))}
+              {/* U */}
+              {[[3,36,1,6],[9,36,1,6],[4,41,5,1]].map(([x,y,w,h],i) => (
+                <rect key={`u${i}`} x={x} y={y} width={w} height={h} fill="white" className="px"
+                  style={{animationDelay:`${2.6 + i*0.08}s`}} />
+              ))}
+              {/* D */}
+              {[[20,36,1,6],[21,36,3,1],[24,37,1,4],[21,41,3,1]].map(([x,y,w,h],i) => (
+                <rect key={`d${i}`} x={x} y={y} width={w} height={h} fill="white" className="px"
+                  style={{animationDelay:`${2.85 + i*0.06}s`}} />
+              ))}
+            </svg>
+          </div>
+          {/* Title - appears after logo finishes building */}
+          <div style={{ fontSize:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:ACCENT,
+            letterSpacing:"0.02em", opacity:0, animation:"slideDown 0.5s ease 3.2s forwards" }}>
             Monitor de Contexto Situacional
           </div>
-          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.2em", textTransform:"uppercase",
-            marginTop:4, animation:"slideDown 0.6s ease 0.2s both" }}>
+          <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.2em", textTransform:"uppercase",
+            marginTop:4, opacity:0, animation:"slideDown 0.5s ease 3.4s forwards" }}>
             Venezuela 2026
           </div>
-          {/* Animated progress bar */}
-          <div style={{ width:220, height:3, background:`${BORDER}40`, borderRadius:2, marginTop:24, overflow:"hidden",
-            animation:"slideDown 0.6s ease 0.3s both" }}>
+          {/* Progress bar */}
+          <div style={{ width:200, height:3, background:`${BORDER}30`, borderRadius:2, marginTop:20, overflow:"hidden",
+            opacity:0, animation:"fadeIn 0.3s ease 3.5s forwards" }}>
             <div style={{ width:"100%", height:"100%", background:`linear-gradient(90deg, transparent, ${ACCENT}, transparent)`,
-              animation:"shimmer 1.5s ease infinite" }} />
+              animation:"shimmer 1.2s ease infinite" }} />
           </div>
-          {/* Status text */}
-          <div style={{ marginTop:12, fontSize:10, fontFamily:font, color:MUTED, animation:"pulse 1.5s infinite",
-            letterSpacing:"0.08em" }}>
-            Cargando datos en vivo...
-          </div>
-          {/* Data source tags with staggered fade */}
-          <div style={{ marginTop:20, display:"flex", gap:6, animation:"slideDown 0.6s ease 0.4s both" }}>
-            {["Dólar","Petróleo","GDELT","Bilateral","ICG"].map((label,i) => (
-              <span key={i} style={{ fontSize:8, fontFamily:font, color:`${MUTED}50`, padding:"2px 8px",
-                border:`1px solid ${BORDER}50`, letterSpacing:"0.08em",
-                animation:`fadeIn 0.4s ease ${0.5 + i*0.15}s both` }}>
-                {label}
-              </span>
-            ))}
+          <div style={{ marginTop:10, fontSize:10, fontFamily:font, color:MUTED, opacity:0,
+            animation:"fadeIn 0.3s ease 3.6s forwards" }}>
+            <span style={{ animation:"pulse 1.5s infinite" }}>Cargando datos en vivo...</span>
           </div>
         </div>
       )}
