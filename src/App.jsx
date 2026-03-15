@@ -25,6 +25,29 @@ const SEM = { green:"#16a34a", yellow:"#ca8a04", red:"#dc2626" };
 const font = "'Space Mono', monospace";
 const fontSans = "'DM Sans', sans-serif";
 
+// ── Lazy script/CSS loader — deduplicates, caches, returns promise ──
+const _scriptCache = {};
+function loadScript(src, opts = {}) {
+  if (_scriptCache[src]) return _scriptCache[src];
+  _scriptCache[src] = new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const el = document.createElement("script");
+    el.src = src;
+    if (opts.async !== false) el.async = true;
+    el.onload = resolve;
+    el.onerror = reject;
+    document.head.appendChild(el);
+  });
+  return _scriptCache[src];
+}
+function loadCSS(href) {
+  if (document.querySelector(`link[href="${href}"]`)) return;
+  const el = document.createElement("link");
+  el.rel = "stylesheet";
+  el.href = href;
+  document.head.appendChild(el);
+}
+
 // Responsive hook
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
@@ -3029,10 +3052,9 @@ function TwitterTimeline({ handle, height=280 }) {
     a.textContent = `@${handle}`;
     node.appendChild(a);
     if (!window.twttr) {
-      const s = document.createElement("script");
-      s.src = "https://platform.twitter.com/widgets.js";
-      s.async = true;
-      document.head.appendChild(s);
+      loadScript("https://platform.twitter.com/widgets.js").then(() => {
+        if (window.twttr) window.twttr.widgets.load(node);
+      });
     } else {
       window.twttr.widgets.load(node);
     }
@@ -4715,20 +4737,10 @@ function LeafletMap({ events, EC, TR }) {
   const mapInstance = useRef(null);
   const markersRef = useRef(null);
 
-  // Load Leaflet CSS + JS from CDN
+  // Load Leaflet CSS + JS from CDN (deduped)
   useEffect(() => {
-    if (document.getElementById("leaflet-css")) return;
-    const css = document.createElement("link");
-    css.id = "leaflet-css";
-    css.rel = "stylesheet";
-    css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    document.head.appendChild(css);
-
-    const js = document.createElement("script");
-    js.id = "leaflet-js";
-    js.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    js.onload = () => initMap();
-    document.head.appendChild(js);
+    loadCSS("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
+    loadScript("https://unpkg.com/leaflet@1.9.4/dist/leaflet.js").then(() => initMap());
 
     function initMap() {
       if (!mapRef.current || mapInstance.current) return;
@@ -7428,10 +7440,7 @@ export default function MonitorPNUD() {
         autoDisplay: false,
       }, 'google_translate_element');
     };
-    const script = document.createElement('script');
-    script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-    script.async = true;
-    document.head.appendChild(script);
+    loadScript('//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit');
   }, []);
 
   return (

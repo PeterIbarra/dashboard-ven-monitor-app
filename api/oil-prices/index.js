@@ -16,15 +16,30 @@ module.exports = async function handler(req, res) {
 
     if (oilKey) {
       const headers = { Authorization: `Token ${oilKey}`, "Content-Type": "application/json" };
+      let oilApiDebug = [];
+      const fetchOil = async (url) => {
+        try {
+          const response = await fetch(url, { headers, signal: AbortSignal.timeout(8000) });
+          if (!response.ok) {
+            oilApiDebug.push(`${url.split('by_code=')[1]}: HTTP ${response.status}`);
+            return null;
+          }
+          return await response.json();
+        } catch (e) {
+          oilApiDebug.push(`${url.split('by_code=')[1]}: ${e.message}`);
+          return null;
+        }
+      };
       const [bR, wR, gR] = await Promise.all([
-        fetchJson(`${OIL_BASE}/prices/latest?by_code=BRENT_CRUDE_USD`, 8000, headers),
-        fetchJson(`${OIL_BASE}/prices/latest?by_code=WTI_USD`, 8000, headers),
-        fetchJson(`${OIL_BASE}/prices/latest?by_code=NATURAL_GAS_USD`, 8000, headers),
+        fetchOil(`${OIL_BASE}/prices/latest?by_code=BRENT_CRUDE_USD`),
+        fetchOil(`${OIL_BASE}/prices/latest?by_code=WTI_USD`),
+        fetchOil(`${OIL_BASE}/prices/latest?by_code=NATURAL_GAS_USD`),
       ]);
       brent = bR?.data || null;
       wti = wR?.data || null;
       natgas = gR?.data || null;
       if (brent || wti) liveSource = "oilpriceapi";
+      if (oilApiDebug.length > 0) liveSource += ` (debug: ${oilApiDebug.join(", ")})`;
     }
 
     // Fallback live prices from EIA if OilPriceAPI unavailable
