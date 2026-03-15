@@ -4005,6 +4005,46 @@ function LivePriceCards() {
     return () => { clearInterval(iv); document.removeEventListener("visibilitychange", onVis1); };
   }, []);
 
+  // ── Scrape OilPriceAPI widget for real-time prices (widget loads in browser, bypasses serverless limits) ──
+  useEffect(() => {
+    let attempts = 0;
+    const scrapeWidget = () => {
+      const ticker = document.getElementById("oilpriceapi-ticker");
+      if (!ticker) return;
+      const allText = ticker.innerText || ticker.textContent || "";
+      const brentMatch = allText.match(/BRENT[^$]*\$([\d.]+)/i);
+      const wtiMatch = allText.match(/WTI[^$]*\$([\d.]+)/i);
+      const gasMatch = allText.match(/(?:NATURAL.?GAS|NAT.?GAS)[^$]*\$([\d.]+)/i);
+      if (brentMatch || wtiMatch) {
+        const now = new Date().toISOString();
+        setPrices(prev => ({
+          ...prev,
+          brent: brentMatch ? { price: parseFloat(brentMatch[1]), created_at: now } : prev?.brent,
+          wti: wtiMatch ? { price: parseFloat(wtiMatch[1]), created_at: now } : prev?.wti,
+          natgas: gasMatch ? { price: parseFloat(gasMatch[1]), created_at: now } : prev?.natgas,
+        }));
+        setSource("live");
+        // Append live Brent price to chart history
+        if (brentMatch) {
+          const livePrice = parseFloat(brentMatch[1]);
+          const today = new Date().toISOString().slice(0, 10);
+          setBrentHistory(prev => {
+            if (!prev || prev.length === 0) return prev;
+            const filtered = prev.filter(h => h.time?.slice(0, 10) !== today);
+            return [...filtered, { price: livePrice, time: today + "T12:00:00Z" }];
+          });
+        }
+        return true;
+      }
+      return false;
+    };
+    const iv = setInterval(() => {
+      attempts++;
+      if (scrapeWidget() || attempts > 15) clearInterval(iv);
+    }, 2000);
+    return () => clearInterval(iv);
+  }, []);
+
   const extract = (obj) => {
     if (!obj) return null;
     if (typeof obj === "number") return obj;
@@ -4039,7 +4079,7 @@ function LivePriceCards() {
           <Card key={i} accent={item.color}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
               <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase" }}>{item.label}</span>
-              {i === 0 && <Badge color={source === "live" ? "#22c55e" : "#a17d08"}>{source === "live" ? "EN VIVO" : "ESTÁTICO"}</Badge>}
+              {i === 0 && <Badge color={source === "live" ? "#22c55e" : source === "yahoo" ? "#22c55e" : "#a17d08"}>{source === "live" || source === "yahoo" ? "EN VIVO" : source === "eia" ? "EIA" : "ESTÁTICO"}</Badge>}
             </div>
             <div style={{ fontSize: 28, fontWeight: 900, color: item.color, fontFamily: "'Playfair Display',serif", lineHeight: 1 }}>
               ${item.value.toFixed(2)}
