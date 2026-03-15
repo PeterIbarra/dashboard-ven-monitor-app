@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef, memo } from "react";
 
 // ═══════════════════════════════════════════════════════════════
 // DATA — Externalized to src/data/ for easier weekly updates
@@ -361,7 +361,7 @@ function GdeltChart({ data }) {
 }
 
 // ── CONFLICTIVIDAD MINI ─────────────────────────────────────
-function ConflictividadChart() {
+const ConflictividadChart = memo(function ConflictividadChart() {
   const max = Math.max(...CONF_HISTORICO.map(h=>h.p));
   return (
     <div style={{ display:"flex", alignItems:"flex-end", gap:3, height:160, paddingBottom:20, position:"relative" }}>
@@ -384,13 +384,13 @@ function ConflictividadChart() {
       })}
     </div>
   );
-}
+});
 
 // ═══════════════════════════════════════════════════════════════
 // TAB VIEWS
 // ═══════════════════════════════════════════════════════════════
 
-function Sparkline({ scId, currentWeek }) {
+const Sparkline = memo(function Sparkline({ scId, currentWeek }) {
   const vals = WEEKS.map(w => w.probs.find(p=>p.sc===scId)?.v || 0);
   const max = Math.max(...vals, 1);
   const W = 80, H = 24;
@@ -404,7 +404,7 @@ function Sparkline({ scId, currentWeek }) {
       )}
     </svg>
   );
-}
+});
 
 // ═══════════════════════════════════════════════════════════════
 // SITREP DATA
@@ -1170,7 +1170,7 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
 // INSTABILITY CHART — Interactive weekly index with MA4
 // ═══════════════════════════════════════════════════════════════
 
-function InstabilityChart({ histIdx, index, zone }) {
+const InstabilityChart = memo(function InstabilityChart({ histIdx, index, zone }) {
   const [hover, setHover] = useState(null);
   if (!histIdx || histIdx.length < 2) return null;
 
@@ -1288,13 +1288,13 @@ function InstabilityChart({ histIdx, index, zone }) {
       </svg>
     </div>
   );
-}
+});
 
 // ═══════════════════════════════════════════════════════════════
 // BILATERAL CHART — Interactive hover chart for PizzINT data
 // ═══════════════════════════════════════════════════════════════
 
-function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, cH, toX, toY, mob }) {
+const BilateralChart = memo(function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, cH, toX, toY, mob }) {
   const [hover, setHover] = useState(null);
   if (!chartData || chartData.length < 2) return null;
 
@@ -1410,13 +1410,13 @@ function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, 
       </circle>
     </svg>
   );
-}
+});
 
 // ═══════════════════════════════════════════════════════════════
 // NEWS ALERTS — Classify headlines by relevance/urgency
 // ═══════════════════════════════════════════════════════════════
 
-function NewsAlerts({ liveData, mob }) {
+const NewsAlerts = memo(function NewsAlerts({ liveData, mob }) {
   const [alerts, setAlerts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [provider, setProvider] = useState("");
@@ -1545,9 +1545,9 @@ INSTRUCCIONES:
       ))}
     </Card>
   );
-}
+});
 
-function CohesionMiniWidget({ liveData = {} }) {
+const CohesionMiniWidget = memo(function CohesionMiniWidget({ liveData = {} }) {
   const mob = useIsMobile();
   const [hover, setHover] = useState(false);
   const [hoverActor, setHoverActor] = useState(null);
@@ -1678,7 +1678,7 @@ function CohesionMiniWidget({ liveData = {} }) {
       )}
     </div>
   );
-}
+});
 
 function TabDashboard({ week, liveData = {} }) {
   const mob = useIsMobile();
@@ -3566,7 +3566,7 @@ function OilPriceTicker() {
   );
 }
 
-function BrentChart({ history: rawHistory, forecast = [] }) {
+const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = [] }) {
   const [hover, setHover] = useState(null);
   if (!rawHistory || rawHistory.length < 2) return null;
 
@@ -3722,13 +3722,13 @@ function BrentChart({ history: rawHistory, forecast = [] }) {
       )}
     </Card>
   );
-}
+});
 
 // ═══════════════════════════════════════════════════════════════
 // VENEZUELA PRODUCTION CHART — Monthly crude oil production (EIA/OPEC)
 // ═══════════════════════════════════════════════════════════════
 
-function VenProductionChart({ data: apiData }) {
+const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
   const [hover, setHover] = useState(null);
 
   // Merge API data with manual OPEC MOMR data
@@ -3915,7 +3915,7 @@ function VenProductionChart({ data: apiData }) {
       </div>
     </Card>
   );
-}
+});
 
 function LivePriceCards() {
   const [prices, setPrices] = useState(null);
@@ -3973,9 +3973,14 @@ function LivePriceCards() {
       setLoading(false);
     }
     fetchPrices();
-    // Auto-refresh every 5 minutes
-    const iv = setInterval(fetchPrices, 300000);
-    return () => clearInterval(iv);
+    // Auto-refresh every 5 minutes — pause when tab not visible
+    let iv = setInterval(fetchPrices, 300000);
+    const onVis1 = () => {
+      clearInterval(iv);
+      if (document.visibilityState === "visible") iv = setInterval(fetchPrices, 300000);
+    };
+    document.addEventListener("visibilitychange", onVis1);
+    return () => { clearInterval(iv); document.removeEventListener("visibilitychange", onVis1); };
   }, []);
 
   const extract = (obj) => {
@@ -4215,7 +4220,7 @@ function TabMercados() {
   );
 }
 
-function EstadosMap() {
+const EstadosMap = memo(function EstadosMap() {
   const mob = useIsMobile();
   const [selected, setSelected] = useState(null);
   const maxEst = Math.max(...CONF_ESTADOS.map(e=>e.p));
@@ -4361,7 +4366,7 @@ function EstadosMap() {
       </div>
     </div>
   );
-}
+});
 
 function TabConflictividad() {
   const mob = useIsMobile();
@@ -6329,8 +6334,8 @@ function TabMacro() {
     }
 
     fetchAll();
-    // Auto-refresh live rates every 5 minutes
-    const iv = setInterval(() => {
+    // Auto-refresh live rates every 5 minutes — pause when tab not visible
+    const refreshRates = () => {
       const liveUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
       fetch(liveUrl, { signal: AbortSignal.timeout(8000) })
         .then(r => r.ok ? r.json() : null).then(data => {
@@ -6339,7 +6344,6 @@ function TabMacro() {
           const bcv = o?.promedio, par = p?.promedio;
           if (bcv && par) {
             setDolar({ bcv, par, brecha: ((par-bcv)/bcv)*100, updated: new Date().toISOString() });
-            // Update today's point in history
             const today = new Date().toISOString().slice(0,10);
             setRateHistory(prev => {
               const filtered = prev.filter(h => h.d !== today);
@@ -6347,8 +6351,14 @@ function TabMacro() {
             });
           }
         }).catch(() => {});
-    }, 300000); // 5 minutes
-    return () => clearInterval(iv);
+    };
+    let iv2 = setInterval(refreshRates, 300000);
+    const onVis2 = () => {
+      clearInterval(iv2);
+      if (document.visibilityState === "visible") iv2 = setInterval(refreshRates, 300000);
+    };
+    document.addEventListener("visibilitychange", onVis2);
+    return () => { clearInterval(iv2); document.removeEventListener("visibilitychange", onVis2); };
   }, []);
 
   // Static macro indicators (update weekly/monthly)
@@ -6880,7 +6890,7 @@ function TabCohesion({ liveData = {} }) {
   );
 }
 
-function CohesionChart({ data }) {
+const CohesionChart = memo(function CohesionChart({ data }) {
   const [hover, setHover] = useState(null);
   const W=700, H=280, padL=45, padR=30, padT=30, padB=32;
   const cW=W-padL-padR, cH=H-padT-padB;
@@ -7008,7 +7018,7 @@ function CohesionChart({ data }) {
       })()}
     </svg>
   );
-}
+});
 
 const TABS = [
   { id:"dashboard", label:"Dashboard", icon:"📊" },
@@ -7376,8 +7386,17 @@ export default function MonitorPNUD() {
       }
     }
     fetchLiveData();
-    const iv = setInterval(fetchLiveData, 300000); // refresh every 5 min
-    return () => clearInterval(iv);
+    // Auto-refresh every 5 min — pause when tab not visible
+    let iv3 = setInterval(fetchLiveData, 300000);
+    const onVis3 = () => {
+      clearInterval(iv3);
+      if (document.visibilityState === "visible") {
+        fetchLiveData(); // refresh immediately when tab becomes visible
+        iv3 = setInterval(fetchLiveData, 300000);
+      }
+    };
+    document.addEventListener("visibilitychange", onVis3);
+    return () => { clearInterval(iv3); document.removeEventListener("visibilitychange", onVis3); };
   }, []);
 
   // Google Translate init
