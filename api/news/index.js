@@ -3,6 +3,8 @@
 
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 
+const { ICG_FEEDS: VEN_RSS_FEEDS, NEWS_RSS_FEEDS: RSS_SOURCES } = require("../feeds.js");
+
 // ═══════════════════════════════════════════════════════════════
 // COHESION INDEX ENGINE — ?source=cohesion
 // ═══════════════════════════════════════════════════════════════
@@ -26,22 +28,6 @@ const ACTORS = [
 ];
 
 // ── VENEZUELAN RSS FEEDS — local media for better actor coverage ──
-const VEN_RSS_FEEDS = [
-  // Oficialistas (señal de alineación) — SSL/Cloudflare may block some; pipeline tolerates failures
-  { name: "VTV", feed: "https://www.vtv.gob.ve/feed/", bias: "oficialista" },
-  { name: "Correo del Orinoco", feed: "https://www.correodelorinoco.gob.ve/feed/", bias: "oficialista" },
-  { name: "La Iguana TV", feed: "https://laiguana.tv/feed/", bias: "oficialista" },
-  { name: "AVN", feed: "https://avn.info.ve/feed/", bias: "oficialista" },
-  { name: "Aporrea", feed: "https://www.aporrea.org/feed/", bias: "oficialista" },
-  // Independientes / críticos (señal de tensión)
-  { name: "Efecto Cocuyo", feed: "https://efectococuyo.com/feed/", bias: "independiente" },
-  { name: "El Pitazo", feed: "https://elpitazo.net/feed/", bias: "independiente" },
-  { name: "Runrunes", feed: "https://runrun.es/feed/", bias: "independiente" },
-  { name: "Tal Cual", feed: "https://talcualdigital.com/feed/", bias: "independiente" },
-  // Generalistas
-  { name: "El Nacional", feed: "https://www.elnacional.com/feed/", bias: "generalista" },
-  { name: "La Patilla", feed: "https://www.lapatilla.com/feed/", bias: "generalista" },
-];
 
 // ── IN-MEMORY CACHE — last valid classification per actor ──
 // Persists across warm invocations on Vercel (same lambda instance)
@@ -566,30 +552,6 @@ async function handleCohesion(req, res) {
 // ORIGINAL NEWS/RSS ENGINE — default route
 // ═══════════════════════════════════════════════════════════════
 
-const RSS_SOURCES = [
-  { name:"Efecto Cocuyo", feed:"https://efectococuyo.com/feed/", lang:"es", type:"news" },
-  { name:"El Pitazo", feed:"https://elpitazo.net/feed/", lang:"es", type:"news" },
-  { name:"Runrunes", feed:"https://runrun.es/feed/", lang:"es", type:"news" },
-  { name:"Tal Cual", feed:"https://talcualdigital.com/feed/", lang:"es", type:"news" },
-  { name:"El Estímulo", feed:"https://elestimulo.com/feed/", lang:"es", type:"news" },
-  { name:"Caracas Chronicles", feed:"https://www.caracaschronicles.com/feed/", lang:"en", type:"news" },
-  { name:"Reuters VE", feed:"https://news.google.com/rss/search?q=venezuela+reuters&hl=en", type:"news" },
-  { name:"BBC Lat Am", feed:"https://feeds.bbci.co.uk/news/world/latin_america/rss.xml", type:"news" },
-  { name:"NYT World", feed:"https://rss.nytimes.com/services/xml/rss/nyt/World.xml", type:"news" },
-  { name:"Al Jazeera", feed:"https://www.aljazeera.com/xml/rss/all.xml", type:"news" },
-  { name:"The Guardian VE", feed:"https://www.theguardian.com/world/venezuela/rss", type:"news" },
-  { name:"Infobae", feed:"https://www.infobae.com/feeds/rss/", type:"news" },
-  { name:"El País", feed:"https://elpais.com/rss/elpais/portada.xml", type:"news" },
-  { name:"France24", feed:"https://www.france24.com/es/am%C3%A9rica-latina/rss", type:"news" },
-  { name:"Google News VE", feed:"https://news.google.com/rss/search?q=venezuela", type:"news" },
-  { name:"Google News VE Economía", feed:"https://news.google.com/rss/search?q=venezuela+economia", type:"news" },
-  { name:"Google News VE Política", feed:"https://news.google.com/rss/search?q=venezuela+politica", type:"news" },
-  { name:"Cocuyo Chequea", feed:"https://efectococuyo.com/cocuyo-chequea/feed/", lang:"es", type:"factcheck" },
-  { name:"Cotejo.info", feed:"https://cotejo.info/feed/", lang:"es", type:"factcheck" },
-  { name:"EsPaja", feed:"https://espaja.com/feed/", lang:"es", type:"factcheck" },
-  { name:"Cazamos Fake News", feed:"https://www.cazadoresdefakenews.info/feed/", lang:"es", type:"factcheck" },
-  { name:"Provea", feed:"https://provea.org/feed/", lang:"es", type:"factcheck" },
-];
 
 const SCENARIO_TAGS = {
   E1: /elecci[oó]n|electoral|voto|transici[oó]n|democra|MCM|Machado|oposici[oó]n|preso.pol[ií]tico|amnist[ií]a|excarcel/i,

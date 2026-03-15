@@ -25,6 +25,21 @@ const SEM = { green:"#16a34a", yellow:"#ca8a04", red:"#dc2626" };
 const font = "'Space Mono', monospace";
 const fontSans = "'DM Sans', sans-serif";
 
+// ── Shared style constants — reduce 1,340 inline objects ──
+const S = {
+  label: S.label,
+  label9: { fontSize:9, fontFamily:font, letterSpacing:"0.1em", textTransform:"uppercase", color:MUTED },
+  labelAccent: { fontSize:10, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:ACCENT },
+  body: { fontSize:12, fontFamily:fontSans, color:TEXT, lineHeight:1.6 },
+  bodySmall: { fontSize:11, fontFamily:fontSans, color:TEXT, lineHeight:1.5 },
+  muted: S.muted,
+  muted10: S.muted10,
+  kpi: { fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", lineHeight:1 },
+  kpiBig: { fontSize:32, fontWeight:900, fontFamily:"'Playfair Display',serif", lineHeight:1 },
+  heading: { fontSize:15, fontWeight:700, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase", color:TEXT },
+  subheading: { fontSize:13, fontWeight:600, color:TEXT },
+};
+
 // ── Lazy script/CSS loader — deduplicates, caches, returns promise ──
 const _scriptCache = {};
 function loadScript(src, opts = {}) {
@@ -1611,7 +1626,7 @@ const CohesionMiniWidget = memo(function CohesionMiniWidget({ liveData = {} }) {
             <div style={{ fontSize:8, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:MUTED }}>Cohesión de Gobierno</div>
             <div style={{ display:"flex", alignItems:"baseline", gap:4, marginTop:1 }}>
               <span style={{ fontSize:mob?20:26, fontWeight:900, fontFamily:"'Playfair Display',serif", color:col, lineHeight:1 }}>{score}</span>
-              <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>/100</span>
+              <span style={S.muted10}>/100</span>
             </div>
           </div>
         </div>
@@ -2734,7 +2749,7 @@ function TabMonitor() {
         <span style={{ fontSize:16 }}>🚦</span>
         <div style={{ flex:1 }}>
           <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Monitor de Señales — {seccion === "senales" ? `${allSignals.length} señales · ${SCENARIO_SIGNALS.length} escenarios` : `${INDICATORS.length} indicadores · ${MONITOR_WEEKS.length} semanas`}</div>
-          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Semáforos, umbrales y señales por escenario</div>
+          <div style={S.muted}>Semáforos, umbrales y señales por escenario</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {[{id:"indicadores",label:"Indicadores"},{id:"senales",label:"Señales E1/E2/E3/E4"},{id:"noticias",label:"Noticias"},{id:"factcheck",label:"Verificación"}].map(s => (
@@ -2984,7 +2999,7 @@ function MonitorNoticias() {
                   <div style={{ fontSize:14, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:4 }}>{n.title}</div>
                   <div style={{ display:"flex", gap:6, alignItems:"center", flexWrap:"wrap" }}>
                     <span style={{ fontSize:10, fontFamily:font, color:ACCENT }}>{n.source}</span>
-                    {n.date && <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>
+                    {n.date && <span style={S.muted10}>
                       {new Date(n.date).toLocaleDateString("es",{day:"numeric",month:"short"})}
                     </span>}
                     {n.week && <span style={{ fontSize:8, fontFamily:font, padding:"1px 5px", background:`${ACCENT}12`,
@@ -3116,7 +3131,7 @@ function MonitorFactCheck() {
             <div style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`2px solid ${s.color}`, padding:"10px 12px", cursor:"pointer" }}
               onMouseEnter={e=>e.currentTarget.style.borderColor=s.color} onMouseLeave={e=>e.currentTarget.style.borderColor=BORDER}>
               <div style={{ fontSize:13, fontWeight:600, color:s.color, marginBottom:2 }}>{s.name}</div>
-              <div style={{ fontSize:10, fontFamily:font, color:MUTED }}>@{s.handle}</div>
+              <div style={S.muted10}>@{s.handle}</div>
             </div>
           </a>
         ))}
@@ -3174,7 +3189,7 @@ function MonitorFactCheck() {
               <div style={{ fontSize:14, fontWeight:600, color:TEXT, lineHeight:1.4, marginBottom:3 }}>{a.title}</div>
               <div style={{ display:"flex", gap:5, alignItems:"center", flexWrap:"wrap" }}>
                 <span style={{ fontSize:10, fontFamily:font, color:FACTCHECK_SOURCES.find(s=>s.name===a.source)?.color||ACCENT, fontWeight:600 }}>{a.source}</span>
-                {a.date && <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>{new Date(a.date).toLocaleDateString("es",{day:"numeric",month:"short"})}</span>}
+                {a.date && <span style={S.muted10}>{new Date(a.date).toLocaleDateString("es",{day:"numeric",month:"short"})}</span>}
                 {a.week && <span style={{ fontSize:8, fontFamily:font, padding:"1px 5px", background:`${ACCENT}12`,
                   color:ACCENT, border:`1px solid ${ACCENT}25`, letterSpacing:"0.08em" }}>{a.week}</span>}
                 {a.verdict && <span style={{ fontSize:8, fontFamily:font, padding:"1px 6px", 
@@ -3266,7 +3281,7 @@ function TabGdelt() {
         <span style={{ fontSize:16 }}>📡</span>
         <div style={{ flex:1 }}>
           <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Cobertura Mediática Internacional</div>
-          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>
+          <div style={S.muted}>
             Señales mediáticas en tiempo real del Proyecto GDELT monitoreando la cobertura sobre Venezuela
           </div>
         </div>
@@ -3308,7 +3323,7 @@ function TabGdelt() {
         {/* KPI Cards */}
         <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:12, marginBottom:16 }}>
           <Card accent={stats.instDelta>0?"#ff3b3b":"#7c3aed"}>
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Inestabilidad Δ</div>
+            <div style={{ ...S.label, marginBottom:4 }}>Inestabilidad Δ</div>
             <div style={{ display:"flex", alignItems:"center", gap:6 }}>
               <span style={{ fontSize:12 }}>{stats.instDelta>0?"📈":"📉"}</span>
               <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
@@ -3319,7 +3334,7 @@ function TabGdelt() {
             <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>vs línea base dic 2025</div>
           </Card>
           <Card accent={(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#7c3aed"}>
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Tono Mediático</div>
+            <div style={{ ...S.label, marginBottom:4 }}>Tono Mediático</div>
             <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
               color:(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#7c3aed" }}>
               {stats.tone!==null ? stats.tone.toFixed(2) : "—"}
@@ -3327,7 +3342,7 @@ function TabGdelt() {
             <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>Actual</div>
           </Card>
           <Card accent={stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#7c3aed"}>
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Señal Compuesta</div>
+            <div style={{ ...S.label, marginBottom:4 }}>Señal Compuesta</div>
             <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
               color:stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#7c3aed" }}>
               {stats.phase || "—"}
@@ -3427,7 +3442,7 @@ function TVMarketQuotes({ title, height=350, groups }) {
 
   return (
     <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px", overflow:"hidden" }}>
-      <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
+      <div style={{ ...S.label, marginBottom:6 }}>
         {title} · En vivo
       </div>
       <div id={containerId} style={{ width:"100%", height }} />
@@ -3580,7 +3595,7 @@ function OilPriceTicker() {
 
   return (
     <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px 16px", minHeight:60 }}>
-      <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8 }}>
+      <div style={{ ...S.label, marginBottom:8 }}>
         🛢 Precios en tiempo real · OilPriceAPI · Actualiza cada 5 min
       </div>
       <div ref={tickerRef} />
@@ -4358,7 +4373,7 @@ const EstadosMap = memo(function EstadosMap() {
         {sel ? (<>
           <div>
             <div style={{ fontSize:16, fontWeight:800, color:TEXT, fontFamily:"'Syne',sans-serif" }}>{sel.e}</div>
-            <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Posición #{selRank} de {CONF_ESTADOS.length} estados</div>
+            <div style={S.muted}>Posición #{selRank} de {CONF_ESTADOS.length} estados</div>
           </div>
 
           {/* KPIs */}
@@ -4446,7 +4461,7 @@ function TabConflictividad() {
         <span style={{ fontSize:16 }}>📊</span>
         <div style={{ flex:1 }}>
           <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Conflictividad Social — Venezuela 2025</div>
-          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Fuente: OVCS · Informe Anual 2025 · 2.219 protestas documentadas</div>
+          <div style={S.muted}>Fuente: OVCS · Informe Anual 2025 · 2.219 protestas documentadas</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {[{id:"semanal26",label:"Semanal 2026"},{id:"resumen",label:"Resumen 2025"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
@@ -4514,7 +4529,7 @@ function TabConflictividad() {
 
           {/* Motivos de la semana */}
           <Card style={{ marginBottom:16 }}>
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>Motivos principales · {latest.label}</div>
+            <div style={{ ...S.label, marginBottom:10 }}>Motivos principales · {latest.label}</div>
             <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
               {latest.motivos.map((m, i) => (
                 <span key={i} style={{ fontSize:12, padding:"4px 12px", background:`${ACCENT}10`, color:ACCENT, border:`1px solid ${ACCENT}25`, borderRadius:20, fontFamily:font }}>{m}</span>
@@ -4524,7 +4539,7 @@ function TabConflictividad() {
 
           {/* Evolución semanal — gráfica de barras */}
           <Card style={{ marginBottom:16 }}>
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:12 }}>Evolución semanal · Protestas S1 → {latest.week}</div>
+            <div style={{ ...S.label, marginBottom:12 }}>Evolución semanal · Protestas S1 → {latest.week}</div>
             <div style={{ display:"flex", gap:3, alignItems:"flex-end", height:140 }}>
               {CONF_SEMANAL.map((w, i) => {
                 const h = Math.max(4, (w.protestas / maxP) * 120);
@@ -4545,7 +4560,7 @@ function TabConflictividad() {
 
           {/* Estados por semana — sparkline horizontal */}
           <Card style={{ marginBottom:16 }}>
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:12 }}>Cobertura territorial · Estados con protestas</div>
+            <div style={{ ...S.label, marginBottom:12 }}>Cobertura territorial · Estados con protestas</div>
             <div style={{ display:"flex", gap:3, alignItems:"flex-end", height:80 }}>
               {CONF_SEMANAL.map((w, i) => {
                 const h = Math.max(4, (w.estados / 24) * 70);
@@ -4568,7 +4583,7 @@ function TabConflictividad() {
 
           {/* Table: all weeks */}
           <Card>
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>Detalle semanal · Ciclo 2026</div>
+            <div style={{ ...S.label, marginBottom:10 }}>Detalle semanal · Ciclo 2026</div>
             <div style={{ overflowX:"auto" }}>
               <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12, fontFamily:font }}>
                 <thead>
@@ -5134,7 +5149,7 @@ function AcledSection() {
                 <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Eventos · {filter} · {tEvents.length}</div>
                 {tTotalP>1 && <div style={{ display:"flex", alignItems:"center", gap:4 }}>
                   <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}40`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
-                  <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>{acledPage}/{tTotalP}</span>
+                  <span style={S.muted10}>{acledPage}/{tTotalP}</span>
                   <button onClick={() => setAcledPage(Math.min(tTotalP,acledPage+1))} disabled={acledPage>=tTotalP} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=tTotalP?`${MUTED}40`:TEXT, cursor:acledPage>=tTotalP?"default":"pointer" }}>→</button>
                 </div>}
               </div>
@@ -5195,7 +5210,7 @@ function AcledSection() {
                 <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Eventos · {actorFilter.slice(0,40)} · {aEvents.length}</div>
                 {aTotalP>1 && <div style={{ display:"flex", alignItems:"center", gap:4 }}>
                   <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}40`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
-                  <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>{acledPage}/{aTotalP}</span>
+                  <span style={S.muted10}>{acledPage}/{aTotalP}</span>
                   <button onClick={() => setAcledPage(Math.min(aTotalP,acledPage+1))} disabled={acledPage>=aTotalP} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=aTotalP?`${MUTED}40`:TEXT, cursor:acledPage>=aTotalP?"default":"pointer" }}>→</button>
                 </div>}
               </div>
@@ -5343,7 +5358,7 @@ function AcledSection() {
                 {stTotalP > 1 && (
                   <div style={{ display:"flex", alignItems:"center", gap:4 }}>
                     <button onClick={() => setAcledPage(Math.max(1,stPage-1))} disabled={stPage===1} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:stPage===1?`${MUTED}40`:TEXT, cursor:stPage===1?"default":"pointer" }}>←</button>
-                    <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>{stPage}/{stTotalP}</span>
+                    <span style={S.muted10}>{stPage}/{stTotalP}</span>
                     <button onClick={() => setAcledPage(Math.min(stTotalP,stPage+1))} disabled={stPage>=stTotalP} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:stPage>=stTotalP?`${MUTED}40`:TEXT, cursor:stPage>=stTotalP?"default":"pointer" }}>→</button>
                   </div>
                 )}
@@ -5618,7 +5633,7 @@ function AcledSection() {
                 <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>{sorted.length} eventos</div>
                 <div style={{ display:"flex", alignItems:"center", gap:4 }}>
                   <button onClick={() => setAcledPage(Math.max(1,acledPage-1))} disabled={acledPage===1} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage===1?`${MUTED}40`:TEXT, cursor:acledPage===1?"default":"pointer" }}>←</button>
-                  <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>{acledPage}/{totalP}</span>
+                  <span style={S.muted10}>{acledPage}/{totalP}</span>
                   <button onClick={() => setAcledPage(Math.min(totalP,acledPage+1))} disabled={acledPage>=totalP} style={{ fontSize:10, fontFamily:font, padding:"3px 7px", border:`1px solid ${BORDER}`, background:"transparent", color:acledPage>=totalP?`${MUTED}40`:TEXT, cursor:acledPage>=totalP?"default":"pointer" }}>→</button>
                 </div>
               </div>
@@ -6163,7 +6178,7 @@ function SocioeconomicPanel({ mob }) {
             <div style={{ fontSize:13, fontWeight:700, fontFamily:"'Syne',sans-serif", color:TEXT, textTransform:"uppercase", letterSpacing:"0.05em" }}>
               Indicadores Socioeconómicos — Venezuela
             </div>
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED }}>
+            <div style={S.muted10}>
               World Bank · IMF WEO · UNHCR/R4V · Actualización automática
             </div>
           </div>
@@ -6434,7 +6449,7 @@ function TabMacro() {
         <span style={{ fontSize:16 }}>💵</span>
         <div style={{ flex:1 }}>
           <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Macroeconomía — Venezuela</div>
-          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Tipo de cambio en vivo · Actualiza cada 5 min · Mercado cambiario</div>
+          <div style={S.muted}>Tipo de cambio en vivo · Actualiza cada 5 min · Mercado cambiario</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {[{id:"cambio",label:"Tipo de cambio"},{id:"indicadores",label:"Indicadores"},{id:"charts",label:"Gráficos"},{id:"socioeco",label:"Socioeconómico"}].map(s => (
@@ -6452,28 +6467,28 @@ function TabMacro() {
         {/* Live rates */}
         <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"1fr 1fr 1fr 1fr", gap:10, marginBottom:16 }}>
           <Card accent="#0468B1">
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Dólar BCV (oficial)</div>
+            <div style={{ ...S.label, marginBottom:4 }}>Dólar BCV (oficial)</div>
             <div style={{ fontSize:26, fontWeight:800, color:"#0468B1", fontFamily:"'Playfair Display',serif" }}>
               {loading ? "..." : dolar?.bcv ? `${dolar.bcv.toFixed(2)}` : "—"}
             </div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>Bs/USD · Fuente: BCV</div>
           </Card>
           <Card accent="#E5243B">
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Dólar Paralelo</div>
+            <div style={{ ...S.label, marginBottom:4 }}>Dólar Paralelo</div>
             <div style={{ fontSize:26, fontWeight:800, color:"#E5243B", fontFamily:"'Playfair Display',serif" }}>
               {loading ? "..." : dolar?.par ? `${dolar.par.toFixed(2)}` : "—"}
             </div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>Bs/USD · Mercado no oficial</div>
           </Card>
           <Card accent={dolar?.brecha > 50 ? "#E5243B" : dolar?.brecha > 30 ? "#f59e0b" : "#22c55e"}>
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Brecha cambiaria</div>
+            <div style={{ ...S.label, marginBottom:4 }}>Brecha cambiaria</div>
             <div style={{ fontSize:26, fontWeight:800, color:dolar?.brecha > 50 ? "#E5243B" : dolar?.brecha > 30 ? "#f59e0b" : "#22c55e", fontFamily:"'Playfair Display',serif" }}>
               {loading ? "..." : dolar?.brecha ? `${dolar.brecha.toFixed(1)}%` : "—"}
             </div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>{dolar?.brecha > 55 ? "⚠ Zona de alerta E2" : dolar?.brecha > 40 ? "Monitoreo activo" : "Rango aceptable"}</div>
           </Card>
           <Card accent="#7c3aed">
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>USDT/VES (ref.)</div>
+            <div style={{ ...S.label, marginBottom:4 }}>USDT/VES (ref.)</div>
             <div style={{ fontSize:26, fontWeight:800, color:"#7c3aed", fontFamily:"'Playfair Display',serif" }}>
               {loading ? "..." : dolar?.par ? `~${(dolar.par * 1.02).toFixed(0)}` : "—"}
             </div>
@@ -6591,7 +6606,7 @@ function TabMacro() {
 
             {/* USD/COP */}
             <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:12, overflow:"hidden" }}>
-              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>USD/COP · Peso Colombiano</div>
+              <div style={{ ...S.label, marginBottom:6 }}>USD/COP · Peso Colombiano</div>
               <TradingViewMini symbol="FX_IDC:USDCOP" />
             </div>
           </div>
