@@ -1682,6 +1682,8 @@ function CohesionMiniWidget({ liveData = {} }) {
 
 function TabDashboard({ week, liveData = {} }) {
   const mob = useIsMobile();
+  const [aiExplanation, setAiExplanation] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const wk = WEEKS[week];
   const prevWk = week > 0 ? WEEKS[week-1] : null;
   const dom = wk.probs.reduce((a,b) => a.v > b.v ? a : b);
@@ -2044,6 +2046,48 @@ function TabDashboard({ week, liveData = {} }) {
                       <span style={{ fontWeight:600, color:item.isNeg?"#16a34a":item.pct>50?"#dc2626":item.pct>25?"#ca8a04":MUTED }}>{item.value}</span>
                     </div>
                   ))}
+                </div>
+
+                {/* AI Explanation button */}
+                <div style={{ marginTop:8, marginBottom:8 }}>
+                  <button onClick={async () => {
+                    if (aiExplanation) { setAiExplanation(null); return; }
+                    setAiLoading(true);
+                    try {
+                      const factorsSummary = breakdown.map(b => `${b.label}: ${b.value} (${b.w})`).join(", ");
+                      const prompt = `Eres analista de riesgo político del PNUD. El Índice de Inestabilidad de Venezuela marca ${index}/100 (${zone.label}), ${delta !== null && delta !== 0 ? `cambio de ${delta > 0 ? "+" : ""}${delta}pp vs semana anterior` : "sin cambio vs anterior"}. Factores: ${factorsSummary}. Explica en 3-4 oraciones en español por qué el índice está en este nivel, cuáles son los factores que más empujan al alza y cuáles estabilizan, y qué vigilar esta semana. Sé conciso y analítico, no uses bullet points.`;
+                      const res = await fetch("/api/ai", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ prompt, max_tokens: 300 }),
+                      });
+                      if (res.ok) {
+                        const data = await res.json();
+                        setAiExplanation(data.text || data.content || "Sin respuesta");
+                      } else {
+                        setAiExplanation("Error: no se pudo generar el análisis (" + res.status + ")");
+                      }
+                    } catch (e) {
+                      setAiExplanation("Error: " + e.message);
+                    }
+                    setAiLoading(false);
+                  }}
+                    style={{ fontSize:11, fontFamily:font, padding:"5px 14px", border:`1px solid ${ACCENT}30`,
+                      background:aiExplanation ? `${ACCENT}10` : "transparent", color:ACCENT, cursor:"pointer",
+                      display:"flex", alignItems:"center", gap:6, letterSpacing:"0.06em" }}>
+                    {aiLoading ? (
+                      <><span style={{ width:10, height:10, border:`2px solid ${ACCENT}`, borderTopColor:"transparent", borderRadius:"50%", animation:"spin 0.8s linear infinite", display:"inline-block" }} /> Analizando...</>
+                    ) : aiExplanation ? "✕ Cerrar análisis" : "🤖 Explicar con IA"}
+                  </button>
+                  {aiExplanation && (
+                    <div style={{ marginTop:8, padding:"10px 14px", background:`${ACCENT}06`, border:`1px solid ${ACCENT}15`,
+                      fontSize:12, fontFamily:fontSans, color:TEXT, lineHeight:1.7 }}>
+                      <div style={{ fontSize:9, fontFamily:font, color:ACCENT, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
+                        🤖 Análisis IA · Índice de Inestabilidad
+                      </div>
+                      {aiExplanation}
+                    </div>
+                  )}
                 </div>
 
                 {/* Historical chart */}
@@ -7337,6 +7381,7 @@ export default function MonitorPNUD() {
     <div style={{ fontFamily:fontSans, background:BG, minHeight:"100vh", color:TEXT, overflowX:"hidden" }}>
       <style>{`
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
         .goog-te-banner-frame, .skiptranslate > iframe { display:none !important; }
         body { top:0 !important; margin:0; overflow-x:hidden; }
         html { overflow-x:hidden; }
