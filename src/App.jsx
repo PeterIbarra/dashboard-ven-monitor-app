@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef, memo } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 
 // ═══════════════════════════════════════════════════════════════
 // DATA — Externalized to src/data/ for easier weekly updates
@@ -399,7 +399,7 @@ function GdeltChart({ data }) {
 }
 
 // ── CONFLICTIVIDAD MINI ─────────────────────────────────────
-const ConflictividadChart = memo(function ConflictividadChart() {
+function ConflictividadChart() {
   const max = Math.max(...CONF_HISTORICO.map(h=>h.p));
   return (
     <div style={{ display:"flex", alignItems:"flex-end", gap:3, height:160, paddingBottom:20, position:"relative" }}>
@@ -422,13 +422,13 @@ const ConflictividadChart = memo(function ConflictividadChart() {
       })}
     </div>
   );
-});
+}
 
 // ═══════════════════════════════════════════════════════════════
 // TAB VIEWS
 // ═══════════════════════════════════════════════════════════════
 
-const Sparkline = memo(function Sparkline({ scId, currentWeek }) {
+function Sparkline({ scId, currentWeek }) {
   const vals = WEEKS.map(w => w.probs.find(p=>p.sc===scId)?.v || 0);
   const max = Math.max(...vals, 1);
   const W = 80, H = 24;
@@ -442,7 +442,7 @@ const Sparkline = memo(function Sparkline({ scId, currentWeek }) {
       )}
     </svg>
   );
-});
+}
 
 // ═══════════════════════════════════════════════════════════════
 // SITREP DATA
@@ -1208,7 +1208,7 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
 // INSTABILITY CHART — Interactive weekly index with MA4
 // ═══════════════════════════════════════════════════════════════
 
-const InstabilityChart = memo(function InstabilityChart({ histIdx, index, zone }) {
+function InstabilityChart({ histIdx, index, zone }) {
   const [hover, setHover] = useState(null);
   if (!histIdx || histIdx.length < 2) return null;
 
@@ -1326,13 +1326,13 @@ const InstabilityChart = memo(function InstabilityChart({ histIdx, index, zone }
       </svg>
     </div>
   );
-});
+}
 
 // ═══════════════════════════════════════════════════════════════
 // BILATERAL CHART — Interactive hover chart for PizzINT data
 // ═══════════════════════════════════════════════════════════════
 
-const BilateralChart = memo(function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, cH, toX, toY, mob }) {
+function BilateralChart({ chartData, cfg, maxV, minV, W, H, PL, PR, PT, PB, cW, cH, toX, toY, mob }) {
   const [hover, setHover] = useState(null);
   if (!chartData || chartData.length < 2) return null;
 
@@ -1448,13 +1448,13 @@ const BilateralChart = memo(function BilateralChart({ chartData, cfg, maxV, minV
       </circle>
     </svg>
   );
-});
+}
 
 // ═══════════════════════════════════════════════════════════════
 // NEWS ALERTS — Classify headlines by relevance/urgency
 // ═══════════════════════════════════════════════════════════════
 
-const NewsAlerts = memo(function NewsAlerts({ liveData, mob }) {
+function NewsAlerts({ liveData, mob }) {
   const [alerts, setAlerts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [provider, setProvider] = useState("");
@@ -1583,9 +1583,9 @@ INSTRUCCIONES:
       ))}
     </Card>
   );
-});
+}
 
-const CohesionMiniWidget = memo(function CohesionMiniWidget({ liveData = {} }) {
+function CohesionMiniWidget({ liveData = {} }) {
   const mob = useIsMobile();
   const [hover, setHover] = useState(false);
   const [hoverActor, setHoverActor] = useState(null);
@@ -1716,7 +1716,7 @@ const CohesionMiniWidget = memo(function CohesionMiniWidget({ liveData = {} }) {
       )}
     </div>
   );
-});
+}
 
 function TabDashboard({ week, liveData = {} }) {
   const mob = useIsMobile();
@@ -3603,7 +3603,7 @@ function OilPriceTicker() {
   );
 }
 
-const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = [] }) {
+function BrentChart({ history: rawHistory, forecast = [] }) {
   const [hover, setHover] = useState(null);
   if (!rawHistory || rawHistory.length < 2) return null;
 
@@ -3759,13 +3759,13 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
       )}
     </Card>
   );
-});
+}
 
 // ═══════════════════════════════════════════════════════════════
 // VENEZUELA PRODUCTION CHART — Monthly crude oil production (EIA/OPEC)
 // ═══════════════════════════════════════════════════════════════
 
-const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
+function VenProductionChart({ data: apiData }) {
   const [hover, setHover] = useState(null);
 
   // Merge API data with manual OPEC MOMR data
@@ -3952,7 +3952,7 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
       </div>
     </Card>
   );
-});
+}
 
 function LivePriceCards() {
   const [prices, setPrices] = useState(null);
@@ -4297,7 +4297,7 @@ function TabMercados() {
   );
 }
 
-const EstadosMap = memo(function EstadosMap() {
+function EstadosMap() {
   const mob = useIsMobile();
   const [selected, setSelected] = useState(null);
   const maxEst = Math.max(...CONF_ESTADOS.map(e=>e.p));
@@ -4443,7 +4443,7 @@ const EstadosMap = memo(function EstadosMap() {
       </div>
     </div>
   );
-});
+}
 
 function TabConflictividad() {
   const mob = useIsMobile();
@@ -6957,7 +6957,7 @@ function TabCohesion({ liveData = {} }) {
   );
 }
 
-const CohesionChart = memo(function CohesionChart({ data }) {
+function CohesionChart({ data }) {
   const [hover, setHover] = useState(null);
   const W=700, H=280, padL=45, padR=30, padT=30, padB=32;
   const cW=W-padL-padR, cH=H-padT-padB;
@@ -7085,7 +7085,7 @@ const CohesionChart = memo(function CohesionChart({ data }) {
       })()}
     </svg>
   );
-});
+}
 
 const TABS = [
   { id:"dashboard", label:"Dashboard", icon:"📊" },
