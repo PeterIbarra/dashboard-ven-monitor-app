@@ -67,6 +67,7 @@ const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 const GDELT_TIMESPAN = "120d";
 
 // Detect if running on Vercel (has /api routes) vs local/Claude artifact
+const PNUD_LOGO = "data:image/png;base64,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";
 const IS_DEPLOYED = typeof window !== "undefined" && (window.location.hostname.includes("vercel.app") || window.location.hostname.includes(".") && !window.location.hostname.includes("localhost"));
 
 // ── PDF export helper for chart elements ──
@@ -2093,12 +2094,40 @@ function TabDashboard({ week, liveData = {} }) {
                 if (aiExplanation) { setAiExplanation(null); return; }
                 setAiLoading(true);
                 try {
-                  const factorsSummary = breakdown.map(b => `${b.label}: ${b.value} (${b.w})`).join(", ");
-                  const prompt = `Eres analista de riesgo político del PNUD. El Índice de Inestabilidad de Venezuela marca ${index}/100 (${zone.label}), ${delta !== null && delta !== 0 ? `cambio de ${delta > 0 ? "+" : ""}${delta}pp vs semana anterior` : "sin cambio vs anterior"}. Factores: ${factorsSummary}. Explica en 3-4 oraciones en español por qué el índice está en este nivel, cuáles son los factores que más empujan al alza y cuáles estabilizan, y qué vigilar esta semana. Sé conciso y analítico. No uses markdown, no uses asteriscos, no uses bullet points.`;
+                  const factorsSummary = breakdown.map(b => `${b.label}: ${b.value} (peso ${b.w})`).join(", ");
+                  // Gather additional dashboard context for richer analysis
+                  const alertsSummary = (() => {
+                    try {
+                      const el = document.querySelectorAll("[data-alert-name]");
+                      return el.length > 0 ? Array.from(el).map(e => e.dataset.alertName).join(", ") : "";
+                    } catch { return ""; }
+                  })();
+                  const tensionsSummary = (typeof TENSIONS !== "undefined" ? TENSIONS : []).slice(0, 6).map(t => `[${t.level}] ${t.text}`).join("; ");
+                  const prompt = `Eres analista senior de riesgo político del PNUD Venezuela. Escribe un análisis de dos párrafos cortos en español sobre el Índice de Inestabilidad.
+
+DATOS DEL ÍNDICE:
+- Score: ${index}/100 (zona: ${zone.label})
+- ${delta !== null && delta !== 0 ? `Cambio: ${delta > 0 ? "+" : ""}${delta}pp vs semana anterior` : "Sin cambio vs semana anterior"}
+- Factores y pesos: ${factorsSummary}
+
+CONTEXTO ADICIONAL DEL DASHBOARD:
+- Precio Brent: $${brentPrice} (referencia Venezuela)
+- Protestas semanales: ${lastWeekConf?.protestas || "N/D"} en ${lastWeekConf?.estados || "N/D"}/24 estados
+- Cobertura territorial de protestas: ${lastWeekConf?.estados || "N/D"}/24 estados (más estados = mayor extensión geográfica del descontento)
+- ICG (Cohesión de Gobierno): ${icgRaw || "N/D"}/100
+- Tendencia mensual protestas (4 sem): ${monthlyTotal}
+- Tensiones clave: ${tensionsSummary}
+
+INSTRUCCIONES:
+Párrafo 1: Explica por qué el índice está en ${index}/100. Identifica los 3-4 factores que más lo impulsan al alza (protestas, cobertura territorial de protestas, brecha cambiaria, señales de colapso, etc.) y los 2-3 factores que lo contienen (probabilidades E1/E3, Brent alto si aplica, amnistía si aplica). IMPORTANTE: la cobertura territorial (${lastWeekConf?.estados || "N/D"}/24 estados) mide la extensión geográfica de las protestas, NO es un factor estabilizador — a mayor cobertura, mayor inestabilidad.
+
+Párrafo 2: Qué vigilar esta semana y qué podría hacer que el índice suba o baje. Menciona riesgos específicos basados en los datos.
+
+No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. Escribe en prosa analítica fluida.`;
                   const res = await fetch("/api/ai", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ prompt, max_tokens: 300 }),
+                    body: JSON.stringify({ prompt, max_tokens: 500 }),
                   });
                   if (res.ok) {
                     const data = await res.json();
@@ -7816,24 +7845,37 @@ export default function MonitorPNUD() {
       {/* Loading splash — shown until liveData finishes first fetch */}
       {!liveData.fetched && (
         <div style={{ position:"fixed", inset:0, zIndex:99999, background:BG, display:"flex", flexDirection:"column",
-          alignItems:"center", justifyContent:"center", gap:16 }}>
-          <div style={{ fontSize:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:ACCENT, letterSpacing:"0.02em" }}>
-            Monitor PNUD
+          alignItems:"center", justifyContent:"center", gap:0, animation:"fadeIn 0.3s ease" }}>
+          {/* Logo */}
+          <img src={PNUD_LOGO} alt="PNUD" style={{ height:70, marginBottom:18, animation:"slideDown 0.6s ease" }} />
+          {/* Title */}
+          <div style={{ fontSize:30, fontWeight:900, fontFamily:"'Playfair Display',serif", color:ACCENT,
+            letterSpacing:"0.02em", animation:"slideDown 0.6s ease 0.1s both" }}>
+            Monitor de Contexto Situacional
           </div>
-          <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase" }}>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.2em", textTransform:"uppercase",
+            marginTop:4, animation:"slideDown 0.6s ease 0.2s both" }}>
             Venezuela 2026
           </div>
-          <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:12 }}>
-            <div style={{ width:14, height:14, border:`2.5px solid ${ACCENT}`, borderTopColor:"transparent",
-              borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
-            <span style={{ fontSize:11, fontFamily:font, color:MUTED, animation:"pulse 1.5s infinite" }}>
-              Cargando datos en vivo...
-            </span>
+          {/* Animated progress bar */}
+          <div style={{ width:220, height:3, background:`${BORDER}40`, borderRadius:2, marginTop:24, overflow:"hidden",
+            animation:"slideDown 0.6s ease 0.3s both" }}>
+            <div style={{ width:"100%", height:"100%", background:`linear-gradient(90deg, transparent, ${ACCENT}, transparent)`,
+              animation:"shimmer 1.5s ease infinite" }} />
           </div>
-          <div style={{ marginTop:20, display:"flex", gap:6 }}>
-            {["Dólar","Petróleo","Bilateral","Noticias","Cohesión"].map((label,i) => (
-              <span key={i} style={{ fontSize:8, fontFamily:font, color:`${MUTED}60`, padding:"2px 6px",
-                border:`1px solid ${BORDER}`, letterSpacing:"0.08em" }}>{label}</span>
+          {/* Status text */}
+          <div style={{ marginTop:12, fontSize:10, fontFamily:font, color:MUTED, animation:"pulse 1.5s infinite",
+            letterSpacing:"0.08em" }}>
+            Cargando datos en vivo...
+          </div>
+          {/* Data source tags with staggered fade */}
+          <div style={{ marginTop:20, display:"flex", gap:6, animation:"slideDown 0.6s ease 0.4s both" }}>
+            {["Dólar","Petróleo","GDELT","Bilateral","ICG"].map((label,i) => (
+              <span key={i} style={{ fontSize:8, fontFamily:font, color:`${MUTED}50`, padding:"2px 8px",
+                border:`1px solid ${BORDER}50`, letterSpacing:"0.08em",
+                animation:`fadeIn 0.4s ease ${0.5 + i*0.15}s both` }}>
+                {label}
+              </span>
             ))}
           </div>
         </div>
@@ -7841,6 +7883,9 @@ export default function MonitorPNUD() {
       <style>{`
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes shimmer { 0% { transform:translateX(-100%); } 100% { transform:translateX(100%); } }
         .goog-te-banner-frame, .skiptranslate > iframe { display:none !important; }
         body { top:0 !important; margin:0; overflow-x:hidden; }
         html { overflow-x:hidden; }
@@ -7868,7 +7913,7 @@ export default function MonitorPNUD() {
       {/* HEADER */}
       <div style={{ borderBottom:`2px solid ${ACCENT}`, padding:mob?"10px 12px":"12px 24px", display:"flex", justifyContent:"space-between", alignItems:"center", background:BG2, boxShadow:"0 1px 4px rgba(0,0,0,0.08)", flexWrap:"wrap", gap:8 }}>
         <div style={{ display:"flex", alignItems:"center", gap:mob?8:14 }}>
-          <div style={{ background:ACCENT, color:"#fff", fontFamily:font, fontSize:mob?11:14, fontWeight:700, letterSpacing:"0.15em", padding:mob?"3px 6px":"5px 10px", borderRadius:3 }}>PNUD</div>
+          <img src={PNUD_LOGO} alt="PNUD" style={{ height:mob?32:40 }} />
           <div>
             <div style={{ fontSize:mob?12:16, fontWeight:600, color:TEXT, letterSpacing:"0.02em" }}>{mob?"Monitor Venezuela 2026":"Monitor de Contexto Situacional · Venezuela 2026"}</div>
             {!mob && <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.08em" }}>Programa de las Naciones Unidas para el Desarrollo</div>}
