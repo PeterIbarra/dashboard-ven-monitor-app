@@ -3590,6 +3590,7 @@ function OilPriceTicker() {
 
 const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = [] }) {
   const [hover, setHover] = useState(null);
+  const [zoomRange, setZoomRange] = useState("all");
   if (!rawHistory || rawHistory.length < 2) return null;
 
   // Downsample: group by day, take last price of each day
@@ -3598,16 +3599,27 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
     const day = h.time ? h.time.split("T")[0] : new Date(h.time).toISOString().split("T")[0];
     byDay.set(day, h);
   });
-  const history = Array.from(byDay.values());
+  const allHistory = Array.from(byDay.values());
+  if (allHistory.length < 2) return null;
+
+  // Apply zoom range filter
+  const now = new Date();
+  const rangeMap = { "1m": 30, "3m": 90, "6m": 180, "1y": 365, "all": 99999 };
+  const cutoff = new Date(now.getTime() - (rangeMap[zoomRange] || 99999) * 86400000);
+  const history = zoomRange === "all" ? allHistory : allHistory.filter(h => new Date(h.time) >= cutoff);
   if (history.length < 2) return null;
 
+  // Only show forecast in "all" or "1y" view
+  const showForecast = (zoomRange === "all" || zoomRange === "1y") && forecast.length > 0;
+
   // Combine history + forecast for Y axis scaling
-  const allPrices = [...history.map(h => h.price), ...forecast.map(f => f.price)];
+  const activeForecast = showForecast ? forecast : [];
+  const allPrices = [...history.map(h => h.price), ...activeForecast.map(f => f.price)];
   const firstDate = history[0]?.time ? new Date(history[0].time).toLocaleDateString("es",{month:"short",year:"numeric"}) : "";
-  const lastForecastDate = forecast.length > 0 ? new Date(forecast[forecast.length-1].time).toLocaleDateString("es",{month:"short",year:"numeric"}) : "";
+  const lastForecastDate = activeForecast.length > 0 ? new Date(activeForecast[activeForecast.length-1].time).toLocaleDateString("es",{month:"short",year:"numeric"}) : "";
   const lastDate = history[history.length-1]?.time ? new Date(history[history.length-1].time).toLocaleDateString("es",{month:"short",year:"numeric"}) : "";
-  const chartLabel = forecast.length > 0
-    ? `Brent Crude · ${firstDate} — ${lastForecastDate} · ${history.length} pts + ${forecast.length} pronóstico EIA`
+  const chartLabel = activeForecast.length > 0
+    ? `Brent Crude · ${firstDate} — ${lastForecastDate} · ${history.length} pts + ${activeForecast.length} pronóstico EIA`
     : `Brent Crude · ${firstDate} — ${lastDate} · ${history.length} puntos`;
 
   const prices = history.map(h => h.price);
@@ -3616,7 +3628,7 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
   const range = max - min || 1;
   
   // Extend chart width to accommodate forecast
-  const totalPoints = history.length + (forecast.length > 0 ? Math.round(forecast.length * 4) : 0); // ~4 days per month forecast point
+  const totalPoints = history.length + (activeForecast.length > 0 ? Math.round(activeForecast.length * 4) : 0);
   const W = 700, H = 140, padL = 45, padR = 10, padT = 10, padB = 25;
   const cW = W - padL - padR, cH = H - padT - padB;
 
@@ -3629,11 +3641,11 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
   // Forecast path (dashed, starting from last historical point)
   let forecastPathD = "";
   let forecastAreaD = "";
-  if (forecast.length > 0) {
+  if (activeForecast.length > 0) {
     const lastHistX = toX(history.length - 1);
     const lastHistY = toY(history[history.length - 1].price);
-    const forecastPts = forecast.map((f, i) => {
-      const fi = history.length + Math.round((i + 1) * 4); // ~4 days spacing per month
+    const forecastPts = activeForecast.map((f, i) => {
+      const fi = history.length + Math.round((i + 1) * 4);
       return { x: toX(fi), y: toY(f.price), price: f.price, time: f.time };
     });
     forecastPathD = `M${lastHistX},${lastHistY} ` + forecastPts.map(p => `L${p.x},${p.y}`).join(" ");
@@ -3647,13 +3659,25 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
 
   return (
     <Card>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap:"wrap", gap:6 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase" }}>
             {chartLabel}
           </span>
           <Badge color="#22c55e">EN VIVO</Badge>
         </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          {["1m","3m","6m","1y","all"].map(r => (
+            <button key={r} onClick={() => { setZoomRange(r); setHover(null); }}
+              style={{ fontSize:9, fontFamily:font, padding:"2px 8px", border:`1px solid ${zoomRange===r ? ACCENT : BORDER}`,
+                background: zoomRange===r ? `${ACCENT}12` : "transparent", color: zoomRange===r ? ACCENT : MUTED,
+                cursor:"pointer", letterSpacing:"0.05em", textTransform:"uppercase" }}>
+              {r === "all" ? "Todo" : r}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 2 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
           <span style={{ fontSize: 18, fontWeight: 900, color: "#22c55e", fontFamily: "'Playfair Display',serif" }}>
             ${last.toFixed(2)}
@@ -3689,7 +3713,7 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
           <path d={forecastAreaD} fill="rgba(234,179,8,0.06)" />
           <path d={forecastPathD} fill="none" stroke="#eab308" strokeWidth={1.5} strokeDasharray="5,3" />
           {/* Forecast dots with labels */}
-          {forecast.map((f, i) => {
+          {activeForecast.map((f, i) => {
             const fi = history.length + Math.round((i + 1) * 4);
             const fx = toX(fi);
             const fy = toY(f.price);
@@ -3730,7 +3754,7 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
         </div>
       )}
       {/* Legend */}
-      {forecast.length > 0 && (
+      {activeForecast.length > 0 && (
         <div style={{ display:"flex", gap:14, justifyContent:"center", marginTop:4 }}>
           <div style={{ display:"flex", alignItems:"center", gap:4 }}>
             <div style={{ width:16, height:2, background:"#22c55e" }} />
@@ -3752,17 +3776,15 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
 
 const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
   const [hover, setHover] = useState(null);
+  const [zoomRange, setZoomRange] = useState("all");
 
   // Merge API data with manual OPEC MOMR data
-  // Manual data only fills gaps — if EIA already has the month, EIA wins
   const merged = (() => {
     const byMonth = new Map();
-    // API data first (authoritative)
     (apiData || []).forEach(d => {
-      const month = d.time.slice(0, 7); // "YYYY-MM"
+      const month = d.time.slice(0, 7);
       byMonth.set(month, { ...d, source: "EIA" });
     });
-    // Manual data fills gaps only
     VEN_PRODUCTION_MANUAL.forEach(d => {
       const month = d.time.slice(0, 7);
       if (!byMonth.has(month)) {
@@ -3772,7 +3794,11 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
     return Array.from(byMonth.values()).sort((a, b) => new Date(a.time) - new Date(b.time));
   })();
 
-  const data = merged;
+  // Apply zoom range filter
+  const rangeMap = { "2y": 730, "5y": 1825, "all": 99999 };
+  const now = new Date();
+  const cutoff = new Date(now.getTime() - (rangeMap[zoomRange] || 99999) * 86400000);
+  const data = zoomRange === "all" ? merged : merged.filter(d => new Date(d.time) >= cutoff);
   if (!data || data.length < 3) return null;
 
   const manualCount = data.filter(d => d.source !== "EIA").length;
@@ -3805,13 +3831,25 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
 
   return (
     <Card>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap:"wrap", gap:6 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase" }}>
             🇻🇪 Producción Petrolera Venezuela · {firstDate} — {lastDate} · {data.length} meses
           </span>
           <Badge color={ACCENT}>EIA/OPEC</Badge>
         </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          {["2y","5y","all"].map(r => (
+            <button key={r} onClick={() => { setZoomRange(r); setHover(null); }}
+              style={{ fontSize:9, fontFamily:font, padding:"2px 8px", border:`1px solid ${zoomRange===r ? ACCENT : BORDER}`,
+                background: zoomRange===r ? `${ACCENT}12` : "transparent", color: zoomRange===r ? ACCENT : MUTED,
+                cursor:"pointer", letterSpacing:"0.05em", textTransform:"uppercase" }}>
+              {r === "all" ? "Todo" : r}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 2 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
           <span style={{ fontSize: 18, fontWeight: 900, color: ACCENT, fontFamily: "'Playfair Display',serif" }}>
             {latest.value.toFixed(0)}
@@ -5941,8 +5979,17 @@ function TabIODA() {
 // MAIN APP
 // ═══════════════════════════════════════════════════════════════
 
-function RateChart({ data }) {
+function RateChart({ data: rawData }) {
   const [hover, setHover] = useState(null);
+  const [zoomRange, setZoomRange] = useState("all");
+
+  // Apply zoom range filter
+  const rangeMap = { "1m": 30, "3m": 90, "6m": 180, "1y": 365, "all": 99999 };
+  const now = new Date();
+  const cutoff = new Date(now.getTime() - (rangeMap[zoomRange] || 99999) * 86400000);
+  const data = zoomRange === "all" ? rawData : rawData.filter(d => new Date(d.d) >= cutoff);
+  if (!data || data.length < 2) return null;
+
   const W = 700, H = 250, padL = 50, padR = 60, padT = 15, padB = 30;
   const cW = W-padL-padR, cH = H-padT-padB;
 
@@ -5966,6 +6013,16 @@ function RateChart({ data }) {
 
   return (
     <div>
+      <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:6, gap:4 }}>
+        {["1m","3m","6m","1y","all"].map(r => (
+          <button key={r} onClick={() => { setZoomRange(r); setHover(null); }}
+            style={{ fontSize:9, fontFamily:font, padding:"2px 8px", border:`1px solid ${zoomRange===r ? ACCENT : BORDER}`,
+              background: zoomRange===r ? `${ACCENT}12` : "transparent", color: zoomRange===r ? ACCENT : MUTED,
+              cursor:"pointer", letterSpacing:"0.05em", textTransform:"uppercase" }}>
+            {r === "all" ? "Todo" : r}
+          </button>
+        ))}
+      </div>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}
         onMouseMove={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
@@ -6038,8 +6095,16 @@ function RateChart({ data }) {
   );
 }
 
-function BrechaChart({ data }) {
+function BrechaChart({ data: rawData }) {
   const [hover, setHover] = useState(null);
+  const [zoomRange, setZoomRange] = useState("all");
+
+  // Apply zoom range filter
+  const rangeMap = { "1m": 30, "3m": 90, "6m": 180, "1y": 365, "all": 99999 };
+  const now = new Date();
+  const cutoff = new Date(now.getTime() - (rangeMap[zoomRange] || 99999) * 86400000);
+  const data = zoomRange === "all" ? rawData : rawData.filter(d => new Date(d.d) >= cutoff);
+
   const W = 800, H = 500, padL = 55, padR = 25, padT = 20, padB = 36;
   const cW = W-padL-padR, cH = H-padT-padB;
 
@@ -6064,6 +6129,17 @@ function BrechaChart({ data }) {
     ` L${toX(validIdxs[validIdxs.length-1])},${padT+cH} L${toX(validIdxs[0])},${padT+cH} Z` : "";
 
   return (
+    <div>
+    <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:6, gap:4 }}>
+      {["1m","3m","6m","1y","all"].map(r => (
+        <button key={r} onClick={() => { setZoomRange(r); setHover(null); }}
+          style={{ fontSize:9, fontFamily:font, padding:"2px 8px", border:`1px solid ${zoomRange===r ? ACCENT : BORDER}`,
+            background: zoomRange===r ? `${ACCENT}12` : "transparent", color: zoomRange===r ? ACCENT : MUTED,
+            cursor:"pointer", letterSpacing:"0.05em", textTransform:"uppercase" }}>
+          {r === "all" ? "Todo" : r}
+        </button>
+      ))}
+    </div>
     <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}
       onMouseMove={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -6108,6 +6184,7 @@ function BrechaChart({ data }) {
         <text x={toX(hover)} y={padT+cH+12} textAnchor="middle" fontSize={7} fill={TEXT} fontFamily={font}>{data[hover].d}</text>
       </>}
     </svg>
+    </div>
   );
 }
 
