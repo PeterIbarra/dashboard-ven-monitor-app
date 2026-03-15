@@ -51,6 +51,44 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  // ── Route: ?type=write_reading → frontend persists live data to fill nulls ──
+  if (req.query.type === "write_reading") {
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+      return res.status(500).json({ error: "Supabase not configured" });
+    }
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      // Only accept known numeric fields — sanitize input
+      const allowed = ["gdelt_tone","gdelt_volume","icg_score","icg_level","brent","wti","bilateral_v","brecha","paralelo"];
+      const update = { date: today };
+      let fieldsSet = 0;
+      for (const key of allowed) {
+        if (req.query[key] != null && req.query[key] !== "" && req.query[key] !== "null") {
+          update[key] = key === "icg_level" ? String(req.query[key]) : parseFloat(req.query[key]);
+          if (!isNaN(update[key]) || key === "icg_level") fieldsSet++;
+        }
+      }
+      if (fieldsSet === 0) return res.status(400).json({ error: "No valid fields" });
+
+      // Upsert — merge with existing row (won't overwrite cron data that's already set)
+      const sbRes = await fetch(`${SUPABASE_URL}/rest/v1/daily_readings?on_conflict=date`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "resolution=merge-duplicates,return=minimal",
+        },
+        body: JSON.stringify(update),
+      });
+      return res.status(sbRes.ok ? 200 : 502).json({ ok: sbRes.ok, date: today, fieldsSet });
+    } catch (e) {
+      return res.status(502).json({ error: e.message });
+    }
+  }
+
   // ── Default: World Bank + IMF + R4V ──
   const years = parseInt(req.query.years) || 15;
 

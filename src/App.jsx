@@ -7353,6 +7353,27 @@ export default function MonitorPNUD() {
         }
       } catch {}
       setLiveData(results);
+
+      // ── Write-back to Supabase: persist live data to fill daily_readings nulls ──
+      if (IS_DEPLOYED) {
+        try {
+          const params = new URLSearchParams({ type: "write_reading" });
+          if (results.bilateral?.latest?.v != null) params.set("bilateral_v", results.bilateral.latest.v.toFixed(2));
+          if (results.cohesion?.index != null) {
+            params.set("icg_score", results.cohesion.index);
+            params.set("icg_level", results.cohesion.level || "");
+          }
+          if (results.dolar?.brecha) params.set("brecha", parseFloat(results.dolar.brecha).toFixed(1));
+          if (results.dolar?.paralelo) params.set("paralelo", results.dolar.paralelo);
+          if (results.oil?.brent) params.set("brent", results.oil.brent);
+          if (results.oil?.wti) params.set("wti", results.oil.wti);
+          // Only write if we have at least 2 data points (avoid writing empty rows)
+          const fieldCount = [...params.entries()].filter(([k]) => k !== "type").length;
+          if (fieldCount >= 2) {
+            fetch(`/api/socioeconomic?${params.toString()}`, { signal: AbortSignal.timeout(5000) }).catch(() => {});
+          }
+        } catch {}
+      }
     }
     fetchLiveData();
     const iv = setInterval(fetchLiveData, 300000); // refresh every 5 min
