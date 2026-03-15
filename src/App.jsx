@@ -1859,19 +1859,21 @@ function TabDashboard({ week, liveData = {} }) {
         // Brent
         if (liveData?.oil?.brent) {
           const brent = parseFloat(liveData.oil.brent);
-          if (brent < 60) liveAlerts.push({ name:"Brent ⬇", val:`$${brent.toFixed(2)}`, umbral:"Brent <$60 presiona ingresos petroleros — riesgo fiscal E2", level:"red" });
-          else if (brent < 65) liveAlerts.push({ name:"Brent ⬇", val:`$${brent.toFixed(2)}`, umbral:"Brent <$65 reduce margen fiscal venezolano", level:"yellow" });
-          else if (brent > 95) liveAlerts.push({ name:"Brent ⬆", val:`$${brent.toFixed(2)}`, umbral:"Brent >$95 — ingresos récord pero posible shock geopolítico (Ormuz/Irán)", level:"red" });
-          else if (brent > 85) liveAlerts.push({ name:"Brent ⬆", val:`$${brent.toFixed(2)}`, umbral:"Brent >$85 — favorable para ingresos VEN, monitorear volatilidad", level:"yellow" });
+          const oilSrc = liveData.oil.source === "oilpriceapi-widget" ? "" : " (EIA)";
+          if (brent < 60) liveAlerts.push({ name:"Brent ⬇", val:`$${brent.toFixed(2)}${oilSrc}`, umbral:"Brent <$60 presiona ingresos petroleros — riesgo fiscal E2", level:"red" });
+          else if (brent < 65) liveAlerts.push({ name:"Brent ⬇", val:`$${brent.toFixed(2)}${oilSrc}`, umbral:"Brent <$65 reduce margen fiscal venezolano", level:"yellow" });
+          else if (brent > 95) liveAlerts.push({ name:"Brent ⬆", val:`$${brent.toFixed(2)}${oilSrc}`, umbral:"Brent >$95 — ingresos récord pero posible shock geopolítico (Ormuz/Irán)", level:"red" });
+          else if (brent > 85) liveAlerts.push({ name:"Brent ⬆", val:`$${brent.toFixed(2)}${oilSrc}`, umbral:"Brent >$85 — favorable para ingresos VEN, monitorear volatilidad", level:"yellow" });
         }
 
         // WTI
         if (liveData?.oil?.wti) {
           const wti = parseFloat(liveData.oil.wti);
-          if (wti < 55) liveAlerts.push({ name:"WTI ⬇", val:`$${wti.toFixed(2)}`, umbral:"WTI <$55 señal de debilidad en mercado energético", level:"red" });
-          else if (wti < 60) liveAlerts.push({ name:"WTI ⬇", val:`$${wti.toFixed(2)}`, umbral:"WTI en zona de presión (<$60)", level:"yellow" });
-          else if (wti > 90) liveAlerts.push({ name:"WTI ⬆", val:`$${wti.toFixed(2)}`, umbral:"WTI >$90 — tensión en mercado energético global, ingresos VEN al alza", level:"red" });
-          else if (wti > 80) liveAlerts.push({ name:"WTI ⬆", val:`$${wti.toFixed(2)}`, umbral:"WTI >$80 — favorable para Venezuela, monitorear causa del alza", level:"yellow" });
+          const oilSrc = liveData.oil.source === "oilpriceapi-widget" ? "" : " (EIA)";
+          if (wti < 55) liveAlerts.push({ name:"WTI ⬇", val:`$${wti.toFixed(2)}${oilSrc}`, umbral:"WTI <$55 señal de debilidad en mercado energético", level:"red" });
+          else if (wti < 60) liveAlerts.push({ name:"WTI ⬇", val:`$${wti.toFixed(2)}${oilSrc}`, umbral:"WTI en zona de presión (<$60)", level:"yellow" });
+          else if (wti > 90) liveAlerts.push({ name:"WTI ⬆", val:`$${wti.toFixed(2)}${oilSrc}`, umbral:"WTI >$90 — tensión en mercado energético global, ingresos VEN al alza", level:"red" });
+          else if (wti > 80) liveAlerts.push({ name:"WTI ⬆", val:`$${wti.toFixed(2)}${oilSrc}`, umbral:"WTI >$80 — favorable para Venezuela, monitorear causa del alza", level:"yellow" });
         }
 
         // Bilateral Threat Index
@@ -7932,7 +7934,7 @@ export default function MonitorPNUD() {
           alignItems:"center", justifyContent:"center", gap:0 }}>
           {/* Animated pixel art PNUD logo — builds itself piece by piece */}
           <div style={{ marginBottom:20, position:"relative" }}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 44" width="96" height="132" shapeRendering="crispEdges">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 44" width="72" height="100" shapeRendering="crispEdges">
               <style>{`
                 .px { opacity:0; animation: pxIn 0.15s ease forwards; }
                 .gl { animation: glowPx 2s ease-in-out infinite alternate; }
@@ -8048,7 +8050,7 @@ export default function MonitorPNUD() {
       {/* HEADER */}
       <div style={{ borderBottom:`2px solid ${ACCENT}`, padding:mob?"10px 12px":"12px 24px", display:"flex", justifyContent:"space-between", alignItems:"center", background:BG2, boxShadow:"0 1px 4px rgba(0,0,0,0.08)", flexWrap:"wrap", gap:8 }}>
         <div style={{ display:"flex", alignItems:"center", gap:mob?8:14 }}>
-          <img src={PNUD_LOGO} alt="PNUD" style={{ height:mob?32:40 }} />
+          <img src={PNUD_LOGO} alt="PNUD" style={{ height:mob?28:36 }} />
           <div>
             <div style={{ fontSize:mob?12:16, fontWeight:600, color:TEXT, letterSpacing:"0.02em" }}>{mob?"Monitor Venezuela 2026":"Monitor de Contexto Situacional · Venezuela 2026"}</div>
             {!mob && <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.08em" }}>Programa de las Naciones Unidas para el Desarrollo</div>}
