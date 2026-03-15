@@ -1,34 +1,74 @@
 // /api/oil-prices — Petroleum spot prices (hybrid)
-// Live prices: OilPriceAPI (intradía) — OILPRICE_API_KEY
+// Live prices: Yahoo Finance (free, ~15min delay) → OilPriceAPI (key) → EIA (daily, delayed)
 // Historical chart: EIA API v2 (daily, 365 days, free) — EIA_API_KEY
 // Returns: { brent, wti, natgas, brentHistory[], histPeriod, source, fetchedAt }
 
 const EIA_BASE = "https://api.eia.gov/v2/petroleum/pri/spt/data/";
 const OIL_BASE = "https://api.oilpriceapi.com/v1";
 
+// Yahoo Finance quote endpoint — no key needed, ~15min delay
+const YAHOO_SYMBOLS = {
+  brent: "BZ=F",   // Brent Crude Futures
+  wti: "CL=F",     // WTI Crude Futures
+  natgas: "NG=F",  // Natural Gas Futures
+};
+
+async function fetchYahooFinance() {
+  try {
+    const symbols = Object.values(YAHOO_SYMBOLS).join(",");
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=regularMarketPrice,regularMarketTime,shortName`;
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(8000),
+      headers: { "User-Agent": "PNUD-Monitor/1.0" },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const quotes = data?.quoteResponse?.result || [];
+    const find = (sym) => {
+      const q = quotes.find(r => r.symbol === sym);
+      if (!q?.regularMarketPrice) return null;
+      return {
+        price: q.regularMarketPrice,
+        created_at: new Date(q.regularMarketTime * 1000).toISOString(),
+      };
+    };
+    const brent = find(YAHOO_SYMBOLS.brent);
+    const wti = find(YAHOO_SYMBOLS.wti);
+    const natgas = find(YAHOO_SYMBOLS.natgas);
+    if (brent || wti) return { brent, wti, natgas, source: "yahoo" };
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 module.exports = async function handler(req, res) {
   const eiaKey = process.env.EIA_API_KEY;
   const oilKey = process.env.OILPRICE_API_KEY;
 
   try {
-    // ── 1. Live prices from OilPriceAPI (intradía) ──
+    // ── 1. Live prices — cascade: Yahoo Finance → OilPriceAPI → EIA ──
     let brent = null, wti = null, natgas = null, liveSource = "static";
 
-    if (oilKey) {
+    // 1a. Yahoo Finance (free, no key, ~15min delay)
+    const yahoo = await fetchYahooFinance();
+    if (yahoo) {
+      brent = yahoo.brent;
+      wti = yahoo.wti;
+      natgas = yahoo.natgas;
+      liveSource = "yahoo";
+    }
+
+    // 1b. OilPriceAPI fallback (if key exists and Yahoo failed)
+    if (!brent && !wti && oilKey) {
       const headers = { Authorization: `Token ${oilKey}`, "Content-Type": "application/json" };
       let oilApiDebug = [];
       const fetchOil = async (url) => {
         try {
           const response = await fetch(url, { headers, signal: AbortSignal.timeout(8000) });
-          if (!response.ok) {
-            oilApiDebug.push(`${url.split('by_code=')[1]}: HTTP ${response.status}`);
-            return null;
-          }
+          if (!response.ok) { oilApiDebug.push(`${url.split('by_code=')[1]}: HTTP ${response.status}`); return null; }
           return await response.json();
-        } catch (e) {
-          oilApiDebug.push(`${url.split('by_code=')[1]}: ${e.message}`);
-          return null;
-        }
+        } catch (e) { oilApiDebug.push(`${url.split('by_code=')[1]}: ${e.message}`); return null; }
       };
       const [bR, wR, gR] = await Promise.all([
         fetchOil(`${OIL_BASE}/prices/latest?by_code=BRENT_CRUDE_USD`),
@@ -39,10 +79,10 @@ module.exports = async function handler(req, res) {
       wti = wR?.data || null;
       natgas = gR?.data || null;
       if (brent || wti) liveSource = "oilpriceapi";
-      if (oilApiDebug.length > 0) liveSource += ` (debug: ${oilApiDebug.join(", ")})`;
+      else if (oilApiDebug.length > 0) liveSource = `oilpriceapi-fail (${oilApiDebug.join(", ")})`;
     }
 
-    // Fallback live prices from EIA if OilPriceAPI unavailable
+    // 1c. EIA fallback (delayed but always works)
     if (!brent && !wti && eiaKey) {
       const buildUrl = (series) =>
         `${EIA_BASE}?api_key=${eiaKey}&frequency=daily&data[0]=value&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=1`;
