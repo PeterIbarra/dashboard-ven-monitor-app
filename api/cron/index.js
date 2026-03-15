@@ -70,6 +70,7 @@ const RSS_SOURCES = [
   { name:"Google News VE Política", feed:"https://news.google.com/rss/search?q=venezuela+politica", type:"news" },
   // ── Fact-checkers ──
   { name:"Cocuyo Chequea", feed:"https://efectococuyo.com/cocuyo-chequea/feed/", type:"factcheck" },
+  { name:"El Diario Chequéalo", feed:"https://eldiario.com/categoria/chequealo/feed/", type:"factcheck" },
   { name:"Cotejo.info", feed:"https://cotejo.info/feed/", type:"factcheck" },
   { name:"Cazamos Fake News", feed:"https://www.cazadoresdefakenews.info/feed/", type:"factcheck" },
   { name:"Provea", feed:"https://provea.org/feed/", type:"factcheck" },

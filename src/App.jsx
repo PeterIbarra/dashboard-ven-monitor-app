@@ -3838,7 +3838,7 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
 
 const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
   const [hover, setHover] = useState(null);
-  const [zoomRange, setZoomRange] = useState("all");
+  const [zoomRange, setZoomRange] = useState("2y");
 
   // Merge API data with manual OPEC MOMR data
   // value = Secondary Sources (EIA/OPEC), dc = Direct Communication (PDVSA)
