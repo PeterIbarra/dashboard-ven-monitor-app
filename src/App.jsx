@@ -7473,12 +7473,12 @@ export default function MonitorPNUD() {
   // Mounts a hidden widget at App level so it loads regardless of which tab is open
   useEffect(() => {
     // Mount hidden OilPriceAPI ticker if not already present
-    if (!document.getElementById("oilpriceapi-ticker-hidden")) {
+    if (!document.getElementById("oilpriceapi-ticker")) {
       const container = document.createElement("div");
-      container.id = "oilpriceapi-ticker-hidden";
-      container.style.cssText = "position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;pointer-events:none;";
+      container.id = "oilpriceapi-ticker-wrap";
+      container.style.cssText = "position:fixed;bottom:0;right:0;width:400px;height:60px;clip:rect(0,0,0,0);clip-path:inset(50%);pointer-events:none;";
       const tickerDiv = document.createElement("div");
-      tickerDiv.id = "oilpriceapi-ticker-global";
+      tickerDiv.id = "oilpriceapi-ticker";
       tickerDiv.setAttribute("data-theme", "light");
       tickerDiv.setAttribute("data-commodities", "BRENT,WTI,NATURAL_GAS");
       tickerDiv.setAttribute("data-layout", "horizontal");
@@ -7492,8 +7492,7 @@ export default function MonitorPNUD() {
 
     let attempts = 0;
     const scrapeOilWidget = () => {
-      // Try both the visible ticker (if Mercados tab open) and our hidden one
-      const ticker = document.getElementById("oilpriceapi-ticker") || document.getElementById("oilpriceapi-ticker-global");
+      const ticker = document.getElementById("oilpriceapi-ticker");
       if (!ticker) return false;
       const allText = ticker.innerText || ticker.textContent || "";
       const brentMatch = allText.match(/BRENT[^$]*\$([\d.]+)/i);
