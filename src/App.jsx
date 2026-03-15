@@ -69,6 +69,30 @@ const GDELT_TIMESPAN = "120d";
 // Detect if running on Vercel (has /api routes) vs local/Claude artifact
 const IS_DEPLOYED = typeof window !== "undefined" && (window.location.hostname.includes("vercel.app") || window.location.hostname.includes(".") && !window.location.hostname.includes("localhost"));
 
+// ── PDF export helper for chart elements ──
+async function exportChartToPDF(elementId, filename) {
+  try {
+    await Promise.all([
+      loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"),
+      loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"),
+    ]);
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    const canvas = await window.html2canvas(el, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new window.jspdf.jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const pdfH = pdf.internal.pageSize.getHeight();
+    const ratio = Math.min(pdfW / canvas.width, pdfH / canvas.height);
+    const imgW = canvas.width * ratio;
+    const imgH = canvas.height * ratio;
+    pdf.addImage(imgData, "PNG", (pdfW - imgW) / 2, (pdfH - imgH) / 2, imgW, imgH);
+    pdf.save(filename);
+  } catch (e) {
+    console.error("Chart PDF export failed:", e);
+  }
+}
+
 const CORS_PROXIES = IS_DEPLOYED
   ? [(url) => url] // On Vercel, no proxy needed (serverless functions handle it)
   : [
@@ -656,7 +680,7 @@ ${Object.keys(liveContext).length > 0 ? JSON.stringify(liveContext, null, 2) : "
   };
 
   // ── Document generator ──
-  const generateDocument = (mode = "html") => {
+  const generateDocument = async (mode = "html") => {
     const escRows = wk.probs.map(p => {
       const sc = SCENARIOS.find(s=>s.id===p.sc);
       return `<tr><td style="padding:8px;border-bottom:1px solid #d0d7e0;font-weight:600;color:${sc?.color}">${sc?.name}</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;text-align:center;font-size:18px;font-weight:700;color:${sc?.color}">${p.v}%</td><td style="padding:8px;border-bottom:1px solid #d0d7e0;color:#5a6a7a">${{up:"↑ Subiendo",down:"↓ Bajando",flat:"→ Estable"}[p.t]}</td></tr>`;
@@ -693,12 +717,43 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
     const url = URL.createObjectURL(blob);
 
     if (mode === "pdf") {
-      // Open in new window and trigger print (save as PDF)
-      const win = window.open(url, "_blank");
-      if (win) {
-        win.addEventListener("load", () => {
-          setTimeout(() => win.print(), 500);
-        });
+      // Direct PDF download using html2canvas + jsPDF
+      try {
+        // Load libraries dynamically
+        await Promise.all([
+          loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"),
+          loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"),
+        ]);
+        // Create hidden container with the HTML
+        const container = document.createElement("div");
+        container.innerHTML = html;
+        container.style.cssText = "position:fixed;top:0;left:0;width:800px;background:#fff;z-index:99999;padding:40px;";
+        document.body.appendChild(container);
+        // Wait for fonts/images to load
+        await new Promise(r => setTimeout(r, 600));
+        const canvas = await window.html2canvas(container, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+        document.body.removeChild(container);
+        const imgData = canvas.toDataURL("image/jpeg", 0.95);
+        const pdf = new window.jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+        const pdfW = pdf.internal.pageSize.getWidth();
+        const pdfH = pdf.internal.pageSize.getHeight();
+        const imgW = canvas.width;
+        const imgH = canvas.height;
+        const ratio = pdfW / imgW;
+        const scaledH = imgH * ratio;
+        // Multi-page support
+        let yOffset = 0;
+        while (yOffset < scaledH) {
+          if (yOffset > 0) pdf.addPage();
+          pdf.addImage(imgData, "JPEG", 0, -yOffset, pdfW, scaledH);
+          yOffset += pdfH;
+        }
+        pdf.save(`SITREP_${d.periodShort.replace(/[^a-zA-Z0-9]/g,"_")}.pdf`);
+      } catch (e) {
+        console.error("PDF generation failed:", e);
+        // Fallback to print dialog
+        const win = window.open(URL.createObjectURL(blob), "_blank");
+        if (win) win.addEventListener("load", () => setTimeout(() => win.print(), 500));
       }
     } else {
       const a = document.createElement("a"); a.href = url;
@@ -3659,6 +3714,7 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
 
   return (
     <Card>
+      <div id="chart-brent-export">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap:"wrap", gap:6 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase" }}>
@@ -3675,6 +3731,11 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
               {r === "all" ? "Todo" : r}
             </button>
           ))}
+          <button onClick={() => exportChartToPDF("chart-brent-export", "Brent_Crude_Venezuela.pdf")}
+            style={{ fontSize:9, fontFamily:font, padding:"2px 8px", border:`1px solid #dc262640`,
+              background:"transparent", color:"#dc2626", cursor:"pointer", letterSpacing:"0.05em" }}>
+            📄 PDF
+          </button>
         </div>
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 2 }}>
@@ -3766,6 +3827,7 @@ const BrentChart = memo(function BrentChart({ history: rawHistory, forecast = []
           </div>
         </div>
       )}
+      </div>
     </Card>
   );
 });
@@ -3831,6 +3893,7 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
 
   return (
     <Card>
+      <div id="chart-venprod-export">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap:"wrap", gap:6 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase" }}>
@@ -3847,6 +3910,11 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
               {r === "all" ? "Todo" : r}
             </button>
           ))}
+          <button onClick={() => exportChartToPDF("chart-venprod-export", "Produccion_Petrolera_Venezuela.pdf")}
+            style={{ fontSize:9, fontFamily:font, padding:"2px 8px", border:`1px solid #dc262640`,
+              background:"transparent", color:"#dc2626", cursor:"pointer", letterSpacing:"0.05em" }}>
+            📄 PDF
+          </button>
         </div>
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 2 }}>
@@ -3972,6 +4040,7 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
       </div>
       <div style={{ fontSize: 8, fontFamily: font, color: `${MUTED}50`, marginTop: 4, textAlign: "center" }}>
         Fuente: EIA / OPEC Secondary Sources · Actualización mensual{manualCount > 0 ? ` · ${manualCount} punto${manualCount>1?"s":""} OPEC MOMR (pendiente EIA)` : ""}
+      </div>
       </div>
     </Card>
   );
@@ -6012,7 +6081,7 @@ function RateChart({ data: rawData }) {
   const maxBrecha = Math.max(...brechaData.filter(Boolean), 1);
 
   return (
-    <div>
+    <div id="chart-rates-export">
       <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:6, gap:4 }}>
         {["1m","3m","6m","1y","all"].map(r => (
           <button key={r} onClick={() => { setZoomRange(r); setHover(null); }}
@@ -6022,6 +6091,11 @@ function RateChart({ data: rawData }) {
             {r === "all" ? "Todo" : r}
           </button>
         ))}
+        <button onClick={() => exportChartToPDF("chart-rates-export", "Tipo_Cambio_Venezuela.pdf")}
+          style={{ fontSize:9, fontFamily:font, padding:"2px 8px", border:`1px solid #dc262640`,
+            background:"transparent", color:"#dc2626", cursor:"pointer", letterSpacing:"0.05em" }}>
+          📄 PDF
+        </button>
       </div>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}
         onMouseMove={(e) => {
@@ -6129,7 +6203,7 @@ function BrechaChart({ data: rawData }) {
     ` L${toX(validIdxs[validIdxs.length-1])},${padT+cH} L${toX(validIdxs[0])},${padT+cH} Z` : "";
 
   return (
-    <div>
+    <div id="chart-brecha-export">
     <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:6, gap:4 }}>
       {["1m","3m","6m","1y","all"].map(r => (
         <button key={r} onClick={() => { setZoomRange(r); setHover(null); }}
@@ -6139,6 +6213,11 @@ function BrechaChart({ data: rawData }) {
           {r === "all" ? "Todo" : r}
         </button>
       ))}
+      <button onClick={() => exportChartToPDF("chart-brecha-export", "Brecha_Cambiaria_Venezuela.pdf")}
+        style={{ fontSize:9, fontFamily:font, padding:"2px 8px", border:`1px solid #dc262640`,
+          background:"transparent", color:"#dc2626", cursor:"pointer", letterSpacing:"0.05em" }}>
+        📄 PDF
+      </button>
     </div>
     <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}
       onMouseMove={(e) => {
