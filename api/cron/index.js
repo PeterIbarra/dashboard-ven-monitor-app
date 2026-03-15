@@ -214,15 +214,15 @@ module.exports = async function handler(req, res) {
     const today = new Date().toISOString().slice(0, 10);
     const reading = { date: today };
 
-    // Fetch in parallel: GDELT tone, oil prices, bilateral, ICG
-    const [gdeltRes, oilRes, bilRes, icgRes] = await Promise.allSettled([
-      fetch("https://api.gdeltproject.org/api/v2/doc/doc?query=Venezuela&mode=timelinetone&timespan=1d&format=csv", { signal: AbortSignal.timeout(8000) }),
+    // Fetch in parallel: GDELT tone (7d avg), oil prices, bilateral, dolar (for brecha)
+    const [gdeltRes, oilRes, bilRes, dolarRes] = await Promise.allSettled([
+      fetch("https://api.gdeltproject.org/api/v2/doc/doc?query=Venezuela&mode=timelinetone&timespan=7d&format=csv", { signal: AbortSignal.timeout(10000) }),
       fetch("https://api.eia.gov/v2/petroleum/pri/spt/data/?api_key=" + (process.env.EIA_API_KEY || "") + "&frequency=daily&data[0]=value&facets[product][]=EPCBRENT&facets[product][]=EPCWTI&sort[0][column]=period&sort[0][direction]=desc&length=1", { signal: AbortSignal.timeout(8000) }),
-      fetch("https://www.pizzint.watch/api/aggregated-data?actorA=United%20States&actorB=Venezuela&days=1", { signal: AbortSignal.timeout(8000) }),
-      fetch((process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://dashboard-ven-monitor-app.vercel.app") + "/api/news?source=cohesion&skipai=true", { signal: AbortSignal.timeout(15000) }),
+      fetch("https://www.pizzint.watch/api/aggregated-data?actorA=United%20States&actorB=Venezuela&days=7", { signal: AbortSignal.timeout(10000) }),
+      fetch("https://ve.dolarapi.com/v1/dolares", { signal: AbortSignal.timeout(6000) }),
     ]);
 
-    // Parse GDELT tone
+    // Parse GDELT tone (7-day average — more reliable than 1d)
     if (gdeltRes.status === "fulfilled" && gdeltRes.value.ok) {
       try {
         const csv = await gdeltRes.value.text();
@@ -251,22 +251,27 @@ module.exports = async function handler(req, res) {
       } catch {}
     }
 
-    // Parse bilateral
+    // Parse bilateral (7-day window — take latest data point)
     if (bilRes.status === "fulfilled" && bilRes.value.ok) {
       try {
         const data = await bilRes.value.json();
-        const latest = data?.data?.[data.data.length - 1];
-        if (latest?.v != null) reading.bilateral_v = parseFloat(latest.v.toFixed(2));
+        const points = data?.data || [];
+        if (points.length > 0) {
+          const latest = points[points.length - 1];
+          if (latest?.v != null) reading.bilateral_v = parseFloat(Number(latest.v).toFixed(2));
+        }
       } catch {}
     }
 
-    // Parse ICG (quick heuristic mode, no Mistral)
-    if (icgRes.status === "fulfilled" && icgRes.value.ok) {
+    // Parse dolar for brecha + paralelo
+    if (dolarRes.status === "fulfilled" && dolarRes.value.ok) {
       try {
-        const data = await icgRes.value.json();
-        if (data?.index != null) {
-          reading.icg_score = data.index;
-          reading.icg_level = data.level;
+        const data = await dolarRes.value.json();
+        const oficial = data.find(d => d.fuente === "oficial");
+        const par = data.find(d => d.fuente === "paralelo");
+        if (oficial?.promedio && par?.promedio) {
+          reading.paralelo = par.promedio;
+          reading.brecha = parseFloat(((par.promedio - oficial.promedio) / oficial.promedio * 100).toFixed(1));
         }
       } catch {}
     }
