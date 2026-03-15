@@ -67,7 +67,70 @@ const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 const GDELT_TIMESPAN = "120d";
 
 // Detect if running on Vercel (has /api routes) vs local/Claude artifact
-const PNUD_LOGO = "data:image/png;base64,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";
+const PNUD_LOGO_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 64">' +
+// Pixel art PNUD logo — 8-bit style globe + PNUD letters
+// Top: UN globe emblem (simplified pixel grid)
+'<rect width="48" height="34" fill="#0468B1"/>' +
+// Globe outline (pixelated circle)
+'<rect x="17" y="3" width="14" height="2" fill="white"/>' +
+'<rect x="13" y="5" width="4" height="2" fill="white"/><rect x="31" y="5" width="4" height="2" fill="white"/>' +
+'<rect x="11" y="7" width="2" height="2" fill="white"/><rect x="35" y="7" width="2" height="2" fill="white"/>' +
+'<rect x="9" y="9" width="2" height="6" fill="white"/><rect x="37" y="9" width="2" height="6" fill="white"/>' +
+'<rect x="9" y="15" width="2" height="6" fill="white"/><rect x="37" y="15" width="2" height="6" fill="white"/>' +
+'<rect x="11" y="21" width="2" height="2" fill="white"/><rect x="35" y="21" width="2" height="2" fill="white"/>' +
+'<rect x="13" y="23" width="4" height="2" fill="white"/><rect x="31" y="23" width="4" height="2" fill="white"/>' +
+'<rect x="17" y="25" width="14" height="2" fill="white"/>' +
+// Horizontal line through globe
+'<rect x="11" y="14" width="26" height="2" fill="white" opacity="0.6"/>' +
+// Vertical line through globe
+'<rect x="23" y="5" width="2" height="22" fill="white" opacity="0.6"/>' +
+// Equator curve dots
+'<rect x="14" y="11" width="2" height="2" fill="white" opacity="0.5"/>' +
+'<rect x="18" y="10" width="2" height="2" fill="white" opacity="0.5"/>' +
+'<rect x="26" y="10" width="2" height="2" fill="white" opacity="0.5"/>' +
+'<rect x="32" y="11" width="2" height="2" fill="white" opacity="0.5"/>' +
+'<rect x="14" y="17" width="2" height="2" fill="white" opacity="0.5"/>' +
+'<rect x="18" y="18" width="2" height="2" fill="white" opacity="0.5"/>' +
+'<rect x="26" y="18" width="2" height="2" fill="white" opacity="0.5"/>' +
+'<rect x="32" y="17" width="2" height="2" fill="white" opacity="0.5"/>' +
+// Laurel leaves (simplified pixel)
+'<rect x="6" y="11" width="2" height="2" fill="white" opacity="0.7"/>' +
+'<rect x="5" y="13" width="2" height="2" fill="white" opacity="0.7"/>' +
+'<rect x="4" y="15" width="2" height="4" fill="white" opacity="0.7"/>' +
+'<rect x="5" y="19" width="2" height="2" fill="white" opacity="0.7"/>' +
+'<rect x="6" y="21" width="2" height="2" fill="white" opacity="0.7"/>' +
+'<rect x="40" y="11" width="2" height="2" fill="white" opacity="0.7"/>' +
+'<rect x="41" y="13" width="2" height="2" fill="white" opacity="0.7"/>' +
+'<rect x="42" y="15" width="2" height="4" fill="white" opacity="0.7"/>' +
+'<rect x="41" y="19" width="2" height="2" fill="white" opacity="0.7"/>' +
+'<rect x="40" y="21" width="2" height="2" fill="white" opacity="0.7"/>' +
+// Bottom: P N U D in pixel font
+'<rect y="36" width="22" height="13" fill="#0468B1"/>' +
+'<rect x="26" y="36" width="22" height="13" fill="#0468B1"/>' +
+'<rect y="51" width="22" height="13" fill="#0468B1"/>' +
+'<rect x="26" y="51" width="22" height="13" fill="#0468B1"/>' +
+// P (pixel)
+'<rect x="4" y="39" width="2" height="8" fill="white"/>' +
+'<rect x="6" y="39" width="4" height="2" fill="white"/>' +
+'<rect x="10" y="39" width="2" height="4" fill="white"/>' +
+'<rect x="6" y="43" width="4" height="2" fill="white"/>' +
+// N (pixel)
+'<rect x="30" y="39" width="2" height="8" fill="white"/>' +
+'<rect x="32" y="40" width="2" height="2" fill="white"/>' +
+'<rect x="34" y="42" width="2" height="2" fill="white"/>' +
+'<rect x="36" y="44" width="2" height="2" fill="white"/>' +
+'<rect x="38" y="39" width="2" height="8" fill="white"/>' +
+// U (pixel)
+'<rect x="4" y="54" width="2" height="8" fill="white"/>' +
+'<rect x="14" y="54" width="2" height="8" fill="white"/>' +
+'<rect x="6" y="60" width="8" height="2" fill="white"/>' +
+// D (pixel)
+'<rect x="30" y="54" width="2" height="8" fill="white"/>' +
+'<rect x="32" y="54" width="4" height="2" fill="white"/>' +
+'<rect x="36" y="56" width="2" height="4" fill="white"/>' +
+'<rect x="32" y="60" width="4" height="2" fill="white"/>' +
+'</svg>';
+const PNUD_LOGO = "data:image/svg+xml," + encodeURIComponent(PNUD_LOGO_SVG);
 const IS_DEPLOYED = typeof window !== "undefined" && (window.location.hostname.includes("vercel.app") || window.location.hostname.includes(".") && !window.location.hostname.includes("localhost"));
 
 // ── PDF export helper for chart elements ──
@@ -7798,32 +7861,53 @@ export default function MonitorPNUD() {
       document.body.appendChild(container);
     }
 
-    let attempts = 0;
+    let oilScraped = false;
     const scrapeOilWidget = () => {
-      const ticker = document.getElementById("oilpriceapi-ticker");
+      // Try multiple selectors — widget might render differently
+      const ticker = document.getElementById("oilpriceapi-ticker") || document.getElementById("oilpriceapi-ticker-global");
       if (!ticker) return false;
-      const allText = ticker.innerText || ticker.textContent || "";
-      const brentMatch = allText.match(/BRENT[^$]*\$([\d.]+)/i);
-      const wtiMatch = allText.match(/WTI[^$]*\$([\d.]+)/i);
+      // Get all text content including nested elements and iframes
+      let allText = ticker.innerText || ticker.textContent || "";
+      // Also check all span/div children for price patterns
+      if (!allText || allText.length < 10) {
+        const els = ticker.querySelectorAll("span, div, td, a");
+        allText = Array.from(els).map(e => e.textContent).join(" ");
+      }
+      // Broader regex: match various price formats ($103.14, $ 103.14, 103.14 USD, etc.)
+      const brentMatch = allText.match(/BRENT[^0-9$]*\$?\s*([\d,.]+)/i) || allText.match(/Brent[^0-9]*?([\d]{2,3}\.[\d]{1,2})/i);
+      const wtiMatch = allText.match(/WTI[^0-9$]*\$?\s*([\d,.]+)/i) || allText.match(/WTI[^0-9]*?([\d]{2,3}\.[\d]{1,2})/i);
       if (brentMatch || wtiMatch) {
-        setLiveData(prev => ({
-          ...prev,
-          oil: {
-            ...prev?.oil,
-            brent: brentMatch ? parseFloat(brentMatch[1]) : prev?.oil?.brent,
-            wti: wtiMatch ? parseFloat(wtiMatch[1]) : prev?.oil?.wti,
-            source: "oilpriceapi-widget",
-          },
-        }));
-        return true;
+        const parsePr = (m) => m ? parseFloat(m[1].replace(",","")) : null;
+        const bVal = parsePr(brentMatch);
+        const wVal = parsePr(wtiMatch);
+        // Sanity check: prices should be between $20-$200
+        if ((bVal && bVal > 20 && bVal < 200) || (wVal && wVal > 20 && wVal < 200)) {
+          setLiveData(prev => ({
+            ...prev,
+            oil: {
+              ...prev?.oil,
+              brent: bVal && bVal > 20 ? bVal : prev?.oil?.brent,
+              wti: wVal && wVal > 20 ? wVal : prev?.oil?.wti,
+              source: "oilpriceapi-widget",
+            },
+          }));
+          oilScraped = true;
+          return true;
+        }
       }
       return false;
     };
-    const iv = setInterval(() => {
+    // Phase 1: aggressive retry every 2s for 40s
+    let attempts = 0;
+    const ivFast = setInterval(() => {
       attempts++;
-      if (scrapeOilWidget() || attempts > 20) clearInterval(iv);
+      if (scrapeOilWidget() || attempts > 20) clearInterval(ivFast);
     }, 2000);
-    return () => clearInterval(iv);
+    // Phase 2: keep retrying every 30s indefinitely (widget might load late)
+    const ivSlow = setInterval(() => {
+      if (!oilScraped) scrapeOilWidget();
+    }, 30000);
+    return () => { clearInterval(ivFast); clearInterval(ivSlow); };
   }, []);
 
   // Google Translate init
