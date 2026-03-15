@@ -3841,16 +3841,22 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
   const [zoomRange, setZoomRange] = useState("all");
 
   // Merge API data with manual OPEC MOMR data
+  // value = Secondary Sources (EIA/OPEC), dc = Direct Communication (PDVSA)
   const merged = (() => {
     const byMonth = new Map();
     (apiData || []).forEach(d => {
       const month = d.time.slice(0, 7);
-      byMonth.set(month, { ...d, source: "EIA" });
+      byMonth.set(month, { ...d, source: "EIA", dc: null });
     });
     VEN_PRODUCTION_MANUAL.forEach(d => {
       const month = d.time.slice(0, 7);
-      if (!byMonth.has(month)) {
-        byMonth.set(month, { value: d.value, time: d.time, source: d.source || "OPEC MOMR" });
+      const existing = byMonth.get(month);
+      if (existing) {
+        // EIA already has this month — just add dc (PDVSA) value
+        existing.dc = d.dc || null;
+      } else {
+        // EIA doesn't have this month yet — use manual secondary + dc
+        byMonth.set(month, { value: d.value, time: d.time, source: d.source || "OPEC MOMR", dc: d.dc || null });
       }
     });
     return Array.from(byMonth.values()).sort((a, b) => new Date(a.time) - new Date(b.time));
@@ -3864,10 +3870,13 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
   if (!data || data.length < 3) return null;
 
   const manualCount = data.filter(d => d.source !== "EIA").length;
+  const hasDC = data.some(d => d.dc != null);
 
   const values = data.map(d => d.value);
-  const min = Math.min(...values) * 0.9;
-  const max = Math.max(...values) * 1.05;
+  const dcValues = data.filter(d => d.dc != null).map(d => d.dc);
+  const allValues = [...values, ...dcValues];
+  const min = Math.min(...allValues) * 0.9;
+  const max = Math.max(...allValues) * 1.05;
   const range = max - min || 1;
   const latest = data[data.length - 1];
   const prev = data.length > 1 ? data[data.length - 2] : null;
@@ -3964,7 +3973,19 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
           </>
         )}
 
-        {/* Bars */}
+        {/* PDVSA Direct Communication bars (behind main bars, semi-transparent) */}
+        {hasDC && data.map((d, i) => {
+          if (d.dc == null) return null;
+          const x = toX(i) - barW / 2 - barW * 0.15;
+          const y = toY(d.dc);
+          const h = PT + cH - y;
+          return (
+            <rect key={`dc-${i}`} x={x} y={y} width={barW * 0.4} height={Math.max(h, 0.5)}
+              fill="#7c3aed" opacity={hover === i ? 0.6 : 0.3} rx={0.5} />
+          );
+        })}
+
+        {/* Bars (Secondary Sources / EIA) */}
         {data.map((d, i) => {
           const x = toX(i) - barW / 2;
           const y = toY(d.value);
@@ -3977,6 +3998,7 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
               <rect x={x} y={y} width={barW} height={Math.max(h, 0.5)} fill={color} opacity={isHovered ? 0.9 : isManual ? 0.7 : 0.5} rx={0.5}
                 strokeDasharray={isManual ? "2,1" : "none"} stroke={isManual ? color : "none"} strokeWidth={isManual ? 0.5 : 0} />
               {isManual && <text x={x + barW/2} y={y - 2} fontSize={4} fill={color} textAnchor="middle" fontFamily={font}>OPEC</text>}
+              {d.dc != null && <text x={x - barW*0.05} y={toY(d.dc) - 2} fontSize={3.5} fill="#7c3aed" textAnchor="middle" fontFamily={font}>PDVSA</text>}
             </g>
           );
         })}
@@ -4003,22 +4025,29 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
           const hx = toX(hover);
           const hy = toY(d.value);
           const dt = new Date(d.time);
-          const tooltipW = 90;
+          const tooltipW = 110;
           const tooltipX = hx > W * 0.65 ? hx - tooltipW - 8 : hx + 8;
-          const tooltipY = Math.max(Math.min(hy - 18, PT + cH - 38), PT);
+          const hasBoth = d.dc != null;
+          const tooltipH = hasBoth ? 46 : (d.source !== "EIA" ? 36 : 30);
+          const tooltipY = Math.max(Math.min(hy - 18, PT + cH - tooltipH - 2), PT);
           const isManual = d.source !== "EIA";
           return (
             <>
               <line x1={hx} y1={PT} x2={hx} y2={PT + cH} stroke={ACCENT} strokeWidth={0.5} opacity={0.3} />
               <circle cx={hx} cy={hy} r={3} fill={ACCENT} stroke="#fff" strokeWidth={1.5} />
-              <rect x={tooltipX} y={tooltipY} width={tooltipW} height={isManual ? 36 : 30} rx={2} fill={BG2} stroke={BORDER} strokeWidth={0.5} opacity={0.95} />
+              {hasBoth && <circle cx={hx - barW*0.15} cy={toY(d.dc)} r={2.5} fill="#7c3aed" stroke="#fff" strokeWidth={1} />}
+              <rect x={tooltipX} y={tooltipY} width={tooltipW} height={tooltipH} rx={2} fill={BG2} stroke={BORDER} strokeWidth={0.5} opacity={0.95} />
               <text x={tooltipX + 4} y={tooltipY + 11} fontSize={6} fill={MUTED} fontFamily={font}>
                 {dt.toLocaleDateString("es", { month: "long", year: "numeric" })}
               </text>
               <text x={tooltipX + 4} y={tooltipY + 23} fontSize={8} fill={ACCENT} fontFamily={font} fontWeight="700">
-                {d.value.toFixed(0)} kbd ({d.value >= 1000 ? (d.value / 1000).toFixed(2) + "M" : d.value.toFixed(0) + "K"} bpd)
+                Sec: {d.value.toFixed(0)} kbd
               </text>
-              {isManual && <text x={tooltipX + 4} y={tooltipY + 32} fontSize={5} fill="#eab308" fontFamily={font}>Fuente: {d.source} (pendiente EIA)</text>}
+              {hasBoth && <text x={tooltipX + 4} y={tooltipY + 34} fontSize={8} fill="#7c3aed" fontFamily={font} fontWeight="700">
+                PDVSA: {d.dc.toFixed(0)} kbd ({d.dc > d.value ? "+" : ""}{(d.dc - d.value).toFixed(0)})
+              </text>}
+              {isManual && !hasBoth && <text x={tooltipX + 4} y={tooltipY + 32} fontSize={5} fill="#eab308" fontFamily={font}>Fuente: {d.source}</text>}
+              {isManual && hasBoth && <text x={tooltipX + 4} y={tooltipY + 43} fontSize={4.5} fill="#eab308" fontFamily={font}>{d.source}</text>}
             </>
           );
         })()}
@@ -4039,7 +4068,7 @@ const VenProductionChart = memo(function VenProductionChart({ data: apiData }) {
         ))}
       </div>
       <div style={{ fontSize: 8, fontFamily: font, color: `${MUTED}50`, marginTop: 4, textAlign: "center" }}>
-        Fuente: EIA / OPEC Secondary Sources · Actualización mensual{manualCount > 0 ? ` · ${manualCount} punto${manualCount>1?"s":""} OPEC MOMR (pendiente EIA)` : ""}
+        Fuente: EIA / OPEC Secondary Sources{hasDC ? " + PDVSA (Comunicación Directa)" : ""} · Actualización mensual{manualCount > 0 ? ` · ${manualCount} punto${manualCount>1?"s":""} OPEC MOMR (pendiente EIA)` : ""}
       </div>
       </div>
     </Card>

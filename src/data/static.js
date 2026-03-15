@@ -65,10 +65,80 @@ export const CONF_HISTORICO = [
 ];
 
 export const VEN_PRODUCTION_MANUAL = [
-  { time:"2025-11-15T00:00:00Z", value:956, source:"OPEC MOMR Ene 2026" },
-  { time:"2025-12-15T00:00:00Z", value:917, source:"OPEC MOMR Feb 2026" },
-  { time:"2026-01-15T00:00:00Z", value:924, source:"OPEC MOMR Mar 2026" },
-  { time:"2026-02-15T00:00:00Z", value:1021, source:"PDVSA / SITREP S9 (OPEP sec.: 903)" },
+  // value = Secondary Sources (OPEC/EIA kbd), dc = Direct Communication (PDVSA kbd)
+  // Sources: OPEC MOMR, OPEC ASB 2024/2025, OPEC Annual Report 2024, Venezuelanalysis, EAI, CEIC
+  // EIA API provides secondary sources automatically — manual entries fill gaps + add dc
+  // 2016-2023: quarterly dc estimates from OPEC ASB annual averages
+  // 2024+: monthly dc from OPEC MOMR tables
+  // ── 2016 (annual avg dc ~2,370) ──
+  { time:"2016-01-15T00:00:00Z", dc:2410, source:"OPEC ASB" },
+  { time:"2016-04-15T00:00:00Z", dc:2390, source:"OPEC ASB" },
+  { time:"2016-07-15T00:00:00Z", dc:2360, source:"OPEC ASB" },
+  { time:"2016-10-15T00:00:00Z", dc:2320, source:"OPEC ASB" },
+  // ── 2017 (annual avg dc ~2,072) ──
+  { time:"2017-01-15T00:00:00Z", dc:2200, source:"OPEC ASB" },
+  { time:"2017-04-15T00:00:00Z", dc:2100, source:"OPEC ASB" },
+  { time:"2017-07-15T00:00:00Z", dc:2050, source:"OPEC ASB" },
+  { time:"2017-10-15T00:00:00Z", dc:1940, source:"OPEC ASB" },
+  // ── 2018 (annual avg dc ~1,510) ──
+  { time:"2018-01-15T00:00:00Z", dc:1750, source:"OPEC ASB" },
+  { time:"2018-04-15T00:00:00Z", dc:1550, source:"OPEC ASB" },
+  { time:"2018-07-15T00:00:00Z", dc:1450, source:"OPEC ASB" },
+  { time:"2018-10-15T00:00:00Z", dc:1280, source:"OPEC ASB" },
+  // ── 2019 (annual avg dc ~1,010) — sanctions + blackout ──
+  { time:"2019-01-15T00:00:00Z", dc:1350, source:"OPEC ASB" },
+  { time:"2019-04-15T00:00:00Z", dc:1030, source:"OPEC ASB" },
+  { time:"2019-07-15T00:00:00Z", dc:940, source:"OPEC ASB" },
+  { time:"2019-10-15T00:00:00Z", dc:720, source:"OPEC ASB" },
+  // ── 2020 (annual avg dc 569) — pandemic nadir ──
+  { time:"2020-01-15T00:00:00Z", dc:730, source:"OPEC AR 2024" },
+  { time:"2020-04-15T00:00:00Z", dc:420, source:"OPEC AR 2024" },
+  { time:"2020-07-15T00:00:00Z", dc:480, source:"OPEC AR 2024" },
+  { time:"2020-10-15T00:00:00Z", dc:640, source:"OPEC AR 2024" },
+  // ── 2021 (annual avg dc 636) ──
+  { time:"2021-01-15T00:00:00Z", dc:560, source:"OPEC AR 2024" },
+  { time:"2021-04-15T00:00:00Z", dc:590, source:"OPEC AR 2024" },
+  { time:"2021-07-15T00:00:00Z", dc:680, source:"OPEC AR 2024" },
+  { time:"2021-10-15T00:00:00Z", dc:710, source:"OPEC AR 2024" },
+  // ── 2022 (annual avg dc 716) ──
+  { time:"2022-01-15T00:00:00Z", dc:690, source:"OPEC AR 2024" },
+  { time:"2022-04-15T00:00:00Z", dc:710, source:"OPEC AR 2024" },
+  { time:"2022-07-15T00:00:00Z", dc:720, source:"OPEC AR 2024" },
+  { time:"2022-10-15T00:00:00Z", dc:740, source:"OPEC AR 2024" },
+  // ── 2023 (annual avg dc 783) ──
+  { time:"2023-01-15T00:00:00Z", dc:740, source:"OPEC AR 2024" },
+  { time:"2023-04-15T00:00:00Z", dc:780, source:"OPEC AR 2024" },
+  { time:"2023-07-15T00:00:00Z", dc:790, source:"OPEC AR 2024" },
+  { time:"2023-10-15T00:00:00Z", dc:820, source:"OPEC AR 2024" },
+  // ── 2024 (OPEC AR quarterly dc: 864, 904, 933, 982) ──
+  { time:"2024-01-15T00:00:00Z", value:793, dc:856, source:"OPEC MOMR" },
+  { time:"2024-02-15T00:00:00Z", value:811, dc:870, source:"OPEC MOMR" },
+  { time:"2024-03-15T00:00:00Z", value:820, dc:866, source:"OPEC MOMR" },
+  { time:"2024-04-15T00:00:00Z", value:839, dc:900, source:"OPEC MOMR" },
+  { time:"2024-05-15T00:00:00Z", value:830, dc:910, source:"OPEC MOMR" },
+  { time:"2024-06-15T00:00:00Z", value:851, dc:922, source:"OPEC MOMR" },
+  { time:"2024-07-15T00:00:00Z", value:880, dc:930, source:"OPEC MOMR" },
+  { time:"2024-08-15T00:00:00Z", value:891, dc:935, source:"OPEC MOMR" },
+  { time:"2024-09-15T00:00:00Z", value:897, dc:935, source:"OPEC MOMR" },
+  { time:"2024-10-15T00:00:00Z", value:908, dc:972, source:"OPEC MOMR" },
+  { time:"2024-11-15T00:00:00Z", value:901, dc:978, source:"OPEC MOMR" },
+  { time:"2024-12-15T00:00:00Z", value:917, dc:998, source:"OPEC MOMR" },
+  // ── 2025 ──
+  { time:"2025-01-15T00:00:00Z", value:830, dc:924, source:"OPEC MOMR / CEIC" },
+  { time:"2025-02-15T00:00:00Z", value:919, dc:985, source:"OPEC MOMR" },
+  { time:"2025-03-15T00:00:00Z", value:922, dc:1010, source:"OPEC MOMR" },
+  { time:"2025-04-15T00:00:00Z", value:888, dc:1005, source:"OPEC MOMR / EAI" },
+  { time:"2025-05-15T00:00:00Z", value:900, dc:1020, source:"OPEC MOMR" },
+  { time:"2025-06-15T00:00:00Z", value:910, dc:1050, source:"OPEC MOMR" },
+  { time:"2025-07-15T00:00:00Z", value:924, dc:1084, source:"Venezuelanalysis" },
+  { time:"2025-08-15T00:00:00Z", value:936, dc:1098, source:"Venezuelanalysis" },
+  { time:"2025-09-15T00:00:00Z", value:940, dc:1100, source:"OPEC MOMR" },
+  { time:"2025-10-15T00:00:00Z", value:935, dc:1080, source:"OPEC MOMR" },
+  { time:"2025-11-15T00:00:00Z", value:956, dc:963, source:"OPEC MOMR Ene 2026" },
+  { time:"2025-12-15T00:00:00Z", value:917, dc:959, source:"OPEC MOMR Feb 2026" },
+  // ── 2026 ──
+  { time:"2026-01-15T00:00:00Z", value:924, dc:998, source:"OPEC MOMR Mar 2026" },
+  { time:"2026-02-15T00:00:00Z", value:903, dc:1021, source:"OPEC MOMR Mar 2026" },
 ];
 
 export const CONF_MESES = [
