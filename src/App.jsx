@@ -7841,10 +7841,60 @@ export default function MonitorPNUD() {
     return () => { clearInterval(iv3); document.removeEventListener("visibilitychange", onVis3); };
   }, []);
 
-  // ── Scrape OilPriceAPI widget to update liveData.oil with real-time prices ──
-  // Mounts a hidden widget at App level so it loads regardless of which tab is open
+  // ── Live oil prices: direct browser fetch to OilPriceAPI (bypasses serverless IP blocks) ──
+  // Browser has user's normal IP — no datacenter restrictions. Falls back to widget scraping.
   useEffect(() => {
-    // Mount hidden OilPriceAPI ticker if not already present
+    let updated = false;
+    const OILPRICE_KEY = "ee08dc36b7a3ff883080dfe426bffd6ed1a392b53d3818c60a57c84b50858f93";
+
+    // Strategy 1: Direct API call from browser
+    const fetchOilDirect = async () => {
+      try {
+        const headers = { Authorization: `Token ${OILPRICE_KEY}`, "Content-Type": "application/json" };
+        const [bRes, wRes] = await Promise.all([
+          fetch("https://api.oilpriceapi.com/v1/prices/latest?by_code=BRENT_CRUDE_USD", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch("https://api.oilpriceapi.com/v1/prices/latest?by_code=WTI_USD", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
+        ]);
+        const brent = bRes?.data?.price;
+        const wti = wRes?.data?.price;
+        if ((brent && brent > 20) || (wti && wti > 20)) {
+          setLiveData(prev => ({
+            ...prev,
+            oil: { ...prev?.oil, brent: brent || prev?.oil?.brent, wti: wti || prev?.oil?.wti, source: "oilpriceapi-live" },
+          }));
+          updated = true;
+          return true;
+        }
+      } catch {}
+      return false;
+    };
+
+    // Strategy 2: Widget DOM scraping fallback
+    const scrapeWidget = () => {
+      const ticker = document.getElementById("oilpriceapi-ticker");
+      if (!ticker) return false;
+      let allText = ticker.innerText || ticker.textContent || "";
+      if (!allText || allText.length < 10) {
+        allText = Array.from(ticker.querySelectorAll("span, div, td, a")).map(e => e.textContent).join(" ");
+      }
+      const bm = allText.match(/BRENT[^0-9$]*\$?\s*([\d,.]+)/i) || allText.match(/Brent[^0-9]*?([\d]{2,3}\.[\d]{1,2})/i);
+      const wm = allText.match(/WTI[^0-9$]*\$?\s*([\d,.]+)/i) || allText.match(/WTI[^0-9]*?([\d]{2,3}\.[\d]{1,2})/i);
+      if (bm || wm) {
+        const b = bm ? parseFloat(bm[1].replace(",","")) : null;
+        const w = wm ? parseFloat(wm[1].replace(",","")) : null;
+        if ((b && b > 20 && b < 200) || (w && w > 20 && w < 200)) {
+          setLiveData(prev => ({
+            ...prev,
+            oil: { ...prev?.oil, brent: b || prev?.oil?.brent, wti: w || prev?.oil?.wti, source: "oilpriceapi-widget" },
+          }));
+          updated = true;
+          return true;
+        }
+      }
+      return false;
+    };
+
+    // Mount hidden widget as backup
     if (!document.getElementById("oilpriceapi-ticker")) {
       const container = document.createElement("div");
       container.id = "oilpriceapi-ticker-wrap";
@@ -7862,54 +7912,20 @@ export default function MonitorPNUD() {
       document.body.appendChild(container);
     }
 
-    let oilScraped = false;
-    const scrapeOilWidget = () => {
-      // Try multiple selectors — widget might render differently
-      const ticker = document.getElementById("oilpriceapi-ticker") || document.getElementById("oilpriceapi-ticker-global");
-      if (!ticker) return false;
-      // Get all text content including nested elements and iframes
-      let allText = ticker.innerText || ticker.textContent || "";
-      // Also check all span/div children for price patterns
-      if (!allText || allText.length < 10) {
-        const els = ticker.querySelectorAll("span, div, td, a");
-        allText = Array.from(els).map(e => e.textContent).join(" ");
+    // Execute: try direct API first, then fall back to widget scraping
+    fetchOilDirect().then(success => {
+      if (!success) {
+        // Widget fallback: retry every 3s for 60s
+        let attempts = 0;
+        const iv = setInterval(() => {
+          attempts++;
+          if (scrapeWidget() || attempts > 20) clearInterval(iv);
+        }, 3000);
       }
-      // Broader regex: match various price formats ($103.14, $ 103.14, 103.14 USD, etc.)
-      const brentMatch = allText.match(/BRENT[^0-9$]*\$?\s*([\d,.]+)/i) || allText.match(/Brent[^0-9]*?([\d]{2,3}\.[\d]{1,2})/i);
-      const wtiMatch = allText.match(/WTI[^0-9$]*\$?\s*([\d,.]+)/i) || allText.match(/WTI[^0-9]*?([\d]{2,3}\.[\d]{1,2})/i);
-      if (brentMatch || wtiMatch) {
-        const parsePr = (m) => m ? parseFloat(m[1].replace(",","")) : null;
-        const bVal = parsePr(brentMatch);
-        const wVal = parsePr(wtiMatch);
-        // Sanity check: prices should be between $20-$200
-        if ((bVal && bVal > 20 && bVal < 200) || (wVal && wVal > 20 && wVal < 200)) {
-          setLiveData(prev => ({
-            ...prev,
-            oil: {
-              ...prev?.oil,
-              brent: bVal && bVal > 20 ? bVal : prev?.oil?.brent,
-              wti: wVal && wVal > 20 ? wVal : prev?.oil?.wti,
-              source: "oilpriceapi-widget",
-            },
-          }));
-          oilScraped = true;
-          return true;
-        }
-      }
-      return false;
-    };
-    // Phase 1: try immediately, then aggressive retry every 2s for 40s
-    setTimeout(scrapeOilWidget, 500); // first attempt after 500ms
-    let attempts = 0;
-    const ivFast = setInterval(() => {
-      attempts++;
-      if (scrapeOilWidget() || attempts > 20) clearInterval(ivFast);
-    }, 2000);
-    // Phase 2: keep retrying every 30s indefinitely (widget might load late)
-    const ivSlow = setInterval(() => {
-      if (!oilScraped) scrapeOilWidget();
-    }, 30000);
-    return () => { clearInterval(ivFast); clearInterval(ivSlow); };
+    });
+    // Periodic refresh every 5 min (direct API)
+    const ivRefresh = setInterval(() => { if (!updated) fetchOilDirect(); }, 300000);
+    return () => clearInterval(ivRefresh);
   }, []);
 
   // Google Translate init
@@ -7998,11 +8014,11 @@ export default function MonitorPNUD() {
           </div>
           {/* Title - appears after logo finishes building */}
           <div style={{ fontSize:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:ACCENT,
-            letterSpacing:"0.02em", opacity:0, animation:"slideDown 0.5s ease 3.2s forwards" }}>
+            letterSpacing:"0.02em", opacity:0, animation:"slideDown 0.5s ease 3.2s forwards", textAlign:"center", padding:"0 20px" }}>
             Monitor de Contexto Situacional
           </div>
           <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.2em", textTransform:"uppercase",
-            marginTop:4, opacity:0, animation:"slideDown 0.5s ease 3.4s forwards" }}>
+            marginTop:4, opacity:0, animation:"slideDown 0.5s ease 3.4s forwards", textAlign:"center" }}>
             Venezuela 2026
           </div>
           {/* Progress bar */}
