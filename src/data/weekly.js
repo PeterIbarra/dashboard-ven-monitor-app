@@ -80,14 +80,6 @@ export const WEEKS = [
     trendSc:3, trendDrivers:["Reconocimiento formal EE.UU. a Rodríguez: «único interlocutor legítimo»","Producción supera 1M bpd + GL-51 oro + USD 100M primer cargamento","39 movilizaciones laborales en 23 estados: mayor jornada del año"] },
 ];
 
-export const KPIS_LATEST = {
-  energia: [
-    { k:"Producción feb.", v:"1.021 kbd", c:"#22c55e" },
-    { k:"Crudo Merey", v:"USD 52,31/bbl", c:"#22c55e" },
-    { k:"Licencias OFAC", v:"GL49+GL50/50A+GL51", c:"#38bdf8" },
-    { k:"Oro a EE.UU.", v:"USD 100M (1er carg.)", c:"#22c55e" },
-  ],
-
 export const TENSIONS = [
   { level:"green", text:"Producción petrolera supera 1M bpd (1.021 kbd feb.) · Chevron, Shell, Repsol amplían inversiones" },
   { level:"green", text:"Trump reconoce formalmente a Rodríguez como «único interlocutor legítimo» de Venezuela" },
