@@ -7470,12 +7470,30 @@ export default function MonitorPNUD() {
   }, []);
 
   // ── Scrape OilPriceAPI widget to update liveData.oil with real-time prices ──
-  // Widget loads in user's browser (no IP restrictions), has accurate intradía prices
-  // Updates liveData.oil so alerts, instability index, and all consumers get the real price
+  // Mounts a hidden widget at App level so it loads regardless of which tab is open
   useEffect(() => {
+    // Mount hidden OilPriceAPI ticker if not already present
+    if (!document.getElementById("oilpriceapi-ticker-hidden")) {
+      const container = document.createElement("div");
+      container.id = "oilpriceapi-ticker-hidden";
+      container.style.cssText = "position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;pointer-events:none;";
+      const tickerDiv = document.createElement("div");
+      tickerDiv.id = "oilpriceapi-ticker-global";
+      tickerDiv.setAttribute("data-theme", "light");
+      tickerDiv.setAttribute("data-commodities", "BRENT,WTI,NATURAL_GAS");
+      tickerDiv.setAttribute("data-layout", "horizontal");
+      container.appendChild(tickerDiv);
+      const script = document.createElement("script");
+      script.src = "https://www.oilpriceapi.com/widgets/ticker.js";
+      script.async = true;
+      container.appendChild(script);
+      document.body.appendChild(container);
+    }
+
     let attempts = 0;
     const scrapeOilWidget = () => {
-      const ticker = document.getElementById("oilpriceapi-ticker");
+      // Try both the visible ticker (if Mercados tab open) and our hidden one
+      const ticker = document.getElementById("oilpriceapi-ticker") || document.getElementById("oilpriceapi-ticker-global");
       if (!ticker) return false;
       const allText = ticker.innerText || ticker.textContent || "";
       const brentMatch = allText.match(/BRENT[^$]*\$([\d.]+)/i);
@@ -7496,7 +7514,7 @@ export default function MonitorPNUD() {
     };
     const iv = setInterval(() => {
       attempts++;
-      if (scrapeOilWidget() || attempts > 15) clearInterval(iv);
+      if (scrapeOilWidget() || attempts > 20) clearInterval(iv);
     }, 2000);
     return () => clearInterval(iv);
   }, []);
