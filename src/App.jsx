@@ -7469,6 +7469,38 @@ export default function MonitorPNUD() {
     return () => { clearInterval(iv3); document.removeEventListener("visibilitychange", onVis3); };
   }, []);
 
+  // ── Scrape OilPriceAPI widget to update liveData.oil with real-time prices ──
+  // Widget loads in user's browser (no IP restrictions), has accurate intradía prices
+  // Updates liveData.oil so alerts, instability index, and all consumers get the real price
+  useEffect(() => {
+    let attempts = 0;
+    const scrapeOilWidget = () => {
+      const ticker = document.getElementById("oilpriceapi-ticker");
+      if (!ticker) return false;
+      const allText = ticker.innerText || ticker.textContent || "";
+      const brentMatch = allText.match(/BRENT[^$]*\$([\d.]+)/i);
+      const wtiMatch = allText.match(/WTI[^$]*\$([\d.]+)/i);
+      if (brentMatch || wtiMatch) {
+        setLiveData(prev => ({
+          ...prev,
+          oil: {
+            ...prev?.oil,
+            brent: brentMatch ? parseFloat(brentMatch[1]) : prev?.oil?.brent,
+            wti: wtiMatch ? parseFloat(wtiMatch[1]) : prev?.oil?.wti,
+            source: "oilpriceapi-widget",
+          },
+        }));
+        return true;
+      }
+      return false;
+    };
+    const iv = setInterval(() => {
+      attempts++;
+      if (scrapeOilWidget() || attempts > 15) clearInterval(iv);
+    }, 2000);
+    return () => clearInterval(iv);
+  }, []);
+
   // Google Translate init
   useEffect(() => {
     if (window.googleTranslateElementInit) return;
