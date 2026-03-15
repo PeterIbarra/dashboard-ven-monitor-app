@@ -425,7 +425,11 @@ async function handleCohesion(req, res) {
   const sitrepOverride = req.query.sitrep ? parseInt(req.query.sitrep) : null;
   const skipAI = req.query.skipai === "true";
 
+  // Global timeout: if everything takes >25s, return partial results
+  const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("TIMEOUT_25S")), 25000));
+
   try {
+    const mainWork = async () => {
     const actorPromises = ACTORS.map(async (actor) => {
       const [news, tone, mentions] = await Promise.all([
         fetchActorNews(actor),
@@ -545,7 +549,14 @@ async function handleCohesion(req, res) {
       sources: "google_news+ven_rss+gdelt+polymarket",
       cacheStats,
     });
+    }; // end mainWork
+
+    return await Promise.race([mainWork(), timeoutPromise]);
   } catch (e) {
+    if (e.message === "TIMEOUT_25S") {
+      console.warn("Cohesion handler timed out at 25s — returning partial");
+      return res.status(200).json({ index: null, level: "TIMEOUT", error: "Engine timed out — try ?skipai=true", fetchedAt: new Date().toISOString() });
+    }
     console.error("Cohesion handler error:", e);
     return res.status(502).json({ error: e.message, index: null });
   }

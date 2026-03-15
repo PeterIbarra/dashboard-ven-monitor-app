@@ -7344,6 +7344,22 @@ export default function MonitorPNUD() {
         }
       } catch {}
       try {
+        // GDELT tone via proxy (avoids CORS — proxy has the data)
+        const gdeltUrl = IS_DEPLOYED ? "/api/gdelt" : null;
+        if (gdeltUrl) {
+          const gRes = await fetch(gdeltUrl, { signal:AbortSignal.timeout(8000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          if (gRes?.data?.length > 0) {
+            const last7 = gRes.data.slice(-7);
+            const tones = last7.map(d => d.tone).filter(v => v != null);
+            const vols = last7.map(d => d.instability).filter(v => v != null);
+            results.gdeltSummary = {
+              tone: tones.length > 0 ? tones.reduce((a,b)=>a+b,0)/tones.length : null,
+              volume: vols.length > 0 ? Math.round(vols.reduce((a,b)=>a+b,0)) : null,
+            };
+          }
+        }
+      } catch {}
+      try {
         // Bilateral Threat Index (PizzINT/GDELT)
         const bilUrl = IS_DEPLOYED ? `/api/bilateral?_t=${Math.floor(Date.now()/600000)}` : null;
         if (bilUrl) {
@@ -7373,6 +7389,8 @@ export default function MonitorPNUD() {
             params.set("icg_score", results.cohesion.index);
             params.set("icg_level", results.cohesion.level || "");
           }
+          if (results.gdeltSummary?.tone != null) params.set("gdelt_tone", results.gdeltSummary.tone.toFixed(2));
+          if (results.gdeltSummary?.volume != null) params.set("gdelt_volume", results.gdeltSummary.volume);
           if (results.dolar?.brecha) params.set("brecha", parseFloat(results.dolar.brecha).toFixed(1));
           if (results.dolar?.paralelo) params.set("paralelo", results.dolar.paralelo);
           if (results.oil?.brent) params.set("brent", results.oil.brent);
