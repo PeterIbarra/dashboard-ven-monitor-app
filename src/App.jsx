@@ -7813,6 +7813,31 @@ export default function MonitorPNUD() {
 
   return (
     <div style={{ fontFamily:fontSans, background:BG, minHeight:"100vh", color:TEXT, overflowX:"hidden" }}>
+      {/* Loading splash — shown until liveData finishes first fetch */}
+      {!liveData.fetched && (
+        <div style={{ position:"fixed", inset:0, zIndex:99999, background:BG, display:"flex", flexDirection:"column",
+          alignItems:"center", justifyContent:"center", gap:16 }}>
+          <div style={{ fontSize:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:ACCENT, letterSpacing:"0.02em" }}>
+            Monitor PNUD
+          </div>
+          <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase" }}>
+            Venezuela 2026
+          </div>
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:12 }}>
+            <div style={{ width:14, height:14, border:`2.5px solid ${ACCENT}`, borderTopColor:"transparent",
+              borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
+            <span style={{ fontSize:11, fontFamily:font, color:MUTED, animation:"pulse 1.5s infinite" }}>
+              Cargando datos en vivo...
+            </span>
+          </div>
+          <div style={{ marginTop:20, display:"flex", gap:6 }}>
+            {["Dólar","Petróleo","Bilateral","Noticias","Cohesión"].map((label,i) => (
+              <span key={i} style={{ fontSize:8, fontFamily:font, color:`${MUTED}60`, padding:"2px 6px",
+                border:`1px solid ${BORDER}`, letterSpacing:"0.08em" }}>{label}</span>
+            ))}
+          </div>
+        </div>
+      )}
       <style>{`
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
         @keyframes spin { to { transform: rotate(360deg); } }
