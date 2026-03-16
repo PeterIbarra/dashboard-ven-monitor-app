@@ -51,6 +51,39 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  // ── Route: ?type=icg_latest → read latest ICG from Supabase (computed by cron) ──
+  if (req.query.type === "icg_latest") {
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ANON_KEY;
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+      return res.status(500).json({ error: "Supabase not configured" });
+    }
+    try {
+      const url = `${SUPABASE_URL}/rest/v1/daily_readings?select=date,icg_score,icg_actors,icg_provider,icg_articles_count&icg_score=not.is.null&order=date.desc&limit=1`;
+      const sbRes = await fetch(url, {
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!sbRes.ok) return res.status(sbRes.status).json({ error: "Supabase error" });
+      const rows = await sbRes.json();
+      if (!rows || rows.length === 0) return res.status(200).json({ icg_score: null, error: "No ICG data yet" });
+      const row = rows[0];
+      let actors = [];
+      try { actors = JSON.parse(row.icg_actors); } catch {}
+      res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=900");
+      return res.status(200).json({
+        icg_score: row.icg_score,
+        actors,
+        provider: row.icg_provider,
+        articles_count: row.icg_articles_count,
+        date: row.date,
+        source: "supabase/cron",
+      });
+    } catch (e) {
+      return res.status(502).json({ error: e.message });
+    }
+  }
+
   // ── Route: ?type=write_reading → frontend persists live data to fill nulls ──
   if (req.query.type === "write_reading") {
     const SUPABASE_URL = process.env.SUPABASE_URL;
