@@ -304,10 +304,182 @@ module.exports = async function handler(req, res) {
     errors.push(`Readings: ${e.message}`);
   }
 
+  // ── 4. ICG via AI — 1 prompt for all 13 actors with article content ──
+  let icgSaved = false;
+  let icgProvider = null;
+  try {
+    // Fetch recent articles from Supabase (last 24h, Venezuela-focused)
+    const since = new Date(Date.now() - 24*60*60*1000).toISOString();
+    const articlesRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/articles?type=eq.news&published_at=gte.${since}&order=published_at.desc&limit=50`,
+      { headers: { apikey: SUPABASE_SECRET, Authorization: `Bearer ${SUPABASE_SECRET}` }, signal: AbortSignal.timeout(8000) }
+    );
+
+    let articles = [];
+    if (articlesRes.ok) articles = await articlesRes.json();
+
+    if (articles.length >= 5) {
+      // Build article summaries — title + first 300 chars of description, with source
+      const OFICIALISTAS = ["VTV","Correo del Orinoco","RNV","TeleSUR","VTV Canal8","Últimas Noticias","La Iguana TV","AVN","Aporrea"];
+      
+      // Sort: oficialistas first (they reveal internal cohesion dynamics)
+      articles.sort((a, b) => {
+        const aOf = OFICIALISTAS.includes(a.source) ? 0 : 1;
+        const bOf = OFICIALISTAS.includes(b.source) ? 0 : 1;
+        return aOf - bOf;
+      });
+
+      const articleTexts = articles.slice(0, 40).map((a, i) => {
+        const bias = OFICIALISTAS.includes(a.source) ? "[OFICIALISTA]" : "[INDEPENDIENTE]";
+        const desc = a.description ? a.description.substring(0, 300) : "";
+        return `${i+1}. ${bias} [${a.source}] "${a.title}"${desc ? "\n   " + desc : ""}`;
+      }).join("\n\n");
+
+      const ICG_ACTORS = [
+        "Delcy Rodríguez (líder interina)",
+        "Jorge Rodríguez (AN)",
+        "Diosdado Cabello",
+        "FANB",
+        "Vladimir Padrino López",
+        "Jorge Arreaza",
+        "Nicolás Maduro Guerra (hijo)",
+        "Asamblea Nacional",
+        "PSUV (partido)",
+        "Chavismo (movimiento)",
+        "Colectivos",
+        "Gobernadores chavistas",
+        "Sector militar amplio",
+      ];
+
+      const prompt = `Eres analista senior de riesgo político del PNUD Venezuela. Tu tarea es evaluar la COHESIÓN INTERNA del gobierno de Delcy Rodríguez post-captura de Maduro (enero 2026).
+
+ARTÍCULOS DE LAS ÚLTIMAS 24 HORAS (${articles.length} noticias):
+${articleTexts}
+
+INSTRUCCIONES:
+1. PRIORIZA las fuentes marcadas [OFICIALISTA] — son las que mejor revelan dinámicas internas de cohesión, lealtad y posibles fracturas dentro del sistema de poder. VTV elogiando o ignorando a un actor es señal poderosa.
+2. Las fuentes [INDEPENDIENTE] complementan con señales externas de presión, pero las oficialistas son el indicador primario.
+3. Para CADA uno de estos 13 actores, evalúa su alineación:
+
+${ICG_ACTORS.map((a, i) => `${i+1}. ${a}`).join("\n")}
+
+4. Responde SOLO con un JSON array válido (sin markdown, sin backticks, sin explicaciones fuera del JSON):
+[{"actor":"Delcy Rodríguez","alignment":"ALINEADO","confidence":0.9,"evidence":"razón corta","signals":["señal1","señal2"]},...]
+
+Criterios:
+- ALINEADO: Acciones coordinadas, declaraciones de apoyo, participación activa, mencionado positivamente en medios oficialistas
+- NEUTRO: Sin señales claras, silencio parcial, perfil bajo, no mencionado
+- TENSION: Contradicciones, ausencias notables, declaraciones divergentes, omitido de medios oficialistas cuando debería aparecer`;
+
+      // Call AI cascade
+      const AI_CASCADE = [
+        { name: "mistral", key: "MISTRAL_API_KEY", url: "https://api.mistral.ai/v1/chat/completions", model: "mistral-small-latest", format: "openai" },
+        { name: "groq", key: "GROQ_API_KEY", url: "https://api.groq.com/openai/v1/chat/completions", model: "llama-3.3-70b-versatile", format: "openai" },
+        { name: "openrouter", key: "OPENROUTER_API_KEY", url: "https://openrouter.ai/api/v1/chat/completions", model: "meta-llama/llama-3.1-8b-instruct:free", format: "openai" },
+      ];
+
+      let aiText = null;
+      for (const prov of AI_CASCADE) {
+        const apiKey = process.env[prov.key];
+        if (!apiKey) continue;
+        try {
+          const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` };
+          if (prov.name === "openrouter") {
+            headers["HTTP-Referer"] = "https://dashboard-ven-monitor-app.vercel.app";
+            headers["X-Title"] = "PNUD Monitor ICG Cron";
+          }
+          const aiRes = await fetch(prov.url, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              model: prov.model,
+              messages: [{ role: "user", content: prompt }],
+              max_tokens: 1500,
+              temperature: 0.1,
+            }),
+            signal: AbortSignal.timeout(25000),
+          });
+          if (aiRes.ok) {
+            const data = await aiRes.json();
+            const text = data.choices?.[0]?.message?.content?.trim();
+            if (text && text.length > 50) {
+              aiText = text;
+              icgProvider = prov.name;
+              break;
+            }
+          }
+        } catch (e) {
+          errors.push(`ICG ${prov.name}: ${e.message}`);
+        }
+      }
+
+      if (aiText) {
+        try {
+          const clean = aiText.replace(/```json|```/g, "").trim();
+          // Extract JSON array
+          const jsonMatch = clean.match(/\[[\s\S]*\]/);
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : clean);
+
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Compute composite ICG score
+            const ALIGN_SCORES = { "ALINEADO": 90, "NEUTRO": 50, "TENSION": 15 };
+            let totalScore = 0, totalWeight = 0;
+            const actorScores = parsed.map(a => {
+              const score = ALIGN_SCORES[a.alignment] || 50;
+              const weight = a.confidence || 0.5;
+              totalScore += score * weight;
+              totalWeight += weight;
+              return {
+                actor: a.actor,
+                alignment: a.alignment,
+                confidence: a.confidence,
+                evidence: a.evidence,
+                signals: a.signals,
+              };
+            });
+            const compositeICG = totalWeight > 0 ? Math.round(totalScore / totalWeight) : null;
+
+            // Save to daily_readings
+            const today = new Date().toISOString().slice(0, 10);
+            const icgData = {
+              date: today,
+              icg_score: compositeICG,
+              icg_actors: JSON.stringify(actorScores),
+              icg_provider: icgProvider,
+              icg_articles_count: articles.length,
+            };
+            const icgUpsert = await fetch(`${SUPABASE_URL}/rest/v1/daily_readings?on_conflict=date`, {
+              method: "POST",
+              headers: {
+                apikey: SUPABASE_SECRET,
+                Authorization: `Bearer ${SUPABASE_SECRET}`,
+                "Content-Type": "application/json",
+                Prefer: "resolution=merge-duplicates,return=minimal",
+              },
+              body: JSON.stringify(icgData),
+            });
+            icgSaved = icgUpsert.ok;
+            if (!icgUpsert.ok) errors.push(`ICG Supabase: ${icgUpsert.status}`);
+          }
+        } catch (e) {
+          errors.push(`ICG parse: ${e.message}`);
+        }
+      } else {
+        errors.push("ICG: No AI provider responded");
+      }
+    } else {
+      errors.push(`ICG: Only ${articles.length} articles found (need 5+)`);
+    }
+  } catch (e) {
+    errors.push(`ICG: ${e.message}`);
+  }
+
   return res.status(200).json({
     inserted: totalInserted,
     ratesSaved,
     readingsSaved,
+    icgSaved,
+    icgProvider,
     sources: RSS_SOURCES.length,
     errors: errors.length > 0 ? errors : null,
     fetchedAt: new Date().toISOString(),

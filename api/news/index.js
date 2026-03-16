@@ -1,7 +1,6 @@
 // /api/news — Venezuela news + fact-check aggregator + Government Cohesion Index
 // Routes: default → RSS news, ?source=cohesion → ICG engine
-
-const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
+// AI: cascade Mistral → Groq → OpenRouter → HuggingFace (same as /api/ai)
 
 // ═══════════════════════════════════════════════════════════════
 // COHESION INDEX ENGINE — ?source=cohesion
@@ -141,11 +140,88 @@ function parseRSSSimple(xml) {
   return items;
 }
 
-// Mistral AI classification — uses titles + descriptions (more reliable than full article fetch)
-async function classifyWithMistral(actorName, articles) {
-  if (!MISTRAL_API_KEY || articles.length === 0) return null;
+// ── AI CASCADE for classification — same providers as /api/ai ──
+const AI_PROVIDERS = [
+  {
+    name: "mistral-small",
+    keyEnv: "MISTRAL_API_KEY",
+    call: async (prompt, maxTokens, apiKey) => {
+      const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+        body: JSON.stringify({ model: "mistral-small-latest", messages: [{ role: "user", content: prompt }], max_tokens: maxTokens, temperature: 0.1 }),
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || null;
+    },
+  },
+  {
+    name: "groq/llama-3.3-70b",
+    keyEnv: "GROQ_API_KEY",
+    call: async (prompt, maxTokens, apiKey) => {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }], max_tokens: maxTokens, temperature: 0.1 }),
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || null;
+    },
+  },
+  {
+    name: "openrouter/free",
+    keyEnv: "OPENROUTER_API_KEY",
+    call: async (prompt, maxTokens, apiKey) => {
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}`, "HTTP-Referer": "https://dashboard-ven-monitor-app.vercel.app", "X-Title": "PNUD Monitor ICG" },
+        body: JSON.stringify({ model: "meta-llama/llama-3.1-8b-instruct:free", messages: [{ role: "user", content: prompt }], max_tokens: maxTokens, temperature: 0.1 }),
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || null;
+    },
+  },
+  {
+    name: "huggingface/qwen",
+    keyEnv: "HF_API_KEY",
+    call: async (prompt, maxTokens, apiKey) => {
+      const res = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2.5-72B-Instruct", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+        body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: maxTokens, temperature: 0.1, return_full_text: false } }),
+        signal: AbortSignal.timeout(20000),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return Array.isArray(data) ? (data[0]?.generated_text || null) : (data.generated_text || null);
+    },
+  },
+];
 
-  // Use titles + descriptions — more reliable than trying to fetch full articles through Google News redirects
+// Run prompt through cascade — returns { text, provider } or null
+async function callAICascade(prompt, maxTokens = 300) {
+  const available = AI_PROVIDERS.filter(p => process.env[p.keyEnv]);
+  for (const provider of available) {
+    try {
+      const text = await provider.call(prompt, maxTokens, process.env[provider.keyEnv]);
+      if (text && text.length > 10) return { text, provider: provider.name };
+    } catch (e) {
+      console.error(`ICG cascade ${provider.name}: ${e.message}`);
+    }
+  }
+  return null;
+}
+
+// AI classification for a single actor — uses cascade
+async function classifyActor(actorName, articles) {
+  if (articles.length === 0) return null;
+
   const articlesText = articles.slice(0, 5).map((a, i) =>
     `${i + 1}. "${a.title}"${a.desc ? `\n   ${a.desc}` : ""}`
   ).join("\n\n");
@@ -166,41 +242,20 @@ Criterios:
 - TENSION: Contradicciones públicas, ausencias notables, declaraciones divergentes, señales de distancia con Delcy`;
 
   try {
-    const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${MISTRAL_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "mistral-small-latest",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 300,
-        temperature: 0.1,
-      }),
-      signal: AbortSignal.timeout(15000),
-    });
+    const result = await callAICascade(prompt, 300);
+    if (!result) return null;
 
-    if (!res.ok) {
-      console.error("Mistral error:", res.status, await res.text().catch(() => ""));
-      return null;
-    }
-
-    const data = await res.json();
-    const text = data.choices?.[0]?.message?.content?.trim();
-    if (!text) return null;
-
-    const clean = text.replace(/```json|```/g, "").trim();
+    const clean = result.text.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(clean);
-    // Normalize
     return {
       alignment: ["ALINEADO", "NEUTRO", "TENSION"].includes(parsed.alignment) ? parsed.alignment : "NEUTRO",
       confidence: Math.max(0, Math.min(1, parsed.confidence || 0.5)),
       evidence: parsed.evidence || null,
       signals: Array.isArray(parsed.signals) ? parsed.signals.slice(0, 3) : [],
+      aiProvider: result.provider,
     };
   } catch (e) {
-    console.error("Mistral classification error:", e.message);
+    console.error("AI classification parse error:", e.message);
     return null;
   }
 }
@@ -430,6 +485,7 @@ async function handleCohesion(req, res) {
 
   try {
     const mainWork = async () => {
+    const hasAnyAIKey = AI_PROVIDERS.some(p => process.env[p.keyEnv]);
     const actorPromises = ACTORS.map(async (actor) => {
       const [news, tone, mentions] = await Promise.all([
         fetchActorNews(actor),
@@ -437,10 +493,10 @@ async function handleCohesion(req, res) {
         fetchGdeltMentionCount(actor.name),
       ]);
 
-      // Classify with Mistral — cache valid results, fall back to cache when no data
+      // Classify with AI cascade — cache valid results, fall back to cache when no data
       let classification = null;
-      if (!skipAI && MISTRAL_API_KEY && news.length > 0) {
-        classification = await classifyWithMistral(actor.name, news);
+      if (!skipAI && hasAnyAIKey && news.length > 0) {
+        classification = await classifyActor(actor.name, news);
         // Cache valid classifications (confidence > 0.4)
         if (classification && classification.confidence > 0.4) {
           classificationCache[actor.id] = {
@@ -545,7 +601,7 @@ async function handleCohesion(req, res) {
       systemic,
       polymarket: polymarket ? { price: polymarket.price, question: polymarket.question } : null,
       fetchedAt: new Date().toISOString(),
-      engine: skipAI ? "gdelt+heuristic" : (MISTRAL_API_KEY ? "mistral+gdelt+rss" : "gdelt+heuristic"),
+      engine: skipAI ? "gdelt+heuristic" : (hasAnyAIKey ? "ai-cascade+gdelt+rss" : "gdelt+heuristic"),
       sources: "google_news+ven_rss+gdelt+polymarket",
       cacheStats,
     });
