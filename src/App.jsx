@@ -1561,18 +1561,17 @@ const NewsAlerts = memo(function NewsAlerts({ liveData, mob }) {
   const [alerts, setAlerts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [provider, setProvider] = useState("");
-  const [error, setError] = useState(null);
-  const retryCount = useRef(0);
+  const [status, setStatus] = useState("waiting"); // waiting | loading | done | error
+  const attempted = useRef(false);
 
   useEffect(() => {
-    if (!liveData?.fetched) return;
+    if (attempted.current || !liveData?.fetched) return;
+    attempted.current = true;
 
     async function classifyNews() {
-      if (alerts && alerts.length > 0) return; // already have alerts, don't retry
       setLoading(true);
-      setError(null);
+      setStatus("loading");
 
-      // Gather headlines from RSS + Google News
       let googleNews = [];
       if (IS_DEPLOYED) {
         try {
@@ -1593,11 +1592,7 @@ const NewsAlerts = memo(function NewsAlerts({ liveData, mob }) {
         ...rssNews.map(a => `"${a.title}" [${a.source}]`)
       ];
 
-      if (allHeadlines.length < 3) {
-        setError("Pocas noticias disponibles");
-        setLoading(false);
-        return;
-      }
+      if (allHeadlines.length < 3) { setLoading(false); setStatus("error"); return false; }
 
       const prompt = `Eres un sistema de alerta del PNUD Venezuela. Clasifica estos titulares de noticias según su relevancia para el monitoreo de Venezuela.
 
@@ -1629,36 +1624,35 @@ INSTRUCCIONES:
               try {
                 const clean = data.text.replace(/```json\s?|```/g, "").trim();
                 const parsed = JSON.parse(clean);
-                if (Array.isArray(parsed) && parsed.length > 0) { setAlerts(parsed.slice(0, 8)); setLoading(false); return; }
+                if (Array.isArray(parsed) && parsed.length > 0) { setAlerts(parsed.slice(0, 8)); setLoading(false); setStatus("done"); return true; }
               } catch {
                 const match = data.text.match(/\[[\s\S]*\]/);
                 if (match) {
-                  try { const p = JSON.parse(match[0]); if (Array.isArray(p) && p.length > 0) { setAlerts(p.slice(0, 8)); setLoading(false); return; } } catch {}
+                  try { const p = JSON.parse(match[0]); if (Array.isArray(p) && p.length > 0) { setAlerts(p.slice(0, 8)); setLoading(false); setStatus("done"); return true; } } catch {}
                 }
               }
             }
           }
-          // If we got here, AI failed — schedule retry
-          setError("IA no disponible");
         }
-      } catch {
-        setError("Error de conexión");
-      }
+      } catch {}
       setLoading(false);
+      setStatus("error");
+      return false;
     }
 
-    // First attempt after 4s, retries at 30s and 120s
-    const delays = [4000, 30000, 120000];
-    const delay = delays[Math.min(retryCount.current, delays.length - 1)];
-    const timer = setTimeout(() => {
-      classifyNews().then(() => {
-        if (!alerts) retryCount.current++;
-      });
-    }, delay);
-    return () => clearTimeout(timer);
-  }, [liveData?.fetched, retryCount.current]);
+    // Attempt with retries: 4s, then 60s, then 180s
+    const attempt = (delay, remaining) => {
+      setTimeout(async () => {
+        const success = await classifyNews();
+        if (!success && remaining > 0) {
+          attempt(remaining > 1 ? 60000 : 180000, remaining - 1);
+        }
+      }, delay);
+    };
+    attempt(4000, 2); // first try at 4s, up to 2 retries
+  }, [liveData?.fetched]);
 
-  if (!alerts && !loading && !error) return null;
+  if (status === "waiting") return null;
 
   const nivelColor = { "🔴":"#dc2626", "🟡":"#ca8a04", "🟢":"#16a34a" };
   const nivelBg = { "🔴":"#dc262608", "🟡":"#ca8a0408", "🟢":"#16a34a08" };
@@ -1677,11 +1671,11 @@ INSTRUCCIONES:
         )}
         <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Google News + RSS · Clasificación IA</span>
         {loading && <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Clasificando noticias...</span>}
-        {error && !loading && retryCount.current < 3 && <span style={{ fontSize:9, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Reintentando...</span>}
+        {status === "error" && !alerts && !loading && <span style={{ fontSize:9, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Reintentando...</span>}
       </div>
-      {error && !alerts && !loading && retryCount.current >= 3 && (
+      {status === "error" && !alerts && !loading && (
         <div style={{ fontSize:11, fontFamily:font, color:MUTED, padding:"12px", textAlign:"center", border:`1px dashed ${BORDER}`, borderRadius:4 }}>
-          {error} — las alertas se actualizarán con la próxima carga de datos
+          Esperando clasificación IA — reintentando automáticamente
         </div>
       )}
       {alerts && alerts.map((a, i) => (
@@ -7861,36 +7855,30 @@ export default function MonitorPNUD() {
     return () => { clearInterval(iv3); document.removeEventListener("visibilitychange", onVis3); };
   }, []);
 
-  // ── Live oil prices: API-Ninjas (free, 50K req/month) ──
-  // Fetches from browser to avoid serverless IP issues. Falls back to EIA data from fetchLiveData.
+  // ── Live oil prices: OilPriceAPI direct from browser ──
+  // Browser has normal user IP (not datacenter). Create new account at oilpriceapi.com if key expires.
+  // Falls back to EIA data from fetchLiveData (3-5 day delay).
   useEffect(() => {
+    const OILPRICE_KEY = "ee08dc36b7a3ff883080dfe426bffd6ed1a392b53d3818c60a57c84b50858f93";
     const fetchLiveOil = async () => {
       try {
-        // API-Ninjas free tier: 50,000 req/month, no datacenter restrictions
-        const NINJAS_KEY = "dHT3FvZNs6XGczWOPLmNew==RCIBLfxmZOGiVb3K";
-        const headers = { "X-Api-Key": NINJAS_KEY };
+        const headers = { Authorization: `Token ${OILPRICE_KEY}`, "Content-Type": "application/json" };
         const [bRes, wRes] = await Promise.all([
-          fetch("https://api.api-ninjas.com/v1/commodityprice?name=brent_crude_oil", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
-          fetch("https://api.api-ninjas.com/v1/commodityprice?name=crude_oil", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch("https://api.oilpriceapi.com/v1/prices/latest?by_code=BRENT_CRUDE_USD", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch("https://api.oilpriceapi.com/v1/prices/latest?by_code=WTI_USD", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
         ]);
-        const brent = bRes?.price;
-        const wti = wRes?.price;
+        const brent = bRes?.data?.price;
+        const wti = wRes?.data?.price;
         if ((brent && brent > 20) || (wti && wti > 20)) {
           setLiveData(prev => ({
             ...prev,
-            oil: {
-              ...prev?.oil,
-              brent: brent && brent > 20 ? brent : prev?.oil?.brent,
-              wti: wti && wti > 20 ? wti : prev?.oil?.wti,
-              source: "api-ninjas-live",
-            },
+            oil: { ...prev?.oil, brent: brent || prev?.oil?.brent, wti: wti || prev?.oil?.wti, source: "oilpriceapi-live" },
           }));
         }
       } catch {}
     };
-    // First fetch after 2s, then every 10 min
     const t = setTimeout(fetchLiveOil, 2000);
-    const iv = setInterval(fetchLiveOil, 600000);
+    const iv = setInterval(fetchLiveOil, 600000); // refresh every 10 min
     return () => { clearTimeout(t); clearInterval(iv); };
   }, []);
 
