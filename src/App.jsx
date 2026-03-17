@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef, memo } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 // ═══════════════════════════════════════════════════════════════
 // DATA — Externalized to src/data/ for easier weekly updates
@@ -8074,6 +8075,7 @@ export default function MonitorPNUD() {
         PNUD Venezuela · Monitor Situacional · Uso interno · {WEEKS[week].label}
       </div>
       <MethodologyFooter mob={useIsMobile()} />
+      <Analytics />
     </div>
   );
 }
