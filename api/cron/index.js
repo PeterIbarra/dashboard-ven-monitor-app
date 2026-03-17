@@ -142,9 +142,179 @@ async function upsertToSupabase(articles) {
   return { ok: res.ok, status: res.status, text: res.ok ? "" : await res.text().catch(() => "") };
 }
 
+// ── AI cascade for news classification ──
+const AI_CASCADE = [
+  { name: "mistral", key: "MISTRAL_API_KEY", url: "https://api.mistral.ai/v1/chat/completions", model: "mistral-small-latest" },
+  { name: "gemini", key: "GEMINI_API_KEY", url: null, model: "gemini-1.5-flash" },
+  { name: "groq", key: "GROQ_API_KEY", url: "https://api.groq.com/openai/v1/chat/completions", model: "llama-3.3-70b-versatile" },
+  { name: "openrouter", key: "OPENROUTER_API_KEY", url: "https://openrouter.ai/api/v1/chat/completions", model: "meta-llama/llama-3.1-8b-instruct:free" },
+];
+
+async function callAICascade(prompt, maxTokens = 800) {
+  for (const prov of AI_CASCADE) {
+    const apiKey = process.env[prov.key];
+    if (!apiKey) continue;
+    try {
+      let text = null;
+      if (prov.name === "gemini") {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${prov.model}:generateContent?key=${apiKey}`;
+        const r = await fetch(url, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: maxTokens, temperature: 0.3 } }),
+          signal: AbortSignal.timeout(25000),
+        });
+        if (r.ok) { const d = await r.json(); text = d.candidates?.[0]?.content?.parts?.map(p => p.text).join("\n"); }
+      } else {
+        const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` };
+        if (prov.name === "openrouter") {
+          headers["HTTP-Referer"] = "https://dashboard-ven-monitor-app.vercel.app";
+          headers["X-Title"] = "PNUD Monitor Alerts Cron";
+        }
+        const r = await fetch(prov.url, {
+          method: "POST", headers,
+          body: JSON.stringify({ model: prov.model, messages: [{ role: "user", content: prompt }], max_tokens: maxTokens, temperature: 0.3 }),
+          signal: AbortSignal.timeout(25000),
+        });
+        if (r.ok) { const d = await r.json(); text = d.choices?.[0]?.message?.content?.trim(); }
+      }
+      if (text && text.length > 50) return { text, provider: prov.name };
+    } catch {}
+  }
+  return null;
+}
+
+// ── News Alerts: classify recent headlines with AI and save to Supabase ──
+async function classifyNewsAlerts(errors) {
+  // 1. Fetch recent articles from Supabase (last 8h)
+  const since = new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString();
+  const articlesRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/articles?type=eq.news&published_at=gte.${since}&order=published_at.desc&limit=40`,
+    { headers: { apikey: SUPABASE_SECRET, Authorization: `Bearer ${SUPABASE_SECRET}` }, signal: AbortSignal.timeout(8000) }
+  );
+  let articles = [];
+  if (articlesRes.ok) articles = await articlesRes.json();
+
+  // 2. Also try Google News RSS for fresh headlines
+  let googleHeadlines = [];
+  try {
+    const gRes = await fetch("https://news.google.com/rss/search?q=venezuela&hl=es-419&gl=VE&ceid=VE:es-419", {
+      signal: AbortSignal.timeout(6000),
+      headers: { "User-Agent": "PNUD-Monitor/1.0", Accept: "application/rss+xml, text/xml" },
+    });
+    if (gRes.ok) {
+      const xml = await gRes.text();
+      const regex = /<item>[\s\S]*?<title>(.*?)<\/title>[\s\S]*?<source[^>]*>(.*?)<\/source>[\s\S]*?<\/item>/gi;
+      let m;
+      while ((m = regex.exec(xml)) !== null && googleHeadlines.length < 15) {
+        const t = m[1].replace(/<!\[CDATA\[|\]\]>/g, "").replace(/<[^>]*>/g, "").trim();
+        const s = m[2].replace(/<[^>]*>/g, "").trim();
+        if (t.length > 20) googleHeadlines.push({ title: t, source: s });
+      }
+    }
+  } catch {}
+
+  // 3. Merge headlines — Supabase articles + Google News, deduplicate
+  const allHeadlines = [];
+  const seen = new Set();
+  for (const a of articles) {
+    const key = (a.title || "").toLowerCase().slice(0, 50);
+    if (!seen.has(key) && a.title?.length > 15) { seen.add(key); allHeadlines.push(`"${a.title}" [${a.source}]`); }
+  }
+  for (const g of googleHeadlines) {
+    const key = g.title.toLowerCase().slice(0, 50);
+    if (!seen.has(key)) { seen.add(key); allHeadlines.push(`"${g.title}" [${g.source}]`); }
+  }
+
+  if (allHeadlines.length < 5) {
+    errors.push(`Alerts: Only ${allHeadlines.length} headlines found (need 5+)`);
+    return { saved: false, provider: null, count: 0 };
+  }
+
+  // 4. Build prompt (same as NewsAlerts component)
+  const prompt = `Eres un sistema de alerta del PNUD Venezuela. Clasifica estos titulares de noticias según su relevancia para el monitoreo de Venezuela.
+
+TITULARES:
+${allHeadlines.slice(0, 25).map((h, i) => `${i + 1}. ${h}`).join("\n")}
+
+INSTRUCCIONES:
+1. Responde SOLO en formato JSON válido, sin markdown ni backticks.
+2. Clasifica SOLO titulares directamente relacionados con Venezuela (política, economía, geopolítica, DDHH, energía, migración).
+3. Ignora completamente titulares sobre otros países o temas no venezolanos.
+4. Cada alerta tiene: "nivel" (🔴/🟡/🟢), "titular", "fuente", "dimension" (POLÍTICO/ECONÓMICO/INTERNACIONAL/DDHH/ENERGÍA), "impacto" (1 frase corta de por qué es relevante).
+5. 🔴 = Evento urgente que podría mover escenarios. 🟡 = Desarrollo relevante para seguimiento. 🟢 = Contexto informativo.
+6. Máximo 8 alertas. Prioriza las más relevantes.
+7. Formato exacto:
+[{"nivel":"🔴","titular":"...","fuente":"...","dimension":"...","impacto":"..."}]`;
+
+  // 5. Call AI cascade
+  const result = await callAICascade(prompt, 800);
+  if (!result) {
+    errors.push("Alerts: No AI provider responded");
+    return { saved: false, provider: null, count: 0 };
+  }
+
+  // 6. Parse response
+  let parsed = null;
+  try {
+    const clean = result.text.replace(/```json\s?|```/g, "").trim();
+    const jsonMatch = clean.match(/\[[\s\S]*\]/);
+    parsed = JSON.parse(jsonMatch ? jsonMatch[0] : clean);
+  } catch (e) {
+    errors.push(`Alerts: JSON parse failed — ${e.message}`);
+    return { saved: false, provider: result.provider, count: 0 };
+  }
+
+  if (!Array.isArray(parsed) || parsed.length === 0) {
+    errors.push("Alerts: AI returned empty or invalid array");
+    return { saved: false, provider: result.provider, count: 0 };
+  }
+
+  // 7. Save to Supabase — news_alerts table (upsert by date-slot)
+  const now = new Date();
+  const slot = `${now.toISOString().slice(0, 10)}-${String(Math.floor(now.getHours() / 6)).padStart(2, "0")}`; // e.g. "2026-03-17-02" = 3rd 6h slot
+  const alertRecord = {
+    slot,
+    alerts: JSON.stringify(parsed.slice(0, 8)),
+    provider: result.provider,
+    headlines_count: allHeadlines.length,
+    classified_at: now.toISOString(),
+  };
+
+  const upsertRes = await fetch(`${SUPABASE_URL}/rest/v1/news_alerts?on_conflict=slot`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_SECRET,
+      Authorization: `Bearer ${SUPABASE_SECRET}`,
+      "Content-Type": "application/json",
+      Prefer: "resolution=merge-duplicates,return=minimal",
+    },
+    body: JSON.stringify(alertRecord),
+  });
+
+  if (!upsertRes.ok) {
+    const errText = await upsertRes.text().catch(() => "");
+    errors.push(`Alerts Supabase: ${upsertRes.status} — ${errText}`);
+    return { saved: false, provider: result.provider, count: parsed.length };
+  }
+
+  return { saved: true, provider: result.provider, count: parsed.length };
+}
+
 module.exports = async function handler(req, res) {
   if (!SUPABASE_URL || !SUPABASE_SECRET) {
     return res.status(500).json({ error: "Supabase not configured" });
+  }
+
+  // ── Task routing: ?task=alerts runs ONLY news alerts classification ──
+  const task = (req.query?.task || "").toLowerCase();
+  if (task === "alerts") {
+    const errors = [];
+    try {
+      const result = await classifyNewsAlerts(errors);
+      return res.status(200).json({ task: "alerts", ...result, errors: errors.length > 0 ? errors : null, fetchedAt: new Date().toISOString() });
+    } catch (e) {
+      return res.status(500).json({ task: "alerts", error: e.message });
+    }
   }
 
   let totalInserted = 0;
@@ -474,12 +644,23 @@ Criterios:
     errors.push(`ICG: ${e.message}`);
   }
 
+  // ── 5. News Alerts — Classify headlines with AI ──
+  let alertsResult = { saved: false, provider: null, count: 0 };
+  try {
+    alertsResult = await classifyNewsAlerts(errors);
+  } catch (e) {
+    errors.push(`Alerts: ${e.message}`);
+  }
+
   return res.status(200).json({
     inserted: totalInserted,
     ratesSaved,
     readingsSaved,
     icgSaved,
     icgProvider,
+    alertsSaved: alertsResult.saved,
+    alertsProvider: alertsResult.provider,
+    alertsCount: alertsResult.count,
     sources: RSS_SOURCES.length,
     errors: errors.length > 0 ? errors : null,
     fetchedAt: new Date().toISOString(),

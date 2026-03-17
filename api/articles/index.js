@@ -11,6 +11,28 @@ module.exports = async function handler(req, res) {
 
   const { type, limit = "30", scenario } = req.query;
 
+  // ── Special case: fetch cached news alerts ──
+  if (type === "alerts") {
+    try {
+      const alertsRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/news_alerts?select=*&order=classified_at.desc&limit=1`,
+        { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` }, signal: AbortSignal.timeout(6000) }
+      );
+      if (!alertsRes.ok) return res.status(alertsRes.status).json({ error: "Supabase alerts fetch failed" });
+      const rows = await alertsRes.json();
+      if (rows.length === 0) return res.status(200).json({ alerts: null, cached: false });
+      const row = rows[0];
+      let alerts = [];
+      try { alerts = typeof row.alerts === "string" ? JSON.parse(row.alerts) : row.alerts; } catch { alerts = []; }
+      const age = Date.now() - new Date(row.classified_at).getTime();
+      const stale = age > 8 * 60 * 60 * 1000; // >8h = stale
+      res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=120");
+      return res.status(200).json({ alerts, provider: row.provider, classified_at: row.classified_at, stale, age_hours: +(age / 3600000).toFixed(1), cached: true });
+    } catch (e) {
+      return res.status(502).json({ error: e.message, alerts: null, cached: false });
+    }
+  }
+
   let url = `${SUPABASE_URL}/rest/v1/articles?select=*&order=published_at.desc&limit=${limit}`;
   if (type) url += `&type=eq.${type}`;
   if (scenario) url += `&scenarios=cs.{${scenario}}`;

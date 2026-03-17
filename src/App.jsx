@@ -1591,11 +1591,32 @@ const NewsAlerts = memo(function NewsAlerts({ liveData, mob }) {
   const [status, setStatus] = useState("waiting"); // waiting | loading | done | error
   const attempted = useRef(false);
 
+  const [cachedAge, setCachedAge] = useState(null);
+
   useEffect(() => {
     if (attempted.current || !liveData?.fetched) return;
     attempted.current = true;
 
-    async function classifyNews() {
+    // ── Step 1: Try cached alerts from Supabase (saved by cron every 6-8h) ──
+    async function tryCached() {
+      if (!IS_DEPLOYED) return false;
+      try {
+        const res = await fetch("/api/articles?type=alerts", { signal: AbortSignal.timeout(6000) });
+        if (!res.ok) return false;
+        const data = await res.json();
+        if (data.cached && data.alerts?.length > 0 && !data.stale) {
+          setAlerts(data.alerts.slice(0, 8));
+          setProvider(data.provider || "cached");
+          setCachedAge(data.age_hours);
+          setStatus("done");
+          return true;
+        }
+      } catch {}
+      return false;
+    }
+
+    // ── Step 2: Live AI classification (fallback) ──
+    async function classifyNewsLive() {
       setLoading(true);
       setStatus("loading");
 
@@ -1667,16 +1688,22 @@ INSTRUCCIONES:
       return false;
     }
 
-    // Attempt with retries: 4s, then 60s, then 180s
-    const attempt = (delay, remaining) => {
-      setTimeout(async () => {
-        const success = await classifyNews();
-        if (!success && remaining > 0) {
-          attempt(remaining > 1 ? 60000 : 180000, remaining - 1);
-        }
-      }, delay);
-    };
-    attempt(4000, 2); // first try at 4s, up to 2 retries
+    // ── Orchestrate: cached first, then live with retries ──
+    async function run() {
+      const cached = await tryCached();
+      if (cached) return;
+      // Live fallback with retries: 4s, then 60s, then 180s
+      const attempt = (delay, remaining) => {
+        setTimeout(async () => {
+          const success = await classifyNewsLive();
+          if (!success && remaining > 0) {
+            attempt(remaining > 1 ? 60000 : 180000, remaining - 1);
+          }
+        }, delay);
+      };
+      attempt(4000, 2);
+    }
+    run();
   }, [liveData?.fetched]);
 
   if (status === "waiting") return null;
@@ -1685,8 +1712,8 @@ INSTRUCCIONES:
   const nivelBg = { "🔴":"#dc262608", "🟡":"#ca8a0408", "🟢":"#16a34a08" };
   const dimColor = { "POLÍTICO":"#7c3aed", "ECONÓMICO":"#0e7490", "INTERNACIONAL":"#0468B1", "DDHH":"#dc2626", "ENERGÍA":"#ca8a04" };
 
-  const badgeColor = provider.includes("mistral") ? "#ff6f00" : provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "#ffbf00" : "#8b5cf6";
-  const badgeLabel = provider.includes("mistral") ? "MISTRAL" : provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "HUGGINGFACE" : "CLAUDE";
+  const badgeColor = provider.includes("mistral") ? "#ff6f00" : provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "#ffbf00" : provider === "cached" ? "#64748b" : "#8b5cf6";
+  const badgeLabel = provider.includes("mistral") ? "MISTRAL" : provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "HUGGINGFACE" : provider === "cached" ? "CACHED" : "CLAUDE";
 
   return (
     <Card>
@@ -1695,6 +1722,11 @@ INSTRUCCIONES:
         <span style={{ fontSize:10, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:TEXT, fontWeight:700 }}>Alertas de Noticias</span>
         {provider && (
           <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${badgeColor}15`, color:badgeColor, border:`1px solid ${badgeColor}30`, letterSpacing:"0.08em" }}>{badgeLabel}</span>
+        )}
+        {cachedAge != null && (
+          <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:`${MUTED}10`, color:MUTED, border:`1px solid ${MUTED}20`, letterSpacing:"0.06em" }}>
+            hace {cachedAge < 1 ? "<1h" : cachedAge.toFixed(0) + "h"}
+          </span>
         )}
         <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Google News + RSS · Clasificación IA</span>
         {loading && <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Clasificando noticias...</span>}
