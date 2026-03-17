@@ -1561,14 +1561,16 @@ const NewsAlerts = memo(function NewsAlerts({ liveData, mob }) {
   const [alerts, setAlerts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [provider, setProvider] = useState("");
-  const generated = useRef(false);
+  const [error, setError] = useState(null);
+  const retryCount = useRef(0);
 
   useEffect(() => {
-    if (generated.current || !liveData?.fetched) return;
-    generated.current = true;
+    if (!liveData?.fetched) return;
 
     async function classifyNews() {
+      if (alerts && alerts.length > 0) return; // already have alerts, don't retry
       setLoading(true);
+      setError(null);
 
       // Gather headlines from RSS + Google News
       let googleNews = [];
@@ -1591,7 +1593,11 @@ const NewsAlerts = memo(function NewsAlerts({ liveData, mob }) {
         ...rssNews.map(a => `"${a.title}" [${a.source}]`)
       ];
 
-      if (allHeadlines.length < 3) { setLoading(false); return; }
+      if (allHeadlines.length < 3) {
+        setError("Pocas noticias disponibles");
+        setLoading(false);
+        return;
+      }
 
       const prompt = `Eres un sistema de alerta del PNUD Venezuela. Clasifica estos titulares de noticias según su relevancia para el monitoreo de Venezuela.
 
@@ -1623,26 +1629,36 @@ INSTRUCCIONES:
               try {
                 const clean = data.text.replace(/```json\s?|```/g, "").trim();
                 const parsed = JSON.parse(clean);
-                if (Array.isArray(parsed) && parsed.length > 0) setAlerts(parsed.slice(0, 8));
+                if (Array.isArray(parsed) && parsed.length > 0) { setAlerts(parsed.slice(0, 8)); setLoading(false); return; }
               } catch {
-                // Try to extract JSON array from text
                 const match = data.text.match(/\[[\s\S]*\]/);
                 if (match) {
-                  try { const p = JSON.parse(match[0]); if (Array.isArray(p)) setAlerts(p.slice(0, 8)); } catch {}
+                  try { const p = JSON.parse(match[0]); if (Array.isArray(p) && p.length > 0) { setAlerts(p.slice(0, 8)); setLoading(false); return; } } catch {}
                 }
               }
             }
           }
+          // If we got here, AI failed — schedule retry
+          setError("IA no disponible");
         }
-      } catch {}
+      } catch {
+        setError("Error de conexión");
+      }
       setLoading(false);
     }
 
-    const timer = setTimeout(classifyNews, 4000);
+    // First attempt after 4s, retries at 30s and 120s
+    const delays = [4000, 30000, 120000];
+    const delay = delays[Math.min(retryCount.current, delays.length - 1)];
+    const timer = setTimeout(() => {
+      classifyNews().then(() => {
+        if (!alerts) retryCount.current++;
+      });
+    }, delay);
     return () => clearTimeout(timer);
-  }, [liveData?.fetched]);
+  }, [liveData?.fetched, retryCount.current]);
 
-  if (!alerts && !loading) return null;
+  if (!alerts && !loading && !error) return null;
 
   const nivelColor = { "🔴":"#dc2626", "🟡":"#ca8a04", "🟢":"#16a34a" };
   const nivelBg = { "🔴":"#dc262608", "🟡":"#ca8a0408", "🟢":"#16a34a08" };
@@ -1661,7 +1677,13 @@ INSTRUCCIONES:
         )}
         <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Google News + RSS · Clasificación IA</span>
         {loading && <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Clasificando noticias...</span>}
+        {error && !loading && retryCount.current < 3 && <span style={{ fontSize:9, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Reintentando...</span>}
       </div>
+      {error && !alerts && !loading && retryCount.current >= 3 && (
+        <div style={{ fontSize:11, fontFamily:font, color:MUTED, padding:"12px", textAlign:"center", border:`1px dashed ${BORDER}`, borderRadius:4 }}>
+          {error} — las alertas se actualizarán con la próxima carga de datos
+        </div>
+      )}
       {alerts && alerts.map((a, i) => (
         <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:8, padding:"6px 0",
           borderTop:i>0?`1px solid ${BORDER}30`:"none", background:nivelBg[a.nivel] || "transparent" }}>
@@ -1859,21 +1881,19 @@ function TabDashboard({ week, liveData = {} }) {
         // Brent
         if (liveData?.oil?.brent) {
           const brent = parseFloat(liveData.oil.brent);
-          const oilSrc = liveData.oil.source === "oilpriceapi-widget" ? "" : " (EIA)";
-          if (brent < 60) liveAlerts.push({ name:"Brent ⬇", val:`$${brent.toFixed(2)}${oilSrc}`, umbral:"Brent <$60 presiona ingresos petroleros — riesgo fiscal E2", level:"red" });
-          else if (brent < 65) liveAlerts.push({ name:"Brent ⬇", val:`$${brent.toFixed(2)}${oilSrc}`, umbral:"Brent <$65 reduce margen fiscal venezolano", level:"yellow" });
-          else if (brent > 95) liveAlerts.push({ name:"Brent ⬆", val:`$${brent.toFixed(2)}${oilSrc}`, umbral:"Brent >$95 — ingresos récord pero posible shock geopolítico (Ormuz/Irán)", level:"red" });
-          else if (brent > 85) liveAlerts.push({ name:"Brent ⬆", val:`$${brent.toFixed(2)}${oilSrc}`, umbral:"Brent >$85 — favorable para ingresos VEN, monitorear volatilidad", level:"yellow" });
+          if (brent < 60) liveAlerts.push({ name:"Brent \u2b07", val:`$${brent.toFixed(2)}`, umbral:"Brent <$60 presiona ingresos petroleros \u2014 riesgo fiscal E2", level:"red" });
+          else if (brent < 65) liveAlerts.push({ name:"Brent \u2b07", val:`$${brent.toFixed(2)}`, umbral:"Brent <$65 reduce margen fiscal venezolano", level:"yellow" });
+          else if (brent > 95) liveAlerts.push({ name:"Brent \u2b06", val:`$${brent.toFixed(2)}`, umbral:"Brent >$95 \u2014 ingresos r\u00e9cord pero posible shock geopol\u00edtico (Ormuz/Ir\u00e1n)", level:"red" });
+          else if (brent > 85) liveAlerts.push({ name:"Brent \u2b06", val:`$${brent.toFixed(2)}`, umbral:"Brent >$85 \u2014 favorable para ingresos VEN, monitorear volatilidad", level:"yellow" });
         }
 
         // WTI
         if (liveData?.oil?.wti) {
           const wti = parseFloat(liveData.oil.wti);
-          const oilSrc = liveData.oil.source === "oilpriceapi-widget" ? "" : " (EIA)";
-          if (wti < 55) liveAlerts.push({ name:"WTI ⬇", val:`$${wti.toFixed(2)}${oilSrc}`, umbral:"WTI <$55 señal de debilidad en mercado energético", level:"red" });
-          else if (wti < 60) liveAlerts.push({ name:"WTI ⬇", val:`$${wti.toFixed(2)}${oilSrc}`, umbral:"WTI en zona de presión (<$60)", level:"yellow" });
-          else if (wti > 90) liveAlerts.push({ name:"WTI ⬆", val:`$${wti.toFixed(2)}${oilSrc}`, umbral:"WTI >$90 — tensión en mercado energético global, ingresos VEN al alza", level:"red" });
-          else if (wti > 80) liveAlerts.push({ name:"WTI ⬆", val:`$${wti.toFixed(2)}${oilSrc}`, umbral:"WTI >$80 — favorable para Venezuela, monitorear causa del alza", level:"yellow" });
+          if (wti < 55) liveAlerts.push({ name:"WTI \u2b07", val:`$${wti.toFixed(2)}`, umbral:"WTI <$55 se\u00f1al de debilidad en mercado energ\u00e9tico", level:"red" });
+          else if (wti < 60) liveAlerts.push({ name:"WTI \u2b07", val:`$${wti.toFixed(2)}`, umbral:"WTI en zona de presi\u00f3n (<$60)", level:"yellow" });
+          else if (wti > 90) liveAlerts.push({ name:"WTI \u2b06", val:`$${wti.toFixed(2)}`, umbral:"WTI >$90 \u2014 tensi\u00f3n en mercado energ\u00e9tico global, ingresos VEN al alza", level:"red" });
+          else if (wti > 80) liveAlerts.push({ name:"WTI \u2b06", val:`$${wti.toFixed(2)}`, umbral:"WTI >$80 \u2014 favorable para Venezuela, monitorear causa del alza", level:"yellow" });
         }
 
         // Bilateral Threat Index
@@ -7841,91 +7861,37 @@ export default function MonitorPNUD() {
     return () => { clearInterval(iv3); document.removeEventListener("visibilitychange", onVis3); };
   }, []);
 
-  // ── Live oil prices: direct browser fetch to OilPriceAPI (bypasses serverless IP blocks) ──
-  // Browser has user's normal IP — no datacenter restrictions. Falls back to widget scraping.
+  // ── Live oil prices: API-Ninjas (free, 50K req/month) ──
+  // Fetches from browser to avoid serverless IP issues. Falls back to EIA data from fetchLiveData.
   useEffect(() => {
-    let updated = false;
-    const OILPRICE_KEY = "ee08dc36b7a3ff883080dfe426bffd6ed1a392b53d3818c60a57c84b50858f93";
-
-    // Strategy 1: Direct API call from browser
-    const fetchOilDirect = async () => {
+    const fetchLiveOil = async () => {
       try {
-        const headers = { Authorization: `Token ${OILPRICE_KEY}`, "Content-Type": "application/json" };
+        // API-Ninjas free tier: 50,000 req/month, no datacenter restrictions
+        const NINJAS_KEY = "dHT3FvZNs6XGczWOPLmNew==RCIBLfxmZOGiVb3K";
+        const headers = { "X-Api-Key": NINJAS_KEY };
         const [bRes, wRes] = await Promise.all([
-          fetch("https://api.oilpriceapi.com/v1/prices/latest?by_code=BRENT_CRUDE_USD", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
-          fetch("https://api.oilpriceapi.com/v1/prices/latest?by_code=WTI_USD", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch("https://api.api-ninjas.com/v1/commodityprice?name=brent_crude_oil", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch("https://api.api-ninjas.com/v1/commodityprice?name=crude_oil", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
         ]);
-        const brent = bRes?.data?.price;
-        const wti = wRes?.data?.price;
+        const brent = bRes?.price;
+        const wti = wRes?.price;
         if ((brent && brent > 20) || (wti && wti > 20)) {
           setLiveData(prev => ({
             ...prev,
-            oil: { ...prev?.oil, brent: brent || prev?.oil?.brent, wti: wti || prev?.oil?.wti, source: "oilpriceapi-live" },
+            oil: {
+              ...prev?.oil,
+              brent: brent && brent > 20 ? brent : prev?.oil?.brent,
+              wti: wti && wti > 20 ? wti : prev?.oil?.wti,
+              source: "api-ninjas-live",
+            },
           }));
-          updated = true;
-          return true;
         }
       } catch {}
-      return false;
     };
-
-    // Strategy 2: Widget DOM scraping fallback
-    const scrapeWidget = () => {
-      const ticker = document.getElementById("oilpriceapi-ticker");
-      if (!ticker) return false;
-      let allText = ticker.innerText || ticker.textContent || "";
-      if (!allText || allText.length < 10) {
-        allText = Array.from(ticker.querySelectorAll("span, div, td, a")).map(e => e.textContent).join(" ");
-      }
-      const bm = allText.match(/BRENT[^0-9$]*\$?\s*([\d,.]+)/i) || allText.match(/Brent[^0-9]*?([\d]{2,3}\.[\d]{1,2})/i);
-      const wm = allText.match(/WTI[^0-9$]*\$?\s*([\d,.]+)/i) || allText.match(/WTI[^0-9]*?([\d]{2,3}\.[\d]{1,2})/i);
-      if (bm || wm) {
-        const b = bm ? parseFloat(bm[1].replace(",","")) : null;
-        const w = wm ? parseFloat(wm[1].replace(",","")) : null;
-        if ((b && b > 20 && b < 200) || (w && w > 20 && w < 200)) {
-          setLiveData(prev => ({
-            ...prev,
-            oil: { ...prev?.oil, brent: b || prev?.oil?.brent, wti: w || prev?.oil?.wti, source: "oilpriceapi-widget" },
-          }));
-          updated = true;
-          return true;
-        }
-      }
-      return false;
-    };
-
-    // Mount hidden widget as backup
-    if (!document.getElementById("oilpriceapi-ticker")) {
-      const container = document.createElement("div");
-      container.id = "oilpriceapi-ticker-wrap";
-      container.style.cssText = "position:fixed;bottom:0;right:0;width:400px;height:60px;clip:rect(0,0,0,0);clip-path:inset(50%);pointer-events:none;";
-      const tickerDiv = document.createElement("div");
-      tickerDiv.id = "oilpriceapi-ticker";
-      tickerDiv.setAttribute("data-theme", "light");
-      tickerDiv.setAttribute("data-commodities", "BRENT,WTI,NATURAL_GAS");
-      tickerDiv.setAttribute("data-layout", "horizontal");
-      container.appendChild(tickerDiv);
-      const script = document.createElement("script");
-      script.src = "https://www.oilpriceapi.com/widgets/ticker.js";
-      script.async = true;
-      container.appendChild(script);
-      document.body.appendChild(container);
-    }
-
-    // Execute: try direct API first, then fall back to widget scraping
-    fetchOilDirect().then(success => {
-      if (!success) {
-        // Widget fallback: retry every 3s for 60s
-        let attempts = 0;
-        const iv = setInterval(() => {
-          attempts++;
-          if (scrapeWidget() || attempts > 20) clearInterval(iv);
-        }, 3000);
-      }
-    });
-    // Periodic refresh every 5 min (direct API)
-    const ivRefresh = setInterval(() => { if (!updated) fetchOilDirect(); }, 300000);
-    return () => clearInterval(ivRefresh);
+    // First fetch after 2s, then every 10 min
+    const t = setTimeout(fetchLiveOil, 2000);
+    const iv = setInterval(fetchLiveOil, 600000);
+    return () => { clearTimeout(t); clearInterval(iv); };
   }, []);
 
   // Google Translate init
