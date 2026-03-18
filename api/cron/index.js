@@ -62,6 +62,7 @@ const RSS_SOURCES = [
   // ── Especializados / análisis ──
   { name:"Venezuela Analysis", feed:"https://venezuelanalysis.com/feed/", type:"news" },
   { name:"Banca y Negocios", feed:"https://www.bancaynegocios.com/feed/", type:"news" },
+  { name:"Bitácora Económica", feed:"https://bitacoraeconomica.com/feed/", type:"news" },
   { name:"Contrapunto", feed:"https://contrapunto.com/feed/", type:"news" },
   { name:"Descifrado", feed:"https://descifrado.com/feed/", type:"news" },
   // ── Google News aggregator ──
@@ -250,28 +251,32 @@ async function classifyNewsAlerts(errors) {
   }
 
   // 5. Build prompt with source hierarchy context
-  const prompt = `Eres un sistema de alerta del PNUD Venezuela. Clasifica estos titulares de noticias según su relevancia para el monitoreo de Venezuela.
+  const prompt = `Eres un sistema de alerta del PNUD Venezuela. Tu ÚNICA función es identificar y clasificar noticias DIRECTAMENTE relacionadas con Venezuela.
+
+REGLA CRÍTICA DE FILTRADO:
+- SOLO incluye noticias donde Venezuela, un actor venezolano, o una institución venezolana sea el SUJETO PRINCIPAL del titular.
+- DESCARTA COMPLETAMENTE: noticias sobre otros países (Colombia, Ecuador, Irán, Rusia, China, etc.) aunque mencionen la región, noticias de entretenimiento, deportes internacionales, farándula, sucesos locales sin relevancia política, y cualquier titular que no tenga impacto directo en la situación política, económica o social de Venezuela.
+- En caso de duda sobre si un titular es relevante para Venezuela, NO lo incluyas. Es preferible devolver 3 alertas buenas que 8 con ruido.
 
 JERARQUÍA DE FUENTES:
-- [INTL] = Medios internacionales de referencia (Reuters, BBC, Bloomberg, WSJ, CNN, etc.). Si cubren algo de Venezuela, probablemente es significativo — no cubren trivialidades. Considéralo señal de relevancia global.
-- [NAC-IND] = Medios independientes venezolanos (Efecto Cocuyo, El Pitazo, Runrunes, etc.). Más confiables para hechos verificados y señales de tensión en terreno.
-- [NAC-GOB] = Medios oficialistas (VTV, TeleSUR, Correo del Orinoco). Lo que publican revela la narrativa oficial del gobierno — su cobertura o silencio sobre un tema es una señal en sí misma.
+- [INTL] = Medios internacionales de referencia (Reuters, BBC, Bloomberg, WSJ, CNN). Si un medio [INTL] cubre algo de Venezuela, es casi seguro relevante.
+- [NAC-IND] = Medios independientes venezolanos (Efecto Cocuyo, El Pitazo, Runrunes). Confiables para hechos en terreno y señales de tensión.
+- [NAC-GOB] = Medios oficialistas (VTV, TeleSUR, Correo del Orinoco). Revelan la narrativa oficial — su cobertura o silencio es señal.
 - [NAC] = Otros medios nacionales o regionales.
-- Si un mismo evento aparece en [INTL] y [NAC-IND] con cobertura significativa, es señal fuerte de relevancia.
-- Si aparece en [NAC-GOB] y [NAC-IND] con narrativas opuestas, es señal de fractura informativa — considéralo para nivel 🔴.
+- Si un evento aparece en [INTL] + [NAC-IND], señal fuerte de relevancia.
+- Si [NAC-GOB] y [NAC-IND] cubren el mismo evento con narrativas opuestas, considéralo para 🔴 (fractura informativa).
 
 TITULARES:
 ${allHeadlines.slice(0, 25).map((h, i) => `${i + 1}. ${h.text}`).join("\n")}
 
 INSTRUCCIONES:
 1. Responde SOLO en formato JSON válido, sin markdown ni backticks.
-2. Clasifica SOLO titulares directamente relacionados con Venezuela (política, economía, geopolítica, DDHH, energía, migración).
-3. Ignora completamente titulares sobre otros países o temas no venezolanos.
-4. Cada alerta tiene: "nivel" (🔴/🟡/🟢), "titular", "fuente", "dimension" (POLÍTICO/ECONÓMICO/INTERNACIONAL/DDHH/ENERGÍA), "impacto" (1 frase corta de por qué es relevante).
-5. 🔴 = Evento urgente que podría mover escenarios. 🟡 = Desarrollo relevante para seguimiento. 🟢 = Contexto informativo.
-6. Usa la jerarquía de fuentes como factor adicional para determinar el nivel — no como regla automática sino como contexto de credibilidad y relevancia.
-7. Máximo 8 alertas. Prioriza las más relevantes.
-8. Formato exacto:
+2. Aplica el filtro estricto: si el titular no tiene a Venezuela como sujeto principal, EXCLÚYELO.
+3. Cada alerta: "nivel" (🔴/🟡/🟢), "titular" (copia exacta del titular original, sin la etiqueta de fuente), "fuente" (nombre del medio), "dimension" (POLÍTICO/ECONÓMICO/INTERNACIONAL/DDHH/ENERGÍA), "impacto" (1 frase de por qué importa para Venezuela).
+4. Niveles: 🔴 = Evento que podría mover escenarios (E1-E4) o requiere acción inmediata. 🟡 = Desarrollo relevante para seguimiento analítico. 🟢 = Contexto informativo útil.
+5. Máximo 8 alertas, mínimo 2. Si hay pocas noticias relevantes, devuelve pocas — no llenes con ruido.
+6. Ordena por relevancia: 🔴 primero, luego 🟡, luego 🟢.
+7. Formato exacto:
 [{"nivel":"🔴","titular":"...","fuente":"...","dimension":"...","impacto":"..."}]`;
 
   // 5. Call AI cascade

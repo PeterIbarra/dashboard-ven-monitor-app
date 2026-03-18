@@ -1642,20 +1642,20 @@ const NewsAlerts = memo(function NewsAlerts({ liveData, mob }) {
 
       if (allHeadlines.length < 3) { setLoading(false); setStatus("error"); return false; }
 
-      const prompt = `Eres un sistema de alerta del PNUD Venezuela. Clasifica estos titulares de noticias según su relevancia para el monitoreo de Venezuela.
+      const prompt = `Eres un sistema de alerta del PNUD Venezuela. Tu ÚNICA función es identificar noticias DIRECTAMENTE relacionadas con Venezuela.
+
+REGLA CRÍTICA: SOLO incluye noticias donde Venezuela, un actor venezolano, o una institución venezolana sea el SUJETO PRINCIPAL. DESCARTA noticias sobre otros países, entretenimiento, deportes internacionales, farándula, o sucesos sin impacto en Venezuela. Es preferible devolver 3 alertas buenas que 8 con ruido.
 
 TITULARES:
 ${allHeadlines.map((h,i) => `${i+1}. ${h}`).join("\n")}
 
 INSTRUCCIONES:
 1. Responde SOLO en formato JSON válido, sin markdown ni backticks.
-2. Clasifica SOLO titulares directamente relacionados con Venezuela (política, economía, geopolítica, DDHH, energía, migración).
-3. Ignora completamente titulares sobre otros países o temas no venezolanos.
-4. Cada alerta tiene: "nivel" (🔴/🟡/🟢), "titular", "fuente", "dimension" (POLÍTICO/ECONÓMICO/INTERNACIONAL/DDHH/ENERGÍA), "impacto" (1 frase corta de por qué es relevante).
-5. 🔴 = Evento urgente que podría mover escenarios. 🟡 = Desarrollo relevante para seguimiento. 🟢 = Contexto informativo.
-6. Máximo 8 alertas. Prioriza las más relevantes.
-7. Formato exacto:
-[{"nivel":"🔴","titular":"...","fuente":"...","dimension":"...","impacto":"..."}]`;
+2. Aplica el filtro estricto: si Venezuela no es el sujeto principal, EXCLÚYELO.
+3. Cada alerta: "nivel" (🔴/🟡/🟢), "titular", "fuente", "dimension" (POLÍTICO/ECONÓMICO/INTERNACIONAL/DDHH/ENERGÍA), "impacto" (1 frase de por qué importa).
+4. 🔴 = Evento que podría mover escenarios. 🟡 = Desarrollo para seguimiento. 🟢 = Contexto informativo.
+5. Máximo 8, mínimo 2. Ordena: 🔴 primero, luego 🟡, luego 🟢.
+6. Formato: [{"nivel":"🔴","titular":"...","fuente":"...","dimension":"...","impacto":"..."}]`;
 
       try {
         if (IS_DEPLOYED) {
@@ -1915,9 +1915,9 @@ const RedesMiniWidget = memo(function RedesMiniWidget({ setTab }) {
           <div>
             <div style={{ fontSize:8, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:MUTED }}>Clima Social · Redes X</div>
             <div style={{ display:"flex", alignItems:"baseline", gap:6, marginTop:1 }}>
-              <span style={{ fontSize:mob?11:13, fontWeight:700, fontFamily:font, color:"#dc2626" }}>{R.polAltoPct}%</span>
+              <span style={{ fontSize:mob?11:13, fontWeight:700, fontFamily:font, color:"#dc2626" }}>{polAmPct}%</span>
               <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>pol.</span>
-              <span style={{ fontSize:mob?11:13, fontWeight:700, fontFamily:font, color:"#16a34a" }}>{R.convAltoPct}%</span>
+              <span style={{ fontSize:mob?11:13, fontWeight:700, fontFamily:font, color:"#16a34a" }}>{convAmPct}%</span>
               <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>conv.</span>
             </div>
           </div>
@@ -2700,8 +2700,8 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
               </div>
               {sec.rows.map((r,j) => (
                 <div key={j} style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6, gap:8 }}>
-                  <span style={{ fontSize:13, color:"#5a8aaa" }}>{r.k}</span>
-                  <span style={{ fontSize:13, fontFamily:font, fontWeight:500, color:r.v==="—"?`${MUTED}60`:TEXT, whiteSpace:"nowrap", textAlign:"right", maxWidth:140, overflow:"hidden", textOverflow:"ellipsis" }}>{r.v}</span>
+                  <span style={{ fontSize:13, color:"#5a8aaa", flexShrink:0 }}>{r.k}</span>
+                  <span title={r.v} style={{ fontSize:13, fontFamily:font, fontWeight:500, color:r.v==="—"?`${MUTED}60`:TEXT, textAlign:"right", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", minWidth:0 }}>{r.v}</span>
                 </div>
               ))}
             </div>
@@ -8618,33 +8618,6 @@ export default function MonitorPNUD() {
     };
     document.addEventListener("visibilitychange", onVis3);
     return () => { clearInterval(iv3); document.removeEventListener("visibilitychange", onVis3); };
-  }, []);
-
-  // ── Live oil prices: OilPriceAPI direct from browser ──
-  // Browser has normal user IP (not datacenter). Create new account at oilpriceapi.com if key expires.
-  // Falls back to EIA data from fetchLiveData (3-5 day delay).
-  useEffect(() => {
-    const OILPRICE_KEY = "ee08dc36b7a3ff883080dfe426bffd6ed1a392b53d3818c60a57c84b50858f93";
-    const fetchLiveOil = async () => {
-      try {
-        const headers = { Authorization: `Token ${OILPRICE_KEY}`, "Content-Type": "application/json" };
-        const [bRes, wRes] = await Promise.all([
-          fetch("https://api.oilpriceapi.com/v1/prices/latest?by_code=BRENT_CRUDE_USD", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
-          fetch("https://api.oilpriceapi.com/v1/prices/latest?by_code=WTI_USD", { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
-        ]);
-        const brent = bRes?.data?.price;
-        const wti = wRes?.data?.price;
-        if ((brent && brent > 20) || (wti && wti > 20)) {
-          setLiveData(prev => ({
-            ...prev,
-            oil: { ...prev?.oil, brent: brent || prev?.oil?.brent, wti: wti || prev?.oil?.wti, source: "oilpriceapi-live" },
-          }));
-        }
-      } catch {}
-    };
-    const t = setTimeout(fetchLiveOil, 2000);
-    const iv = setInterval(fetchLiveOil, 600000); // refresh every 10 min
-    return () => { clearTimeout(t); clearInterval(iv); };
   }, []);
 
   // Google Translate init
