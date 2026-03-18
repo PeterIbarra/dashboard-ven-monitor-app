@@ -443,24 +443,23 @@ module.exports = async function handler(req, res) {
       } catch {}
     }
 
-    // Parse oil prices — try Alpha Vantage first (daily commodity data), then EIA (delayed)
+    // Parse oil prices — OilPriceAPI first (real-time, cron runs every 12h = ~180 req/mo), EIA fallback
     let oilParsed = false;
-    const avKey = process.env.ALPHAVANTAGE_API_KEY;
-    if (avKey) {
+    const oilKey = process.env.OILPRICE_API_KEY;
+    if (oilKey) {
       try {
-        const [bAV, wAV] = await Promise.allSettled([
-          fetch(`https://www.alphavantage.co/query?function=BRENT&interval=daily&apikey=${avKey}`, { signal: AbortSignal.timeout(8000) }),
-          fetch(`https://www.alphavantage.co/query?function=WTI&interval=daily&apikey=${avKey}`, { signal: AbortSignal.timeout(8000) }),
+        const oilHeaders = { Authorization: `Token ${oilKey}`, "Content-Type": "application/json" };
+        const [bOP, wOP] = await Promise.allSettled([
+          fetch(`https://api.oilpriceapi.com/v1/prices/latest?by_code=BRENT_CRUDE_USD`, { headers: oilHeaders, signal: AbortSignal.timeout(8000) }),
+          fetch(`https://api.oilpriceapi.com/v1/prices/latest?by_code=WTI_USD`, { headers: oilHeaders, signal: AbortSignal.timeout(8000) }),
         ]);
-        if (bAV.status === "fulfilled" && bAV.value.ok) {
-          const d = await bAV.value.json();
-          const latest = d?.data?.[0];
-          if (latest?.value && latest.value !== ".") { reading.brent = parseFloat(parseFloat(latest.value).toFixed(2)); oilParsed = true; }
+        if (bOP.status === "fulfilled" && bOP.value.ok) {
+          const d = await bOP.value.json();
+          if (d?.data?.price > 10) { reading.brent = parseFloat(d.data.price.toFixed(2)); oilParsed = true; }
         }
-        if (wAV.status === "fulfilled" && wAV.value.ok) {
-          const d = await wAV.value.json();
-          const latest = d?.data?.[0];
-          if (latest?.value && latest.value !== ".") { reading.wti = parseFloat(parseFloat(latest.value).toFixed(2)); oilParsed = true; }
+        if (wOP.status === "fulfilled" && wOP.value.ok) {
+          const d = await wOP.value.json();
+          if (d?.data?.price > 10) { reading.wti = parseFloat(d.data.price.toFixed(2)); oilParsed = true; }
         }
       } catch {}
     }

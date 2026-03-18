@@ -1,54 +1,43 @@
 // /api/oil-prices — Petroleum spot prices (hybrid)
-// Live prices: Alpha Vantage commodities (free, 25/day) → Supabase cached → OilPriceAPI (200/mo) → EIA (delayed)
+// Live prices: OilPriceAPI (200/mo, real-time) → Supabase cached (from cron every 12h) → EIA (delayed)
 // Historical chart: EIA API v2 (daily, 365 days, free) — EIA_API_KEY
 // Returns: { brent, wti, natgas, brentHistory[], histPeriod, source, fetchedAt }
 
 const EIA_BASE = "https://api.eia.gov/v2/petroleum/pri/spt/data/";
 const OIL_BASE = "https://api.oilpriceapi.com/v1";
 
-// 1a. Alpha Vantage — dedicated commodity endpoints (free, 25 req/day, daily prices)
-async function fetchAlphaVantage() {
-  const key = process.env.ALPHAVANTAGE_API_KEY;
-  if (!key) return null;
-  try {
-    const [bRes, wRes, gRes] = await Promise.all([
-      fetch(`https://www.alphavantage.co/query?function=BRENT&interval=daily&apikey=${key}`, { signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
-      fetch(`https://www.alphavantage.co/query?function=WTI&interval=daily&apikey=${key}`, { signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
-      fetch(`https://www.alphavantage.co/query?function=NATURAL_GAS&interval=daily&apikey=${key}`, { signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
-    ]);
-    const parse = (r) => {
-      const data = r?.data;
-      if (!Array.isArray(data) || data.length === 0) return null;
-      const latest = data[0]; // most recent entry
-      if (!latest?.value || latest.value === ".") return null;
-      return { price: parseFloat(latest.value), created_at: latest.date + "T00:00:00Z" };
-    };
-    const brent = parse(bRes);
-    const wti = parse(wRes);
-    const natgas = parse(gRes);
-    if (brent || wti) return { brent, wti, natgas, source: "alphavantage" };
-    return null;
-  } catch { return null; }
-}
-
 module.exports = async function handler(req, res) {
   const eiaKey = process.env.EIA_API_KEY;
   const oilKey = process.env.OILPRICE_API_KEY;
 
   try {
-    // ── 1. Live prices — cascade: Alpha Vantage → Supabase → OilPriceAPI → EIA ──
+    // ── 1. Live prices — cascade: Supabase cached (cron saves OilPriceAPI every 12h) → OilPriceAPI direct → EIA ──
     let brent = null, wti = null, natgas = null, liveSource = "static";
 
-    // 1a. Alpha Vantage commodities (free, 25 req/day, dedicated Brent/WTI/NatGas endpoints)
-    const av = await fetchAlphaVantage();
-    if (av) {
-      brent = av.brent;
-      wti = av.wti;
-      natgas = av.natgas;
-      liveSource = "alphavantage";
+    // 1a. Supabase cached prices (from cron every 12h — OilPriceAPI data, free read)
+    if (!brent && !wti) {
+      const sbUrl = process.env.SUPABASE_URL;
+      const sbKey = process.env.SUPABASE_ANON_KEY;
+      if (sbUrl && sbKey) {
+        try {
+          const sbRes = await fetch(
+            `${sbUrl}/rest/v1/daily_readings?select=brent,wti,date&order=date.desc&limit=1`,
+            { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` }, signal: AbortSignal.timeout(5000) }
+          );
+          if (sbRes.ok) {
+            const rows = await sbRes.json();
+            if (rows.length > 0 && rows[0].brent) {
+              brent = { price: rows[0].brent, created_at: rows[0].date + "T06:00:00Z" };
+              if (rows[0].wti) wti = { price: rows[0].wti, created_at: rows[0].date + "T06:00:00Z" };
+              liveSource = "supabase-cached";
+            }
+          }
+        } catch {}
+      }
     }
 
-    // 1b. Supabase cached prices fallback (from cron, free, no API usage)
+    // 1b. OilPriceAPI direct (only if Supabase has no data — should be rare with cron every 12h)
+    if (!brent && !wti && oilKey) {
     if (!brent && !wti) {
       const sbUrl = process.env.SUPABASE_URL;
       const sbKey = process.env.SUPABASE_ANON_KEY;
@@ -93,7 +82,7 @@ module.exports = async function handler(req, res) {
       else if (oilApiDebug.length > 0) liveSource = `oilpriceapi-fail (${oilApiDebug.join(", ")})`;
     }
 
-    // 1d. EIA fallback (delayed but always works)
+    // 1c. EIA fallback (delayed but always works)
     if (!brent && !wti && eiaKey) {
       const buildUrl = (series) =>
         `${EIA_BASE}?api_key=${eiaKey}&frequency=daily&data[0]=value&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=1`;
