@@ -443,22 +443,24 @@ module.exports = async function handler(req, res) {
       } catch {}
     }
 
-    // Parse oil prices — try Finnhub first (real-time), then EIA (delayed)
+    // Parse oil prices — try Alpha Vantage first (daily commodity data), then EIA (delayed)
     let oilParsed = false;
-    const finnhubKey = process.env.FINNHUB_API_KEY;
-    if (finnhubKey) {
+    const avKey = process.env.ALPHAVANTAGE_API_KEY;
+    if (avKey) {
       try {
-        const [bFH, wFH] = await Promise.allSettled([
-          fetch(`https://finnhub.io/api/v1/quote?symbol=BZ&token=${finnhubKey}`, { signal: AbortSignal.timeout(6000) }),
-          fetch(`https://finnhub.io/api/v1/quote?symbol=CL&token=${finnhubKey}`, { signal: AbortSignal.timeout(6000) }),
+        const [bAV, wAV] = await Promise.allSettled([
+          fetch(`https://www.alphavantage.co/query?function=BRENT&interval=daily&apikey=${avKey}`, { signal: AbortSignal.timeout(8000) }),
+          fetch(`https://www.alphavantage.co/query?function=WTI&interval=daily&apikey=${avKey}`, { signal: AbortSignal.timeout(8000) }),
         ]);
-        if (bFH.status === "fulfilled" && bFH.value.ok) {
-          const d = await bFH.value.json();
-          if (d?.c > 10) { reading.brent = parseFloat(d.c.toFixed(2)); oilParsed = true; }
+        if (bAV.status === "fulfilled" && bAV.value.ok) {
+          const d = await bAV.value.json();
+          const latest = d?.data?.[0];
+          if (latest?.value && latest.value !== ".") { reading.brent = parseFloat(parseFloat(latest.value).toFixed(2)); oilParsed = true; }
         }
-        if (wFH.status === "fulfilled" && wFH.value.ok) {
-          const d = await wFH.value.json();
-          if (d?.c > 10) { reading.wti = parseFloat(d.c.toFixed(2)); oilParsed = true; }
+        if (wAV.status === "fulfilled" && wAV.value.ok) {
+          const d = await wAV.value.json();
+          const latest = d?.data?.[0];
+          if (latest?.value && latest.value !== ".") { reading.wti = parseFloat(parseFloat(latest.value).toFixed(2)); oilParsed = true; }
         }
       } catch {}
     }
