@@ -1896,7 +1896,7 @@ const CohesionMiniWidget = memo(function CohesionMiniWidget({ liveData = {} }) {
   );
 });
 
-function TabDashboard({ week, liveData = {} }) {
+function TabDashboard({ week, liveData = {}, setTab }) {
   const mob = useIsMobile();
   const [aiExplanation, setAiExplanation] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -2457,11 +2457,15 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
         const convAmPct = ((R.totConvA + R.totConvM) / R.total * 100).toFixed(0);
         return (
           <Card>
+            <div onClick={() => setTab && setTab("clima")} style={{ cursor:"pointer" }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
               <div style={{ fontSize:10, fontFamily:font, color:ACCENT, letterSpacing:"0.15em", textTransform:"uppercase" }}>
                 🌡️ Clima Social · Redes X — Dos lentes, un discurso
               </div>
-              <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>{R.days} días · {(R.total/1e6).toFixed(1)}M int.</div>
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>{R.days} días · {(R.total/1e6).toFixed(1)}M int.</span>
+                <span style={{ fontSize:10, color:ACCENT }}>→</span>
+              </div>
             </div>
             {/* Dual dimension bars — side by side, same universe */}
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:10 }}>
@@ -2521,6 +2525,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
               <span style={{ fontSize:8, fontFamily:font, color:`${MUTED}60` }}>
                 {R.firstDay} – {R.lastDay} · Cada mensaje tiene ambas clasificaciones simultáneas
               </span>
+            </div>
             </div>
           </Card>
         );
@@ -8586,7 +8591,7 @@ export default function MonitorPNUD() {
 
       {/* CONTENT */}
       <div style={{ maxWidth:1340, margin:"0 auto", padding:mob?"12px 10px 40px":"24px 24px 60px" }}>
-        {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} />}
+        {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} setTab={setTab} />}
         {tab === "sitrep" && <TabSitrep liveData={liveData} />}
         {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
