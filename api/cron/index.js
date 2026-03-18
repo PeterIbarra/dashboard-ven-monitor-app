@@ -558,6 +558,26 @@ module.exports = async function handler(req, res) {
         return `${i+1}. ${bias} [${a.source}] "${a.title}"${desc ? "\n   " + desc : ""}`;
       }).join("\n\n");
 
+      // Pre-process: detect critical signals automatically from headlines
+      const CRITICAL_PATTERNS = [
+        { pattern: /design[ao]|nombr[ao]|asume|nuevo.{0,15}ministr|reemplaz|sustitu|relev[ao]|cambi[ao].{0,15}ministr|destitu/i, type: "CAMBIO_GABINETE" },
+        { pattern: /detenid|arrest|captur|pres[ao].{0,10}polític|SEBIN|DGCIM|allanam/i, type: "REPRESION" },
+        { pattern: /protest|movilizaci|march[ao]|manifestaci/i, type: "PROTESTA" },
+        { pattern: /fractur|disidencia|ruptur|desert|renunci/i, type: "FRACTURA" },
+        { pattern: /sancion|OFAC|licencia|bloque/i, type: "SANCION" },
+        { pattern: /FANB|militar|general|almirante|coronel|defensa/i, type: "MILITAR" },
+      ];
+      const criticalSignals = [];
+      for (const a of articles.slice(0, 40)) {
+        const text = `${a.title} ${a.description || ""}`;
+        for (const cp of CRITICAL_PATTERNS) {
+          if (cp.pattern.test(text)) {
+            criticalSignals.push(`[${cp.type}] "${a.title}" [${a.source}]`);
+            break;
+          }
+        }
+      }
+
       const ICG_ACTORS = [
         "Delcy Rodríguez (líder interina)",
         "Jorge Rodríguez (AN)",
@@ -574,30 +594,40 @@ module.exports = async function handler(req, res) {
         "Sector militar amplio",
       ];
 
-      const prompt = `Eres analista senior de riesgo político del PNUD Venezuela. Tu tarea es evaluar la COHESIÓN INTERNA del gobierno de Delcy Rodríguez post-captura de Maduro (enero 2026).
+      const criticalBlock = criticalSignals.length > 0
+        ? `\n\nSEÑALES CRÍTICAS DETECTADAS AUTOMÁTICAMENTE (DEBES abordar cada una en tu análisis):\n${criticalSignals.map((s, i) => `⚠ ${i+1}. ${s}`).join("\n")}\n\nIMPORTANTE: Cada señal crítica arriba DEBE reflejarse en la evaluación del actor correspondiente. Un cambio de gabinete (CAMBIO_GABINETE) que involucra a un actor de la lista NUNCA puede resultar en "ALINEADO" para ese actor — como mínimo es "NEUTRO" y probablemente "TENSION".`
+        : "";
+
+      const prompt = `Eres analista senior de riesgo político del PNUD Venezuela. Evalúas la COHESIÓN INTERNA del gobierno de Delcy Rodríguez post-captura de Maduro (enero 2026).
 
 ARTÍCULOS DE LAS ÚLTIMAS 24 HORAS (${articles.length} noticias):
 ${articleTexts}
+${criticalBlock}
 
-INSTRUCCIONES:
-1. PRIORIZA las fuentes marcadas [OFICIALISTA] — son las que mejor revelan dinámicas internas de cohesión, lealtad y posibles fracturas dentro del sistema de poder. VTV elogiando o ignorando a un actor es señal poderosa.
-2. Las fuentes [INDEPENDIENTE] complementan con señales externas de presión, pero las oficialistas son el indicador primario.
-3. Para CADA uno de estos 13 actores, evalúa su alineación:
+REGLAS DE EVALUACIÓN ESTRICTAS:
+
+CAMBIOS DE GABINETE: Si un actor fue REEMPLAZADO, REMOVIDO, o su cargo fue asignado a otra persona → ese actor es TENSION (no ALINEADO ni NEUTRO). Un reemplazo ministerial siempre indica reestructuración de poder. El nuevo designado es ALINEADO (fue elegido por Delcy). El actor reemplazado NUNCA puede ser ALINEADO.
+
+SILENCIO: Si un actor NO aparece mencionado en NINGÚN artículo → es NEUTRO (no ALINEADO). ALINEADO requiere evidencia POSITIVA, no ausencia de evidencia negativa. "No hay críticas" NO es evidencia de alineación — es ausencia de información.
+
+FUENTES: [OFICIALISTA] revela la narrativa oficial. Si un medio oficialista cubre el reemplazo de un funcionario, eso CONFIRMA el cambio. [INDEPENDIENTE] complementa con contexto.
+
+Para CADA uno de estos 13 actores, evalúa su alineación:
 
 ${ICG_ACTORS.map((a, i) => `${i+1}. ${a}`).join("\n")}
 
-4. Responde SOLO con un JSON array válido (sin markdown, sin backticks, sin explicaciones fuera del JSON):
-[{"actor":"Delcy Rodríguez","alignment":"ALINEADO","confidence":0.9,"evidence":"razón corta","signals":["señal1","señal2"]},...]
-
 Criterios:
-- ALINEADO: Acciones coordinadas, declaraciones de apoyo, participación activa, mencionado positivamente en medios oficialistas
-- NEUTRO: Sin señales claras, silencio parcial, perfil bajo, no mencionado
-- TENSION: Contradicciones, ausencias notables, declaraciones divergentes, omitido de medios oficialistas cuando debería aparecer`;
+- ALINEADO: Evidencia POSITIVA de acciones coordinadas, declaraciones de apoyo, participación activa en agenda de Delcy, mencionado positivamente en medios oficialistas. Requiere al menos 1 señal concreta.
+- NEUTRO: Sin menciones, perfil bajo, sin señales claras en ninguna dirección, o señales mixtas.
+- TENSION: Reemplazado/removido de cargo, declaraciones divergentes, ausencias notables en eventos donde debería estar, omitido de medios oficialistas en contexto donde debería aparecer, señales de fractura o disidencia.
 
-      // Call AI cascade
+Responde SOLO con un JSON array válido (sin markdown, sin backticks):
+[{"actor":"Delcy Rodríguez","alignment":"ALINEADO","confidence":0.9,"evidence":"razón corta basada en artículos concretos","signals":["señal1","señal2"]},...]`;
+
+      // Call AI cascade — Groq Llama 70B first (better political reasoning), Mistral as fallback
       const AI_CASCADE = [
-        { name: "mistral", key: "MISTRAL_API_KEY", url: "https://api.mistral.ai/v1/chat/completions", model: "mistral-small-latest", format: "openai" },
         { name: "groq", key: "GROQ_API_KEY", url: "https://api.groq.com/openai/v1/chat/completions", model: "llama-3.3-70b-versatile", format: "openai" },
+        { name: "mistral", key: "MISTRAL_API_KEY", url: "https://api.mistral.ai/v1/chat/completions", model: "mistral-small-latest", format: "openai" },
         { name: "openrouter", key: "OPENROUTER_API_KEY", url: "https://openrouter.ai/api/v1/chat/completions", model: "meta-llama/llama-3.1-8b-instruct:free", format: "openai" },
       ];
 
