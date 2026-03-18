@@ -11,6 +11,29 @@ module.exports = async function handler(req, res) {
 
   const { type, limit = "30", scenario } = req.query;
 
+  // ── Special case: fetch cached ICG from daily_readings ──
+  if (type === "icg") {
+    try {
+      const icgRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/daily_readings?select=date,icg_score,icg_actors,icg_provider,icg_articles_count&icg_score=not.is.null&order=date.desc&limit=1`,
+        { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` }, signal: AbortSignal.timeout(6000) }
+      );
+      if (!icgRes.ok) return res.status(icgRes.status).json({ error: "Supabase ICG fetch failed" });
+      const rows = await icgRes.json();
+      if (rows.length === 0) return res.status(200).json({ icg: null, cached: false });
+      const row = rows[0];
+      let actors = [];
+      try { actors = typeof row.icg_actors === "string" ? JSON.parse(row.icg_actors) : (row.icg_actors || []); } catch { actors = []; }
+      res.setHeader("Cache-Control", "public, s-maxage=600, stale-while-revalidate=300");
+      return res.status(200).json({
+        icg: { index: row.icg_score, actors, provider: row.icg_provider, articles_count: row.icg_articles_count, date: row.date },
+        cached: true,
+      });
+    } catch (e) {
+      return res.status(502).json({ error: e.message, icg: null, cached: false });
+    }
+  }
+
   // ── Special case: fetch cached news alerts ──
   if (type === "alerts") {
     try {

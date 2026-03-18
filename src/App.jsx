@@ -1896,6 +1896,134 @@ const CohesionMiniWidget = memo(function CohesionMiniWidget({ liveData = {} }) {
   );
 });
 
+const RedesMiniWidget = memo(function RedesMiniWidget({ setTab }) {
+  const mob = useIsMobile();
+  const [hover, setHover] = useState(false);
+  const R = REDES_TOTALS;
+  const polAmPct = ((R.totPolA + R.totPolM) / R.total * 100).toFixed(0);
+  const convAmPct = ((R.totConvA + R.totConvM) / R.total * 100).toFixed(0);
+
+  return (
+    <div style={{ border:`1px solid ${BORDER}`, background:BG2 }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}>
+      {/* Compact header row */}
+      <div style={{ display:"flex", alignItems:"center", gap:0, cursor:"pointer" }}>
+        {/* Left: Label + totals */}
+        <div style={{ padding:mob?"8px 10px":"10px 14px", display:"flex", alignItems:"center", gap:8, borderRight:`1px solid ${BORDER}40`, minWidth:mob?"auto":180 }}>
+          <span style={{ fontSize:14 }}>🌡️</span>
+          <div>
+            <div style={{ fontSize:8, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:MUTED }}>Clima Social · Redes X</div>
+            <div style={{ display:"flex", alignItems:"baseline", gap:6, marginTop:1 }}>
+              <span style={{ fontSize:mob?11:13, fontWeight:700, fontFamily:font, color:"#dc2626" }}>{R.polAltoPct}%</span>
+              <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>pol.</span>
+              <span style={{ fontSize:mob?11:13, fontWeight:700, fontFamily:font, color:"#16a34a" }}>{R.convAltoPct}%</span>
+              <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>conv.</span>
+            </div>
+          </div>
+        </div>
+        {/* Dual bars compact */}
+        <div style={{ flex:1, padding:mob?"6px 8px":"8px 14px" }}>
+          <div style={{ display:"flex", gap:6, alignItems:"center", marginBottom:3 }}>
+            <span style={{ fontSize:8, fontFamily:font, color:"#dc2626", fontWeight:600, width:35 }}>POL</span>
+            <div style={{ flex:1, height:8, background:`${BORDER}20`, borderRadius:3, overflow:"hidden", display:"flex" }}>
+              <div style={{ width:`${R.polAltoPct}%`, background:"#dc2626", height:8 }} />
+              <div style={{ width:`${(R.totPolM/R.total*100).toFixed(0)}%`, background:"#f59e0b", height:8 }} />
+            </div>
+            <span style={{ fontSize:8, fontFamily:font, color:MUTED, width:40, textAlign:"right" }}>{polAmPct}%</span>
+          </div>
+          <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+            <span style={{ fontSize:8, fontFamily:font, color:"#16a34a", fontWeight:600, width:35 }}>CONV</span>
+            <div style={{ flex:1, height:8, background:`${BORDER}20`, borderRadius:3, overflow:"hidden", display:"flex" }}>
+              <div style={{ width:`${R.convAltoPct}%`, background:"#16a34a", height:8 }} />
+              <div style={{ width:`${(R.totConvM/R.total*100).toFixed(0)}%`, background:"#5DCAA5", height:8 }} />
+            </div>
+            <span style={{ fontSize:8, fontFamily:font, color:MUTED, width:40, textAlign:"right" }}>{convAmPct}%</span>
+          </div>
+        </div>
+        {/* Right: period badge */}
+        <div style={{ padding:mob?"6px 8px":"8px 14px", display:"flex", alignItems:"center", gap:6 }}>
+          <div style={{ fontSize:9, fontFamily:font, color:MUTED, textAlign:"right" }}>
+            <div>{R.days} días</div>
+            <div>{(R.total/1e6).toFixed(1)}M int.</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Expanded on hover — detailed breakdown */}
+      {hover && (
+        <div style={{ padding:mob?"8px 10px":"10px 14px", borderTop:`1px solid ${BORDER}40`, animation:"fadeSlide 0.2s ease" }}>
+          {/* Dual dimension cards */}
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:10, marginBottom:10 }}>
+            {/* Polarización breakdown */}
+            <div style={{ background:BG3, padding:"8px 10px" }}>
+              <div style={{ fontSize:10, fontFamily:font, color:"#dc2626", fontWeight:700, letterSpacing:"0.06em", marginBottom:6 }}>POLARIZACIÓN — lente 1</div>
+              {[
+                { k:"Alta", pct:R.polAltoPct, c:"#dc2626" },
+                { k:"Moderada", pct:(R.totPolM/R.total*100).toFixed(1), c:"#f59e0b" },
+                { k:"Baja/Ninguna", pct:(100 - parseFloat(R.polAltoPct) - R.totPolM/R.total*100).toFixed(1), c:`${MUTED}60` },
+              ].map((item,i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
+                  <span style={{ width:6, height:6, borderRadius:"50%", background:item.c, flexShrink:0 }} />
+                  <span style={{ fontSize:10, fontFamily:font, color:TEXT, width:70 }}>{item.k}</span>
+                  <div style={{ flex:1, height:6, background:`${BORDER}30`, borderRadius:2, overflow:"hidden" }}>
+                    <div style={{ width:`${item.pct}%`, height:6, background:item.c, borderRadius:2 }} />
+                  </div>
+                  <span style={{ fontSize:10, fontFamily:font, fontWeight:600, color:item.c, width:35, textAlign:"right" }}>{item.pct}%</span>
+                </div>
+              ))}
+            </div>
+            {/* Convivencia breakdown */}
+            <div style={{ background:BG3, padding:"8px 10px" }}>
+              <div style={{ fontSize:10, fontFamily:font, color:"#16a34a", fontWeight:700, letterSpacing:"0.06em", marginBottom:6 }}>CONVIVENCIA — lente 2</div>
+              {[
+                { k:"Alta", pct:R.convAltoPct, c:"#16a34a" },
+                { k:"Moderada", pct:(R.totConvM/R.total*100).toFixed(1), c:"#5DCAA5" },
+                { k:"Baja/Ninguna", pct:(100 - parseFloat(R.convAltoPct) - R.totConvM/R.total*100).toFixed(1), c:`${MUTED}60` },
+              ].map((item,i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
+                  <span style={{ width:6, height:6, borderRadius:"50%", background:item.c, flexShrink:0 }} />
+                  <span style={{ fontSize:10, fontFamily:font, color:TEXT, width:70 }}>{item.k}</span>
+                  <div style={{ flex:1, height:6, background:`${BORDER}30`, borderRadius:2, overflow:"hidden" }}>
+                    <div style={{ width:`${item.pct}%`, height:6, background:item.c, borderRadius:2 }} />
+                  </div>
+                  <span style={{ fontSize:10, fontFamily:font, fontWeight:600, color:item.c, width:35, textAlign:"right" }}>{item.pct}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Key insight + weekly ratio */}
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"2fr 1fr", gap:10 }}>
+            <div style={{ fontSize:11, fontFamily:fontSans, color:MUTED, lineHeight:1.5, padding:"4px 0" }}>
+              <span style={{ fontWeight:600, color:TEXT }}>Dos lentes, un discurso:</span> Cada interacción se clasifica simultáneamente en ambas dimensiones. 91% tiene polarización mod+alta, pero 63% también tiene algún nivel de convivencia. El discurso es confrontativo <i>y</i> condicionalmente conciliador a la vez.
+            </div>
+            <div>
+              <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:4 }}>Ratio pol/conv alta semanal</div>
+              <div style={{ display:"flex", gap:2, alignItems:"flex-end", height:32 }}>
+                {R.weekly.map((w, i) => {
+                  const maxR = Math.max(...R.weekly.map(x => x.ratio || 0), 1);
+                  const h = w.ratio ? Math.max(3, (Math.min(w.ratio, maxR) / maxR) * 28) : 3;
+                  const col = !w.ratio ? MUTED : w.ratio > 10 ? "#dc2626" : w.ratio > 5 ? "#ca8a04" : w.ratio > 2 ? "#f59e0b" : "#16a34a";
+                  return (
+                    <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:1 }}>
+                      <span style={{ fontSize:7, fontFamily:font, fontWeight:600, color:col }}>{w.ratio ? w.ratio+"x" : "—"}</span>
+                      <div style={{ width:"100%", height:h, background:col, opacity:0.7, borderRadius:"2px 2px 0 0" }} />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <div style={{ fontSize:8, fontFamily:font, color:`${MUTED}50`, marginTop:6, display:"flex", justifyContent:"space-between" }}>
+            <span>{R.firstDay} – {R.lastDay} · {(R.total/1e6).toFixed(1)}M interacciones · Red X</span>
+            <span onClick={() => setTab && setTab("clima")} style={{ color:ACCENT, cursor:"pointer" }}>Ver análisis completo →</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+});
+
 function TabDashboard({ week, liveData = {}, setTab }) {
   const mob = useIsMobile();
   const [aiExplanation, setAiExplanation] = useState(null);
@@ -2450,86 +2578,8 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
       {/* ── ROW 1d: Cohesión de Gobierno (mini) ── */}
       <CohesionMiniWidget liveData={liveData} />
 
-      {/* ── ROW 1e: Clima Social Redes — Dos lentes, un discurso ── */}
-      {(() => {
-        const R = REDES_TOTALS;
-        const polAmPct = ((R.totPolA + R.totPolM) / R.total * 100).toFixed(0);
-        const convAmPct = ((R.totConvA + R.totConvM) / R.total * 100).toFixed(0);
-        return (
-          <Card>
-            <div onClick={() => setTab && setTab("clima")} style={{ cursor:"pointer" }}>
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
-              <div style={{ fontSize:10, fontFamily:font, color:ACCENT, letterSpacing:"0.15em", textTransform:"uppercase" }}>
-                🌡️ Clima Social · Redes X — Dos lentes, un discurso
-              </div>
-              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>{R.days} días · {(R.total/1e6).toFixed(1)}M int.</span>
-                <span style={{ fontSize:10, color:ACCENT }}>→</span>
-              </div>
-            </div>
-            {/* Dual dimension bars — side by side, same universe */}
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:10 }}>
-              {/* Polarización lens */}
-              <div style={{ background:BG3, padding:"8px 10px" }}>
-                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:5 }}>
-                  <span style={{ fontSize:10, fontFamily:font, color:"#dc2626", fontWeight:700, letterSpacing:"0.06em" }}>POLARIZACIÓN</span>
-                  <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>{polAmPct}% mod+alta</span>
-                </div>
-                <div style={{ height:10, background:`${BORDER}30`, borderRadius:3, overflow:"hidden", display:"flex" }}>
-                  <div style={{ width:`${R.polAltoPct}%`, background:"#dc2626", height:10 }} />
-                  <div style={{ width:`${(R.totPolM/R.total*100).toFixed(0)}%`, background:"#f59e0b", height:10 }} />
-                </div>
-                <div style={{ display:"flex", justifyContent:"space-between", marginTop:3 }}>
-                  <span style={{ fontSize:8, fontFamily:font, color:"#dc2626" }}>Alta {R.polAltoPct}%</span>
-                  <span style={{ fontSize:8, fontFamily:font, color:"#f59e0b" }}>Mod {(R.totPolM/R.total*100).toFixed(0)}%</span>
-                </div>
-              </div>
-              {/* Convivencia lens */}
-              <div style={{ background:BG3, padding:"8px 10px" }}>
-                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:5 }}>
-                  <span style={{ fontSize:10, fontFamily:font, color:"#16a34a", fontWeight:700, letterSpacing:"0.06em" }}>CONVIVENCIA</span>
-                  <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>{convAmPct}% mod+alta</span>
-                </div>
-                <div style={{ height:10, background:`${BORDER}30`, borderRadius:3, overflow:"hidden", display:"flex" }}>
-                  <div style={{ width:`${R.convAltoPct}%`, background:"#16a34a", height:10 }} />
-                  <div style={{ width:`${(R.totConvM/R.total*100).toFixed(0)}%`, background:"#5DCAA5", height:10 }} />
-                </div>
-                <div style={{ display:"flex", justifyContent:"space-between", marginTop:3 }}>
-                  <span style={{ fontSize:8, fontFamily:font, color:"#16a34a" }}>Alta {R.convAltoPct}%</span>
-                  <span style={{ fontSize:8, fontFamily:font, color:"#5DCAA5" }}>Mod {(R.totConvM/R.total*100).toFixed(0)}%</span>
-                </div>
-              </div>
-            </div>
-            {/* Sparkline: last 7 days showing BOTH signals per day */}
-            <div style={{ display:"flex", gap:3, alignItems:"flex-end", height:36, marginBottom:6, padding:"0 4px" }}>
-              {R.last7.map((d,i) => {
-                const maxT = Math.max(...R.last7.map(x => x.pol.t), 1);
-                const hTotal = Math.max(6, (d.pol.t / maxT) * 32);
-                const pctPA = d.pol.t > 0 ? d.pol.a / d.pol.t : 0;
-                const pctCA = d.conv.t > 0 ? d.conv.a / d.conv.t : 0;
-                return (
-                  <div key={i} style={{ flex:1, display:"flex", gap:1, alignItems:"flex-end", justifyContent:"center" }}>
-                    {/* Pol bar */}
-                    <div style={{ width:4, height:Math.max(2, hTotal * pctPA), background:"#dc2626", borderRadius:1, opacity:0.8 }} title={`Pol.alta ${(pctPA*100).toFixed(0)}%`} />
-                    {/* Conv bar */}
-                    <div style={{ width:4, height:Math.max(2, hTotal * Math.max(pctCA, 0.03)), background:"#16a34a", borderRadius:1, opacity:0.8 }} title={`Conv.alta ${(pctCA*100).toFixed(0)}%`} />
-                  </div>
-                );
-              })}
-            </div>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingTop:4, borderTop:`1px solid ${BORDER}30` }}>
-              <div style={{ display:"flex", gap:8 }}>
-                <span style={{ fontSize:8, fontFamily:font, color:MUTED, display:"flex", alignItems:"center", gap:3 }}><span style={{ width:6, height:6, background:"#dc2626", borderRadius:1 }}/>Pol. alta</span>
-                <span style={{ fontSize:8, fontFamily:font, color:MUTED, display:"flex", alignItems:"center", gap:3 }}><span style={{ width:6, height:6, background:"#16a34a", borderRadius:1 }}/>Conv. alta</span>
-              </div>
-              <span style={{ fontSize:8, fontFamily:font, color:`${MUTED}60` }}>
-                {R.firstDay} – {R.lastDay} · Cada mensaje tiene ambas clasificaciones simultáneas
-              </span>
-            </div>
-            </div>
-          </Card>
-        );
-      })()}
+      {/* ── ROW 1e: Clima Social Redes — Dos lentes, un discurso (expandible) ── */}
+      <RedesMiniWidget setTab={setTab} />
 
       {/* ── ROW 2: Amnistía Tracker ── */}
       {(() => {
@@ -7176,21 +7226,52 @@ function TabCohesion({ liveData = {} }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expanded, setExpanded] = useState(null);
+  const [aiExplain, setAiExplain] = useState(null);
+  const [aiExplainLoading, setAiExplainLoading] = useState(false);
+  const [dataSource, setDataSource] = useState("");
 
-  // Use liveData if already loaded, otherwise fetch directly, fallback to mock
+  // Step 1: liveData → Supabase cached ICG → live API → mock
   useEffect(() => {
     if (liveData?.cohesion) {
       setData(liveData.cohesion);
+      setDataSource("live");
       setLoading(false);
       return;
     }
     async function fetchCohesion() {
+      // Try Supabase cached ICG first (from cron, no AI call)
       if (IS_DEPLOYED) {
+        try {
+          const cacheRes = await fetch("/api/articles?type=icg", { signal: AbortSignal.timeout(6000) });
+          if (cacheRes.ok) {
+            const cacheData = await cacheRes.json();
+            if (cacheData.cached && cacheData.icg?.index != null) {
+              const icg = cacheData.icg;
+              const level = icg.index >= 75 ? "ALTA" : icg.index >= 55 ? "MEDIA" : icg.index >= 35 ? "BAJA" : "CRITICA";
+              const actors = (icg.actors || []).map(a => ({
+                actor: a.actor, name: a.actor, status: a.alignment,
+                confidence: a.confidence, evidence: a.evidence, signals: a.signals || [],
+                mentions: 0, tone: 0, topHeadlines: [],
+              }));
+              setData({
+                index: icg.index, level, actors,
+                systemic: actors.filter(a => ["psuv","chavismo","colectivos","gobernadores","militares"].some(s => a.actor?.toLowerCase().includes(s))),
+                engine: `cached/${icg.provider || "cron"}`, fetchedAt: icg.date + "T06:00:00Z",
+                cachedDate: icg.date,
+              });
+              setDataSource("supabase");
+              setLoading(false);
+              return;
+            }
+          }
+        } catch {}
+
+        // Fallback: live API (full computation with AI)
         try {
           const latestSitrep = [...ICG_HISTORY].reverse().find(h => h.sitrep && h.score != null);
           const sitrepParam = latestSitrep ? `&sitrep=${latestSitrep.score}` : "";
           const res = await fetch(`/api/news?source=cohesion${sitrepParam}&_t=${Date.now()}`, { signal: AbortSignal.timeout(30000) });
-          if (res.ok) { const json = await res.json(); if (json.index != null) { setData(json); setLoading(false); return; } }
+          if (res.ok) { const json = await res.json(); if (json.index != null) { setData(json); setDataSource("live"); setLoading(false); return; } }
         } catch (e) { setError(e.message); }
       }
       // Fallback: mock data so the tab always renders
@@ -7222,10 +7303,46 @@ function TabCohesion({ liveData = {} }) {
         polymarket:{price:0.57,question:"Delcy líder fin de 2026"},
         fetchedAt:new Date().toISOString(), engine:"mock",
       });
+      setDataSource("mock");
       setLoading(false);
     }
     fetchCohesion();
   }, [liveData?.cohesion]);
+
+  // AI Explanation button handler
+  async function handleAiExplain() {
+    if (aiExplain || aiExplainLoading || !data) return;
+    setAiExplainLoading(true);
+    const allActors = [...(data.actors || []), ...(data.systemic || [])];
+    const actorSummary = allActors.map(a => `${a.name}: ${a.status} (${(a.confidence*100).toFixed(0)}%) — ${a.evidence}`).join("\n");
+    const prompt = `Eres analista senior de riesgo político del PNUD Venezuela. El Índice de Cohesión de Gobierno (ICG) actual es ${data.index}/100 (nivel: ${data.level}).
+
+ACTORES Y SU ALINEACIÓN:
+${actorSummary}
+
+INSTRUCCIONES:
+1. Explica en 3-4 párrafos cortos POR QUÉ el ICG tiene este puntaje.
+2. Identifica los principales factores de riesgo para la cohesión.
+3. Señala qué actores son los más críticos para vigilar.
+4. Máximo 200 palabras. Lenguaje profesional, directo, sin repeticiones.
+5. Responde SOLO el análisis, sin preámbulos ni formato JSON.`;
+
+    try {
+      if (IS_DEPLOYED) {
+        const res = await fetch("/api/ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt, max_tokens: 400 }),
+          signal: AbortSignal.timeout(30000),
+        });
+        if (res.ok) {
+          const d = await res.json();
+          if (d.text) { setAiExplain({ text: d.text, provider: d.provider }); }
+        }
+      }
+    } catch {}
+    setAiExplainLoading(false);
+  }
 
   const statusColor = {ALINEADO:"#16a34a",NEUTRO:"#ca8a04",TENSION:"#dc2626",SILENCIO:"#6b7280"};
   const statusIcon = {ALINEADO:"✓",NEUTRO:"◉",TENSION:"⚠",SILENCIO:"○"};
@@ -7470,9 +7587,41 @@ function TabCohesion({ liveData = {} }) {
         </div>
       </Card>
 
+      {/* AI Explanation button */}
+      <div style={{ marginTop:10, marginBottom:6 }}>
+        {!aiExplain && (
+          <button onClick={handleAiExplain} disabled={aiExplainLoading}
+            style={{ fontSize:11, fontFamily:font, padding:"8px 16px", border:`1px solid ${ACCENT}`,
+              background:aiExplainLoading?BG3:"transparent", color:ACCENT, cursor:aiExplainLoading?"wait":"pointer",
+              letterSpacing:"0.06em", display:"flex", alignItems:"center", gap:6 }}>
+            {aiExplainLoading ? (
+              <><span style={{ width:10, height:10, border:`2px solid ${BORDER}`, borderTopColor:ACCENT, borderRadius:"50%", animation:"pulse 1s linear infinite", display:"inline-block" }} /> Analizando con IA...</>
+            ) : (
+              <>🤖 Explicar puntaje con IA</>
+            )}
+          </button>
+        )}
+        {aiExplain && (
+          <Card accent="#8b5cf6">
+            <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:8 }}>
+              <span style={{ fontSize:12 }}>🤖</span>
+              <span style={{ fontSize:10, fontFamily:font, fontWeight:700, color:"#8b5cf6", letterSpacing:"0.08em" }}>ANÁLISIS IA — ICG {data.index}/100</span>
+              {aiExplain.provider && (
+                <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:"#8b5cf615", color:"#8b5cf6", border:"1px solid #8b5cf630" }}>
+                  {aiExplain.provider.toUpperCase()}
+                </span>
+              )}
+            </div>
+            <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.7, whiteSpace:"pre-wrap" }}>
+              {aiExplain.text}
+            </div>
+          </Card>
+        )}
+      </div>
+
       {/* Status footer */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:10, fontFamily:font, color:`${MUTED}60` }}>
-        <span>{data.engine==="mock" ? "⚠ Datos demo — conectar MISTRAL_API_KEY para datos en vivo" : `Motor: ${data.engine}`}</span>
+        <span>{data.engine==="mock" ? "⚠ Datos demo — conectar MISTRAL_API_KEY para datos en vivo" : `Motor: ${data.engine}`}{data.cachedDate ? ` · Datos del ${data.cachedDate}` : ""}</span>
         {error && <span style={{ color:"#ca8a04" }}>⚠ {error}</span>}
       </div>
     </div>
@@ -7698,7 +7847,7 @@ function RedesChart({ view }) {
 
 function TabClimaSocial({ liveData = {} }) {
   const mob = useIsMobile();
-  const [seccion, setSeccion] = useState("redes");
+  const [seccion, setSeccion] = useState("cohesion");
   const [chartView, setChartView] = useState("mirror");
   const R = REDES_TOTALS;
 
@@ -7729,7 +7878,7 @@ function TabClimaSocial({ liveData = {} }) {
           <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Polarización y convivencia en X · Índice de Cohesión de Gobierno</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
-          {[{id:"redes",label:"📱 Redes"},{id:"cohesion",label:"🏛 Cohesión GOB"},{id:"analisis",label:"📊 Análisis"},{id:"metodologia",label:"📋 Metodología"}].map(s => (
+          {[{id:"cohesion",label:"🏛 Cohesión GOB"},{id:"redes",label:"📱 Redes"},{id:"analisis",label:"📊 Análisis"},{id:"metodologia",label:"📋 Metodología"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:12, fontFamily:font, padding:"6px 14px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED,
@@ -7739,6 +7888,11 @@ function TabClimaSocial({ liveData = {} }) {
           ))}
         </div>
       </div>
+
+      {/* ═══ COHESIÓN GOB ═══ */}
+      {seccion === "cohesion" && (
+        <TabCohesion liveData={liveData} />
+      )}
 
       {/* ═══ REDES ═══ */}
       {seccion === "redes" && (<>
@@ -7889,11 +8043,6 @@ function TabClimaSocial({ liveData = {} }) {
           </div>
         </div>
       </>)}
-
-      {/* ═══ COHESIÓN GOB ═══ */}
-      {seccion === "cohesion" && (
-        <TabCohesion liveData={liveData} />
-      )}
 
       {/* ═══ ANÁLISIS ═══ */}
       {seccion === "analisis" && (<>
