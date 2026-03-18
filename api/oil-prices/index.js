@@ -59,7 +59,29 @@ module.exports = async function handler(req, res) {
       liveSource = "yahoo";
     }
 
-    // 1b. OilPriceAPI fallback (if key exists and Yahoo failed)
+    // 1b. Supabase cached prices fallback (from daily cron, free, no API usage)
+    if (!brent && !wti) {
+      const sbUrl = process.env.SUPABASE_URL;
+      const sbKey = process.env.SUPABASE_ANON_KEY;
+      if (sbUrl && sbKey) {
+        try {
+          const sbRes = await fetch(
+            `${sbUrl}/rest/v1/daily_readings?select=brent,wti,date&order=date.desc&limit=1`,
+            { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` }, signal: AbortSignal.timeout(5000) }
+          );
+          if (sbRes.ok) {
+            const rows = await sbRes.json();
+            if (rows.length > 0 && rows[0].brent) {
+              brent = { price: rows[0].brent, created_at: rows[0].date + "T06:00:00Z" };
+              if (rows[0].wti) wti = { price: rows[0].wti, created_at: rows[0].date + "T06:00:00Z" };
+              liveSource = "supabase-cached";
+            }
+          }
+        } catch {}
+      }
+    }
+
+    // 1c. OilPriceAPI fallback (if key exists and Yahoo + Supabase failed)
     if (!brent && !wti && oilKey) {
       const headers = { Authorization: `Token ${oilKey}`, "Content-Type": "application/json" };
       let oilApiDebug = [];
@@ -82,7 +104,7 @@ module.exports = async function handler(req, res) {
       else if (oilApiDebug.length > 0) liveSource = `oilpriceapi-fail (${oilApiDebug.join(", ")})`;
     }
 
-    // 1c. EIA fallback (delayed but always works)
+    // 1d. EIA fallback (delayed but always works)
     if (!brent && !wti && eiaKey) {
       const buildUrl = (series) =>
         `${EIA_BASE}?api_key=${eiaKey}&frequency=daily&data[0]=value&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=1`;
@@ -128,25 +150,6 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // Fallback history from OilPriceAPI if no EIA
-    if (brentHistory.length === 0 && oilKey) {
-      const headers = { Authorization: `Token ${oilKey}`, "Content-Type": "application/json" };
-      let histRes = await fetchJson(`${OIL_BASE}/prices/past_year?by_code=BRENT_CRUDE_USD`, 15000, headers);
-      if (!histRes?.data?.prices?.length) {
-        histRes = await fetchJson(`${OIL_BASE}/prices/past_month?by_code=BRENT_CRUDE_USD`, 10000, headers);
-        histPeriod = "month";
-      }
-      const hd = histRes?.data?.prices || histRes?.data;
-      if (Array.isArray(hd) && hd.length > 0) {
-        const byDay = new Map();
-        hd.filter(p => p.price != null).forEach(p => {
-          const day = p.created_at?.split("T")[0] || "";
-          if (day) byDay.set(day, { price: p.price, time: p.created_at });
-        });
-        brentHistory = Array.from(byDay.values()).sort((a, b) => new Date(a.time) - new Date(b.time));
-      }
-    }
-
     // ── 4. STEO Forecast (monthly, free) ──
     let steoForecast = [];
     if (eiaKey) {
@@ -179,7 +182,7 @@ module.exports = async function handler(req, res) {
       } catch {}
     }
 
-    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=120");
+    res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=600");
     return res.status(200).json({
       brent, wti, natgas,
       brentHistory, steoForecast, venProduction, histPeriod,
