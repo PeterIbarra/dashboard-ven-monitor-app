@@ -94,13 +94,13 @@ module.exports = async function handler(req, res) {
     try {
       const today = new Date().toISOString().slice(0, 10);
       // Only accept known numeric fields — sanitize input
-      const allowed = ["gdelt_tone","gdelt_volume","icg_score","icg_level","brent","wti","bilateral_v","brecha","paralelo"];
+      const allowed = ["gdelt_tone","gdelt_volume","brent","wti","bilateral_v","brecha","paralelo"];
       const update = { date: today };
       let fieldsSet = 0;
       for (const key of allowed) {
         if (req.query[key] != null && req.query[key] !== "" && req.query[key] !== "null") {
-          update[key] = key === "icg_level" ? String(req.query[key]) : parseFloat(req.query[key]);
-          if (!isNaN(update[key]) || key === "icg_level") fieldsSet++;
+          update[key] = parseFloat(req.query[key]);
+          if (!isNaN(update[key])) fieldsSet++;
         }
       }
       if (fieldsSet === 0) return res.status(400).json({ error: "No valid fields" });

@@ -8591,10 +8591,7 @@ export default function MonitorPNUD() {
         try {
           const params = new URLSearchParams({ type: "write_reading" });
           if (results.bilateral?.latest?.v != null) params.set("bilateral_v", results.bilateral.latest.v.toFixed(2));
-          if (results.cohesion?.index != null) {
-            params.set("icg_score", results.cohesion.index);
-            params.set("icg_level", results.cohesion.level || "");
-          }
+          // ICG is NOT written back from frontend — cron is the authoritative source
           if (results.gdeltSummary?.tone != null) params.set("gdelt_tone", results.gdeltSummary.tone.toFixed(2));
           if (results.gdeltSummary?.volume != null) params.set("gdelt_volume", results.gdeltSummary.volume);
           if (results.dolar?.brecha) params.set("brecha", parseFloat(results.dolar.brecha).toFixed(1));
