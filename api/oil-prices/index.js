@@ -1,5 +1,5 @@
 // /api/oil-prices — Petroleum spot prices (hybrid)
-// Live prices: OilPriceAPI (200/mo, real-time) → Supabase cached (from cron every 12h) → EIA (delayed)
+// Live prices: Supabase cached (cron saves OilPriceAPI every 12h) → OilPriceAPI direct → EIA (delayed)
 // Historical chart: EIA API v2 (daily, 365 days, free) — EIA_API_KEY
 // Returns: { brent, wti, natgas, brentHistory[], histPeriod, source, fetchedAt }
 
@@ -11,55 +11,30 @@ module.exports = async function handler(req, res) {
   const oilKey = process.env.OILPRICE_API_KEY;
 
   try {
-    // ── 1. Live prices — cascade: Supabase cached (cron saves OilPriceAPI every 12h) → OilPriceAPI direct → EIA ──
+    // ── 1. Live prices — cascade: Supabase cached → OilPriceAPI direct → EIA ──
     let brent = null, wti = null, natgas = null, liveSource = "static";
 
-    // 1a. Supabase cached prices (from cron every 12h — OilPriceAPI data, free read)
-    if (!brent && !wti) {
-      const sbUrl = process.env.SUPABASE_URL;
-      const sbKey = process.env.SUPABASE_ANON_KEY;
-      if (sbUrl && sbKey) {
-        try {
-          const sbRes = await fetch(
-            `${sbUrl}/rest/v1/daily_readings?select=brent,wti,date&order=date.desc&limit=1`,
-            { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` }, signal: AbortSignal.timeout(5000) }
-          );
-          if (sbRes.ok) {
-            const rows = await sbRes.json();
-            if (rows.length > 0 && rows[0].brent) {
-              brent = { price: rows[0].brent, created_at: rows[0].date + "T06:00:00Z" };
-              if (rows[0].wti) wti = { price: rows[0].wti, created_at: rows[0].date + "T06:00:00Z" };
-              liveSource = "supabase-cached";
-            }
+    // 1a. Supabase cached prices (cron saves OilPriceAPI data every 12h — free read)
+    const sbUrl = process.env.SUPABASE_URL;
+    const sbKey = process.env.SUPABASE_ANON_KEY;
+    if (sbUrl && sbKey) {
+      try {
+        const sbRes = await fetch(
+          `${sbUrl}/rest/v1/daily_readings?select=brent,wti,date&order=date.desc&limit=1`,
+          { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` }, signal: AbortSignal.timeout(5000) }
+        );
+        if (sbRes.ok) {
+          const rows = await sbRes.json();
+          if (rows.length > 0 && rows[0].brent) {
+            brent = { price: rows[0].brent, created_at: rows[0].date + "T06:00:00Z" };
+            if (rows[0].wti) wti = { price: rows[0].wti, created_at: rows[0].date + "T06:00:00Z" };
+            liveSource = "supabase-cached";
           }
-        } catch {}
-      }
+        }
+      } catch {}
     }
 
-    // 1b. OilPriceAPI direct (only if Supabase has no data — should be rare with cron every 12h)
-    if (!brent && !wti && oilKey) {
-    if (!brent && !wti) {
-      const sbUrl = process.env.SUPABASE_URL;
-      const sbKey = process.env.SUPABASE_ANON_KEY;
-      if (sbUrl && sbKey) {
-        try {
-          const sbRes = await fetch(
-            `${sbUrl}/rest/v1/daily_readings?select=brent,wti,date&order=date.desc&limit=1`,
-            { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` }, signal: AbortSignal.timeout(5000) }
-          );
-          if (sbRes.ok) {
-            const rows = await sbRes.json();
-            if (rows.length > 0 && rows[0].brent) {
-              brent = { price: rows[0].brent, created_at: rows[0].date + "T06:00:00Z" };
-              if (rows[0].wti) wti = { price: rows[0].wti, created_at: rows[0].date + "T06:00:00Z" };
-              liveSource = "supabase-cached";
-            }
-          }
-        } catch {}
-      }
-    }
-
-    // 1c. OilPriceAPI fallback (200 req/mo — only if AV + Supabase failed)
+    // 1b. OilPriceAPI direct (only if Supabase has no data — rare with cron every 12h)
     if (!brent && !wti && oilKey) {
       const headers = { Authorization: `Token ${oilKey}`, "Content-Type": "application/json" };
       let oilApiDebug = [];
@@ -82,7 +57,7 @@ module.exports = async function handler(req, res) {
       else if (oilApiDebug.length > 0) liveSource = `oilpriceapi-fail (${oilApiDebug.join(", ")})`;
     }
 
-    // 1c. EIA fallback (delayed but always works)
+    // 1c. EIA fallback (delayed 5-7 days but always works)
     if (!brent && !wti && eiaKey) {
       const buildUrl = (series) =>
         `${EIA_BASE}?api_key=${eiaKey}&frequency=daily&data[0]=value&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=1`;
