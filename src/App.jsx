@@ -7314,25 +7314,41 @@ function TabCohesion({ liveData = {} }) {
     if (aiExplain || aiExplainLoading || !data) return;
     setAiExplainLoading(true);
     const allActors = [...(data.actors || []), ...(data.systemic || [])];
-    const actorSummary = allActors.map(a => `${a.name}: ${a.status} (${(a.confidence*100).toFixed(0)}%) — ${a.evidence}`).join("\n");
-    const prompt = `Eres analista senior de riesgo político del PNUD Venezuela. El Índice de Cohesión de Gobierno (ICG) actual es ${data.index}/100 (nivel: ${data.level}).
+    const actorSummary = allActors.map(a => {
+      const sigs = (a.signals || []).join(", ");
+      return `- ${a.name}: ${a.status} (confianza ${(a.confidence*100).toFixed(0)}%)\n  Evidencia: ${a.evidence}${sigs ? `\n  Señales: ${sigs}` : ""}`;
+    }).join("\n");
 
-ACTORES Y SU ALINEACIÓN:
+    const aligned = allActors.filter(a => a.status === "ALINEADO").length;
+    const tension = allActors.filter(a => a.status === "TENSION").length;
+    const neutral = allActors.filter(a => a.status === "NEUTRO").length;
+
+    const prompt = `Eres analista senior de riesgo político del PNUD Venezuela. Debes explicar el puntaje actual del Índice de Cohesión de Gobierno (ICG).
+
+DATOS DEL ICG:
+- Puntaje: ${data.index}/100 (nivel: ${data.level})
+- Actores alineados: ${aligned}/${allActors.length}
+- En tensión: ${tension}/${allActors.length}
+- Neutros: ${neutral}/${allActors.length}
+
+DETALLE POR ACTOR:
 ${actorSummary}
 
 INSTRUCCIONES:
-1. Explica en 3-4 párrafos cortos POR QUÉ el ICG tiene este puntaje.
-2. Identifica los principales factores de riesgo para la cohesión.
-3. Señala qué actores son los más críticos para vigilar.
-4. Máximo 200 palabras. Lenguaje profesional, directo, sin repeticiones.
-5. Responde SOLO el análisis, sin preámbulos ni formato JSON.`;
+1. Escribe un análisis de 4-5 párrafos explicando POR QUÉ el ICG tiene ${data.index} puntos.
+2. Sé ESPECÍFICO: nombra actores concretos, cita las señales y evidencia proporcionadas, explica las dinámicas de poder.
+3. Identifica los 2-3 principales factores de riesgo para la cohesión con ejemplos concretos.
+4. Señala qué actores son los más críticos para vigilar en las próximas semanas y por qué.
+5. Concluye con una frase sobre la tendencia probable (se fortalece, se debilita, se mantiene).
+6. Lenguaje profesional, analítico, directo. No uses formato markdown (sin asteriscos, sin #, sin listas con guiones). Usa texto plano con párrafos separados.
+7. Máximo 300 palabras.`;
 
     try {
       if (IS_DEPLOYED) {
         const res = await fetch("/api/ai", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt, max_tokens: 400 }),
+          body: JSON.stringify({ prompt, max_tokens: 600 }),
           signal: AbortSignal.timeout(30000),
         });
         if (res.ok) {
@@ -7344,14 +7360,52 @@ INSTRUCCIONES:
     setAiExplainLoading(false);
   }
 
+  // Render AI text with **bold** markdown support
+  function renderAiText(text) {
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return <b key={i} style={{ color:TEXT, fontWeight:600 }}>{part.slice(2, -2)}</b>;
+      }
+      return <span key={i}>{part}</span>;
+    });
+  }
+
   const statusColor = {ALINEADO:"#16a34a",NEUTRO:"#ca8a04",TENSION:"#dc2626",SILENCIO:"#6b7280"};
   const statusIcon = {ALINEADO:"✓",NEUTRO:"◉",TENSION:"⚠",SILENCIO:"○"};
   const statusLabel = {ALINEADO:"Alineado",NEUTRO:"Neutro",TENSION:"Tensión",SILENCIO:"Silencio"};
   const levelColor = {ALTA:"#16a34a",MEDIA:"#ca8a04",BAJA:"#f97316",CRITICA:"#dc2626"};
 
-  const historyData = ICG_HISTORY.map((h,i) => ({
-    ...h, score: i===ICG_HISTORY.length-1 && data?.index ? data.index : h.score,
-  })).filter(h => h.score !== null);
+  const [dailyICG, setDailyICG] = useState([]);
+
+  // Fetch daily ICG readings from Supabase for chart (post-S9)
+  useEffect(() => {
+    if (!IS_DEPLOYED) return;
+    async function fetchDailyICG() {
+      try {
+        const res = await fetch("/api/articles?type=icg_history", { signal: AbortSignal.timeout(6000) });
+        if (res.ok) {
+          const d = await res.json();
+          if (d.readings?.length) setDailyICG(d.readings);
+        }
+      } catch {}
+    }
+    fetchDailyICG();
+  }, []);
+
+  // Build chart data: weekly S1-S9 + daily readings after that
+  const historyData = useMemo(() => {
+    const weekly = ICG_HISTORY.map((h,i) => ({
+      ...h, score: i===ICG_HISTORY.length-1 && data?.index && dailyICG.length === 0 ? data.index : h.score,
+    })).filter(h => h.score !== null);
+    // Append daily readings after last week
+    if (dailyICG.length > 0) {
+      dailyICG.forEach(r => {
+        weekly.push({ week: r.date.slice(5), score: r.icg_score, note: `Diario · ${r.icg_provider || "cron"}`, daily: true });
+      });
+    }
+    return weekly;
+  }, [data?.index, dailyICG]);
 
   if (loading) {
     return (
@@ -7412,6 +7466,39 @@ INSTRUCCIONES:
           </div>
         </Card>
       </div>
+
+      {/* AI Explanation — top of section */}
+      <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
+        {!aiExplain && (
+          <button onClick={handleAiExplain} disabled={aiExplainLoading}
+            style={{ fontSize:11, fontFamily:font, padding:"7px 14px", border:`1px solid ${ACCENT}`,
+              background:aiExplainLoading?BG3:"transparent", color:ACCENT, cursor:aiExplainLoading?"wait":"pointer",
+              letterSpacing:"0.06em", display:"flex", alignItems:"center", gap:6 }}>
+            {aiExplainLoading ? (
+              <><span style={{ width:10, height:10, border:`2px solid ${BORDER}`, borderTopColor:ACCENT, borderRadius:"50%", animation:"pulse 1s linear infinite", display:"inline-block" }} /> Analizando con IA...</>
+            ) : (
+              <>🤖 Explicar puntaje con IA</>
+            )}
+          </button>
+        )}
+        {dataSource === "supabase" && <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Datos cacheados · {data.cachedDate}</span>}
+      </div>
+      {aiExplain && (
+        <Card accent="#8b5cf6">
+          <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:8 }}>
+            <span style={{ fontSize:12 }}>🤖</span>
+            <span style={{ fontSize:10, fontFamily:font, fontWeight:700, color:"#8b5cf6", letterSpacing:"0.08em" }}>ANÁLISIS IA — ICG {data.index}/100 ({data.level})</span>
+            {aiExplain.provider && (
+              <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:"#8b5cf615", color:"#8b5cf6", border:"1px solid #8b5cf630" }}>
+                {aiExplain.provider.toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.7, whiteSpace:"pre-wrap" }}>
+            {renderAiText(aiExplain.text)}
+          </div>
+        </Card>
+      )}
 
       {/* THERMOMETER */}
       <Card>
@@ -7586,38 +7673,6 @@ INSTRUCCIONES:
           </div>
         </div>
       </Card>
-
-      {/* AI Explanation button */}
-      <div style={{ marginTop:10, marginBottom:6 }}>
-        {!aiExplain && (
-          <button onClick={handleAiExplain} disabled={aiExplainLoading}
-            style={{ fontSize:11, fontFamily:font, padding:"8px 16px", border:`1px solid ${ACCENT}`,
-              background:aiExplainLoading?BG3:"transparent", color:ACCENT, cursor:aiExplainLoading?"wait":"pointer",
-              letterSpacing:"0.06em", display:"flex", alignItems:"center", gap:6 }}>
-            {aiExplainLoading ? (
-              <><span style={{ width:10, height:10, border:`2px solid ${BORDER}`, borderTopColor:ACCENT, borderRadius:"50%", animation:"pulse 1s linear infinite", display:"inline-block" }} /> Analizando con IA...</>
-            ) : (
-              <>🤖 Explicar puntaje con IA</>
-            )}
-          </button>
-        )}
-        {aiExplain && (
-          <Card accent="#8b5cf6">
-            <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:8 }}>
-              <span style={{ fontSize:12 }}>🤖</span>
-              <span style={{ fontSize:10, fontFamily:font, fontWeight:700, color:"#8b5cf6", letterSpacing:"0.08em" }}>ANÁLISIS IA — ICG {data.index}/100</span>
-              {aiExplain.provider && (
-                <span style={{ fontSize:7, fontFamily:font, padding:"1px 5px", background:"#8b5cf615", color:"#8b5cf6", border:"1px solid #8b5cf630" }}>
-                  {aiExplain.provider.toUpperCase()}
-                </span>
-              )}
-            </div>
-            <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.7, whiteSpace:"pre-wrap" }}>
-              {aiExplain.text}
-            </div>
-          </Card>
-        )}
-      </div>
 
       {/* Status footer */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:10, fontFamily:font, color:`${MUTED}60` }}>
@@ -7896,21 +7951,39 @@ function TabClimaSocial({ liveData = {} }) {
 
       {/* ═══ REDES ═══ */}
       {seccion === "redes" && (<>
-        {/* KPIs */}
+        {/* KPIs — same font style as Conflictividad */}
         <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(5,1fr)", gap:10, marginBottom:16 }}>
-          {[
-            { label:"Interacciones", value:`${(R.total/1e6).toFixed(1)}M`, color:ACCENT, sub:`${R.days} días analizados` },
-            { label:"Polarización alta", value:`${R.polAltoPct}%`, color:"#dc2626", sub:"Insultos, descalificación" },
-            { label:"Convivencia alta", value:`${R.convAltoPct}%`, color:"#16a34a", sub:"Llamados al diálogo" },
-            { label:"Índice neto", value:`+${R.netIdx}pp`, color:thermoColor, sub:"Polarización domina" },
-            { label:"Pico", value:"Ene 8", color:"#dc2626", sub:"295K pol. alta · 527K total" },
-          ].map((k,i) => (
-            <Card key={i} accent={k.color}>
-              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{k.label}</div>
-              <div style={{ fontSize:22, fontWeight:800, color:k.color, fontFamily:"'Playfair Display',serif" }}>{k.value}</div>
-              <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>{k.sub}</div>
-            </Card>
-          ))}
+          <Card accent={ACCENT}>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Interacciones</div>
+            <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:ACCENT }}>{(R.total/1e6).toFixed(1)}M</span>
+            <div style={{ fontSize:10, color:MUTED }}>{R.days} días analizados</div>
+          </Card>
+          <Card accent="#dc2626">
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Polarización</div>
+            <div style={{ display:"flex", alignItems:"baseline", gap:4 }}>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:"#dc2626" }}>{((R.totPolA + R.totPolM) / R.total * 100).toFixed(0)}%</span>
+              <span style={{ fontSize:11, fontFamily:font, color:MUTED }}>mod+alta</span>
+            </div>
+            <div style={{ fontSize:10, color:MUTED }}>Alta {R.polAltoPct}% · Mod {(R.totPolM/R.total*100).toFixed(0)}%</div>
+          </Card>
+          <Card accent="#16a34a">
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Convivencia</div>
+            <div style={{ display:"flex", alignItems:"baseline", gap:4 }}>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:"#16a34a" }}>{((R.totConvA + R.totConvM) / R.total * 100).toFixed(0)}%</span>
+              <span style={{ fontSize:11, fontFamily:font, color:MUTED }}>mod+alta</span>
+            </div>
+            <div style={{ fontSize:10, color:MUTED }}>Alta {R.convAltoPct}% · Mod {(R.totConvM/R.total*100).toFixed(0)}%</div>
+          </Card>
+          <Card accent={thermoColor}>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Índice neto</div>
+            <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:thermoColor }}>+{R.netIdx}pp</span>
+            <div style={{ fontSize:10, color:MUTED }}>Polarización domina</div>
+          </Card>
+          <Card accent="#dc2626">
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Pico</div>
+            <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:"#dc2626" }}>Ene 8</span>
+            <div style={{ fontSize:10, color:MUTED }}>295K pol. alta · 527K total</div>
+          </Card>
         </div>
 
         {/* Thermometer */}

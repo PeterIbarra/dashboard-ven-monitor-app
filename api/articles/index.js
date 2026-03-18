@@ -11,6 +11,22 @@ module.exports = async function handler(req, res) {
 
   const { type, limit = "30", scenario } = req.query;
 
+  // ── Special case: fetch daily ICG history for chart ──
+  if (type === "icg_history") {
+    try {
+      const icgRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/daily_readings?select=date,icg_score,icg_provider&icg_score=not.is.null&order=date.asc&limit=90`,
+        { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` }, signal: AbortSignal.timeout(6000) }
+      );
+      if (!icgRes.ok) return res.status(icgRes.status).json({ error: "Supabase ICG history fetch failed" });
+      const rows = await icgRes.json();
+      res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=600");
+      return res.status(200).json({ readings: rows });
+    } catch (e) {
+      return res.status(502).json({ error: e.message, readings: [] });
+    }
+  }
+
   // ── Special case: fetch cached ICG from daily_readings ──
   if (type === "icg") {
     try {
