@@ -8526,7 +8526,7 @@ export default function MonitorPNUD() {
         const oilUrl = IS_DEPLOYED ? "/api/oil-prices" : null;
         if (oilUrl) {
           const oRes = await fetch(oilUrl, { signal:AbortSignal.timeout(12000) }).then(r=>r.ok?r.json():null).catch(()=>null);
-          if (oRes) results.oil = { brent:oRes.brent?.price, wti:oRes.wti?.price, gas:oRes.natgas?.price };
+          if (oRes) results.oil = { brent:oRes.brent?.price, wti:oRes.wti?.price, gas:oRes.natgas?.price, source:oRes.source || "unknown" };
         }
       } catch {}
       try {

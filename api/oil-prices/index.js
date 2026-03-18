@@ -1,45 +1,49 @@
 // /api/oil-prices — Petroleum spot prices (hybrid)
-// Live prices: Yahoo Finance (free, ~15min delay) → OilPriceAPI (key) → EIA (daily, delayed)
+// Live prices: Finnhub (free, 60/min) → Alpha Vantage (free, 25/day) → Supabase cached → OilPriceAPI (200/mo) → EIA (delayed)
 // Historical chart: EIA API v2 (daily, 365 days, free) — EIA_API_KEY
 // Returns: { brent, wti, natgas, brentHistory[], histPeriod, source, fetchedAt }
 
 const EIA_BASE = "https://api.eia.gov/v2/petroleum/pri/spt/data/";
 const OIL_BASE = "https://api.oilpriceapi.com/v1";
 
-// Yahoo Finance quote endpoint — no key needed, ~15min delay
-const YAHOO_SYMBOLS = {
-  brent: "BZ=F",   // Brent Crude Futures
-  wti: "CL=F",     // WTI Crude Futures
-  natgas: "NG=F",  // Natural Gas Futures
-};
+// Finnhub commodity symbols
+const FINNHUB_SYMBOLS = { brent: "IC:BRN", wti: "IC:WTI" };
 
-async function fetchYahooFinance() {
+// 1a. Finnhub (free, 60 calls/min, real-time)
+async function fetchFinnhub() {
+  const key = process.env.FINNHUB_API_KEY;
+  if (!key) return null;
   try {
-    const symbols = Object.values(YAHOO_SYMBOLS).join(",");
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=regularMarketPrice,regularMarketTime,shortName`;
-    const res = await fetch(url, {
-      signal: AbortSignal.timeout(8000),
-      headers: { "User-Agent": "PNUD-Monitor/1.0" },
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const quotes = data?.quoteResponse?.result || [];
-    const find = (sym) => {
-      const q = quotes.find(r => r.symbol === sym);
-      if (!q?.regularMarketPrice) return null;
-      return {
-        price: q.regularMarketPrice,
-        created_at: new Date(q.regularMarketTime * 1000).toISOString(),
-      };
+    const [bRes, wRes] = await Promise.all([
+      fetch(`https://finnhub.io/api/v1/quote?symbol=BZ&token=${key}`, { signal: AbortSignal.timeout(6000) }).then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch(`https://finnhub.io/api/v1/quote?symbol=CL&token=${key}`, { signal: AbortSignal.timeout(6000) }).then(r => r.ok ? r.json() : null).catch(() => null),
+    ]);
+    const brent = bRes?.c > 10 ? { price: bRes.c, created_at: new Date(bRes.t * 1000).toISOString() } : null;
+    const wti = wRes?.c > 10 ? { price: wRes.c, created_at: new Date(wRes.t * 1000).toISOString() } : null;
+    if (brent || wti) return { brent, wti, natgas: null, source: "finnhub" };
+    return null;
+  } catch { return null; }
+}
+
+// 1b. Alpha Vantage (free, 25 calls/day)
+async function fetchAlphaVantage() {
+  const key = process.env.ALPHAVANTAGE_API_KEY;
+  if (!key) return null;
+  try {
+    const [bRes, wRes] = await Promise.all([
+      fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=BZ%3DF&apikey=${key}`, { signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=CL%3DF&apikey=${key}`, { signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null),
+    ]);
+    const parse = (r) => {
+      const q = r?.["Global Quote"];
+      if (!q?.["05. price"]) return null;
+      return { price: parseFloat(q["05. price"]), created_at: q["07. latest trading day"] + "T16:00:00Z" };
     };
-    const brent = find(YAHOO_SYMBOLS.brent);
-    const wti = find(YAHOO_SYMBOLS.wti);
-    const natgas = find(YAHOO_SYMBOLS.natgas);
-    if (brent || wti) return { brent, wti, natgas, source: "yahoo" };
+    const brent = parse(bRes);
+    const wti = parse(wRes);
+    if (brent || wti) return { brent, wti, natgas: null, source: "alphavantage" };
     return null;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 module.exports = async function handler(req, res) {
@@ -47,19 +51,28 @@ module.exports = async function handler(req, res) {
   const oilKey = process.env.OILPRICE_API_KEY;
 
   try {
-    // ── 1. Live prices — cascade: Yahoo Finance → OilPriceAPI → EIA ──
+    // ── 1. Live prices — cascade: Finnhub → Alpha Vantage → Supabase → OilPriceAPI → EIA ──
     let brent = null, wti = null, natgas = null, liveSource = "static";
 
-    // 1a. Yahoo Finance (free, no key, ~15min delay)
-    const yahoo = await fetchYahooFinance();
-    if (yahoo) {
-      brent = yahoo.brent;
-      wti = yahoo.wti;
-      natgas = yahoo.natgas;
-      liveSource = "yahoo";
+    // 1a. Finnhub (free, 60 req/min, real-time futures)
+    const finnhub = await fetchFinnhub();
+    if (finnhub) {
+      brent = finnhub.brent;
+      wti = finnhub.wti;
+      liveSource = "finnhub";
     }
 
-    // 1b. Supabase cached prices fallback (from daily cron, free, no API usage)
+    // 1b. Alpha Vantage fallback (free, 25 req/day)
+    if (!brent && !wti) {
+      const av = await fetchAlphaVantage();
+      if (av) {
+        brent = av.brent;
+        wti = av.wti;
+        liveSource = "alphavantage";
+      }
+    }
+
+    // 1c. Supabase cached prices fallback (from cron, free, no API usage)
     if (!brent && !wti) {
       const sbUrl = process.env.SUPABASE_URL;
       const sbKey = process.env.SUPABASE_ANON_KEY;
@@ -81,7 +94,7 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // 1c. OilPriceAPI fallback (if key exists and Yahoo + Supabase failed)
+    // 1d. OilPriceAPI fallback (if key exists and Finnhub + AV + Supabase failed)
     if (!brent && !wti && oilKey) {
       const headers = { Authorization: `Token ${oilKey}`, "Content-Type": "application/json" };
       let oilApiDebug = [];
@@ -104,7 +117,7 @@ module.exports = async function handler(req, res) {
       else if (oilApiDebug.length > 0) liveSource = `oilpriceapi-fail (${oilApiDebug.join(", ")})`;
     }
 
-    // 1d. EIA fallback (delayed but always works)
+    // 1e. EIA fallback (delayed but always works)
     if (!brent && !wti && eiaKey) {
       const buildUrl = (series) =>
         `${EIA_BASE}?api_key=${eiaKey}&frequency=daily&data[0]=value&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=1`;

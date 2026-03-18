@@ -443,8 +443,27 @@ module.exports = async function handler(req, res) {
       } catch {}
     }
 
-    // Parse oil prices
-    if (oilRes.status === "fulfilled" && oilRes.value.ok) {
+    // Parse oil prices — try Finnhub first (real-time), then EIA (delayed)
+    let oilParsed = false;
+    const finnhubKey = process.env.FINNHUB_API_KEY;
+    if (finnhubKey) {
+      try {
+        const [bFH, wFH] = await Promise.allSettled([
+          fetch(`https://finnhub.io/api/v1/quote?symbol=BZ&token=${finnhubKey}`, { signal: AbortSignal.timeout(6000) }),
+          fetch(`https://finnhub.io/api/v1/quote?symbol=CL&token=${finnhubKey}`, { signal: AbortSignal.timeout(6000) }),
+        ]);
+        if (bFH.status === "fulfilled" && bFH.value.ok) {
+          const d = await bFH.value.json();
+          if (d?.c > 10) { reading.brent = parseFloat(d.c.toFixed(2)); oilParsed = true; }
+        }
+        if (wFH.status === "fulfilled" && wFH.value.ok) {
+          const d = await wFH.value.json();
+          if (d?.c > 10) { reading.wti = parseFloat(d.c.toFixed(2)); oilParsed = true; }
+        }
+      } catch {}
+    }
+    // EIA fallback for oil
+    if (!oilParsed && oilRes.status === "fulfilled" && oilRes.value.ok) {
       try {
         const data = await oilRes.value.json();
         const items = data?.response?.data || [];
