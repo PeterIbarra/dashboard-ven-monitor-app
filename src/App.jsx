@@ -2450,105 +2450,77 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
       {/* ── ROW 1d: Cohesión de Gobierno (mini) ── */}
       <CohesionMiniWidget liveData={liveData} />
 
-      {/* ── ROW 1e: Clima Social Redes — Polarización/Convivencia Mini ── */}
+      {/* ── ROW 1e: Clima Social Redes — Dos lentes, un discurso ── */}
       {(() => {
         const R = REDES_TOTALS;
-        const netVal = parseFloat(R.netIdx);
-        const thermoPos = Math.min(95, Math.max(5, 50 + netVal * 0.5));
-        const thermoColor = netVal > 30 ? "#dc2626" : netVal > 15 ? "#ca8a04" : netVal > 0 ? "#f59e0b" : "#16a34a";
-        // Dual bar proportions
         const polAmPct = ((R.totPolA + R.totPolM) / R.total * 100).toFixed(0);
         const convAmPct = ((R.totConvA + R.totConvM) / R.total * 100).toFixed(0);
-        // Ratio last week
-        const lastWeek = R.weekly[R.weekly.length - 1];
-        const ratioLabel = lastWeek?.ratio ? `${lastWeek.ratio}x` : "—";
-        const ratioColor = !lastWeek?.ratio ? MUTED : lastWeek.ratio > 10 ? "#dc2626" : lastWeek.ratio > 5 ? "#ca8a04" : lastWeek.ratio > 2 ? "#f59e0b" : "#16a34a";
         return (
           <Card>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
               <div style={{ fontSize:10, fontFamily:font, color:ACCENT, letterSpacing:"0.15em", textTransform:"uppercase" }}>
-                🌡️ Clima Social · Redes X
+                🌡️ Clima Social · Redes X — Dos lentes, un discurso
               </div>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>{R.days} días · {(R.total/1e6).toFixed(1)}M int.</div>
             </div>
-            {/* Thermometer */}
-            <div style={{ marginBottom:10 }}>
-              <div style={{ position:"relative", height:12, background:"linear-gradient(to right, #16a34a, #ca8a04, #dc2626)", borderRadius:6, overflow:"hidden" }}>
-                {[25,50,75].map(v => <div key={v} style={{ position:"absolute", left:`${v}%`, top:0, bottom:0, width:1, background:"rgba(255,255,255,0.35)" }} />)}
-                <div style={{ position:"absolute", left:`${thermoPos}%`, top:"50%", transform:"translate(-50%,-50%)", width:9, height:9, borderRadius:"50%", background:"#fff", border:`2.5px solid ${thermoColor}`, boxShadow:`0 0 5px ${thermoColor}` }} />
-              </div>
-              <div style={{ display:"flex", justifyContent:"space-between", fontSize:8, fontFamily:font, color:`${MUTED}60`, marginTop:2 }}>
-                <span>Conv. dominante</span><span>Equilibrio</span><span>Pol. dominante</span>
-              </div>
-            </div>
-            {/* Dual stacked bar: Pol vs Conv */}
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:8 }}>
-              <div>
-                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-                  <span style={{ fontSize:9, fontFamily:font, color:"#dc2626", fontWeight:600 }}>Polarización</span>
+            {/* Dual dimension bars — side by side, same universe */}
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:10 }}>
+              {/* Polarización lens */}
+              <div style={{ background:BG3, padding:"8px 10px" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:5 }}>
+                  <span style={{ fontSize:10, fontFamily:font, color:"#dc2626", fontWeight:700, letterSpacing:"0.06em" }}>POLARIZACIÓN</span>
                   <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>{polAmPct}% mod+alta</span>
                 </div>
-                <div style={{ height:8, background:BG3, borderRadius:3, overflow:"hidden", display:"flex" }}>
-                  <div style={{ width:`${R.polAltoPct}%`, background:"#dc2626", height:8 }} />
-                  <div style={{ width:`${(R.totPolM/R.total*100).toFixed(0)}%`, background:"#f59e0b", height:8 }} />
+                <div style={{ height:10, background:`${BORDER}30`, borderRadius:3, overflow:"hidden", display:"flex" }}>
+                  <div style={{ width:`${R.polAltoPct}%`, background:"#dc2626", height:10 }} />
+                  <div style={{ width:`${(R.totPolM/R.total*100).toFixed(0)}%`, background:"#f59e0b", height:10 }} />
                 </div>
-                <div style={{ display:"flex", gap:6, marginTop:2 }}>
-                  <span style={{ fontSize:7, fontFamily:font, color:"#dc2626" }}>Alta {R.polAltoPct}%</span>
-                  <span style={{ fontSize:7, fontFamily:font, color:"#f59e0b" }}>Mod {(R.totPolM/R.total*100).toFixed(0)}%</span>
+                <div style={{ display:"flex", justifyContent:"space-between", marginTop:3 }}>
+                  <span style={{ fontSize:8, fontFamily:font, color:"#dc2626" }}>Alta {R.polAltoPct}%</span>
+                  <span style={{ fontSize:8, fontFamily:font, color:"#f59e0b" }}>Mod {(R.totPolM/R.total*100).toFixed(0)}%</span>
                 </div>
               </div>
-              <div>
-                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-                  <span style={{ fontSize:9, fontFamily:font, color:"#16a34a", fontWeight:600 }}>Convivencia</span>
+              {/* Convivencia lens */}
+              <div style={{ background:BG3, padding:"8px 10px" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:5 }}>
+                  <span style={{ fontSize:10, fontFamily:font, color:"#16a34a", fontWeight:700, letterSpacing:"0.06em" }}>CONVIVENCIA</span>
                   <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>{convAmPct}% mod+alta</span>
                 </div>
-                <div style={{ height:8, background:BG3, borderRadius:3, overflow:"hidden", display:"flex" }}>
-                  <div style={{ width:`${R.convAltoPct}%`, background:"#16a34a", height:8 }} />
-                  <div style={{ width:`${(R.totConvM/R.total*100).toFixed(0)}%`, background:"#5DCAA5", height:8 }} />
+                <div style={{ height:10, background:`${BORDER}30`, borderRadius:3, overflow:"hidden", display:"flex" }}>
+                  <div style={{ width:`${R.convAltoPct}%`, background:"#16a34a", height:10 }} />
+                  <div style={{ width:`${(R.totConvM/R.total*100).toFixed(0)}%`, background:"#5DCAA5", height:10 }} />
                 </div>
-                <div style={{ display:"flex", gap:6, marginTop:2 }}>
-                  <span style={{ fontSize:7, fontFamily:font, color:"#16a34a" }}>Alta {R.convAltoPct}%</span>
-                  <span style={{ fontSize:7, fontFamily:font, color:"#5DCAA5" }}>Mod {(R.totConvM/R.total*100).toFixed(0)}%</span>
+                <div style={{ display:"flex", justifyContent:"space-between", marginTop:3 }}>
+                  <span style={{ fontSize:8, fontFamily:font, color:"#16a34a" }}>Alta {R.convAltoPct}%</span>
+                  <span style={{ fontSize:8, fontFamily:font, color:"#5DCAA5" }}>Mod {(R.totConvM/R.total*100).toFixed(0)}%</span>
                 </div>
               </div>
             </div>
-            {/* KPI row */}
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr 1fr", gap:4 }}>
-              {/* Sparkline last 7 days */}
-              <div style={{ background:BG3, padding:"5px 6px", display:"flex", flexDirection:"column", alignItems:"center" }}>
-                <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:3 }}>7 días</div>
-                <div style={{ display:"flex", gap:1, alignItems:"flex-end", height:22 }}>
-                  {R.last7.map((d,i) => {
-                    const maxT = Math.max(...R.last7.map(x => x.pol.t), 1);
-                    const h = Math.max(3, (d.pol.t / maxT) * 18);
-                    const pctP = d.pol.t > 0 ? d.pol.a / d.pol.t : 0;
-                    return <div key={i} style={{ width:4, height:h, background:pctP > 0.5 ? "#dc2626" : pctP > 0.3 ? "#f59e0b" : "#16a34a", borderRadius:1, opacity:0.8 }} />;
-                  })}
-                </div>
-              </div>
-              {/* Neto */}
-              <div style={{ background:BG3, padding:"5px 6px", textAlign:"center" }}>
-                <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.06em", textTransform:"uppercase" }}>Neto</div>
-                <div style={{ fontSize:15, fontWeight:700, color:thermoColor, fontFamily:"'Playfair Display',serif" }}>+{R.netIdx}<span style={{ fontSize:8 }}>pp</span></div>
-              </div>
-              {/* Ratio */}
-              <div style={{ background:BG3, padding:"5px 6px", textAlign:"center" }}>
-                <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.06em", textTransform:"uppercase" }}>Ratio últ.</div>
-                <div style={{ fontSize:15, fontWeight:700, color:ratioColor, fontFamily:"'Playfair Display',serif" }}>{ratioLabel}</div>
-              </div>
-              {/* Conv alta */}
-              <div style={{ background:BG3, padding:"5px 6px", textAlign:"center" }}>
-                <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.06em", textTransform:"uppercase" }}>Conv.alta</div>
-                <div style={{ fontSize:15, fontWeight:700, color:"#16a34a", fontFamily:"'Playfair Display',serif" }}>{R.convAltoPct}<span style={{ fontSize:8 }}>%</span></div>
-              </div>
-              {/* Pol alta */}
-              <div style={{ background:BG3, padding:"5px 6px", textAlign:"center" }}>
-                <div style={{ fontSize:7, fontFamily:font, color:MUTED, letterSpacing:"0.06em", textTransform:"uppercase" }}>Pol.alta</div>
-                <div style={{ fontSize:15, fontWeight:700, color:"#dc2626", fontFamily:"'Playfair Display',serif" }}>{R.polAltoPct}<span style={{ fontSize:8 }}>%</span></div>
-              </div>
+            {/* Sparkline: last 7 days showing BOTH signals per day */}
+            <div style={{ display:"flex", gap:3, alignItems:"flex-end", height:36, marginBottom:6, padding:"0 4px" }}>
+              {R.last7.map((d,i) => {
+                const maxT = Math.max(...R.last7.map(x => x.pol.t), 1);
+                const hTotal = Math.max(6, (d.pol.t / maxT) * 32);
+                const pctPA = d.pol.t > 0 ? d.pol.a / d.pol.t : 0;
+                const pctCA = d.conv.t > 0 ? d.conv.a / d.conv.t : 0;
+                return (
+                  <div key={i} style={{ flex:1, display:"flex", gap:1, alignItems:"flex-end", justifyContent:"center" }}>
+                    {/* Pol bar */}
+                    <div style={{ width:4, height:Math.max(2, hTotal * pctPA), background:"#dc2626", borderRadius:1, opacity:0.8 }} title={`Pol.alta ${(pctPA*100).toFixed(0)}%`} />
+                    {/* Conv bar */}
+                    <div style={{ width:4, height:Math.max(2, hTotal * Math.max(pctCA, 0.03)), background:"#16a34a", borderRadius:1, opacity:0.8 }} title={`Conv.alta ${(pctCA*100).toFixed(0)}%`} />
+                  </div>
+                );
+              })}
             </div>
-            <div style={{ fontSize:8, fontFamily:font, color:`${MUTED}50`, marginTop:6, textAlign:"center" }}>
-              {R.firstDay} – {R.lastDay} · Pol. domina en {REDES_DATA.filter(d => d.pol.a > d.conv.a).length}/{R.days} días · Factor de inestabilidad: pol. alta {R.polAltoPct}%, conv. alta {R.convAltoPct}%
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingTop:4, borderTop:`1px solid ${BORDER}30` }}>
+              <div style={{ display:"flex", gap:8 }}>
+                <span style={{ fontSize:8, fontFamily:font, color:MUTED, display:"flex", alignItems:"center", gap:3 }}><span style={{ width:6, height:6, background:"#dc2626", borderRadius:1 }}/>Pol. alta</span>
+                <span style={{ fontSize:8, fontFamily:font, color:MUTED, display:"flex", alignItems:"center", gap:3 }}><span style={{ width:6, height:6, background:"#16a34a", borderRadius:1 }}/>Conv. alta</span>
+              </div>
+              <span style={{ fontSize:8, fontFamily:font, color:`${MUTED}60` }}>
+                {R.firstDay} – {R.lastDay} · Cada mensaje tiene ambas clasificaciones simultáneas
+              </span>
             </div>
           </Card>
         );
