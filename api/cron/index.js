@@ -595,7 +595,17 @@ module.exports = async function handler(req, res) {
       ];
 
       const criticalBlock = criticalSignals.length > 0
-        ? `\n\nSEÑALES CRÍTICAS DETECTADAS AUTOMÁTICAMENTE (DEBES abordar cada una en tu análisis):\n${criticalSignals.map((s, i) => `⚠ ${i+1}. ${s}`).join("\n")}\n\nIMPORTANTE: Cada señal crítica arriba DEBE reflejarse en la evaluación del actor correspondiente. Un cambio de gabinete (CAMBIO_GABINETE) que involucra a un actor de la lista NUNCA puede resultar en "ALINEADO" para ese actor — como mínimo es "NEUTRO" y probablemente "TENSION".`
+        ? `\n\n╔══════════════════════════════════════════════════════════╗
+║  SEÑALES CRÍTICAS — REGLAS OBLIGATORIAS (NO NEGOCIABLES) ║
+╚══════════════════════════════════════════════════════════╝
+${criticalSignals.map((s, i) => `⚠ ${i+1}. ${s}`).join("\n")}
+
+REGLAS ABSOLUTAS QUE NO PUEDES VIOLAR:
+- Si un titular dice que se DESIGNÓ un NUEVO ministro de Defensa → Vladimir Padrino López fue REEMPLAZADO → Padrino = "TENSION" obligatorio. No importa si fue "ordenado" o "con agradecimiento". Un reemplazo es TENSION, punto.
+- Si un titular dice "designan nuevo ministro" de cualquier cartera → el anterior titular de esa cartera = "TENSION".
+- Un "relevo ordenado" o "transición suave" sigue siendo TENSION — el actor perdió su cargo.
+- NUNCA clasifiques a un actor reemplazado como "ALINEADO". Eso es una contradicción lógica.
+- Si no estás seguro de quién fue reemplazado, pon "TENSION" en los actores más cercanos al cargo.`
         : "";
 
       const prompt = `Eres analista senior de riesgo político del PNUD Venezuela. Evalúas la COHESIÓN INTERNA del gobierno de Delcy Rodríguez post-captura de Maduro (enero 2026).
@@ -674,6 +684,67 @@ Responde SOLO con un JSON array válido (sin markdown, sin backticks):
           const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : clean);
 
           if (Array.isArray(parsed) && parsed.length > 0) {
+            // POST-PROCESSING: Force TENSION on actors involved in cabinet changes
+            // Generic: maps ministry keywords → actors who hold those roles
+            const ROLE_MAP = [
+              { keywords: ["defensa", "defense", "militar"], actors: ["padrino"] },
+              { keywords: ["interior", "justicia", "seguridad"], actors: ["cabello"] },
+              { keywords: ["petróleo", "pdvsa", "energía", "petrol"], actors: [] },
+              { keywords: ["exterior", "cancill", "relaciones exteriores"], actors: ["arreaza"] },
+              { keywords: ["asamblea", "parlamento", "legislat"], actors: ["jorge rodríguez"] },
+            ];
+
+            const cabinetSignals = criticalSignals.filter(s => s.startsWith("[CAMBIO_GABINETE]"));
+            if (cabinetSignals.length > 0) {
+              const cabinetText = cabinetSignals.join(" ").toLowerCase();
+
+              for (const actor of parsed) {
+                if (actor.alignment !== "ALINEADO") continue;
+                const actorName = (actor.actor || "").toLowerCase();
+
+                // Check if any ROLE_MAP entry matches: cabinet change mentions the ministry AND actor holds that role
+                for (const role of ROLE_MAP) {
+                  const ministryMentioned = role.keywords.some(kw => cabinetText.includes(kw));
+                  const actorMatchesRole = role.actors.some(a => actorName.includes(a));
+                  if (ministryMentioned && actorMatchesRole) {
+                    actor.alignment = "TENSION";
+                    actor.confidence = Math.max(actor.confidence || 0.5, 0.85);
+                    actor.evidence = (actor.evidence || "") + " [OVERRIDE: Cambio de gabinete detectado en su área — nuevo designado implica remoción]";
+                    actor.signals = [...(actor.signals || []), "POST-PROCESO: Cambio ministerial en su cartera"];
+                    break;
+                  }
+                }
+
+                // Generic fallback: if actor's own name appears near "reemplaz/sustitu/relev/nuevo" in cabinet signals
+                if (actor.alignment === "ALINEADO") {
+                  const nameWords = actorName.split(" ").filter(w => w.length > 3);
+                  for (const signal of cabinetSignals) {
+                    const sigLow = signal.toLowerCase();
+                    const nameInSignal = nameWords.some(w => sigLow.includes(w));
+                    if (nameInSignal && (sigLow.includes("reemplaz") || sigLow.includes("sustitu") || sigLow.includes("relev") || sigLow.includes("saliente"))) {
+                      actor.alignment = "TENSION";
+                      actor.confidence = Math.max(actor.confidence || 0.5, 0.9);
+                      actor.evidence = (actor.evidence || "") + " [OVERRIDE: Mencionado directamente en señal de cambio de gabinete]";
+                      actor.signals = [...(actor.signals || []), "POST-PROCESO: Nombre aparece en titular de cambio ministerial"];
+                      break;
+                    }
+                  }
+                }
+              }
+
+              // Also: if 3+ cabinet changes in same cycle → FANB and Sector militar go to max NEUTRO
+              if (cabinetSignals.length >= 3) {
+                for (const actor of parsed) {
+                  const name = (actor.actor || "").toLowerCase();
+                  if ((name.includes("fanb") || name.includes("sector militar")) && actor.alignment === "ALINEADO") {
+                    actor.alignment = "NEUTRO";
+                    actor.confidence = Math.min(actor.confidence || 0.5, 0.65);
+                    actor.evidence = (actor.evidence || "") + " [AJUSTE: Reestructuración masiva de gabinete (3+ cambios) genera incertidumbre en sector militar]";
+                  }
+                }
+              }
+            }
+
             // Compute composite ICG score
             const ALIGN_SCORES = { "ALINEADO": 90, "NEUTRO": 50, "TENSION": 15 };
             let totalScore = 0, totalWeight = 0;
