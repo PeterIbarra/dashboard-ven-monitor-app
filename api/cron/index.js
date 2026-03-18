@@ -213,28 +213,55 @@ async function classifyNewsAlerts(errors) {
     }
   } catch {}
 
-  // 3. Merge headlines — Supabase articles + Google News, deduplicate
+  // 3. Source classification
+  const INTL_SOURCES = ["reuters", "bloomberg", "wsj", "wall street journal", "washington post", "cnn", "bbc", "abc", "associated press", "ap news", "france 24", "el país", "elpais", "nyt", "new york times", "the guardian", "financial times", "dw", "al jazeera", "mercopress"];
+  const NAC_GOB = ["vtv", "correo del orinoco", "rnv", "telesur", "últimas noticias", "la iguana", "avn", "aporrea", "canal8"];
+  const NAC_IND = ["efecto cocuyo", "el pitazo", "runrunes", "tal cual", "armando.info", "crónica uno", "prodavinci", "el estímulo", "caracas chronicles", "contrapunto", "provea"];
+
+  function tagSource(source) {
+    const s = (source || "").toLowerCase();
+    if (INTL_SOURCES.some(p => s.includes(p))) return "INTL";
+    if (NAC_GOB.some(p => s.includes(p))) return "NAC-GOB";
+    if (NAC_IND.some(p => s.includes(p))) return "NAC-IND";
+    return "NAC";
+  }
+
+  // 4. Merge headlines — Supabase articles + Google News, deduplicate, tag sources
   const allHeadlines = [];
   const seen = new Set();
   for (const a of articles) {
     const key = (a.title || "").toLowerCase().slice(0, 50);
-    if (!seen.has(key) && a.title?.length > 15) { seen.add(key); allHeadlines.push(`"${a.title}" [${a.source}]`); }
+    const tag = tagSource(a.source);
+    if (!seen.has(key) && a.title?.length > 15) { seen.add(key); allHeadlines.push({ text: `[${tag}] "${a.title}" [${a.source}]`, tag }); }
   }
   for (const g of googleHeadlines) {
     const key = g.title.toLowerCase().slice(0, 50);
-    if (!seen.has(key)) { seen.add(key); allHeadlines.push(`"${g.title}" [${g.source}]`); }
+    const tag = tagSource(g.source);
+    if (!seen.has(key)) { seen.add(key); allHeadlines.push({ text: `[${tag}] "${g.title}" [${g.source}]`, tag }); }
   }
+
+  // Sort: INTL first, then NAC-IND, then NAC-GOB, then NAC
+  const tagOrder = { "INTL": 0, "NAC-IND": 1, "NAC-GOB": 2, "NAC": 3 };
+  allHeadlines.sort((a, b) => (tagOrder[a.tag] || 3) - (tagOrder[b.tag] || 3));
 
   if (allHeadlines.length < 5) {
     errors.push(`Alerts: Only ${allHeadlines.length} headlines found (need 5+)`);
     return { saved: false, provider: null, count: 0 };
   }
 
-  // 4. Build prompt (same as NewsAlerts component)
+  // 5. Build prompt with source hierarchy context
   const prompt = `Eres un sistema de alerta del PNUD Venezuela. Clasifica estos titulares de noticias según su relevancia para el monitoreo de Venezuela.
 
+JERARQUÍA DE FUENTES:
+- [INTL] = Medios internacionales de referencia (Reuters, BBC, Bloomberg, WSJ, CNN, etc.). Si cubren algo de Venezuela, probablemente es significativo — no cubren trivialidades. Considéralo señal de relevancia global.
+- [NAC-IND] = Medios independientes venezolanos (Efecto Cocuyo, El Pitazo, Runrunes, etc.). Más confiables para hechos verificados y señales de tensión en terreno.
+- [NAC-GOB] = Medios oficialistas (VTV, TeleSUR, Correo del Orinoco). Lo que publican revela la narrativa oficial del gobierno — su cobertura o silencio sobre un tema es una señal en sí misma.
+- [NAC] = Otros medios nacionales o regionales.
+- Si un mismo evento aparece en [INTL] y [NAC-IND] con cobertura significativa, es señal fuerte de relevancia.
+- Si aparece en [NAC-GOB] y [NAC-IND] con narrativas opuestas, es señal de fractura informativa — considéralo para nivel 🔴.
+
 TITULARES:
-${allHeadlines.slice(0, 25).map((h, i) => `${i + 1}. ${h}`).join("\n")}
+${allHeadlines.slice(0, 25).map((h, i) => `${i + 1}. ${h.text}`).join("\n")}
 
 INSTRUCCIONES:
 1. Responde SOLO en formato JSON válido, sin markdown ni backticks.
@@ -242,8 +269,9 @@ INSTRUCCIONES:
 3. Ignora completamente titulares sobre otros países o temas no venezolanos.
 4. Cada alerta tiene: "nivel" (🔴/🟡/🟢), "titular", "fuente", "dimension" (POLÍTICO/ECONÓMICO/INTERNACIONAL/DDHH/ENERGÍA), "impacto" (1 frase corta de por qué es relevante).
 5. 🔴 = Evento urgente que podría mover escenarios. 🟡 = Desarrollo relevante para seguimiento. 🟢 = Contexto informativo.
-6. Máximo 8 alertas. Prioriza las más relevantes.
-7. Formato exacto:
+6. Usa la jerarquía de fuentes como factor adicional para determinar el nivel — no como regla automática sino como contexto de credibilidad y relevancia.
+7. Máximo 8 alertas. Prioriza las más relevantes.
+8. Formato exacto:
 [{"nivel":"🔴","titular":"...","fuente":"...","dimension":"...","impacto":"..."}]`;
 
   // 5. Call AI cascade
