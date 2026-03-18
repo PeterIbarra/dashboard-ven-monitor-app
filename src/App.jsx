@@ -8562,14 +8562,26 @@ export default function MonitorPNUD() {
         }
       } catch {}
       try {
-        // Government Cohesion Index (ICG)
-        // Get latest SITREP score from ICG_HISTORY for cohesion anchor
-        const latestSitrep = [...ICG_HISTORY].reverse().find(h => h.sitrep && h.score != null);
-        const sitrepParam = latestSitrep ? `&sitrep=${latestSitrep.score}` : "";
-        const cohUrl = IS_DEPLOYED ? `/api/news?source=cohesion${sitrepParam}&_t=${Math.floor(Date.now()/600000)}` : null;
-        if (cohUrl) {
-          const cRes = await fetch(cohUrl, { signal:AbortSignal.timeout(15000) }).then(r=>r.ok?r.json():null).catch(()=>null);
-          if (cRes?.index != null) results.cohesion = cRes;
+        // Government Cohesion Index (ICG) — from Supabase cache (cron saves every 8h)
+        if (IS_DEPLOYED) {
+          const cRes = await fetch(`/api/articles?type=icg&_t=${Math.floor(Date.now()/600000)}`, { signal:AbortSignal.timeout(6000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          if (cRes?.cached && cRes.icg?.index != null) {
+            const icg = cRes.icg;
+            const level = icg.index >= 75 ? "ALTA" : icg.index >= 55 ? "MEDIA" : icg.index >= 35 ? "BAJA" : "CRITICA";
+            const actors = (icg.actors || []).map(a => ({
+              actor: a.actor?.toLowerCase().replace(/\s+/g,"").slice(0,12) || "unknown",
+              name: a.actor, status: a.alignment,
+              confidence: a.confidence, evidence: a.evidence, signals: a.signals || [],
+              mentions: 0, tone: 0, topHeadlines: [],
+            }));
+            const systemic = actors.filter(a => ["psuv","chavismo","colectivo","gobernador","militar","sector"].some(s => a.name?.toLowerCase().includes(s)));
+            const individual = actors.filter(a => !systemic.includes(a));
+            results.cohesion = {
+              index: icg.index, level, actors: individual, systemic,
+              engine: `cached/${icg.provider || "cron"}`, fetchedAt: icg.date + "T06:00:00Z",
+              cachedDate: icg.date, hasSitrep: true,
+            };
+          }
         }
       } catch {}
       setLiveData(results);
