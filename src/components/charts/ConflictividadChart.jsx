@@ -1,6 +1,6 @@
 import { memo, useState } from "react";
-import { CONF_SEMANAL } from "../../data/weekly.js";
-import { BORDER, MUTED, font } from "../../constants";
+import { CONF_HISTORICO } from "../../data/static.js";
+import { BORDER, MUTED, ACCENT, font } from "../../constants";
 
 export const ConflictividadChart = memo(function ConflictividadChart() {
   const max = Math.max(...CONF_HISTORICO.map(h=>h.p));
