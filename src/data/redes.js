@@ -65,3 +65,26 @@ export const REDES_DATA = [
   {d:"Feb-22",pol:{a:36342,m:12882,b:826,n:0,t:50050},conv:{a:1304,m:31116,b:295,n:17335,t:50050}},
   {d:"Feb-23",pol:{a:8324,m:3546,b:1407,n:988,t:14265},conv:{a:5,m:6315,b:1775,n:6170,t:14265}},
 ];
+
+// Precomputed aggregates for Polarización/Convivencia
+export const REDES_TOTALS = (() => {
+  const total = REDES_DATA.reduce((s,d) => s + d.pol.t, 0);
+  const totPolA = REDES_DATA.reduce((s,d) => s + d.pol.a, 0);
+  const totPolM = REDES_DATA.reduce((s,d) => s + d.pol.m, 0);
+  const totConvA = REDES_DATA.reduce((s,d) => s + d.conv.a, 0);
+  const totConvM = REDES_DATA.reduce((s,d) => s + d.conv.m, 0);
+  const polAltoPct = (totPolA / total * 100).toFixed(1);
+  const convAltoPct = (totConvA / total * 100).toFixed(1);
+  const netIdx = (polAltoPct - convAltoPct).toFixed(1);
+  const weeks = [];
+  for (let i = 0; i < REDES_DATA.length; i += 7) {
+    const chunk = REDES_DATA.slice(i, i + 7);
+    const wPA = chunk.reduce((s,d) => s + d.pol.a, 0);
+    const wCA = chunk.reduce((s,d) => s + d.conv.a, 0);
+    const wT = chunk.reduce((s,d) => s + d.pol.t, 0);
+    weeks.push({ label: chunk[0].d + "–" + chunk[chunk.length-1].d, polA:wPA, convA:wCA, total:wT, ratio: wCA > 0 ? +(wPA/wCA).toFixed(1) : null });
+  }
+  const last7 = REDES_DATA.slice(-7);
+  return { total, totPolA, totPolM, totConvA, totConvM, polAltoPct, convAltoPct, netIdx, weekly:weeks,
+    days: REDES_DATA.length, firstDay: REDES_DATA[0].d, lastDay: REDES_DATA[REDES_DATA.length-1].d, last7 };
+})();
