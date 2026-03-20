@@ -1,0 +1,81 @@
+// Monitor indicators — 22 indicators across 4 dimensions
+// Updated each SITREP cycle (hist arrays get new entries)
+export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6"];
+
+export const INDICATORS = [
+  // ── ENERGÉTICO ──
+  { dim:"Energético", icon:"⚡", esc:"E3", name:"Exportaciones de crudo", desc:"Volumen semanal bajo licencias OFAC",
+    umbral:"Sostenimiento >750 kbd. Caída <600 kbd activa alerta.",
+    hist:[["green","up","~500 kbd"],["green","up","~620 kbd"],["green","up","~700 kbd"],["green","up","~740 kbd"],["green","up","~770 kbd"],["green","up","~800 kbd ↑60.6%"]] },
+  { dim:"Energético", icon:"⚡", esc:"E3", name:"Ventas petroleras (ingresos)", desc:"Acuerdos bajo GL49 y GL50/50A",
+    umbral:"Flujo regular a banca PDVSA. Interrupción >2 sem activa E2.",
+    hist:[["yellow","flat","En negociación"],["yellow","up","Acuerdos Vitol/Trafigura"],["green","up","Proy. USD 3-4B"],["green","up","Contratos activos"],["green","up","India + EE.UU."],["green","up","Proy. USD 6.000M"]] },
+  { dim:"Energético", icon:"⚡", esc:"E3", name:"Licencias OFAC activas", desc:"GL49, GL50, GL50A — cobertura operativa",
+    umbral:"Revocación activa E2/E4. FAQ 1238 incluye Cuba condicionado.",
+    hist:[["green","flat","GL49 activa"],["green","flat","GL49 + GL50"],["green","flat","Sin cambios"],["green","flat","Sin cambios"],["green","flat","GL50/50A vigentes"],["green","flat","FAQ 1238 Cuba"]] },
+  { dim:"Energético", icon:"⚡", esc:"E3", name:"Producción Chevron", desc:"Operaciones directas en bloques venezolanos",
+    umbral:"Expansión confirma E3. Suspensión reactiva E2.",
+    hist:[["yellow","flat","Operación básica"],["yellow","up","Autorización ampliada"],["green","up","Incremento confirmado"],["green","up","Ampliación activa"],["yellow","flat","Revisión 19 contratos"],["yellow","up","Expansión anunciada"]] },
+  { dim:"Energético", icon:"⚡", esc:"E2", name:"Infraestructura de refinación", desc:"Capacidad operativa refinerías nacionales",
+    umbral:"Operación <25% capacidad instalada. Mantenimiento diferido.",
+    hist:[["red","flat","<20% capacidad"],["red","flat","Sin mejora"],["red","flat","Mantenimiento pendiente"],["red","flat","Exportación compensa"],["red","flat","Crítica pero estable"],["red","flat","Sin cambio"]] },
+  { dim:"Energético", icon:"⚡", esc:"E2", name:"Taladros activos", desc:"Operaciones de perforación nuevas",
+    umbral:"<30 taladros activos. Recuperación <5% anual vs 2014.",
+    hist:[["red","flat","Bajo histórico"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","Sin variación"],["red","flat","Sin variación"]] },
+
+  // ── POLÍTICO ──
+  { dim:"Político", icon:"🏛", esc:"E3", name:"Ley de Amnistía", desc:"Operativización y verificación independiente",
+    umbral:"Brecha oficial vs. verificado. >50% sin verificar activa E4.",
+    hist:[["yellow","flat","Anunciada"],["yellow","up","Aprobada AN"],["yellow","up","Primeras excarcelaciones"],["green","up","Comisión operativa"],["green","up","1.200+ beneficiados"],["green","up","4.203 sol. · 568 verif."]] },
+  { dim:"Político", icon:"🏛", esc:"E3", name:"Excarcelaciones verificadas", desc:"Foro Penal: presos políticos activos",
+    umbral:"Ritmo <20/sem o reversión activa E4.",
+    hist:[["yellow","flat","0 verificadas"],["yellow","up","12 verificadas"],["yellow","up","45 verificadas"],["yellow","up","78 verificadas"],["yellow","up","108 verificadas"],["yellow","flat","126 verif. · 568 activos"]] },
+  { dim:"Político", icon:"🏛", esc:"E4", name:"Cohesión FANB", desc:"Señales de fractura o lealtad institucional",
+    umbral:"Fractura visible = E4/E2 inmediato.",
+    hist:[["yellow","flat","Sin señales fractura"],["yellow","flat","Sin señales fractura"],["yellow","flat","Ajustes menores"],["yellow","down","Presión cooperación EE.UU."],["yellow","down","Cubanos retirándose"],["yellow","down","Cubanos salen · SOUTHCOM"]] },
+  { dim:"Político", icon:"🏛", esc:"E3", name:"Reorganización del Ejecutivo", desc:"Capacidad de gestión institucional",
+    umbral:"Reconfiguración técnica → E1. Política → E4.",
+    hist:[["yellow","flat","Maduro removido"],["yellow","up","Delcy consolida"],["green","up","Gabinete activo"],["green","up","Estructura operativa"],["green","up","Cancillería reestructurada"],["green","up","Poder Ciudadano: encargados"]] },
+  { dim:"Político", icon:"🏛", esc:"E1", name:"Agenda electoral", desc:"Calendario y compromisos electorales concretos",
+    umbral:"Anuncio formal de fecha = E1 gana probabilidad.",
+    hist:[["red","flat","Sin agenda"],["red","flat","Sin agenda"],["yellow","flat","Señales vagas"],["yellow","up","Rubio: legitimación req."],["yellow","up","Presión EE.UU. activa"],["yellow","up","Rubio reitera exigencia"]] },
+  { dim:"Político", icon:"🏛", esc:"E4", name:"Marcos restrictivos vigentes", desc:"Leyes de odio, terrorismo, delitos de expresión",
+    umbral:"Activación contra oposición = E4. Derogación = E1.",
+    hist:[["red","flat","Ley Odio vigente"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["red","flat","Stalin exige derogar"]] },
+
+  // ── ECONÓMICO ──
+  { dim:"Económico", icon:"📊", esc:"E2", name:"Brecha cambiaria", desc:"Diferencial BCV vs. mercado paralelo",
+    umbral:"Brecha >55% activa E2. <30% fortalece E3.",
+    hist:[["green","flat","~15%"],["green","flat","~18%"],["yellow","down","~28%"],["yellow","down","~35%"],["yellow","down","~46%"],["yellow","down","52,6% · 631 vs 414"]] },
+  { dim:"Económico", icon:"📊", esc:"E2", name:"Inflación", desc:"Tasa mensual proyectada",
+    umbral:"Retorno a >30% mensual activa E2.",
+    hist:[["yellow","flat","~12% mensual"],["yellow","flat","~10% mensual"],["yellow","up","~8% mensual"],["yellow","up","Desacelerando"],["yellow","up","~6% proyectado"],["yellow","up","FMI: tres dígitos anual"]] },
+  { dim:"Económico", icon:"📊", esc:"E2", name:"Ingresos de la población", desc:"Salario mínimo y poder adquisitivo real",
+    umbral:"47 meses sin ajuste. Ingreso ~USD 270 vs canasta USD 550.",
+    hist:[["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","Sin ajuste"],["red","flat","47 meses sin ajuste"],["red","flat","Ajuste prometido"]] },
+  { dim:"Económico", icon:"📊", esc:"E2", name:"Sistema eléctrico", desc:"Disponibilidad y frecuencia de cortes",
+    umbral:"Cortes >4h/día en zonas urbanas activa presión social.",
+    hist:[["red","flat","Cortes frecuentes"],["red","flat","Sin mejora"],["red","flat","Sin mejora"],["red","flat","Sin mejora"],["red","flat","Crítico"],["red","flat","Crítico · sin inversión"]] },
+  { dim:"Económico", icon:"📊", esc:"E3", name:"Percepción dirección del país", desc:"Encuestas de opinión pública",
+    umbral:">60% percepción positiva sostiene E3.",
+    hist:[["yellow","flat","~35% positivo"],["yellow","up","~40% positivo"],["yellow","up","~44% positivo"],["green","up","~48% positivo"],["green","up","~50% positivo"],["green","up","51,5% mejor s/ Maduro"]] },
+
+  // ── INTERNACIONAL ──
+  { dim:"Internacional", icon:"🌐", esc:"E3", name:"Cooperación EE.UU.–Venezuela", desc:"Nivel operativo de acuerdos bilaterales",
+    umbral:"Ruptura = E4/E2. Profundización = E1.",
+    hist:[["yellow","up","Negociaciones iniciales"],["yellow","up","Petróleo fluye"],["green","up","SOUTHCOM reunión"],["green","up","Visitas técnicas"],["green","up","Plan 3 fases"],["green","up","Trump \"nuevo amigo\""]] },
+  { dim:"Internacional", icon:"🌐", esc:"E3", name:"Sanciones UE", desc:"Estado de sanciones europeas",
+    umbral:"Levantamiento parcial fortalece E3.",
+    hist:[["red","flat","Sanciones plenas"],["red","flat","Sin cambio"],["red","flat","Sin cambio"],["yellow","up","Señales apertura"],["yellow","up","Diálogo España"],["yellow","up","España propone levantar"]] },
+  { dim:"Internacional", icon:"🌐", esc:"E3", name:"China y Rusia", desc:"Balanza estratégica en contexto acercamiento EE.UU.",
+    umbral:"Ruptura con China/Rusia por presión EE.UU. fragiliza E3.",
+    hist:[["green","flat","Alineación plena"],["green","flat","Sin cambio"],["green","down","Señales tensión"],["yellow","down","Rebalanceo activo"],["yellow","down","Reducción presencia rusa"],["yellow","down","Cuba retira asesores"]] },
+  { dim:"Internacional", icon:"🌐", esc:"E1", name:"FMI y reinserción financiera", desc:"Diálogo con IFIs y acceso a mercados",
+    umbral:"Acuerdo FMI = E1 clave. 'Intensa Fragilidad' sostiene E2.",
+    hist:[["red","flat","Fragmentación total"],["red","flat","Sin diálogo"],["red","flat","Sin diálogo"],["yellow","up","Señales apertura"],["yellow","up","Reuniones técnicas"],["yellow","up","FMI: Intensa Fragilidad"]] },
+  { dim:"Internacional", icon:"🌐", esc:"E3", name:"Normalización diplomática", desc:"Reapertura embajadas y relaciones bilaterales",
+    umbral:"Reapertura embajada EE.UU. = E1/E3 consolidado.",
+    hist:[["yellow","flat","Limitada"],["yellow","up","Señales apertura"],["green","up","Múltiples contactos"],["green","up","Visitas ministros"],["green","up","Cancillería reestructurada"],["green","up","Tajani · Petro-Delcy 14 mar"]] },
+];
+
+// Señales por escenario (solo semana más reciente)
