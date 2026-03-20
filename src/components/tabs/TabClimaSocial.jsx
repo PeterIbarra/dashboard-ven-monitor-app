@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { Card } from "../Card";
 import { RedesChart } from "../charts/RedesChart";
+import { TabCohesion } from "./TabCohesion";
 import { REDES_DATA } from "../../data/redes.js";
 import { REDES_TOTALS } from "../../data/redes.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "../../constants";
