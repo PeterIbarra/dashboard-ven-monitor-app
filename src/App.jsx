@@ -21,7 +21,6 @@ import { TabDashboard } from "./components/tabs/TabDashboard";
 import { TabSitrep } from "./components/tabs/TabSitrep";
 import { TabMatriz } from "./components/tabs/TabMatriz";
 import { TabMonitor } from "./components/tabs/TabMonitor";
-import { TabCohesion } from "./components/tabs/TabCohesion";
 import { TabClimaSocial } from "./components/tabs/TabClimaSocial";
 import { TabGdelt } from "./components/tabs/TabGdelt";
 import { TabConflictividad } from "./components/tabs/TabConflictividad";
@@ -405,7 +404,7 @@ export default function MonitorPNUD() {
       <div style={{ textAlign:"center", fontSize:12, fontFamily:font, color:`${MUTED}60`, padding:"8px 0 4px", letterSpacing:"0.1em", textTransform:"uppercase" }}>
         PNUD Venezuela · Monitor Situacional · Uso interno · {WEEKS[week].label}
       </div>
-      <MethodologyFooter mob={useIsMobile()} />
+      <MethodologyFooter mob={mob} />
     </div>
   );
 }
