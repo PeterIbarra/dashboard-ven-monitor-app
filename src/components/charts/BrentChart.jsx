@@ -1,5 +1,6 @@
 import { memo, useRef, useCallback, useState } from "react";
 import { Card } from "../Card";
+import { Badge } from "../Badge";
 import { ACCENT, BORDER, MUTED, font } from "../../constants";
 import { exportChartToPDF } from "../../utils";
 

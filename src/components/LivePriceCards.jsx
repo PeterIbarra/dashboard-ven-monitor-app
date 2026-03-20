@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card } from "./Card";
 import { Badge } from "./Badge";
+import { BrentChart } from "./charts/BrentChart";
+import { VenProductionChart } from "./charts/VenProductionChart";
 import { MUTED, font } from "../constants";
 import { IS_DEPLOYED, CORS_PROXIES } from "../utils";
 
