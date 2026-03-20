@@ -1,4 +1,5 @@
 import { memo, useState, useEffect } from "react";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { BG2, BG3, BORDER, TEXT, MUTED, font, fontSans } from "../constants";
 import { IS_DEPLOYED } from "../utils";
 

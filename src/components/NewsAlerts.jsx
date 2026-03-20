@@ -1,6 +1,7 @@
 import { memo, useState, useEffect, useRef } from "react";
 import { Card } from "./Card";
 import { BORDER, TEXT, MUTED, font, fontSans } from "../constants";
+import { IS_DEPLOYED } from "../utils";
 
 export const NewsAlerts = memo(function NewsAlerts({ liveData, mob }) {
   const [alerts, setAlerts] = useState(null);

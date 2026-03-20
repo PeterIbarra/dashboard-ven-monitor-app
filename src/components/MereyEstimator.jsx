@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { Card } from "./Card";
 import { BG, ACCENT, BORDER, MUTED, font } from "../constants";
 
