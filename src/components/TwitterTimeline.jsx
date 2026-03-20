@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { loadScript } from "../utils";
 
 export function TwitterTimeline({ handle, height=280 }) {

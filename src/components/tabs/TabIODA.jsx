@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BORDER, TEXT, MUTED, ACCENT, font } from "../../constants";
 import { IS_DEPLOYED, CORS_PROXIES } from "../../utils";
 import { useIsMobile } from "../../hooks/useIsMobile";

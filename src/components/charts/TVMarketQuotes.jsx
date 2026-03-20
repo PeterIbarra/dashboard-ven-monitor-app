@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { BG2, BORDER, MUTED, font } from "../../constants";
 
 export function TVMarketQuotes({ title, height=350, groups }) {

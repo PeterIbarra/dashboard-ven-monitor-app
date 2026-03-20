@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 
 export function TradingViewMini({ symbol, height=280 }) {
   const id = useMemo(() => `tv-${Math.random().toString(36).slice(2,8)}`, []);
