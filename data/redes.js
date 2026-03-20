@@ -1,0 +1,90 @@
+// ═══════════════════════════════════════════════════════════════
+// Polarización & Convivencia en Redes Sociales — Red X
+// Ene 3 – Feb 23, 2026 · 52 días · 4.2M interacciones
+//
+// Cada interacción (post+likes+reposts) clasificada en DOS dimensiones simultáneas:
+//   Polarización: Alto / Moderado / Bajo / Ninguno
+//   Convivencia:  Alto / Moderado / Bajo / Ninguno
+//
+// d=día, pol=Polarización, conv=Convivencia
+// a=alto, m=moderado, b=bajo, n=ninguno, t=total
+// Actualización: irregular — cuando el proveedor entregue nuevos cortes
+// ═══════════════════════════════════════════════════════════════
+
+export const REDES_DATA = [
+  {d:"Ene-3",pol:{a:72803,m:119033,b:3621,n:0,t:195457},conv:{a:69326,m:92971,b:1075,n:32085,t:195457}},
+  {d:"Ene-4",pol:{a:31906,m:58952,b:22,n:290,t:91170},conv:{a:2043,m:51470,b:23886,n:13771,t:91170}},
+  {d:"Ene-5",pol:{a:47625,m:52650,b:31,n:39,t:100345},conv:{a:182,m:53273,b:1816,n:45074,t:100345}},
+  {d:"Ene-6",pol:{a:43579,m:17629,b:274,n:31,t:61513},conv:{a:21,m:37397,b:12037,n:12058,t:61513}},
+  {d:"Ene-7",pol:{a:64359,m:12843,b:1417,n:28,t:78647},conv:{a:219,m:49571,b:805,n:28052,t:78647}},
+  {d:"Ene-8",pol:{a:294550,m:210348,b:20006,n:2518,t:527422},conv:{a:21958,m:310351,b:13890,n:181223,t:527422}},
+  {d:"Ene-9",pol:{a:137206,m:63313,b:1515,n:661,t:202695},conv:{a:757,m:167600,b:3682,n:30656,t:202695}},
+  {d:"Ene-10",pol:{a:275,m:0,b:0,n:0,t:275},conv:{a:0,m:0,b:0,n:275,t:275}},
+  {d:"Ene-11",pol:{a:16931,m:4861,b:6846,n:73,t:28711},conv:{a:988,m:8389,b:141,n:19193,t:28711}},
+  {d:"Ene-12",pol:{a:12334,m:17785,b:786,n:176,t:31081},conv:{a:8026,m:17449,b:600,n:5006,t:31081}},
+  {d:"Ene-13",pol:{a:4128,m:29672,b:29996,n:820,t:64616},conv:{a:3895,m:20402,b:458,n:39861,t:64616}},
+  {d:"Ene-14",pol:{a:24592,m:8559,b:3447,n:167,t:36765},conv:{a:3007,m:14267,b:710,n:18781,t:36765}},
+  {d:"Ene-15",pol:{a:28400,m:3383,b:98,n:0,t:31881},conv:{a:143,m:23738,b:780,n:7220,t:31881}},
+  {d:"Ene-16",pol:{a:1618,m:8602,b:89,n:16,t:10325},conv:{a:3505,m:2532,b:41,n:4247,t:10325}},
+  {d:"Ene-17",pol:{a:31353,m:7160,b:0,n:0,t:38513},conv:{a:0,m:34744,b:729,n:3040,t:38513}},
+  {d:"Ene-18",pol:{a:7968,m:2366,b:402,n:328,t:11064},conv:{a:67,m:4954,b:402,n:5641,t:11064}},
+  {d:"Ene-19",pol:{a:38057,m:33043,b:6682,n:0,t:77782},conv:{a:5257,m:36200,b:6877,n:29448,t:77782}},
+  {d:"Ene-20",pol:{a:25368,m:136129,b:47240,n:5142,t:213879},conv:{a:69432,m:95524,b:23868,n:25055,t:213879}},
+  {d:"Ene-21",pol:{a:38037,m:22301,b:3069,n:109,t:63516},conv:{a:5263,m:34097,b:6931,n:17225,t:63516}},
+  {d:"Ene-22",pol:{a:19786,m:38975,b:27388,n:9588,t:95737},conv:{a:26454,m:38472,b:1752,n:29059,t:95737}},
+  {d:"Ene-23",pol:{a:30326,m:23704,b:6724,n:1991,t:62745},conv:{a:1098,m:26428,b:1983,n:33236,t:62745}},
+  {d:"Ene-24",pol:{a:30956,m:11414,b:3592,n:0,t:45962},conv:{a:27,m:35304,b:458,n:10173,t:45962}},
+  {d:"Ene-25",pol:{a:69464,m:17223,b:12624,n:10126,t:109437},conv:{a:656,m:38648,b:8804,n:61329,t:109437}},
+  {d:"Ene-26",pol:{a:33308,m:29592,b:1337,n:129,t:64366},conv:{a:646,m:34103,b:1804,n:27813,t:64366}},
+  {d:"Ene-27",pol:{a:70591,m:7979,b:1123,n:150,t:79843},conv:{a:794,m:42895,b:468,n:35686,t:79843}},
+  {d:"Ene-28",pol:{a:78379,m:55817,b:32573,n:45,t:166814},conv:{a:15753,m:57807,b:34316,n:58938,t:166814}},
+  {d:"Ene-29",pol:{a:6959,m:23260,b:718,n:1189,t:32126},conv:{a:1094,m:15497,b:767,n:14768,t:32126}},
+  {d:"Ene-30",pol:{a:119876,m:65947,b:4692,n:0,t:190515},conv:{a:4162,m:123748,b:13460,n:49145,t:190515}},
+  {d:"Ene-31",pol:{a:71845,m:108233,b:2019,n:82,t:182179},conv:{a:2093,m:127506,b:1169,n:51411,t:182179}},
+  {d:"Feb-1",pol:{a:23787,m:35905,b:1352,n:4971,t:66015},conv:{a:7513,m:40828,b:2257,n:15417,t:66015}},
+  {d:"Feb-2",pol:{a:42168,m:26681,b:18196,n:344,t:87389},conv:{a:13239,m:42998,b:13196,n:17956,t:87389}},
+  {d:"Feb-3",pol:{a:56720,m:32300,b:12553,n:1552,t:103125},conv:{a:4820,m:56309,b:4159,n:37837,t:103125}},
+  {d:"Feb-4",pol:{a:83594,m:39189,b:2440,n:82,t:125305},conv:{a:1563,m:74818,b:5761,n:43163,t:125305}},
+  {d:"Feb-5",pol:{a:29577,m:35354,b:6637,n:1944,t:73512},conv:{a:10183,m:31181,b:11983,n:20165,t:73512}},
+  {d:"Feb-6",pol:{a:30537,m:16304,b:13487,n:296,t:60624},conv:{a:873,m:40266,b:2888,n:16597,t:60624}},
+  {d:"Feb-7",pol:{a:54799,m:20548,b:1457,n:185,t:76989},conv:{a:3712,m:27062,b:2616,n:43599,t:76989}},
+  {d:"Feb-8",pol:{a:47548,m:38781,b:9317,n:2418,t:98064},conv:{a:7958,m:56015,b:4313,n:29778,t:98064}},
+  {d:"Feb-9",pol:{a:74580,m:22215,b:1047,n:4283,t:102125},conv:{a:2021,m:73317,b:777,n:26010,t:102125}},
+  {d:"Feb-10",pol:{a:32126,m:23731,b:570,n:30,t:56457},conv:{a:104,m:37868,b:1867,n:16618,t:56457}},
+  {d:"Feb-11",pol:{a:21007,m:11573,b:358,n:0,t:32938},conv:{a:1367,m:19291,b:676,n:11604,t:32938}},
+  {d:"Feb-12",pol:{a:51471,m:27707,b:8346,n:240,t:87764},conv:{a:8877,m:40896,b:5292,n:32699,t:87764}},
+  {d:"Feb-13",pol:{a:23344,m:3730,b:4437,n:370,t:31881},conv:{a:1518,m:18530,b:2611,n:9222,t:31881}},
+  {d:"Feb-14",pol:{a:6182,m:11103,b:1472,n:259,t:19016},conv:{a:1519,m:15211,b:389,n:1897,t:19016}},
+  {d:"Feb-15",pol:{a:16996,m:5365,b:2375,n:32,t:24768},conv:{a:1923,m:20161,b:715,n:1969,t:24768}},
+  {d:"Feb-16",pol:{a:18325,m:6378,b:404,n:1226,t:26333},conv:{a:1589,m:12261,b:2634,n:9849,t:26333}},
+  {d:"Feb-17",pol:{a:8765,m:6571,b:622,n:167,t:16125},conv:{a:0,m:8470,b:0,n:7655,t:16125}},
+  {d:"Feb-18",pol:{a:6068,m:14143,b:380,n:311,t:20902},conv:{a:705,m:14432,b:351,n:5414,t:20902}},
+  {d:"Feb-19",pol:{a:44945,m:6867,b:1738,n:923,t:54473},conv:{a:362,m:20950,b:880,n:32281,t:54473}},
+  {d:"Feb-20",pol:{a:18448,m:22285,b:2282,n:0,t:43015},conv:{a:2117,m:24033,b:5083,n:11782,t:43015}},
+  {d:"Feb-21",pol:{a:21240,m:26415,b:6211,n:0,t:53866},conv:{a:5654,m:42747,b:501,n:4964,t:53866}},
+  {d:"Feb-22",pol:{a:36342,m:12882,b:826,n:0,t:50050},conv:{a:1304,m:31116,b:295,n:17335,t:50050}},
+  {d:"Feb-23",pol:{a:8324,m:3546,b:1407,n:988,t:14265},conv:{a:5,m:6315,b:1775,n:6170,t:14265}},
+];
+
+// Precomputed aggregates for Polarización/Convivencia
+export const REDES_TOTALS = (() => {
+  const total = REDES_DATA.reduce((s,d) => s + d.pol.t, 0);
+  const totPolA = REDES_DATA.reduce((s,d) => s + d.pol.a, 0);
+  const totPolM = REDES_DATA.reduce((s,d) => s + d.pol.m, 0);
+  const totConvA = REDES_DATA.reduce((s,d) => s + d.conv.a, 0);
+  const totConvM = REDES_DATA.reduce((s,d) => s + d.conv.m, 0);
+  const polAltoPct = (totPolA / total * 100).toFixed(1);
+  const convAltoPct = (totConvA / total * 100).toFixed(1);
+  const netIdx = (polAltoPct - convAltoPct).toFixed(1);
+  const weeks = [];
+  for (let i = 0; i < REDES_DATA.length; i += 7) {
+    const chunk = REDES_DATA.slice(i, i + 7);
+    const wPA = chunk.reduce((s,d) => s + d.pol.a, 0);
+    const wCA = chunk.reduce((s,d) => s + d.conv.a, 0);
+    const wT = chunk.reduce((s,d) => s + d.pol.t, 0);
+    weeks.push({ label: chunk[0].d + "–" + chunk[chunk.length-1].d, polA:wPA, convA:wCA, total:wT, ratio: wCA > 0 ? +(wPA/wCA).toFixed(1) : null });
+  }
+  const last7 = REDES_DATA.slice(-7);
+  return { total, totPolA, totPolM, totConvA, totConvM, polAltoPct, convAltoPct, netIdx, weekly:weeks,
+    days: REDES_DATA.length, firstDay: REDES_DATA[0].d, lastDay: REDES_DATA[REDES_DATA.length-1].d, last7 };
+})();
