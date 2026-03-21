@@ -20,7 +20,7 @@ module.exports = async function handler(req, res) {
     if (sbUrl && sbKey) {
       try {
         const sbRes = await fetch(
-          `${sbUrl}/rest/v1/daily_readings?select=brent,wti,date&order=date.desc&limit=1`,
+          `${sbUrl}/rest/v1/daily_readings?select=brent,wti,natgas,date&order=date.desc&limit=1`,
           { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` }, signal: AbortSignal.timeout(5000) }
         );
         if (sbRes.ok) {
@@ -28,6 +28,7 @@ module.exports = async function handler(req, res) {
           if (rows.length > 0 && rows[0].brent) {
             brent = { price: rows[0].brent, created_at: rows[0].date + "T06:00:00Z" };
             if (rows[0].wti) wti = { price: rows[0].wti, created_at: rows[0].date + "T06:00:00Z" };
+            if (rows[0].natgas) natgas = { price: rows[0].natgas, created_at: rows[0].date + "T06:00:00Z" };
             liveSource = "supabase-cached";
           }
         }
