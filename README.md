@@ -141,7 +141,7 @@ Visualizaciones disponibles: gráfica espejo (polarización arriba, convivencia 
 
 **📋 Metodología** — Explicación técnica completa: definición de cada nivel de polarización y convivencia, unidad de análisis (interacción, no mensaje), cobertura temporal, fuente de datos y notas sobre actualización.
 
-Datos: ~4.2 millones de interacciones, 52 días continuos (enero–febrero 2026). Se actualiza cuando el proveedor entrega nuevos cortes — no es automático.
+Datos: ~4.2 millones de interacciones, 52 días continuos (enero–febrero 2026). Se actualiza cuando el equipo del PNUD entrega nuevos cortes — no es automático.
 
 ---
 
