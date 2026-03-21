@@ -305,7 +305,7 @@ export function TabClimaSocial({ liveData = {} }) {
             <b>Cobertura:</b> {R.days} días continuos ({R.firstDay} – {R.lastDay}). {(R.total/1e6).toFixed(1)} millones de interacciones totales. Los totales diarios son idénticos entre polarización y convivencia porque son dos clasificaciones del mismo universo de mensajes.
           </div>
           <div style={{ fontSize:12, color:MUTED, lineHeight:1.7, marginTop:6 }}>
-            <b>Actualización:</b> Irregular — se actualiza cuando el proveedor entrega nuevos cortes de datos.
+            <b>Actualización:</b> Se actualiza cuando el equipo del PNUD entrega nuevos cortes — no es automático.
           </div>
           <div style={{ fontSize:12, color:MUTED, lineHeight:1.7, marginTop:6 }}>
             <b>Fuente:</b> Análisis especializado de redes sociales · Red X · Clasificación por niveles de contenido.
