@@ -177,24 +177,47 @@ export default function MonitorPNUD() {
           }
         }
       } catch {}
-      // IODA — quick national connectivity check for alerts
+      // IODA — national + 5 critical states connectivity check for alerts
       try {
         if (IS_DEPLOYED) {
           const now = Math.floor(Date.now() / 1000);
-          const from = now - 6 * 3600; // last 6 hours
-          const iRes = await fetch(`/api/ioda?path=signals/raw/country/VE&from=${from}&until=${now}`, { signal:AbortSignal.timeout(10000) }).then(r=>r.ok?r.json():null).catch(()=>null);
-          if (iRes?.data) {
-            const raw = Array.isArray(iRes.data) ? iRes.data.flat() : [];
+          const from = now - 6 * 3600;
+          // Helper: get probing health from IODA signals
+          const getHealth = async (path) => {
+            const r = await fetch(`/api/ioda?path=${path}&from=${from}&until=${now}`, { signal:AbortSignal.timeout(8000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+            if (!r?.data) return null;
+            const raw = Array.isArray(r.data) ? r.data.flat() : [];
             const probing = raw.find(s => s.datasource === "ping-slash24");
-            if (probing?.values?.length > 0) {
-              const vals = probing.values.filter(v => v !== null);
-              const current = vals[vals.length - 1] || 0;
-              const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.1)));
-              const baseAvg = baseline.reduce((a,b) => a+b, 0) / baseline.length || 1;
-              const healthPct = Math.min(100, Math.round((current / baseAvg) * 100));
-              results.ioda = { avgHealth: healthPct, nationalCurrent: current, nationalBaseline: Math.round(baseAvg) };
-            }
-          }
+            if (!probing?.values?.length) return null;
+            const vals = probing.values.filter(v => v !== null);
+            if (vals.length < 5) return null;
+            const current = vals[vals.length - 1];
+            const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.1)));
+            const baseAvg = baseline.reduce((a,b) => a+b, 0) / baseline.length || 1;
+            return { health: Math.min(100, Math.round((current / baseAvg) * 100)), current, baseline: Math.round(baseAvg) };
+          };
+          // National
+          const nat = await getHealth("signals/raw/country/VE");
+          // 5 critical states in parallel (Táchira, Barinas, Lara, Zulia, Trujillo)
+          const criticalStates = [
+            { code:"4020", name:"Táchira" }, { code:"4005", name:"Barinas" },
+            { code:"4013", name:"Lara" }, { code:"4024", name:"Zulia" }, { code:"4021", name:"Trujillo" },
+          ];
+          const stateResults = await Promise.allSettled(
+            criticalStates.map(async st => {
+              const h = await getHealth(`signals/raw/region/${st.code}`);
+              return h ? { ...st, ...h } : null;
+            })
+          );
+          const stateData = stateResults.filter(r => r.status === "fulfilled" && r.value).map(r => r.value);
+          const worst = stateData.length > 0 ? stateData.sort((a,b) => a.health - b.health)[0] : null;
+          results.ioda = {
+            avgHealth: nat?.health ?? null,
+            nationalCurrent: nat?.current, nationalBaseline: nat?.baseline,
+            worstState: worst?.name || null,
+            worstHealth: worst?.health ?? null,
+            states: stateData,
+          };
         }
       } catch {}
       setLiveData(results);
