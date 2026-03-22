@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "../../constants";
 import { IS_DEPLOYED, CORS_PROXIES } from "../../utils";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { Badge } from "../Badge";
 import { Card } from "../Card";
 import { TwitterTimeline } from "../TwitterTimeline";
-import { VZ_MAP } from "../../data/static";
+import { loadScript, loadCSS } from "../../utils";
 
 // ── IODA Venezuelan state FIPS codes ──
 const VE_REGIONS = [
@@ -65,6 +65,106 @@ const fmtVal = v => v == null ? "—" : v >= 1e6 ? `${(v/1e6).toFixed(1)}M` : v 
 const fmtTime = epoch => new Date(epoch * 1000).toLocaleString("es-VE", { timeZone:"America/Caracas", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", hour12:false });
 const fmtDuration = secs => { if (secs < 3600) return `${Math.round(secs/60)}m`; const h = Math.floor(secs/3600), m = Math.round((secs%3600)/60); return m > 0 ? `${h}h ${m}m` : `${h}h`; };
 
+// ── Venezuela state centroids for Leaflet ──
+const STATE_COORDS = {
+  "Amazonas":[3.4,-66.0],"Anzoátegui":[8.6,-64.2],"Apure":[7.0,-69.5],"Aragua":[10.2,-67.6],
+  "Barinas":[8.4,-70.2],"Bolívar":[6.5,-63.5],"Carabobo":[10.2,-68.0],"Cojedes":[9.4,-68.6],
+  "Delta Amacuro":[8.8,-61.3],"Distrito Capital":[10.5,-66.9],"Falcón":[11.2,-69.9],"Guárico":[8.7,-66.5],
+  "Lara":[10.1,-69.8],"Mérida":[8.4,-71.1],"Miranda":[10.2,-66.4],"Monagas":[9.3,-63.2],
+  "Nueva Esparta":[11.0,-63.9],"Portuguesa":[9.1,-69.3],"Sucre":[10.4,-63.1],"Táchira":[7.8,-72.2],
+  "Trujillo":[9.4,-70.5],"Vargas":[10.6,-67.0],"Yaracuy":[10.3,-68.7],"Zulia":[9.8,-71.6],
+};
+
+// ── Leaflet map for IODA regional outages ──
+function IODALeafletMap({ regionScores, selectedState, onSelectState, mapMode }) {
+  const mapRef = useRef(null);
+  const mapInst = useRef(null);
+  const markersRef = useRef(null);
+  const geoLayerRef = useRef(null);
+
+  // Load Leaflet + init map
+  useEffect(() => {
+    loadCSS("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
+    loadScript("https://unpkg.com/leaflet@1.9.4/dist/leaflet.js").then(() => {
+      if (!mapRef.current || mapInst.current) return;
+      const L = window.L;
+      const map = L.map(mapRef.current, { zoomControl: true, scrollWheelZoom: true, attributionControl: false }).setView([7.5, -66.5], 6);
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", { maxZoom: 12 }).addTo(map);
+      L.control.attribution({ prefix: false }).addTo(map).addAttribution("© OSM · CARTO · IODA");
+      mapInst.current = map;
+      // Try to load GeoJSON for state boundaries
+      fetch("https://raw.githubusercontent.com/deldersveld/topojson/master/countries/venezuela/venezuela-estados.json")
+        .then(r => r.json())
+        .then(topo => {
+          // Convert TopoJSON to GeoJSON if needed
+          if (topo.type === "Topology" && window.topojson) {
+            const key = Object.keys(topo.objects)[0];
+            const geo = window.topojson.feature(topo, topo.objects[key]);
+            geoLayerRef.current = geo;
+          }
+        }).catch(() => {});
+    });
+    return () => { if (mapInst.current) { mapInst.current.remove(); mapInst.current = null; } };
+  }, []);
+
+  // Update markers when regionScores change
+  useEffect(() => {
+    if (!mapInst.current || !window.L) return;
+    const L = window.L;
+    const map = mapInst.current;
+    if (markersRef.current) { map.removeLayer(markersRef.current); }
+    const group = L.layerGroup();
+    const maxScore = Math.max(...regionScores.map(r => r.displayScore || r.dropScore90 || 0), 1);
+
+    regionScores.forEach(r => {
+      const coords = STATE_COORDS[r.name];
+      if (!coords) return;
+      const isAffected = (r.displayScore || r.dropScore90 || 0) > 0;
+      const severity = r.healthPct;
+      const color = severity >= 90 ? "#34d399" : severity >= 70 ? "#fbbf24" : severity >= 50 ? "#f97316" : "#ef4444";
+      // Size: in "live" mode based on severity, in accumulated modes based on score
+      let radius;
+      if (mapMode === "live") {
+        // Live: size reflects how bad it is RIGHT NOW
+        radius = severity >= 90 ? 6 : severity >= 70 ? 14 : severity >= 50 ? 22 : 32;
+      } else {
+        // Accumulated: size proportional to outage score
+        const ds = r.displayScore || r.dropScore90 || 0;
+        radius = ds > 0 ? Math.max(8, Math.min(40, (ds / maxScore) * 40)) : 5;
+      }
+      const circle = L.circleMarker(coords, {
+        radius, fillColor: color, color: selectedState === r.name ? "#fff" : color,
+        weight: selectedState === r.name ? 3 : 1.5, opacity: 0.9, fillOpacity: isAffected ? 0.7 : 0.3,
+      });
+      const modeLabel = mapMode === "live" ? "En Vivo" : mapMode === "24h" ? "24h" : "7 días";
+      circle.bindPopup(
+        `<div style="font-family:monospace;font-size:11px;min-width:160px">` +
+        `<b style="font-size:13px">${r.name}</b> <span style="color:#888">(${modeLabel})</span><br/>` +
+        `Conectividad: <b style="color:${color}">${r.healthPct}%</b><br/>` +
+        `${mapMode === "live" ? "Caída actual" : "Outage Score"}: <b>${(r.displayScore || 0) > 0 ? (r.displayScore || 0).toLocaleString() : "0.0"}</b><br/>` +
+        `Baseline: ${Math.round(r.baseAvg).toLocaleString()} · Actual: ${Math.round(r.current).toLocaleString()}` +
+        `</div>`, { className: "ioda-popup" }
+      );
+      circle.on("click", () => onSelectState(r.name));
+      group.addLayer(circle);
+
+      // Add label for affected states
+      if (isAffected && (r.displayScore || 0) > maxScore * 0.05) {
+        const label = L.divIcon({
+          className: "ioda-label",
+          html: `<div style="font:bold 10px monospace;color:${color};text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap">${r.name}</div>`,
+          iconSize: [80, 14], iconAnchor: [40, -radius - 2],
+        });
+        L.marker(coords, { icon: label, interactive: false }).addTo(group);
+      }
+    });
+    group.addTo(map);
+    markersRef.current = group;
+  }, [regionScores, selectedState, mapMode]);
+
+  return <div ref={mapRef} style={{ width:"100%", height: 350, borderRadius:4, border:`1px solid ${BORDER}` }} />;
+}
+
 export function TabIODA() {
   const mob = useIsMobile();
   const [signals, setSignals] = useState(null);
@@ -81,6 +181,7 @@ export function TabIODA() {
   const [aiLoading, setAiLoading] = useState(false);
   const [subView, setSubView] = useState("nacional"); // nacional | estados | eventos
   const [scoreView, setScoreView] = useState("outage"); // outage | health
+  const [mapMode, setMapMode] = useState("live"); // live | 24h | 7d
 
   // ── 1. Load national signals ──
   const loadNational = useCallback(async () => {
@@ -164,45 +265,56 @@ export function TabIODA() {
   }, []);
 
   // ── 3. Load regional scores (probing only, lighter) ──
+  // Store separate datasets for different time ranges
+  const [regionData7d, setRegionData7d] = useState([]);
+
   const loadRegions = useCallback(async () => {
     setRegionLoading(true);
     const now = Math.floor(Date.now() / 1000);
-    const from = now - 24 * 3600;
-    const scores = [];
-    // Fetch top states in parallel (batch of 8 to avoid overload)
-    const topStates = VE_REGIONS;
-    const batches = [];
-    for (let i = 0; i < topStates.length; i += 8) batches.push(topStates.slice(i, i + 8));
-    for (const batch of batches) {
-      const results = await Promise.allSettled(
-        batch.map(async (st) => {
-          const json = await iodaFetch(`signals/raw/region/${st.code}`, { from, until: now });
-          if (!json) return null;
-          const parsed = parseSignals(json);
-          if (!parsed || parsed.length === 0) return null;
-          // Calculate health: use probing (most granular), fallback to bgp
-          const vals = parsed.map(p => p.probing ?? p.bgp).filter(v => v !== null);
-          if (vals.length === 0) return null;
-          const current = vals[vals.length - 1];
-          const max = Math.max(...vals);
-          const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.1)));
-          const baseAvg = baseline.reduce((a,b) => a+b, 0) / baseline.length || 1;
-          const healthPct = baseAvg > 0 ? Math.min(100, Math.round((current / baseAvg) * 100)) : 100;
-          // Outage score: accumulated sum of drops below baseline (replicates IODA scoring)
-          let dropScore = 0;
-          for (const v of vals) {
-            if (v < baseAvg * 0.95) {
-              dropScore += Math.round(baseAvg - v);
+
+    // Helper: fetch and compute scores for a time range
+    const fetchRange = async (hours) => {
+      const from = now - hours * 3600;
+      const scores = [];
+      const batches = [];
+      for (let i = 0; i < VE_REGIONS.length; i += 8) batches.push(VE_REGIONS.slice(i, i + 8));
+      for (const batch of batches) {
+        const results = await Promise.allSettled(
+          batch.map(async (st) => {
+            const json = await iodaFetch(`signals/raw/region/${st.code}`, { from, until: now });
+            if (!json) return null;
+            const parsed = parseSignals(json);
+            if (!parsed || parsed.length === 0) return null;
+            const vals = parsed.map(p => p.probing ?? p.bgp).filter(v => v !== null);
+            if (vals.length === 0) return null;
+            const current = vals[vals.length - 1];
+            const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.1)));
+            const baseAvg = baseline.reduce((a,b) => a+b, 0) / baseline.length || 1;
+            const healthPct = baseAvg > 0 ? Math.min(100, Math.round((current / baseAvg) * 100)) : 100;
+            // Accumulated outage score with variable threshold
+            let dropScore75 = 0, dropScore90 = 0;
+            for (const v of vals) {
+              if (v < baseAvg * 0.75) dropScore75 += Math.round(baseAvg - v);
+              if (v < baseAvg * 0.90) dropScore90 += Math.round(baseAvg - v);
             }
-          }
-          return { ...st, healthPct: Math.min(healthPct, 100), dropScore, current, baseAvg, series: parsed };
-        })
-      );
-      results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
-    }
-    scores.sort((a,b) => b.dropScore - a.dropScore || a.healthPct - b.healthPct); // highest outage score first
-    setRegionScores(scores);
+            // Live drop: absolute difference right now
+            const liveDrop = Math.max(0, Math.round(baseAvg - current));
+            return { ...st, healthPct, dropScore75, dropScore90, liveDrop, current, baseAvg, series: parsed };
+          })
+        );
+        results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
+      }
+      scores.sort((a,b) => b.dropScore90 - a.dropScore90 || a.healthPct - b.healthPct);
+      return scores;
+    };
+
+    // Fetch 24h first (faster, shown by default in live/24h modes)
+    const data24h = await fetchRange(24);
+    setRegionScores(data24h);
     setRegionLoading(false);
+
+    // Then fetch 7d in background (slower, 7 days of data per state)
+    fetchRange(168).then(data7d => setRegionData7d(data7d));
   }, []);
 
   useEffect(() => { loadNational(); loadEvents(); }, [loadNational, loadEvents]);
@@ -421,53 +533,53 @@ export function TabIODA() {
       </>)}
 
       {/* ══════ ESTADOS ══════ */}
-      {subView === "estados" && (<>
+      {subView === "estados" && (() => {
+        // Select data based on map mode
+        const rawData = mapMode === "7d" && regionData7d.length > 0 ? regionData7d : regionScores;
+        // Compute display score based on mode
+        const activeData = rawData.map(r => ({
+          ...r,
+          displayScore: mapMode === "live" ? r.liveDrop :
+                        mapMode === "24h" ? r.dropScore90 :
+                        r.dropScore75,
+        })).sort((a,b) => b.displayScore - a.displayScore || a.healthPct - b.healthPct);
+        return (<>
         {regionLoading ? (
           <Card><div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:14, fontFamily:font }}>
             <div style={{ fontSize:20, marginBottom:8 }}>🗺</div>Cargando datos por estado...<div style={{ fontSize:12, marginTop:4, color:`${MUTED}80` }}>24 estados · Probing + BGP · puede tardar 15-20s</div>
           </div></Card>
         ) : (
           <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 320px", gap:14 }}>
-            {/* Map */}
+            {/* Leaflet Map */}
             <Card accent="#7c3aed">
-              <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
-                Mapa de Severidad de Interrupciones
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8, flexWrap:"wrap", gap:8 }}>
+                <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+                  Mapa de Interrupciones
+                </div>
+                <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+                  {[{id:"live",label:"🔴 En Vivo"},{id:"24h",label:"24h"},{id:"7d",label:"7 días"}].map(m => (
+                    <button key={m.id} onClick={() => setMapMode(m.id)}
+                      style={{ fontSize:11, fontFamily:font, padding:"4px 12px", border:"none",
+                        background:mapMode===m.id?ACCENT:"transparent", color:mapMode===m.id?"#fff":MUTED, cursor:"pointer" }}>{m.label}</button>
+                  ))}
+                </div>
               </div>
-              <svg viewBox="0 0 600 420" style={{ width:"100%", background:"rgba(0,0,0,0.02)", borderRadius:4 }}>
-                {VZ_MAP.map(state => {
-                  const rData = regionScores.find(r => r.name === state.id);
-                  const health = rData ? rData.healthPct : 100;
-                  const fill = rData ? getSeverityColor(health) : `${MUTED}25`;
-                  const isSelected = selectedState === state.id;
-                  return (
-                    <g key={state.id}>
-                      <path d={state.d} fill={fill}
-                        stroke={isSelected ? "#fff" : `${BORDER}`} strokeWidth={isSelected ? 2 : 0.5}
-                        style={{ cursor:"pointer", transition:"all 0.2s" }}
-                        opacity={selectedState && !isSelected ? 0.3 : 1}
-                        onClick={() => setSelectedState(isSelected ? null : state.id)} />
-                      {/* Label for affected states */}
-                      {rData && health < 90 && !mob && (() => {
-                        const match = state.d.match(/M\s*([\d.]+),([\d.]+)/);
-                        if (!match) return null;
-                        const bounds = state.d.match(/[\d.]+/g).map(Number);
-                        const xs = bounds.filter((_, i) => i % 2 === 0), ys = bounds.filter((_, i) => i % 2 === 1);
-                        const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys)) / 2;
-                        return <text x={cx} y={cy} textAnchor="middle" fontSize={8} fill="#fff" fontWeight={700} fontFamily={font}>{health}%</text>;
-                      })()}
-                    </g>
-                  );
-                })}
-              </svg>
-              {/* Legend */}
-              <div style={{ display:"flex", gap:16, marginTop:8, justifyContent:"center", flexWrap:"wrap" }}>
-                {[{l:"Normal",c:"#34d399"},{l:"Degradado",c:"#fbbf24"},{l:"Alto",c:"#f97316"},{l:"Crítico",c:"#ef4444"}].map(lg => (
-                  <div key={lg.l} style={{ display:"flex", alignItems:"center", gap:4 }}>
-                    <span style={{ width:10, height:10, borderRadius:"50%", background:lg.c }} />
-                    <span style={{ fontSize:11, fontFamily:font, color:MUTED }}>{lg.l}</span>
-                  </div>
-                ))}
+              <div style={{ display:"flex", gap:12, marginBottom:6, flexWrap:"wrap" }}>
+                <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>
+                  {mapMode === "live" ? "Color = severidad actual · Tamaño = impacto" :
+                   mapMode === "24h" ? "Score acumulado últimas 24 horas" : "Score acumulado últimos 7 días"}
+                </span>
+                <div style={{ display:"flex", gap:8, marginLeft:"auto" }}>
+                  {[{l:"Normal",c:"#34d399"},{l:"Degradado",c:"#fbbf24"},{l:"Alto",c:"#f97316"},{l:"Crítico",c:"#ef4444"}].map(lg => (
+                    <div key={lg.l} style={{ display:"flex", alignItems:"center", gap:3 }}>
+                      <span style={{ width:6, height:6, borderRadius:"50%", background:lg.c }} />
+                      <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>{lg.l}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
+              <IODALeafletMap regionScores={activeData} selectedState={selectedState} mapMode={mapMode}
+                onSelectState={s => setSelectedState(selectedState === s ? null : s)} />
             </Card>
 
             {/* Rankings */}
@@ -483,7 +595,10 @@ export function TabIODA() {
                       <span style={{ fontSize:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:getSeverityColor(rd.healthPct) }}>{rd.healthPct}%</span>
                       <Badge color={getSeverityColor(rd.healthPct)}>{getSeverityLabel(rd.healthPct)}</Badge>
                     </div>
-                    <div style={{ fontSize:11, color:MUTED, marginTop:4 }}>Baseline: {fmtVal(rd.baseAvg)} · Actual: {fmtVal(rd.current)}</div>
+                    <div style={{ fontSize:11, color:MUTED, marginTop:4 }}>
+                      Baseline: {fmtVal(rd.baseAvg)} · Actual: {fmtVal(rd.current)}
+                      {rd.displayScore > 0 && <> · {mapMode === "live" ? "Caída" : "Score"}: <span style={{ color:"#dc2626", fontWeight:600 }}>{fmtVal(rd.displayScore)}</span></>}
+                    </div>
                   </Card>
                 );
               })()}
@@ -492,27 +607,30 @@ export function TabIODA() {
               <Card accent="#f59e0b">
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
                   <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-                    {scoreView === "outage" ? "Outage Score" : "Salud %"}
+                    {scoreView === "outage" ? (mapMode === "live" ? "Caída Actual" : "Outage Score") : "Salud %"}
                   </div>
-                  <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    {mapMode === "7d" && regionData7d.length === 0 && <span style={{ fontSize:9, fontFamily:font, color:AM }}>cargando 7d...</span>}
+                    <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
                     {[{id:"outage",label:"Score"},{id:"health",label:"Salud %"}].map(v => (
                       <button key={v.id} onClick={() => setScoreView(v.id)}
                         style={{ fontSize:10, fontFamily:font, padding:"3px 10px", border:"none",
                           background:scoreView===v.id?ACCENT:"transparent", color:scoreView===v.id?"#fff":MUTED, cursor:"pointer" }}>{v.label}</button>
                     ))}
                   </div>
+                  </div>
                 </div>
-                {regionScores.length === 0 ? (
+                {activeData.length === 0 ? (
                   <div style={{ fontSize:12, color:MUTED, padding:8 }}>Cargando...</div>
                 ) : (<>
                   <div style={{ display:"flex", justifyContent:"space-between", padding:"4px 8px", borderBottom:`1px solid ${BORDER}`, marginBottom:4 }}>
                     <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Región</span>
                     <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>
-                      {scoreView === "outage" ? "Puntaje" : "Salud"}
+                      {scoreView === "outage" ? (mapMode === "live" ? "Caída" : "Puntaje") : "Salud"}
                     </span>
                   </div>
                   <div style={{ maxHeight:400, overflowY:"auto" }}>
-                    {regionScores.map((r, i) => (
+                    {activeData.map((r, i) => (
                       <div key={r.code}
                         onClick={() => setSelectedState(selectedState === r.name ? null : r.name)}
                         style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px",
@@ -525,21 +643,21 @@ export function TabIODA() {
                         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                           {scoreView === "outage" ? (<>
                             <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                              {r.dropScore > 0 && (() => {
-                                const maxScore = Math.max(...regionScores.map(x => x.dropScore), 1);
-                                const barW = Math.max(4, (r.dropScore / maxScore) * 60);
+                              {r.displayScore > 0 && (() => {
+                                const maxScore = Math.max(...activeData.map(x => x.displayScore), 1);
+                                const barW = Math.max(4, (r.displayScore / maxScore) * 60);
                                 return <div style={{ width:barW, height:4, background:getSeverityColor(r.healthPct), borderRadius:2 }} />;
                               })()}
-                              <span style={{ fontSize:13, fontWeight:700, fontFamily:font, color:r.dropScore > 0 ? getSeverityColor(r.healthPct) : MUTED }}>
-                                {r.dropScore > 0 ? fmtVal(r.dropScore) : "0.0"}
+                              <span style={{ fontSize:13, fontWeight:700, fontFamily:font, color:r.displayScore > 0 ? getSeverityColor(r.healthPct) : MUTED }}>
+                                {r.displayScore > 0 ? fmtVal(r.displayScore) : "0.0"}
                               </span>
                             </div>
                           </>) : (<>
                             <span style={{ fontSize:13, fontWeight:700, fontFamily:font, color:getSeverityColor(r.healthPct) }}>
                               {r.healthPct}%
                             </span>
-                            {r.dropScore > 0 && (
-                              <span style={{ fontSize:10, fontFamily:font, color:"#dc2626" }}>↓{fmtVal(r.dropScore)}</span>
+                            {r.displayScore > 0 && (
+                              <span style={{ fontSize:10, fontFamily:font, color:"#dc2626" }}>↓{fmtVal(r.displayScore)}</span>
                             )}
                           </>)}
                         </div>
@@ -551,7 +669,8 @@ export function TabIODA() {
             </div>
           </div>
         )}
-      </>)}
+      </>);
+      })()}
 
       {/* ══════ EVENTOS ══════ */}
       {subView === "eventos" && (
