@@ -65,6 +65,36 @@ const fmtVal = v => v == null ? "—" : v >= 1e6 ? `${(v/1e6).toFixed(1)}M` : v 
 const fmtTime = epoch => new Date(epoch * 1000).toLocaleString("es-VE", { timeZone:"America/Caracas", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", hour12:false });
 const fmtDuration = secs => { if (secs < 3600) return `${Math.round(secs/60)}m`; const h = Math.floor(secs/3600), m = Math.round((secs%3600)/60); return m > 0 ? `${h}h ${m}m` : `${h}h`; };
 
+// ── Interpret connectivity pattern from per-source data ──
+function interpretPattern(perSource) {
+  if (!perSource) return { emoji: "❓", text: "Sin datos suficientes para interpretar." };
+  const bgp = perSource.bgp?.health ?? null;
+  const prob = perSource.probing?.health ?? null;
+  const tele = perSource.telescope?.health ?? null;
+  
+  const vals = [bgp, prob, tele].filter(v => v !== null);
+  if (vals.length === 0) return { emoji: "❓", text: "Sin datos suficientes." };
+  const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+  
+  if (avg >= 90) return { emoji: "✅", text: "Conectividad normal — sin anomalías detectadas en ningún indicador." };
+  
+  const bgpDown = bgp !== null && bgp < 70;
+  const probDown = prob !== null && prob < 70;
+  const teleDown = tele !== null && tele < 70;
+  
+  if (bgpDown && probDown && teleDown) return { emoji: "🔴", text: "Desconexión generalizada — los tres indicadores registran caídas significativas. Consistente con corte gubernamental deliberado o falla mayor de infraestructura troncal (CANTV)." };
+  if (!bgpDown && probDown && teleDown) return { emoji: "⚡", text: "Dispositivos inaccesibles pero rutas activas — las rutas de red se anuncian pero los equipos no responden. Consistente con corte eléctrico regional o falla de último kilómetro." };
+  if (bgpDown && !probDown && !teleDown) return { emoji: "🌐", text: "Pérdida de rutas upstream — el proveedor dejó de anunciar prefijos pero dispositivos locales funcionan. Posible problema con proveedor internacional o reconfiguración de red." };
+  if (!bgpDown && !probDown && teleDown) return { emoji: "🔍", text: "Anomalía en tráfico de fondo — el telescopio detecta cambios pero BGP y sondeo están normales. Posible filtrado selectivo de tráfico o cambio en patrones de red." };
+  if (!bgpDown && probDown && !teleDown) return { emoji: "📡", text: "Caída en sondeo activo — los dispositivos no responden al probing pero las rutas y tráfico de fondo están normales. Posible congestión severa o bloqueo de ICMP." };
+  if (bgpDown && probDown && !teleDown) return { emoji: "🔗", text: "Pérdida de rutas y dispositivos — el tráfico de fondo persiste pero las rutas y hosts caen. Posible falla de peering o desconexión parcial de proveedor." };
+  if (bgpDown && !probDown && teleDown) return { emoji: "⚠️", text: "Rutas y tráfico de fondo afectados — combinación inusual que puede indicar una reconfiguración de red en progreso o ataque a infraestructura BGP." };
+  
+  // Mild degradation
+  if (avg >= 70) return { emoji: "🟡", text: "Degradación leve — uno o más indicadores muestran reducción moderada. Puede ser congestión temporal, mantenimiento de red, o fluctuación normal." };
+  return { emoji: "🟠", text: "Degradación significativa — múltiples indicadores afectados parcialmente. Monitorear evolución para determinar si es transitorio o escalará." };
+}
+
 // ── Venezuela state centroids for Leaflet ──
 const STATE_COORDS = {
   "Amazonas":[3.4,-66.0],"Anzoátegui":[8.6,-64.2],"Apure":[7.0,-69.5],"Aragua":[10.2,-67.6],
@@ -285,38 +315,43 @@ export function TabIODA() {
             if (!json) return null;
             const parsed = parseSignals(json);
             if (!parsed || parsed.length === 0) return null;
-            // Analyze ALL 3 signal sources independently, use worst for scoring
-            const sources = ["probing", "bgp", "telescope"];
-            let worstHealthPct = 100, totalDrop75 = 0, totalDrop90 = 0, worstLiveDrop = 0;
-            let bestCurrent = null, bestBaseAvg = null;
+            // Analyze ALL 3 signal sources, compute average health + per-source detail
+            const srcKeys = ["probing", "bgp", "telescope"];
+            const srcLabels = { probing: "Sondeo", bgp: "BGP", telescope: "Telescopio" };
+            let totalDrop75 = 0, totalDrop90 = 0, maxLiveDrop = 0;
+            const perSource = {};
+            let validSources = 0, healthSum = 0;
+            let refCurrent = null, refBaseAvg = null;
             
-            for (const src of sources) {
+            for (const src of srcKeys) {
               const sVals = parsed.map(p => p[src]).filter(v => v !== null);
-              if (sVals.length < 5) continue;
+              if (sVals.length < 5) { perSource[src] = null; continue; }
               const sCurrent = sVals[sVals.length - 1];
               const sBaseline = sVals.slice(0, Math.max(1, Math.floor(sVals.length * 0.1)));
               const sBaseAvg = sBaseline.reduce((a,b) => a+b, 0) / sBaseline.length;
-              if (sBaseAvg === 0) continue;
+              if (sBaseAvg === 0) { perSource[src] = null; continue; }
               
               const sHealth = Math.min(100, Math.round((sCurrent / sBaseAvg) * 100));
-              if (sHealth < worstHealthPct) {
-                worstHealthPct = sHealth;
-                bestCurrent = sCurrent;
-                bestBaseAvg = sBaseAvg;
+              perSource[src] = { health: sHealth, current: Math.round(sCurrent), baseline: Math.round(sBaseAvg) };
+              validSources++;
+              healthSum += sHealth;
+              
+              if (refCurrent === null || sHealth < (refCurrent._h || 999)) {
+                refCurrent = sCurrent; refBaseAvg = sBaseAvg;
+                refCurrent._h = sHealth;
               }
               
-              // Accumulate drops from ALL sources
               for (const v of sVals) {
                 if (v < sBaseAvg * 0.75) totalDrop75 += Math.round(sBaseAvg - v);
                 if (v < sBaseAvg * 0.90) totalDrop90 += Math.round(sBaseAvg - v);
               }
-              
               const sLiveDrop = Math.max(0, Math.round(sBaseAvg - sCurrent));
-              if (sLiveDrop > worstLiveDrop) worstLiveDrop = sLiveDrop;
+              if (sLiveDrop > maxLiveDrop) maxLiveDrop = sLiveDrop;
             }
             
-            if (bestBaseAvg === null) return null;
-            return { ...st, healthPct: worstHealthPct, dropScore75: totalDrop75, dropScore90: totalDrop90, liveDrop: worstLiveDrop, current: bestCurrent, baseAvg: bestBaseAvg, series: parsed };
+            if (validSources === 0) return null;
+            const avgHealth = Math.round(healthSum / validSources);
+            return { ...st, healthPct: avgHealth, dropScore75: totalDrop75, dropScore90: totalDrop90, liveDrop: maxLiveDrop, current: refCurrent, baseAvg: refBaseAvg, perSource, series: parsed };
           })
         );
         results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
@@ -603,18 +638,50 @@ export function TabIODA() {
             <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               {/* Selected state detail */}
               {selectedState && (() => {
-                const rd = regionScores.find(r => r.name === selectedState);
+                const rd = activeData.find(r => r.name === selectedState);
                 if (!rd) return <Card><div style={{ fontSize:12, color:MUTED }}>Sin datos para {selectedState}</div></Card>;
+                const interp = interpretPattern(rd.perSource);
+                const srcOrder = ["bgp", "probing", "telescope"];
+                const srcLabels = { bgp: "BGP Routes", probing: "Sondeo Activo", telescope: "Telescopio" };
+                const srcEmojis = { bgp: "🌐", probing: "📡", telescope: "🔭" };
                 return (
                   <Card accent={getSeverityColor(rd.healthPct)}>
-                    <div style={{ fontSize:14, fontWeight:700, color:TEXT, marginBottom:4 }}>{rd.name}</div>
-                    <div style={{ display:"flex", gap:12, alignItems:"baseline" }}>
-                      <span style={{ fontSize:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:getSeverityColor(rd.healthPct) }}>{rd.healthPct}%</span>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
+                      <div style={{ fontSize:14, fontWeight:700, color:TEXT }}>{rd.name}</div>
                       <Badge color={getSeverityColor(rd.healthPct)}>{getSeverityLabel(rd.healthPct)}</Badge>
                     </div>
-                    <div style={{ fontSize:11, color:MUTED, marginTop:4 }}>
-                      Baseline: {fmtVal(rd.baseAvg)} · Actual: {fmtVal(rd.current)}
-                      {rd.displayScore > 0 && <> · {mapMode === "live" ? "Caída" : "Score"}: <span style={{ color:"#dc2626", fontWeight:600 }}>{fmtVal(rd.displayScore)}</span></>}
+                    <div style={{ display:"flex", gap:8, alignItems:"baseline", marginBottom:8 }}>
+                      <span style={{ fontSize:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:getSeverityColor(rd.healthPct) }}>{rd.healthPct}%</span>
+                      <span style={{ fontSize:11, color:MUTED }}>promedio</span>
+                      {rd.displayScore > 0 && <span style={{ fontSize:12, color:"#dc2626", fontWeight:600 }}>Score: {fmtVal(rd.displayScore)}</span>}
+                    </div>
+                    {/* Per-source breakdown */}
+                    <div style={{ display:"flex", flexDirection:"column", gap:4, marginBottom:8 }}>
+                      {srcOrder.map(src => {
+                        const d = rd.perSource?.[src];
+                        if (!d) return (
+                          <div key={src} style={{ display:"flex", justifyContent:"space-between", fontSize:11, color:`${MUTED}80`, padding:"3px 0" }}>
+                            <span>{srcEmojis[src]} {srcLabels[src]}</span><span>— sin datos</span>
+                          </div>
+                        );
+                        const c = getSeverityColor(d.health);
+                        return (
+                          <div key={src} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:11, padding:"3px 0", borderBottom:`1px solid ${BORDER}20` }}>
+                            <span style={{ color:TEXT }}>{srcEmojis[src]} {srcLabels[src]}</span>
+                            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                              <div style={{ width:40, height:4, background:`${BORDER}30`, borderRadius:2, overflow:"hidden" }}>
+                                <div style={{ width:`${d.health}%`, height:4, background:c, borderRadius:2 }} />
+                              </div>
+                              <span style={{ fontWeight:700, color:c, minWidth:32, textAlign:"right" }}>{d.health}%</span>
+                              <span style={{ color:MUTED, fontSize:10 }}>({d.current}/{d.baseline})</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Interpretation */}
+                    <div style={{ fontSize:11, color:TEXT, lineHeight:1.5, padding:"6px 8px", background:`${BORDER}10`, borderRadius:4, borderLeft:`3px solid ${getSeverityColor(rd.healthPct)}` }}>
+                      <span style={{ marginRight:4 }}>{interp.emoji}</span>{interp.text}
                     </div>
                   </Card>
                 );
