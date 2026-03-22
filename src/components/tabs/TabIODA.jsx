@@ -285,21 +285,38 @@ export function TabIODA() {
             if (!json) return null;
             const parsed = parseSignals(json);
             if (!parsed || parsed.length === 0) return null;
-            const vals = parsed.map(p => p.probing ?? p.bgp).filter(v => v !== null);
-            if (vals.length === 0) return null;
-            const current = vals[vals.length - 1];
-            const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.1)));
-            const baseAvg = baseline.reduce((a,b) => a+b, 0) / baseline.length || 1;
-            const healthPct = baseAvg > 0 ? Math.min(100, Math.round((current / baseAvg) * 100)) : 100;
-            // Accumulated outage score with variable threshold
-            let dropScore75 = 0, dropScore90 = 0;
-            for (const v of vals) {
-              if (v < baseAvg * 0.75) dropScore75 += Math.round(baseAvg - v);
-              if (v < baseAvg * 0.90) dropScore90 += Math.round(baseAvg - v);
+            // Analyze ALL 3 signal sources independently, use worst for scoring
+            const sources = ["probing", "bgp", "telescope"];
+            let worstHealthPct = 100, totalDrop75 = 0, totalDrop90 = 0, worstLiveDrop = 0;
+            let bestCurrent = null, bestBaseAvg = null;
+            
+            for (const src of sources) {
+              const sVals = parsed.map(p => p[src]).filter(v => v !== null);
+              if (sVals.length < 5) continue;
+              const sCurrent = sVals[sVals.length - 1];
+              const sBaseline = sVals.slice(0, Math.max(1, Math.floor(sVals.length * 0.1)));
+              const sBaseAvg = sBaseline.reduce((a,b) => a+b, 0) / sBaseline.length;
+              if (sBaseAvg === 0) continue;
+              
+              const sHealth = Math.min(100, Math.round((sCurrent / sBaseAvg) * 100));
+              if (sHealth < worstHealthPct) {
+                worstHealthPct = sHealth;
+                bestCurrent = sCurrent;
+                bestBaseAvg = sBaseAvg;
+              }
+              
+              // Accumulate drops from ALL sources
+              for (const v of sVals) {
+                if (v < sBaseAvg * 0.75) totalDrop75 += Math.round(sBaseAvg - v);
+                if (v < sBaseAvg * 0.90) totalDrop90 += Math.round(sBaseAvg - v);
+              }
+              
+              const sLiveDrop = Math.max(0, Math.round(sBaseAvg - sCurrent));
+              if (sLiveDrop > worstLiveDrop) worstLiveDrop = sLiveDrop;
             }
-            // Live drop: absolute difference right now
-            const liveDrop = Math.max(0, Math.round(baseAvg - current));
-            return { ...st, healthPct, dropScore75, dropScore90, liveDrop, current, baseAvg, series: parsed };
+            
+            if (bestBaseAvg === null) return null;
+            return { ...st, healthPct: worstHealthPct, dropScore75: totalDrop75, dropScore90: totalDrop90, liveDrop: worstLiveDrop, current: bestCurrent, baseAvg: bestBaseAvg, series: parsed };
           })
         );
         results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
