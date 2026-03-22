@@ -100,11 +100,11 @@ export default function MonitorPNUD() {
   const mob = useIsMobile();
 
   // ── Shared live data (fetched once, available to all tabs including AI) ──
-  const [liveData, setLiveData] = useState({ dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, cohesion:null, fetched:false });
+  const [liveData, setLiveData] = useState({ dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, cohesion:null, ioda:null, fetched:false });
 
   useEffect(() => {
     async function fetchLiveData() {
-      const results = { dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, cohesion:null, fetched:true };
+      const results = { dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, cohesion:null, ioda:null, fetched:true };
       try {
         // Dolar
         const dolarUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
@@ -174,6 +174,26 @@ export default function MonitorPNUD() {
               engine: `cached/${icg.provider || "cron"}`, fetchedAt: icg.date + "T06:00:00Z",
               cachedDate: icg.date, hasSitrep: true,
             };
+          }
+        }
+      } catch {}
+      // IODA — quick national connectivity check for alerts
+      try {
+        if (IS_DEPLOYED) {
+          const now = Math.floor(Date.now() / 1000);
+          const from = now - 6 * 3600; // last 6 hours
+          const iRes = await fetch(`/api/ioda?path=signals/raw/country/VE&from=${from}&until=${now}`, { signal:AbortSignal.timeout(10000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          if (iRes?.data) {
+            const raw = Array.isArray(iRes.data) ? iRes.data.flat() : [];
+            const probing = raw.find(s => s.datasource === "ping-slash24");
+            if (probing?.values?.length > 0) {
+              const vals = probing.values.filter(v => v !== null);
+              const current = vals[vals.length - 1] || 0;
+              const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.1)));
+              const baseAvg = baseline.reduce((a,b) => a+b, 0) / baseline.length || 1;
+              const healthPct = Math.min(100, Math.round((current / baseAvg) * 100));
+              results.ioda = { avgHealth: healthPct, nationalCurrent: current, nationalBaseline: Math.round(baseAvg) };
+            }
           }
         }
       } catch {}

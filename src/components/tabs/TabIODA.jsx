@@ -635,6 +635,116 @@ export function TabIODA() {
                 onSelectState={s => setSelectedState(selectedState === s ? null : s)} />
             </Card>
 
+            {/* Multi-line temporal chart: connectivity % per state */}
+            {activeData.length > 0 && activeData.some(r => r.series?.length > 10) && (
+              <Card accent="#dc2626" style={{ gridColumn: mob ? "1" : "1 / -1" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                  <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+                    Conectividad por Estado — Línea Temporal
+                  </div>
+                  <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>
+                    {mapMode === "live" ? "Últimas 24h" : mapMode === "24h" ? "24 horas" : "7 días"} · Probing (sondeo activo)
+                  </span>
+                </div>
+                {(() => {
+                  // Get states with most interesting data (worst health first, max 8)
+                  const statesForChart = activeData
+                    .filter(r => r.series && r.series.length > 5)
+                    .slice(0, 8);
+                  if (statesForChart.length === 0) return <div style={{ fontSize:12, color:MUTED, padding:20, textAlign:"center" }}>Sin datos temporales</div>;
+                  
+                  // Build normalized % series for each state (probing-based)
+                  const chartData = statesForChart.map(st => {
+                    const vals = st.series.map(p => p.probing ?? p.bgp).filter(v => v !== null);
+                    const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.1)));
+                    const baseAvg = baseline.reduce((a,b) => a+b, 0) / baseline.length || 1;
+                    const pctSeries = st.series.map(p => {
+                      const v = p.probing ?? p.bgp;
+                      return { ts: p.ts, pct: v !== null ? Math.min(100, Math.round((v / baseAvg) * 100)) : null };
+                    });
+                    return { name: st.name, health: st.healthPct, pctSeries };
+                  });
+                  
+                  // Chart dimensions
+                  const W = 900, H = 220, pL = 40, pR = 10, pT = 10, pB = 25;
+                  const cW = W - pL - pR, cH = H - pT - pB;
+                  
+                  // Time range from anchor state
+                  const anchor = chartData[0].pctSeries;
+                  const tMin = anchor[0]?.ts || 0;
+                  const tMax = anchor[anchor.length - 1]?.ts || 1;
+                  const tRange = tMax - tMin || 1;
+                  
+                  const toX = ts => pL + ((ts - tMin) / tRange) * cW;
+                  const toY = pct => pT + cH - (pct / 100) * cH;
+                  
+                  // Colors for each state line
+                  const palette = ["#dc2626","#f59e0b","#7c3aed","#2563eb","#059669","#ec4899","#84cc16","#06b6d4"];
+                  
+                  return (
+                    <div>
+                      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}>
+                        {/* Grid lines */}
+                        {[0, 20, 40, 60, 80, 100].map(pct => (
+                          <g key={pct}>
+                            <line x1={pL} y1={toY(pct)} x2={pL+cW} y2={toY(pct)} stroke={pct === 80 ? "rgba(220,38,38,0.15)" : "rgba(0,0,0,0.04)"} strokeDasharray={pct === 80 ? "4,3" : "none"} />
+                            <text x={pL-4} y={toY(pct)+3} textAnchor="end" fontSize={7} fill={MUTED} fontFamily={font}>{pct}%</text>
+                          </g>
+                        ))}
+                        {/* X-axis time labels */}
+                        {[0, 0.25, 0.5, 0.75, 1].map(f => {
+                          const ts = tMin + f * tRange;
+                          return <text key={f} x={toX(ts)} y={H-4} textAnchor="middle" fontSize={7} fill={`${MUTED}90`} fontFamily={font}>
+                            {fmtTime(ts)}
+                          </text>;
+                        })}
+                        {/* Danger zone below 80% */}
+                        <rect x={pL} y={toY(80)} width={cW} height={toY(0) - toY(80)} fill="rgba(220,38,38,0.03)" />
+                        {/* State lines */}
+                        {chartData.map((st, si) => {
+                          const color = palette[si % palette.length];
+                          let d = "";
+                          st.pctSeries.forEach(p => {
+                            if (p.pct === null) return;
+                            const x = toX(p.ts), y = toY(p.pct);
+                            d += d === "" ? `M${x},${y}` : ` L${x},${y}`;
+                          });
+                          if (!d) return null;
+                          return <path key={st.name} d={d} fill="none" stroke={color} strokeWidth={1.5} opacity={0.8} />;
+                        })}
+                        {/* End labels */}
+                        {chartData.map((st, si) => {
+                          const color = palette[si % palette.length];
+                          const lastPt = [...st.pctSeries].reverse().find(p => p.pct !== null);
+                          if (!lastPt) return null;
+                          return (
+                            <g key={`label-${st.name}`}>
+                              <circle cx={toX(lastPt.ts)} cy={toY(lastPt.pct)} r={3} fill={color} />
+                              <text x={toX(lastPt.ts) - 4} y={toY(lastPt.pct) - 5} textAnchor="end" fontSize={7} fill={color} fontWeight={700} fontFamily={font}>
+                                {st.name} {lastPt.pct}%
+                              </text>
+                            </g>
+                          );
+                        })}
+                      </svg>
+                      {/* Legend */}
+                      <div style={{ display:"flex", gap:12, flexWrap:"wrap", marginTop:6, justifyContent:"center" }}>
+                        {chartData.map((st, si) => (
+                          <div key={st.name} style={{ display:"flex", alignItems:"center", gap:4, cursor:"pointer" }}
+                            onClick={() => setSelectedState(selectedState === st.name ? null : st.name)}>
+                            <span style={{ width:10, height:3, borderRadius:1, background:palette[si % palette.length] }} />
+                            <span style={{ fontSize:10, fontFamily:font, color: selectedState === st.name ? TEXT : MUTED, fontWeight: selectedState === st.name ? 700 : 400 }}>
+                              {st.name}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </Card>
+            )}
+
             {/* Rankings */}
             <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               {/* Selected state detail */}

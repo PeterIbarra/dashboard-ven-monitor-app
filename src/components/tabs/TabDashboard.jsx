@@ -94,6 +94,18 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
           if (accel > 50) liveAlerts.push({ name:"Aceleración ⚡", val:`+${Math.round(accel)}%`, umbral:`Protestas aumentaron ${Math.round(accel)}% vs semana anterior (${prevW.protestas}→${lastW.protestas}) — escalada rápida`, level: accel > 100 ? "red" : "yellow" });
         }
 
+        // Internet connectivity (IODA)
+        if (liveData?.ioda) {
+          const { avgHealth, worstState, worstHealth } = liveData.ioda;
+          if (avgHealth !== undefined && avgHealth < 70) {
+            liveAlerts.push({ name:"Internet 🌐", val:`${avgHealth}%`, umbral:`Conectividad nacional promedio ${avgHealth}% — ${worstState || "múltiples estados"} más afectado (${worstHealth || 0}%). Posible corte masivo.`, level:"red" });
+          } else if (avgHealth !== undefined && avgHealth < 85) {
+            liveAlerts.push({ name:"Internet 🌐", val:`${avgHealth}%`, umbral:`Degradación de conectividad — ${worstState || "varios estados"} con ${worstHealth || 0}%. Monitorear evolución.`, level:"yellow" });
+          } else if (worstHealth !== undefined && worstHealth < 50) {
+            liveAlerts.push({ name:"Internet 🌐", val:`${worstState} ${worstHealth}%`, umbral:`${worstState} con conectividad crítica (${worstHealth}%) — posible corte regional focalizado.`, level: worstHealth < 30 ? "red" : "yellow" });
+          }
+        }
+
         if (liveAlerts.length === 0) return null;
 
         const reds = liveAlerts.filter(a => a.level === "red");
