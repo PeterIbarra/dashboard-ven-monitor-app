@@ -94,18 +94,59 @@ export function TabIODA() {
     setLoading(false);
   }, [timeRange]);
 
-  // ── 2. Load alerts/events ──
+  // ── 2. Load outage alerts from IODA + signal-based detection as fallback ──
   const loadEvents = useCallback(async () => {
     const now = Math.floor(Date.now() / 1000);
-    const from = now - 7 * 86400; // last 7 days
-    const json = await iodaFetch(`alerts/country/VE`, { from, until: now });
-    if (json?.data) {
-      const evts = (Array.isArray(json.data) ? json.data : [])
-        .filter(e => e.condition && e.condition !== "normal")
-        .sort((a,b) => (b.time || 0) - (a.time || 0))
+    const from = now - 7 * 86400;
+    
+    // Try IODA outages/alerts endpoint first (correct v2 path)
+    const alertsJson = await iodaFetch(`outages/alerts/country/VE`, { from, until: now });
+    if (alertsJson?.data && Array.isArray(alertsJson.data) && alertsJson.data.length > 0) {
+      const evts = alertsJson.data
+        .filter(e => e.level && e.level !== "normal")
+        .map(e => ({
+          time: e.time,
+          datasource: e.datasource || "unknown",
+          condition: e.level === "critical" ? "critical" : e.level === "warning" ? "medium" : "low",
+          value: e.value,
+          historyValue: e.historyValue,
+          duration: null,
+        }))
+        .sort((a,b) => b.time - a.time)
         .slice(0, 20);
-      setEvents(evts);
+      if (evts.length > 0) { setEvents(evts); return; }
     }
+
+    // Fallback: detect events from 7-day signal drops
+    const json = await iodaFetch(`signals/raw/country/VE`, { from, until: now });
+    const parsed = json ? parseSignals(json) : null;
+    if (!parsed || parsed.length < 10) return;
+    const detectedEvents = [];
+    const windowSize = 12;
+    for (let i = windowSize; i < parsed.length; i++) {
+      const p = parsed[i];
+      for (const key of ["bgp", "probing", "telescope"]) {
+        if (p[key] === null) continue;
+        const baseline = parsed.slice(Math.max(0, i - windowSize), i).map(x => x[key]).filter(v => v !== null);
+        if (baseline.length < 3) continue;
+        const avg = baseline.reduce((a,b) => a+b, 0) / baseline.length;
+        if (avg === 0) continue;
+        const dropPct = ((avg - p[key]) / avg) * 100;
+        if (dropPct > 20) {
+          const lastSame = detectedEvents.filter(e => e.datasource === key);
+          if (lastSame.some(e => Math.abs(e.time - p.ts) < 7200)) continue;
+          const severity = dropPct > 60 ? "critical" : dropPct > 40 ? "high" : "medium";
+          let dur = 0;
+          for (let j = i + 1; j < parsed.length; j++) {
+            if (parsed[j][key] !== null && parsed[j][key] > avg * 0.8) break;
+            dur += (parsed[j].ts - parsed[j-1].ts);
+          }
+          detectedEvents.push({ time: p.ts, datasource: key, condition: severity, value: Math.round(dropPct), duration: dur || null });
+        }
+      }
+    }
+    detectedEvents.sort((a,b) => b.time - a.time);
+    setEvents(detectedEvents.slice(0, 20));
   }, []);
 
   // ── 3. Load regional scores (probing only, lighter) ──
@@ -177,11 +218,11 @@ export function TabIODA() {
       const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [{ role: "user", content: prompt }], max_tokens: 600 }),
+        body: JSON.stringify({ prompt, max_tokens: 600 }),
       });
       if (res.ok) {
         const data = await res.json();
-        setAiExplain(data.choices?.[0]?.message?.content || data.content?.[0]?.text || "Sin respuesta.");
+        setAiExplain(data.text || data.choices?.[0]?.message?.content || "Sin respuesta.");
       } else setAiExplain("Error al conectar con IA.");
     } catch { setAiExplain("Error de conexión."); }
     setAiLoading(false);
@@ -214,7 +255,7 @@ export function TabIODA() {
     const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.2)));
     const avg = baseline.reduce((a,b) => a+b, 0) / baseline.length;
     const pctChange = avg !== 0 ? ((current - avg) / avg * 100) : 0;
-    const W = 600, H = 100, pL = 50, pR = 10, pT = 5, pB = 5;
+    const W = 600, H = 130, pL = 50, pR = 10, pT = 5, pB = 5;
     const cW = W-pL-pR, cH = H-pT-pB;
     const toX = i => pL + (i/(data.length-1)) * cW;
     const toY = v => v === null ? null : pT + cH - ((v-min)/(max-min||1))*cH;
@@ -244,9 +285,37 @@ export function TabIODA() {
           <text x={pL-4} y={pT+6} textAnchor="end" fontSize={7} fill={MUTED} fontFamily={font}>{fmtVal(max)}</text>
           <text x={pL-4} y={pT+cH} textAnchor="end" fontSize={7} fill={MUTED} fontFamily={font}>{fmtVal(min)}</text>
           <path d={areaD} fill={`${color}12`} /><path d={pathD} fill="none" stroke={color} strokeWidth={1.5} />
+          {/* Baseline reference line */}
+          {avg > 0 && <><line x1={pL} y1={toY(avg)} x2={pL+cW} y2={toY(avg)} stroke={`${color}40`} strokeDasharray="4,3" />
+            <text x={pL+cW+2} y={toY(avg)+3} fontSize={6} fill={`${color}80`} fontFamily={font}>base</text></>}
+          {/* X-axis time labels */}
+          {[0, 0.25, 0.5, 0.75, 1].map(f => {
+            const idx = Math.round(f * (data.length - 1));
+            if (idx >= data.length) return null;
+            return <text key={f} x={toX(idx)} y={H-1} textAnchor="middle" fontSize={6} fill={`${MUTED}90`} fontFamily={font}>
+              {fmtTime(data[idx].ts).replace(/,/g, "")}
+            </text>;
+          })}
+          {/* Drop zone shading — highlight areas below 80% of baseline */}
+          {avg > 0 && (() => {
+            let zones = "";
+            let inDrop = false, startX = 0;
+            data.forEach((d, i) => {
+              const v = d[key];
+              if (v !== null && v < avg * 0.8) {
+                if (!inDrop) { inDrop = true; startX = toX(i); }
+              } else if (inDrop) {
+                inDrop = false;
+                zones += `<rect x="${startX}" y="${pT}" width="${toX(i) - startX}" height="${cH}" fill="rgba(220,38,38,0.06)" />`;
+              }
+            });
+            if (inDrop) zones += `<rect x="${startX}" y="${pT}" width="${toX(data.length-1) - startX}" height="${cH}" fill="rgba(220,38,38,0.06)" />`;
+            return zones ? <g dangerouslySetInnerHTML={{ __html: zones }} /> : null;
+          })()}
+          {/* Hover */}
           {hover && hover.key === key && hover.idx < data.length && data[hover.idx][key] !== null && (<>
-            <line x1={toX(hover.idx)} y1={pT} x2={toX(hover.idx)} y2={pT+cH} stroke="rgba(0,0,0,0.1)" />
-            <circle cx={toX(hover.idx)} cy={toY(data[hover.idx][key])} r={3} fill={color} /></>)}
+            <line x1={toX(hover.idx)} y1={pT} x2={toX(hover.idx)} y2={pT+cH} stroke="rgba(0,0,0,0.15)" strokeDasharray="2,2" />
+            <circle cx={toX(hover.idx)} cy={toY(data[hover.idx][key])} r={3.5} fill={color} stroke="#fff" strokeWidth={1.5} /></>)}
         </svg>
         {hover && hover.key === key && hover.idx < data.length && (
           <div style={{ fontSize:12, fontFamily:font, color:MUTED, marginTop:4 }}>
@@ -473,7 +542,7 @@ export function TabIODA() {
                         <td style={{ padding:"8px" }}>
                           <span style={{ fontSize:12, fontWeight:600, color:sevColor, textTransform:"uppercase" }}>{ev.condition || "?"}</span>
                         </td>
-                        <td style={{ padding:"8px", textAlign:"right", fontWeight:700, color:sevColor }}>{ev.value ? fmtVal(ev.value) : "—"}</td>
+                        <td style={{ padding:"8px", textAlign:"right", fontWeight:700, color:sevColor }}>{ev.historyValue ? `${fmtVal(ev.value)} / ${fmtVal(ev.historyValue)}` : ev.value ? `-${ev.value}%` : "—"}</td>
                         <td style={{ padding:"8px", color:MUTED }}>{ev.duration ? fmtDuration(ev.duration) : "—"}</td>
                       </tr>
                     );
