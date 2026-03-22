@@ -80,6 +80,7 @@ export function TabIODA() {
   const [aiExplain, setAiExplain] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [subView, setSubView] = useState("nacional"); // nacional | estados | eventos
+  const [scoreView, setScoreView] = useState("outage"); // outage | health
 
   // ── 1. Load national signals ──
   const loadNational = useCallback(async () => {
@@ -181,7 +182,7 @@ export function TabIODA() {
       );
       results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
     }
-    scores.sort((a,b) => a.healthPct - b.healthPct); // worst first
+    scores.sort((a,b) => b.dropScore - a.dropScore || a.healthPct - b.healthPct); // highest outage score first
     setRegionScores(scores);
     setRegionLoading(false);
   }, []);
@@ -471,12 +472,27 @@ export function TabIODA() {
 
               {/* Ranking table */}
               <Card accent="#f59e0b">
-                <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>
-                  Puntajes de Interrupción
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                  <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+                    {scoreView === "outage" ? "Outage Score" : "Salud %"}
+                  </div>
+                  <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+                    {[{id:"outage",label:"Score"},{id:"health",label:"Salud %"}].map(v => (
+                      <button key={v.id} onClick={() => setScoreView(v.id)}
+                        style={{ fontSize:10, fontFamily:font, padding:"3px 10px", border:"none",
+                          background:scoreView===v.id?ACCENT:"transparent", color:scoreView===v.id?"#fff":MUTED, cursor:"pointer" }}>{v.label}</button>
+                    ))}
+                  </div>
                 </div>
                 {regionScores.length === 0 ? (
                   <div style={{ fontSize:12, color:MUTED, padding:8 }}>Cargando...</div>
-                ) : (
+                ) : (<>
+                  <div style={{ display:"flex", justifyContent:"space-between", padding:"4px 8px", borderBottom:`1px solid ${BORDER}`, marginBottom:4 }}>
+                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Región</span>
+                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>
+                      {scoreView === "outage" ? "Puntaje" : "Salud"}
+                    </span>
+                  </div>
                   <div style={{ maxHeight:400, overflowY:"auto" }}>
                     {regionScores.map((r, i) => (
                       <div key={r.code}
@@ -489,17 +505,23 @@ export function TabIODA() {
                           <span style={{ fontSize:13, color:TEXT, fontWeight:r.healthPct < 70 ? 700 : 400 }}>{r.name}</span>
                         </div>
                         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                          <span style={{ fontSize:13, fontWeight:700, fontFamily:font, color:getSeverityColor(r.healthPct) }}>
-                            {r.healthPct}%
-                          </span>
-                          {r.dropScore > 0 && (
-                            <span style={{ fontSize:10, fontFamily:font, color:"#dc2626" }}>↓{fmtVal(r.dropScore)}</span>
-                          )}
+                          {scoreView === "outage" ? (<>
+                            <span style={{ fontSize:13, fontWeight:700, fontFamily:font, color:r.dropScore > 0 ? getSeverityColor(r.healthPct) : MUTED }}>
+                              {r.dropScore > 0 ? fmtVal(r.dropScore) : "0.0"}
+                            </span>
+                          </>) : (<>
+                            <span style={{ fontSize:13, fontWeight:700, fontFamily:font, color:getSeverityColor(r.healthPct) }}>
+                              {r.healthPct}%
+                            </span>
+                            {r.dropScore > 0 && (
+                              <span style={{ fontSize:10, fontFamily:font, color:"#dc2626" }}>↓{fmtVal(r.dropScore)}</span>
+                            )}
+                          </>)}
                         </div>
                       </div>
                     ))}
                   </div>
-                )}
+                </>)}
               </Card>
             </div>
           </div>
