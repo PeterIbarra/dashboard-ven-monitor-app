@@ -95,59 +95,72 @@ export function TabIODA() {
     setLoading(false);
   }, [timeRange]);
 
-  // ── 2. Load outage alerts from IODA + signal-based detection as fallback ──
+  // ── 2. Detect outage events from signal analysis ──
   const loadEvents = useCallback(async () => {
     const now = Math.floor(Date.now() / 1000);
-    const from = now - 7 * 86400;
-    
-    // Try IODA outages/alerts endpoint first (correct v2 path)
-    const alertsJson = await iodaFetch(`outages/alerts/country/VE`, { from, until: now });
-    if (alertsJson?.data && Array.isArray(alertsJson.data) && alertsJson.data.length > 0) {
-      const evts = alertsJson.data
-        .filter(e => e.level && e.level !== "normal")
-        .map(e => ({
-          time: e.time,
-          datasource: e.datasource || "unknown",
-          condition: e.level === "critical" ? "critical" : e.level === "warning" ? "medium" : "low",
-          value: e.value,
-          historyValue: e.historyValue,
-          duration: null,
-        }))
-        .sort((a,b) => b.time - a.time)
-        .slice(0, 20);
-      if (evts.length > 0) { setEvents(evts); return; }
-    }
+    const from = now - 7 * 86400; // always scan 7 days for events
 
-    // Fallback: detect events from 7-day signal drops
+    // Detect events from signal drops (IODA outage endpoints return 404 on v2)
     const json = await iodaFetch(`signals/raw/country/VE`, { from, until: now });
     const parsed = json ? parseSignals(json) : null;
     if (!parsed || parsed.length < 10) return;
     const detectedEvents = [];
-    const windowSize = 12;
-    for (let i = windowSize; i < parsed.length; i++) {
-      const p = parsed[i];
-      for (const key of ["bgp", "probing", "telescope"]) {
-        if (p[key] === null) continue;
-        const baseline = parsed.slice(Math.max(0, i - windowSize), i).map(x => x[key]).filter(v => v !== null);
-        if (baseline.length < 3) continue;
-        const avg = baseline.reduce((a,b) => a+b, 0) / baseline.length;
-        if (avg === 0) continue;
-        const dropPct = ((avg - p[key]) / avg) * 100;
-        if (dropPct > 20) {
-          const lastSame = detectedEvents.filter(e => e.datasource === key);
-          if (lastSame.some(e => Math.abs(e.time - p.ts) < 7200)) continue;
-          const severity = dropPct > 60 ? "critical" : dropPct > 40 ? "high" : "medium";
-          let dur = 0;
-          for (let j = i + 1; j < parsed.length; j++) {
-            if (parsed[j][key] !== null && parsed[j][key] > avg * 0.8) break;
-            dur += (parsed[j].ts - parsed[j-1].ts);
+    // Use wider baseline window for 7-day data
+    const windowSize = Math.min(48, Math.floor(parsed.length * 0.1));
+    // Calculate global baseline from first 10% of data
+    for (const key of ["bgp", "probing", "telescope"]) {
+      const allVals = parsed.map(p => p[key]).filter(v => v !== null);
+      if (allVals.length < 10) continue;
+      const globalBase = allVals.slice(0, Math.max(10, Math.floor(allVals.length * 0.1)));
+      const baseAvg = globalBase.reduce((a,b) => a+b, 0) / globalBase.length;
+      if (baseAvg === 0) continue;
+      
+      let inEvent = false, eventStart = null, eventMinVal = Infinity, eventMaxDrop = 0;
+      for (let i = 0; i < parsed.length; i++) {
+        const v = parsed[i][key];
+        if (v === null) continue;
+        const dropPct = ((baseAvg - v) / baseAvg) * 100;
+        if (dropPct > 10 && !inEvent) {
+          // Start of event
+          inEvent = true;
+          eventStart = parsed[i].ts;
+          eventMinVal = v;
+          eventMaxDrop = dropPct;
+        } else if (inEvent && dropPct > 10) {
+          // Continue event
+          if (v < eventMinVal) eventMinVal = v;
+          if (dropPct > eventMaxDrop) eventMaxDrop = dropPct;
+        } else if (inEvent && dropPct <= 5) {
+          // End of event — record it
+          const duration = parsed[i].ts - eventStart;
+          if (eventMaxDrop > 15 && duration > 300) { // >15% drop lasting >5min
+            const severity = eventMaxDrop > 60 ? "critical" : eventMaxDrop > 30 ? "high" : "medium";
+            detectedEvents.push({
+              time: eventStart,
+              datasource: key,
+              condition: severity,
+              value: Math.round(eventMaxDrop),
+              dropAbsolute: Math.round(baseAvg - eventMinVal),
+              baseline: Math.round(baseAvg),
+              duration,
+            });
           }
-          detectedEvents.push({ time: p.ts, datasource: key, condition: severity, value: Math.round(dropPct), duration: dur || null });
+          inEvent = false; eventMinVal = Infinity; eventMaxDrop = 0;
         }
+      }
+      // If still in event at end of data
+      if (inEvent && eventMaxDrop > 15) {
+        const duration = parsed[parsed.length-1].ts - eventStart;
+        const severity = eventMaxDrop > 60 ? "critical" : eventMaxDrop > 30 ? "high" : "medium";
+        detectedEvents.push({
+          time: eventStart, datasource: key, condition: severity,
+          value: Math.round(eventMaxDrop), dropAbsolute: Math.round(baseAvg - eventMinVal),
+          baseline: Math.round(baseAvg), duration: duration > 0 ? duration : null,
+        });
       }
     }
     detectedEvents.sort((a,b) => b.time - a.time);
-    setEvents(detectedEvents.slice(0, 20));
+    setEvents(detectedEvents.slice(0, 30));
   }, []);
 
   // ── 3. Load regional scores (probing only, lighter) ──
@@ -174,9 +187,14 @@ export function TabIODA() {
           const max = Math.max(...vals);
           const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.1)));
           const baseAvg = baseline.reduce((a,b) => a+b, 0) / baseline.length || 1;
-          const healthPct = baseAvg > 0 ? Math.round((current / baseAvg) * 100) : 100;
-          // Drop score (how much it dropped from baseline)
-          const dropScore = Math.max(0, Math.round(baseAvg - current));
+          const healthPct = baseAvg > 0 ? Math.min(100, Math.round((current / baseAvg) * 100)) : 100;
+          // Outage score: accumulated sum of drops below baseline (replicates IODA scoring)
+          let dropScore = 0;
+          for (const v of vals) {
+            if (v < baseAvg * 0.95) {
+              dropScore += Math.round(baseAvg - v);
+            }
+          }
           return { ...st, healthPct: Math.min(healthPct, 100), dropScore, current, baseAvg, series: parsed };
         })
       );
@@ -506,9 +524,16 @@ export function TabIODA() {
                         </div>
                         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                           {scoreView === "outage" ? (<>
-                            <span style={{ fontSize:13, fontWeight:700, fontFamily:font, color:r.dropScore > 0 ? getSeverityColor(r.healthPct) : MUTED }}>
-                              {r.dropScore > 0 ? fmtVal(r.dropScore) : "0.0"}
-                            </span>
+                            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                              {r.dropScore > 0 && (() => {
+                                const maxScore = Math.max(...regionScores.map(x => x.dropScore), 1);
+                                const barW = Math.max(4, (r.dropScore / maxScore) * 60);
+                                return <div style={{ width:barW, height:4, background:getSeverityColor(r.healthPct), borderRadius:2 }} />;
+                              })()}
+                              <span style={{ fontSize:13, fontWeight:700, fontFamily:font, color:r.dropScore > 0 ? getSeverityColor(r.healthPct) : MUTED }}>
+                                {r.dropScore > 0 ? fmtVal(r.dropScore) : "0.0"}
+                              </span>
+                            </div>
                           </>) : (<>
                             <span style={{ fontSize:13, fontWeight:700, fontFamily:font, color:getSeverityColor(r.healthPct) }}>
                               {r.healthPct}%
@@ -531,8 +556,13 @@ export function TabIODA() {
       {/* ══════ EVENTOS ══════ */}
       {subView === "eventos" && (
         <Card accent="#f59e0b">
-          <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>
-            Eventos Recientes · Últimos 7 días
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
+            <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+              Eventos Recientes
+            </div>
+            <span style={{ fontSize:12, fontFamily:font, color:events.length > 0 ? "#dc2626" : MUTED }}>
+              {events.length} detectados · 7 días
+            </span>
           </div>
           {events.length === 0 ? (
             <div style={{ textAlign:"center", padding:"30px 0", color:MUTED, fontSize:13 }}>
@@ -544,10 +574,10 @@ export function TabIODA() {
                 <thead>
                   <tr style={{ borderBottom:`2px solid ${BORDER}` }}>
                     <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Fecha</th>
+                    <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Duración</th>
                     <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Fuente</th>
                     <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Severidad</th>
-                    <th style={{ padding:"6px 8px", textAlign:"right", color:MUTED, fontWeight:600 }}>Score</th>
-                    <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Duración</th>
+                    <th style={{ padding:"6px 8px", textAlign:"right", color:MUTED, fontWeight:600 }}>Caída</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -555,17 +585,28 @@ export function TabIODA() {
                     const sevColor = ev.condition === "critical" ? "#ef4444" : ev.condition === "high" ? "#f97316" : ev.condition === "medium" ? "#fbbf24" : MUTED;
                     return (
                       <tr key={i} style={{ borderBottom:`1px solid ${BORDER}30` }}>
-                        <td style={{ padding:"8px", color:TEXT }}>{ev.time ? fmtTime(ev.time) : "—"}</td>
                         <td style={{ padding:"8px" }}>
-                          <Badge color={ev.datasource === "bgp" ? "#7c3aed" : ev.datasource?.includes("ping") ? "#f59e0b" : "#dc2626"}>
-                            {(ev.datasource || "?").toUpperCase().replace("PING-SLASH24","SONDEO").replace("MERIT-NT","TELESCOPIO").replace("UCSD-NT","TELESCOPIO")}
+                          <div style={{ color:TEXT, fontWeight:600 }}>{ev.time ? fmtTime(ev.time) : "—"}</div>
+                        </td>
+                        <td style={{ padding:"8px", color:MUTED, fontSize:11 }}>{ev.duration ? fmtDuration(ev.duration) : "en curso"}</td>
+                        <td style={{ padding:"8px" }}>
+                          <Badge color={ev.datasource === "bgp" ? "#7c3aed" : ev.datasource === "probing" ? "#f59e0b" : "#dc2626"}>
+                            {ev.datasource === "bgp" ? "BGP" : ev.datasource === "probing" ? "SONDEO" : ev.datasource === "telescope" ? "TELESCOPIO" : (ev.datasource || "?").toUpperCase()}
                           </Badge>
                         </td>
                         <td style={{ padding:"8px" }}>
-                          <span style={{ fontSize:12, fontWeight:600, color:sevColor, textTransform:"uppercase" }}>{ev.condition || "?"}</span>
+                          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                            <span style={{ fontSize:12, fontWeight:700, color:sevColor, textTransform:"uppercase" }}>{ev.condition === "critical" ? "CRÍTICO" : ev.condition === "high" ? "ALTO" : "MEDIO"}</span>
+                            {/* Severity bar */}
+                            <div style={{ width:60, height:4, background:`${BORDER}40`, borderRadius:2, overflow:"hidden" }}>
+                              <div style={{ width:`${Math.min(ev.value || 0, 100)}%`, height:4, background:sevColor, borderRadius:2 }} />
+                            </div>
+                          </div>
                         </td>
-                        <td style={{ padding:"8px", textAlign:"right", fontWeight:700, color:sevColor }}>{ev.historyValue ? `${fmtVal(ev.value)} / ${fmtVal(ev.historyValue)}` : ev.value ? `-${ev.value}%` : "—"}</td>
-                        <td style={{ padding:"8px", color:MUTED }}>{ev.duration ? fmtDuration(ev.duration) : "—"}</td>
+                        <td style={{ padding:"8px", textAlign:"right" }}>
+                          <span style={{ fontWeight:700, color:sevColor, fontSize:13 }}>-{ev.value}%</span>
+                          {ev.dropAbsolute > 0 && <div style={{ fontSize:10, color:MUTED }}>↓{fmtVal(ev.dropAbsolute)}</div>}
+                        </td>
                       </tr>
                     );
                   })}
