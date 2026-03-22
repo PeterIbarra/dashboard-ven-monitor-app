@@ -106,8 +106,9 @@ function InteractiveChart({ states, mapMode, selectedState, onSelectState, palet
   // Build chart data
   const chartData = states.map(st => {
     const vals = st.series.map(p => p.probing ?? p.bgp).filter(v => v !== null);
-    const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.1)));
-    const baseAvg = baseline.reduce((a,b) => a+b, 0) / baseline.length || 1;
+    // Baseline = P95 (95th percentile) — the normal plateau
+    const sorted = [...vals].sort((a,b) => a - b);
+    const baseAvg = sorted[Math.floor(sorted.length * 0.95)] || sorted[sorted.length - 1] || 1;
     return {
       name: st.name, health: st.healthPct,
       pctSeries: st.series.map(p => {
@@ -350,13 +351,13 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, mapMode })
     const map = mapInst.current;
     if (markersRef.current) { map.removeLayer(markersRef.current); }
     const group = L.layerGroup();
-    const scores = regionScores.map(r => r.displayScore || r.dropScore90 || 0);
+    const scores = regionScores.map(r => r.displayScore || r.dropScore || 0);
     const maxScore = Math.max(...scores, 1);
 
     regionScores.forEach(r => {
       const coords = STATE_COORDS[r.name];
       if (!coords) return;
-      const isAffected = (r.displayScore || r.dropScore90 || 0) > 0;
+      const isAffected = (r.displayScore || r.dropScore || 0) > 0;
       const severity = r.healthPct;
       const color = severity >= 90 ? "#34d399" : severity >= 70 ? "#fbbf24" : severity >= 50 ? "#f97316" : "#ef4444";
       // Size: in "live" mode based on severity, in accumulated modes based on score
@@ -366,7 +367,7 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, mapMode })
         radius = severity >= 90 ? 6 : severity >= 70 ? 14 : severity >= 50 ? 22 : 32;
       } else {
         // Accumulated: size proportional to outage score
-        const ds = r.displayScore || r.dropScore90 || 0;
+        const ds = r.displayScore || r.dropScore || 0;
         radius = ds > 0 ? Math.max(8, Math.min(40, (ds / maxScore) * 40)) : 5;
       }
       const circle = L.circleMarker(coords, {
@@ -525,43 +526,56 @@ export function TabIODA() {
             if (!json) return null;
             const parsed = parseSignals(json);
             if (!parsed || parsed.length === 0) return null;
-            // Analyze ALL 3 signal sources, compute average health + per-source detail
             const srcKeys = ["probing", "bgp", "telescope"];
-            const srcLabels = { probing: "Sondeo", bgp: "BGP", telescope: "Telescopio" };
-            let totalDrop75 = 0, totalDrop90 = 0, maxLiveDrop = 0;
+            let totalDropScore = 0, maxLiveDrop = 0;
             const perSource = {};
-            let validSources = 0, healthSum = 0;
+            let validSources = 0;
             let refCurrent = null, refBaseAvg = null, refWorstHealth = 999;
             
             for (const src of srcKeys) {
               const sVals = parsed.map(p => p[src]).filter(v => v !== null);
               if (sVals.length < 5) { perSource[src] = null; continue; }
-              const sCurrent = sVals[sVals.length - 1];
-              const sBaseline = sVals.slice(0, Math.max(1, Math.floor(sVals.length * 0.1)));
-              const sBaseAvg = sBaseline.reduce((a,b) => a+b, 0) / sBaseline.length;
-              if (sBaseAvg < 10) { perSource[src] = null; continue; } // Skip sources with too little coverage
               
-              const sHealth = Math.min(100, Math.round((sCurrent / sBaseAvg) * 100));
+              // Baseline = P95 (95th percentile) — the "normal" plateau level
+              const sorted = [...sVals].sort((a,b) => a - b);
+              const p95idx = Math.floor(sorted.length * 0.95);
+              const sBaseAvg = sorted[p95idx] || sorted[sorted.length - 1];
+              if (sBaseAvg < 10) { perSource[src] = null; continue; }
+              
+              // Current = average of last 5 readings (smooths noise)
+              const recentN = sVals.slice(-Math.min(5, sVals.length));
+              const sCurrent = recentN.reduce((a,b) => a+b, 0) / recentN.length;
+              
+              // Health: worst reading in last ~2h (12 readings at 10min step)
+              const tailWindow = sVals.slice(-Math.min(12, sVals.length));
+              const worstRecent = Math.min(...tailWindow);
+              const sHealth = Math.min(100, Math.round((worstRecent / sBaseAvg) * 100));
+              
               perSource[src] = { health: sHealth, current: Math.round(sCurrent), baseline: Math.round(sBaseAvg) };
               validSources++;
-              healthSum += sHealth;
               
               if (sHealth < refWorstHealth) {
                 refCurrent = sCurrent; refBaseAvg = sBaseAvg;
                 refWorstHealth = sHealth;
               }
               
+              // Outage score: sum of ALL drops below baseline, any magnitude
+              // Each point contributes (baseline - value) if value < baseline * 0.97
+              // This accumulates big scores over 7d/30d even for moderate dips
+              const threshold = sBaseAvg * 0.97; // 3% tolerance for noise
               for (const v of sVals) {
-                if (v < sBaseAvg * 0.75) totalDrop75 += Math.round(sBaseAvg - v);
-                if (v < sBaseAvg * 0.90) totalDrop90 += Math.round(sBaseAvg - v);
+                if (v < threshold) {
+                  totalDropScore += Math.round(sBaseAvg - v);
+                }
               }
+              
               const sLiveDrop = Math.max(0, Math.round(sBaseAvg - sCurrent));
               if (sLiveDrop > maxLiveDrop) maxLiveDrop = sLiveDrop;
             }
             
             if (validSources === 0) return null;
-            // Weighted average: Probing 50%, BGP 30%, Telescope 20%
-            const weights = { probing: 50, bgp: 30, telescope: 20 };
+            // Weighted average health: Probing 60%, BGP 30%, Telescope 10%
+            const weights = { probing: 60, bgp: 30, telescope: 10 };
             let wSum = 0, wTotal = 0;
             for (const src of srcKeys) {
               if (perSource[src]) {
@@ -569,13 +583,13 @@ export function TabIODA() {
                 wTotal += weights[src];
               }
             }
-            const avgHealth = wTotal > 0 ? Math.round(wSum / wTotal) : Math.round(healthSum / validSources);
-            return { ...st, healthPct: avgHealth, dropScore75: totalDrop75, dropScore90: totalDrop90, liveDrop: maxLiveDrop, current: refCurrent, baseAvg: refBaseAvg, perSource, series: parsed };
+            const avgHealth = wTotal > 0 ? Math.round(wSum / wTotal) : 100;
+            return { ...st, healthPct: avgHealth, dropScore: totalDropScore, liveDrop: maxLiveDrop, current: refCurrent, baseAvg: refBaseAvg, perSource, series: parsed };
           })
         );
         results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
       }
-      scores.sort((a,b) => b.dropScore90 - a.dropScore90 || a.healthPct - b.healthPct);
+      scores.sort((a,b) => b.dropScore - a.dropScore || a.healthPct - b.healthPct);
       return scores;
     };
 
@@ -609,39 +623,43 @@ export function TabIODA() {
           const parsed = parseSignals(json);
           if (!parsed || parsed.length === 0) return null;
           const srcKeys = ["probing", "bgp", "telescope"];
-          let totalDrop75 = 0, totalDrop90 = 0, maxLiveDrop = 0;
+          let totalDropScore = 0, maxLiveDrop = 0;
           const perSource = {};
-          let validSources = 0, healthSum = 0;
+          let validSources = 0;
           let refCurrent = null, refBaseAvg = null, refWorstHealth = 999;
           for (const src of srcKeys) {
             const sVals = parsed.map(p => p[src]).filter(v => v !== null);
             if (sVals.length < 5) { perSource[src] = null; continue; }
-            const sCurrent = sVals[sVals.length - 1];
-            const sBaseline = sVals.slice(0, Math.max(1, Math.floor(sVals.length * 0.1)));
-            const sBaseAvg = sBaseline.reduce((a,b) => a+b, 0) / sBaseline.length;
+            const sorted = [...sVals].sort((a,b) => a - b);
+            const p95idx = Math.floor(sorted.length * 0.95);
+            const sBaseAvg = sorted[p95idx] || sorted[sorted.length - 1];
             if (sBaseAvg < 10) { perSource[src] = null; continue; }
-            const sHealth = Math.min(100, Math.round((sCurrent / sBaseAvg) * 100));
+            const recentN = sVals.slice(-Math.min(5, sVals.length));
+            const sCurrent = recentN.reduce((a,b) => a+b, 0) / recentN.length;
+            const tailWindow = sVals.slice(-Math.min(12, sVals.length));
+            const worstRecent = Math.min(...tailWindow);
+            const sHealth = Math.min(100, Math.round((worstRecent / sBaseAvg) * 100));
             perSource[src] = { health: sHealth, current: Math.round(sCurrent), baseline: Math.round(sBaseAvg) };
-            validSources++; healthSum += sHealth;
+            validSources++;
             if (sHealth < refWorstHealth) { refCurrent = sCurrent; refBaseAvg = sBaseAvg; refWorstHealth = sHealth; }
+            const threshold = sBaseAvg * 0.97;
             for (const v of sVals) {
-              if (v < sBaseAvg * 0.75) totalDrop75 += Math.round(sBaseAvg - v);
-              if (v < sBaseAvg * 0.90) totalDrop90 += Math.round(sBaseAvg - v);
+              if (v < threshold) totalDropScore += Math.round(sBaseAvg - v);
             }
             const sLiveDrop = Math.max(0, Math.round(sBaseAvg - sCurrent));
             if (sLiveDrop > maxLiveDrop) maxLiveDrop = sLiveDrop;
           }
           if (validSources === 0) return null;
-          const weights = { probing: 50, bgp: 30, telescope: 20 };
+          const weights = { probing: 60, bgp: 30, telescope: 10 };
           let wSum = 0, wTotal = 0;
           for (const src of srcKeys) { if (perSource[src]) { wSum += perSource[src].health * weights[src]; wTotal += weights[src]; } }
-          const avgHealth = wTotal > 0 ? Math.round(wSum / wTotal) : Math.round(healthSum / validSources);
-          return { ...st, healthPct: avgHealth, dropScore75: totalDrop75, dropScore90: totalDrop90, liveDrop: maxLiveDrop, current: refCurrent, baseAvg: refBaseAvg, perSource, series: parsed };
+          const avgHealth = wTotal > 0 ? Math.round(wSum / wTotal) : 100;
+          return { ...st, healthPct: avgHealth, dropScore: totalDropScore, liveDrop: maxLiveDrop, current: refCurrent, baseAvg: refBaseAvg, perSource, series: parsed };
         })
       );
       results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
     }
-    scores.sort((a,b) => b.dropScore90 - a.dropScore90 || a.healthPct - b.healthPct);
+    scores.sort((a,b) => b.dropScore - a.dropScore || a.healthPct - b.healthPct);
     setRegionData30d(scores);
     setRegionLoading30d(false);
   }, [regionData30d.length, regionLoading30d]);
@@ -711,8 +729,8 @@ export function TabIODA() {
     );
     const max = Math.max(...vals), min = Math.min(...vals);
     const current = vals[vals.length - 1];
-    const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.2)));
-    const avg = baseline.reduce((a,b) => a+b, 0) / baseline.length;
+    const sortedNat = [...vals].sort((a,b) => a - b);
+    const avg = sortedNat[Math.floor(sortedNat.length * 0.95)] || sortedNat[sortedNat.length - 1] || 1;
     const pctChange = avg !== 0 ? ((current - avg) / avg * 100) : 0;
     const W = 600, H = 130, pL = 50, pR = 10, pT = 5, pB = 5;
     const cW = W-pL-pR, cH = H-pT-pB;
@@ -793,9 +811,7 @@ export function TabIODA() {
     || (mapMode === "30d" && regionData30d.length === 0 && regionLoading30d);
   const activeData = (rawRegionData || []).map(r => ({
     ...r,
-    displayScore: mapMode === "live" ? (r.liveDrop || 0) :
-                  mapMode === "24h" ? (r.dropScore90 || 0) :
-                  (r.dropScore75 || 0),
+    displayScore: mapMode === "live" ? (r.liveDrop || 0) : (r.dropScore || 0),
   })).sort((a,b) => b.displayScore - a.displayScore || a.healthPct - b.healthPct);
 
   return (
@@ -1149,8 +1165,8 @@ export function TabIODA() {
                                 <div style={{ fontSize:10, color:`${MUTED}60`, marginTop:4 }}>Sin datos suficientes</div>
                               </div>
                             );
-                            const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.1)));
-                            const baseAvg = baseline.reduce((a,b) => a+b, 0) / baseline.length || 1;
+                            const sortedV = [...vals].sort((a,b) => a - b);
+                            const baseAvg = sortedV[Math.floor(sortedV.length * 0.95)] || sortedV[sortedV.length - 1] || 1;
                             const current = vals[vals.length - 1];
                             const health = Math.min(100, Math.round((current / baseAvg) * 100));
                             // Mini sparkline
