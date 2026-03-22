@@ -20,7 +20,7 @@ const VE_REGIONS = [
 ];
 
 const IODA_BASE = "https://api.ioda.inetintel.cc.gatech.edu/v2";
-const hoursMap = { "24h":24, "48h":48, "7d":168 };
+const hoursMap = { "24h":24, "48h":48, "7d":168, "30d":720 };
 
 // ── Helper: fetch with cascade (Vercel proxy → CORS proxies) ──
 async function iodaFetch(path, params = {}) {
@@ -101,6 +101,7 @@ function InteractiveChart({ states, mapMode, selectedState, onSelectState, palet
   const [zoomRange, setZoomRange] = useState(null); // {start, end} as fraction 0-1
   const [dragging, setDragging] = useState(false);
   const [dragStart, setDragStart] = useState(null);
+  const [chartHover, setChartHover] = useState(null); // { x, ts, values: [{name, pct, color}] }
   
   // Build chart data
   const chartData = states.map(st => {
@@ -153,8 +154,27 @@ function InteractiveChart({ states, mapMode, selectedState, onSelectState, palet
   
   return (
     <div>
-      <div ref={containerRef} onWheel={handleWheel} style={{ cursor: "crosshair", touchAction: "none" }}>
-        <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}>
+      <div ref={containerRef} onWheel={handleWheel} style={{ cursor: "crosshair", touchAction: "none", position: "relative" }}>
+        <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}
+          onMouseMove={e => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / rect.width * W;
+            const ts = viewStart + ((mx - pL) / cW) * viewRange;
+            if (ts < viewStart || ts > viewEnd) { setChartHover(null); return; }
+            const values = chartData.map((st, si) => {
+              const closest = st.pctSeries.reduce((best, p) => {
+                if (p.pct === null) return best;
+                const dist = Math.abs(p.ts - ts);
+                return (!best || dist < best.dist) ? { pct: p.pct, dist } : best;
+              }, null);
+              return closest ? { name: st.name, pct: closest.pct, color: palette[si % palette.length] } : null;
+            }).filter(Boolean);
+            values.sort((a,b) => b.pct - a.pct);
+            setChartHover({ x: mx, ts, values, clientX: e.clientX - rect.left, clientY: e.clientY - rect.top });
+          }}
+          onMouseLeave={() => setChartHover(null)}>
+          {/* Hover crosshair */}
+          {chartHover && <line x1={chartHover.x} y1={pT} x2={chartHover.x} y2={pT+cH} stroke="rgba(0,0,0,0.12)" strokeDasharray="2,2" />}
           {/* Grid */}
           {[0, 20, 40, 60, 80, 100].map(pct => (
             <g key={pct}>
@@ -188,25 +208,70 @@ function InteractiveChart({ states, mapMode, selectedState, onSelectState, palet
             return <path key={st.name} d={d} fill="none" stroke={color} 
               strokeWidth={isSelected ? 2.5 : 1.5} opacity={opacity} />;
           })}
-          {/* End labels */}
-          {chartData.map((st, si) => {
-            const color = palette[si % palette.length];
-            const isSelected = selectedState === st.name;
-            if (selectedState && !isSelected) return null;
-            const visible = st.pctSeries.filter(p => p.pct !== null && p.ts >= viewStart && p.ts <= viewEnd);
-            const lastPt = visible[visible.length - 1];
-            if (!lastPt) return null;
-            const x = Math.min(toX(lastPt.ts) + 4, pL + cW + 4);
-            return (
-              <g key={`lbl-${st.name}`}>
-                <circle cx={toX(lastPt.ts)} cy={toY(lastPt.pct)} r={3} fill={color} />
-                <text x={x} y={toY(lastPt.pct) + 3} fontSize={8} fill={color} fontWeight={700} fontFamily={font}>
-                  {st.name} {lastPt.pct}%
-                </text>
-              </g>
-            );
-          })}
+          {/* End labels with collision avoidance */}
+          {(() => {
+            // Collect label positions first
+            const labels = [];
+            chartData.forEach((st, si) => {
+              const color = palette[si % palette.length];
+              const isSelected = selectedState === st.name;
+              if (selectedState && !isSelected) return;
+              const visible = st.pctSeries.filter(p => p.pct !== null && p.ts >= viewStart && p.ts <= viewEnd);
+              const lastPt = visible[visible.length - 1];
+              if (!lastPt) return;
+              labels.push({ name: st.name, pct: lastPt.pct, ts: lastPt.ts, color, si });
+            });
+            // Sort by Y position (top to bottom) and apply offset to avoid overlap
+            labels.sort((a, b) => toY(a.pct) - toY(b.pct));
+            const minGap = 10; // minimum px between label centers
+            const positioned = [];
+            labels.forEach(lb => {
+              let y = toY(lb.pct);
+              // Push down if too close to previous label
+              for (const prev of positioned) {
+                if (Math.abs(y - prev.y) < minGap) {
+                  y = prev.y + minGap;
+                }
+              }
+              // Clamp within chart area
+              y = Math.max(pT + 6, Math.min(pT + cH - 2, y));
+              positioned.push({ ...lb, y });
+            });
+            return positioned.map(lb => {
+              const cx = toX(lb.ts);
+              const x = Math.min(cx + 4, pL + cW + 4);
+              return (
+                <g key={`lbl-${lb.name}`}>
+                  <circle cx={cx} cy={toY(lb.pct)} r={3} fill={lb.color} />
+                  {/* Connector line if label was offset */}
+                  {Math.abs(lb.y - toY(lb.pct)) > 2 && (
+                    <line x1={cx + 3} y1={toY(lb.pct)} x2={x} y2={lb.y} stroke={`${lb.color}40`} strokeWidth={0.5} />
+                  )}
+                  <text x={x} y={lb.y + 3} fontSize={8} fill={lb.color} fontWeight={700} fontFamily={font}>
+                    {lb.name} {lb.pct}%
+                  </text>
+                </g>
+              );
+            });
+          })()}
         </svg>
+        {/* Hover tooltip */}
+        {chartHover && chartHover.values.length > 0 && (
+          <div style={{
+            position:"absolute", left: Math.min(chartHover.clientX + 12, (containerRef.current?.offsetWidth || 600) - 160),
+            top: Math.max(0, chartHover.clientY - 20), background:"rgba(0,0,0,0.88)", color:"#fff", padding:"6px 10px",
+            borderRadius:4, fontSize:10, fontFamily:font, pointerEvents:"none", zIndex:10, minWidth:120, maxHeight:200, overflowY:"auto",
+            boxShadow:"0 2px 8px rgba(0,0,0,0.3)"
+          }}>
+            <div style={{ fontSize:9, color:"rgba(255,255,255,0.6)", marginBottom:4 }}>{fmtTime(chartHover.ts)}</div>
+            {chartHover.values.map(v => (
+              <div key={v.name} style={{ display:"flex", justifyContent:"space-between", gap:12, padding:"1px 0" }}>
+                <span style={{ color:v.color, fontWeight:600 }}>{v.name}</span>
+                <span style={{ fontWeight:700 }}>{v.pct}%</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       {/* Legend + zoom controls */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:6, flexWrap:"wrap", gap:6 }}>
@@ -308,7 +373,7 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, mapMode })
         radius, fillColor: color, color: selectedState === r.name ? "#fff" : color,
         weight: selectedState === r.name ? 3 : 1.5, opacity: 0.9, fillOpacity: isAffected ? 0.7 : 0.3,
       });
-      const modeLabel = mapMode === "live" ? "En Vivo" : mapMode === "24h" ? "24h" : "7 días";
+      const modeLabel = mapMode === "live" ? "En Vivo" : mapMode === "24h" ? "24h" : mapMode === "7d" ? "7 días" : "30 días";
       circle.bindPopup(
         `<div style="font-family:monospace;font-size:11px;min-width:160px">` +
         `<b style="font-size:13px">${r.name}</b> <span style="color:#888">(${modeLabel})</span><br/>` +
@@ -353,7 +418,7 @@ export function TabIODA() {
   const [aiLoading, setAiLoading] = useState(false);
   const [subView, setSubView] = useState("nacional"); // nacional | estados | eventos
   const [scoreView, setScoreView] = useState("outage"); // outage | health
-  const [mapMode, setMapMode] = useState("live"); // live | 24h | 7d
+  const [mapMode, setMapMode] = useState("live"); // live | 24h | 7d | 30d
 
   // ── 1. Load national signals ──
   const loadNational = useCallback(async () => {
@@ -439,6 +504,9 @@ export function TabIODA() {
   // ── 3. Load regional scores (probing only, lighter) ──
   // Store separate datasets for different time ranges
   const [regionData7d, setRegionData7d] = useState([]);
+  const [regionData30d, setRegionData30d] = useState([]);
+  const [regionLoading7d, setRegionLoading7d] = useState(false);
+  const [regionLoading30d, setRegionLoading30d] = useState(false);
 
   const loadRegions = useCallback(async () => {
     setRegionLoading(true);
@@ -517,11 +585,68 @@ export function TabIODA() {
     setRegionLoading(false);
 
     // Then fetch 7d in background (slower, 7 days of data per state)
-    fetchRange(168).then(data7d => setRegionData7d(data7d));
+    setRegionLoading7d(true);
+    fetchRange(168).then(data7d => { setRegionData7d(data7d); setRegionLoading7d(false); }).catch(() => setRegionLoading7d(false));
   }, []);
 
   useEffect(() => { loadNational(); loadEvents(); }, [loadNational, loadEvents]);
   useEffect(() => { if (subView === "estados") loadRegions(); }, [subView, loadRegions]);
+
+  // Lazy-load 30d data when user selects that mode
+  const load30d = useCallback(async () => {
+    if (regionData30d.length > 0 || regionLoading30d) return;
+    setRegionLoading30d(true);
+    const now = Math.floor(Date.now() / 1000);
+    const from = now - 30 * 24 * 3600;
+    const scores = [];
+    const batches = [];
+    for (let i = 0; i < VE_REGIONS.length; i += 8) batches.push(VE_REGIONS.slice(i, i + 8));
+    for (const batch of batches) {
+      const results = await Promise.allSettled(
+        batch.map(async (st) => {
+          const json = await iodaFetch(`signals/raw/region/${st.code}`, { from, until: now });
+          if (!json) return null;
+          const parsed = parseSignals(json);
+          if (!parsed || parsed.length === 0) return null;
+          const srcKeys = ["probing", "bgp", "telescope"];
+          let totalDrop75 = 0, totalDrop90 = 0, maxLiveDrop = 0;
+          const perSource = {};
+          let validSources = 0, healthSum = 0;
+          let refCurrent = null, refBaseAvg = null, refWorstHealth = 999;
+          for (const src of srcKeys) {
+            const sVals = parsed.map(p => p[src]).filter(v => v !== null);
+            if (sVals.length < 5) { perSource[src] = null; continue; }
+            const sCurrent = sVals[sVals.length - 1];
+            const sBaseline = sVals.slice(0, Math.max(1, Math.floor(sVals.length * 0.1)));
+            const sBaseAvg = sBaseline.reduce((a,b) => a+b, 0) / sBaseline.length;
+            if (sBaseAvg < 10) { perSource[src] = null; continue; }
+            const sHealth = Math.min(100, Math.round((sCurrent / sBaseAvg) * 100));
+            perSource[src] = { health: sHealth, current: Math.round(sCurrent), baseline: Math.round(sBaseAvg) };
+            validSources++; healthSum += sHealth;
+            if (sHealth < refWorstHealth) { refCurrent = sCurrent; refBaseAvg = sBaseAvg; refWorstHealth = sHealth; }
+            for (const v of sVals) {
+              if (v < sBaseAvg * 0.75) totalDrop75 += Math.round(sBaseAvg - v);
+              if (v < sBaseAvg * 0.90) totalDrop90 += Math.round(sBaseAvg - v);
+            }
+            const sLiveDrop = Math.max(0, Math.round(sBaseAvg - sCurrent));
+            if (sLiveDrop > maxLiveDrop) maxLiveDrop = sLiveDrop;
+          }
+          if (validSources === 0) return null;
+          const weights = { probing: 50, bgp: 30, telescope: 20 };
+          let wSum = 0, wTotal = 0;
+          for (const src of srcKeys) { if (perSource[src]) { wSum += perSource[src].health * weights[src]; wTotal += weights[src]; } }
+          const avgHealth = wTotal > 0 ? Math.round(wSum / wTotal) : Math.round(healthSum / validSources);
+          return { ...st, healthPct: avgHealth, dropScore75: totalDrop75, dropScore90: totalDrop90, liveDrop: maxLiveDrop, current: refCurrent, baseAvg: refBaseAvg, perSource, series: parsed };
+        })
+      );
+      results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
+    }
+    scores.sort((a,b) => b.dropScore90 - a.dropScore90 || a.healthPct - b.healthPct);
+    setRegionData30d(scores);
+    setRegionLoading30d(false);
+  }, [regionData30d.length, regionLoading30d]);
+
+  useEffect(() => { if (mapMode === "30d") load30d(); }, [mapMode, load30d]);
 
   // ── 4. AI Explain ──
   const explainWithAI = async () => {
@@ -661,7 +786,11 @@ export function TabIODA() {
   };
 
   // Compute activeData at component level (used by estados + chart)
-  const rawRegionData = mapMode === "7d" && regionData7d.length > 0 ? regionData7d : regionScores;
+  const rawRegionData = mapMode === "30d" && regionData30d.length > 0 ? regionData30d
+    : mapMode === "7d" && regionData7d.length > 0 ? regionData7d
+    : regionScores;
+  const isExtendedLoading = (mapMode === "7d" && regionData7d.length === 0 && regionLoading7d)
+    || (mapMode === "30d" && regionData30d.length === 0 && regionLoading30d);
   const activeData = (rawRegionData || []).map(r => ({
     ...r,
     displayScore: mapMode === "live" ? (r.liveDrop || 0) :
@@ -760,9 +889,9 @@ export function TabIODA() {
                   Mapa de Interrupciones
                 </div>
                 <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
-                  {[{id:"live",label:"🔴 En Vivo"},{id:"24h",label:"24h"},{id:"7d",label:"7 días"}].map(m => (
+                  {[{id:"live",label:"🔴 En Vivo"},{id:"24h",label:"24h"},{id:"7d",label:"7 días"},{id:"30d",label:"30 días"}].map(m => (
                     <button key={m.id} onClick={() => setMapMode(m.id)}
-                      style={{ fontSize:11, fontFamily:font, padding:"4px 12px", border:"none",
+                      style={{ fontSize:11, fontFamily:font, padding:"4px 10px", border:"none",
                         background:mapMode===m.id?ACCENT:"transparent", color:mapMode===m.id?"#fff":MUTED, cursor:"pointer" }}>{m.label}</button>
                   ))}
                 </div>
@@ -770,7 +899,9 @@ export function TabIODA() {
               <div style={{ display:"flex", gap:12, marginBottom:6, flexWrap:"wrap" }}>
                 <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>
                   {mapMode === "live" ? "Color = severidad actual · Tamaño = impacto" :
-                   mapMode === "24h" ? "Score acumulado últimas 24 horas" : "Score acumulado últimos 7 días"}
+                   mapMode === "24h" ? "Score acumulado últimas 24 horas" :
+                   mapMode === "7d" ? "Score acumulado últimos 7 días" : "Score acumulado últimos 30 días"}
+                  {isExtendedLoading && " · ⏳ cargando datos..."}
                 </span>
                 <div style={{ display:"flex", gap:8, marginLeft:"auto" }}>
                   {[{l:"Normal",c:"#34d399"},{l:"Degradado",c:"#fbbf24"},{l:"Alto",c:"#f97316"},{l:"Crítico",c:"#ef4444"}].map(lg => (
@@ -845,7 +976,7 @@ export function TabIODA() {
                     {scoreView === "outage" ? (mapMode === "live" ? "Caída Actual" : "Outage Score") : "Salud %"}
                   </div>
                   <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    {mapMode === "7d" && regionData7d.length === 0 && <span style={{ fontSize:9, fontFamily:font, color:AM }}>cargando 7d...</span>}
+                    {isExtendedLoading && <span style={{ fontSize:9, fontFamily:font, color:"#a17d08" }}>⏳ cargando {mapMode}...</span>}
                     <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
                     {[{id:"outage",label:"Score"},{id:"health",label:"Salud %"}].map(v => (
                       <button key={v.id} onClick={() => setScoreView(v.id)}
@@ -990,7 +1121,8 @@ export function TabIODA() {
                       Conectividad por Estado
                     </div>
                     <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>
-                      {mapMode === "live" ? "24h" : mapMode === "24h" ? "24h" : "7 días"} · Scroll para zoom · Click estado en mapa para filtrar
+                      {mapMode === "live" ? "24h" : mapMode === "24h" ? "24h" : mapMode === "7d" ? "7 días" : "30 días"} · Scroll para zoom · Click estado en mapa para filtrar
+                      {isExtendedLoading && " · ⏳ cargando..."}
                     </span>
                   </div>
                   {/* Main probing-based multi-line chart */}
