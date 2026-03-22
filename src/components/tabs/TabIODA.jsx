@@ -660,6 +660,15 @@ export function TabIODA() {
     );
   };
 
+  // Compute activeData at component level (used by estados + chart)
+  const rawRegionData = mapMode === "7d" && regionData7d.length > 0 ? regionData7d : regionScores;
+  const activeData = (rawRegionData || []).map(r => ({
+    ...r,
+    displayScore: mapMode === "live" ? (r.liveDrop || 0) :
+                  mapMode === "24h" ? (r.dropScore90 || 0) :
+                  (r.dropScore75 || 0),
+  })).sort((a,b) => b.displayScore - a.displayScore || a.healthPct - b.healthPct);
+
   return (
     <div>
       {/* ── Header ── */}
@@ -737,15 +746,6 @@ export function TabIODA() {
 
       {/* ══════ ESTADOS ══════ */}
       {subView === "estados" && (() => {
-        // Select data based on map mode
-        const rawData = mapMode === "7d" && regionData7d.length > 0 ? regionData7d : regionScores;
-        // Compute display score based on mode
-        const activeData = (rawData || []).map(r => ({
-          ...r,
-          displayScore: mapMode === "live" ? (r.liveDrop || 0) :
-                        mapMode === "24h" ? (r.dropScore90 || 0) :
-                        (r.dropScore75 || 0),
-        })).sort((a,b) => b.displayScore - a.displayScore || a.healthPct - b.healthPct);
         return (<>
         {regionLoading ? (
           <Card><div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:14, fontFamily:font }}>
