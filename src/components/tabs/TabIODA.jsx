@@ -139,12 +139,13 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, mapMode })
 
   // Update markers when regionScores change
   useEffect(() => {
-    if (!mapInst.current || !window.L) return;
+    if (!mapInst.current || !window.L || !regionScores || regionScores.length === 0) return;
     const L = window.L;
     const map = mapInst.current;
     if (markersRef.current) { map.removeLayer(markersRef.current); }
     const group = L.layerGroup();
-    const maxScore = Math.max(...regionScores.map(r => r.displayScore || r.dropScore90 || 0), 1);
+    const scores = regionScores.map(r => r.displayScore || r.dropScore90 || 0);
+    const maxScore = Math.max(...scores, 1);
 
     regionScores.forEach(r => {
       const coords = STATE_COORDS[r.name];
@@ -321,7 +322,7 @@ export function TabIODA() {
             let totalDrop75 = 0, totalDrop90 = 0, maxLiveDrop = 0;
             const perSource = {};
             let validSources = 0, healthSum = 0;
-            let refCurrent = null, refBaseAvg = null;
+            let refCurrent = null, refBaseAvg = null, refWorstHealth = 999;
             
             for (const src of srcKeys) {
               const sVals = parsed.map(p => p[src]).filter(v => v !== null);
@@ -336,9 +337,9 @@ export function TabIODA() {
               validSources++;
               healthSum += sHealth;
               
-              if (refCurrent === null || sHealth < (refCurrent._h || 999)) {
+              if (sHealth < refWorstHealth) {
                 refCurrent = sCurrent; refBaseAvg = sBaseAvg;
-                refCurrent._h = sHealth;
+                refWorstHealth = sHealth;
               }
               
               for (const v of sVals) {
@@ -589,11 +590,11 @@ export function TabIODA() {
         // Select data based on map mode
         const rawData = mapMode === "7d" && regionData7d.length > 0 ? regionData7d : regionScores;
         // Compute display score based on mode
-        const activeData = rawData.map(r => ({
+        const activeData = (rawData || []).map(r => ({
           ...r,
-          displayScore: mapMode === "live" ? r.liveDrop :
-                        mapMode === "24h" ? r.dropScore90 :
-                        r.dropScore75,
+          displayScore: mapMode === "live" ? (r.liveDrop || 0) :
+                        mapMode === "24h" ? (r.dropScore90 || 0) :
+                        (r.dropScore75 || 0),
         })).sort((a,b) => b.displayScore - a.displayScore || a.healthPct - b.healthPct);
         return (<>
         {regionLoading ? (
