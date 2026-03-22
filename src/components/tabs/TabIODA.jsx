@@ -47,6 +47,8 @@ function parseSignals(json) {
   const bgp = raw.find(s => s.datasource === "bgp");
   const probing = raw.find(s => s.datasource === "ping-slash24");
   const telescope = raw.find(s => s.datasource === "ucsd-nt") || raw.find(s => s.datasource === "merit-nt");
+  const loss = raw.find(s => s.datasource === "ping-slash24-loss");
+  const latency = raw.find(s => s.datasource === "ping-slash24-latency");
   const anchor = [bgp, probing, telescope].filter(Boolean).sort((a,b) => b.values.length - a.values.length)[0];
   if (!anchor) return null;
   const valAt = (sig, ts) => {
@@ -54,9 +56,26 @@ function parseSignals(json) {
     const idx = Math.round((ts - sig.from) / sig.step);
     return (idx >= 0 && idx < sig.values.length) ? sig.values[idx] : null;
   };
+  // Extract scalar from nested loss/latency objects: values[i] = [{agg_values:{loss_pct:X}}]
+  const objValAt = (sig, ts, field) => {
+    if (!sig) return null;
+    const idx = Math.round((ts - sig.from) / sig.step);
+    if (idx < 0 || idx >= sig.values.length) return null;
+    const entry = sig.values[idx];
+    const obj = Array.isArray(entry) ? entry[0] : entry;
+    const v = obj?.agg_values?.[field];
+    return typeof v === "number" ? v : null;
+  };
   return anchor.values.map((_, i) => {
     const ts = anchor.from + i * anchor.step;
-    return { ts, bgp: valAt(bgp, ts), probing: valAt(probing, ts), telescope: valAt(telescope, ts) };
+    return {
+      ts,
+      bgp: valAt(bgp, ts),
+      probing: valAt(probing, ts),
+      telescope: valAt(telescope, ts),
+      lossPct: objValAt(loss, ts, "loss_pct"),
+      medianLatency: objValAt(latency, ts, "median_latency"),
+    };
   });
 }
 
@@ -66,33 +85,200 @@ const fmtTime = epoch => new Date(epoch * 1000).toLocaleString("es-VE", { timeZo
 const fmtDuration = secs => { if (secs < 3600) return `${Math.round(secs/60)}m`; const h = Math.floor(secs/3600), m = Math.round((secs%3600)/60); return m > 0 ? `${h}h ${m}m` : `${h}h`; };
 
 // ── Interpret connectivity pattern from per-source data ──
-function interpretPattern(perSource) {
+function interpretPattern(perSource, telescopeMultiplier) {
   if (!perSource) return { emoji: "❓", text: "Sin datos suficientes para interpretar." };
-  const bgp = perSource.bgp?.health ?? null;
   const prob = perSource.probing?.health ?? null;
+  const bgp = perSource.bgp?.health ?? null;
+  const loss = perSource.loss?.health ?? null;
+  const lat = perSource.latency?.health ?? null;
   const tele = perSource.telescope?.health ?? null;
+  const natTeleAnomaly = (telescopeMultiplier || 1) > 1;
   
-  const vals = [bgp, prob, tele].filter(v => v !== null);
+  const vals = [prob, bgp, loss, lat].filter(v => v !== null);
   if (vals.length === 0) return { emoji: "❓", text: "Sin datos suficientes." };
-  const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+  const worst = Math.min(...vals);
   
-  if (avg >= 90) return { emoji: "✅", text: "Conectividad normal — sin anomalías detectadas en ningún indicador." };
+  if (worst >= 90) return { emoji: "✅", text: "Conectividad normal — sin anomalías detectadas en ningún indicador." };
   
-  const bgpDown = bgp !== null && bgp < 70;
-  const probDown = prob !== null && prob < 70;
-  const teleDown = tele !== null && tele < 70;
+  const probDown = prob !== null && prob < 80;
+  const bgpDown = bgp !== null && bgp < 80;
+  const lossHigh = loss !== null && loss < 70;
+  const latHigh = lat !== null && lat < 70;
   
-  if (bgpDown && probDown && teleDown) return { emoji: "🔴", text: "Desconexión generalizada — los tres indicadores registran caídas significativas. Consistente con corte gubernamental deliberado o falla mayor de infraestructura troncal (CANTV)." };
-  if (!bgpDown && probDown && teleDown) return { emoji: "⚡", text: "Dispositivos inaccesibles pero rutas activas — las rutas de red se anuncian pero los equipos no responden. Consistente con corte eléctrico regional o falla de último kilómetro." };
-  if (bgpDown && !probDown && !teleDown) return { emoji: "🌐", text: "Pérdida de rutas upstream — el proveedor dejó de anunciar prefijos pero dispositivos locales funcionan. Posible problema con proveedor internacional o reconfiguración de red." };
-  if (!bgpDown && !probDown && teleDown) return { emoji: "🔍", text: "Anomalía en tráfico de fondo — el telescopio detecta cambios pero BGP y sondeo están normales. Posible filtrado selectivo de tráfico o cambio en patrones de red." };
-  if (!bgpDown && probDown && !teleDown) return { emoji: "📡", text: "Caída en sondeo activo — los dispositivos no responden al probing pero las rutas y tráfico de fondo están normales. Posible congestión severa o bloqueo de ICMP." };
-  if (bgpDown && probDown && !teleDown) return { emoji: "🔗", text: "Pérdida de rutas y dispositivos — el tráfico de fondo persiste pero las rutas y hosts caen. Posible falla de peering o desconexión parcial de proveedor." };
-  if (bgpDown && !probDown && teleDown) return { emoji: "⚠️", text: "Rutas y tráfico de fondo afectados — combinación inusual que puede indicar una reconfiguración de red en progreso o ataque a infraestructura BGP." };
+  // Probing down + national telescope anomaly → likely power outage
+  if (probDown && natTeleAnomaly && !bgpDown) {
+    return { emoji: "⚡", text: "Dispositivos inaccesibles con anomalía en telescopio nacional — patrón consistente con corte eléctrico regional. Las rutas BGP se mantienen (routers con UPS) pero los equipos finales no responden." };
+  }
+  // Probing down + BGP down → major disconnection
+  if (probDown && bgpDown) {
+    return { emoji: "🔴", text: "Desconexión generalizada — sondeo y rutas BGP afectados simultáneamente. Consistente con corte gubernamental deliberado o falla mayor de infraestructura troncal (CANTV)." };
+  }
+  // Only probing down, no telescope anomaly → congestion or ICMP block
+  if (probDown && !natTeleAnomaly && !bgpDown) {
+    return { emoji: "📡", text: "Caída en sondeo activo — los dispositivos no responden pero las rutas se mantienen y no hay anomalía en telescopio nacional. Posible congestión severa, mantenimiento de red, o bloqueo de ICMP." };
+  }
+  // High loss but probing count OK → network degradation
+  if (lossHigh && !probDown) {
+    return { emoji: "📉", text: `Packet loss elevado (${perSource.loss?.current || "?"}%) — los hosts responden pero con pérdida significativa de paquetes. Indica congestión de red, infraestructura degradada, o sobrecarga de CANTV regional.` };
+  }
+  // High latency → congestion
+  if (latHigh && !probDown && !lossHigh) {
+    return { emoji: "⏱", text: `Latencia elevada (${perSource.latency?.current || "?"}ms vs ${perSource.latency?.baseline || "?"}ms base) — los hosts responden pero con retrasos significativos. Indica saturación de ancho de banda o problemas de enrutamiento.` };
+  }
+  // Loss + latency both bad
+  if (lossHigh && latHigh) {
+    return { emoji: "🟠", text: "Degradación severa — packet loss alto y latencia elevada simultáneamente. La red está bajo estrés significativo. Posible saturación de infraestructura, corte parcial, o interferencia." };
+  }
+  // BGP down alone
+  if (bgpDown && !probDown) {
+    return { emoji: "🌐", text: "Pérdida de rutas upstream — el proveedor dejó de anunciar prefijos pero dispositivos locales funcionan. Posible problema con proveedor internacional o reconfiguración de red." };
+  }
   
   // Mild degradation
-  if (avg >= 70) return { emoji: "🟡", text: "Degradación leve — uno o más indicadores muestran reducción moderada. Puede ser congestión temporal, mantenimiento de red, o fluctuación normal." };
-  return { emoji: "🟠", text: "Degradación significativa — múltiples indicadores afectados parcialmente. Monitorear evolución para determinar si es transitorio o escalará." };
+  if (worst >= 70) return { emoji: "🟡", text: "Degradación leve — uno o más indicadores muestran reducción moderada. Puede ser congestión temporal, mantenimiento de red, o fluctuación normal." };
+  return { emoji: "🟠", text: "Degradación significativa — múltiples indicadores afectados. Monitorear evolución para determinar si es transitorio o escalará." };
+}
+
+// ── Compute region scores: 3-layer approach ──
+// Layer 1: Probing (primary signal) — P95 baseline, 10% noise threshold
+// Layer 2: Loss/Latency (complementary) — penalizes high packet loss and latency spikes
+// Layer 3: National telescope (amplifier) — boosts scores when national anomaly coincides
+function computeRegionScore(parsed, nationalTelescopeData) {
+  if (!parsed || parsed.length === 0) return null;
+  
+  // ── Layer 1: Probing ──
+  const probVals = parsed.map(p => p.probing).filter(v => v !== null);
+  if (probVals.length < 5) return null; // need probing as minimum
+  
+  const probSorted = [...probVals].sort((a,b) => a - b);
+  const probP95 = probSorted[Math.floor(probSorted.length * 0.95)];
+  if (probP95 < 10) return null;
+  
+  // Probing health: worst of last 6h (~36 points at 10min step)
+  const probTail = probVals.slice(-Math.min(36, probVals.length));
+  const probWorst = Math.min(...probTail);
+  const probHealth = Math.min(100, Math.round((probWorst / probP95) * 100));
+  
+  // Probing score: sum drops >10% below P95 (noise threshold)
+  const probThreshold = probP95 * 0.90;
+  let probDropScore = 0;
+  for (const v of probVals) {
+    if (v < probThreshold) {
+      probDropScore += Math.round(probP95 - v);
+    }
+  }
+  
+  // Current probing (avg last 5)
+  const probRecent = probVals.slice(-5);
+  const probCurrent = probRecent.reduce((a,b) => a+b, 0) / probRecent.length;
+  const probLiveDrop = Math.max(0, Math.round(probP95 - probCurrent));
+  
+  // ── Layer 2: Loss & Latency ──
+  const lossVals = parsed.map(p => p.lossPct).filter(v => v !== null);
+  const latVals = parsed.map(p => p.medianLatency).filter(v => v !== null);
+  
+  let lossHealth = 100, lossPenalty = 0;
+  let latHealth = 100, latPenalty = 0;
+  let lossInfo = null, latInfo = null;
+  
+  if (lossVals.length >= 5) {
+    // Loss: normal is <5%. Above 10% is degraded, above 25% is critical
+    const lossTail = lossVals.slice(-Math.min(36, lossVals.length));
+    const lossWorst = Math.max(...lossTail); // worst = highest loss
+    const lossAvg = lossVals.reduce((a,b) => a+b, 0) / lossVals.length;
+    lossHealth = lossWorst > 30 ? 30 : lossWorst > 20 ? 50 : lossWorst > 10 ? 70 : lossWorst > 5 ? 90 : 100;
+    // Penalty: each point above 5% loss adds to score
+    for (const v of lossVals) {
+      if (v > 5) lossPenalty += Math.round((v - 5) * 10); // scale up for visibility
+    }
+    lossInfo = { health: lossHealth, current: Math.round(lossVals[lossVals.length-1] * 10) / 10, baseline: 5 };
+  }
+  
+  if (latVals.length >= 5) {
+    // Latency: compute P10 as "good" baseline, flag spikes above 2× baseline
+    const latSorted = [...latVals].sort((a,b) => a - b);
+    const latP10 = latSorted[Math.floor(latSorted.length * 0.1)];
+    const latTail = latVals.slice(-Math.min(36, latVals.length));
+    const latWorst = Math.max(...latTail);
+    const latRatio = latP10 > 0 ? latWorst / latP10 : 1;
+    latHealth = latRatio > 3 ? 40 : latRatio > 2 ? 60 : latRatio > 1.5 ? 80 : 100;
+    // Penalty: each point with latency > 1.5× baseline
+    const latThresh = latP10 * 1.5;
+    for (const v of latVals) {
+      if (v > latThresh) latPenalty += Math.round((v - latP10) / 10);
+    }
+    latInfo = { health: latHealth, current: Math.round(latVals[latVals.length-1]), baseline: Math.round(latP10) };
+  }
+  
+  // ── Layer 3: National telescope amplifier ──
+  let telescopeMultiplier = 1.0;
+  if (nationalTelescopeData && nationalTelescopeData.length > 0) {
+    const ntVals = nationalTelescopeData.filter(v => v !== null);
+    if (ntVals.length > 10) {
+      const ntSorted = [...ntVals].sort((a,b) => a - b);
+      const ntP95 = ntSorted[Math.floor(ntSorted.length * 0.95)];
+      if (ntP95 > 5) {
+        // Check if telescope dipped >20% during the same time window
+        const ntTail = ntVals.slice(-Math.min(36, ntVals.length));
+        const ntWorst = Math.min(...ntTail);
+        const ntDropPct = (ntP95 - ntWorst) / ntP95;
+        if (ntDropPct > 0.20) telescopeMultiplier = 1.8; // strong national anomaly
+        else if (ntDropPct > 0.10) telescopeMultiplier = 1.3; // mild national anomaly
+      }
+    }
+  }
+  
+  // ── BGP (informational only — usually flat) ──
+  const bgpVals = parsed.map(p => p.bgp).filter(v => v !== null);
+  let bgpInfo = null;
+  if (bgpVals.length >= 5) {
+    const bgpSorted = [...bgpVals].sort((a,b) => a - b);
+    const bgpP95 = bgpSorted[Math.floor(bgpSorted.length * 0.95)];
+    if (bgpP95 >= 10) {
+      const bgpCurrent = bgpVals[bgpVals.length - 1];
+      const bgpHealth = Math.min(100, Math.round((bgpCurrent / bgpP95) * 100));
+      bgpInfo = { health: bgpHealth, current: Math.round(bgpCurrent), baseline: Math.round(bgpP95) };
+    }
+  }
+  
+  // ── Telescope regional (informational — usually excluded) ──
+  const teleVals = parsed.map(p => p.telescope).filter(v => v !== null);
+  let teleInfo = null;
+  if (teleVals.length >= 5) {
+    const teleSorted = [...teleVals].sort((a,b) => a - b);
+    const teleP95 = teleSorted[Math.floor(teleSorted.length * 0.95)];
+    if (teleP95 >= 1) { // lower threshold for telescope — even small values matter
+      const teleCurrent = teleVals[teleVals.length - 1];
+      const teleHealth = Math.min(100, Math.round((Math.min(...teleVals.slice(-12)) / teleP95) * 100));
+      teleInfo = { health: teleHealth, current: Math.round(teleCurrent * 10) / 10, baseline: Math.round(teleP95 * 10) / 10 };
+    }
+  }
+  
+  // ── Combine: Health = worst of probing, loss, latency (not averaged!) ──
+  const healthPct = Math.min(probHealth, lossHealth, latHealth);
+  
+  // ── Combined score with amplifier ──
+  const rawScore = probDropScore + lossPenalty + latPenalty;
+  const dropScore = Math.round(rawScore * telescopeMultiplier);
+  
+  // perSource for detail panel
+  const perSource = {
+    probing: { health: probHealth, current: Math.round(probCurrent), baseline: Math.round(probP95) },
+    bgp: bgpInfo,
+    telescope: teleInfo,
+    loss: lossInfo,
+    latency: latInfo,
+  };
+  
+  return {
+    healthPct,
+    dropScore,
+    liveDrop: probLiveDrop,
+    current: Math.round(probCurrent),
+    baseAvg: Math.round(probP95),
+    perSource,
+    telescopeMultiplier,
+  };
 }
 
 // ── Interactive multi-line chart with zoom/pan ──
@@ -516,6 +702,18 @@ export function TabIODA() {
     // Helper: fetch and compute scores for a time range
     const fetchRange = async (hours) => {
       const from = now - hours * 3600;
+      
+      // Fetch national telescope data first (Layer 3)
+      let nationalTelescope = null;
+      try {
+        const natJson = await iodaFetch(`signals/raw/country/VE`, { from, until: now });
+        if (natJson) {
+          const natRaw = Array.isArray(natJson?.data) ? natJson.data.flat() : [];
+          const ntSrc = natRaw.find(s => s.datasource === "ucsd-nt") || natRaw.find(s => s.datasource === "merit-nt");
+          if (ntSrc?.values) nationalTelescope = ntSrc.values.filter(v => v !== null);
+        }
+      } catch {}
+      
       const scores = [];
       const batches = [];
       for (let i = 0; i < VE_REGIONS.length; i += 8) batches.push(VE_REGIONS.slice(i, i + 8));
@@ -525,66 +723,9 @@ export function TabIODA() {
             const json = await iodaFetch(`signals/raw/region/${st.code}`, { from, until: now });
             if (!json) return null;
             const parsed = parseSignals(json);
-            if (!parsed || parsed.length === 0) return null;
-            const srcKeys = ["probing", "bgp", "telescope"];
-            let totalDropScore = 0, maxLiveDrop = 0;
-            const perSource = {};
-            let validSources = 0;
-            let refCurrent = null, refBaseAvg = null, refWorstHealth = 999;
-            
-            for (const src of srcKeys) {
-              const sVals = parsed.map(p => p[src]).filter(v => v !== null);
-              if (sVals.length < 5) { perSource[src] = null; continue; }
-              
-              // Baseline = P95 (95th percentile) — the "normal" plateau level
-              const sorted = [...sVals].sort((a,b) => a - b);
-              const p95idx = Math.floor(sorted.length * 0.95);
-              const sBaseAvg = sorted[p95idx] || sorted[sorted.length - 1];
-              if (sBaseAvg < 10) { perSource[src] = null; continue; }
-              
-              // Current = average of last 5 readings (smooths noise)
-              const recentN = sVals.slice(-Math.min(5, sVals.length));
-              const sCurrent = recentN.reduce((a,b) => a+b, 0) / recentN.length;
-              
-              // Health: worst reading in last ~2h (12 readings at 10min step)
-              const tailWindow = sVals.slice(-Math.min(12, sVals.length));
-              const worstRecent = Math.min(...tailWindow);
-              const sHealth = Math.min(100, Math.round((worstRecent / sBaseAvg) * 100));
-              
-              perSource[src] = { health: sHealth, current: Math.round(sCurrent), baseline: Math.round(sBaseAvg) };
-              validSources++;
-              
-              if (sHealth < refWorstHealth) {
-                refCurrent = sCurrent; refBaseAvg = sBaseAvg;
-                refWorstHealth = sHealth;
-              }
-              
-              // Outage score: sum of ALL drops below baseline, any magnitude
-              // Each point contributes (baseline - value) if value < baseline * 0.97
-              // This accumulates big scores over 7d/30d even for moderate dips
-              const threshold = sBaseAvg * 0.97; // 3% tolerance for noise
-              for (const v of sVals) {
-                if (v < threshold) {
-                  totalDropScore += Math.round(sBaseAvg - v);
-                }
-              }
-              
-              const sLiveDrop = Math.max(0, Math.round(sBaseAvg - sCurrent));
-              if (sLiveDrop > maxLiveDrop) maxLiveDrop = sLiveDrop;
-            }
-            
-            if (validSources === 0) return null;
-            // Weighted average health: Probing 60%, BGP 30%, Telescope 10%
-            const weights = { probing: 60, bgp: 30, telescope: 10 };
-            let wSum = 0, wTotal = 0;
-            for (const src of srcKeys) {
-              if (perSource[src]) {
-                wSum += perSource[src].health * weights[src];
-                wTotal += weights[src];
-              }
-            }
-            const avgHealth = wTotal > 0 ? Math.round(wSum / wTotal) : 100;
-            return { ...st, healthPct: avgHealth, dropScore: totalDropScore, liveDrop: maxLiveDrop, current: refCurrent, baseAvg: refBaseAvg, perSource, series: parsed };
+            const result = computeRegionScore(parsed, nationalTelescope);
+            if (!result) return null;
+            return { ...st, ...result, series: parsed };
           })
         );
         results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
@@ -612,6 +753,18 @@ export function TabIODA() {
     setRegionLoading30d(true);
     const now = Math.floor(Date.now() / 1000);
     const from = now - 30 * 24 * 3600;
+    
+    // National telescope for Layer 3
+    let nationalTelescope = null;
+    try {
+      const natJson = await iodaFetch(`signals/raw/country/VE`, { from, until: now });
+      if (natJson) {
+        const natRaw = Array.isArray(natJson?.data) ? natJson.data.flat() : [];
+        const ntSrc = natRaw.find(s => s.datasource === "ucsd-nt") || natRaw.find(s => s.datasource === "merit-nt");
+        if (ntSrc?.values) nationalTelescope = ntSrc.values.filter(v => v !== null);
+      }
+    } catch {}
+    
     const scores = [];
     const batches = [];
     for (let i = 0; i < VE_REGIONS.length; i += 8) batches.push(VE_REGIONS.slice(i, i + 8));
@@ -621,40 +774,9 @@ export function TabIODA() {
           const json = await iodaFetch(`signals/raw/region/${st.code}`, { from, until: now });
           if (!json) return null;
           const parsed = parseSignals(json);
-          if (!parsed || parsed.length === 0) return null;
-          const srcKeys = ["probing", "bgp", "telescope"];
-          let totalDropScore = 0, maxLiveDrop = 0;
-          const perSource = {};
-          let validSources = 0;
-          let refCurrent = null, refBaseAvg = null, refWorstHealth = 999;
-          for (const src of srcKeys) {
-            const sVals = parsed.map(p => p[src]).filter(v => v !== null);
-            if (sVals.length < 5) { perSource[src] = null; continue; }
-            const sorted = [...sVals].sort((a,b) => a - b);
-            const p95idx = Math.floor(sorted.length * 0.95);
-            const sBaseAvg = sorted[p95idx] || sorted[sorted.length - 1];
-            if (sBaseAvg < 10) { perSource[src] = null; continue; }
-            const recentN = sVals.slice(-Math.min(5, sVals.length));
-            const sCurrent = recentN.reduce((a,b) => a+b, 0) / recentN.length;
-            const tailWindow = sVals.slice(-Math.min(12, sVals.length));
-            const worstRecent = Math.min(...tailWindow);
-            const sHealth = Math.min(100, Math.round((worstRecent / sBaseAvg) * 100));
-            perSource[src] = { health: sHealth, current: Math.round(sCurrent), baseline: Math.round(sBaseAvg) };
-            validSources++;
-            if (sHealth < refWorstHealth) { refCurrent = sCurrent; refBaseAvg = sBaseAvg; refWorstHealth = sHealth; }
-            const threshold = sBaseAvg * 0.97;
-            for (const v of sVals) {
-              if (v < threshold) totalDropScore += Math.round(sBaseAvg - v);
-            }
-            const sLiveDrop = Math.max(0, Math.round(sBaseAvg - sCurrent));
-            if (sLiveDrop > maxLiveDrop) maxLiveDrop = sLiveDrop;
-          }
-          if (validSources === 0) return null;
-          const weights = { probing: 60, bgp: 30, telescope: 10 };
-          let wSum = 0, wTotal = 0;
-          for (const src of srcKeys) { if (perSource[src]) { wSum += perSource[src].health * weights[src]; wTotal += weights[src]; } }
-          const avgHealth = wTotal > 0 ? Math.round(wSum / wTotal) : 100;
-          return { ...st, healthPct: avgHealth, dropScore: totalDropScore, liveDrop: maxLiveDrop, current: refCurrent, baseAvg: refBaseAvg, perSource, series: parsed };
+          const result = computeRegionScore(parsed, nationalTelescope);
+          if (!result) return null;
+          return { ...st, ...result, series: parsed };
         })
       );
       results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
@@ -938,20 +1060,22 @@ export function TabIODA() {
               {selectedState && (() => {
                 const rd = activeData.find(r => r.name === selectedState);
                 if (!rd) return <Card><div style={{ fontSize:12, color:MUTED }}>Sin datos para {selectedState}</div></Card>;
-                const interp = interpretPattern(rd.perSource);
-                const srcOrder = ["bgp", "probing", "telescope"];
-                const srcLabels = { bgp: "BGP Routes", probing: "Sondeo Activo", telescope: "Telescopio" };
-                const srcEmojis = { bgp: "🌐", probing: "📡", telescope: "🔭" };
+                const interp = interpretPattern(rd.perSource, rd.telescopeMultiplier);
+                const srcOrder = ["probing", "loss", "latency", "bgp", "telescope"];
+                const srcLabels = { probing: "Sondeo Activo", bgp: "BGP Routes", telescope: "Telescopio", loss: "Packet Loss", latency: "Latencia" };
+                const srcEmojis = { probing: "📡", bgp: "🌐", telescope: "🔭", loss: "📉", latency: "⏱" };
+                const srcUnits = { probing: "", bgp: "", telescope: "", loss: "%", latency: "ms" };
                 return (
                   <Card accent={getSeverityColor(rd.healthPct)}>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
                       <div style={{ fontSize:14, fontWeight:700, color:TEXT }}>{rd.name}</div>
                       <Badge color={getSeverityColor(rd.healthPct)}>{getSeverityLabel(rd.healthPct)}</Badge>
                     </div>
-                    <div style={{ display:"flex", gap:8, alignItems:"baseline", marginBottom:8 }}>
+                    <div style={{ display:"flex", gap:8, alignItems:"baseline", marginBottom:8, flexWrap:"wrap" }}>
                       <span style={{ fontSize:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:getSeverityColor(rd.healthPct) }}>{rd.healthPct}%</span>
-                      <span style={{ fontSize:11, color:MUTED }}>promedio</span>
+                      <span style={{ fontSize:11, color:MUTED }}>peor indicador</span>
                       {rd.displayScore > 0 && <span style={{ fontSize:12, color:"#dc2626", fontWeight:600 }}>Score: {fmtVal(rd.displayScore)}</span>}
+                      {rd.telescopeMultiplier > 1 && <span style={{ fontSize:10, color:"#7c3aed", fontWeight:600 }}>🔭 ×{rd.telescopeMultiplier}</span>}
                     </div>
                     {/* Per-source breakdown */}
                     <div style={{ display:"flex", flexDirection:"column", gap:4, marginBottom:8 }}>
@@ -963,6 +1087,11 @@ export function TabIODA() {
                           </div>
                         );
                         const c = getSeverityColor(d.health);
+                        const unit = srcUnits[src] || "";
+                        // For loss, display is inverted: high loss = bad, so show "current/baseline" as "actual vs normal"
+                        const detail = src === "loss" ? `${d.current}% (normal <${d.baseline}%)` :
+                                       src === "latency" ? `${d.current}ms (base ${d.baseline}ms)` :
+                                       `(${d.current}/${d.baseline})`;
                         return (
                           <div key={src} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:11, padding:"3px 0", borderBottom:`1px solid ${BORDER}20` }}>
                             <span style={{ color:TEXT }}>{srcEmojis[src]} {srcLabels[src]}</span>
@@ -971,7 +1100,7 @@ export function TabIODA() {
                                 <div style={{ width:`${d.health}%`, height:4, background:c, borderRadius:2 }} />
                               </div>
                               <span style={{ fontWeight:700, color:c, minWidth:32, textAlign:"right" }}>{d.health}%</span>
-                              <span style={{ color:MUTED, fontSize:10 }}>({d.current}/{d.baseline})</span>
+                              <span style={{ color:MUTED, fontSize:10 }}>{detail}</span>
                             </div>
                           </div>
                         );
