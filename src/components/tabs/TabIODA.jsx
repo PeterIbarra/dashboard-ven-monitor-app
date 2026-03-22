@@ -282,12 +282,28 @@ function computeRegionScore(parsed, nationalTelescopeData) {
 }
 
 // ── Interactive multi-line chart with zoom/pan ──
-function InteractiveChart({ states, mapMode, selectedState, onSelectState, palette }) {
+function InteractiveChart({ states, timePreset, selectedState, onSelectState, palette, events, focusEvent, onClearFocus }) {
   const containerRef = useRef(null);
   const [zoomRange, setZoomRange] = useState(null); // {start, end} as fraction 0-1
   const [dragging, setDragging] = useState(false);
   const [dragStart, setDragStart] = useState(null);
   const [chartHover, setChartHover] = useState(null); // { x, ts, values: [{name, pct, color}] }
+  
+  // Auto-zoom to focusEvent
+  useEffect(() => {
+    if (!focusEvent || !states.length) return;
+    const anchor = states[0]?.series;
+    if (!anchor?.length) return;
+    const tMin = anchor[0].ts, tMax = anchor[anchor.length - 1].ts;
+    const fullRange = tMax - tMin || 1;
+    // Center on event with 2h window
+    const center = (focusEvent - tMin) / fullRange;
+    const span = Math.min(0.15, 7200 / fullRange); // ~2h window or 15% of range
+    const start = Math.max(0, center - span / 2);
+    const end = Math.min(1, start + span);
+    setZoomRange({ start, end });
+    if (onClearFocus) setTimeout(onClearFocus, 100);
+  }, [focusEvent]);
   
   // Build chart data
   const chartData = states.map(st => {
@@ -395,6 +411,20 @@ function InteractiveChart({ states, mapMode, selectedState, onSelectState, palet
             return <path key={st.name} d={d} fill="none" stroke={color} 
               strokeWidth={isSelected ? 2.5 : 1.5} opacity={opacity} />;
           })}
+          {/* Event markers — red triangles at event timestamps */}
+          {events && events.filter(ev => ev.time >= viewStart && ev.time <= viewEnd).map((ev, ei) => {
+            const x = toX(ev.time);
+            const sevColor = ev.condition === "critical" ? "#ef4444" : ev.condition === "high" ? "#f97316" : "#fbbf24";
+            return (
+              <g key={`ev-${ei}`}>
+                <line x1={x} y1={pT} x2={x} y2={pT+cH} stroke={sevColor} strokeWidth={1} strokeDasharray="3,3" opacity={0.5} />
+                <polygon points={`${x-5},${pT+cH+2} ${x+5},${pT+cH+2} ${x},${pT+cH-6}`} fill={sevColor} opacity={0.8} />
+                <text x={x} y={pT+cH+12} textAnchor="middle" fontSize={6} fill={sevColor} fontFamily={font}>
+                  {ev.region === "🇻🇪 Nacional" ? "NAC" : (ev.region || "").slice(0,4)}
+                </text>
+              </g>
+            );
+          })}
           {/* End labels with collision avoidance */}
           {(() => {
             // Collect label positions first
@@ -499,7 +529,7 @@ const STATE_COORDS = {
 };
 
 // ── Leaflet map for IODA regional outages ──
-function IODALeafletMap({ regionScores, selectedState, onSelectState, mapMode }) {
+function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset }) {
   const mapRef = useRef(null);
   const mapInst = useRef(null);
   const markersRef = useRef(null);
@@ -546,26 +576,18 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, mapMode })
       const isAffected = (r.displayScore || r.dropScore || 0) > 0;
       const severity = r.healthPct;
       const color = severity >= 90 ? "#34d399" : severity >= 70 ? "#fbbf24" : severity >= 50 ? "#f97316" : "#ef4444";
-      // Size: in "live" mode based on severity, in accumulated modes based on score
-      let radius;
-      if (mapMode === "live") {
-        // Live: size reflects how bad it is RIGHT NOW
-        radius = severity >= 90 ? 6 : severity >= 70 ? 14 : severity >= 50 ? 22 : 32;
-      } else {
-        // Accumulated: size proportional to outage score
-        const ds = r.displayScore || r.dropScore || 0;
-        radius = ds > 0 ? Math.max(8, Math.min(40, (ds / maxScore) * 40)) : 5;
-      }
+      // Size proportional to outage score, fallback to severity
+      const ds = r.displayScore || r.dropScore || 0;
+      const radius = ds > 0 ? Math.max(8, Math.min(40, (ds / maxScore) * 40)) : (severity >= 90 ? 6 : severity >= 70 ? 12 : severity >= 50 ? 20 : 30);
       const circle = L.circleMarker(coords, {
         radius, fillColor: color, color: selectedState === r.name ? "#fff" : color,
         weight: selectedState === r.name ? 3 : 1.5, opacity: 0.9, fillOpacity: isAffected ? 0.7 : 0.3,
       });
-      const modeLabel = mapMode === "live" ? "En Vivo" : mapMode === "24h" ? "24h" : mapMode === "7d" ? "7 días" : "30 días";
       circle.bindPopup(
         `<div style="font-family:monospace;font-size:11px;min-width:160px">` +
-        `<b style="font-size:13px">${r.name}</b> <span style="color:#888">(${modeLabel})</span><br/>` +
+        `<b style="font-size:13px">${r.name}</b><br/>` +
         `Conectividad: <b style="color:${color}">${r.healthPct}%</b><br/>` +
-        `${mapMode === "live" ? "Caída actual" : "Outage Score"}: <b>${(r.displayScore || 0) > 0 ? (r.displayScore || 0).toLocaleString() : "0.0"}</b><br/>` +
+        `Outage Score: <b>${ds > 0 ? ds.toLocaleString() : "0"}</b><br/>` +
         `Baseline: ${Math.round(r.baseAvg).toLocaleString()} · Actual: ${Math.round(r.current).toLocaleString()}` +
         `</div>`, { className: "ioda-popup" }
       );
@@ -584,7 +606,7 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, mapMode })
     });
     group.addTo(map);
     markersRef.current = group;
-  }, [regionScores, selectedState, mapMode]);
+  }, [regionScores, selectedState, timePreset]);
 
   return <div ref={mapRef} style={{ width:"100%", height: 350, borderRadius:4, border:`1px solid ${BORDER}` }} />;
 }
@@ -595,7 +617,6 @@ export function TabIODA() {
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("loading");
   const [error, setError] = useState(null);
-  const [timeRange, setTimeRange] = useState("24h");
   const [hover, setHover] = useState(null);
   const [events, setEvents] = useState([]);
   const [regionScores, setRegionScores] = useState([]);
@@ -605,159 +626,136 @@ export function TabIODA() {
   const [aiLoading, setAiLoading] = useState(false);
   const [subView, setSubView] = useState("nacional"); // nacional | estados | eventos
   const [scoreView, setScoreView] = useState("outage"); // outage | health
-  const [mapMode, setMapMode] = useState("live"); // live | 24h | 7d | 30d
+  const [focusEvent, setFocusEvent] = useState(null); // timestamp to zoom chart to
+
+  // ── Unified time window ──
+  const [timePreset, setTimePreset] = useState("24h"); // 24h | 48h | 7d | 30d | custom
+  const [customFrom, setCustomFrom] = useState("");
+  const [customUntil, setCustomUntil] = useState("");
+  
+  // Compute actual from/until epoch from preset or custom
+  const timeWindow = (() => {
+    const now = Math.floor(Date.now() / 1000);
+    if (timePreset === "custom" && customFrom) {
+      const f = Math.floor(new Date(customFrom).getTime() / 1000);
+      const u = customUntil ? Math.floor(new Date(customUntil).getTime() / 1000) : now;
+      return { from: f, until: u };
+    }
+    const hours = { "24h": 24, "48h": 48, "7d": 168, "30d": 720 }[timePreset] || 24;
+    return { from: now - hours * 3600, until: now };
+  })();
+
+  const timeLabel = timePreset === "custom"
+    ? `${new Date(timeWindow.from * 1000).toLocaleDateString("es-VE")} — ${new Date(timeWindow.until * 1000).toLocaleDateString("es-VE")}`
+    : timePreset;
 
   // ── 1. Load national signals ──
   const loadNational = useCallback(async () => {
     setLoading(true); setError(null); setSource("loading");
-    const hours = hoursMap[timeRange];
-    const now = Math.floor(Date.now() / 1000);
-    const from = now - hours * 3600;
-    const json = await iodaFetch(`signals/raw/country/VE`, { from, until: now });
+    const json = await iodaFetch(`signals/raw/country/VE`, { from: timeWindow.from, until: timeWindow.until });
     const parsed = json ? parseSignals(json) : null;
     if (parsed) { setSignals(parsed); setSource("live"); }
     else { setSignals(null); setSource("failed"); setError("No se pudo conectar con IODA API."); }
     setLoading(false);
-  }, [timeRange]);
+  }, [timeWindow.from, timeWindow.until]);
 
-  // ── 2. Detect outage events from signal analysis ──
+  // ── 2. Detect outage events from national + regional signal analysis ──
   const loadEvents = useCallback(async () => {
-    const now = Math.floor(Date.now() / 1000);
-    const from = now - 7 * 86400; // always scan 7 days for events
-
-    // Detect events from signal drops (IODA outage endpoints return 404 on v2)
-    const json = await iodaFetch(`signals/raw/country/VE`, { from, until: now });
-    const parsed = json ? parseSignals(json) : null;
-    if (!parsed || parsed.length < 10) return;
     const detectedEvents = [];
-    // Use wider baseline window for 7-day data
-    const windowSize = Math.min(48, Math.floor(parsed.length * 0.1));
-    // Calculate global baseline from first 10% of data
-    for (const key of ["bgp", "probing", "telescope"]) {
-      const allVals = parsed.map(p => p[key]).filter(v => v !== null);
-      if (allVals.length < 10) continue;
-      const globalBase = allVals.slice(0, Math.max(10, Math.floor(allVals.length * 0.1)));
-      const baseAvg = globalBase.reduce((a,b) => a+b, 0) / globalBase.length;
-      if (baseAvg === 0) continue;
-      
-      let inEvent = false, eventStart = null, eventMinVal = Infinity, eventMaxDrop = 0;
-      for (let i = 0; i < parsed.length; i++) {
-        const v = parsed[i][key];
-        if (v === null) continue;
-        const dropPct = ((baseAvg - v) / baseAvg) * 100;
-        if (dropPct > 10 && !inEvent) {
-          // Start of event
-          inEvent = true;
-          eventStart = parsed[i].ts;
-          eventMinVal = v;
-          eventMaxDrop = dropPct;
-        } else if (inEvent && dropPct > 10) {
-          // Continue event
-          if (v < eventMinVal) eventMinVal = v;
-          if (dropPct > eventMaxDrop) eventMaxDrop = dropPct;
-        } else if (inEvent && dropPct <= 5) {
-          // End of event — record it
-          const duration = parsed[i].ts - eventStart;
-          if (eventMaxDrop > 15 && duration > 300) { // >15% drop lasting >5min
-            const severity = eventMaxDrop > 60 ? "critical" : eventMaxDrop > 30 ? "high" : "medium";
-            detectedEvents.push({
-              time: eventStart,
-              datasource: key,
-              condition: severity,
-              value: Math.round(eventMaxDrop),
-              dropAbsolute: Math.round(baseAvg - eventMinVal),
-              baseline: Math.round(baseAvg),
-              duration,
-            });
+    
+    // Helper: detect events in a signal series
+    const detectDrops = (parsed, sourceName, regionLabel) => {
+      if (!parsed || parsed.length < 10) return;
+      for (const key of ["probing", "bgp", "telescope"]) {
+        const allVals = parsed.map(p => p[key]).filter(v => v !== null);
+        if (allVals.length < 10) continue;
+        const sorted = [...allVals].sort((a,b) => a - b);
+        const baseAvg = sorted[Math.floor(sorted.length * 0.95)] || sorted[sorted.length - 1];
+        if (baseAvg === 0 || baseAvg < 10) continue;
+        
+        let inEvent = false, eventStart = null, eventMinVal = Infinity, eventMaxDrop = 0;
+        for (let i = 0; i < parsed.length; i++) {
+          const v = parsed[i][key];
+          if (v === null) continue;
+          const dropPct = ((baseAvg - v) / baseAvg) * 100;
+          if (dropPct > 10 && !inEvent) {
+            inEvent = true; eventStart = parsed[i].ts; eventMinVal = v; eventMaxDrop = dropPct;
+          } else if (inEvent && dropPct > 10) {
+            if (v < eventMinVal) eventMinVal = v;
+            if (dropPct > eventMaxDrop) eventMaxDrop = dropPct;
+          } else if (inEvent && dropPct <= 5) {
+            const duration = parsed[i].ts - eventStart;
+            if (eventMaxDrop > 15 && duration > 300) {
+              const severity = eventMaxDrop > 60 ? "critical" : eventMaxDrop > 30 ? "high" : "medium";
+              detectedEvents.push({ time: eventStart, datasource: key, condition: severity, region: regionLabel,
+                value: Math.round(eventMaxDrop), dropAbsolute: Math.round(baseAvg - eventMinVal), baseline: Math.round(baseAvg), duration });
+            }
+            inEvent = false; eventMinVal = Infinity; eventMaxDrop = 0;
           }
-          inEvent = false; eventMinVal = Infinity; eventMaxDrop = 0;
+        }
+        if (inEvent && eventMaxDrop > 15) {
+          const duration = parsed[parsed.length-1].ts - eventStart;
+          const severity = eventMaxDrop > 60 ? "critical" : eventMaxDrop > 30 ? "high" : "medium";
+          detectedEvents.push({ time: eventStart, datasource: key, condition: severity, region: regionLabel,
+            value: Math.round(eventMaxDrop), dropAbsolute: Math.round(baseAvg - eventMinVal), baseline: Math.round(baseAvg), duration: duration > 0 ? duration : null });
         }
       }
-      // If still in event at end of data
-      if (inEvent && eventMaxDrop > 15) {
-        const duration = parsed[parsed.length-1].ts - eventStart;
-        const severity = eventMaxDrop > 60 ? "critical" : eventMaxDrop > 30 ? "high" : "medium";
-        detectedEvents.push({
-          time: eventStart, datasource: key, condition: severity,
-          value: Math.round(eventMaxDrop), dropAbsolute: Math.round(baseAvg - eventMinVal),
-          baseline: Math.round(baseAvg), duration: duration > 0 ? duration : null,
-        });
+      // Also detect loss spikes
+      const lossVals = parsed.map(p => p.lossPct).filter(v => v !== null);
+      if (lossVals.length >= 10) {
+        const lossSorted = [...lossVals].sort((a,b) => a - b);
+        const lossBase = lossSorted[Math.floor(lossSorted.length * 0.1)]; // P10 = normal low
+        let inLoss = false, lossStart = null, lossMax = 0;
+        for (let i = 0; i < parsed.length; i++) {
+          const v = parsed[i].lossPct;
+          if (v === null) continue;
+          if (v > 15 && !inLoss) { inLoss = true; lossStart = parsed[i].ts; lossMax = v; }
+          else if (inLoss && v > 15) { if (v > lossMax) lossMax = v; }
+          else if (inLoss && v <= 10) {
+            const duration = parsed[i].ts - lossStart;
+            if (lossMax > 20 && duration > 300) {
+              detectedEvents.push({ time: lossStart, datasource: "packet-loss", condition: lossMax > 40 ? "high" : "medium", region: regionLabel,
+                value: Math.round(lossMax), dropAbsolute: 0, baseline: Math.round(lossBase), duration });
+            }
+            inLoss = false; lossMax = 0;
+          }
+        }
+      }
+    };
+    
+    // National events
+    const natJson = await iodaFetch(`signals/raw/country/VE`, { from: timeWindow.from, until: timeWindow.until });
+    const natParsed = natJson ? parseSignals(natJson) : null;
+    detectDrops(natParsed, "national", "🇻🇪 Nacional");
+    
+    // Regional events (from already loaded region data, or fetch top states)
+    if (regionScores.length > 0) {
+      for (const r of regionScores) {
+        if (r.series) detectDrops(r.series, "regional", r.name);
+      }
+    } else {
+      // Fetch a few key states
+      const keyStates = VE_REGIONS.filter(s => ["4020","4013","4024","4005","4021"].includes(s.code));
+      for (const st of keyStates) {
+        try {
+          const json = await iodaFetch(`signals/raw/region/${st.code}`, { from: timeWindow.from, until: timeWindow.until });
+          if (json) { const parsed = parseSignals(json); detectDrops(parsed, "regional", st.name); }
+        } catch {}
       }
     }
+    
     detectedEvents.sort((a,b) => b.time - a.time);
-    setEvents(detectedEvents.slice(0, 30));
-  }, []);
+    setEvents(detectedEvents.slice(0, 50));
+  }, [timeWindow.from, timeWindow.until, regionScores]);
 
-  // ── 3. Load regional scores (probing only, lighter) ──
-  // Store separate datasets for different time ranges
-  const [regionData7d, setRegionData7d] = useState([]);
-  const [regionData30d, setRegionData30d] = useState([]);
-  const [regionLoading7d, setRegionLoading7d] = useState(false);
-  const [regionLoading30d, setRegionLoading30d] = useState(false);
-
+  // ── 3. Load regional scores ──
   const loadRegions = useCallback(async () => {
     setRegionLoading(true);
-    const now = Math.floor(Date.now() / 1000);
-
-    // Helper: fetch and compute scores for a time range
-    const fetchRange = async (hours) => {
-      const from = now - hours * 3600;
-      
-      // Fetch national telescope data first (Layer 3)
-      let nationalTelescope = null;
-      try {
-        const natJson = await iodaFetch(`signals/raw/country/VE`, { from, until: now });
-        if (natJson) {
-          const natRaw = Array.isArray(natJson?.data) ? natJson.data.flat() : [];
-          const ntSrc = natRaw.find(s => s.datasource === "ucsd-nt") || natRaw.find(s => s.datasource === "merit-nt");
-          if (ntSrc?.values) nationalTelescope = ntSrc.values.filter(v => v !== null);
-        }
-      } catch {}
-      
-      const scores = [];
-      const batches = [];
-      for (let i = 0; i < VE_REGIONS.length; i += 8) batches.push(VE_REGIONS.slice(i, i + 8));
-      for (const batch of batches) {
-        const results = await Promise.allSettled(
-          batch.map(async (st) => {
-            const json = await iodaFetch(`signals/raw/region/${st.code}`, { from, until: now });
-            if (!json) return null;
-            const parsed = parseSignals(json);
-            const result = computeRegionScore(parsed, nationalTelescope);
-            if (!result) return null;
-            return { ...st, ...result, series: parsed };
-          })
-        );
-        results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
-      }
-      scores.sort((a,b) => b.dropScore - a.dropScore || a.healthPct - b.healthPct);
-      return scores;
-    };
-
-    // Fetch 24h first (faster, shown by default in live/24h modes)
-    const data24h = await fetchRange(24);
-    setRegionScores(data24h);
-    setRegionLoading(false);
-
-    // Then fetch 7d in background (slower, 7 days of data per state)
-    setRegionLoading7d(true);
-    fetchRange(168).then(data7d => { setRegionData7d(data7d); setRegionLoading7d(false); }).catch(() => setRegionLoading7d(false));
-  }, []);
-
-  useEffect(() => { loadNational(); loadEvents(); }, [loadNational, loadEvents]);
-  useEffect(() => { if (subView === "estados") loadRegions(); }, [subView, loadRegions]);
-
-  // Lazy-load 30d data when user selects that mode
-  const load30d = useCallback(async () => {
-    if (regionData30d.length > 0 || regionLoading30d) return;
-    setRegionLoading30d(true);
-    const now = Math.floor(Date.now() / 1000);
-    const from = now - 30 * 24 * 3600;
     
-    // National telescope for Layer 3
+    // Fetch national telescope data first (Layer 3)
     let nationalTelescope = null;
     try {
-      const natJson = await iodaFetch(`signals/raw/country/VE`, { from, until: now });
+      const natJson = await iodaFetch(`signals/raw/country/VE`, { from: timeWindow.from, until: timeWindow.until });
       if (natJson) {
         const natRaw = Array.isArray(natJson?.data) ? natJson.data.flat() : [];
         const ntSrc = natRaw.find(s => s.datasource === "ucsd-nt") || natRaw.find(s => s.datasource === "merit-nt");
@@ -771,7 +769,7 @@ export function TabIODA() {
     for (const batch of batches) {
       const results = await Promise.allSettled(
         batch.map(async (st) => {
-          const json = await iodaFetch(`signals/raw/region/${st.code}`, { from, until: now });
+          const json = await iodaFetch(`signals/raw/region/${st.code}`, { from: timeWindow.from, until: timeWindow.until });
           if (!json) return null;
           const parsed = parseSignals(json);
           const result = computeRegionScore(parsed, nationalTelescope);
@@ -782,11 +780,13 @@ export function TabIODA() {
       results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
     }
     scores.sort((a,b) => b.dropScore - a.dropScore || a.healthPct - b.healthPct);
-    setRegionData30d(scores);
-    setRegionLoading30d(false);
-  }, [regionData30d.length, regionLoading30d]);
+    setRegionScores(scores);
+    setRegionLoading(false);
+  }, [timeWindow.from, timeWindow.until]);
 
-  useEffect(() => { if (mapMode === "30d") load30d(); }, [mapMode, load30d]);
+  useEffect(() => { loadNational(); }, [loadNational]);
+  useEffect(() => { if (subView === "estados") loadRegions(); }, [subView, loadRegions]);
+  useEffect(() => { loadEvents(); }, [loadEvents]);
 
   // ── 4. AI Explain ──
   const explainWithAI = async () => {
@@ -795,7 +795,7 @@ export function TabIODA() {
     if (signals) {
       const last = signals[signals.length - 1];
       const first = signals[0];
-      ctx.push(`Señales nacionales (${timeRange}): BGP actual=${fmtVal(last?.bgp)}, Probing=${fmtVal(last?.probing)}, Telescope=${fmtVal(last?.telescope)}`);
+      ctx.push(`Señales nacionales (${timeLabel}): BGP actual=${fmtVal(last?.bgp)}, Probing=${fmtVal(last?.probing)}, Telescope=${fmtVal(last?.telescope)}`);
       if (first?.bgp && last?.bgp) {
         const pct = ((last.bgp - first.bgp) / first.bgp * 100).toFixed(1);
         ctx.push(`Cambio BGP en el período: ${pct}%`);
@@ -926,37 +926,52 @@ export function TabIODA() {
   };
 
   // Compute activeData at component level (used by estados + chart)
-  const rawRegionData = mapMode === "30d" && regionData30d.length > 0 ? regionData30d
-    : mapMode === "7d" && regionData7d.length > 0 ? regionData7d
-    : regionScores;
-  const isExtendedLoading = (mapMode === "7d" && regionData7d.length === 0 && regionLoading7d)
-    || (mapMode === "30d" && regionData30d.length === 0 && regionLoading30d);
-  const activeData = (rawRegionData || []).map(r => ({
+  const activeData = (regionScores || []).map(r => ({
     ...r,
-    displayScore: mapMode === "live" ? (r.liveDrop || 0) : (r.dropScore || 0),
+    displayScore: r.dropScore || 0,
   })).sort((a,b) => b.displayScore - a.displayScore || a.healthPct - b.healthPct);
 
   return (
     <div>
-      {/* ── Header ── */}
-      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16, flexWrap:"wrap" }}>
+      {/* ── Header + Unified Time Picker ── */}
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:10, flexWrap:"wrap" }}>
         <span style={{ fontSize:16 }}>🌐</span>
-        <div style={{ flex:1 }}>
+        <div style={{ flex:1, minWidth:200 }}>
           <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Monitor de Internet — Venezuela</div>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
-            Detección de interrupciones · Georgia Tech IODA · {source === "live" ? `${signals?.length || 0} puntos · EN VIVO` : source === "failed" ? "Sin conexión" : "Conectando..."}
+            Georgia Tech IODA · {source === "live" ? `${signals?.length || 0} puntos` : source === "failed" ? "Sin conexión" : "Conectando..."}
           </div>
         </div>
         <Badge color={source==="live"?"#7c3aed":source==="failed"?"#dc2626":"#a17d08"}>
           {source==="live"?"EN VIVO":source==="failed"?"OFFLINE":"..."}
         </Badge>
+      </div>
+      {/* Time controls */}
+      <div style={{ display:"flex", gap:8, marginBottom:14, flexWrap:"wrap", alignItems:"center" }}>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
-          {["24h","48h","7d"].map(r => (
-            <button key={r} onClick={() => setTimeRange(r)}
+          {["24h","48h","7d","30d"].map(r => (
+            <button key={r} onClick={() => { setTimePreset(r); setRegionScores([]); }}
               style={{ fontSize:12, fontFamily:font, padding:"5px 12px", border:"none",
-                background:timeRange===r?ACCENT:"transparent", color:timeRange===r?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.08em" }}>{r}</button>
+                background:timePreset===r?ACCENT:"transparent", color:timePreset===r?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.08em" }}>{r}</button>
           ))}
+          <button onClick={() => setTimePreset("custom")}
+            style={{ fontSize:12, fontFamily:font, padding:"5px 12px", border:"none",
+              background:timePreset==="custom"?ACCENT:"transparent", color:timePreset==="custom"?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.08em" }}>📅</button>
         </div>
+        {timePreset === "custom" && (
+          <div style={{ display:"flex", gap:6, alignItems:"center", flexWrap:"wrap" }}>
+            <input type="datetime-local" value={customFrom} onChange={e => { setCustomFrom(e.target.value); setRegionScores([]); }}
+              style={{ fontSize:11, fontFamily:font, padding:"4px 8px", border:`1px solid ${BORDER}`, background:"transparent", color:TEXT, borderRadius:3 }} />
+            <span style={{ fontSize:11, color:MUTED }}>→</span>
+            <input type="datetime-local" value={customUntil} onChange={e => setCustomUntil(e.target.value)}
+              style={{ fontSize:11, fontFamily:font, padding:"4px 8px", border:`1px solid ${BORDER}`, background:"transparent", color:TEXT, borderRadius:3 }} />
+            <button onClick={() => { setRegionScores([]); loadNational(); }}
+              style={{ fontSize:11, fontFamily:font, padding:"4px 10px", background:ACCENT, color:"#fff", border:"none", cursor:"pointer", borderRadius:3 }}>Cargar</button>
+          </div>
+        )}
+        {timePreset === "custom" && customFrom && (
+          <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>{timeLabel}</span>
+        )}
       </div>
 
       {error && (
@@ -979,7 +994,7 @@ export function TabIODA() {
       {subView === "nacional" && (<>
         {loading ? (
           <Card><div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:14, fontFamily:font }}>
-            <div style={{ fontSize:20, marginBottom:8 }}>🌐</div>Conectando con IODA...<div style={{ fontSize:12, marginTop:4, color:`${MUTED}80` }}>Señales BGP + Active Probing + Telescope · {timeRange}</div>
+            <div style={{ fontSize:20, marginBottom:8 }}>🌐</div>Conectando con IODA...<div style={{ fontSize:12, marginTop:4, color:`${MUTED}80` }}>Señales BGP + Active Probing + Telescope · {timeLabel}</div>
           </div></Card>
         ) : signals ? (
           <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
@@ -1024,22 +1039,13 @@ export function TabIODA() {
             <Card accent="#7c3aed">
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8, flexWrap:"wrap", gap:8 }}>
                 <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-                  Mapa de Interrupciones
-                </div>
-                <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
-                  {[{id:"live",label:"🔴 En Vivo"},{id:"24h",label:"24h"},{id:"7d",label:"7 días"},{id:"30d",label:"30 días"}].map(m => (
-                    <button key={m.id} onClick={() => setMapMode(m.id)}
-                      style={{ fontSize:11, fontFamily:font, padding:"4px 10px", border:"none",
-                        background:mapMode===m.id?ACCENT:"transparent", color:mapMode===m.id?"#fff":MUTED, cursor:"pointer" }}>{m.label}</button>
-                  ))}
+                  Mapa de Interrupciones · {timeLabel}
                 </div>
               </div>
               <div style={{ display:"flex", gap:12, marginBottom:6, flexWrap:"wrap" }}>
                 <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>
-                  {mapMode === "live" ? "Color = severidad actual · Tamaño = impacto" :
-                   mapMode === "24h" ? "Score acumulado últimas 24 horas" :
-                   mapMode === "7d" ? "Score acumulado últimos 7 días" : "Score acumulado últimos 30 días"}
-                  {isExtendedLoading && " · ⏳ cargando datos..."}
+                  Score acumulado · Color = severidad · Tamaño = impacto
+                  {regionLoading && " · ⏳ cargando datos..."}
                 </span>
                 <div style={{ display:"flex", gap:8, marginLeft:"auto" }}>
                   {[{l:"Normal",c:"#34d399"},{l:"Degradado",c:"#fbbf24"},{l:"Alto",c:"#f97316"},{l:"Crítico",c:"#ef4444"}].map(lg => (
@@ -1050,7 +1056,7 @@ export function TabIODA() {
                   ))}
                 </div>
               </div>
-              <IODALeafletMap regionScores={activeData} selectedState={selectedState} mapMode={mapMode}
+              <IODALeafletMap regionScores={activeData} selectedState={selectedState} timePreset={timePreset}
                 onSelectState={s => setSelectedState(selectedState === s ? null : s)} />
             </Card>
 
@@ -1118,10 +1124,10 @@ export function TabIODA() {
               <Card accent="#f59e0b">
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
                   <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-                    {scoreView === "outage" ? (mapMode === "live" ? "Caída Actual" : "Outage Score") : "Salud %"}
+                    {scoreView === "outage" ? "Outage Score" : "Salud %"}
                   </div>
                   <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    {isExtendedLoading && <span style={{ fontSize:9, fontFamily:font, color:"#a17d08" }}>⏳ cargando {mapMode}...</span>}
+                    {regionLoading && <span style={{ fontSize:9, fontFamily:font, color:"#a17d08" }}>⏳ cargando {timePreset}...</span>}
                     <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
                     {[{id:"outage",label:"Score"},{id:"health",label:"Salud %"}].map(v => (
                       <button key={v.id} onClick={() => setScoreView(v.id)}
@@ -1137,7 +1143,7 @@ export function TabIODA() {
                   <div style={{ display:"flex", justifyContent:"space-between", padding:"4px 8px", borderBottom:`1px solid ${BORDER}`, marginBottom:4 }}>
                     <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Región</span>
                     <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>
-                      {scoreView === "outage" ? (mapMode === "live" ? "Caída" : "Puntaje") : "Salud"}
+                      {scoreView === "outage" ? "Puntaje" : "Salud"}
                     </span>
                   </div>
                   <div style={{ maxHeight:400, overflowY:"auto" }}>
@@ -1188,15 +1194,15 @@ export function TabIODA() {
         <Card accent="#f59e0b">
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
             <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-              Eventos Recientes
+              Eventos Detectados · {timeLabel}
             </div>
             <span style={{ fontSize:12, fontFamily:font, color:events.length > 0 ? "#dc2626" : MUTED }}>
-              {events.length} detectados · 7 días
+              {events.length} detectados
             </span>
           </div>
           {events.length === 0 ? (
             <div style={{ textAlign:"center", padding:"30px 0", color:MUTED, fontSize:13 }}>
-              No se detectaron eventos de interrupción en los últimos 7 días.
+              No se detectaron eventos de interrupción en este período.
             </div>
           ) : (
             <div style={{ overflowX:"auto" }}>
@@ -1204,6 +1210,7 @@ export function TabIODA() {
                 <thead>
                   <tr style={{ borderBottom:`2px solid ${BORDER}` }}>
                     <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Fecha</th>
+                    <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Región</th>
                     <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Duración</th>
                     <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Fuente</th>
                     <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Severidad</th>
@@ -1213,21 +1220,28 @@ export function TabIODA() {
                 <tbody>
                   {events.map((ev, i) => {
                     const sevColor = ev.condition === "critical" ? "#ef4444" : ev.condition === "high" ? "#f97316" : ev.condition === "medium" ? "#fbbf24" : MUTED;
+                    const dsColor = ev.datasource === "bgp" ? "#7c3aed" : ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "#f59e0b" : ev.datasource === "packet-loss" ? "#dc2626" : "#dc2626";
+                    const dsLabel = ev.datasource === "bgp" ? "BGP" : ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "SONDEO" : ev.datasource === "telescope" ? "TELESCOPIO" : ev.datasource === "packet-loss" ? "LOSS" : (ev.datasource || "?").toUpperCase();
                     return (
-                      <tr key={i} style={{ borderBottom:`1px solid ${BORDER}30` }}>
+                      <tr key={i} onClick={() => { setFocusEvent(ev.time); if (ev.region !== "🇻🇪 Nacional") setSelectedState(ev.region); }}
+                        style={{ borderBottom:`1px solid ${BORDER}30`, cursor:"pointer" }}
+                        onMouseEnter={e => e.currentTarget.style.background = `${ACCENT}08`}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                         <td style={{ padding:"8px" }}>
                           <div style={{ color:TEXT, fontWeight:600 }}>{ev.time ? fmtTime(ev.time) : "—"}</div>
                         </td>
+                        <td style={{ padding:"8px" }}>
+                          <span style={{ fontSize:11, color: ev.region === "🇻🇪 Nacional" ? "#7c3aed" : TEXT, fontWeight: ev.region === "🇻🇪 Nacional" ? 600 : 400 }}>
+                            {ev.region || "—"}
+                          </span>
+                        </td>
                         <td style={{ padding:"8px", color:MUTED, fontSize:11 }}>{ev.duration ? fmtDuration(ev.duration) : "en curso"}</td>
                         <td style={{ padding:"8px" }}>
-                          <Badge color={ev.datasource === "bgp" ? "#7c3aed" : ev.datasource === "probing" ? "#f59e0b" : "#dc2626"}>
-                            {ev.datasource === "bgp" ? "BGP" : ev.datasource === "probing" ? "SONDEO" : ev.datasource === "telescope" ? "TELESCOPIO" : (ev.datasource || "?").toUpperCase()}
-                          </Badge>
+                          <Badge color={dsColor}>{dsLabel}</Badge>
                         </td>
                         <td style={{ padding:"8px" }}>
                           <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                             <span style={{ fontSize:12, fontWeight:700, color:sevColor, textTransform:"uppercase" }}>{ev.condition === "critical" ? "CRÍTICO" : ev.condition === "high" ? "ALTO" : "MEDIO"}</span>
-                            {/* Severity bar */}
                             <div style={{ width:60, height:4, background:`${BORDER}40`, borderRadius:2, overflow:"hidden" }}>
                               <div style={{ width:`${Math.min(ev.value || 0, 100)}%`, height:4, background:sevColor, borderRadius:2 }} />
                             </div>
@@ -1244,6 +1258,9 @@ export function TabIODA() {
               </table>
             </div>
           )}
+          <div style={{ fontSize:10, color:`${MUTED}60`, marginTop:8 }}>
+            Click en un evento para ver en la gráfica · Incluye eventos nacionales y regionales
+          </div>
         </Card>
       )}
 
@@ -1266,13 +1283,13 @@ export function TabIODA() {
                       Conectividad por Estado
                     </div>
                     <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>
-                      {mapMode === "live" ? "24h" : mapMode === "24h" ? "24h" : mapMode === "7d" ? "7 días" : "30 días"} · Scroll para zoom · Click estado en mapa para filtrar
-                      {isExtendedLoading && " · ⏳ cargando..."}
+                      {timeLabel} · Scroll para zoom · Click estado en mapa para filtrar
                     </span>
                   </div>
                   {/* Main probing-based multi-line chart */}
-                  <InteractiveChart states={chartStates} mapMode={mapMode} selectedState={selectedState}
-                    onSelectState={s => setSelectedState(selectedState === s ? null : s)} palette={palette} />
+                  <InteractiveChart states={chartStates} timePreset={timePreset} selectedState={selectedState}
+                    onSelectState={s => setSelectedState(selectedState === s ? null : s)} palette={palette}
+                    events={events} focusEvent={focusEvent} onClearFocus={() => setFocusEvent(null)} />
                   
                   {/* Per-source breakdown for selected state */}
                   {selectedState && (() => {
