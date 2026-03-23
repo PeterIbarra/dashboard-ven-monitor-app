@@ -208,44 +208,51 @@ function computeRegionScore(parsed, nationalTelescopeData) {
   const connectivityScore = probDropScore + lossPenalty + latPenalty;
   
   // ══════ INDEX 2: ELECTRICITY ══════
-  // Detect abrupt probing drops (>20% in <30min = potential power outage)
+  // Detect probing drops vs P95 baseline (not moving average — avoids smoothing away events)
+  // Threshold: >15% below P95 for 2+ consecutive points = potential power outage
   const step = parsed.length > 1 ? (parsed[parsed.length-1].ts - parsed[0].ts) / (parsed.length - 1) : 600;
-  const windowPts = Math.max(1, Math.round(1800 / step)); // ~30min window
+  const elecThreshold = probP95 * 0.85; // 15% below baseline
+  const elecRecovery = probP95 * 0.92; // recovered when back to within 8% of baseline
   
-  let powerEvents = []; // {ts, dropPct, duration, recovered}
-  let inDrop = false, dropStart = null, dropMinVal = Infinity, preDropVal = 0;
+  let powerEvents = [];
+  let inDrop = false, dropStart = null, dropMinVal = Infinity, consecutiveBelow = 0;
   
-  for (let i = windowPts; i < probVals.length; i++) {
-    const prev = probVals.slice(Math.max(0, i - windowPts), i);
-    const prevAvg = prev.reduce((a,b) => a+b, 0) / prev.length;
-    const current = probVals[i];
-    const dropPct = prevAvg > 0 ? ((prevAvg - current) / prevAvg) * 100 : 0;
+  for (let i = 0; i < probVals.length; i++) {
+    const v = probVals[i];
+    const dropPct = probP95 > 0 ? ((probP95 - v) / probP95) * 100 : 0;
     
-    if (dropPct > 20 && !inDrop) {
-      inDrop = true;
-      dropStart = i;
-      dropMinVal = current;
-      preDropVal = prevAvg;
-    } else if (inDrop && dropPct > 10) {
-      if (current < dropMinVal) dropMinVal = current;
-    } else if (inDrop && dropPct <= 5) {
-      const durationPts = i - dropStart;
-      const maxDropPct = preDropVal > 0 ? Math.round(((preDropVal - dropMinVal) / preDropVal) * 100) : 0;
-      if (maxDropPct > 20 && durationPts >= 2) {
-        powerEvents.push({
-          ts: parsed[dropStart]?.ts || 0,
-          dropPct: maxDropPct,
-          durationSec: Math.round(durationPts * step),
-          recovered: true,
-        });
+    if (v < elecThreshold) {
+      consecutiveBelow++;
+      if (!inDrop && consecutiveBelow >= 2) {
+        // Confirmed drop start (2+ consecutive points below threshold)
+        inDrop = true;
+        dropStart = i - 1; // include the first point that crossed
+        dropMinVal = Math.min(v, probVals[i - 1] || v);
+      } else if (inDrop) {
+        if (v < dropMinVal) dropMinVal = v;
       }
-      inDrop = false; dropMinVal = Infinity;
+    } else {
+      consecutiveBelow = 0;
+      if (inDrop && v >= elecRecovery) {
+        // Event ended — recovered
+        const durationPts = i - dropStart;
+        const maxDropPct = probP95 > 0 ? Math.round(((probP95 - dropMinVal) / probP95) * 100) : 0;
+        if (maxDropPct >= 15 && durationPts >= 2) {
+          powerEvents.push({
+            ts: parsed[dropStart]?.ts || 0,
+            dropPct: maxDropPct,
+            durationSec: Math.round(durationPts * step),
+            recovered: true,
+          });
+        }
+        inDrop = false; dropMinVal = Infinity;
+      }
     }
   }
   // Still in drop at end of data
   if (inDrop) {
-    const maxDropPct = preDropVal > 0 ? Math.round(((preDropVal - dropMinVal) / preDropVal) * 100) : 0;
-    if (maxDropPct > 20) {
+    const maxDropPct = probP95 > 0 ? Math.round(((probP95 - dropMinVal) / probP95) * 100) : 0;
+    if (maxDropPct >= 15) {
       powerEvents.push({
         ts: parsed[dropStart]?.ts || 0,
         dropPct: maxDropPct,
