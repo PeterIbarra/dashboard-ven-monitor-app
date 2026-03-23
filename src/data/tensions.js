@@ -1,9 +1,10 @@
 // Active tensions — updated each SITREP cycle
 export const TENSIONS = [
-  { level:"green", text:"Amnistía operativa · 4.203 solicitudes · Trump: \"nuevo amigo y socio\"" },
-  { level:"green", text:"Petróleo ~800K bpd · Vitol/Trafigura · Eni USD 3B · Shell gas" },
-  { level:"yellow", text:"Brecha cambiaria 52,6% ↑6,5pp · 47 meses sin ajuste salarial" },
-  { level:"yellow", text:"Poder Ciudadano: renuncias Saab/Ruiz · plazo 30 días" },
-  { level:"red", text:"Agenda electoral: Rubio condiciona · Sin calendario · Caso Magalli Meda" },
+  { level:"green", text:"Reconfiguración gabinete: 42% modificado · nueva cúpula FANB · Padrino López sale tras 11+ años" },
+  { level:"green", text:"Normalización diplomática: bandera EE.UU. (7 años) · Senado en Miraflores · alerta nivel 3 · Trump «fantástica»" },
+  { level:"green", text:"Expansión energética: Cardón IV (gas) · LG-52 · export. duplicadas · Repsol +50%/+200% · Maurel & Prom" },
+  { level:"yellow", text:"Contención social temporal: bono 150 USD + 300M Fondo · protestas 65→46 · brecha salarial persiste" },
+  { level:"yellow", text:"Amnistía: 7.580 beneficiados · 690 excarcelados (FP) · 515 presos · art.9 exclusiones" },
+  { level:"red", text:"Ambigüedad jurídica: jueza Netburn · PDV Holding/Citgo sin efecto sin OFAC · gasoducto Ricaurte" },
 ];
 

@@ -212,6 +212,26 @@ export const SITREP_ALL = [
       { tag:"Factor 3", color:"#ca8a04", title:"Sostenibilidad del esquema en tres factores", text:"(1) Traducir el boom energético en mejoras salariales antes de que la conflictividad escale; (2) designaciones en Poder Ciudadano que muestren apertura real; (3) manejo del retorno de MCM sin fricciones con Washington." },
     ],
   },
+  // S10: 13-20 marzo
+  { period:"13 – 20 de marzo de 2026", periodShort:"13–20 mar 2026",
+    keyPoints:[
+      { tag:"Institucional", color:"#0468B1", title:"Reconfiguración gabinete y Alto Mando Militar", text:"11 cambios ministeriales y nueva cúpula FANB. Padrino López sale tras 11+ años en Defensa; González López centraliza seguridad. 42% del gabinete Maduro modificado (14 de 33 carteras). Opositores (Ríos, Blanco) y técnicos (Sanjuán, Alcalá) amplían base." },
+      { tag:"Diplomacia", color:"#16a34a", title:"Normalización EE.UU. en fase operativa", text:"Bandera estadounidense izada en Caracas por primera vez en 7 años. Delegación del Senado en Miraflores. Alerta de viaje reducida a nivel 3. Trump califica la relación como «fantástica». LG-52 autoriza transacciones amplias con PDVSA." },
+      { tag:"Energía", color:"#ca8a04", title:"Diversificación energética: gas y nuevos operadores", text:"Acuerdo gasífero Cardón IV (PDVSA-Repsol-Eni). Exportaciones petroleras a EE.UU. duplicadas. Repsol proyecta +50% producción 2026 y +200% para 2028. Maurel & Prom activa taladro en Maracaibo tras 8 años. Primer envío de GLP a Colombia." },
+    ],
+    sintesis:"E3 se consolida como escenario dominante con fuerza inédita — 47% (+5pp) — impulsado por la reconfiguración institucional más amplia desde enero (42% gabinete, nueva cúpula FANB), la normalización diplomática operativa (bandera, Senado, nivel 3, Trump «fantástica») y la expansión energética diversificada hacia el gas. E1 retrocede a 30% por incorporación de opositores al Ejecutivo y MCM sin retorno. E2 baja a 8%, contenido por solidez bilateral. E4 estable en 15%: protestas bajan de 65 a 46 por bono 150 USD + 300M Fondo, pero brecha salarial persiste. La sostenibilidad del esquema depende de traducir ingresos en mejoras tangibles antes de que la conflictividad supere la contención temporal.",
+    actores:[
+      { name:"EE.UU.", items:["Bandera izada en Caracas: primera vez en 7 años","Delegación Senado (Comité RREE) en Miraflores","Alerta viaje reducida nivel 4→3","LG-52: autoriza transacciones amplias con PDVSA","Trump: relación «fantástica»; elogia gestión Delcy","Prórroga protección Citgo hasta 5 de mayo","Jueza Netburn: representación legal de Venezuela sin resolver"] },
+      { name:"Gobierno Interino", items:["11 cambios ministeriales: 42% gabinete modificado","Padrino López sale; González López asume Defensa","Nueva cúpula FANB: Prieto Martínez Cmdte. Estratégico","Bono Guerra Económica 150 USD (+25%)","300M USD al Fondo de Protección Social","PDV Holding/Citgo: juntas directivas actualizadas","Embajador Maniglia designado ante Colombia"] },
+      { name:"Oposición", items:["MCM en CERAWeek Houston: posicionamiento internacional","Guanipa cuestiona cambio en Defensa; desconfianza","Ríos (AD) como viceministro Educ. Univ.: 2º opositor en gobierno","Foro Penal: 690 excarcelados · 515 presos políticos","Dirigentes en exilio inician trámites amnistía","SNTP plantea urgencia de garantías para periodismo","Bracho (Grupo Libertad): reservas sobre implementación amnistía"] },
+      { name:"Internacional", items:["Cardón IV: acuerdo gasífero PDVSA-Repsol-Eni","Repsol +50% producción 2026 · +200% para 2028","Maurel & Prom: primer taladro en Maracaibo en 8 años","Colombia: Petro califica reunión «supremamente exitosa»; Mercosur + coordinación militar","Primer envío GLP Venezuela→Colombia","Zapatero «campeón de la paz»: respalda amnistía","Volker Türk (ONU): «esperanza, miedo e incertidumbre»"] },
+    ],
+    factoresEstructurantes:[
+      { tag:"Factor 1", color:"#16a34a", title:"Reconfiguración institucional sin precedentes", text:"La remodelación simultánea del gabinete (42%) y del Alto Mando Militar constituye el movimiento de ingeniería política más amplio desde el 3 de enero. González López centraliza seguridad (Defensa + ex-DGCIM + ex-Guardia Honor). La incorporación de opositores y técnicos amplía la legitimidad funcional sin ceder espacios de decisión estratégica." },
+      { tag:"Factor 2", color:"#0468B1", title:"Normalización diplomática avanza más rápido que la legal", text:"El izado de bandera, la delegación senatorial y las declaraciones de Trump configuran la secuencia de normalización más acelerada en la historia reciente. Sin embargo, la ambigüedad jurídica sobre representación legal (jueza Netburn) y PDV Holding/Citgo sin efecto sin OFAC evidencian asimetría entre normalización política y corporativa." },
+      { tag:"Factor 3", color:"#ca8a04", title:"Brecha distributiva: vulnerabilidad principal del modelo", text:"El bono de 150 USD y los 300M al Fondo contienen temporalmente la conflictividad (65→46 protestas). Pero no resuelven la brecha estructural entre recuperación macroeconómica energética y condiciones salariales. La reactivación de conflictividad laboral es probable cuando el efecto del ajuste se diluya." },
+    ],
+  },
 ];
 
 export const CURATED_NEWS = [
@@ -304,4 +324,23 @@ export const CURATED_FACTCHECK = [
   { title:"Foro Penal: 508 presos políticos al 9 de marzo; ONU reporta 87 nuevas detenciones", date:"2026-03-09", source:"Foro Penal / ONU", scenarios:["E4"], dims:["Político"], week:"S9" },
   { title:"AN aprueba 7.727 beneficiados por Ley de Amnistía; Guanipa sobreseído; Dávila libre", date:"2026-03-13", source:"AN/Foro Penal", scenarios:["E1","E3"], dims:["Político"], week:"S9" },
   { title:"SOUTHCOM realiza patrulla aérea F-35/P-8/KC-46 frente a costas venezolanas", date:"2026-03-06", source:"SOUTHCOM", scenarios:["E4"], dims:["Internacional"], week:"S9" },
+  // S10: 13-20 marzo
+  { title:"Embajada EE.UU. iza bandera en Caracas por primera vez en 7 años", date:"2026-03-14", source:"Embajada EE.UU.", scenarios:["E3"], dims:["Internacional"], week:"S10" },
+  { title:"Delcy Rodríguez anuncia 11 cambios ministeriales: 42% del gabinete Maduro modificado", date:"2026-03-18", source:"Presidencia", scenarios:["E3"], dims:["Político"], week:"S10" },
+  { title:"Padrino López sale de Defensa tras 11+ años; González López asume y centraliza seguridad", date:"2026-03-18", source:"Gaceta Oficial", scenarios:["E3","E4"], dims:["Político"], week:"S10" },
+  { title:"Acuerdo gasífero Cardón IV firmado entre PDVSA, Repsol y Eni", date:"2026-03-17", source:"PDVSA/Repsol", scenarios:["E3"], dims:["Energético"], week:"S10" },
+  { title:"OFAC emite LG-52: autoriza transacciones amplias de empresas estadounidenses con PDVSA", date:"2026-03-19", source:"OFAC/Tesoro", scenarios:["E3"], dims:["Energético","Internacional"], week:"S10" },
+  { title:"Departamento de Estado reduce alerta de viaje a Venezuela de nivel 4 a nivel 3", date:"2026-03-19", source:"Dept. of State", scenarios:["E3"], dims:["Internacional"], week:"S10" },
+  { title:"Trump califica relación con Venezuela como «fantástica»; elogia gestión de Delcy", date:"2026-03-18", source:"White House", scenarios:["E3"], dims:["Internacional"], week:"S10" },
+  { title:"Delegación del Senado (Comité RREE) se reúne con AN y Delcy en Miraflores", date:"2026-03-18", source:"AN/Embajada", scenarios:["E3"], dims:["Internacional","Político"], week:"S10" },
+  { title:"Bono de Guerra Económica aumenta a 150 USD; 300M USD al Fondo de Protección Social", date:"2026-03-18", source:"Presidencia", scenarios:["E3"], dims:["Económico"], week:"S10" },
+  { title:"Amnistía: 7.580 beneficiados; 24% solicitudes rechazadas; mecanismo exterior habilitado", date:"2026-03-18", source:"AN/J. Rodríguez", scenarios:["E3","E1"], dims:["Político"], week:"S10" },
+  { title:"Protestas bajan de 65 a 46 en la semana; demandas ESCP dominan 60-65%", date:"2026-03-19", source:"OVCS/Prensa", scenarios:["E4"], dims:["Social"], week:"S10" },
+  { title:"Foro Penal: 690 excarcelados verificados; 515 presos políticos al 13 de marzo", date:"2026-03-13", source:"Foro Penal", scenarios:["E4"], dims:["Político"], week:"S10" },
+  { title:"Repsol proyecta +50% producción petrolera en Venezuela 2026 y +200% para 2028", date:"2026-03-17", source:"Repsol/Reuters", scenarios:["E3"], dims:["Energético"], week:"S10" },
+  { title:"Maurel & Prom activa primer taladro de perforación en Maracaibo en 8 años", date:"2026-03-16", source:"Maurel & Prom", scenarios:["E3"], dims:["Energético"], week:"S10" },
+  { title:"Jueza Netburn confirma ambigüedad sobre representación legal de Venezuela en EE.UU.", date:"2026-03-17", source:"Tribunal Federal", scenarios:["E2"], dims:["Internacional","Político"], week:"S10" },
+  { title:"Colombia-Venezuela: Petro anuncia Mercosur conjunto y coordinación militar antinarcóticos", date:"2026-03-15", source:"Presidencia Colombia", scenarios:["E3"], dims:["Internacional"], week:"S10" },
+  { title:"Ley de Minas diferida en segunda discusión: avanzó solo hasta artículo 12", date:"2026-03-18", source:"AN", scenarios:["E3"], dims:["Político","Económico"], week:"S10" },
+  { title:"Ricardo Ríos (AD) designado viceministro Educ. Universitaria: 2º opositor en Ejecutivo", date:"2026-03-18", source:"Gaceta Oficial", scenarios:["E1","E3"], dims:["Político"], week:"S10" },
 ];

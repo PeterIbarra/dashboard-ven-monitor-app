@@ -3,22 +3,22 @@
 
 export const KPIS_LATEST = {
   energia: [
-    { k:"Producción feb.", v:"1.021 kbd", c:"#22c55e" },
-    { k:"Crudo Merey", v:"USD 52,31/bbl", c:"#22c55e" },
-    { k:"Licencias OFAC", v:"GL49+GL50/50A+GL51", c:"#38bdf8" },
-    { k:"Oro a EE.UU.", v:"USD 100M (1er carg.)", c:"#22c55e" },
+    { k:"Cardón IV", v:"Acuerdo gas PDVSA-Repsol-Eni", c:"#22c55e" },
+    { k:"Licencias OFAC", v:"GL46B+48A+49A+51+52", c:"#38bdf8" },
+    { k:"Repsol proyección", v:"+50% 2026 · +200% 2028", c:"#22c55e" },
+    { k:"Maurel & Prom", v:"Taladro Maracaibo (1º en 8 años)", c:"#22c55e" },
   ],
   politico: [
-    { k:"Amnistía", v:"7.727 beneficiados", c:"#22c55e" },
-    { k:"Excarcelaciones verif.", v:"670 (Foro Penal)", c:"#22c55e" },
-    { k:"Presos políticos", v:"508 (Foro Penal)", c:"#ef4444" },
-    { k:"Reconocimiento EE.UU.", v:"Rodríguez legítima", c:"#22c55e" },
+    { k:"Gabinete", v:"42% modificado (14 de 33)", c:"#22c55e" },
+    { k:"Amnistía", v:"7.580 beneficiados", c:"#22c55e" },
+    { k:"Excarcelaciones verif.", v:"690 (Foro Penal)", c:"#22c55e" },
+    { k:"Presos políticos", v:"515 (Foro Penal)", c:"#ef4444" },
   ],
   opinion: [
-    { k:"MCM liderazgo", v:"106,84/137 pts", c:"#22c55e" },
-    { k:"Elecciones", v:"Washington: 2027", c:"#a17d08" },
-    { k:"Conflictividad 12/03", v:"39 movilizaciones", c:"#ef4444" },
-    { k:"Inflación anualizada", v:"617% (BCV)", c:"#ef4444" },
+    { k:"Protestas 13–19 mar", v:"46 (↓ de 65)", c:"#a17d08" },
+    { k:"Bono Guerra Econ.", v:"150 USD (+25%)", c:"#22c55e" },
+    { k:"Fondo Protección", v:"300M USD", c:"#22c55e" },
+    { k:"Inflación proy.", v:"197% (2026)", c:"#ef4444" },
   ],
 };
 
@@ -78,20 +78,24 @@ export const WEEKS = [
     tensiones:[{l:"green",t:"<b>Energía:</b> Producción supera 1M bpd por primera vez. Chevron, Shell, Repsol amplían inversiones >EUR 1.000M."},{l:"green",t:"<b>Diplomacia:</b> Trump reconoce formalmente a Rodríguez como «único interlocutor legítimo». GL-51 oro operativa."},{l:"green",t:"<b>Minería:</b> Primer cargamento oro USD 100M a EE.UU. Decreto 5.266 absorción Minerven. Ley de Minas primera discusión."},{l:"yellow",t:"<b>Conflictividad laboral:</b> 39 movilizaciones en 23 estados el 12/03. Mayor jornada del año. Superaron piquetes PNB."},{l:"yellow",t:"<b>Inflación:</b> BCV publica 51,9% acumulado ene-feb (617% anualizada). 70% población <USD 300 vs canasta USD 425-622."},{l:"red",t:"<b>DDHH:</b> 508 presos políticos (Foro Penal). ONU: 87 nuevas detenciones post-3 enero, 14 periodistas."}],
     lectura:"E3 se consolida como escenario dominante al 42% (+2pp), impulsado por el reconocimiento formal de EE.UU. al gobierno de Rodríguez como «único interlocutor legítimo» — el hecho de mayor impacto estructural de la semana y de todo el período post-3 de enero. La producción petrolera superó por primera vez el millón de barriles diarios (1.021.000 bpd en febrero, +10,5%), la GL-51 habilitó el oro venezolano, y el primer cargamento aurífero de USD 100M fue entregado a EE.UU. Chevron, Shell y Repsol consolidan inversiones sin precedentes.\n\nE1 retrocede a 33% (-5pp): Washington priorizó estabilidad sobre transición acelerada. Trump aconsejó a MCM no regresar y señaló elecciones hacia 2027, reduciendo su margen de acción. E4 sube a 15% (+5pp) por la escalada laboral del 12 de marzo — 39 movilizaciones en 23 estados, la mayor jornada del año — y las tensiones en designaciones del Poder Ciudadano. E2 baja a 10% (-2pp), contenido por la solidez del acuerdo bilateral.\n\nEl equilibrio es funcional pero frágil: depende de que la redistribución del boom energético comience a materializarse antes de que la conflictividad laboral supere el umbral político. La inflación anualizada del 617% (BCV oficial) confirma que la estabilización macroeconómica no se ha consolidado.",
     trendSc:3, trendDrivers:["Reconocimiento formal EE.UU. a Rodríguez: «único interlocutor legítimo»","Producción supera 1M bpd + GL-51 oro + USD 100M primer cargamento","39 movilizaciones laborales en 23 estados: mayor jornada del año"] },
+  { label:"13–20m", short:"S10", probs:[{sc:1,v:30,t:"down"},{sc:2,v:8,t:"down"},{sc:3,v:47,t:"up"},{sc:4,v:15,t:"flat"}], xy:{x:0.36,y:0.44},
+    sem:{g:10,y:5,r:4},
+    kpis:{ energia:{exportaciones:"Export. a EE.UU. duplicadas",ingresos:"Cardón IV · LG-52 · Repsol +50%",licencias:"GL46B+48A+49A+51+52",cambio:"Ingresos PDVSA −46% 1er bim."}, economico:{inflacion:"197% proy. 2026",ingresos_pob:"Bono 150 USD + 300M Fondo",electricidad:"Sin datos nuevos",pib:"+6,9% proy. 2026"}, opinion:{direccion:"71% salida «a cualquier costo»",elecciones:"Washington: 2027",mcm:"MCM en CERAWeek Houston",eeuu:"Trump: «fantástica»"} },
+    tensiones:[{l:"green",t:"<b>Gabinete:</b> 42% modificado · nueva cúpula FANB · Padrino López sale tras 11+ años."},{l:"green",t:"<b>Diplomacia:</b> Bandera EE.UU. izada (7 años) · Senado en Miraflores · alerta nivel 3."},{l:"green",t:"<b>Energía:</b> Cardón IV (gas) · LG-52 · export. duplicadas · Repsol +50%/+200% · Maurel & Prom Maracaibo."},{l:"yellow",t:"<b>Contención social:</b> Bono 150 USD + 300M Fondo. Protestas 65→46. Efecto temporal."},{l:"yellow",t:"<b>Amnistía:</b> 7.580 beneficiados · 690 excarcelados (FP) · 515 presos · art.9 exclusiones."},{l:"red",t:"<b>Jurídico:</b> Jueza Netburn · PDV Holding/Citgo sin efecto sin OFAC · gasoducto Ricaurte."}],
+    lectura:"E3 se consolida como escenario dominante con fuerza inédita — 47% (+5pp) — impulsado por la convergencia de cuatro factores de primer orden. La reconfiguración institucional más amplia desde el 3 de enero: 11 cambios ministeriales y nueva cúpula FANB, con la salida de Padrino López tras más de 11 años en Defensa y su reemplazo por González López, quien centraliza el aparato de seguridad. Con 14 ministros cambiados, Delcy Rodríguez ha modificado el 42% del gabinete heredado de Maduro. La incorporación de opositores (Ríos, Blanco) y técnicos (Sanjuán, Alcalá) amplía la base de gobernabilidad.\n\nLa normalización diplomática entró en fase operativa: el izado de bandera en Caracas (primera vez en 7 años), la delegación del Senado en Miraflores, la reducción de alerta de viaje a nivel 3, y Trump calificando la relación como «fantástica». La expansión energética se diversifica: acuerdo gasífero Cardón IV (PDVSA-Repsol-Eni), LG-52 para transacciones con PDVSA, exportaciones a EE.UU. duplicadas, Repsol proyecta +50% en 2026 y +200% para 2028, Maurel & Prom reactiva taladro en Maracaibo tras 8 años.\n\nE1 retrocede a 30% (-3pp): la incorporación de opositores al Ejecutivo y la ausencia de retorno de MCM difuminan las fronteras entre oficialismo y oposición. E4 se mantiene estable en 15%: las protestas bajan de 65 a 46 por el bono de 150 USD y los 300M al Fondo de Protección Social, pero la brecha salarial estructural persiste. E2 baja a 8% (-2pp), contenido por la solidez creciente del eje bilateral. Sin embargo, la ambigüedad jurídica sobre representación legal (jueza Netburn) y las disputas PDV Holding/Citgo que carecen de efecto sin OFAC evidencian que la normalización política avanza más rápido que la normalización legal y corporativa.",
+    trendSc:3, trendDrivers:["42% gabinete modificado + nueva cúpula FANB: reconfiguración institucional sin precedentes","Bandera EE.UU. + Senado + nivel 3 + «fantástica»: normalización diplomática operativa","Cardón IV + LG-52 + export. duplicadas + Repsol/Maurel & Prom: diversificación energética"] },
 ];
 
 export const TENSIONS = [
-  { level:"green", text:"Producción petrolera supera 1M bpd (1.021 kbd feb.) · Chevron, Shell, Repsol amplían inversiones" },
-  { level:"green", text:"Trump reconoce formalmente a Rodríguez como «único interlocutor legítimo» de Venezuela" },
-  { level:"green", text:"GL-51 oro operativa · Primer cargamento USD 100M a EE.UU. · Decreto 5.266 absorción Minerven" },
-  { level:"green", text:"Amnistía: 7.727 beneficiados · 670 excarcelaciones verificadas · Guanipa sobreseído" },
-  { level:"yellow", text:"Conflictividad laboral: 39 movilizaciones en 23 estados (12/03) · Mayor jornada del año" },
-  { level:"yellow", text:"Inflación 617% anualizada (BCV oficial) · 70% población <USD 300 vs canasta USD 425-622" },
-  { level:"red", text:"508 presos políticos · ONU: 87 nuevas detenciones post-3 enero · 14 periodistas detenidos" },
-  { level:"red", text:"MCM marginalizada: Trump aconseja no regresar · Elecciones diferidas a 2027" },
+  { level:"green", text:"Reconfiguración gabinete: 42% modificado · nueva cúpula FANB · Padrino López sale tras 11+ años" },
+  { level:"green", text:"Normalización diplomática: bandera EE.UU. (7 años) · Senado en Miraflores · alerta nivel 3 · Trump «fantástica»" },
+  { level:"green", text:"Expansión energética: Cardón IV (gas) · LG-52 · export. duplicadas · Repsol +50%/+200% · Maurel & Prom" },
+  { level:"yellow", text:"Contención social temporal: bono 150 USD + 300M Fondo · protestas 65→46 · brecha salarial persiste" },
+  { level:"yellow", text:"Amnistía: 7.580 beneficiados · 690 excarcelados (FP) · 515 presos · art.9 exclusiones" },
+  { level:"red", text:"Ambigüedad jurídica: jueza Netburn · PDV Holding/Citgo sin efecto sin OFAC · gasoducto Ricaurte" },
 ];
 
-export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9"];
+export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10"];
 
 
 export const ICG_HISTORY = [
@@ -104,6 +108,7 @@ export const ICG_HISTORY = [
   { week:"S7", score:70, sitrep:true, note:"Poder Ciudadano: renuncias Saab/Ruiz. Trump 'amigo'" },
   { week:"S8", score:66, sitrep:true, note:"Brecha entre discurso amnistía y control paralelo" },
   { week:"S9", score:72, sitrep:true, note:"Reconocimiento formal EE.UU. + 39 protestas 23 estados" },
+  { week:"S10", score:68, sitrep:true, note:"Reconfiguración gabinete 42% + nueva cúpula FANB. Padrino sale. Normalización diplomática operativa" },
 ];
 
 export const CONF_SEMANAL = [
@@ -134,4 +139,7 @@ export const CONF_SEMANAL = [
   { week:"S9", label:"6–13 mar", protestas:65, estados:23, reprimidas:0,
     motivos:["Aumento salarial","Jubilaciones","Pensiones","Laborales"],
     hecho:"RÉCORD: 39 movilizaciones 12/03 en 23 estados. Inflación 617%." },
+  { week:"S10", label:"13–20 mar", protestas:46, estados:14, reprimidas:0,
+    motivos:["Salarios","Vivienda","Agua","Laborales","DDHH","Participación política"],
+    hecho:"Bono 150 USD + 300M Fondo contienen protestas (65→46). Demandas ESCP 60-65%." },
 ];
