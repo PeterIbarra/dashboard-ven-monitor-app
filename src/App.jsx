@@ -177,46 +177,98 @@ export default function MonitorPNUD() {
           }
         }
       } catch {}
-      // IODA — national + 5 critical states connectivity check for alerts
+      // IODA — national connectivity + electrical alerts (using outage endpoints)
       try {
         if (IS_DEPLOYED) {
           const now = Math.floor(Date.now() / 1000);
-          const from = now - 6 * 3600;
-          // Helper: get probing health from IODA signals
-          const getHealth = async (path) => {
-            const r = await fetch(`/api/ioda?path=${path}&from=${from}&until=${now}`, { signal:AbortSignal.timeout(8000) }).then(r=>r.ok?r.json():null).catch(()=>null);
-            if (!r?.data) return null;
-            const raw = Array.isArray(r.data) ? r.data.flat() : [];
-            const probing = raw.find(s => s.datasource === "ping-slash24");
-            if (!probing?.values?.length) return null;
-            const vals = probing.values.filter(v => v !== null);
-            if (vals.length < 5) return null;
-            const current = vals[vals.length - 1];
-            const baseline = vals.slice(0, Math.max(1, Math.floor(vals.length * 0.1)));
-            const baseAvg = baseline.reduce((a,b) => a+b, 0) / baseline.length || 1;
-            return { health: Math.min(100, Math.round((current / baseAvg) * 100)), current, baseline: Math.round(baseAvg) };
+          const from6h = now - 6 * 3600;
+          const from7d = now - 7 * 86400;
+          
+          // Helper: fetch IODA endpoint
+          const iodaGet = async (path, params) => {
+            const qs = Object.entries(params).map(([k,v])=>`${k}=${v}`).join("&");
+            return fetch(`/api/ioda?path=${path}&${qs}`, { signal:AbortSignal.timeout(10000) }).then(r=>r.ok?r.json():null).catch(()=>null);
           };
-          // National
-          const nat = await getHealth("signals/raw/country/VE");
-          // 5 critical states in parallel (Táchira, Barinas, Lara, Zulia, Trujillo)
-          const criticalStates = [
-            { code:"4020", name:"Táchira" }, { code:"4005", name:"Barinas" },
-            { code:"4013", name:"Lara" }, { code:"4024", name:"Zulia" }, { code:"4021", name:"Trujillo" },
+          
+          // National health from signals/raw (last 6h)
+          const natRaw = await iodaGet("signals/raw/country/VE", { from:from6h, until:now });
+          let natHealth = null;
+          if (natRaw?.data) {
+            const raw = Array.isArray(natRaw.data) ? natRaw.data.flat() : [];
+            const probing = raw.find(s => s.datasource === "ping-slash24");
+            if (probing?.values?.length) {
+              const vals = probing.values.filter(v => v !== null);
+              if (vals.length >= 5) {
+                const current = vals[vals.length - 1];
+                const sorted = [...vals].sort((a,b) => a - b);
+                const p95 = sorted[Math.floor(sorted.length * 0.95)] || 1;
+                natHealth = Math.min(100, Math.round((current / p95) * 100));
+              }
+            }
+          }
+          
+          // Key states: IODA codes
+          const keyStates = [
+            { code:"4486", name:"Táchira" }, { code:"4484", name:"Barinas" },
+            { code:"4491", name:"Lara" }, { code:"4488", name:"Zulia" }, { code:"4487", name:"Trujillo" },
+            { code:"4492", name:"Portuguesa" }, { code:"4489", name:"Cojedes" }, { code:"4493", name:"Yaracuy" },
+            { code:"4485", name:"Mérida" }, { code:"4490", name:"Carabobo" },
+            { code:"4498", name:"Vargas" }, { code:"4499", name:"Distrito Capital" },
           ];
-          const stateResults = await Promise.allSettled(
-            criticalStates.map(async st => {
-              const h = await getHealth(`signals/raw/region/${st.code}`);
-              return h ? { ...st, ...h } : null;
+          
+          // Fetch alerts for key states (7d window for electricity persistence)
+          const stateAlertResults = await Promise.allSettled(
+            keyStates.map(async st => {
+              const json = await iodaGet("outages/alerts", { entityType:"region", entityCode:st.code, from:from7d, until:now });
+              const alerts = Array.isArray(json?.data) ? json.data : [];
+              
+              // Current connectivity from last alert
+              const pingAlerts = alerts.filter(a => a.datasource === "ping-slash24");
+              const bgpAlerts = alerts.filter(a => a.datasource === "bgp");
+              const lastPing = pingAlerts[pingAlerts.length - 1];
+              const pingH = lastPing?.historyValue > 0 ? Math.min(100, Math.round((lastPing.value / lastPing.historyValue) * 100)) : 100;
+              
+              // Electrical events: ping critical + BGP stable
+              const critPing = pingAlerts.filter(a => a.level === "critical");
+              const critBgp = bgpAlerts.filter(a => a.level === "critical");
+              const electricAlerts = critPing.filter(cp => {
+                const bgpDown = critBgp.some(cb => Math.abs(cb.time - cp.time) < 1800);
+                return !bgpDown; // electric = ping down + BGP stable
+              }).map(cp => ({
+                time: cp.time,
+                dropPct: cp.historyValue > 0 ? Math.round(((cp.historyValue - cp.value) / cp.historyValue) * 100) : 0,
+                value: cp.value,
+                historyValue: cp.historyValue,
+              }));
+              
+              return {
+                ...st, health: pingH,
+                electricAlerts,
+                hasElecEvent: electricAlerts.length > 0,
+                worstElecDrop: electricAlerts.length > 0 ? Math.max(...electricAlerts.map(e => e.dropPct)) : 0,
+                lastElecTime: electricAlerts.length > 0 ? Math.max(...electricAlerts.map(e => e.time)) : null,
+              };
             })
           );
-          const stateData = stateResults.filter(r => r.status === "fulfilled" && r.value).map(r => r.value);
-          const worst = stateData.length > 0 ? stateData.sort((a,b) => a.health - b.health)[0] : null;
+          
+          const stateData = stateAlertResults.filter(r => r.status === "fulfilled" && r.value).map(r => r.value);
+          const worstInternet = stateData.sort((a,b) => a.health - b.health)[0] || null;
+          
+          // Electrical events: filter to those within 7d, sorted by severity
+          const elecStates = stateData.filter(s => s.hasElecEvent && s.lastElecTime > from7d)
+            .sort((a,b) => b.worstElecDrop - a.worstElecDrop);
+          
           results.ioda = {
-            avgHealth: nat?.health ?? null,
-            nationalCurrent: nat?.current, nationalBaseline: nat?.baseline,
-            worstState: worst?.name || null,
-            worstHealth: worst?.health ?? null,
+            avgHealth: natHealth,
+            worstState: worstInternet?.name || null,
+            worstHealth: worstInternet?.health ?? null,
             states: stateData,
+            // Electrical alerts (7d persistence)
+            elecAlerts: elecStates.map(s => ({
+              state: s.name, dropPct: s.worstElecDrop,
+              lastTime: s.lastElecTime, events: s.electricAlerts.length,
+            })),
+            elecCount: elecStates.reduce((acc, s) => acc + s.electricAlerts.length, 0),
           };
         }
       } catch {}

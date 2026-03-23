@@ -94,7 +94,7 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
           if (accel > 50) liveAlerts.push({ name:"Aceleración ⚡", val:`+${Math.round(accel)}%`, umbral:`Protestas aumentaron ${Math.round(accel)}% vs semana anterior (${prevW.protestas}→${lastW.protestas}) — escalada rápida`, level: accel > 100 ? "red" : "yellow" });
         }
 
-        // Internet connectivity (IODA)
+        // Internet connectivity (IODA) — 24h persistence
         if (liveData?.ioda) {
           const { avgHealth, worstState, worstHealth } = liveData.ioda;
           if (avgHealth !== undefined && avgHealth < 70) {
@@ -103,6 +103,29 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
             liveAlerts.push({ name:"Internet 🌐", val:`${avgHealth}%`, umbral:`Degradación de conectividad — ${worstState || "varios estados"} con ${worstHealth || 0}%. Monitorear evolución.`, level:"yellow" });
           } else if (worstHealth !== undefined && worstHealth < 50) {
             liveAlerts.push({ name:"Internet 🌐", val:`${worstState} ${worstHealth}%`, umbral:`${worstState} con conectividad crítica (${worstHealth}%) — posible corte regional focalizado.`, level: worstHealth < 30 ? "red" : "yellow" });
+          }
+          
+          // Electrical alerts (IODA) — 7d persistence
+          const elec = liveData.ioda.elecAlerts;
+          if (elec && elec.length > 0) {
+            const totalEvents = liveData.ioda.elecCount || elec.reduce((a,s) => a + s.events, 0);
+            const severe = elec.filter(s => s.dropPct > 40);
+            const moderate = elec.filter(s => s.dropPct > 20 && s.dropPct <= 40);
+            const fmtAgo = (ts) => {
+              const h = Math.round((Date.now()/1000 - ts) / 3600);
+              return h < 24 ? `hace ${h}h` : `hace ${Math.round(h/24)}d`;
+            };
+            
+            if (severe.length > 0) {
+              const top = severe.slice(0, 3).map(s => `${s.state} −${s.dropPct}%`).join(", ");
+              liveAlerts.push({ name:"Electricidad ⚡", val:`${totalEvents} eventos`, umbral:`Apagones severos (7d): ${top}. BGP estable — patrón consistente con corte eléctrico regional.`, level:"red" });
+            } else if (moderate.length > 0) {
+              const top = moderate.slice(0, 3).map(s => `${s.state} −${s.dropPct}%`).join(", ");
+              liveAlerts.push({ name:"Electricidad ⚡", val:`${totalEvents} eventos`, umbral:`Interrupciones eléctricas detectadas (7d): ${top}. Monitorear evolución.`, level:"yellow" });
+            } else if (elec.length > 0) {
+              const top = elec.slice(0, 3).map(s => `${s.state} (${fmtAgo(s.lastTime)})`).join(", ");
+              liveAlerts.push({ name:"Electricidad ⚡", val:`${totalEvents} eventos`, umbral:`Fluctuaciones eléctricas en: ${top}. Impacto leve, seguimiento activo.`, level:"yellow" });
+            }
           }
         }
 

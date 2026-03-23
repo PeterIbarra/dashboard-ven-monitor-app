@@ -831,16 +831,31 @@ export function TabIODA() {
         const pingAlerts = alerts.filter(a => a.datasource === "ping-slash24");
         const bgpAlerts = alerts.filter(a => a.datasource === "bgp");
         
-        // Current connectivity health from latest alert
+        // Current connectivity health
         const lastPingAlert = pingAlerts[pingAlerts.length - 1];
         const lastBgpAlert = bgpAlerts[bgpAlerts.length - 1];
-        // Current connectivity: use WORST critical alert in period, not just latest
+        // Use WORST critical alert in period
         const worstPingAlert = pingAlerts
           .filter(a => a.level === "critical" && a.historyValue > 0)
           .sort((a, b) => (a.value / a.historyValue) - (b.value / b.historyValue))[0];
-        const pingHealth = worstPingAlert
-          ? Math.min(100, Math.round((worstPingAlert.value / worstPingAlert.historyValue) * 100))
-          : (lastPingAlert?.historyValue > 0 ? Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100)) : 100);
+        
+        let pingHealth;
+        if (worstPingAlert) {
+          pingHealth = Math.min(100, Math.round((worstPingAlert.value / worstPingAlert.historyValue) * 100));
+        } else if (lastPingAlert?.historyValue > 0) {
+          pingHealth = Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100));
+        } else {
+          // No alerts at all — use score to estimate health
+          // Higher score = worse. Score 0 = 100%, Score 1000 = ~85%, Score 10000 = ~60%, Score 50000 = ~30%
+          if (overallScore > 50000) pingHealth = 30;
+          else if (overallScore > 20000) pingHealth = 50;
+          else if (overallScore > 10000) pingHealth = 60;
+          else if (overallScore > 5000) pingHealth = 70;
+          else if (overallScore > 1000) pingHealth = 85;
+          else if (overallScore > 0) pingHealth = 90;
+          else pingHealth = 100;
+        }
+        
         const bgpHealth = lastBgpAlert?.historyValue > 0
           ? Math.min(100, Math.round((lastBgpAlert.value / lastBgpAlert.historyValue) * 100))
           : 100;
@@ -1033,7 +1048,11 @@ export function TabIODA() {
               ps.telescope = { health: Math.min(100, Math.round((teleCurrent / teleP95) * 100)), current: Math.round(teleCurrent * 10) / 10, baseline: Math.round(teleP95 * 10) / 10 };
             }
           }
-          const connHealth = Math.min(r.pingHealth || 100, ps.loss?.health || 100, ps.latency?.health || 100);
+          // Connectivity = primarily probing, with loss/latency as secondary penalties (max -15 and -10 pts)
+          const basePing = r.pingHealth || 100;
+          const lossPenalty = ps.loss ? Math.min(15, Math.round((100 - ps.loss.health) * 0.15)) : 0;
+          const latPenalty = ps.latency ? Math.min(10, Math.round((100 - ps.latency.health) * 0.10)) : 0;
+          const connHealth = Math.max(10, basePing - lossPenalty - latPenalty);
           return { ...r, perSource: ps, connectivityHealth: connHealth, healthPct: connHealth };
         }));
       }
