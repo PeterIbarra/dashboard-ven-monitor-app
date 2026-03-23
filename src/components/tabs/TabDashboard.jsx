@@ -116,16 +116,28 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
               return h < 24 ? `hace ${h}h` : `hace ${Math.round(h/24)}d`;
             };
             
+            // Summary alert
             if (severe.length > 0) {
               const top = severe.slice(0, 3).map(s => `${s.state} −${s.dropPct}%`).join(", ");
               liveAlerts.push({ name:"Electricidad ⚡", val:`${totalEvents} eventos`, umbral:`Apagones severos (7d): ${top}. BGP estable — patrón consistente con corte eléctrico regional.`, level:"red" });
             } else if (moderate.length > 0) {
               const top = moderate.slice(0, 3).map(s => `${s.state} −${s.dropPct}%`).join(", ");
               liveAlerts.push({ name:"Electricidad ⚡", val:`${totalEvents} eventos`, umbral:`Interrupciones eléctricas detectadas (7d): ${top}. Monitorear evolución.`, level:"yellow" });
-            } else if (elec.length > 0) {
+            } else {
               const top = elec.slice(0, 3).map(s => `${s.state} (${fmtAgo(s.lastTime)})`).join(", ");
               liveAlerts.push({ name:"Electricidad ⚡", val:`${totalEvents} eventos`, umbral:`Fluctuaciones eléctricas en: ${top}. Impacto leve, seguimiento activo.`, level:"yellow" });
             }
+            
+            // Individual alerts per state
+            elec.forEach(s => {
+              if (s.dropPct > 40) {
+                liveAlerts.push({ name:`⚡ ${s.state}`, val:`−${s.dropPct}%`, umbral:`Apagón severo (${fmtAgo(s.lastTime)}). ${s.events} evento${s.events>1?"s":""}. BGP estable — patrón de corte eléctrico.`, level:"red" });
+              } else if (s.dropPct > 20) {
+                liveAlerts.push({ name:`⚡ ${s.state}`, val:`−${s.dropPct}%`, umbral:`Interrupción eléctrica (${fmtAgo(s.lastTime)}). ${s.events} evento${s.events>1?"s":""}. Monitorear evolución.`, level:"yellow" });
+              } else {
+                liveAlerts.push({ name:`⚡ ${s.state}`, val:`−${s.dropPct}%`, umbral:`Fluctuación eléctrica (${fmtAgo(s.lastTime)}). Impacto leve.`, level:"yellow" });
+              }
+            });
           }
         }
 

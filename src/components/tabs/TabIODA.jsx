@@ -661,6 +661,8 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
     if (!mapInst.current || !window.L || !regionScores || regionScores.length === 0) return;
     const L = window.L;
     const map = mapInst.current;
+    // Force map to recalculate size (fixes invisible dots after tab switch)
+    setTimeout(() => map.invalidateSize(), 100);
     if (markersRef.current) { map.removeLayer(markersRef.current); }
     const group = L.layerGroup();
     const scores = regionScores.map(r => r.displayScore || r.dropScore || 0);
@@ -670,27 +672,30 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
       const coords = STATE_COORDS[r.name];
       if (!coords) return;
       const severity = r.connectivityHealth ?? r.healthPct ?? 100;
-      const color = severity >= 90 ? "#34d399" : severity >= 70 ? "#fbbf24" : severity >= 50 ? "#f97316" : "#ef4444";
+      const elecSev = r.elecHealth ?? 100;
+      // Color: worst of connectivity or electricity
+      const worstSev = Math.min(severity, elecSev);
+      const color = worstSev >= 90 ? "#34d399" : worstSev >= 70 ? "#fbbf24" : worstSev >= 50 ? "#f97316" : "#ef4444";
       const ds = r.displayScore || r.dropScore || 0;
-      // Always visible: minimum radius 8, minimum opacity 0.5
-      const radius = ds > 0 ? Math.max(10, Math.min(40, (ds / maxScore) * 40)) : (severity >= 90 ? 8 : severity >= 70 ? 14 : severity >= 50 ? 22 : 30);
+      // Always visible: minimum radius 12 for all states
+      const radius = ds > 0 ? Math.max(12, Math.min(40, (ds / maxScore) * 40)) : (worstSev >= 90 ? 12 : worstSev >= 70 ? 16 : worstSev >= 50 ? 24 : 32);
       const circle = L.circleMarker(coords, {
         radius, fillColor: color, color: selectedState === r.name ? "#fff" : color,
-        weight: selectedState === r.name ? 3 : 1.5, opacity: 0.9, fillOpacity: 0.6,
+        weight: selectedState === r.name ? 3 : 1.5, opacity: 0.9, fillOpacity: 0.65,
       });
       circle.bindPopup(
         `<div style="font-family:monospace;font-size:11px;min-width:160px">` +
         `<b style="font-size:13px">${r.name}</b><br/>` +
-        `Conectividad: <b style="color:${color}">${r.healthPct}%</b><br/>` +
-        `Outage Score: <b>${ds > 0 ? ds.toLocaleString() : "0"}</b><br/>` +
-        `Baseline: ${Math.round(r.baseAvg).toLocaleString()} · Actual: ${Math.round(r.current).toLocaleString()}` +
+        `Conectividad: <b style="color:${color}">${severity}%</b><br/>` +
+        `Electricidad: <b>${elecSev}%</b> ${r.elecLabel || ""}<br/>` +
+        `Score IODA: <b>${ds > 0 ? ds.toLocaleString() : "0"}</b>` +
         `</div>`, { className: "ioda-popup" }
       );
       circle.on("click", () => onSelectState(r.name));
       group.addLayer(circle);
 
-      // Add label for non-normal states
-      if (severity < 90 || ds > maxScore * 0.05) {
+      // Add label for non-normal states (connectivity OR electricity)
+      if (worstSev < 90 || ds > maxScore * 0.05) {
         const label = L.divIcon({
           className: "ioda-label",
           html: `<div style="font:bold 10px monospace;color:${color};text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap">${r.name}</div>`,
@@ -846,7 +851,6 @@ export function TabIODA() {
           pingHealth = Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100));
         } else {
           // No alerts at all — use score to estimate health
-          // Higher score = worse. Score 0 = 100%, Score 1000 = ~85%, Score 10000 = ~60%, Score 50000 = ~30%
           if (overallScore > 50000) pingHealth = 30;
           else if (overallScore > 20000) pingHealth = 50;
           else if (overallScore > 10000) pingHealth = 60;
@@ -1217,6 +1221,9 @@ export function TabIODA() {
         <Badge color={source==="live"?"#7c3aed":source==="failed"?"#dc2626":"#a17d08"}>
           {source==="live"?"EN VIVO":source==="failed"?"OFFLINE":"..."}
         </Badge>
+        <button onClick={() => changePreset(timePreset)} title="Refrescar datos"
+          style={{ fontSize:14, padding:"4px 8px", background:"transparent", border:`1px solid ${BORDER}`,
+            cursor:"pointer", borderRadius:4, color:MUTED, lineHeight:1 }}>🔄</button>
       </div>
       {/* Time controls */}
       <div style={{ display:"flex", gap:8, marginBottom:14, flexWrap:"wrap", alignItems:"center" }}>

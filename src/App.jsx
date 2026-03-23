@@ -207,13 +207,16 @@ export default function MonitorPNUD() {
             }
           }
           
-          // Key states: IODA codes
+          // All 24 Venezuelan states: IODA codes
           const keyStates = [
-            { code:"4486", name:"Táchira" }, { code:"4484", name:"Barinas" },
-            { code:"4491", name:"Lara" }, { code:"4488", name:"Zulia" }, { code:"4487", name:"Trujillo" },
-            { code:"4492", name:"Portuguesa" }, { code:"4489", name:"Cojedes" }, { code:"4493", name:"Yaracuy" },
-            { code:"4485", name:"Mérida" }, { code:"4490", name:"Carabobo" },
-            { code:"4498", name:"Vargas" }, { code:"4499", name:"Distrito Capital" },
+            { code:"4482", name:"Falcón" }, { code:"4483", name:"Apure" }, { code:"4484", name:"Barinas" },
+            { code:"4485", name:"Mérida" }, { code:"4486", name:"Táchira" }, { code:"4487", name:"Trujillo" },
+            { code:"4488", name:"Zulia" }, { code:"4489", name:"Cojedes" }, { code:"4490", name:"Carabobo" },
+            { code:"4491", name:"Lara" }, { code:"4492", name:"Portuguesa" }, { code:"4493", name:"Yaracuy" },
+            { code:"4494", name:"Amazonas" }, { code:"4495", name:"Bolívar" }, { code:"4496", name:"Anzoátegui" },
+            { code:"4497", name:"Aragua" }, { code:"4498", name:"Vargas" }, { code:"4499", name:"Distrito Capital" },
+            { code:"4501", name:"Guárico" }, { code:"4502", name:"Monagas" }, { code:"4503", name:"Miranda" },
+            { code:"4504", name:"Nueva Esparta" }, { code:"4505", name:"Sucre" }, { code:"4506", name:"Delta Amacuro" },
           ];
           
           // Fetch alerts for key states (7d window for electricity persistence)
