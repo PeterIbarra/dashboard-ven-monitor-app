@@ -210,37 +210,20 @@ function computeRegionScore(parsed, nationalTelescopeData) {
     latInfo = { health: latHealth, current: Math.round(latVals[latVals.length-1]), baseline: Math.round(latP10) };
   }
   
-  // ── Layer 3: National telescope amplifier (temporally coincident) ──
-  // Only amplifies when national telescope AND regional probing drop at the SAME time
+  // ── Layer 3: National telescope amplifier ──
   let telescopeMultiplier = 1.0;
-  if (nationalTelescopeData && nationalTelescopeData.length > 0 && parsed.length > 0) {
+  if (nationalTelescopeData && nationalTelescopeData.length > 0) {
     const ntVals = nationalTelescopeData.filter(v => v !== null);
     if (ntVals.length > 10) {
       const ntSorted = [...ntVals].sort((a,b) => a - b);
       const ntP95 = ntSorted[Math.floor(ntSorted.length * 0.95)];
       if (ntP95 > 5) {
-        // Find timestamps where probing dropped >10%
-        const probDropTimes = new Set();
-        for (const p of parsed) {
-          const v = p.probing;
-          if (v !== null && v < probP95 * 0.90) probDropTimes.add(p.ts);
-        }
-        if (probDropTimes.size > 0) {
-          // Check if national telescope also dipped during those same timestamps (±30min)
-          const ntStep = ntVals.length > 1 ? Math.round((parsed[parsed.length-1].ts - parsed[0].ts) / ntVals.length) : 600;
-          let coincidentDrops = 0;
-          for (let i = 0; i < ntVals.length; i++) {
-            if (ntVals[i] < ntP95 * 0.80) { // national telescope >20% drop
-              // Check if any probing drop within ±30min of this telescope reading
-              const approxTs = parsed[0].ts + i * ntStep;
-              for (const pt of probDropTimes) {
-                if (Math.abs(pt - approxTs) < 1800) { coincidentDrops++; break; }
-              }
-            }
-          }
-          if (coincidentDrops >= 3) telescopeMultiplier = 1.8; // strong coincidence
-          else if (coincidentDrops >= 1) telescopeMultiplier = 1.3; // mild coincidence
-        }
+        // Check if telescope dipped >20% during the same time window
+        const ntTail = ntVals.slice(-Math.min(36, ntVals.length));
+        const ntWorst = Math.min(...ntTail);
+        const ntDropPct = (ntP95 - ntWorst) / ntP95;
+        if (ntDropPct > 0.20) telescopeMultiplier = 1.8; // strong national anomaly
+        else if (ntDropPct > 0.10) telescopeMultiplier = 1.3; // mild national anomaly
       }
     }
   }
@@ -258,31 +241,24 @@ function computeRegionScore(parsed, nationalTelescopeData) {
     }
   }
   
-  // ── Telescope regional (low values but relative drops matter) ──
+  // ── Telescope regional (informational — usually excluded) ──
   const teleVals = parsed.map(p => p.telescope).filter(v => v !== null);
-  let teleInfo = null, teleHealth = 100, telePenalty = 0;
+  let teleInfo = null;
   if (teleVals.length >= 5) {
     const teleSorted = [...teleVals].sort((a,b) => a - b);
     const teleP95 = teleSorted[Math.floor(teleSorted.length * 0.95)];
-    if (teleP95 >= 0.5) { // very low threshold — even values of 1-2 are meaningful
-      const teleTail = teleVals.slice(-Math.min(12, teleVals.length));
-      const teleWorst = Math.min(...teleTail);
-      teleHealth = Math.min(100, Math.round((teleWorst / teleP95) * 100));
+    if (teleP95 >= 1) { // lower threshold for telescope — even small values matter
       const teleCurrent = teleVals[teleVals.length - 1];
+      const teleHealth = Math.min(100, Math.round((Math.min(...teleVals.slice(-12)) / teleP95) * 100));
       teleInfo = { health: teleHealth, current: Math.round(teleCurrent * 10) / 10, baseline: Math.round(teleP95 * 10) / 10 };
-      // Telescope drops contribute to score (scaled up since values are small)
-      const teleThresh = teleP95 * 0.7; // 30% drop threshold for telescope
-      for (const v of teleVals) {
-        if (v < teleThresh) telePenalty += Math.round((teleP95 - v) * 50); // scale up
-      }
     }
   }
   
-  // ── Combine: Health = worst of all indicators ──
-  const healthPct = Math.min(probHealth, lossHealth, latHealth, teleHealth);
+  // ── Combine: Health = worst of probing, loss, latency (not averaged!) ──
+  const healthPct = Math.min(probHealth, lossHealth, latHealth);
   
   // ── Combined score with amplifier ──
-  const rawScore = probDropScore + lossPenalty + latPenalty + telePenalty;
+  const rawScore = probDropScore + lossPenalty + latPenalty;
   const dropScore = Math.round(rawScore * telescopeMultiplier);
   
   // perSource for detail panel
@@ -652,24 +628,21 @@ export function TabIODA() {
   const [scoreView, setScoreView] = useState("outage"); // outage | health
   const [focusEvent, setFocusEvent] = useState(null); // timestamp to zoom chart to
 
-  // ── Unified time window (stable — only recalculates on user action) ──
+  // ── Unified time window ──
   const [timePreset, setTimePreset] = useState("24h"); // 24h | 48h | 7d | 30d | custom
   const [customFrom, setCustomFrom] = useState("");
   const [customUntil, setCustomUntil] = useState("");
-  const [timeEpoch, setTimeEpoch] = useState(() => Math.floor(Date.now() / 1000)); // frozen "now"
   
-  // Refreeze "now" when preset changes (not on every render)
-  const changePreset = (p) => { setTimePreset(p); setTimeEpoch(Math.floor(Date.now() / 1000)); setRegionScores([]); };
-  
-  // Compute actual from/until epoch — stable between renders
+  // Compute actual from/until epoch from preset or custom
   const timeWindow = (() => {
+    const now = Math.floor(Date.now() / 1000);
     if (timePreset === "custom" && customFrom) {
       const f = Math.floor(new Date(customFrom).getTime() / 1000);
-      const u = customUntil ? Math.floor(new Date(customUntil).getTime() / 1000) : timeEpoch;
+      const u = customUntil ? Math.floor(new Date(customUntil).getTime() / 1000) : now;
       return { from: f, until: u };
     }
     const hours = { "24h": 24, "48h": 48, "7d": 168, "30d": 720 }[timePreset] || 24;
-    return { from: timeEpoch - hours * 3600, until: timeEpoch };
+    return { from: now - hours * 3600, until: now };
   })();
 
   const timeLabel = timePreset === "custom"
@@ -977,11 +950,11 @@ export function TabIODA() {
       <div style={{ display:"flex", gap:8, marginBottom:14, flexWrap:"wrap", alignItems:"center" }}>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
           {["24h","48h","7d","30d"].map(r => (
-            <button key={r} onClick={() => changePreset(r)}
+            <button key={r} onClick={() => { setTimePreset(r); setRegionScores([]); }}
               style={{ fontSize:12, fontFamily:font, padding:"5px 12px", border:"none",
                 background:timePreset===r?ACCENT:"transparent", color:timePreset===r?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.08em" }}>{r}</button>
           ))}
-          <button onClick={() => changePreset("custom")}
+          <button onClick={() => setTimePreset("custom")}
             style={{ fontSize:12, fontFamily:font, padding:"5px 12px", border:"none",
               background:timePreset==="custom"?ACCENT:"transparent", color:timePreset==="custom"?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.08em" }}>📅</button>
         </div>
@@ -992,7 +965,7 @@ export function TabIODA() {
             <span style={{ fontSize:11, color:MUTED }}>→</span>
             <input type="datetime-local" value={customUntil} onChange={e => setCustomUntil(e.target.value)}
               style={{ fontSize:11, fontFamily:font, padding:"4px 8px", border:`1px solid ${BORDER}`, background:"transparent", color:TEXT, borderRadius:3 }} />
-            <button onClick={() => { setTimeEpoch(Math.floor(Date.now() / 1000)); setRegionScores([]); }}
+            <button onClick={() => { setRegionScores([]); loadNational(); }}
               style={{ fontSize:11, fontFamily:font, padding:"4px 10px", background:ACCENT, color:"#fff", border:"none", cursor:"pointer", borderRadius:3 }}>Cargar</button>
           </div>
         )}
@@ -1322,21 +1295,16 @@ export function TabIODA() {
                   {selectedState && (() => {
                     const st = activeData.find(r => r.name === selectedState);
                     if (!st?.series?.length) return null;
-                    const sparkSources = [
-                      { key:"probing", label:"Sondeo Activo", color:"#f59e0b", invert:false },
-                      { key:"lossPct", label:"Packet Loss %", color:"#dc2626", invert:true },
-                      { key:"medianLatency", label:"Latencia (ms)", color:"#7c3aed", invert:true },
-                      { key:"bgp", label:"BGP Routes", color:"#7c3aed", invert:false },
-                      { key:"telescope", label:"Telescopio", color:"#dc2626", invert:false },
-                    ];
                     return (
                       <div style={{ marginTop:12, borderTop:`1px solid ${BORDER}30`, paddingTop:10 }}>
                         <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:8 }}>
                           {selectedState} — Desglose por indicador
                         </div>
                         <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:8 }}>
-                          {sparkSources.map(({ key: src, label, color, invert }) => {
-                            const vals = st.series.map(p => p[src]).filter(v => v !== null && typeof v === "number");
+                          {["bgp","probing","telescope"].map(src => {
+                            const label = src === "bgp" ? "BGP Routes" : src === "probing" ? "Sondeo Activo" : "Telescopio";
+                            const color = srcColors[src];
+                            const vals = st.series.map(p => p[src]).filter(v => v !== null);
                             if (vals.length < 5) return (
                               <div key={src} style={{ padding:8, background:`${BORDER}08`, borderRadius:4, borderLeft:`3px solid ${MUTED}30` }}>
                                 <div style={{ fontSize:11, fontWeight:600, color:MUTED }}>{label}</div>
@@ -1344,32 +1312,20 @@ export function TabIODA() {
                               </div>
                             );
                             const sortedV = [...vals].sort((a,b) => a - b);
+                            const baseAvg = sortedV[Math.floor(sortedV.length * 0.95)] || sortedV[sortedV.length - 1] || 1;
                             const current = vals[vals.length - 1];
-                            let health, baseRef;
-                            if (invert) {
-                              // For loss/latency: lower is better. Health = 100 when at P10, 0 when at 3× P10
-                              const p10 = sortedV[Math.floor(sortedV.length * 0.1)] || 1;
-                              baseRef = p10;
-                              health = src === "lossPct"
-                                ? (current > 30 ? 20 : current > 20 ? 40 : current > 10 ? 60 : current > 5 ? 85 : 100)
-                                : (p10 > 0 ? Math.max(0, Math.min(100, Math.round(100 - ((current / p10 - 1) * 50)))) : 100);
-                            } else {
-                              const p95 = sortedV[Math.floor(sortedV.length * 0.95)] || sortedV[sortedV.length - 1] || 1;
-                              baseRef = p95;
-                              health = p95 > 0 ? Math.min(100, Math.round((current / p95) * 100)) : 100;
-                            }
+                            const health = Math.min(100, Math.round((current / baseAvg) * 100));
                             // Mini sparkline
                             const W2 = 200, H2 = 40, pL2 = 2, pR2 = 2, pT2 = 2, pB2 = 2;
                             const cW2 = W2-pL2-pR2, cH2 = H2-pT2-pB2;
                             const mn = Math.min(...vals), mx = Math.max(...vals);
                             let spark = "";
                             st.series.forEach((p, i) => {
-                              const v = p[src]; if (v === null || typeof v !== "number") return;
+                              const v = p[src]; if (v === null) return;
                               const x = pL2 + (i / (st.series.length - 1)) * cW2;
                               const y = pT2 + cH2 - ((v - mn) / (mx - mn || 1)) * cH2;
                               spark += spark === "" ? `M${x},${y}` : ` L${x},${y}`;
                             });
-                            const unit = src === "lossPct" ? "%" : src === "medianLatency" ? "ms" : "";
                             return (
                               <div key={src} style={{ padding:8, background:`${BORDER}08`, borderRadius:4, borderLeft:`3px solid ${color}` }}>
                                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -1380,7 +1336,7 @@ export function TabIODA() {
                                   <path d={spark} fill="none" stroke={color} strokeWidth={1.5} />
                                 </svg>
                                 <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>
-                                  {invert ? `Actual: ${fmtVal(current)}${unit} · Base: ${fmtVal(baseRef)}${unit}` : `Base: ${fmtVal(baseRef)} · Actual: ${fmtVal(current)}`}
+                                  Base: {fmtVal(baseAvg)} · Actual: {fmtVal(current)}
                                 </div>
                               </div>
                             );
