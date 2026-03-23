@@ -218,6 +218,7 @@ export const SITREP_ALL = [
       { tag:"Institucional", color:"#0468B1", title:"Reconfiguración gabinete y Alto Mando Militar", text:"11 cambios ministeriales y nueva cúpula FANB. Padrino López sale tras 11+ años en Defensa; González López centraliza seguridad. 42% del gabinete Maduro modificado (14 de 33 carteras). Opositores (Ríos, Blanco) y técnicos (Sanjuán, Alcalá) amplían base." },
       { tag:"Diplomacia", color:"#16a34a", title:"Normalización EE.UU. en fase operativa", text:"Bandera estadounidense izada en Caracas por primera vez en 7 años. Delegación del Senado en Miraflores. Alerta de viaje reducida a nivel 3. Trump califica la relación como «fantástica». LG-52 autoriza transacciones amplias con PDVSA." },
       { tag:"Energía", color:"#ca8a04", title:"Diversificación energética: gas y nuevos operadores", text:"Acuerdo gasífero Cardón IV (PDVSA-Repsol-Eni). Exportaciones petroleras a EE.UU. duplicadas. Repsol proyecta +50% producción 2026 y +200% para 2028. Maurel & Prom activa taladro en Maracaibo tras 8 años. Primer envío de GLP a Colombia." },
+      { tag:"Social", color:"#E5243B", title:"Contención temporal: bono y fondo vs. brecha salarial", text:"Bono de Guerra Económica sube a 150 USD (+25%). 300M USD al Fondo de Protección Social. Protestas bajan de 65 a 46, pero demandas ESCP dominan 60-65%. Efecto de contención temporal, no solución estructural." },
     ],
     sintesis:"E3 se consolida como escenario dominante con fuerza inédita — 47% (+5pp) — impulsado por la reconfiguración institucional más amplia desde enero (42% gabinete, nueva cúpula FANB), la normalización diplomática operativa (bandera, Senado, nivel 3, Trump «fantástica») y la expansión energética diversificada hacia el gas. E1 retrocede a 30% por incorporación de opositores al Ejecutivo y MCM sin retorno. E2 baja a 8%, contenido por solidez bilateral. E4 estable en 15%: protestas bajan de 65 a 46 por bono 150 USD + 300M Fondo, pero brecha salarial persiste. La sostenibilidad del esquema depende de traducir ingresos en mejoras tangibles antes de que la conflictividad supere la contención temporal.",
     actores:[
@@ -226,11 +227,68 @@ export const SITREP_ALL = [
       { name:"Oposición", items:["MCM en CERAWeek Houston: posicionamiento internacional","Guanipa cuestiona cambio en Defensa; desconfianza","Ríos (AD) como viceministro Educ. Univ.: 2º opositor en gobierno","Foro Penal: 690 excarcelados · 515 presos políticos","Dirigentes en exilio inician trámites amnistía","SNTP plantea urgencia de garantías para periodismo","Bracho (Grupo Libertad): reservas sobre implementación amnistía"] },
       { name:"Internacional", items:["Cardón IV: acuerdo gasífero PDVSA-Repsol-Eni","Repsol +50% producción 2026 · +200% para 2028","Maurel & Prom: primer taladro en Maracaibo en 8 años","Colombia: Petro califica reunión «supremamente exitosa»; Mercosur + coordinación militar","Primer envío GLP Venezuela→Colombia","Zapatero «campeón de la paz»: respalda amnistía","Volker Türk (ONU): «esperanza, miedo e incertidumbre»"] },
     ],
-    factoresEstructurantes:[
+    nacional: {
+      amnistia: { solicitudes:null, libertadesPlenas:7580, privadosLiberados:null, cautelares:null, militares:null, fpVerificados:690, fpDetenidos:515, fpNota:"Foro Penal 13 mar: 690 excarcelaciones verificadas · 515 presos políticos · 24% solicitudes rechazadas · mecanismo exterior habilitado" },
+      rodriguez: [
+        { title:"Reconfiguración del gabinete", text:"11 cambios ministeriales: 42% del gabinete Maduro modificado (14 de 33 carteras). Incorporación de opositores (Ríos) y técnicos (Sanjuán, Alcalá)." },
+        { title:"Nueva cúpula FANB", text:"Padrino López sale tras 11+ años. González López asume Defensa (ex-DGCIM y Guardia Honor). Prieto Martínez como Cmdte. Estratégico Operacional." },
+        { title:"Compensación social", text:"Bono de Guerra Económica aumenta a 150 USD (+25%). 300M USD asignados al Fondo de Protección Social." },
+        { title:"PDV Holding y Citgo", text:"Juntas directivas actualizadas: Asdrúbal Chávez presidente. Hernández advierte que sin OFAC carecen de efecto legal." },
+      ],
+    },
+    economia: {
+      kpis: [
+        { value:"150 USD", label:"Bono Guerra Económica (+25%)", color:"#16a34a" },
+        { value:"300M", label:"Fondo de Protección Social (USD)", color:"#16a34a" },
+        { value:"197%", label:"Inflación proyectada 2026", color:"#E5243B" },
+        { value:"+6,9%", label:"PIB proyectado 2026", color:"#0468B1" },
+      ],
+      empresas: [
+        { empresa:"Repsol", desarrollo:"Proyecta +50% producción en 2026 y +200% para 2028. Campo Perla (Cardón IV) al 48,7% de capacidad." },
+        { empresa:"Eni", desarrollo:"Firma acuerdo gasífero Cardón IV con PDVSA y Repsol. Desarrollo de gas natural para consumo interno y exportación." },
+        { empresa:"Maurel & Prom", desarrollo:"Activa primer taladro de perforación en la cuenca de Maracaibo en 8 años." },
+        { empresa:"Trafigura", desarrollo:"Colabora con Minerven en programa de abastecimiento responsable de oro." },
+      ],
+    },
+    escenarios: [
+      { name:"Continuidad Negociada", prob:"47%", color:"#0468B1", text:"Reconfiguración gabinete 42% + nueva cúpula FANB + normalización diplomática operativa (bandera, Senado, nivel 3) + Cardón IV + LG-52 + exportaciones duplicadas." },
+      { name:"Transición Política Pacífica", prob:"30%", color:"#2d8a30", text:"Diferida: MCM en CERAWeek sin retorno. Opositores en Ejecutivo difuminan fronteras. 71% desea salida «a cualquier costo». Horizonte electoral 2027." },
+      { name:"Resistencia Coercitiva", prob:"15%", color:"#ca8a04", text:"Estable: protestas bajan 65→46 por bono 150 USD + 300M Fondo. Pero 515 presos, art.9 exclusiones, SNTP denuncia hostigamiento. González López perfil inteligencia." },
+      { name:"Colapso y Fragmentación", prob:"8%", color:"#dc2626", text:"Contenido por solidez bilateral. Riesgo: ambigüedad jurídica (Netburn), PDV Holding/Citgo sin efecto sin OFAC, tensión gasoducto Ricaurte, ingresos PDVSA −46%." },
+    ],
+    comentarios: [
       { tag:"Factor 1", color:"#16a34a", title:"Reconfiguración institucional sin precedentes", text:"La remodelación simultánea del gabinete (42%) y del Alto Mando Militar constituye el movimiento de ingeniería política más amplio desde el 3 de enero. González López centraliza seguridad (Defensa + ex-DGCIM + ex-Guardia Honor). La incorporación de opositores y técnicos amplía la legitimidad funcional sin ceder espacios de decisión estratégica." },
       { tag:"Factor 2", color:"#0468B1", title:"Normalización diplomática avanza más rápido que la legal", text:"El izado de bandera, la delegación senatorial y las declaraciones de Trump configuran la secuencia de normalización más acelerada en la historia reciente. Sin embargo, la ambigüedad jurídica sobre representación legal (jueza Netburn) y PDV Holding/Citgo sin efecto sin OFAC evidencian asimetría entre normalización política y corporativa." },
       { tag:"Factor 3", color:"#ca8a04", title:"Brecha distributiva: vulnerabilidad principal del modelo", text:"El bono de 150 USD y los 300M al Fondo contienen temporalmente la conflictividad (65→46 protestas). Pero no resuelven la brecha estructural entre recuperación macroeconómica energética y condiciones salariales. La reactivación de conflictividad laboral es probable cuando el efecto del ajuste se diluya." },
     ],
+    marcoNormativo: {
+      titulo: "Reforma de la Ley de Minas — Viraje estructural del modelo extractivo",
+      resumen: "La AN difirió la segunda discusión del proyecto de reforma de la Ley de Minas, tras avanzar solo hasta el artículo 12. La reforma busca actualizar una normativa con más de 25 años de vigencia y revela un viraje significativo en el modelo de gobernanza del sector minero venezolano: contractualización de concesiones, eliminación de la reserva estatal del oro y apertura al capital internacional.",
+      cambios: [
+        { titulo:"Cambio en la naturaleza jurídica de la concesión", texto:"La concesión minera pasa de acto administrativo unilateral del Ejecutivo (modelo 1999) a contrato negociado con la República, con condiciones flexibles caso por caso. Incrementa la discrecionalidad del Ejecutivo.", color:"#0468B1" },
+        { titulo:"Financiarización del derecho minero", texto:"La concesión pasa a ser un activo económico transable: derecho real pleno, hipotecable, habilitado para subrogación, cesión y financiamiento tipo project finance. Integra la minería a los circuitos de capital global.", color:"#16a34a" },
+        { titulo:"Apertura a actores privados y extranjeros", texto:"Participación amplia de empresas privadas, capital extranjero y esquemas mixtos con participación pública minoritaria. Mecanismos de entrada indirecta mediante subrogación de derechos.", color:"#ca8a04" },
+        { titulo:"Régimen fiscal flexible", texto:"Regalía hasta 13% (ajustable), impuesto minero hasta 12% (modificable por Ejecutivo), exoneraciones del IGP, contribuciones parafiscales y tributos subnacionales.", color:"#8b5cf6" },
+        { titulo:"Eliminación de la reserva estatal del oro", texto:"Derogación de la ley de 2015 que reservaba al Estado la explotación del oro. Se mantiene solo el derecho preferente del BCV para compra. Se alinea con la GL-51 de OFAC.", color:"#E5243B" },
+        { titulo:"Rediseño institucional: SUNAMIN", texto:"Creación de la Superintendencia Nacional de la Actividad Minera (SUNAMIN), con funciones de supervisión, fiscalización y administración de regalías, en sustitución del SENAFIM.", color:"#0A97D9" },
+      ],
+      comparativaHeaders: ["Ley de Minas 1999", "Reforma 2026"],
+      comparativa: [
+        { dim:"Rol del Estado", antes:"Regulador y controlador", despues:"Propietario y regulador" },
+        { dim:"Naturaleza de concesión", antes:"Acto administrativo", despues:"Contrato negociado" },
+        { dim:"Régimen jurídico", antes:"Rígido, uniforme", despues:"Flexible, adaptable" },
+        { dim:"Derechos de concesión", antes:"Derecho real limitado", despues:"Derecho real pleno" },
+        { dim:"Transferibilidad", antes:"Restringida y condicionada", despues:"Transferible, hipotecable" },
+        { dim:"Función económica", antes:"No concebida como activo", despues:"Activo financiero negociable" },
+        { dim:"Participación privada", antes:"Permitida pero limitada", despues:"Amplia, incluyendo extranjeros" },
+        { dim:"Régimen fiscal", antes:"Más rígido", despues:"Flexible y discrecional" },
+        { dim:"Exoneraciones", antes:"Limitadas", despues:"Amplias (nacionales y parafiscales)" },
+        { dim:"Institucionalidad", antes:"SENAFIM", despues:"SUNAMIN (nuevo ente)" },
+        { dim:"Minerales estratégicos (oro)", antes:"Reservados al Estado", despues:"Reserva derogada" },
+        { dim:"Modelo general", antes:"Control estatal y rigidez legal", despues:"Apertura y contractualización" },
+      ],
+      lecturaAnalitica: "La reforma de la Ley de Minas representa un viraje estructural del modelo extractivo venezolano, coherente con la lógica de apertura económica observada en el sector hidrocarburífero. La contractualización de las concesiones, la eliminación de la reserva estatal del oro y la financiarización de los derechos mineros configuran un marco orientado a maximizar la atracción de capital internacional. Sin embargo, el aumento de la discrecionalidad ejecutiva, los posibles déficits de transparencia y las tensiones en materia ambiental y territorial constituyen riesgos relevantes.",
+    },
   },
 ];
 

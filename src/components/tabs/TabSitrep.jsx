@@ -719,9 +719,64 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
         </Section>
       )}
 
-      {/* SECTION 05: ESCENARIOS (S8 only) */}
+      {/* SECTION 05: MARCO NORMATIVO (if available) */}
+      {hasDetail && d.marcoNormativo && (
+        <Section num="05" title="Marco Normativo" id="normativo">
+          {d.marcoNormativo.titulo && (
+            <div style={{ ...cardStyle, borderTop:`3px solid ${ACCENT}` }}>
+              <div style={tagStyle(ACCENT)}>Reforma en curso</div>
+              <div style={{ fontFamily:fontSans, fontSize:mob?15:17, fontWeight:700, color:TEXT, marginBottom:8 }}>{d.marcoNormativo.titulo}</div>
+              {d.marcoNormativo.resumen && <div style={{ fontFamily:fontSans, fontSize:mob?12:13, color:MUTED, lineHeight:1.6, marginBottom:12 }}>{d.marcoNormativo.resumen}</div>}
+            </div>
+          )}
+          {d.marcoNormativo.cambios && d.marcoNormativo.cambios.length > 0 && (
+            <div style={gridStyle(mob ? 1 : 2)}>
+              {d.marcoNormativo.cambios.map((c, i) => (
+                <div key={i} style={{ ...cardStyle, borderLeft:`3px solid ${c.color || ACCENT}` }}>
+                  <div style={{ fontFamily:fontSans, fontSize:mob?13:14, fontWeight:600, color:TEXT, marginBottom:4 }}>{c.titulo}</div>
+                  <div style={tlBodyStyle}>{c.texto}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          {d.marcoNormativo.comparativa && d.marcoNormativo.comparativa.length > 0 && (
+            <div style={cardStyle}>
+              <div style={tagStyle("#ca8a04")}>Cuadro Comparativo</div>
+              <div style={{ overflowX:"auto" }}>
+                <table style={{ width:"100%", borderCollapse:"collapse", fontFamily:fontSans, fontSize:mob?11:12 }}>
+                  <thead>
+                    <tr style={{ borderBottom:`2px solid ${BORDER}` }}>
+                      <th style={{ textAlign:"left", padding:"6px 8px", color:MUTED, fontWeight:500, fontSize:mob?9:10, letterSpacing:"0.1em", textTransform:"uppercase" }}>Dimensión</th>
+                      <th style={{ textAlign:"left", padding:"6px 8px", color:MUTED, fontWeight:500, fontSize:mob?9:10, letterSpacing:"0.1em", textTransform:"uppercase" }}>{d.marcoNormativo.comparativaHeaders?.[0] || "Anterior"}</th>
+                      <th style={{ textAlign:"left", padding:"6px 8px", color:MUTED, fontWeight:500, fontSize:mob?9:10, letterSpacing:"0.1em", textTransform:"uppercase" }}>{d.marcoNormativo.comparativaHeaders?.[1] || "Reforma"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {d.marcoNormativo.comparativa.map((row, i) => (
+                      <tr key={i} style={{ borderBottom:`1px solid ${BORDER}40` }}>
+                        <td style={{ padding:"6px 8px", fontWeight:600, color:TEXT }}>{row.dim}</td>
+                        <td style={{ padding:"6px 8px", color:MUTED }}>{row.antes}</td>
+                        <td style={{ padding:"6px 8px", color:ACCENT, fontWeight:500 }}>{row.despues}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          {d.marcoNormativo.lecturaAnalitica && (
+            <div style={{ ...cardStyle, borderLeft:`3px solid #ca8a04`, background:"rgba(234,179,8,0.04)" }}>
+              <div style={{ fontFamily:fontSans, fontSize:mob?11:12, color:"#92400e", fontStyle:"italic", lineHeight:1.6 }}>
+                📋 <strong>Lectura analítica:</strong> {d.marcoNormativo.lecturaAnalitica}
+              </div>
+            </div>
+          )}
+        </Section>
+      )}
+
+      {/* SECTION 06: ESCENARIOS (S8+) */}
       {hasDetail && d.escenarios && (
-        <Section num="05" title="Escenarios Proyectados" id="escenarios">
+        <Section num="06" title="Escenarios Proyectados" id="escenarios">
           {d.escenarios.map((esc, i) => (
             <div key={i} style={{ ...cardStyle, marginBottom:mob?10:14, display:"flex", gap:12, alignItems:"center" }}>
               <div style={{ flex:1 }}>
@@ -739,7 +794,7 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
 
       {/* SECTION 06: COMENTARIOS (S8 only) */}
       {hasDetail && d.comentarios && (
-        <Section num="06" title="Comentarios Analíticos" id="comentarios">
+        <Section num="07" title="Comentarios Analíticos" id="comentarios">
           <div style={gridStyle(3)}>
             {d.comentarios.map((c, i) => (
               <div key={i} style={{ ...cardStyle, borderTop:`3px solid ${c.color}` }}>

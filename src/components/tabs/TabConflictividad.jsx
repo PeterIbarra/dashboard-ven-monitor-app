@@ -11,6 +11,7 @@ import { BG2, BORDER, TEXT, MUTED, ACCENT, font } from "../../constants";
 export function TabConflictividad() {
   const mob = useIsMobile();
   const [seccion, setSeccion] = useState("semanal26");
+  const [weekDetail, setWeekDetail] = useState(null);
 
   const maxMes = Math.max(...CONF_MESES.map(m=>m.t));
   const maxEst = Math.max(...CONF_ESTADOS.map(e=>e.p));
@@ -23,8 +24,8 @@ export function TabConflictividad() {
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14, flexWrap:"wrap" }}>
         <span style={{ fontSize:16 }}>📊</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Conflictividad Social — Venezuela 2025</div>
-          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Fuente: OVCS · Informe Anual 2025 · 2.219 protestas documentadas</div>
+          <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Conflictividad Social — Venezuela</div>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Fuente: OVCS · Monitoreo continuo de protestas y conflictividad</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {[{id:"semanal26",label:"Semanal 2026"},{id:"resumen",label:"Resumen 2025"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
@@ -174,6 +175,102 @@ export function TabConflictividad() {
               </table>
             </div>
           </Card>
+
+          {/* Weekly detail selector — daily breakdown */}
+          {(() => {
+            const weeksWithDays = CONF_SEMANAL.filter(w => w.dias && w.dias.length > 0);
+            if (weeksWithDays.length === 0) return null;
+            const selWeek = weeksWithDays.find(w => w.week === weekDetail) || weeksWithDays[weeksWithDays.length - 1];
+            const maxDayP = Math.max(...selWeek.dias.map(d => d.protestas), 1);
+            return (
+              <Card>
+                <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12, flexWrap:"wrap" }}>
+                  <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>Detalle diario</div>
+                  <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, marginLeft:"auto" }}>
+                    {weeksWithDays.map(w => (
+                      <button key={w.week} onClick={() => setWeekDetail(w.week)}
+                        style={{ fontSize:11, fontFamily:font, padding:"4px 12px", border:"none",
+                          background:(selWeek.week===w.week)?ACCENT:"transparent", color:(selWeek.week===w.week)?"#fff":MUTED,
+                          cursor:"pointer", letterSpacing:"0.06em" }}>
+                        {w.week} ({w.label})
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* KPI row */}
+                <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8, marginBottom:14 }}>
+                  <div style={{ background:`${ACCENT}06`, border:`1px solid ${BORDER}`, padding:"10px 12px", textAlign:"center" }}>
+                    <div style={{ fontSize:22, fontWeight:800, color:TEXT, fontFamily:"'Playfair Display',serif" }}>{selWeek.protestas}</div>
+                    <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Total protestas</div>
+                  </div>
+                  <div style={{ background:`${ACCENT}06`, border:`1px solid ${BORDER}`, padding:"10px 12px", textAlign:"center" }}>
+                    <div style={{ fontSize:22, fontWeight:800, color:selWeek.estados > 18 ? "#dc2626" : TEXT, fontFamily:"'Playfair Display',serif" }}>{selWeek.estados}/24</div>
+                    <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Estados</div>
+                  </div>
+                  <div style={{ background:`${ACCENT}06`, border:`1px solid ${BORDER}`, padding:"10px 12px", textAlign:"center" }}>
+                    <div style={{ fontSize:22, fontWeight:800, color:selWeek.reprimidas > 0 ? "#dc2626" : "#16a34a", fontFamily:"'Playfair Display',serif" }}>{selWeek.reprimidas}</div>
+                    <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Reprimidas</div>
+                  </div>
+                  <div style={{ background:`${ACCENT}06`, border:`1px solid ${BORDER}`, padding:"10px 12px", textAlign:"center" }}>
+                    <div style={{ fontSize:14, fontWeight:600, color:ACCENT, fontFamily:font }}>{selWeek.motivos.slice(0,3).join(", ")}</div>
+                    <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginTop:4 }}>Motivos principales</div>
+                  </div>
+                </div>
+
+                {/* Bar chart + table */}
+                <div style={{ display:"flex", gap:4, alignItems:"flex-end", height:100, marginBottom:6, padding:"0 4px" }}>
+                  {selWeek.dias.map((d, i) => {
+                    const h = Math.max((d.protestas / maxDayP) * 90, 4);
+                    const isMax = d.protestas === maxDayP;
+                    return (
+                      <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
+                        <span style={{ fontSize:10, fontWeight:isMax?700:400, color:isMax?ACCENT:TEXT, fontFamily:font }}>{d.protestas}</span>
+                        <div style={{ width:"100%", maxWidth:50, height:h, background:isMax?ACCENT:`${ACCENT}60`, borderRadius:"2px 2px 0 0", transition:"height 0.3s" }} />
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ display:"flex", gap:4, marginBottom:14, padding:"0 4px" }}>
+                  {selWeek.dias.map((d, i) => (
+                    <div key={i} style={{ flex:1, textAlign:"center", fontSize:9, fontFamily:font, color:MUTED }}>{d.fecha}</div>
+                  ))}
+                </div>
+
+                {/* Daily table */}
+                <div style={{ overflowX:"auto" }}>
+                  <table style={{ width:"100%", borderCollapse:"collapse", fontSize:11, fontFamily:font }}>
+                    <thead>
+                      <tr style={{ borderBottom:`2px solid ${BORDER}` }}>
+                        {["Fecha","Protestas","Estados","Tipo","Exigencias principales"].map(h => (
+                          <th key={h} style={{ padding:"5px 8px", textAlign:"left", color:MUTED, fontSize:9, letterSpacing:"0.08em", textTransform:"uppercase" }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selWeek.dias.map((d, i) => {
+                        const isMax = d.protestas === maxDayP;
+                        return (
+                          <tr key={i} style={{ borderBottom:`1px solid ${BORDER}30`, background:isMax?`${ACCENT}06`:"transparent" }}>
+                            <td style={{ padding:"5px 8px", fontWeight:isMax?700:400, color:isMax?ACCENT:TEXT, whiteSpace:"nowrap" }}>{d.fecha}</td>
+                            <td style={{ padding:"5px 8px", fontWeight:600, color:d.protestas > 20 ? "#dc2626" : d.protestas > 10 ? "#ca8a04" : TEXT }}>{d.protestas}</td>
+                            <td style={{ padding:"5px 8px", color:d.estados > 15 ? "#dc2626" : TEXT }}>{d.estados}</td>
+                            <td style={{ padding:"5px 8px", color:MUTED, fontSize:10 }}>{d.tipo}</td>
+                            <td style={{ padding:"5px 8px", color:MUTED, fontSize:10 }}>{d.exigencias}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Hecho clave */}
+                <div style={{ marginTop:10, padding:"8px 12px", background:`${ACCENT}06`, border:`1px solid ${BORDER}`, fontSize:12, fontFamily:font, color:TEXT }}>
+                  📋 <strong>Hecho clave:</strong> {selWeek.hecho}
+                </div>
+              </Card>
+            );
+          })()}
         </>);
       })()}
 

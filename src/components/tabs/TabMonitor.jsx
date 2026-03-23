@@ -135,13 +135,13 @@ export function TabMonitor() {
                       ⚠ {ind.umbral}
                     </div>
                     <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Historial</div>
-                    <div style={{ display:"flex", gap:6 }}>
-                      {ind.hist.map((h,k) => (
+                    <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+                      {ind.hist.map((h,k) => h ? (
                         <div key={k} style={{ fontSize:12, padding:"3px 8px", background:`${SEM[h[0]]}10`, border:`1px solid ${SEM[h[0]]}25`,
                           color:SEM[h[0]], fontFamily:font, whiteSpace:"nowrap" }}>
                           <span style={{ color:MUTED, marginRight:4 }}>{MONITOR_WEEKS[k]}</span>{h[2]}
                         </div>
-                      ))}
+                      ) : null)}
                     </div>
                   </div>
                 )}
