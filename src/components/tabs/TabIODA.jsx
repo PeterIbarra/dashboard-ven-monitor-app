@@ -7,16 +7,16 @@ import { Card } from "../Card";
 import { TwitterTimeline } from "../TwitterTimeline";
 import { loadScript, loadCSS } from "../../utils";
 
-// ── IODA Venezuelan state FIPS codes ──
+// ── IODA Venezuelan state codes (confirmed from API) ──
 const VE_REGIONS = [
-  { code:"4001", name:"Amazonas" }, { code:"4002", name:"Anzoátegui" }, { code:"4003", name:"Apure" },
-  { code:"4004", name:"Aragua" }, { code:"4005", name:"Barinas" }, { code:"4006", name:"Bolívar" },
-  { code:"4007", name:"Carabobo" }, { code:"4008", name:"Cojedes" }, { code:"4009", name:"Delta Amacuro" },
-  { code:"4010", name:"Distrito Capital" }, { code:"4011", name:"Falcón" }, { code:"4012", name:"Guárico" },
-  { code:"4013", name:"Lara" }, { code:"4014", name:"Mérida" }, { code:"4015", name:"Miranda" },
-  { code:"4016", name:"Monagas" }, { code:"4017", name:"Nueva Esparta" }, { code:"4018", name:"Portuguesa" },
-  { code:"4019", name:"Sucre" }, { code:"4020", name:"Táchira" }, { code:"4021", name:"Trujillo" },
-  { code:"4022", name:"Vargas" }, { code:"4023", name:"Yaracuy" }, { code:"4024", name:"Zulia" },
+  { code:"4482", name:"Falcón" }, { code:"4483", name:"Apure" }, { code:"4484", name:"Barinas" },
+  { code:"4485", name:"Mérida" }, { code:"4486", name:"Táchira" }, { code:"4487", name:"Trujillo" },
+  { code:"4488", name:"Zulia" }, { code:"4489", name:"Cojedes" }, { code:"4490", name:"Carabobo" },
+  { code:"4491", name:"Lara" }, { code:"4492", name:"Portuguesa" }, { code:"4493", name:"Yaracuy" },
+  { code:"4494", name:"Amazonas" }, { code:"4495", name:"Bolívar" }, { code:"4496", name:"Anzoátegui" },
+  { code:"4497", name:"Aragua" }, { code:"4498", name:"Vargas" }, { code:"4499", name:"Distrito Capital" },
+  { code:"4501", name:"Guárico" }, { code:"4502", name:"Monagas" }, { code:"4503", name:"Miranda" },
+  { code:"4504", name:"Nueva Esparta" }, { code:"4505", name:"Sucre" }, { code:"4506", name:"Delta Amacuro" },
 ];
 
 const IODA_BASE = "https://api.ioda.inetintel.cc.gatech.edu/v2";
@@ -720,6 +720,8 @@ export function TabIODA() {
   regionScoresRef.current = regionScores;
   const [regionLoading, setRegionLoading] = useState(false);
   const [selectedState, setSelectedState] = useState(null);
+  const [selectedStateData, setSelectedStateData] = useState(null); // signals/raw for selected state
+  const [selectedStateLoading, setSelectedStateLoading] = useState(false);
   const [aiExplain, setAiExplain] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [subView, setSubView] = useState("nacional"); // nacional | estados | eventos
@@ -763,225 +765,263 @@ export function TabIODA() {
 
   // ── 2. Detect outage events from national + regional signal analysis ──
   const loadEvents = useCallback(async () => {
-    const detectedEvents = [];
-    
-    // Helper: detect events in a signal series
-    const detectDrops = (parsed, sourceName, regionLabel) => {
-      if (!parsed || parsed.length < 10) return;
-      for (const key of ["probing", "bgp", "telescope"]) {
-        const allVals = parsed.map(p => p[key]).filter(v => v !== null);
-        if (allVals.length < 10) continue;
-        const sorted = [...allVals].sort((a,b) => a - b);
-        const baseAvg = sorted[Math.floor(sorted.length * 0.95)] || sorted[sorted.length - 1];
-        if (baseAvg === 0 || baseAvg < 10) continue;
-        
-        let inEvent = false, eventStart = null, eventMinVal = Infinity, eventMaxDrop = 0;
-        for (let i = 0; i < parsed.length; i++) {
-          const v = parsed[i][key];
-          if (v === null) continue;
-          const dropPct = ((baseAvg - v) / baseAvg) * 100;
-          if (dropPct > 10 && !inEvent) {
-            inEvent = true; eventStart = parsed[i].ts; eventMinVal = v; eventMaxDrop = dropPct;
-          } else if (inEvent && dropPct > 10) {
-            if (v < eventMinVal) eventMinVal = v;
-            if (dropPct > eventMaxDrop) eventMaxDrop = dropPct;
-          } else if (inEvent && dropPct <= 5) {
-            const duration = parsed[i].ts - eventStart;
-            if (eventMaxDrop > 15 && duration > 300) {
-              const severity = eventMaxDrop > 60 ? "critical" : eventMaxDrop > 30 ? "high" : "medium";
-              detectedEvents.push({ time: eventStart, datasource: key, condition: severity, region: regionLabel,
-                value: Math.round(eventMaxDrop), dropAbsolute: Math.round(baseAvg - eventMinVal), baseline: Math.round(baseAvg), duration });
-            }
-            inEvent = false; eventMinVal = Infinity; eventMaxDrop = 0;
-          }
-        }
-        if (inEvent && eventMaxDrop > 15) {
-          const duration = parsed[parsed.length-1].ts - eventStart;
-          const severity = eventMaxDrop > 60 ? "critical" : eventMaxDrop > 30 ? "high" : "medium";
-          detectedEvents.push({ time: eventStart, datasource: key, condition: severity, region: regionLabel,
-            value: Math.round(eventMaxDrop), dropAbsolute: Math.round(baseAvg - eventMinVal), baseline: Math.round(baseAvg), duration: duration > 0 ? duration : null });
-        }
-      }
-      // Also detect loss spikes
-      const lossVals = parsed.map(p => p.lossPct).filter(v => v !== null);
-      if (lossVals.length >= 10) {
-        const lossSorted = [...lossVals].sort((a,b) => a - b);
-        const lossBase = lossSorted[Math.floor(lossSorted.length * 0.1)]; // P10 = normal low
-        let inLoss = false, lossStart = null, lossMax = 0;
-        for (let i = 0; i < parsed.length; i++) {
-          const v = parsed[i].lossPct;
-          if (v === null) continue;
-          if (v > 15 && !inLoss) { inLoss = true; lossStart = parsed[i].ts; lossMax = v; }
-          else if (inLoss && v > 15) { if (v > lossMax) lossMax = v; }
-          else if (inLoss && v <= 10) {
-            const duration = parsed[i].ts - lossStart;
-            if (lossMax > 20 && duration > 300) {
-              detectedEvents.push({ time: lossStart, datasource: "packet-loss", condition: lossMax > 40 ? "high" : "medium", region: regionLabel,
-                value: Math.round(lossMax), dropAbsolute: 0, baseline: Math.round(lossBase), duration });
-            }
-            inLoss = false; lossMax = 0;
-          }
-        }
-      }
-    };
+    const allEvents = [];
     
     // National events
-    const natJson = await iodaFetch(`signals/raw/country/VE`, { from: twFrom, until: twUntil });
-    const natParsed = natJson ? parseSignals(natJson) : null;
-    detectDrops(natParsed, "national", "🇻🇪 Nacional");
+    try {
+      const natJson = await iodaFetch(`outages/events`, { entityType: "country", entityCode: "VE", from: twFrom, until: twUntil });
+      const natEvents = Array.isArray(natJson?.data) ? natJson.data : [];
+      natEvents.forEach(ev => {
+        const severity = ev.score > 5000 ? "critical" : ev.score > 1000 ? "high" : "medium";
+        allEvents.push({
+          time: ev.start, datasource: ev.datasource, condition: severity, region: "🇻🇪 Nacional",
+          value: ev.score ? Math.round(ev.score) : 0, duration: ev.duration, score: ev.score,
+          dropAbsolute: 0, baseline: 0,
+        });
+      });
+    } catch {}
     
-    // Regional events (from already loaded region data, or fetch top states)
+    // Regional events — fetch top affected states from loaded data, or key states
     const cachedRegions = regionScoresRef.current;
-    if (cachedRegions.length > 0) {
-      for (const r of cachedRegions) {
-        if (r.series) detectDrops(r.series, "regional", r.name);
-      }
-    } else {
-      // Fetch a few key states
-      const keyStates = VE_REGIONS.filter(s => ["4020","4013","4024","4005","4021"].includes(s.code));
-      for (const st of keyStates) {
-        try {
-          const json = await iodaFetch(`signals/raw/region/${st.code}`, { from: twFrom, until: twUntil });
-          if (json) { const parsed = parseSignals(json); detectDrops(parsed, "regional", st.name); }
-        } catch {}
-      }
-    }
+    const statesToQuery = cachedRegions.length > 0
+      ? cachedRegions.filter(r => r.eventCnt > 0).slice(0, 12)
+      : VE_REGIONS.filter(s => ["4486","4491","4488","4484","4487"].includes(s.code));
     
-    detectedEvents.sort((a,b) => b.time - a.time);
-    setEvents(detectedEvents.slice(0, 50));
+    const regionResults = await Promise.allSettled(
+      statesToQuery.map(async (st) => {
+        const json = await iodaFetch(`outages/events`, { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil });
+        const evts = Array.isArray(json?.data) ? json.data : [];
+        return evts.map(ev => {
+          const severity = ev.score > 3000 ? "critical" : ev.score > 500 ? "high" : "medium";
+          return {
+            time: ev.start, datasource: ev.datasource, condition: severity, region: st.name,
+            value: ev.score ? Math.round(ev.score) : 0, duration: ev.duration, score: ev.score,
+            dropAbsolute: 0, baseline: 0,
+          };
+        });
+      })
+    );
+    regionResults.forEach(r => { if (r.status === "fulfilled" && r.value) allEvents.push(...r.value); });
+    
+    allEvents.sort((a,b) => b.time - a.time);
+    setEvents(allEvents.slice(0, 60));
   }, [twFrom, twUntil]);
 
-  // ── 3. Load regional scores ──
+  // ── 3. Load regional data using IODA outage endpoints (lightweight) ──
   const loadRegions = useCallback(async () => {
     setRegionLoading(true);
     
-    // Fetch national telescope data first (Layer 3)
-    let nationalTelescope = null;
-    try {
-      const natJson = await iodaFetch(`signals/raw/country/VE`, { from: twFrom, until: twUntil });
-      if (natJson) {
-        const natRaw = Array.isArray(natJson?.data) ? natJson.data.flat() : [];
-        const ntSrc = natRaw.find(s => s.datasource === "ucsd-nt") || natRaw.find(s => s.datasource === "merit-nt");
-        if (ntSrc?.values) nationalTelescope = ntSrc.values.filter(v => v !== null);
-      }
-    } catch {}
+    // Fetch summary + alerts for all states in parallel
+    const results = await Promise.allSettled(
+      VE_REGIONS.map(async (st) => {
+        const [summaryJson, alertsJson] = await Promise.all([
+          iodaFetch(`outages/summary`, { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }),
+          iodaFetch(`outages/alerts`, { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }),
+        ]);
+        
+        // Parse summary
+        const summary = summaryJson?.data?.[0] || {};
+        const overallScore = summary.scores?.overall ?? 0;
+        const pingScore = summary.scores?.["ping-slash24.median"] ?? 0;
+        const bgpScore = summary.scores?.["bgp.median"] ?? 0;
+        const eventCnt = summary.event_cnt ?? 0;
+        
+        // Parse alerts
+        const alerts = Array.isArray(alertsJson?.data) ? alertsJson.data : [];
+        const pingAlerts = alerts.filter(a => a.datasource === "ping-slash24");
+        const bgpAlerts = alerts.filter(a => a.datasource === "bgp");
+        
+        // Current connectivity health from latest alert
+        const lastPingAlert = pingAlerts[pingAlerts.length - 1];
+        const lastBgpAlert = bgpAlerts[bgpAlerts.length - 1];
+        const pingHealth = lastPingAlert?.historyValue > 0
+          ? Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100))
+          : 100;
+        const bgpHealth = lastBgpAlert?.historyValue > 0
+          ? Math.min(100, Math.round((lastBgpAlert.value / lastBgpAlert.historyValue) * 100))
+          : 100;
+        const connectivityHealth = Math.min(pingHealth, bgpHealth);
+        
+        // Electricity: find critical ping events where BGP was NOT also critical at same time
+        const criticalPing = pingAlerts.filter(a => a.level === "critical");
+        const criticalBgp = bgpAlerts.filter(a => a.level === "critical");
+        
+        const powerEvents = [];
+        const bgpStable = criticalBgp.length === 0;
+        
+        for (const alert of criticalPing) {
+          const dropPct = alert.historyValue > 0
+            ? Math.round(((alert.historyValue - alert.value) / alert.historyValue) * 100)
+            : 0;
+          // Check if BGP also critical within ±30min
+          const bgpAlsoDown = criticalBgp.some(b => Math.abs(b.time - alert.time) < 1800);
+          
+          powerEvents.push({
+            ts: alert.time,
+            dropPct,
+            value: alert.value,
+            historyValue: alert.historyValue,
+            bgpAlsoDown,
+            isElectric: !bgpAlsoDown && dropPct > 15, // ping down + BGP stable = likely electric
+          });
+        }
+        
+        // Electricity index from events
+        const electricEvents = powerEvents.filter(e => e.isElectric);
+        let elecHealth = 100, elecLabel = "Normal";
+        if (electricEvents.length > 0) {
+          const worstDrop = Math.max(...electricEvents.map(e => e.dropPct));
+          if (worstDrop > 60) { elecHealth = 20; elecLabel = "Apagón severo"; }
+          else if (worstDrop > 40) { elecHealth = 40; elecLabel = "Apagón moderado"; }
+          else if (worstDrop > 25) { elecHealth = 60; elecLabel = "Interrupción leve"; }
+          else { elecHealth = 80; elecLabel = "Fluctuación"; }
+        } else if (powerEvents.length > 0 && !bgpStable) {
+          // Ping critical + BGP critical = infrastructure/censorship, not electricity
+          elecHealth = 100;
+          elecLabel = "Normal (corte infra.)";
+        }
+        
+        return {
+          ...st,
+          // Scores from IODA
+          dropScore: overallScore,
+          pingScore, bgpScore, eventCnt,
+          // Health
+          connectivityHealth,
+          healthPct: connectivityHealth,
+          pingHealth, bgpHealth,
+          // Electricity
+          elecHealth, elecLabel,
+          elecEvents: electricEvents.length,
+          powerEvents,
+          bgpStable,
+          // Raw alert data for detail panel
+          alerts,
+          // Compatibility fields
+          displayScore: overallScore,
+          current: lastPingAlert?.value ?? 0,
+          baseAvg: lastPingAlert?.historyValue ?? 0,
+          perSource: {
+            probing: lastPingAlert ? { health: pingHealth, current: lastPingAlert.value, baseline: lastPingAlert.historyValue } : null,
+            bgp: lastBgpAlert ? { health: bgpHealth, current: lastBgpAlert.value, baseline: lastBgpAlert.historyValue } : null,
+            telescope: null, loss: null, latency: null,
+          },
+        };
+      })
+    );
     
-    const scores = [];
-    const batches = [];
-    for (let i = 0; i < VE_REGIONS.length; i += 8) batches.push(VE_REGIONS.slice(i, i + 8));
-    for (const batch of batches) {
-      const results = await Promise.allSettled(
-        batch.map(async (st) => {
-          const json = await iodaFetch(`signals/raw/region/${st.code}`, { from: twFrom, until: twUntil });
-          if (!json) return null;
-          const parsed = parseSignals(json);
-          const result = computeRegionScore(parsed, nationalTelescope);
-          if (!result) return null;
-          return { ...st, ...result, series: parsed };
-        })
-      );
-      results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
-    }
-    scores.sort((a,b) => b.dropScore - a.dropScore || a.healthPct - b.healthPct);
+    const scores = results
+      .filter(r => r.status === "fulfilled" && r.value)
+      .map(r => r.value);
     
-    // ── Post-processing: filter national events from electricity index ──
-    // If >50% of states have a power event at the same time, it's a national network event, not electricity
+    // ── Post-processing: classify national vs regional events ──
     const allEventTimes = [];
     scores.forEach(s => {
       if (s.powerEvents) s.powerEvents.forEach(ev => allEventTimes.push(ev.ts));
     });
     
-    // Cluster event timestamps (±30min = same event)
-    // For each cluster, compute how many states + average drop to distinguish network vs blackout
-    const nationalEvents = []; // {ts, statesAffected, avgDrop, severity}
     const processedTimes = new Set();
+    const nationalEvents = [];
     for (const t of allEventTimes) {
-      // Skip if already clustered
       let alreadyClustered = false;
       for (const pt of processedTimes) { if (Math.abs(t - pt) < 1800) { alreadyClustered = true; break; } }
       if (alreadyClustered) continue;
       
-      const affectedStates = scores.filter(s => 
-        s.powerEvents?.some(ev => Math.abs(ev.ts - t) < 1800)
-      );
-      const stateCount = affectedStates.length;
-      
-      if (stateCount > scores.length * 0.5) {
-        // National event — compute average drop across affected states
-        const drops = [];
-        affectedStates.forEach(s => {
+      const affectedStates = scores.filter(s => s.powerEvents?.some(ev => Math.abs(ev.ts - t) < 1800));
+      if (affectedStates.length > scores.length * 0.5) {
+        const drops = affectedStates.map(s => {
           const ev = s.powerEvents.find(ev => Math.abs(ev.ts - t) < 1800);
-          if (ev) drops.push(ev.dropPct);
+          return ev?.dropPct || 0;
         });
-        const avgDrop = drops.length > 0 ? drops.reduce((a,b) => a+b, 0) / drops.length : 0;
-        
-        // Classify: network issue vs national blackout based on magnitude
-        let severity;
-        if (avgDrop > 50) severity = "blackout_severe";      // >50% avg = national blackout severe
-        else if (avgDrop > 30) severity = "blackout_moderate"; // 30-50% = national blackout moderate
-        else severity = "network_mild";                        // <30% = network/CANTV issue
-        
-        nationalEvents.push({ ts: t, statesAffected: stateCount, avgDrop: Math.round(avgDrop), severity });
+        const avgDrop = drops.reduce((a,b) => a+b, 0) / drops.length;
+        const severity = avgDrop > 50 ? "blackout_severe" : avgDrop > 30 ? "blackout_moderate" : "network_mild";
+        nationalEvents.push({ ts: t, statesAffected: affectedStates.length, avgDrop: Math.round(avgDrop), severity });
         processedTimes.add(t);
       }
     }
     
-    // Apply national event classification to each state's electricity index
     if (nationalEvents.length > 0) {
       scores.forEach(s => {
         if (!s.powerEvents || s.powerEvents.length === 0) return;
-        let hasRegionalEvent = false;
-        let worstRegionalDrop = 0;
-        let worstNationalSeverity = null;
-        
+        let hasRegional = false, worstRegDrop = 0, worstNatSev = null;
         s.powerEvents.forEach(ev => {
-          // Check if this event matches a national event
-          let matchedNational = null;
-          for (const ne of nationalEvents) {
-            if (Math.abs(ev.ts - ne.ts) < 1800) { matchedNational = ne; break; }
-          }
-          ev.isNational = !!matchedNational;
-          ev.nationalSeverity = matchedNational?.severity || null;
-          ev.nationalAvgDrop = matchedNational?.avgDrop || 0;
-          
-          if (matchedNational) {
-            if (!worstNationalSeverity || 
-              (matchedNational.severity === "blackout_severe") ||
-              (matchedNational.severity === "blackout_moderate" && worstNationalSeverity !== "blackout_severe")) {
-              worstNationalSeverity = matchedNational.severity;
-            }
-          } else {
-            hasRegionalEvent = true;
-            if (ev.dropPct > worstRegionalDrop) worstRegionalDrop = ev.dropPct;
-          }
+          const matched = nationalEvents.find(ne => Math.abs(ev.ts - ne.ts) < 1800);
+          ev.isNational = !!matched;
+          ev.nationalSeverity = matched?.severity || null;
+          ev.nationalAvgDrop = matched?.avgDrop || 0;
+          if (matched) {
+            if (!worstNatSev || matched.severity === "blackout_severe" || (matched.severity === "blackout_moderate" && worstNatSev !== "blackout_severe"))
+              worstNatSev = matched.severity;
+          } else { hasRegional = true; if (ev.dropPct > worstRegDrop) worstRegDrop = ev.dropPct; }
         });
-        
-        // Recalculate electricity index
-        if (hasRegionalEvent) {
-          // Has state-specific events → use those for severity (full weight)
-          s.elecHealth = worstRegionalDrop > 60 ? 20 : worstRegionalDrop > 40 ? 40 : worstRegionalDrop > 25 ? 60 : 80;
-          if (s.teleCoincidence && s.elecHealth > 15) s.elecHealth = Math.max(15, s.elecHealth - 20);
+        if (hasRegional) {
+          s.elecHealth = worstRegDrop > 60 ? 20 : worstRegDrop > 40 ? 40 : worstRegDrop > 25 ? 60 : 80;
           s.elecLabel = s.elecHealth <= 30 ? "Apagón regional severo" : s.elecHealth <= 50 ? "Apagón regional moderado" : s.elecHealth <= 70 ? "Interrupción regional" : "Fluctuación regional";
-        } else if (worstNationalSeverity === "blackout_severe") {
-          s.elecHealth = 15;
-          s.elecLabel = "Apagón nacional severo";
-        } else if (worstNationalSeverity === "blackout_moderate") {
-          s.elecHealth = 40;
-          s.elecLabel = "Apagón nacional moderado";
-        } else if (worstNationalSeverity === "network_mild") {
-          s.elecHealth = 80;
-          s.elecLabel = "Degradación leve (red)";
-        }
+        } else if (worstNatSev === "blackout_severe") { s.elecHealth = 15; s.elecLabel = "Apagón nacional severo"; }
+        else if (worstNatSev === "blackout_moderate") { s.elecHealth = 40; s.elecLabel = "Apagón nacional moderado"; }
+        else if (worstNatSev === "network_mild") { s.elecHealth = 80; s.elecLabel = "Degradación leve (red)"; }
         s.elecEvents = s.powerEvents.length;
       });
     }
     
+    scores.sort((a,b) => b.dropScore - a.dropScore || a.healthPct - b.healthPct);
     setRegionScores(scores);
     setRegionLoading(false);
   }, [twFrom, twUntil]);
 
   useEffect(() => { loadNational(); loadEvents(); }, [loadNational, loadEvents]);
   useEffect(() => { if (subView === "estados") loadRegions(); }, [subView, loadRegions]);
+  
+  // Lazy-load signals/raw for selected state (chart + sparklines + loss/latency)
+  useEffect(() => {
+    if (!selectedState) { setSelectedStateData(null); return; }
+    const st = VE_REGIONS.find(r => r.name === selectedState);
+    if (!st) return;
+    setSelectedStateLoading(true);
+    (async () => {
+      const json = await iodaFetch(`signals/raw/region/${st.code}`, { from: twFrom, until: twUntil });
+      const parsed = json ? parseSignals(json) : null;
+      setSelectedStateData(parsed ? { name: st.name, code: st.code, series: parsed } : null);
+      
+      // Update perSource with loss/latency from signals/raw
+      if (parsed) {
+        const lossVals = parsed.map(p => p.lossPct).filter(v => v !== null);
+        const latVals = parsed.map(p => p.medianLatency).filter(v => v !== null);
+        setRegionScores(prev => prev.map(r => {
+          if (r.name !== selectedState) return r;
+          const ps = { ...r.perSource };
+          if (lossVals.length >= 5) {
+            const lossTail = lossVals.slice(-Math.min(36, lossVals.length));
+            const lossAvg = lossTail.reduce((a,b) => a+b, 0) / lossTail.length;
+            const lossHealth = lossAvg > 50 ? 30 : lossAvg > 35 ? 50 : lossAvg > 20 ? 70 : lossAvg > 10 ? 85 : 100;
+            ps.loss = { health: lossHealth, current: Math.round(lossAvg * 10) / 10, baseline: 10 };
+          }
+          if (latVals.length >= 5) {
+            const latSorted = [...latVals].sort((a,b) => a - b);
+            const latP10 = latSorted[Math.floor(latSorted.length * 0.1)];
+            const latTail = latVals.slice(-Math.min(36, latVals.length));
+            const latWorst = Math.max(...latTail);
+            const latRatio = latP10 > 0 ? latWorst / latP10 : 1;
+            const latHealth = latRatio > 3 ? 40 : latRatio > 2 ? 60 : latRatio > 1.5 ? 80 : 100;
+            ps.latency = { health: latHealth, current: Math.round(latVals[latVals.length-1]), baseline: Math.round(latP10) };
+          }
+          // Also extract telescope
+          const teleVals = parsed.map(p => p.telescope).filter(v => v !== null);
+          if (teleVals.length >= 5) {
+            const teleSorted = [...teleVals].sort((a,b) => a - b);
+            const teleP95 = teleSorted[Math.floor(teleSorted.length * 0.95)];
+            if (teleP95 >= 0.5) {
+              const teleCurrent = teleVals[teleVals.length - 1];
+              ps.telescope = { health: Math.min(100, Math.round((teleCurrent / teleP95) * 100)), current: Math.round(teleCurrent * 10) / 10, baseline: Math.round(teleP95 * 10) / 10 };
+            }
+          }
+          const connHealth = Math.min(r.pingHealth || 100, ps.loss?.health || 100, ps.latency?.health || 100);
+          return { ...r, perSource: ps, connectivityHealth: connHealth, healthPct: connHealth };
+        }));
+      }
+      setSelectedStateLoading(false);
+    })();
+  }, [selectedState, twFrom, twUntil]);
 
   // ── 4. AI Explain ──
   const explainWithAI = async () => {
@@ -1432,7 +1472,7 @@ export function TabIODA() {
                     <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Duración</th>
                     <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Fuente</th>
                     <th style={{ padding:"6px 8px", textAlign:"left", color:MUTED, fontWeight:600 }}>Severidad</th>
-                    <th style={{ padding:"6px 8px", textAlign:"right", color:MUTED, fontWeight:600 }}>Caída</th>
+                    <th style={{ padding:"6px 8px", textAlign:"right", color:MUTED, fontWeight:600 }}>Score</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1448,21 +1488,19 @@ export function TabIODA() {
                         : ev.datasource === "bgp" ? "rutas BGP (anuncios de red)"
                         : ev.datasource === "telescope" ? "telescopio de red (tráfico de fondo)"
                         : ev.datasource === "packet-loss" ? "pérdida de paquetes" : ev.datasource;
-                      const sev = ev.condition === "critical" ? "Caída crítica" : ev.condition === "high" ? "Caída significativa" : "Caída moderada";
+                      const sev = ev.condition === "critical" ? "Evento crítico" : ev.condition === "high" ? "Evento significativo" : "Evento moderado";
                       const dur = ev.duration ? `Duración: ${fmtDuration(ev.duration)}.` : "Evento posiblemente en curso.";
                       let cause = "";
-                      if (ev.datasource === "probing" || ev.datasource === "ping-slash24") {
-                        if (ev.value > 50) cause = "Una caída de esta magnitud en sondeo es consistente con un apagón eléctrico regional o un corte masivo de CANTV. Si BGP se mantuvo estable, apunta más a electricidad.";
-                        else if (ev.value > 25) cause = "Caída moderada en sondeo — puede indicar un apagón parcial, mantenimiento de red, o congestión severa en la infraestructura de CANTV.";
-                        else cause = "Caída leve en sondeo — posible fluctuación de red, congestión temporal, o mantenimiento programado.";
+                      if (ev.datasource === "ping-slash24") {
+                        if (ev.score > 3000) cause = "Score alto en sondeo — consistente con un corte severo de conectividad. Si BGP se mantuvo estable, apunta a apagón eléctrico regional.";
+                        else if (ev.score > 500) cause = "Score moderado en sondeo — indica interrupción significativa. Puede ser apagón parcial, falla de CANTV, o mantenimiento.";
+                        else cause = "Score bajo en sondeo — interrupción breve o de bajo impacto. Posible fluctuación de red o mantenimiento programado.";
                       } else if (ev.datasource === "bgp") {
-                        cause = "Caída en rutas BGP indica que el proveedor dejó de anunciar prefijos. Esto es más consistente con un corte deliberado o falla de peering internacional que con un apagón eléctrico.";
-                      } else if (ev.datasource === "telescope") {
-                        cause = "Anomalía en telescopio de red — el tráfico de fondo cayó, lo que suele coincidir con desconexión masiva de dispositivos (apagón) o filtrado a gran escala.";
-                      } else if (ev.datasource === "packet-loss") {
-                        cause = "Pico severo de pérdida de paquetes — la red está operativa pero con degradación grave. Indica sobrecarga de infraestructura, interferencia, o throttling.";
+                        cause = "Evento en rutas BGP — el proveedor dejó de anunciar prefijos. Más consistente con corte deliberado o falla de peering que con apagón eléctrico.";
+                      } else {
+                        cause = "Anomalía detectada por IODA en este indicador.";
                       }
-                      return `${sev} ${region} detectada en ${src}. Magnitud: −${ev.value}% respecto al nivel normal. ${dur} ${cause}`;
+                      return `${sev} ${region} detectado en ${src}. Score IODA: ${fmtVal(ev.score || ev.value)}. ${dur} ${cause}`;
                     })();
                     return (
                       <React.Fragment key={i}>
@@ -1485,14 +1523,11 @@ export function TabIODA() {
                           <td style={{ padding:"8px" }}>
                             <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                               <span style={{ fontSize:12, fontWeight:700, color:sevColor, textTransform:"uppercase" }}>{ev.condition === "critical" ? "CRÍTICO" : ev.condition === "high" ? "ALTO" : "MEDIO"}</span>
-                              <div style={{ width:60, height:4, background:`${BORDER}40`, borderRadius:2, overflow:"hidden" }}>
-                                <div style={{ width:`${Math.min(ev.value || 0, 100)}%`, height:4, background:sevColor, borderRadius:2 }} />
-                              </div>
                             </div>
                           </td>
                           <td style={{ padding:"8px", textAlign:"right" }}>
-                            <span style={{ fontWeight:700, color:sevColor, fontSize:13 }}>-{ev.value}%</span>
-                            {ev.dropAbsolute > 0 && <div style={{ fontSize:10, color:MUTED }}>↓{fmtVal(ev.dropAbsolute)}</div>}
+                            <span style={{ fontWeight:700, color:sevColor, fontSize:13 }}>{fmtVal(ev.score || ev.value)}</span>
+                            {ev.duration > 0 && <div style={{ fontSize:10, color:MUTED }}>{fmtDuration(ev.duration)}</div>}
                           </td>
                         </tr>
                         {isExpanded && (
@@ -1517,15 +1552,12 @@ export function TabIODA() {
         </Card>
       )}
 
-            {/* Interactive temporal chart — national + selected state */}
-            {activeData.length > 0 && activeData.some(r => r.series?.length > 10) && (() => {
+            {/* Interactive temporal chart — selected state */}
+            {selectedState && selectedStateData?.series?.length > 10 && (() => {
               const palette = ["#2563eb","#dc2626","#f59e0b","#7c3aed","#059669","#ec4899","#84cc16","#06b6d4"];
               
-              // Build chart states: always include selected or top affected
-              const chartStates = selectedState 
-                ? activeData.filter(r => r.name === selectedState).slice(0, 1)
-                : activeData.filter(r => r.connectivityHealth < 90 && r.series?.length > 5).slice(0, 5);
-              if (chartStates.length === 0 && activeData.length > 0) chartStates.push(activeData[0]);
+              // Build chart states from selectedStateData
+              const chartStates = [{ ...selectedStateData, healthPct: activeData.find(r => r.name === selectedState)?.connectivityHealth || 100 }];
 
               return (
                 <Card accent="#2563eb" style={{ marginTop: 14 }}>
@@ -1546,9 +1578,8 @@ export function TabIODA() {
                     events={events} focusEvent={focusEvent} onClearFocus={() => setFocusEvent(null)} />
                   
                   {/* Per-source breakdown for selected state */}
-                  {selectedState && (() => {
-                    const st = activeData.find(r => r.name === selectedState);
-                    if (!st?.series?.length) return null;
+                  {(() => {
+                    const series = selectedStateData.series;
                     const sparkSources = [
                       { key:"probing", label:"Sondeo Activo", color:"#f59e0b", invert:false },
                       { key:"lossPct", label:"Packet Loss %", color:"#dc2626", invert:true },
@@ -1563,7 +1594,7 @@ export function TabIODA() {
                         </div>
                         <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:8 }}>
                           {sparkSources.map(({ key: src, label, color, invert }) => {
-                            const vals = st.series.map(p => p[src]).filter(v => v !== null && typeof v === "number");
+                            const vals = series.map(p => p[src]).filter(v => v !== null && typeof v === "number");
                             if (vals.length < 5) return (
                               <div key={src} style={{ padding:8, background:`${BORDER}08`, borderRadius:4, borderLeft:`3px solid ${MUTED}30` }}>
                                 <div style={{ fontSize:11, fontWeight:600, color:MUTED }}>{label}</div>
@@ -1590,9 +1621,9 @@ export function TabIODA() {
                             const cW2 = W2-pL2-pR2, cH2 = H2-pT2-pB2;
                             const mn = Math.min(...vals), mx = Math.max(...vals);
                             let spark = "";
-                            st.series.forEach((p, i) => {
+                            series.forEach((p, i) => {
                               const v = p[src]; if (v === null || typeof v !== "number") return;
-                              const x = pL2 + (i / (st.series.length - 1)) * cW2;
+                              const x = pL2 + (i / (series.length - 1)) * cW2;
                               const y = pT2 + cH2 - ((v - mn) / (mx - mn || 1)) * cH2;
                               spark += spark === "" ? `M${x},${y}` : ` L${x},${y}`;
                             });
@@ -1619,6 +1650,27 @@ export function TabIODA() {
                 </Card>
               );
             })()}
+            {/* State selector prompt when no state selected */}
+            {!selectedState && activeData.length > 0 && (
+              <Card accent="#2563eb" style={{ marginTop: 14 }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                  <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+                    Conectividad Temporal
+                  </div>
+                  <select value="" onChange={e => setSelectedState(e.target.value || null)}
+                    style={{ fontSize:11, fontFamily:font, padding:"4px 10px", border:`1px solid ${BORDER}`, background:"transparent", color:TEXT, borderRadius:3 }}>
+                    <option value="">Seleccionar estado para gráfica...</option>
+                    {activeData.map(r => <option key={r.code} value={r.name}>{r.name} ({r.connectivityHealth}%)</option>)}
+                  </select>
+                </div>
+              </Card>
+            )}
+            {/* Loading indicator for selected state */}
+            {selectedState && selectedStateLoading && (
+              <Card accent="#2563eb" style={{ marginTop: 14 }}>
+                <div style={{ textAlign:"center", padding:30, color:MUTED, fontSize:13, fontFamily:font }}>⏳ Cargando datos temporales de {selectedState}...</div>
+              </Card>
+            )}
 
             {/* ── Explicar con IA (visible in all subviews) ── */}
       <Card accent={ACCENT} style={{ marginTop:14 }}>
