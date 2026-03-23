@@ -7,7 +7,7 @@ export const TABS = [
   { id:"clima", label:"Clima Social", icon:"🌡️" },
   { id:"gdelt", label:"Medios", icon:"📡" },
   { id:"conflictividad", label:"Conflictividad", icon:"✊" },
-  { id:"ioda", label:"Internet", icon:"🌐" },
+  { id:"ioda", label:"Conectividad", icon:"🌐" },
   { id:"mercados", label:"Mercados", icon:"📈" },
   { id:"macro", label:"Macro VEN", icon:"💵" },
 ];

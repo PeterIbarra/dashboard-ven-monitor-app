@@ -1213,7 +1213,7 @@ export function TabIODA() {
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:10, flexWrap:"wrap" }}>
         <span style={{ fontSize:16 }}>🌐</span>
         <div style={{ flex:1, minWidth:200 }}>
-          <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Monitor de Internet — Venezuela</div>
+          <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Monitor de Conectividad — Venezuela</div>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
             Georgia Tech IODA · {source === "live" ? `${signals?.length || 0} puntos` : source === "failed" ? "Sin conexión" : "Conectando..."}
           </div>

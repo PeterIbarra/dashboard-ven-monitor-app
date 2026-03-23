@@ -113,7 +113,7 @@ dashboard-ven-monitor-app/
 | 5 | **Clima Social** | TabClimaSocial | Cohesión gubernamental (ICG, sub-módulo TabCohesion) + Redes/Polarización |
 | 6 | **Medios** | TabGdelt | GDELT: volumen de artículos, tono mediático, índice de inestabilidad — 120 días |
 | 7 | **Conflictividad** | TabConflictividad | Semanal 2026 + OVCS anual 2025 + ACLED: protestas, estados, derechos, represión |
-| 8 | **Internet** | TabIODA | IODA: conectividad nacional, detección de cortes, señales de censura |
+| 8 | **Conectividad** | TabIODA | IODA: conectividad nacional + electricidad, detección de cortes, alertas por estado |
 | 9 | **Mercados** | TabMercados | Petróleo (Brent/WTI/Merey), producción VEN, Polymarket, mercados globales |
 | 10 | **Macro VEN** | TabMacro | Tipo de cambio BCV vs paralelo, brecha, World Bank, IMF WEO, UNHCR/R4V |
 
@@ -304,7 +304,7 @@ redes.js ───────────┬──→ Dashboard (mini widget po
 
 **Tabs que NO dependen del SITREP** (se alimentan solo de APIs live):
 - **Medios** → GDELT API (120 días de datos, actualización automática)
-- **Internet** → IODA API (conectividad en tiempo real)
+- **Conectividad** → IODA API (conectividad + electricidad en tiempo real)
 - **Mercados** → OilPriceAPI + EIA + Polymarket (datos live + históricos)
 - **Macro VEN** → DolarAPI + World Bank + IMF (parcialmente, las tasas de cambio son live)
 
@@ -461,7 +461,7 @@ No todos los datos del dashboard se actualizan a la misma velocidad. Es importan
 | PizzINT | [pizzint.watch](https://www.pizzint.watch/) | Índice de amenaza bilateral USA↔VEN |
 | GDELT | [gdeltproject.org](https://www.gdeltproject.org/) | Monitoreo global de medios (volumen, tono, inestabilidad) |
 | EIA | [eia.gov](https://www.eia.gov/) | Precios petróleo, producción VEN, forecast STEO |
-| IODA | [ioda.inetintel.cc.gatech.edu](https://ioda.inetintel.cc.gatech.edu/) | Conectividad internet (Georgia Tech) |
+| IODA | [ioda.inetintel.cc.gatech.edu](https://ioda.inetintel.cc.gatech.edu/) | Conectividad internet + inferencia eléctrica (Georgia Tech) |
 | OVCS | [observatoriodeconflictos.org.ve](https://www.observatoriodeconflictos.org.ve/) | Conflictividad social Venezuela |
 | Polymarket | [polymarket.com](https://polymarket.com) | Mercados de predicción |
 | ACLED | [acleddata.com](https://acleddata.com/) | Datos de conflicto armado y protestas |
