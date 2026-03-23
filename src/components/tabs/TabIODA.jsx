@@ -88,7 +88,7 @@ function parseSignals(json) {
 // ── Format helpers ──
 const fmtVal = v => v == null ? "—" : v >= 1e6 ? `${(v/1e6).toFixed(1)}M` : v >= 1e3 ? `${(v/1e3).toFixed(1)}K` : v.toFixed(0);
 const fmtTime = epoch => new Date(epoch * 1000).toLocaleString("es-VE", { timeZone:"America/Caracas", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", hour12:false });
-const fmtDuration = secs => { if (secs < 3600) return `${Math.round(secs/60)}m`; const h = Math.floor(secs/3600), m = Math.round((secs%3600)/60); return m > 0 ? `${h}h ${m}m` : `${h}h`; };
+const fmtDuration = secs => { if (!secs || isNaN(secs) || secs <= 0) return "—"; if (secs < 3600) return `${Math.round(secs/60)}m`; const h = Math.floor(secs/3600), m = Math.round((secs%3600)/60); return m > 0 ? `${h}h ${m}m` : `${h}h`; };
 
 // ── Interpret connectivity pattern from per-source data ──
 function interpretPattern(perSource, telescopeMultiplier) {
@@ -834,9 +834,13 @@ export function TabIODA() {
         // Current connectivity health from latest alert
         const lastPingAlert = pingAlerts[pingAlerts.length - 1];
         const lastBgpAlert = bgpAlerts[bgpAlerts.length - 1];
-        const pingHealth = lastPingAlert?.historyValue > 0
-          ? Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100))
-          : 100;
+        // Current connectivity: use WORST critical alert in period, not just latest
+        const worstPingAlert = pingAlerts
+          .filter(a => a.level === "critical" && a.historyValue > 0)
+          .sort((a, b) => (a.value / a.historyValue) - (b.value / b.historyValue))[0];
+        const pingHealth = worstPingAlert
+          ? Math.min(100, Math.round((worstPingAlert.value / worstPingAlert.historyValue) * 100))
+          : (lastPingAlert?.historyValue > 0 ? Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100)) : 100);
         const bgpHealth = lastBgpAlert?.historyValue > 0
           ? Math.min(100, Math.round((lastBgpAlert.value / lastBgpAlert.historyValue) * 100))
           : 100;
@@ -862,18 +866,23 @@ export function TabIODA() {
             value: alert.value,
             historyValue: alert.historyValue,
             bgpAlsoDown,
-            isElectric: !bgpAlsoDown && dropPct > 15, // ping down + BGP stable = likely electric
+            isElectric: !bgpAlsoDown,
+            iodaCritical: alert.level === "critical", // ping down + BGP stable = likely electric
           });
         }
         
-        // Electricity index from events
+        // Electricity index: respect IODA critical level + count
         const electricEvents = powerEvents.filter(e => e.isElectric);
         let elecHealth = 100, elecLabel = "Normal";
         if (electricEvents.length > 0) {
+          const criticalCount = electricEvents.filter(e => e.iodaCritical).length;
           const worstDrop = Math.max(...electricEvents.map(e => e.dropPct));
+          // Severity from worst drop, boosted by IODA critical count
           if (worstDrop > 60) { elecHealth = 20; elecLabel = "Apagón severo"; }
           else if (worstDrop > 40) { elecHealth = 40; elecLabel = "Apagón moderado"; }
-          else if (worstDrop > 25) { elecHealth = 60; elecLabel = "Interrupción leve"; }
+          else if (worstDrop > 25) { elecHealth = 60; elecLabel = "Interrupción"; }
+          else if (criticalCount >= 3) { elecHealth = 50; elecLabel = "Interrupciones recurrentes"; }
+          else if (criticalCount >= 1) { elecHealth = 60; elecLabel = "Interrupción detectada"; }
           else { elecHealth = 80; elecLabel = "Fluctuación"; }
         } else if (powerEvents.length > 0 && !bgpStable) {
           // Ping critical + BGP critical = infrastructure/censorship, not electricity
@@ -903,7 +912,7 @@ export function TabIODA() {
           baseAvg: lastPingAlert?.historyValue ?? 0,
           perSource: {
             probing: lastPingAlert ? { health: pingHealth, current: lastPingAlert.value, baseline: lastPingAlert.historyValue } : null,
-            bgp: lastBgpAlert ? { health: bgpHealth, current: lastBgpAlert.value, baseline: lastBgpAlert.historyValue } : null,
+            bgp: lastBgpAlert ? { health: bgpHealth, current: lastBgpAlert.value, baseline: lastBgpAlert.historyValue } : { health: 100, current: 0, baseline: 0 },
             telescope: null, loss: null, latency: null,
           },
         };
@@ -972,6 +981,15 @@ export function TabIODA() {
   useEffect(() => { loadNational(); loadEvents(); }, [loadNational, loadEvents]);
   useEffect(() => { if (subView === "estados") loadRegions(); }, [subView, loadRegions]);
   
+  // Auto-refresh every 5 min for 24h/48h modes
+  useEffect(() => {
+    if (timePreset !== "24h" && timePreset !== "48h") return;
+    const interval = setInterval(() => {
+      changePreset(timePreset); // re-freezes epoch, triggers reload
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [timePreset]);
+  
   // Lazy-load signals/raw for selected state (chart + sparklines + loss/latency)
   useEffect(() => {
     if (!selectedState) { setSelectedStateData(null); return; }
@@ -993,7 +1011,7 @@ export function TabIODA() {
           if (lossVals.length >= 5) {
             const lossTail = lossVals.slice(-Math.min(36, lossVals.length));
             const lossAvg = lossTail.reduce((a,b) => a+b, 0) / lossTail.length;
-            const lossHealth = lossAvg > 50 ? 30 : lossAvg > 35 ? 50 : lossAvg > 20 ? 70 : lossAvg > 10 ? 85 : 100;
+            const lossHealth = lossAvg > 60 ? 30 : lossAvg > 40 ? 50 : lossAvg > 25 ? 70 : lossAvg > 15 ? 85 : 100;
             ps.loss = { health: lossHealth, current: Math.round(lossAvg * 10) / 10, baseline: 10 };
           }
           if (latVals.length >= 5) {
@@ -1349,6 +1367,7 @@ export function TabIODA() {
                         const c = getSeverityColor(d.health);
                         const detail = src === "loss" ? `${d.current}% (normal <${d.baseline}%)` :
                                        src === "latency" ? `${d.current}ms (base ${d.baseline}ms)` :
+                                       src === "bgp" && d.current === 0 && d.baseline === 0 ? "Estable" :
                                        `(${d.current}/${d.baseline})`;
                         return (
                           <div key={src} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:11, padding:"2px 0", borderBottom:`1px solid ${BORDER}15` }}>
@@ -1609,7 +1628,7 @@ export function TabIODA() {
                               const p10 = sortedV[Math.floor(sortedV.length * 0.1)] || 1;
                               baseRef = p10;
                               health = src === "lossPct"
-                                ? (current > 50 ? 30 : current > 35 ? 50 : current > 20 ? 70 : current > 10 ? 85 : 100)
+                                ? (current > 60 ? 30 : current > 40 ? 50 : current > 25 ? 70 : current > 15 ? 85 : 100)
                                 : (p10 > 0 ? Math.max(0, Math.min(100, Math.round(100 - ((current / p10 - 1) * 50)))) : 100);
                             } else {
                               const p95 = sortedV[Math.floor(sortedV.length * 0.95)] || sortedV[sortedV.length - 1] || 1;
