@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "../../constants";
 import { IS_DEPLOYED, CORS_PROXIES } from "../../utils";
 import { useIsMobile } from "../../hooks/useIsMobile";
@@ -426,28 +426,33 @@ function InteractiveChart({ states, timePreset, selectedState, onSelectState, pa
   const toX = ts => pL + ((ts - viewStart) / viewRange) * cW;
   const toY = pct => pT + cH - (pct / 100) * cH;
   
-  // Zoom with scroll wheel
-  const handleWheel = (e) => {
-    e.preventDefault();
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const mx = (e.clientX - rect.left) / rect.width;
-    const center = zoomRange ? zoomRange.start + mx * (zoomRange.end - zoomRange.start) : mx;
+  // Zoom with +/- buttons
+  const zoomIn = () => {
     const currentSpan = zoomRange ? zoomRange.end - zoomRange.start : 1;
-    const factor = e.deltaY > 0 ? 1.2 : 0.8; // scroll down = zoom out
-    let newSpan = Math.min(1, Math.max(0.05, currentSpan * factor));
-    let newStart = center - newSpan * (mx);
+    const center = zoomRange ? (zoomRange.start + zoomRange.end) / 2 : 0.5;
+    let newSpan = Math.max(0.05, currentSpan * 0.6);
+    let newStart = center - newSpan / 2;
     let newEnd = newStart + newSpan;
     if (newStart < 0) { newEnd -= newStart; newStart = 0; }
     if (newEnd > 1) { newStart -= (newEnd - 1); newEnd = 1; }
-    newStart = Math.max(0, newStart);
+    setZoomRange({ start: Math.max(0, newStart), end: Math.min(1, newEnd) });
+  };
+  const zoomOut = () => {
+    if (!zoomRange) return;
+    const currentSpan = zoomRange.end - zoomRange.start;
+    const center = (zoomRange.start + zoomRange.end) / 2;
+    let newSpan = Math.min(1, currentSpan * 1.5);
     if (newSpan >= 0.95) { setZoomRange(null); return; }
-    setZoomRange({ start: newStart, end: newEnd });
+    let newStart = center - newSpan / 2;
+    let newEnd = newStart + newSpan;
+    if (newStart < 0) { newEnd -= newStart; newStart = 0; }
+    if (newEnd > 1) { newStart -= (newEnd - 1); newEnd = 1; }
+    setZoomRange({ start: Math.max(0, newStart), end: Math.min(1, newEnd) });
   };
   
   return (
     <div>
-      <div ref={containerRef} onWheel={handleWheel} style={{ cursor: "crosshair", touchAction: "none", position: "relative" }}>
+      <div ref={containerRef} style={{ cursor: "crosshair", touchAction: "none", position: "relative" }}>
         <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}
           onMouseMove={e => {
             const rect = e.currentTarget.getBoundingClientRect();
@@ -593,15 +598,16 @@ function InteractiveChart({ states, timePreset, selectedState, onSelectState, pa
             </div>
           ))}
         </div>
-        <div style={{ display:"flex", gap:4 }}>
+        <div style={{ display:"flex", gap:4, alignItems:"center" }}>
+          <button onClick={zoomIn} style={{ fontSize:12, fontFamily:font, padding:"2px 8px", background:"transparent",
+            border:`1px solid ${BORDER}`, color:MUTED, cursor:"pointer", borderRadius:3 }}>+</button>
+          <button onClick={zoomOut} style={{ fontSize:12, fontFamily:font, padding:"2px 8px", background:"transparent",
+            border:`1px solid ${BORDER}`, color:MUTED, cursor:"pointer", borderRadius:3, opacity:zoomRange?1:0.3 }}>−</button>
           {zoomRange && (
             <button onClick={() => setZoomRange(null)}
               style={{ fontSize:10, fontFamily:font, padding:"2px 8px", background:"transparent",
-                border:`1px solid ${BORDER}`, color:MUTED, cursor:"pointer" }}>Reset zoom</button>
+                border:`1px solid ${BORDER}`, color:MUTED, cursor:"pointer", borderRadius:3 }}>Reset</button>
           )}
-          <span style={{ fontSize:9, fontFamily:font, color:`${MUTED}60` }}>
-            Ponderación: Sondeo 50% · BGP 30% · Telescopio 20%
-          </span>
         </div>
       </div>
     </div>
@@ -663,15 +669,14 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
     regionScores.forEach(r => {
       const coords = STATE_COORDS[r.name];
       if (!coords) return;
-      const isAffected = (r.displayScore || r.dropScore || 0) > 0;
-      const severity = r.healthPct;
+      const severity = r.connectivityHealth ?? r.healthPct ?? 100;
       const color = severity >= 90 ? "#34d399" : severity >= 70 ? "#fbbf24" : severity >= 50 ? "#f97316" : "#ef4444";
-      // Size proportional to outage score, fallback to severity
       const ds = r.displayScore || r.dropScore || 0;
-      const radius = ds > 0 ? Math.max(8, Math.min(40, (ds / maxScore) * 40)) : (severity >= 90 ? 6 : severity >= 70 ? 12 : severity >= 50 ? 20 : 30);
+      // Always visible: minimum radius 8, minimum opacity 0.5
+      const radius = ds > 0 ? Math.max(10, Math.min(40, (ds / maxScore) * 40)) : (severity >= 90 ? 8 : severity >= 70 ? 14 : severity >= 50 ? 22 : 30);
       const circle = L.circleMarker(coords, {
         radius, fillColor: color, color: selectedState === r.name ? "#fff" : color,
-        weight: selectedState === r.name ? 3 : 1.5, opacity: 0.9, fillOpacity: isAffected ? 0.7 : 0.3,
+        weight: selectedState === r.name ? 3 : 1.5, opacity: 0.9, fillOpacity: 0.6,
       });
       circle.bindPopup(
         `<div style="font-family:monospace;font-size:11px;min-width:160px">` +
@@ -684,8 +689,8 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
       circle.on("click", () => onSelectState(r.name));
       group.addLayer(circle);
 
-      // Add label for affected states
-      if (isAffected && (r.displayScore || 0) > maxScore * 0.05) {
+      // Add label for non-normal states
+      if (severity < 90 || ds > maxScore * 0.05) {
         const label = L.divIcon({
           className: "ioda-label",
           html: `<div style="font:bold 10px monospace;color:${color};text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap">${r.name}</div>`,
@@ -719,6 +724,7 @@ export function TabIODA() {
   const [aiLoading, setAiLoading] = useState(false);
   const [subView, setSubView] = useState("nacional"); // nacional | estados | eventos
   const [focusEvent, setFocusEvent] = useState(null); // timestamp to zoom chart to
+  const [expandedEvent, setExpandedEvent] = useState(null); // index of event to show explanation
 
   // ── Unified time window (stable — only recalculates on user action) ──
   const [timePreset, setTimePreset] = useState("24h"); // 24h | 48h | 7d | 30d | custom
@@ -877,6 +883,99 @@ export function TabIODA() {
       results.forEach(r => { if (r.status === "fulfilled" && r.value) scores.push(r.value); });
     }
     scores.sort((a,b) => b.dropScore - a.dropScore || a.healthPct - b.healthPct);
+    
+    // ── Post-processing: filter national events from electricity index ──
+    // If >50% of states have a power event at the same time, it's a national network event, not electricity
+    const allEventTimes = [];
+    scores.forEach(s => {
+      if (s.powerEvents) s.powerEvents.forEach(ev => allEventTimes.push(ev.ts));
+    });
+    
+    // Cluster event timestamps (±30min = same event)
+    // For each cluster, compute how many states + average drop to distinguish network vs blackout
+    const nationalEvents = []; // {ts, statesAffected, avgDrop, severity}
+    const processedTimes = new Set();
+    for (const t of allEventTimes) {
+      // Skip if already clustered
+      let alreadyClustered = false;
+      for (const pt of processedTimes) { if (Math.abs(t - pt) < 1800) { alreadyClustered = true; break; } }
+      if (alreadyClustered) continue;
+      
+      const affectedStates = scores.filter(s => 
+        s.powerEvents?.some(ev => Math.abs(ev.ts - t) < 1800)
+      );
+      const stateCount = affectedStates.length;
+      
+      if (stateCount > scores.length * 0.5) {
+        // National event — compute average drop across affected states
+        const drops = [];
+        affectedStates.forEach(s => {
+          const ev = s.powerEvents.find(ev => Math.abs(ev.ts - t) < 1800);
+          if (ev) drops.push(ev.dropPct);
+        });
+        const avgDrop = drops.length > 0 ? drops.reduce((a,b) => a+b, 0) / drops.length : 0;
+        
+        // Classify: network issue vs national blackout based on magnitude
+        let severity;
+        if (avgDrop > 50) severity = "blackout_severe";      // >50% avg = national blackout severe
+        else if (avgDrop > 30) severity = "blackout_moderate"; // 30-50% = national blackout moderate
+        else severity = "network_mild";                        // <30% = network/CANTV issue
+        
+        nationalEvents.push({ ts: t, statesAffected: stateCount, avgDrop: Math.round(avgDrop), severity });
+        processedTimes.add(t);
+      }
+    }
+    
+    // Apply national event classification to each state's electricity index
+    if (nationalEvents.length > 0) {
+      scores.forEach(s => {
+        if (!s.powerEvents || s.powerEvents.length === 0) return;
+        let hasRegionalEvent = false;
+        let worstRegionalDrop = 0;
+        let worstNationalSeverity = null;
+        
+        s.powerEvents.forEach(ev => {
+          // Check if this event matches a national event
+          let matchedNational = null;
+          for (const ne of nationalEvents) {
+            if (Math.abs(ev.ts - ne.ts) < 1800) { matchedNational = ne; break; }
+          }
+          ev.isNational = !!matchedNational;
+          ev.nationalSeverity = matchedNational?.severity || null;
+          ev.nationalAvgDrop = matchedNational?.avgDrop || 0;
+          
+          if (matchedNational) {
+            if (!worstNationalSeverity || 
+              (matchedNational.severity === "blackout_severe") ||
+              (matchedNational.severity === "blackout_moderate" && worstNationalSeverity !== "blackout_severe")) {
+              worstNationalSeverity = matchedNational.severity;
+            }
+          } else {
+            hasRegionalEvent = true;
+            if (ev.dropPct > worstRegionalDrop) worstRegionalDrop = ev.dropPct;
+          }
+        });
+        
+        // Recalculate electricity index
+        if (hasRegionalEvent) {
+          // Has state-specific events → use those for severity (full weight)
+          s.elecHealth = worstRegionalDrop > 60 ? 20 : worstRegionalDrop > 40 ? 40 : worstRegionalDrop > 25 ? 60 : 80;
+          if (s.teleCoincidence && s.elecHealth > 15) s.elecHealth = Math.max(15, s.elecHealth - 20);
+          s.elecLabel = s.elecHealth <= 30 ? "Apagón regional severo" : s.elecHealth <= 50 ? "Apagón regional moderado" : s.elecHealth <= 70 ? "Interrupción regional" : "Fluctuación regional";
+        } else if (worstNationalSeverity === "blackout_severe") {
+          s.elecHealth = 15;
+          s.elecLabel = "Apagón nacional severo";
+        } else if (worstNationalSeverity === "blackout_moderate") {
+          s.elecHealth = 40;
+          s.elecLabel = "Apagón nacional moderado";
+        } else if (worstNationalSeverity === "network_mild") {
+          s.elecHealth = 80;
+          s.elecLabel = "Degradación leve (red)";
+        }
+        s.elecEvents = s.powerEvents.length;
+      });
+    }
+    
     setRegionScores(scores);
     setRegionLoading(false);
   }, [twFrom, twUntil]);
@@ -1233,7 +1332,10 @@ export function TabIODA() {
                           <div key={i} style={{ color:MUTED, padding:"1px 0" }}>
                             {fmtTime(ev.ts)} · −{ev.dropPct}% · {fmtDuration(ev.durationSec)}
                             {!ev.recovered && " · ⚠ en curso"}
-                            {rd.teleCoincidence && " · 🔭 telescopio"}
+                            {ev.isNational && ev.nationalSeverity === "network_mild" && <span style={{ color:"#2563eb" }}> · 🌐 red (avg −{ev.nationalAvgDrop}%)</span>}
+                            {ev.isNational && ev.nationalSeverity === "blackout_moderate" && <span style={{ color:"#f97316" }}> · ⚡ nacional (avg −{ev.nationalAvgDrop}%)</span>}
+                            {ev.isNational && ev.nationalSeverity === "blackout_severe" && <span style={{ color:"#ef4444" }}> · ⚡⚡ nacional severo (avg −{ev.nationalAvgDrop}%)</span>}
+                            {!ev.isNational && <span style={{ color:"#7c3aed" }}> · 📍 regional</span>}
                           </div>
                         ))}
                         {rd.bgpStable && <div style={{ color:"#34d399", marginTop:3 }}>✓ BGP estable — patrón consistente con apagón</div>}
@@ -1338,36 +1440,71 @@ export function TabIODA() {
                     const sevColor = ev.condition === "critical" ? "#ef4444" : ev.condition === "high" ? "#f97316" : ev.condition === "medium" ? "#fbbf24" : MUTED;
                     const dsColor = ev.datasource === "bgp" ? "#7c3aed" : ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "#f59e0b" : ev.datasource === "packet-loss" ? "#dc2626" : "#dc2626";
                     const dsLabel = ev.datasource === "bgp" ? "BGP" : ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "SONDEO" : ev.datasource === "telescope" ? "TELESCOPIO" : ev.datasource === "packet-loss" ? "LOSS" : (ev.datasource || "?").toUpperCase();
+                    const isExpanded = expandedEvent === i;
+                    // Generate explanation based on event characteristics
+                    const explain = (() => {
+                      const region = ev.region === "🇻🇪 Nacional" ? "a nivel nacional" : `en ${ev.region}`;
+                      const src = ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "sondeo activo (hosts que responden)"
+                        : ev.datasource === "bgp" ? "rutas BGP (anuncios de red)"
+                        : ev.datasource === "telescope" ? "telescopio de red (tráfico de fondo)"
+                        : ev.datasource === "packet-loss" ? "pérdida de paquetes" : ev.datasource;
+                      const sev = ev.condition === "critical" ? "Caída crítica" : ev.condition === "high" ? "Caída significativa" : "Caída moderada";
+                      const dur = ev.duration ? `Duración: ${fmtDuration(ev.duration)}.` : "Evento posiblemente en curso.";
+                      let cause = "";
+                      if (ev.datasource === "probing" || ev.datasource === "ping-slash24") {
+                        if (ev.value > 50) cause = "Una caída de esta magnitud en sondeo es consistente con un apagón eléctrico regional o un corte masivo de CANTV. Si BGP se mantuvo estable, apunta más a electricidad.";
+                        else if (ev.value > 25) cause = "Caída moderada en sondeo — puede indicar un apagón parcial, mantenimiento de red, o congestión severa en la infraestructura de CANTV.";
+                        else cause = "Caída leve en sondeo — posible fluctuación de red, congestión temporal, o mantenimiento programado.";
+                      } else if (ev.datasource === "bgp") {
+                        cause = "Caída en rutas BGP indica que el proveedor dejó de anunciar prefijos. Esto es más consistente con un corte deliberado o falla de peering internacional que con un apagón eléctrico.";
+                      } else if (ev.datasource === "telescope") {
+                        cause = "Anomalía en telescopio de red — el tráfico de fondo cayó, lo que suele coincidir con desconexión masiva de dispositivos (apagón) o filtrado a gran escala.";
+                      } else if (ev.datasource === "packet-loss") {
+                        cause = "Pico severo de pérdida de paquetes — la red está operativa pero con degradación grave. Indica sobrecarga de infraestructura, interferencia, o throttling.";
+                      }
+                      return `${sev} ${region} detectada en ${src}. Magnitud: −${ev.value}% respecto al nivel normal. ${dur} ${cause}`;
+                    })();
                     return (
-                      <tr key={i} onClick={() => { setFocusEvent(ev.time); if (ev.region !== "🇻🇪 Nacional") setSelectedState(ev.region); }}
-                        style={{ borderBottom:`1px solid ${BORDER}30`, cursor:"pointer" }}
-                        onMouseEnter={e => e.currentTarget.style.background = `${ACCENT}08`}
-                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                        <td style={{ padding:"8px" }}>
-                          <div style={{ color:TEXT, fontWeight:600 }}>{ev.time ? fmtTime(ev.time) : "—"}</div>
-                        </td>
-                        <td style={{ padding:"8px" }}>
-                          <span style={{ fontSize:11, color: ev.region === "🇻🇪 Nacional" ? "#7c3aed" : TEXT, fontWeight: ev.region === "🇻🇪 Nacional" ? 600 : 400 }}>
-                            {ev.region || "—"}
-                          </span>
-                        </td>
-                        <td style={{ padding:"8px", color:MUTED, fontSize:11 }}>{ev.duration ? fmtDuration(ev.duration) : "en curso"}</td>
-                        <td style={{ padding:"8px" }}>
-                          <Badge color={dsColor}>{dsLabel}</Badge>
-                        </td>
-                        <td style={{ padding:"8px" }}>
-                          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                            <span style={{ fontSize:12, fontWeight:700, color:sevColor, textTransform:"uppercase" }}>{ev.condition === "critical" ? "CRÍTICO" : ev.condition === "high" ? "ALTO" : "MEDIO"}</span>
-                            <div style={{ width:60, height:4, background:`${BORDER}40`, borderRadius:2, overflow:"hidden" }}>
-                              <div style={{ width:`${Math.min(ev.value || 0, 100)}%`, height:4, background:sevColor, borderRadius:2 }} />
+                      <React.Fragment key={i}>
+                        <tr onClick={() => { setExpandedEvent(isExpanded ? null : i); setFocusEvent(ev.time); if (ev.region !== "🇻🇪 Nacional") setSelectedState(ev.region); }}
+                          style={{ borderBottom: isExpanded ? "none" : `1px solid ${BORDER}30`, cursor:"pointer", background: isExpanded ? `${ACCENT}06` : "transparent" }}
+                          onMouseEnter={e => { if (!isExpanded) e.currentTarget.style.background = `${ACCENT}08`; }}
+                          onMouseLeave={e => { if (!isExpanded) e.currentTarget.style.background = "transparent"; }}>
+                          <td style={{ padding:"8px" }}>
+                            <div style={{ color:TEXT, fontWeight:600 }}>{ev.time ? fmtTime(ev.time) : "—"}</div>
+                          </td>
+                          <td style={{ padding:"8px" }}>
+                            <span style={{ fontSize:11, color: ev.region === "🇻🇪 Nacional" ? "#7c3aed" : TEXT, fontWeight: ev.region === "🇻🇪 Nacional" ? 600 : 400 }}>
+                              {ev.region || "—"}
+                            </span>
+                          </td>
+                          <td style={{ padding:"8px", color:MUTED, fontSize:11 }}>{ev.duration ? fmtDuration(ev.duration) : "en curso"}</td>
+                          <td style={{ padding:"8px" }}>
+                            <Badge color={dsColor}>{dsLabel}</Badge>
+                          </td>
+                          <td style={{ padding:"8px" }}>
+                            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                              <span style={{ fontSize:12, fontWeight:700, color:sevColor, textTransform:"uppercase" }}>{ev.condition === "critical" ? "CRÍTICO" : ev.condition === "high" ? "ALTO" : "MEDIO"}</span>
+                              <div style={{ width:60, height:4, background:`${BORDER}40`, borderRadius:2, overflow:"hidden" }}>
+                                <div style={{ width:`${Math.min(ev.value || 0, 100)}%`, height:4, background:sevColor, borderRadius:2 }} />
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td style={{ padding:"8px", textAlign:"right" }}>
-                          <span style={{ fontWeight:700, color:sevColor, fontSize:13 }}>-{ev.value}%</span>
-                          {ev.dropAbsolute > 0 && <div style={{ fontSize:10, color:MUTED }}>↓{fmtVal(ev.dropAbsolute)}</div>}
-                        </td>
-                      </tr>
+                          </td>
+                          <td style={{ padding:"8px", textAlign:"right" }}>
+                            <span style={{ fontWeight:700, color:sevColor, fontSize:13 }}>-{ev.value}%</span>
+                            {ev.dropAbsolute > 0 && <div style={{ fontSize:10, color:MUTED }}>↓{fmtVal(ev.dropAbsolute)}</div>}
+                          </td>
+                        </tr>
+                        {isExpanded && (
+                          <tr style={{ borderBottom:`1px solid ${BORDER}30` }}>
+                            <td colSpan={6} style={{ padding:"8px 12px 12px", background:`${ACCENT}04` }}>
+                              <div style={{ fontSize:12, color:TEXT, lineHeight:1.6, borderLeft:`3px solid ${sevColor}`, paddingLeft:10 }}>
+                                {explain}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     );
                   })}
                 </tbody>
@@ -1380,29 +1517,30 @@ export function TabIODA() {
         </Card>
       )}
 
-            {/* Interactive multi-line temporal chart */}
+            {/* Interactive temporal chart — national + selected state */}
             {activeData.length > 0 && activeData.some(r => r.series?.length > 10) && (() => {
-              // Selected states for chart: use selectedState or top 8
+              const palette = ["#2563eb","#dc2626","#f59e0b","#7c3aed","#059669","#ec4899","#84cc16","#06b6d4"];
+              
+              // Build chart states: always include selected or top affected
               const chartStates = selectedState 
-                ? activeData.filter(r => r.name === selectedState || r.healthPct < 95).slice(0, 8)
-                : activeData.filter(r => r.series && r.series.length > 5).slice(0, 8);
-              if (chartStates.length === 0) return null;
-
-              // Palette
-              const palette = ["#dc2626","#f59e0b","#7c3aed","#2563eb","#059669","#ec4899","#84cc16","#06b6d4"];
-              const srcColors = { bgp: "#7c3aed", probing: "#f59e0b", telescope: "#dc2626" };
+                ? activeData.filter(r => r.name === selectedState).slice(0, 1)
+                : activeData.filter(r => r.connectivityHealth < 90 && r.series?.length > 5).slice(0, 5);
+              if (chartStates.length === 0 && activeData.length > 0) chartStates.push(activeData[0]);
 
               return (
-                <Card accent="#dc2626" style={{ marginTop: 14 }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:4, flexWrap:"wrap", gap:6 }}>
+                <Card accent="#2563eb" style={{ marginTop: 14 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6, flexWrap:"wrap", gap:6 }}>
                     <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-                      Conectividad por Estado
+                      Conectividad Temporal · {timeLabel}
                     </div>
-                    <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>
-                      {timeLabel} · Scroll para zoom · Click estado en mapa para filtrar
-                    </span>
+                    <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                      <select value={selectedState || ""} onChange={e => setSelectedState(e.target.value || null)}
+                        style={{ fontSize:11, fontFamily:font, padding:"3px 8px", border:`1px solid ${BORDER}`, background:"transparent", color:TEXT, borderRadius:3 }}>
+                        <option value="">Top afectados</option>
+                        {activeData.map(r => <option key={r.code} value={r.name}>{r.name} ({r.connectivityHealth}%)</option>)}
+                      </select>
+                    </div>
                   </div>
-                  {/* Main probing-based multi-line chart */}
                   <InteractiveChart states={chartStates} timePreset={timePreset} selectedState={selectedState}
                     onSelectState={s => setSelectedState(selectedState === s ? null : s)} palette={palette}
                     events={events} focusEvent={focusEvent} onClearFocus={() => setFocusEvent(null)} />
