@@ -719,9 +719,79 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
         </Section>
       )}
 
-      {/* SECTION 05: MARCO NORMATIVO (if available) */}
+      {/* SECTION 05: OPINIÓN PÚBLICA Y CLIMA SOCIAL */}
+      {hasDetail && d.opinionPublica && (
+        <Section num="05" title="Opinión Pública y Clima Social" id="opinion">
+          <div style={gridStyle(mob ? 1 : 2)}>
+            {/* Conflictividad card */}
+            <div style={cardStyle}>
+              <div style={tagStyle("#E5243B")}>Conflictividad Social</div>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:10 }}>
+                <div style={{ textAlign:"center" }}>
+                  <div style={{ fontFamily:fontSans, fontSize:mob?20:26, fontWeight:700, color:d.opinionPublica.protestas.total > 50 ? "#dc2626" : "#ca8a04" }}>{d.opinionPublica.protestas.total}</div>
+                  <div style={{ fontFamily:font, fontSize:8, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Protestas</div>
+                </div>
+                <div style={{ textAlign:"center" }}>
+                  <div style={{ fontFamily:fontSans, fontSize:mob?20:26, fontWeight:700, color:TEXT }}>{d.opinionPublica.protestas.promDiario}</div>
+                  <div style={{ fontFamily:font, fontSize:8, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Prom. diario</div>
+                </div>
+                <div style={{ textAlign:"center" }}>
+                  <div style={{ fontFamily:fontSans, fontSize:mob?14:16, fontWeight:600, color:"#16a34a" }}>{d.opinionPublica.protestas.variacion}</div>
+                  <div style={{ fontFamily:font, fontSize:8, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Variación</div>
+                </div>
+              </div>
+              <div style={{ fontFamily:font, fontSize:11, color:MUTED, marginBottom:6 }}>
+                <strong>Período:</strong> {d.opinionPublica.protestas.periodo} · <strong>Composición:</strong> {d.opinionPublica.protestas.composicion}
+              </div>
+              <div style={{ fontFamily:font, fontSize:10, color:MUTED, padding:"4px 8px", background:"rgba(234,179,8,0.06)", border:"1px solid rgba(234,179,8,0.15)", lineHeight:1.5, fontSize:11 }}>
+                ⚠ {d.opinionPublica.protestas.nota}
+              </div>
+              {d.opinionPublica.excarcelados && (
+                <div style={{ display:"flex", gap:12, marginTop:10 }}>
+                  <div style={{ flex:1, textAlign:"center", padding:"6px 8px", background:`#16a34a10`, border:"1px solid #16a34a25" }}>
+                    <div style={{ fontSize:18, fontWeight:700, color:"#16a34a", fontFamily:fontSans }}>{d.opinionPublica.excarcelados.fp}</div>
+                    <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Excarcelados (FP)</div>
+                  </div>
+                  <div style={{ flex:1, textAlign:"center", padding:"6px 8px", background:`#dc262610`, border:"1px solid #dc262625" }}>
+                    <div style={{ fontSize:18, fontWeight:700, color:"#dc2626", fontFamily:fontSans }}>{d.opinionPublica.excarcelados.presos}</div>
+                    <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Presos políticos</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Percepción social card */}
+            {d.opinionPublica.percepcion && (
+              <div style={cardStyle}>
+                <div style={tagStyle(ACCENT)}>Percepción Social</div>
+                <div style={{ fontFamily:fontSans, fontSize:mob?12:13, fontWeight:600, color:TEXT, marginBottom:4 }}>{d.opinionPublica.percepcion.titulo}</div>
+                <div style={{ fontFamily:font, fontSize:10, color:MUTED, marginBottom:10 }}>{d.opinionPublica.percepcion.fuente}</div>
+                {d.opinionPublica.percepcion.datos.map((item, i) => {
+                  const barColor = i === 0 ? "#dc2626" : i === 1 ? "#ca8a04" : i === 2 ? "#0468B1" : MUTED;
+                  return (
+                    <div key={i} style={{ marginBottom:8 }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:2 }}>
+                        <span style={{ fontFamily:font, fontSize:11, color:TEXT }}>{item.factor}</span>
+                        <span style={{ fontFamily:fontSans, fontSize:12, fontWeight:700, color:barColor }}>{item.pct}%</span>
+                      </div>
+                      <div style={{ height:10, background:`${BORDER}30`, borderRadius:2, overflow:"hidden" }}>
+                        <div style={{ height:"100%", width:`${item.pct}%`, background:barColor, opacity:0.6, borderRadius:2, transition:"width 0.4s" }} />
+                      </div>
+                    </div>
+                  );
+                })}
+                <div style={{ fontFamily:font, fontSize:10, color:MUTED, marginTop:8, fontStyle:"italic", lineHeight:1.5 }}>
+                  📋 {d.opinionPublica.percepcion.nota}
+                </div>
+              </div>
+            )}
+          </div>
+        </Section>
+      )}
+
+      {/* SECTION 06: MARCO NORMATIVO (if available) */}
       {hasDetail && d.marcoNormativo && (
-        <Section num="05" title="Marco Normativo" id="normativo">
+        <Section num="06" title="Marco Normativo" id="normativo">
           {d.marcoNormativo.titulo && (
             <div style={{ ...cardStyle, borderTop:`3px solid ${ACCENT}` }}>
               <div style={tagStyle(ACCENT)}>Reforma en curso</div>
@@ -776,7 +846,7 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
 
       {/* SECTION 06: ESCENARIOS (S8+) */}
       {hasDetail && d.escenarios && (
-        <Section num="06" title="Escenarios Proyectados" id="escenarios">
+        <Section num="07" title="Escenarios Proyectados" id="escenarios">
           {d.escenarios.map((esc, i) => (
             <div key={i} style={{ ...cardStyle, marginBottom:mob?10:14, display:"flex", gap:12, alignItems:"center" }}>
               <div style={{ flex:1 }}>
@@ -794,7 +864,7 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
 
       {/* SECTION 06: COMENTARIOS (S8 only) */}
       {hasDetail && d.comentarios && (
-        <Section num="07" title="Comentarios Analíticos" id="comentarios">
+        <Section num="08" title="Comentarios Analíticos" id="comentarios">
           <div style={gridStyle(3)}>
             {d.comentarios.map((c, i) => (
               <div key={i} style={{ ...cardStyle, borderTop:`3px solid ${c.color}` }}>

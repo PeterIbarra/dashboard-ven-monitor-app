@@ -250,6 +250,28 @@ export const SITREP_ALL = [
         { empresa:"Trafigura", desarrollo:"Colabora con Minerven en programa de abastecimiento responsable de oro." },
       ],
     },
+    opinionPublica: {
+      protestas: {
+        total: 46,
+        promDiario: 9.2,
+        periodo: "13–19 marzo",
+        variacion: "↓ de 65 (semana anterior)",
+        composicion: "ESCP 60–65% · CPP 35–40%",
+        nota: "La reducción no indica desactivación de la presión social, sino contención temporal asociada al aumento del bono a 150 USD y la inyección al Fondo de Protección Social. Las demandas laborales y salariales se mantienen como eje transversal.",
+      },
+      percepcion: {
+        fuente: "Mass Behavior Research Venezuela — marzo 2026",
+        titulo: "Factores de respaldo a la acción del 3 de enero",
+        nota: "El respaldo observado no debe interpretarse como adhesión directa al evento, sino como resultado de un proceso acumulativo de deterioro en las expectativas políticas y sociales desde el segundo semestre de 2025.",
+        datos: [
+          { factor:"Deseo de salida del liderazgo político «a cualquier costo»", pct:71.14 },
+          { factor:"Agotamiento de las vías democráticas", pct:15.03 },
+          { factor:"Cansancio social y resignación", pct:8.15 },
+          { factor:"Otros (percepción de liberación, expectativa de transición, rechazo a intervención)", pct:5.68 },
+        ],
+      },
+      excarcelados: { fp:690, presos:515, fuente:"Foro Penal, 13 mar." },
+    },
     escenarios: [
       { name:"Continuidad Negociada", prob:"47%", color:"#0468B1", text:"Reconfiguración gabinete 42% + nueva cúpula FANB + normalización diplomática operativa (bandera, Senado, nivel 3) + Cardón IV + LG-52 + exportaciones duplicadas." },
       { name:"Transición Política Pacífica", prob:"30%", color:"#2d8a30", text:"Diferida: MCM en CERAWeek sin retorno. Opositores en Ejecutivo difuminan fronteras. 71% desea salida «a cualquier costo». Horizonte electoral 2027." },
