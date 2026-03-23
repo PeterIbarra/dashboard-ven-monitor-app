@@ -4,6 +4,7 @@ import { Card } from "../Card";
 import { ConflictividadChart } from "../charts/ConflictividadChart";
 import { EstadosMap } from "../EstadosMap";
 import { AcledSection } from "../AcledSection";
+import { ConfMensual2026 } from "../ConfMensual2026";
 import { CONF_HISTORICO, CONF_MESES, CONF_DERECHOS, CONF_SERVICIOS, CONF_ESTADOS } from "../../data/static.js";
 import { CONF_SEMANAL } from "../../data/weekly.js";
 import { BG2, BORDER, TEXT, MUTED, ACCENT, font } from "../../constants";
@@ -25,10 +26,10 @@ export function TabConflictividad() {
         <span style={{ fontSize:16 }}>📊</span>
         <div style={{ flex:1 }}>
           <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Conflictividad Social — Venezuela</div>
-          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Fuente: OVCS · Monitoreo continuo de protestas y conflictividad</div>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Fuente: OVCS · <span style={{ fontSize:10 }}>DCP: Derechos Civiles y Políticos · DESCA: Derechos Económicos, Sociales, Culturales y Ambientales</span></div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
-          {[{id:"semanal26",label:"Semanal 2026"},{id:"resumen",label:"Resumen 2025"},{id:"mensual",label:"Mensual"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
+          {[{id:"semanal26",label:"Semanal 2026"},{id:"mensual26",label:"Mensual 2026"},{id:"resumen",label:"Resumen 2025"},{id:"mensual",label:"Mensual 2025"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:12, fontFamily:font, padding:"6px 12px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
@@ -184,7 +185,7 @@ export function TabConflictividad() {
             const maxDayP = Math.max(...selWeek.dias.map(d => d.protestas), 1);
             return (
               <Card>
-                <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12, flexWrap:"wrap" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:8, flexWrap:"wrap" }}>
                   <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>Detalle diario</div>
                   <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, marginLeft:"auto" }}>
                     {weeksWithDays.map(w => (
@@ -196,6 +197,9 @@ export function TabConflictividad() {
                       </button>
                     ))}
                   </div>
+                </div>
+                <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginBottom:12, lineHeight:1.5 }}>
+                  <strong style={{ color:"#0A97D9" }}>ESCP</strong> = Exigencias Económicas, Sociales, Culturales y Políticas · <strong style={{ color:"#4C9F38" }}>CPP</strong> = Civiles y Políticas Puras · <strong style={{ color:"#0A97D9" }}>DCP</strong> = Derechos Civiles y Políticos · <strong style={{ color:"#4C9F38" }}>DESCA</strong> = Derechos Económicos, Sociales, Culturales y Ambientales
                 </div>
 
                 {/* KPI row */}
@@ -273,6 +277,9 @@ export function TabConflictividad() {
           })()}
         </>);
       })()}
+
+      {/* ── MENSUAL 2026 (OVCS) ── */}
+      {seccion === "mensual26" && <ConfMensual2026 />}
 
       {/* ── RESUMEN ── */}
       {seccion === "resumen" && (<>
