@@ -30,12 +30,18 @@ async function iodaFetch(path, params = {}) {
   const urls = IS_DEPLOYED
     ? [() => vercelUrl, ...CORS_PROXIES.map(fn => () => fn(directUrl))]
     : CORS_PROXIES.map(fn => () => fn(directUrl));
-  for (const getUrl of urls) {
-    try {
-      const res = await fetch(getUrl(), { signal: AbortSignal.timeout(12000), headers: { Accept: "application/json" } });
-      if (!res.ok) continue;
-      return await res.json();
-    } catch { continue; }
+  // Try each URL, with one retry on failure
+  for (let attempt = 0; attempt < 2; attempt++) {
+    for (const getUrl of urls) {
+      try {
+        const res = await fetch(getUrl(), { signal: AbortSignal.timeout(15000), headers: { Accept: "application/json" } });
+        if (!res.ok) continue;
+        const json = await res.json();
+        if (json?.error || !json?.data) continue; // proxy returned error JSON
+        return json;
+      } catch { continue; }
+    }
+    if (attempt === 0) await new Promise(r => setTimeout(r, 2000)); // wait 2s before retry
   }
   return null;
 }
@@ -139,70 +145,58 @@ function interpretPattern(perSource, telescopeMultiplier) {
   return { emoji: "🟠", text: "Degradación significativa — múltiples indicadores afectados. Monitorear evolución para determinar si es transitorio o escalará." };
 }
 
-// ── Compute region scores: 3-layer approach ──
-// Layer 1: Probing (primary signal) — P95 baseline, 10% noise threshold
-// Layer 2: Loss/Latency (complementary) — penalizes high packet loss and latency spikes
-// Layer 3: National telescope (amplifier) — boosts scores when national anomaly coincides
+// ── Compute region scores: two indices per state ──
+// INDEX 1 — Connectivity: probing health + loss + latency (internet quality)
+// INDEX 2 — Electricity: abrupt probing drops + national telescope coincidence + BGP stable
 function computeRegionScore(parsed, nationalTelescopeData) {
   if (!parsed || parsed.length === 0) return null;
   
-  // ── Layer 1: Probing ──
+  // ── Probing base metrics (shared by both indices) ──
   const probVals = parsed.map(p => p.probing).filter(v => v !== null);
-  if (probVals.length < 5) return null; // need probing as minimum
+  if (probVals.length < 5) return null;
   
   const probSorted = [...probVals].sort((a,b) => a - b);
   const probP95 = probSorted[Math.floor(probSorted.length * 0.95)];
   if (probP95 < 10) return null;
   
-  // Probing health: worst of last 6h (~36 points at 10min step)
   const probTail = probVals.slice(-Math.min(36, probVals.length));
   const probWorst = Math.min(...probTail);
   const probHealth = Math.min(100, Math.round((probWorst / probP95) * 100));
-  
-  // Probing score: sum drops >10% below P95 (noise threshold)
-  const probThreshold = probP95 * 0.90;
-  let probDropScore = 0;
-  for (const v of probVals) {
-    if (v < probThreshold) {
-      probDropScore += Math.round(probP95 - v);
-    }
-  }
-  
-  // Current probing (avg last 5)
   const probRecent = probVals.slice(-5);
   const probCurrent = probRecent.reduce((a,b) => a+b, 0) / probRecent.length;
   const probLiveDrop = Math.max(0, Math.round(probP95 - probCurrent));
   
-  // ── Layer 2: Loss & Latency ──
+  // Probing score
+  const probThreshold = probP95 * 0.90;
+  let probDropScore = 0;
+  for (const v of probVals) {
+    if (v < probThreshold) probDropScore += Math.round(probP95 - v);
+  }
+  
+  // ══════ INDEX 1: CONNECTIVITY ══════
   const lossVals = parsed.map(p => p.lossPct).filter(v => v !== null);
   const latVals = parsed.map(p => p.medianLatency).filter(v => v !== null);
   
-  let lossHealth = 100, lossPenalty = 0;
-  let latHealth = 100, latPenalty = 0;
-  let lossInfo = null, latInfo = null;
+  let lossHealth = 100, lossPenalty = 0, lossInfo = null;
+  let latHealth = 100, latPenalty = 0, latInfo = null;
   
   if (lossVals.length >= 5) {
-    // Loss: normal is <5%. Above 10% is degraded, above 25% is critical
     const lossTail = lossVals.slice(-Math.min(36, lossVals.length));
-    const lossWorst = Math.max(...lossTail); // worst = highest loss
-    const lossAvg = lossVals.reduce((a,b) => a+b, 0) / lossVals.length;
-    lossHealth = lossWorst > 30 ? 30 : lossWorst > 20 ? 50 : lossWorst > 10 ? 70 : lossWorst > 5 ? 90 : 100;
-    // Penalty: each point above 5% loss adds to score
+    const lossAvg6h = lossTail.reduce((a,b) => a+b, 0) / lossTail.length;
+    lossHealth = lossAvg6h > 50 ? 30 : lossAvg6h > 35 ? 50 : lossAvg6h > 20 ? 70 : lossAvg6h > 10 ? 85 : 100;
     for (const v of lossVals) {
-      if (v > 5) lossPenalty += Math.round((v - 5) * 2); // moderate scale
+      if (v > 10) lossPenalty += Math.round((v - 10) * 2);
     }
-    lossInfo = { health: lossHealth, current: Math.round(lossVals[lossVals.length-1] * 10) / 10, baseline: 5 };
+    lossInfo = { health: lossHealth, current: Math.round(lossAvg6h * 10) / 10, baseline: 10 };
   }
   
   if (latVals.length >= 5) {
-    // Latency: compute P10 as "good" baseline, flag spikes above 2× baseline
     const latSorted = [...latVals].sort((a,b) => a - b);
     const latP10 = latSorted[Math.floor(latSorted.length * 0.1)];
     const latTail = latVals.slice(-Math.min(36, latVals.length));
     const latWorst = Math.max(...latTail);
     const latRatio = latP10 > 0 ? latWorst / latP10 : 1;
     latHealth = latRatio > 3 ? 40 : latRatio > 2 ? 60 : latRatio > 1.5 ? 80 : 100;
-    // Penalty: each point with latency > 1.5× baseline
     const latThresh = latP10 * 1.5;
     for (const v of latVals) {
       if (v > latThresh) latPenalty += Math.round((v - latP10) / 20);
@@ -210,44 +204,60 @@ function computeRegionScore(parsed, nationalTelescopeData) {
     latInfo = { health: latHealth, current: Math.round(latVals[latVals.length-1]), baseline: Math.round(latP10) };
   }
   
-  // ── Layer 3: National telescope amplifier (temporally coincident) ──
-  // Only amplifies when national telescope AND regional probing drop at the SAME time
-  let telescopeMultiplier = 1.0;
-  if (nationalTelescopeData && nationalTelescopeData.length > 0 && parsed.length > 0) {
-    const ntVals = nationalTelescopeData.filter(v => v !== null);
-    if (ntVals.length > 10) {
-      const ntSorted = [...ntVals].sort((a,b) => a - b);
-      const ntP95 = ntSorted[Math.floor(ntSorted.length * 0.95)];
-      if (ntP95 > 5) {
-        // Find timestamps where probing dropped >10%
-        const probDropTimes = new Set();
-        for (const p of parsed) {
-          const v = p.probing;
-          if (v !== null && v < probP95 * 0.90) probDropTimes.add(p.ts);
-        }
-        if (probDropTimes.size > 0) {
-          // Check if national telescope also dipped during those same timestamps (±30min)
-          const ntStep = ntVals.length > 1 ? Math.round((parsed[parsed.length-1].ts - parsed[0].ts) / ntVals.length) : 600;
-          let coincidentDrops = 0;
-          for (let i = 0; i < ntVals.length; i++) {
-            if (ntVals[i] < ntP95 * 0.80) { // national telescope >20% drop
-              // Check if any probing drop within ±30min of this telescope reading
-              const approxTs = parsed[0].ts + i * ntStep;
-              for (const pt of probDropTimes) {
-                if (Math.abs(pt - approxTs) < 1800) { coincidentDrops++; break; }
-              }
-            }
-          }
-          if (coincidentDrops >= 3) telescopeMultiplier = 1.8; // strong coincidence
-          else if (coincidentDrops >= 1) telescopeMultiplier = 1.3; // mild coincidence
-        }
+  const connectivityHealth = Math.min(probHealth, lossHealth, latHealth);
+  const connectivityScore = probDropScore + lossPenalty + latPenalty;
+  
+  // ══════ INDEX 2: ELECTRICITY ══════
+  // Detect abrupt probing drops (>20% in <30min = potential power outage)
+  const step = parsed.length > 1 ? (parsed[parsed.length-1].ts - parsed[0].ts) / (parsed.length - 1) : 600;
+  const windowPts = Math.max(1, Math.round(1800 / step)); // ~30min window
+  
+  let powerEvents = []; // {ts, dropPct, duration, recovered}
+  let inDrop = false, dropStart = null, dropMinVal = Infinity, preDropVal = 0;
+  
+  for (let i = windowPts; i < probVals.length; i++) {
+    const prev = probVals.slice(Math.max(0, i - windowPts), i);
+    const prevAvg = prev.reduce((a,b) => a+b, 0) / prev.length;
+    const current = probVals[i];
+    const dropPct = prevAvg > 0 ? ((prevAvg - current) / prevAvg) * 100 : 0;
+    
+    if (dropPct > 20 && !inDrop) {
+      inDrop = true;
+      dropStart = i;
+      dropMinVal = current;
+      preDropVal = prevAvg;
+    } else if (inDrop && dropPct > 10) {
+      if (current < dropMinVal) dropMinVal = current;
+    } else if (inDrop && dropPct <= 5) {
+      const durationPts = i - dropStart;
+      const maxDropPct = preDropVal > 0 ? Math.round(((preDropVal - dropMinVal) / preDropVal) * 100) : 0;
+      if (maxDropPct > 20 && durationPts >= 2) {
+        powerEvents.push({
+          ts: parsed[dropStart]?.ts || 0,
+          dropPct: maxDropPct,
+          durationSec: Math.round(durationPts * step),
+          recovered: true,
+        });
       }
+      inDrop = false; dropMinVal = Infinity;
+    }
+  }
+  // Still in drop at end of data
+  if (inDrop) {
+    const maxDropPct = preDropVal > 0 ? Math.round(((preDropVal - dropMinVal) / preDropVal) * 100) : 0;
+    if (maxDropPct > 20) {
+      powerEvents.push({
+        ts: parsed[dropStart]?.ts || 0,
+        dropPct: maxDropPct,
+        durationSec: Math.round((probVals.length - dropStart) * step),
+        recovered: false,
+      });
     }
   }
   
-  // ── BGP (informational only — usually flat) ──
+  // BGP stability check — if BGP also dropped, it's more likely censorship than power
   const bgpVals = parsed.map(p => p.bgp).filter(v => v !== null);
-  let bgpInfo = null;
+  let bgpInfo = null, bgpStable = true;
   if (bgpVals.length >= 5) {
     const bgpSorted = [...bgpVals].sort((a,b) => a - b);
     const bgpP95 = bgpSorted[Math.floor(bgpSorted.length * 0.95)];
@@ -255,10 +265,34 @@ function computeRegionScore(parsed, nationalTelescopeData) {
       const bgpCurrent = bgpVals[bgpVals.length - 1];
       const bgpHealth = Math.min(100, Math.round((bgpCurrent / bgpP95) * 100));
       bgpInfo = { health: bgpHealth, current: Math.round(bgpCurrent), baseline: Math.round(bgpP95) };
+      const bgpMin = Math.min(...bgpVals);
+      bgpStable = (bgpMin / bgpP95) > 0.90; // BGP varied <10% = stable
     }
   }
   
-  // ── Telescope regional (informational — shown in panel but not in health) ──
+  // National telescope coincidence
+  let teleCoincidence = false;
+  if (nationalTelescopeData && nationalTelescopeData.length > 0 && powerEvents.length > 0) {
+    const ntVals = nationalTelescopeData.filter(v => v !== null);
+    if (ntVals.length > 10) {
+      const ntSorted = [...ntVals].sort((a,b) => a - b);
+      const ntP95 = ntSorted[Math.floor(ntSorted.length * 0.95)];
+      if (ntP95 > 5) {
+        const ntStep = ntVals.length > 1 ? Math.round((parsed[parsed.length-1].ts - parsed[0].ts) / ntVals.length) : 600;
+        for (const ev of powerEvents) {
+          for (let i = 0; i < ntVals.length; i++) {
+            if (ntVals[i] < ntP95 * 0.80) {
+              const approxTs = parsed[0].ts + i * ntStep;
+              if (Math.abs(ev.ts - approxTs) < 1800) { teleCoincidence = true; break; }
+            }
+          }
+          if (teleCoincidence) break;
+        }
+      }
+    }
+  }
+  
+  // Telescope regional info
   const teleVals = parsed.map(p => p.telescope).filter(v => v !== null);
   let teleInfo = null;
   if (teleVals.length >= 5) {
@@ -273,12 +307,31 @@ function computeRegionScore(parsed, nationalTelescopeData) {
     }
   }
   
-  // ── Combine: Health = worst of probing, loss, latency (telescope is informational) ──
-  const healthPct = Math.min(probHealth, lossHealth, latHealth);
+  // Electricity index: severity based on number of events, depth, and pattern
+  let elecHealth = 100, elecLabel = "Normal";
+  const confirmedPowerEvents = powerEvents.filter(ev => bgpStable); // only count if BGP was stable
+  if (confirmedPowerEvents.length > 0) {
+    const worstDrop = Math.max(...confirmedPowerEvents.map(e => e.dropPct));
+    const totalDuration = confirmedPowerEvents.reduce((a, e) => a + (e.durationSec || 0), 0);
+    const hasTelescopeConfirm = teleCoincidence;
+    
+    // Base severity from worst drop
+    if (worstDrop > 60) elecHealth = 20;
+    else if (worstDrop > 40) elecHealth = 40;
+    else if (worstDrop > 25) elecHealth = 60;
+    else elecHealth = 80;
+    
+    // Boost severity if telescope confirmed
+    if (hasTelescopeConfirm && elecHealth > 15) elecHealth = Math.max(15, elecHealth - 20);
+    
+    // Label
+    if (elecHealth <= 30) elecLabel = "Apagón severo";
+    else if (elecHealth <= 50) elecLabel = "Apagón moderado";
+    else if (elecHealth <= 70) elecLabel = "Interrupción leve";
+    else elecLabel = "Fluctuación";
+  }
   
-  // ── Combined score: amplifier only applies to probing drops ──
-  const amplifiedProbing = Math.round(probDropScore * telescopeMultiplier);
-  const dropScore = amplifiedProbing + lossPenalty + latPenalty;
+  const elecScore = confirmedPowerEvents.reduce((a, e) => a + e.dropPct * Math.max(1, Math.round(e.durationSec / 600)), 0);
   
   // perSource for detail panel
   const perSource = {
@@ -290,13 +343,24 @@ function computeRegionScore(parsed, nationalTelescopeData) {
   };
   
   return {
-    healthPct,
-    dropScore,
+    // Combined (backwards compatible)
+    healthPct: connectivityHealth,
+    dropScore: connectivityScore,
     liveDrop: probLiveDrop,
     current: Math.round(probCurrent),
     baseAvg: Math.round(probP95),
     perSource,
-    telescopeMultiplier,
+    // Connectivity index
+    connectivityHealth,
+    connectivityScore,
+    // Electricity index
+    elecHealth,
+    elecScore,
+    elecLabel,
+    elecEvents: confirmedPowerEvents.length,
+    teleCoincidence,
+    bgpStable,
+    powerEvents: confirmedPowerEvents,
   };
 }
 
@@ -647,7 +711,6 @@ export function TabIODA() {
   const [aiExplain, setAiExplain] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [subView, setSubView] = useState("nacional"); // nacional | estados | eventos
-  const [scoreView, setScoreView] = useState("outage"); // outage | health
   const [focusEvent, setFocusEvent] = useState(null); // timestamp to zoom chart to
 
   // ── Unified time window (stable — only recalculates on user action) ──
@@ -1092,120 +1155,140 @@ export function TabIODA() {
               {selectedState && (() => {
                 const rd = activeData.find(r => r.name === selectedState);
                 if (!rd) return <Card><div style={{ fontSize:12, color:MUTED }}>Sin datos para {selectedState}</div></Card>;
-                const interp = interpretPattern(rd.perSource, rd.telescopeMultiplier);
                 const srcOrder = ["probing", "loss", "latency", "bgp", "telescope"];
                 const srcLabels = { probing: "Sondeo Activo", bgp: "BGP Routes", telescope: "Telescopio", loss: "Packet Loss", latency: "Latencia" };
                 const srcEmojis = { probing: "📡", bgp: "🌐", telescope: "🔭", loss: "📉", latency: "⏱" };
-                const srcUnits = { probing: "", bgp: "", telescope: "", loss: "%", latency: "ms" };
-                return (
-                  <Card accent={getSeverityColor(rd.healthPct)}>
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
+                const elecColor = rd.elecHealth >= 90 ? "#34d399" : rd.elecHealth >= 60 ? "#fbbf24" : rd.elecHealth >= 40 ? "#f97316" : "#ef4444";
+                return (<>
+                  {/* Dual index header */}
+                  <Card accent={getSeverityColor(rd.connectivityHealth)}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
                       <div style={{ fontSize:14, fontWeight:700, color:TEXT }}>{rd.name}</div>
-                      <Badge color={getSeverityColor(rd.healthPct)}>{getSeverityLabel(rd.healthPct)}</Badge>
+                      <div style={{ display:"flex", gap:6 }}>
+                        <Badge color={getSeverityColor(rd.connectivityHealth)}>Internet</Badge>
+                        <Badge color={elecColor}>Electricidad</Badge>
+                      </div>
                     </div>
-                    <div style={{ display:"flex", gap:8, alignItems:"baseline", marginBottom:8, flexWrap:"wrap" }}>
-                      <span style={{ fontSize:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:getSeverityColor(rd.healthPct) }}>{rd.healthPct}%</span>
-                      <span style={{ fontSize:11, color:MUTED }}>peor indicador</span>
-                      {rd.displayScore > 0 && <span style={{ fontSize:12, color:"#dc2626", fontWeight:600 }}>Score: {fmtVal(rd.displayScore)}</span>}
-                      {rd.telescopeMultiplier > 1 && <span style={{ fontSize:10, color:"#7c3aed", fontWeight:600 }}>🔭 ×{rd.telescopeMultiplier}</span>}
+                    {/* Two index boxes side by side */}
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:10 }}>
+                      {/* Connectivity */}
+                      <div style={{ padding:"8px 10px", borderRadius:4, border:`1px solid ${getSeverityColor(rd.connectivityHealth)}30`, background:`${getSeverityColor(rd.connectivityHealth)}08` }}>
+                        <div style={{ fontSize:10, color:MUTED, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:4 }}>🌐 Conectividad</div>
+                        <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
+                          <span style={{ fontSize:24, fontWeight:900, fontFamily:"'Playfair Display',serif", color:getSeverityColor(rd.connectivityHealth) }}>{rd.connectivityHealth}%</span>
+                          {rd.connectivityScore > 0 && <span style={{ fontSize:10, color:MUTED }}>Score: {fmtVal(rd.connectivityScore)}</span>}
+                        </div>
+                      </div>
+                      {/* Electricity */}
+                      <div style={{ padding:"8px 10px", borderRadius:4, border:`1px solid ${elecColor}30`, background:`${elecColor}08` }}>
+                        <div style={{ fontSize:10, color:MUTED, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:4 }}>⚡ Electricidad</div>
+                        <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
+                          <span style={{ fontSize:24, fontWeight:900, fontFamily:"'Playfair Display',serif", color:elecColor }}>{rd.elecHealth}%</span>
+                        </div>
+                        <div style={{ fontSize:10, color:elecColor, fontWeight:600 }}>
+                          {rd.elecLabel}{rd.elecEvents > 0 ? ` · ${rd.elecEvents} evento${rd.elecEvents > 1 ? "s" : ""}` : ""}
+                          {rd.teleCoincidence && " · 🔭"}
+                        </div>
+                      </div>
                     </div>
-                    {/* Per-source breakdown */}
-                    <div style={{ display:"flex", flexDirection:"column", gap:4, marginBottom:8 }}>
+                    {/* Per-source indicators */}
+                    <div style={{ display:"flex", flexDirection:"column", gap:3, marginBottom:8 }}>
                       {srcOrder.map(src => {
                         const d = rd.perSource?.[src];
                         if (!d) return (
-                          <div key={src} style={{ display:"flex", justifyContent:"space-between", fontSize:11, color:`${MUTED}80`, padding:"3px 0" }}>
-                            <span>{srcEmojis[src]} {srcLabels[src]}</span><span>— sin datos</span>
+                          <div key={src} style={{ display:"flex", justifyContent:"space-between", fontSize:11, color:`${MUTED}80`, padding:"2px 0" }}>
+                            <span>{srcEmojis[src]} {srcLabels[src]}</span><span>—</span>
                           </div>
                         );
                         const c = getSeverityColor(d.health);
-                        const unit = srcUnits[src] || "";
-                        // For loss, display is inverted: high loss = bad, so show "current/baseline" as "actual vs normal"
                         const detail = src === "loss" ? `${d.current}% (normal <${d.baseline}%)` :
                                        src === "latency" ? `${d.current}ms (base ${d.baseline}ms)` :
                                        `(${d.current}/${d.baseline})`;
                         return (
-                          <div key={src} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:11, padding:"3px 0", borderBottom:`1px solid ${BORDER}20` }}>
+                          <div key={src} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:11, padding:"2px 0", borderBottom:`1px solid ${BORDER}15` }}>
                             <span style={{ color:TEXT }}>{srcEmojis[src]} {srcLabels[src]}</span>
-                            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                              <div style={{ width:40, height:4, background:`${BORDER}30`, borderRadius:2, overflow:"hidden" }}>
+                            <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+                              <div style={{ width:36, height:4, background:`${BORDER}30`, borderRadius:2, overflow:"hidden" }}>
                                 <div style={{ width:`${d.health}%`, height:4, background:c, borderRadius:2 }} />
                               </div>
-                              <span style={{ fontWeight:700, color:c, minWidth:32, textAlign:"right" }}>{d.health}%</span>
-                              <span style={{ color:MUTED, fontSize:10 }}>{detail}</span>
+                              <span style={{ fontWeight:700, color:c, minWidth:28, textAlign:"right", fontSize:10 }}>{d.health}%</span>
+                              <span style={{ color:MUTED, fontSize:9 }}>{detail}</span>
                             </div>
                           </div>
                         );
                       })}
                     </div>
+                    {/* Electricity events detail */}
+                    {rd.powerEvents && rd.powerEvents.length > 0 && (
+                      <div style={{ fontSize:10, color:TEXT, padding:"6px 8px", background:`${elecColor}08`, borderRadius:4, borderLeft:`3px solid ${elecColor}`, marginBottom:6 }}>
+                        <div style={{ fontWeight:600, marginBottom:3 }}>⚡ Eventos eléctricos detectados:</div>
+                        {rd.powerEvents.slice(0, 5).map((ev, i) => (
+                          <div key={i} style={{ color:MUTED, padding:"1px 0" }}>
+                            {fmtTime(ev.ts)} · −{ev.dropPct}% · {fmtDuration(ev.durationSec)}
+                            {!ev.recovered && " · ⚠ en curso"}
+                            {rd.teleCoincidence && " · 🔭 telescopio"}
+                          </div>
+                        ))}
+                        {rd.bgpStable && <div style={{ color:"#34d399", marginTop:3 }}>✓ BGP estable — patrón consistente con apagón</div>}
+                        {!rd.bgpStable && <div style={{ color:"#f97316", marginTop:3 }}>⚠ BGP inestable — posible corte deliberado</div>}
+                      </div>
+                    )}
                     {/* Interpretation */}
-                    <div style={{ fontSize:11, color:TEXT, lineHeight:1.5, padding:"6px 8px", background:`${BORDER}10`, borderRadius:4, borderLeft:`3px solid ${getSeverityColor(rd.healthPct)}` }}>
-                      <span style={{ marginRight:4 }}>{interp.emoji}</span>{interp.text}
-                    </div>
+                    {(() => {
+                      const interp = interpretPattern(rd.perSource, rd.teleCoincidence ? 1.5 : 1);
+                      return (
+                        <div style={{ fontSize:11, color:TEXT, lineHeight:1.5, padding:"6px 8px", background:`${BORDER}10`, borderRadius:4, borderLeft:`3px solid ${getSeverityColor(rd.connectivityHealth)}` }}>
+                          <span style={{ marginRight:4 }}>{interp.emoji}</span>{interp.text}
+                        </div>
+                      );
+                    })()}
                   </Card>
-                );
+                </>);
               })()}
 
-              {/* Ranking table */}
+              {/* Ranking table — dual index */}
               <Card accent="#f59e0b">
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
                   <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-                    {scoreView === "outage" ? "Outage Score" : "Salud %"}
+                    Ranking por Estado · {timeLabel}
                   </div>
-                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    {regionLoading && <span style={{ fontSize:9, fontFamily:font, color:"#a17d08" }}>⏳ cargando {timePreset}...</span>}
-                    <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
-                    {[{id:"outage",label:"Score"},{id:"health",label:"Salud %"}].map(v => (
-                      <button key={v.id} onClick={() => setScoreView(v.id)}
-                        style={{ fontSize:10, fontFamily:font, padding:"3px 10px", border:"none",
-                          background:scoreView===v.id?ACCENT:"transparent", color:scoreView===v.id?"#fff":MUTED, cursor:"pointer" }}>{v.label}</button>
-                    ))}
-                  </div>
-                  </div>
+                  {regionLoading && <span style={{ fontSize:9, fontFamily:font, color:"#a17d08" }}>⏳ cargando...</span>}
                 </div>
                 {activeData.length === 0 ? (
                   <div style={{ fontSize:12, color:MUTED, padding:8 }}>Cargando...</div>
                 ) : (<>
                   <div style={{ display:"flex", justifyContent:"space-between", padding:"4px 8px", borderBottom:`1px solid ${BORDER}`, marginBottom:4 }}>
-                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Región</span>
-                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>
-                      {scoreView === "outage" ? "Puntaje" : "Salud"}
-                    </span>
+                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", flex:1 }}>Región</span>
+                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", width:55, textAlign:"center" }}>🌐 Internet</span>
+                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", width:55, textAlign:"center" }}>⚡ Elec.</span>
                   </div>
                   <div style={{ maxHeight:400, overflowY:"auto" }}>
-                    {activeData.map((r, i) => (
-                      <div key={r.code}
-                        onClick={() => setSelectedState(selectedState === r.name ? null : r.name)}
-                        style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px",
-                          background:selectedState === r.name ? `${ACCENT}15` : i % 2 ? "rgba(0,0,0,0.02)" : "transparent",
-                          cursor:"pointer", borderRadius:3 }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                          <span style={{ width:8, height:8, borderRadius:"50%", background:getSeverityColor(r.healthPct) }} />
-                          <span style={{ fontSize:13, color:TEXT, fontWeight:r.healthPct < 70 ? 700 : 400 }}>{r.name}</span>
-                        </div>
-                        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                          {scoreView === "outage" ? (<>
-                            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                              {r.displayScore > 0 && (() => {
-                                const maxScore = Math.max(...activeData.map(x => x.displayScore), 1);
-                                const barW = Math.max(4, (r.displayScore / maxScore) * 60);
-                                return <div style={{ width:barW, height:4, background:getSeverityColor(r.healthPct), borderRadius:2 }} />;
-                              })()}
-                              <span style={{ fontSize:13, fontWeight:700, fontFamily:font, color:r.displayScore > 0 ? getSeverityColor(r.healthPct) : MUTED }}>
-                                {r.displayScore > 0 ? fmtVal(r.displayScore) : "0.0"}
-                              </span>
-                            </div>
-                          </>) : (<>
-                            <span style={{ fontSize:13, fontWeight:700, fontFamily:font, color:getSeverityColor(r.healthPct) }}>
-                              {r.healthPct}%
+                    {activeData.map((r, i) => {
+                      const elecC = r.elecHealth >= 90 ? "#34d399" : r.elecHealth >= 60 ? "#fbbf24" : r.elecHealth >= 40 ? "#f97316" : "#ef4444";
+                      return (
+                        <div key={r.code}
+                          onClick={() => setSelectedState(selectedState === r.name ? null : r.name)}
+                          style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px",
+                            background:selectedState === r.name ? `${ACCENT}15` : i % 2 ? "rgba(0,0,0,0.02)" : "transparent",
+                            cursor:"pointer", borderRadius:3 }}>
+                          <div style={{ display:"flex", alignItems:"center", gap:5, flex:1, minWidth:0 }}>
+                            <span style={{ width:7, height:7, borderRadius:"50%", background:getSeverityColor(r.connectivityHealth), flexShrink:0 }} />
+                            <span style={{ fontSize:12, color:TEXT, fontWeight:r.connectivityHealth < 70 ? 700 : 400, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{r.name}</span>
+                          </div>
+                          <div style={{ width:55, textAlign:"center" }}>
+                            <span style={{ fontSize:12, fontWeight:700, fontFamily:font, color:getSeverityColor(r.connectivityHealth) }}>
+                              {r.connectivityHealth}%
                             </span>
-                            {r.displayScore > 0 && (
-                              <span style={{ fontSize:10, fontFamily:font, color:"#dc2626" }}>↓{fmtVal(r.displayScore)}</span>
-                            )}
-                          </>)}
+                          </div>
+                          <div style={{ width:55, textAlign:"center" }}>
+                            <span style={{ fontSize:12, fontWeight:700, fontFamily:font, color:elecC }}>
+                              {r.elecHealth}%
+                            </span>
+                            {r.elecEvents > 0 && <span style={{ fontSize:8, color:elecC }}> ⚡{r.elecEvents}</span>}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </>)}
               </Card>
@@ -1350,7 +1433,7 @@ export function TabIODA() {
                               const p10 = sortedV[Math.floor(sortedV.length * 0.1)] || 1;
                               baseRef = p10;
                               health = src === "lossPct"
-                                ? (current > 30 ? 20 : current > 20 ? 40 : current > 10 ? 60 : current > 5 ? 85 : 100)
+                                ? (current > 50 ? 30 : current > 35 ? 50 : current > 20 ? 70 : current > 10 ? 85 : 100)
                                 : (p10 > 0 ? Math.max(0, Math.min(100, Math.round(100 - ((current / p10 - 1) * 50)))) : 100);
                             } else {
                               const p95 = sortedV[Math.floor(sortedV.length * 0.95)] || sortedV[sortedV.length - 1] || 1;
