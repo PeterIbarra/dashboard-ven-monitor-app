@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useIsMobile } from "../../hooks/useIsMobile";
-import { Card } from "../Card";
-import { VenezuelaLeafletMap } from "../charts/VenezuelaLeafletMap";
-import { CONF_MENSUAL_2026 } from "../../data/confMensual2026.js";
-import { BG2, BORDER, TEXT, MUTED, ACCENT, font } from "../../constants";
+import { useIsMobile } from "../hooks/useIsMobile";
+import { Card } from "./Card";
+import { VenezuelaLeafletMap } from "./charts/VenezuelaLeafletMap";
+import { CONF_MENSUAL_2026 } from "../data/confMensual2026.js";
+import { BG2, BORDER, TEXT, MUTED, ACCENT, font } from "../constants";
 
 const catColor = { DCP:"#0A97D9", DESCA:"#4C9F38" };
 
