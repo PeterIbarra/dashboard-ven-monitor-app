@@ -98,6 +98,31 @@ export const INDICATORS = [
   { dim:"Internacional", icon:"🌐", esc:"E3", name:"Relación Venezuela-Colombia", desc:"Agenda bilateral y cooperación fronteriza",
     umbral:"Ruptura bilateral = E2. Integración energética = E3.", addedWeek:10,
     hist:[null,null,null,null,null,null,null,null,null,["green","up","Petro: «exitosa» · Mercosur · GLP"],["green","flat","Petro: elecciones «no libres» · apoya DR"]] },
+  { dim:"Internacional", icon:"🌐", esc:"E3", name:"Proceso judicial Maduro", desc:"Caso narco en Distrito Sur de Nueva York",
+    umbral:"Desestimación = fortalece DR. Condena = consolida separación. Financiamiento = zona gris.", addedWeek:11,
+    hist:[null,null,null,null,null,null,null,null,null,null,["yellow","up","Rechazo desestimación · cargos adicionales"]] },
+
+  // ── SOCIAL ──
+  { dim:"Social", icon:"✊", esc:"E4", name:"Conflictividad laboral", desc:"Protestas semanales — eje salarial y gremial",
+    umbral:">50 protestas/sem = presión política de primer orden. >35 = escalada.",
+    hist:[["yellow","flat","28 protestas · post-operativo"],["green","down","22 protestas · baja intensidad"],["green","down","18 protestas · mínimo ciclo"],["yellow","up","25 protestas · amnistía diferida"],["yellow","up","30 protestas · 11 estados"],["yellow","up","35 protestas · 12 estados"],["yellow","flat","32 protestas · brecha cambiaria"],["yellow","up","38 protestas · presión salarial"],["red","up","65 protestas · RÉCORD 12 mar"],["yellow","down","46 protestas · bono contiene"],["red","up","97 protestas 4 días · ESCALAMIENTO"]] },
+  { dim:"Social", icon:"✊", esc:"E4", name:"Cobertura territorial protestas", desc:"Estados con movilizaciones activas",
+    umbral:">18 estados = alcance casi nacional. >12 = multi-regional.",
+    hist:[["yellow","flat","8 estados"],["green","down","6 estados"],["green","flat","7 estados"],["yellow","up","9 estados"],["yellow","up","11 estados"],["yellow","up","12 estados"],["yellow","down","10 estados"],["yellow","up","14 estados"],["red","up","23 estados · nacional"],["yellow","down","14 estados"],["red","up","22+ estados · nacional"]] },
+  { dim:"Social", icon:"✊", esc:"E4", name:"Conectividad y electricidad", desc:"Apagones e impacto en conectividad regional",
+    umbral:"Conectividad nacional <80% = alerta. Estado <30% = crítico.", addedWeek:10,
+    hist:[null,null,null,null,null,null,null,null,null,["yellow","flat","Sin datos nuevos"],["red","down","Táchira 8,70% · Barinas 33,51% · Zulia 51,83%"]] },
+  { dim:"Social", icon:"✊", esc:"E3", name:"Percepción pública", desc:"Encuestas de aprobación y dirección del país",
+    umbral:"Aprobación DR <30% = erosión E3. Percepción democrática >50% = sostiene E1.", addedWeek:11,
+    hist:[null,null,null,null,null,null,null,null,null,null,["yellow","flat","AtlasIntel 34,6% vs Hinterlaces 73% · 58% más democ."]] },
+
+  // ── ECONÓMICO (nuevos) ──
+  { dim:"Económico", icon:"📊", esc:"E3", name:"Atracción de inversión", desc:"Señales de FDI y apertura a capital internacional",
+    umbral:"Presencia de majors + incentivos fiscales = E3 consolidado. Retiro = E2.", addedWeek:11,
+    hist:[null,null,null,null,null,null,null,null,null,null,["green","up","FII Priority · Signum · CERAWeek · Petropymi-Alep"]] },
+  { dim:"Económico", icon:"📊", esc:"E2", name:"Sistema eléctrico nacional", desc:"Rehabilitación como precondición para reactivación",
+    umbral:"Sin rehabilitación eléctrica no hay reactivación sostenible. Inversión est. $40.000M.", addedWeek:11,
+    hist:[null,null,null,null,null,null,null,null,null,null,["yellow","up","Siemens/GE evalúan Bajo Caroní · CAF reactiva"]] },
 ];
 
 export const SCENARIO_SIGNALS = [

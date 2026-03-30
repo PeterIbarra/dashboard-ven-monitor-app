@@ -11,4 +11,6 @@ export const AMNISTIA_TRACKER = [
   { week:"S7", label:"20–27 feb", gob:{ solicitudes:4203, libertades:3231, excarcelados:null }, fp:{ verificados:126, detenidos:568 }, hito:"Amnistía operativa: 4.203 solicitudes procesadas" },
   { week:"S8", label:"27f–6m", gob:{ solicitudes:9060, libertades:5628, excarcelados:245, cautelares:5383, militares:31 }, fp:{ verificados:670, detenidos:568 }, hito:"9.060 solicitudes · FP: 670 excarcelaciones verificadas (8 mar)" },
   { week:"S9", label:"6–13m", gob:{ solicitudes:null, libertades:7727, excarcelados:null, cautelares:null, militares:null }, fp:{ verificados:670, detenidos:508 }, hito:"7.727 beneficiados Ley de Amnistía · 508 presos políticos · Guanipa sobreseído · Dávila libertad plena" },
+  { week:"S10", label:"13–20m", gob:{ solicitudes:null, libertades:7580, excarcelados:690, cautelares:null, militares:null }, fp:{ verificados:690, detenidos:515 }, hito:"7.580 beneficiados · 690 excarcelados (FP) · 515 presos · 24% solicitudes rechazadas · mecanismo exterior habilitado" },
+  { week:"S11", label:"20–29m", gob:{ solicitudes:11559, libertades:8146, excarcelados:310, cautelares:7836, militares:null }, fp:{ verificados:690, detenidos:515, militares:179 }, hito:"8.146 libertades plenas · 11.559 solicitudes · prórroga 30 días · MCM denuncia 179 presos militares · Pilieri libre" },
 ];
