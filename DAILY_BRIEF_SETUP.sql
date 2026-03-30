@@ -23,9 +23,10 @@ CREATE INDEX IF NOT EXISTS idx_daily_briefs_date ON daily_briefs(date DESC);
 -- Settings > Environment Variables
 -- ═══════════════════════════════════════════════════════════
 --
--- RESEND_API_KEY        = re_xxxxxxxxxxxx (de resend.com/api-keys)
--- DAILY_BRIEF_TO        = tu-email@dominio.com (el mismo de tu cuenta Resend)
--- DAILY_BRIEF_FROM      = onboarding@resend.dev (por ahora, sin dominio propio)
+-- SENDGRID_API_KEY       = SG.xxxxxxxxxxxx (de sendgrid.com > Settings > API Keys)
+-- DAILY_BRIEF_TO         = email1@dominio.com,email2@dominio.com,email3@dominio.com
+-- DAILY_BRIEF_FROM       = tu-email-verificado@dominio.com (el Single Sender verificado)
+-- DAILY_BRIEF_FROM_NAME  = Monitor PNUD Venezuela (opcional, nombre del remitente)
 --
 -- ═══════════════════════════════════════════════════════════
 -- TEST MANUAL — Después del deploy
@@ -49,14 +50,18 @@ CREATE INDEX IF NOT EXISTS idx_daily_briefs_date ON daily_briefs(date DESC);
 --    Method: GET
 --
 -- ═══════════════════════════════════════════════════════════
--- NOTA SOBRE onboarding@resend.dev
+-- NOTA SOBRE SENDGRID (Twilio)
 -- ═══════════════════════════════════════════════════════════
 --
--- Con la dirección de prueba de Resend SOLO puedes enviar al
--- email verificado de tu cuenta. Para enviar a 2-3 personas
--- necesitas agregar un dominio propio en Resend:
---   1. Resend Dashboard > Domains > Add Domain
---   2. Agregar registros DNS (MX, TXT) que Resend te indica
---   3. Cambiar DAILY_BRIEF_FROM a monitor@tu-dominio.com
---   4. Agregar los otros emails a DAILY_BRIEF_TO separados por coma
+-- SendGrid NO requiere dominio propio. Solo necesitas:
+--   1. Crear cuenta gratis en sendgrid.com (100 emails/día)
+--   2. Settings > Sender Authentication > Single Sender Verification
+--   3. Agregas tu email personal (Gmail, Outlook, etc.)
+--   4. SendGrid te envía un email de confirmación → click verify
+--   5. Settings > API Keys > Create API Key (Full Access)
+--   6. Puedes enviar a CUALQUIER email sin restricción
+--
+-- Para agregar más destinatarios, solo edita DAILY_BRIEF_TO
+-- en Vercel separando por coma:
+--   email1@org.com,email2@org.com,email3@org.com
 --
