@@ -20,6 +20,7 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
   const mob = useIsMobile();
   const [aiExplanation, setAiExplanation] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [alertsOpen, setAlertsOpen] = useState(false);
   const wk = WEEKS[week];
   const prevWk = week > 0 ? WEEKS[week-1] : null;
   const dom = wk.probs.reduce((a,b) => a.v > b.v ? a : b);
@@ -148,27 +149,33 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
         return (
           <div style={{ border:`1px solid ${reds.length > 0 ? "#dc262640" : "#ca8a0440"}`,
             background:reds.length > 0 ? "#dc262608" : "#ca8a0408", padding:mob?"10px 12px":"12px 16px" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:liveAlerts.length > 1 ? 8 : 0, flexWrap:"wrap" }}>
+            <div onClick={() => setAlertsOpen(p => !p)} style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", userSelect:"none", flexWrap:"wrap" }}>
               <span style={{ fontSize:14 }}>{reds.length > 0 ? "🚨" : "⚠️"}</span>
               <span style={{ fontSize:10, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase",
                 color:reds.length > 0 ? "#dc2626" : "#ca8a04", fontWeight:700 }}>
                 {liveAlerts.length} alerta{liveAlerts.length>1?"s":""} en vivo
+                {reds.length > 0 && !alertsOpen ? ` · ${reds.length} roja${reds.length>1?"s":""}` : ""}
               </span>
               <span style={{ width:6, height:6, borderRadius:"50%", background:"#22c55e", animation:"pulse 1.5s infinite" }} />
               <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Datos en tiempo real · cada 5 min</span>
+              <span style={{ marginLeft:"auto", fontSize:12, color:MUTED, transition:"transform 0.2s", transform:alertsOpen?"rotate(180deg)":"rotate(0deg)" }}>▼</span>
             </div>
-            {liveAlerts.map((a, i) => (
-              <div key={i} style={{ display:"flex", alignItems:"center", gap:8, padding:"4px 0",
-                borderTop:i>0?`1px solid ${BORDER}30`:"none", fontSize:12, fontFamily:font }}>
-                <span style={{ width:7, height:7, borderRadius:"50%", flexShrink:0,
-                  background:a.level==="red"?"#dc2626":"#ca8a04",
-                  boxShadow:a.level==="red"?"0 0 4px #dc262660":"none",
-                  animation:a.level==="red"?"pulse 1.5s infinite":"none" }} />
-                <span style={{ color:a.level==="red"?"#dc2626":"#ca8a04", fontWeight:700, minWidth:mob?90:130 }}>{a.name}</span>
-                <span style={{ color:TEXT, fontWeight:600, minWidth:60 }}>{a.val}</span>
-                <span style={{ color:MUTED, fontSize:11, flex:1 }}>{a.umbral}</span>
+            {alertsOpen && (
+              <div style={{ marginTop:8 }}>
+                {liveAlerts.map((a, i) => (
+                  <div key={i} style={{ display:"flex", alignItems:"center", gap:8, padding:"4px 0",
+                    borderTop:i>0?`1px solid ${BORDER}30`:"none", fontSize:12, fontFamily:font }}>
+                    <span style={{ width:7, height:7, borderRadius:"50%", flexShrink:0,
+                      background:a.level==="red"?"#dc2626":"#ca8a04",
+                      boxShadow:a.level==="red"?"0 0 4px #dc262660":"none",
+                      animation:a.level==="red"?"pulse 1.5s infinite":"none" }} />
+                    <span style={{ color:a.level==="red"?"#dc2626":"#ca8a04", fontWeight:700, minWidth:mob?90:130 }}>{a.name}</span>
+                    <span style={{ color:TEXT, fontWeight:600, minWidth:60 }}>{a.val}</span>
+                    <span style={{ color:MUTED, fontSize:11, flex:1 }}>{a.umbral}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         );
       })()}

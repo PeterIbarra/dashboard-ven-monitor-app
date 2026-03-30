@@ -312,6 +312,93 @@ export const SITREP_ALL = [
       lecturaAnalitica: "La reforma de la Ley de Minas representa un viraje estructural del modelo extractivo venezolano, coherente con la lógica de apertura económica observada en el sector hidrocarburífero. La contractualización de las concesiones, la eliminación de la reserva estatal del oro y la financiarización de los derechos mineros configuran un marco orientado a maximizar la atracción de capital internacional. Sin embargo, el aumento de la discrecionalidad ejecutiva, los posibles déficits de transparencia y las tensiones en materia ambiental y territorial constituyen riesgos relevantes.",
     },
   },
+  // S11: 20-29 marzo
+  { period:"20 – 29 de marzo de 2026", periodShort:"20–29 mar 2026",
+    keyPoints:[
+      { tag:"Inversión", color:"#16a34a", title:"De la estabilización a la ofensiva económica internacional", text:"Venezuela se presenta ante inversionistas globales en múltiples frentes: Rodríguez en FII Priority Miami (incentivos fiscales, reducción regalías, reservas como garantía), MCM en CERAWeek Houston (meta 5M b/d, $150B inversión, nueva ley petrolera, privatización parcial PDVSA). Signum Global Advisors reúne fondos en Caracas. Repsol proyecta triplicar producción para 2029. Petropymi-Alep: primer acuerdo empresarial Texas-Venezuela." },
+      { tag:"Social", color:"#E5243B", title:"97 protestas en 4 días: conflictividad supera contención", text:"Escalamiento significativo entre el 23 y 26 de marzo: 97 protestas en 22+ estados, pico de 41 el 25 de marzo en 16 estados. Demandas salariales y laborales como eje transversal, combinadas con servicios públicos y participación política. Marcha gremial a CTV en Caracas con denuncias de movilizaciones paralelas del oficialismo." },
+      { tag:"Diplomacia", color:"#0468B1", title:"Normalización bilateral alcanza su punto más avanzado", text:"Misión diplomática instalada en Washington. Recuperación de sedes consulares. LG-53 (OFAC) para misiones. Trump califica a Rodríguez de «presidenta electa» y sugiere «modelo venezolano» para Irán. Comando Sur confirma cumplimiento de directrices. Congreso da 180 días a Rubio para plan de transición." },
+      { tag:"Judicial", color:"#8b5cf6", title:"Caso Maduro: rechazo a desestimación y cargos adicionales", text:"Audiencia del 26 de marzo: juez Hellerstein rechaza desestimación. Cuestiona coherencia entre sanciones y garantías constitucionales. Debate sobre financiamiento de defensa con fondos del Estado venezolano sin resolver. Trump anuncia cargos adicionales." },
+    ],
+    sintesis:"E3 se mantiene dominante pero cede 4pp (47%→43%), erosionado por el escalamiento de la conflictividad social (97 protestas en 4 días, 22+ estados) y el control de EE.UU. sobre ingresos petroleros (Rubio/Tesoro), que limita el margen fiscal del Ejecutivo. La doble ofensiva económica — DR en FII Priority Miami y MCM en CERAWeek Houston — marca el tránsito de la estabilización a la ofensiva para captar inversión. La apertura sectorial se amplía: OFAC emite licencias para minería, Siemens y GE evalúan el eléctrico, CAF reactiva financiamiento. E4 sube de 15% a 20% (+5pp) por conflictividad laboral, amenazas de colectivos contra MCM y persistencia del esquema coercitivo. E1 se mantiene en 30%: MCM lidera MassBehaviorResearch (123,68 pts), Congreso da 180 días a Rubio, Vente reabre sede. E2 baja a 7% (-1pp). La paradoja central: MCM (123,68 pts) carece de poder institucional; DR (9,12 pts) detenta la Presidencia pero ocupa posición 32/33 en apoyo popular.",
+    actores:[
+      { name:"EE.UU.", items:["Trump: Rodríguez «presidenta electa» · sugiere modelo para Irán","LG-53 (OFAC): autoriza transacciones misiones diplomáticas","OFAC: nuevas licencias para sector minero (oro, minerales)","Congreso: 180 días a Rubio para plan de transición democrática","Comando Sur confirma cumplimiento de directrices ante Senado","Trump anuncia cargos adicionales contra Maduro","EE.UU. mantiene control sobre ingresos petroleros (Rubio/Tesoro)"] },
+      { name:"Gobierno Interino", items:["FII Priority Miami: incentivos fiscales, reducción regalías, reservas como garantía","Reunión con fondos de inversión en Caracas (Signum Global Advisors)","Misión diplomática instalada en Washington; recuperación sedes consulares","González López: giro institucional FANB (elimina consignas, revisa comisiones)","Plan Nacional de Ahorro Eléctrico activado","Procuradora Seijo Noguera designada; embajadora Godoy ante ONU","Detención de Wilmer Ruperti (empresario petrolero)","PDVSA rechaza publicaciones de El Español"] },
+      { name:"Oposición", items:["MCM en CERAWeek Houston: 5M b/d, $150B inversión, nueva ley petrolera, Citgo como activo estratégico","ConocoPhillips (Lance): reformas «lamentablemente inadecuadas» · Chevron pide legislación adicional","Vente Venezuela reabre sede (Quinta Bejucal) + anuncia movilización para retorno MCM","MCM denuncia 179 presos militares, desapariciones y torturas","Biagio Pilieri: libertad plena tras 569 días","Guanipa cuestiona aplicación de amnistía al cumplirse un mes","Colectivos amenazan a MCM: «detención por traición» · 5.000 combatientes"] },
+      { name:"Internacional", items:["Petro: elecciones «no fueron libres» · Maduro «adicto al poder» · apoya a DR","Eurasia Group: DR se beneficia de conflicto Irán + deseo Trump de mostrar éxito","Siemens y GE evalúan sistema eléctrico del Bajo Caroní (inversión est. $40.000M)","CAF reactiva financiamiento eléctrico (termoeléctricas + renovables; excluye gobierno)","Repsol proyecta triplicar producción para 2029 (meta 150K b/d)","España: J. Rodríguez se reúne con embajador Albacete; Diplomacia de Paz","Buque ruso con 200K bbl diésel desvía de Cuba a Venezuela"] },
+    ],
+    nacional: {
+      amnistia: { solicitudes:11559, libertadesPlenas:8146, privadosLiberados:310, cautelares:7836, militares:null, fpVerificados:690, fpDetenidos:515, fpNota:"8.146 libertades plenas (AN). 11.559 solicitudes válidas. Prórroga 30 días Comisión Especial. Comisión especial para excluidos. Villegas retira candidatura Defensoría." },
+      rodriguez: [
+        { title:"Ofensiva económica en Miami y Caracas", text:"FII Priority: incentivos fiscales, reducción regalías proporcional a inversión, reservas como garantía. Signum en Caracas. 19 trimestres de crecimiento consecutivo." },
+        { title:"Giro institucional FANB", text:"González López elimina consignas ideológicas, reduce barricadas, revisa comisiones de servicio y escoltas. Royman Hernández Briceño nuevo comandante Aviación." },
+        { title:"Demanda de levantamiento total de sanciones", text:"DR insta a Trump a levantar sanciones: licencias no ofrecen certidumbre. Respaldada por Cabello y Maduro Guerra." },
+        { title:"Designaciones institucionales", text:"Procuradora Seijo Noguera, Godoy embajadora ONU (sustituye Moncada), Álvarez Márquez comercio exterior, Maniglia embajador Colombia." },
+      ],
+    },
+    economia: {
+      kpis: [
+        { value:"$18.212M", label:"Exportaciones petroleras 2025 (BCV)", color:"#0468B1" },
+        { value:">600%", label:"Inflación interanual estimada", color:"#E5243B" },
+        { value:"x3", label:"Meta Repsol producción 2029 (150K b/d)", color:"#16a34a" },
+        { value:"$40.000M", label:"Inversión eléctrica estimada (Siemens/GE)", color:"#ca8a04" },
+      ],
+      empresas: [
+        { empresa:"Repsol", desarrollo:"Proyecta triplicar producción para 2029 (meta 150K b/d). Cardón IV al 48,7%. Shell-Monagas gas para mercado interno." },
+        { empresa:"ConocoPhillips", desarrollo:"CEO Lance en CERAWeek: reformas «lamentablemente inadecuadas». Exige reconexión completa del sistema fiscal. Deuda de $12.000M." },
+        { empresa:"Chevron", desarrollo:"CEO Wirth en CERAWeek: persisten ambigüedades normativas. Demanda arbitraje internacional y claridad tributaria." },
+        { empresa:"Siemens/GE", desarrollo:"Evalúan sistema eléctrico del Bajo Caroní (80% suministro nacional). Inversión estimada hasta $40.000M." },
+        { empresa:"Petropymi-Alep", desarrollo:"Primer acuerdo empresarial Texas-Venezuela. Meta: recuperar intercambio comercial de $49.200M (2014) a $10.200M (2026)." },
+      ],
+    },
+    opinionPublica: {
+      protestas: {
+        total: 97,
+        promDiario: 24.3,
+        periodo: "23–26 marzo",
+        variacion: "↑ de 46 (semana anterior) — ESCALAMIENTO",
+        composicion: "Laboral-salarial dominante · servicios públicos · participación política",
+        nota: "El efecto de contención del bono de 150 USD y los 300M al Fondo de Protección Social se diluyó en menos de dos semanas. Las movilizaciones gremiales, incluyendo la marcha a la CTV en Caracas, revelan organización coordinada a nivel nacional. Si la conflictividad sigue escalando, el gobierno enfrentará un dilema entre la disciplina fiscal exigida por Washington y las demandas sociales con potencial desestabilizador.",
+      },
+      percepcion: {
+        fuente: "AtlasIntel/Bloomberg + Hinterlaces + MassBehaviorResearch — marzo 2026",
+        titulo: "Dos encuestas, dos realidades + índice de liderazgo",
+        nota: "La discrepancia entre Hinterlaces (73% aprobación) y AtlasIntel (34,6%) obliga a interpretar con cautela. Lo que converge: 58% percibe país más democrático, 53,5% evalúa positivamente influencia EE.UU. MassBehaviorResearch ubica a DR en posición 32/33 (9,12 pts); MCM lidera con 123,68.",
+        datos: [
+          { factor:"País se vuelve más democrático (AtlasIntel)", pct:58.0 },
+          { factor:"Influencia EE.UU. positiva (AtlasIntel)", pct:53.5 },
+          { factor:"MCM debe retornar (AtlasIntel)", pct:53.0 },
+          { factor:"Retorno migratorio posible (AtlasIntel)", pct:51.3 },
+          { factor:"Corrupción principal preocupación (AtlasIntel)", pct:59.0 },
+        ],
+      },
+      excarcelados: { fp:690, presos:515, militares:179, fuente:"Foro Penal + MCM denuncia 179 presos militares" },
+    },
+    escenarios: [
+      { name:"Continuidad Negociada", prob:"43%", color:"#0468B1", text:"Ofensiva económica multisectorial (FII Priority, Signum, CERAWeek, Petropymi-Alep) + normalización bilateral máxima (misión, sedes, LG-53, «presidenta electa») + apertura OFAC minero + Siemens/GE + CAF. Baja 4pp por conflictividad y control EE.UU. sobre ingresos." },
+      { name:"Transición Política Pacífica", prob:"30%", color:"#2d8a30", text:"MCM lidera MassBehavior (123,68 pts) + CERAWeek posiciona ante majors. Guanipa segundo (119,80). Congreso: 180 días plan Rubio. Vente reabre sede. 58% percibe país más democrático. Sin retorno ni poder institucional." },
+      { name:"Resistencia Coercitiva", prob:"20%", color:"#ca8a04", text:"Sube 5pp: 97 protestas en 4 días (22+ estados). Colectivos amenazan MCM (5.000 combatientes). 515 presos + 179 militares. Apagones occidente (Táchira 8,70%). Registro portales digitales (Urbaneja). Inflación >600%." },
+      { name:"Colapso y Fragmentación", prob:"7%", color:"#dc2626", text:"Contenido por solidez bilateral y ofensiva de inversión. Riesgo: desconexión macro vs micro (97 protestas), control EE.UU. ingresos petroleros, dependencia factor externo (Eurasia Group), buque ruso desvía a VEN." },
+    ],
+    comentarios: [
+      { tag:"Factor 1", color:"#16a34a", title:"De estabilización a ofensiva económica: cambio de fase", text:"La participación de Rodríguez en FII Priority, los incentivos fiscales, las reuniones con fondos en Caracas y las proyecciones de Repsol configuran un cambio de fase. Venezuela transita de la estabilización post-3 enero a una ofensiva para captar inversión extranjera. Sin embargo, Chevron y ConocoPhillips demandan claridad normativa y reforma fiscal profunda — el proceso está en negociación, no en consolidación." },
+      { tag:"Factor 2", color:"#E5243B", title:"97 protestas: la brecha entre discurso y realidad material", text:"El registro de 97 protestas en cuatro días, distribuidas en 22+ estados con predominio salarial-laboral, constituye la señal más clara de que el discurso de recuperación no se traduce en mejoras tangibles. El efecto del bono de 150 USD se diluyó en menos de dos semanas. Si la conflictividad continúa escalando, el gobierno enfrentará un dilema entre disciplina fiscal (Washington) y demandas sociales con potencial desestabilizador." },
+      { tag:"Factor 3", color:"#8b5cf6", title:"Paradoja de liderazgo: MCM 123,68 vs DR 9,12", text:"MassBehaviorResearch revela la paradoja central: MCM lidera con 123,68 pts pero carece de poder institucional; DR detenta la Presidencia pero ocupa posición 32/33. El chavismo «tiende a desaparecer como fuerza competitiva». Guanipa (119,80) emerge como segundo líder nacional. Los diputados opositores tienen 4% de percepción positiva. La reconfiguración del mapa político será profunda si se convocan elecciones." },
+      { tag:"Factor 4", color:"#ca8a04", title:"Sistema eléctrico: cuello de botella de la reactivación", text:"La llegada de Siemens y GE al Bajo Caroní, la reactivación del plan CAF y los apagones que redujeron la conectividad del occidente (Táchira al 8,70%) convergen en una señal clara: sin rehabilitación eléctrica no habrá reactivación económica sostenible. Inversiones estimadas en hasta $40.000M. El esquema CAF excluye al gobierno como receptor directo por morosidad." },
+    ],
+    marcoNormativo: {
+      titulo: "Proceso Judicial Maduro-Flores — Dimensión jurídica de la transición",
+      resumen: "El proceso judicial contra Nicolás Maduro y Cilia Flores en la corte federal del Distrito Sur de Nueva York registró desarrollos significativos con la audiencia del 26 de marzo: el juez Hellerstein rechazó la solicitud de desestimación, cuestionó la coherencia entre las sanciones y las garantías constitucionales, y el debate sobre el financiamiento de la defensa con fondos del Estado venezolano quedó sin resolver. Trump anunció cargos adicionales.",
+      cambios: [
+        { titulo:"Rechazo a la desestimación del caso", texto:"El juez Alvin Hellerstein rechazó la solicitud de la defensa, manteniendo activo el proceso por cargos de narcotráfico y crimen organizado. La decisión asegura que Maduro permanecerá en el centro del tablero judicial durante meses.", color:"#0468B1" },
+        { titulo:"Debate sobre financiamiento de la defensa", texto:"La defensa solicita acceso a fondos del Estado venezolano para honorarios legales. El juez cuestionó la coherencia entre la política de sanciones y el derecho constitucional de los acusados a elegir abogado. Si OFAC autoriza fondos, legitima al gobierno interino como continuador del Estado; si lo niega, expone al sistema a cuestionamientos de equidad procesal.", color:"#ca8a04" },
+        { titulo:"Cargos adicionales anunciados por Trump", texto:"El presidente afirmó que Maduro ha sido acusado solo por «una fracción» de los hechos que se le atribuyen. La declaración añade presión política al proceso y refuerza la narrativa de que el caso se mantendrá como instrumento de presión sostenido.", color:"#E5243B" },
+        { titulo:"Cuestionamiento de la coherencia sanciones-garantías", texto:"Hellerstein sugirió que el contexto político ha cambiado y puso en duda la vigencia de los fundamentos originales de las sanciones, aunque reconoció los límites del tribunal para intervenir en decisiones de OFAC. La fiscalía defendió que los acusados no tienen derecho a utilizar fondos del Estado venezolano.", color:"#8b5cf6" },
+        { titulo:"Maduro difunde mensaje desde Nueva York", texto:"El exmandatario, junto a Cilia Flores, difundió un mensaje de tono espiritual citando pasajes bíblicos e insistiendo en paz, reconciliación y unidad, proyectando firmeza y cohesión emocional con su base política.", color:"#6b7280" },
+      ],
+      lecturaAnalitica: "El proceso judicial opera en una doble lógica: como procedimiento penal autónomo y como factor de presión política en la relación bilateral. El rechazo a la desestimación y el anuncio de cargos adicionales aseguran que Maduro permanecerá en el centro del tablero judicial durante meses. El cuestionamiento del juez sobre la coherencia entre sanciones y garantías constitucionales abre una línea de tensión que podría generar precedentes relevantes sobre la intersección entre política exterior y debido proceso. El debate no resuelto sobre el financiamiento de la defensa con fondos del Estado venezolano permanece como zona gris jurídica con implicaciones para la legitimidad del gobierno interino.",
+    },
+  },
 ];
 
 export const CURATED_NEWS = [
