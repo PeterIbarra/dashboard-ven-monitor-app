@@ -9,14 +9,16 @@ const { fetchRSS } = require("../../lib/cron/tasks/fetchRSS");
 const { dailyReadings } = require("../../lib/cron/tasks/dailyReadings");
 const { icgAnalysis } = require("../../lib/cron/tasks/icgAnalysis");
 const { classifyNewsAlerts } = require("../../lib/cron/tasks/newsAlerts");
+const { sendDailyBrief } = require("../../lib/cron/tasks/dailyBrief");
 
 module.exports = async function handler(req, res) {
   if (!SUPABASE_URL || !SUPABASE_SECRET) {
     return res.status(500).json({ error: "Supabase not configured" });
   }
 
-  // ── Task routing: ?task=alerts runs ONLY news alerts classification ──
+  // ── Task routing ──
   const task = (req.query?.task || "").toLowerCase();
+
   if (task === "alerts") {
     const errors = [];
     try {
@@ -24,6 +26,16 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ task: "alerts", ...result, errors: errors.length > 0 ? errors : null, fetchedAt: new Date().toISOString() });
     } catch (e) {
       return res.status(500).json({ task: "alerts", error: e.message });
+    }
+  }
+
+  if (task === "dailybrief") {
+    const errors = [];
+    try {
+      const result = await sendDailyBrief(errors);
+      return res.status(200).json({ task: "dailyBrief", ...result, errors: errors.length > 0 ? errors : null, fetchedAt: new Date().toISOString() });
+    } catch (e) {
+      return res.status(500).json({ task: "dailyBrief", error: e.message });
     }
   }
 
