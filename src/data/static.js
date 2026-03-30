@@ -29,6 +29,17 @@ export const GDELT_ANNOTATIONS = [
   { date:"2026-03-10", tier:"MEDIUM", label:"Producción supera 1M bpd · Shell y Repsol amplían", tierEs:"MEDIA" },
   { date:"2026-03-12", tier:"HIGH", label:"39 movilizaciones laborales en 23 estados", tierEs:"ALTA" },
   { date:"2026-03-13", tier:"MEDIUM", label:"BCV: inflación 617% anualizada · Ley de Minas 1ra discusión", tierEs:"MEDIA" },
+  // S10
+  { date:"2026-03-14", tier:"HIGH", label:"Bandera EE.UU. izada en Caracas (7 años)", tierEs:"ALTA" },
+  { date:"2026-03-18", tier:"HIGH", label:"11 cambios gabinete · Padrino López sale · nueva cúpula FANB", tierEs:"ALTA" },
+  // S11
+  { date:"2026-03-20", tier:"MEDIUM", label:"LG-53 OFAC: misiones diplomáticas venezolanas", tierEs:"MEDIA" },
+  { date:"2026-03-21", tier:"HIGH", label:"Trump: Rodríguez «presidenta electa» · modelo para Irán", tierEs:"ALTA" },
+  { date:"2026-03-22", tier:"HIGH", label:"FII Priority Miami · Signum Caracas: ofensiva de inversión", tierEs:"ALTA" },
+  { date:"2026-03-24", tier:"HIGH", label:"MCM en CERAWeek Houston: 5M b/d, $150B inversión", tierEs:"ALTA" },
+  { date:"2026-03-25", tier:"HIGH", label:"97 protestas en 4 días · pico 41 (25 mar) · 22+ estados", tierEs:"ALTA" },
+  { date:"2026-03-26", tier:"MEDIUM", label:"Audiencia Maduro: rechazo desestimación · cargos adicionales", tierEs:"MEDIA" },
+  { date:"2026-03-28", tier:"MEDIUM", label:"OFAC: nuevas licencias sector minero (oro, minerales)", tierEs:"MEDIA" },
 ];
 
 export const POLYMARKET_SLUGS = [

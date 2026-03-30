@@ -84,18 +84,26 @@ export const WEEKS = [
     tensiones:[{l:"green",t:"<b>Gabinete:</b> 42% modificado · nueva cúpula FANB · Padrino López sale tras 11+ años."},{l:"green",t:"<b>Diplomacia:</b> Bandera EE.UU. izada (7 años) · Senado en Miraflores · alerta nivel 3."},{l:"green",t:"<b>Energía:</b> Cardón IV (gas) · LG-52 · export. duplicadas · Repsol +50%/+200% · Maurel & Prom Maracaibo."},{l:"yellow",t:"<b>Contención social:</b> Bono 150 USD + 300M Fondo. Protestas 65→46. Efecto temporal."},{l:"yellow",t:"<b>Amnistía:</b> 7.580 beneficiados · 690 excarcelados (FP) · 515 presos · art.9 exclusiones."},{l:"red",t:"<b>Jurídico:</b> Jueza Netburn · PDV Holding/Citgo sin efecto sin OFAC · gasoducto Ricaurte."}],
     lectura:"E3 se consolida como escenario dominante con fuerza inédita — 47% (+5pp) — impulsado por la convergencia de cuatro factores de primer orden. La reconfiguración institucional más amplia desde el 3 de enero: 11 cambios ministeriales y nueva cúpula FANB, con la salida de Padrino López tras más de 11 años en Defensa y su reemplazo por González López, quien centraliza el aparato de seguridad. Con 14 ministros cambiados, Delcy Rodríguez ha modificado el 42% del gabinete heredado de Maduro. La incorporación de opositores (Ríos, Blanco) y técnicos (Sanjuán, Alcalá) amplía la base de gobernabilidad.\n\nLa normalización diplomática entró en fase operativa: el izado de bandera en Caracas (primera vez en 7 años), la delegación del Senado en Miraflores, la reducción de alerta de viaje a nivel 3, y Trump calificando la relación como «fantástica». La expansión energética se diversifica: acuerdo gasífero Cardón IV (PDVSA-Repsol-Eni), LG-52 para transacciones con PDVSA, exportaciones a EE.UU. duplicadas, Repsol proyecta +50% en 2026 y +200% para 2028, Maurel & Prom reactiva taladro en Maracaibo tras 8 años.\n\nE1 retrocede a 30% (-3pp): la incorporación de opositores al Ejecutivo y la ausencia de retorno de MCM difuminan las fronteras entre oficialismo y oposición. E4 se mantiene estable en 15%: las protestas bajan de 65 a 46 por el bono de 150 USD y los 300M al Fondo de Protección Social, pero la brecha salarial estructural persiste. E2 baja a 8% (-2pp), contenido por la solidez creciente del eje bilateral. Sin embargo, la ambigüedad jurídica sobre representación legal (jueza Netburn) y las disputas PDV Holding/Citgo que carecen de efecto sin OFAC evidencian que la normalización política avanza más rápido que la normalización legal y corporativa.",
     trendSc:3, trendDrivers:["42% gabinete modificado + nueva cúpula FANB: reconfiguración institucional sin precedentes","Bandera EE.UU. + Senado + nivel 3 + «fantástica»: normalización diplomática operativa","Cardón IV + LG-52 + export. duplicadas + Repsol/Maurel & Prom: diversificación energética"] },
+  // S11: 20–29 marzo 2026
+  { label:"20–29m", short:"S11", probs:[{sc:1,v:30,t:"flat"},{sc:2,v:7,t:"down"},{sc:3,v:43,t:"down"},{sc:4,v:20,t:"up"}], xy:{x:0.35,y:0.42},
+    sem:{g:8,y:6,r:5},
+    kpis:{ energia:{exportaciones:"Repsol x3 meta 2029 (150K b/d)",ingresos:"FII Priority · Signum · incentivos",licencias:"GL-53 + OFAC minero",cambio:"Exp. pet. $18.212M (BCV 2025)"}, economico:{inflacion:">600% interanual",ingresos_pob:"97 protestas 4 días · brecha salarial",electricidad:"Siemens/GE evalúan · CAF reactiva",pib:"19 trim. crecimiento consecutivo"}, opinion:{direccion:"58% país más democrático (AtlasIntel)",elecciones:"180 días Congreso → plan Rubio",mcm:"MCM CERAWeek: 5M b/d · $150B inv.",eeuu:"Trump: «presidenta electa»"} },
+    tensiones:[{l:"green",t:"<b>Ofensiva económica:</b> FII Priority Miami · Signum Caracas · CERAWeek Houston · Repsol x3 · Petropymi-Alep Texas."},{l:"green",t:"<b>Normalización bilateral:</b> Misión diplomática Washington · sedes consulares · LG-53 · Trump «presidenta electa» · Comando Sur confirma."},{l:"green",t:"<b>Apertura sectorial:</b> OFAC licencias mineras · Siemens/GE evalúan eléctrico · CAF financiamiento · Cardón IV gas."},{l:"yellow",t:"<b>Conflictividad:</b> 97 protestas 23–26 mar en 22+ estados · pico 41 (25 mar) · eje laboral-salarial dominante."},{l:"yellow",t:"<b>Encuestas contradictorias:</b> Hinterlaces 73% vs AtlasIntel 34,6% aprobación DR · MassBehavior: DR 32/33 (9,12 pts)."},{l:"red",t:"<b>Caso Maduro:</b> Audiencia 26 mar · rechazo desestimación · cargos adicionales · financiamiento defensa sin resolver."},{l:"red",t:"<b>Amenazas MCM:</b> Colectivos: «detención por traición» · 5.000 combatientes. 515 presos + 179 militares."}],
+    lectura:"E3 se mantiene como escenario dominante pero cede 4pp (47%→43%), erosionado por el escalamiento de la conflictividad social (97 protestas en 4 días, 22+ estados, pico de 41 el 25 de marzo) y el control de EE.UU. sobre los ingresos petroleros (Rubio/Tesoro), que limita el margen fiscal del Ejecutivo. La doble ofensiva económica — Rodríguez en FII Priority Miami con incentivos fiscales directos y MCM en CERAWeek Houston ante petroleras (meta 5M b/d, $150B inversión, nueva ley petrolera) — marca el tránsito de la estabilización a la ofensiva internacional para captar inversión. Signum Global Advisors reunió a decenas de fondos de cobertura en Caracas. Repsol proyecta triplicar producción para 2029. La apertura sectorial se amplía: OFAC emite licencias para minería, Siemens y GE evalúan el sistema eléctrico del Bajo Caroní, la CAF reactiva financiamiento para termoeléctricas y renovables, y se firma el primer acuerdo empresarial Texas-Venezuela (Petropymi-Alep).\n\nLa normalización bilateral alcanza su punto más avanzado: misión diplomática en Washington, recuperación de sedes consulares, LG-53 para misiones diplomáticas, Trump califica a Rodríguez de «presidenta electa», y el Comando Sur confirma cumplimiento de directrices. Sin embargo, ConocoPhillips califica las reformas de «lamentablemente inadecuadas» y Chevron demanda legislación adicional.\n\nE4 sube de 15% a 20% (+5pp), impulsado por la reactivación de la conflictividad laboral, las amenazas de colectivos contra MCM, la persistencia del esquema coercitivo (515 presos, 179 militares denunciados por MCM) y los apagones en el occidente (Táchira al 8,70%). E1 se mantiene en 30%: MCM lidera MassBehaviorResearch (123,68 pts), Guanipa segundo (119,80), Vente reabre sede. El Congreso da 180 días a Rubio para plan de transición. E2 baja a 7% (-1pp), contenido por solidez bilateral. La paradoja central: MCM (123,68) carece de poder institucional; DR (9,12) detenta la Presidencia pero ocupa posición 32/33 en apoyo popular.",
+    trendSc:3, trendDrivers:["Ofensiva económica multisectorial: FII Priority + Signum + CERAWeek + Petropymi-Alep + OFAC minero","Normalización bilateral máxima: misión Washington + sedes + LG-53 + «presidenta electa»","97 protestas en 4 días (22+ estados): conflictividad social supera mecanismos de contención"] },
 ];
 
 export const TENSIONS = [
-  { level:"green", text:"Reconfiguración gabinete: 42% modificado · nueva cúpula FANB · Padrino López sale tras 11+ años" },
-  { level:"green", text:"Normalización diplomática: bandera EE.UU. (7 años) · Senado en Miraflores · alerta nivel 3 · Trump «fantástica»" },
-  { level:"green", text:"Expansión energética: Cardón IV (gas) · LG-52 · export. duplicadas · Repsol +50%/+200% · Maurel & Prom" },
-  { level:"yellow", text:"Contención social temporal: bono 150 USD + 300M Fondo · protestas 65→46 · brecha salarial persiste" },
-  { level:"yellow", text:"Amnistía: 7.580 beneficiados · 690 excarcelados (FP) · 515 presos · art.9 exclusiones" },
-  { level:"red", text:"Ambigüedad jurídica: jueza Netburn · PDV Holding/Citgo sin efecto sin OFAC · gasoducto Ricaurte" },
+  { level:"green", text:"Ofensiva económica multisectorial: FII Priority Miami · Signum Caracas · CERAWeek Houston · Repsol x3 · Petropymi-Alep Texas" },
+  { level:"green", text:"Normalización bilateral máxima: misión diplomática Washington · sedes consulares · LG-53 · Trump «presidenta electa» · Comando Sur" },
+  { level:"green", text:"Apertura sectorial ampliada: OFAC licencias mineras · Siemens/GE evalúan eléctrico · CAF financiamiento · Cardón IV gas" },
+  { level:"yellow", text:"Conflictividad en escalamiento: 97 protestas 23–26 mar en 22+ estados · pico 41 (25 mar) · eje laboral-salarial dominante" },
+  { level:"yellow", text:"Encuestas contradictorias: Hinterlaces 73% vs AtlasIntel 34,6% aprobación DR · MassBehavior: DR 32/33 (9,12 pts)" },
+  { level:"red", text:"Caso Maduro: audiencia 26 mar · rechazo desestimación · cargos adicionales · financiamiento defensa sin resolver" },
+  { level:"red", text:"Amenazas a MCM: colectivos «detención por traición» · 5.000 combatientes · 515 presos + 179 militares · apagones occidente" },
 ];
 
-export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10"];
+export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11"];
 
 
 export const ICG_HISTORY = [
@@ -109,6 +117,7 @@ export const ICG_HISTORY = [
   { week:"S8", score:66, sitrep:true, note:"Brecha entre discurso amnistía y control paralelo" },
   { week:"S9", score:72, sitrep:true, note:"Reconocimiento formal EE.UU. + 39 protestas 23 estados" },
   { week:"S10", score:68, sitrep:true, note:"Reconfiguración gabinete 42% + nueva cúpula FANB. Padrino sale. Normalización diplomática operativa" },
+  { week:"S11", score:66, sitrep:true, note:"González López giro institucional FANB. Ofensiva económica. 97 protestas en 4 días. Colectivos amenazan MCM" },
 ];
 
 export const CONF_SEMANAL = [
@@ -156,5 +165,15 @@ export const CONF_SEMANAL = [
       { fecha:"17 Mar", protestas:5, estados:4, tipo:"ESCP", exigencias:"Seguridad social, laborales, vivienda" },
       { fecha:"18 Mar", protestas:8, estados:7, tipo:"Mixto (ESCP + CPP)", exigencias:"Laborales, justicia, educación, participación política" },
       { fecha:"19 Mar", protestas:5, estados:3, tipo:"CPP dominante", exigencias:"Justicia, presos, DDHH, participación política" },
+    ] },
+  { week:"S11", label:"20–29 mar", protestas:97, estados:22, reprimidas:0,
+    motivos:["Aumento salarial","Laborales","Pensiones","Servicios públicos","Presos políticos","Participación política"],
+    hecho:"ESCALAMIENTO: 97 protestas 23–26 mar en 22+ estados. Pico 41 (25 mar, 16 estados). Marcha gremial a CTV en Caracas.",
+    dias:[
+      { fecha:"23 Mar (1er)", protestas:12, estados:11, tipo:"ESCP", exigencias:"Laborales: salario, bono, OIT, ONAPRE" },
+      { fecha:"23 Mar (2do)", protestas:27, estados:22, tipo:"Mixto (ESCP + DESCA)", exigencias:"Laborales + servicios: agua, electricidad" },
+      { fecha:"24 Mar", protestas:15, estados:9, tipo:"Mixto (ESCP + CPP)", exigencias:"Laborales + libertad de presos políticos" },
+      { fecha:"25 Mar", protestas:41, estados:16, tipo:"ESCP dominante", exigencias:"PICO: Aumento salarial, pensiones + electricidad" },
+      { fecha:"26 Mar", protestas:2, estados:2, tipo:"CPP + DESCA", exigencias:"Participación política + acceso al agua" },
     ] },
 ];

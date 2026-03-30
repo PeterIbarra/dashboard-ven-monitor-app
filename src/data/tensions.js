@@ -1,10 +1,11 @@
 // Active tensions — updated each SITREP cycle
 export const TENSIONS = [
-  { level:"green", text:"Reconfiguración gabinete: 42% modificado · nueva cúpula FANB · Padrino López sale tras 11+ años" },
-  { level:"green", text:"Normalización diplomática: bandera EE.UU. (7 años) · Senado en Miraflores · alerta nivel 3 · Trump «fantástica»" },
-  { level:"green", text:"Expansión energética: Cardón IV (gas) · LG-52 · export. duplicadas · Repsol +50%/+200% · Maurel & Prom" },
-  { level:"yellow", text:"Contención social temporal: bono 150 USD + 300M Fondo · protestas 65→46 · brecha salarial persiste" },
-  { level:"yellow", text:"Amnistía: 7.580 beneficiados · 690 excarcelados (FP) · 515 presos · art.9 exclusiones" },
-  { level:"red", text:"Ambigüedad jurídica: jueza Netburn · PDV Holding/Citgo sin efecto sin OFAC · gasoducto Ricaurte" },
+  { level:"green", text:"Ofensiva económica multisectorial: FII Priority Miami · Signum Caracas · CERAWeek Houston · Repsol x3 · Petropymi-Alep Texas" },
+  { level:"green", text:"Normalización bilateral máxima: misión diplomática Washington · sedes consulares · LG-53 · Trump «presidenta electa» · Comando Sur" },
+  { level:"green", text:"Apertura sectorial ampliada: OFAC licencias mineras · Siemens/GE evalúan eléctrico · CAF financiamiento · Cardón IV gas" },
+  { level:"yellow", text:"Conflictividad en escalamiento: 97 protestas 23–26 mar en 22+ estados · pico 41 (25 mar) · eje laboral-salarial dominante" },
+  { level:"yellow", text:"Encuestas contradictorias: Hinterlaces 73% vs AtlasIntel 34,6% aprobación DR · MassBehavior: DR 32/33 (9,12 pts)" },
+  { level:"red", text:"Caso Maduro: audiencia 26 mar · rechazo desestimación · cargos adicionales · financiamiento defensa sin resolver" },
+  { level:"red", text:"Amenazas a MCM: colectivos «detención por traición» · 5.000 combatientes · 515 presos + 179 militares · apagones occidente" },
 ];
 

@@ -1,21 +1,21 @@
 // Latest KPI snapshot — updated each SITREP cycle
 export const KPIS_LATEST = {
   energia: [
-    { k:"Exportaciones", v:"~800 kbd", c:"#22c55e" },
-    { k:"Ingresos proy.", v:"USD 6.000M", c:"#22c55e" },
-    { k:"Licencias OFAC", v:"GL49+GL50/50A", c:"#38bdf8" },
-    { k:"Brecha cambiaria", v:"52,6%", c:"#ef4444" },
+    { k:"Exportaciones", v:"Repsol x3 meta 2029", c:"#22c55e" },
+    { k:"Ingresos proy.", v:"FII Priority · Signum", c:"#22c55e" },
+    { k:"Licencias OFAC", v:"GL-53 + OFAC minero", c:"#38bdf8" },
+    { k:"Eléctrico", v:"Siemens/GE + CAF", c:"#a17d08" },
   ],
   politico: [
-    { k:"Amnistía", v:"4.203 solicitudes", c:"#22c55e" },
-    { k:"Presos políticos", v:"568 (Foro Penal)", c:"#ef4444" },
-    { k:"Agenda electoral", v:"Sin fecha", c:"#ef4444" },
-    { k:"Poder Ciudadano", v:"Encargados", c:"#a17d08" },
+    { k:"Amnistía", v:"8.146 libertades plenas", c:"#22c55e" },
+    { k:"Presos políticos", v:"515 + 179 militares", c:"#ef4444" },
+    { k:"Agenda electoral", v:"180 días plan Rubio", c:"#a17d08" },
+    { k:"Poder Ciudadano", v:"Prórroga 48h · Villegas retira", c:"#a17d08" },
   ],
   opinion: [
-    { k:"País mejor s/ Maduro", v:"51,5%", c:"#22c55e" },
-    { k:"Influencia EE.UU.", v:"62,4% positiva", c:"#22c55e" },
-    { k:"Aprobación Delcy", v:"37,0%", c:"#a17d08" },
-    { k:"Corrupción #1", v:"56,7%", c:"#ef4444" },
+    { k:"País más democrático", v:"58% (AtlasIntel)", c:"#22c55e" },
+    { k:"Aprobación DR", v:"34,6% (Atlas) / 73% (Hint.)", c:"#a17d08" },
+    { k:"MCM liderazgo", v:"123,68/137 pts (#1)", c:"#22c55e" },
+    { k:"Conflictividad", v:"97 protestas · 22+ estados", c:"#ef4444" },
   ],
 };

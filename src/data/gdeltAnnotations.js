@@ -12,5 +12,18 @@ export const GDELT_ANNOTATIONS = [
   { date:"2026-02-13", tier:"MEDIUM", label:"Nuevas licencias petroleras", tierEs:"MEDIA" },
   { date:"2026-02-19", tier:"HIGH", label:"Ley de Amnistía aprobada y firmada", tierEs:"ALTA" },
   { date:"2026-02-25", tier:"LOW", label:"Trump: \"nuevo amigo\"", tierEs:"BAJA" },
+  { date:"2026-03-01", tier:"HIGH", label:"Restablecimiento relaciones EE.UU.–VEN", tierEs:"ALTA" },
+  { date:"2026-03-07", tier:"HIGH", label:"Trump reconoce a Rodríguez como interlocutor legítimo", tierEs:"ALTA" },
+  { date:"2026-03-08", tier:"MEDIUM", label:"GL-51 oro · Primer cargamento USD 100M a EE.UU.", tierEs:"MEDIA" },
+  { date:"2026-03-12", tier:"HIGH", label:"39 movilizaciones laborales en 23 estados", tierEs:"ALTA" },
+  { date:"2026-03-14", tier:"HIGH", label:"Bandera EE.UU. izada en Caracas (7 años)", tierEs:"ALTA" },
+  { date:"2026-03-18", tier:"HIGH", label:"11 cambios gabinete · Padrino López sale · nueva cúpula FANB", tierEs:"ALTA" },
+  { date:"2026-03-20", tier:"MEDIUM", label:"LG-53 OFAC: misiones diplomáticas venezolanas", tierEs:"MEDIA" },
+  { date:"2026-03-21", tier:"HIGH", label:"Trump: Rodríguez «presidenta electa» · modelo para Irán", tierEs:"ALTA" },
+  { date:"2026-03-22", tier:"HIGH", label:"FII Priority Miami · Signum Caracas: ofensiva de inversión", tierEs:"ALTA" },
+  { date:"2026-03-24", tier:"HIGH", label:"MCM en CERAWeek Houston: 5M b/d, $150B inversión", tierEs:"ALTA" },
+  { date:"2026-03-25", tier:"HIGH", label:"97 protestas en 4 días · pico 41 (25 mar) · 22+ estados", tierEs:"ALTA" },
+  { date:"2026-03-26", tier:"MEDIUM", label:"Audiencia Maduro: rechazo desestimación · cargos adicionales", tierEs:"MEDIA" },
+  { date:"2026-03-28", tier:"MEDIUM", label:"OFAC: nuevas licencias sector minero (oro, minerales)", tierEs:"MEDIA" },
 ];
 
