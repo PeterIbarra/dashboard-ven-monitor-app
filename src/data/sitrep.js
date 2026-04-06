@@ -399,6 +399,88 @@ export const SITREP_ALL = [
       lecturaAnalitica: "El proceso judicial opera en una doble lógica: como procedimiento penal autónomo y como factor de presión política en la relación bilateral. El rechazo a la desestimación y el anuncio de cargos adicionales aseguran que Maduro permanecerá en el centro del tablero judicial durante meses. El cuestionamiento del juez sobre la coherencia entre sanciones y garantías constitucionales abre una línea de tensión que podría generar precedentes relevantes sobre la intersección entre política exterior y debido proceso. El debate no resuelto sobre el financiamiento de la defensa con fondos del Estado venezolano permanece como zona gris jurídica con implicaciones para la legitimidad del gobierno interino.",
     },
   },
+
+  // ── S12: 29 marzo – 06 abril 2026 ──
+  { period:"29 de marzo – 06 de abril de 2026", periodShort:"29 mar–6 abr 2026",
+    keyPoints:[
+      { tag:"Bilateral", color:"#16a34a", title:"De estabilización a «empresa conjunta» energética", text:"OFAC levanta sanciones a Delcy Rodríguez, desbloqueando activos y cooperación directa. Trump califica la relación como «empresa conjunta» energética. Rubio declara que la estabilización se ha cumplido «en gran medida» y articula la estrategia de tres fases: estabilización → recuperación → elecciones. La reapertura formal de la embajada (Laura F. Dogu) y la calificación de SOUTHCOM como «hito histórico» institucionalizan la normalización." },
+      { tag:"Constitucional", color:"#8b5cf6", title:"90 días cumplidos: el reloj jurídico del interinato", text:"Vencimiento de los primeros 90 días de la «ausencia forzosa» declarada por el TSJ. La figura no existe en la Constitución y deja en suspenso la definición entre falta temporal prorrogable y falta absoluta con convocatoria electoral obligatoria (30 días). Tres escenarios: prórroga formal por AN (base), declaración de falta absoluta, o extensión indefinida. Primer test real de capacidad institucional." },
+      { tag:"Energía", color:"#ca8a04", title:"Exportaciones >1M bpd pero trimestre en negativo", text:"Las exportaciones petroleras alcanzaron 1,09 millones de bpd en marzo — mayor nivel en seis meses — con ingresos causados de USD 2.398M. Sin embargo, el Q1 cierra con caída acumulada de 14,2%, evidenciando que el repunte responde a factores coyunturales. Shell negocia expansión gasífera Mariscal Sucre y Loran (~20 Tcf). Alza del crudo: Brent 102, Merey 73,3." },
+      { tag:"Social", color:"#E5243B", title:"Conflictividad sostenida y marcha a Miraflores convocada", text:"11 protestas en 4 días (30 mar–02 abr) en 9 estados, promedio 3,6 diario. Demandas de vivienda, laborales, justicia y derechos de detenidos. Salario mínimo congelado 4 años en 130 Bs (<1 USD). Marcha a Miraflores convocada para el 9 de abril por sindicatos y trabajadores públicos. Constituyente Laboral (Piñate) como mecanismo de respuesta." },
+    ],
+    sintesis:"E3 se fortalece a 45% (+2pp) por la convergencia de tres factores decisivos: el levantamiento de sanciones a Delcy Rodríguez por la OFAC, que la valida como interlocutora plena; Trump calificando la relación como «empresa conjunta» energética; y la reapertura formal de la embajada en Caracas. Rubio declara estabilización «lograda en gran medida». Sin embargo, el vencimiento de los 90 días de «ausencia forzosa» introduce un factor de presión institucional sin precedente: la figura no existe en la Constitución y la prórroga por la AN será el primer test real de gestión institucional. E1 sube a 32% (+2pp) impulsado por la reunión Machado-Rubio en el Departamento de Estado, la reactivación de «comanditos» y la presión del reloj constitucional. E4 baja a 17% (-3pp) por ausencia de señales coercitivas directas, pero la marcha convocada a Miraflores y la presencia del embajador iraní con colectivos mantienen el riesgo. E2 se contrae a 6% (-1pp), aunque el Q1 cierra con -14,2% y la detención de Ruperti señala inestabilidad.",
+    actores:[
+      { name:"EE.UU.", items:["OFAC levanta sanciones a Delcy Rodríguez: la retira de lista de bloqueados","Trump califica relación como «empresa conjunta» energética; vincula con captura Maduro","Reapertura formal embajada en Caracas: Laura F. Dogu lidera restauración","Rubio declara estabilización «lograda en gran medida»; estrategia de tres fases","SOUTHCOM: reapertura de embajada como «hito histórico» para seguridad hemisférica","OFAC: guía sobre evasión de sanciones + flexibilización controlada para empresas no estadounidenses","Reunión Machado-Rubio a puerta cerrada en Departamento de Estado","Laura Loomer pide elecciones inmediatas vinculadas a «dominio energético»"] },
+      { name:"Gobierno Interino", items:["Gobierno busca retomar control juntas directivas subsidiarias PDVSA/Citgo (sujeto a OFAC)","Remoción de Walter Gavidia; designación de Aníbal Coronado","Constituyente Laboral: Eduardo Piñate designado Comisionado Presidencial","FANB retoma consigna «Chávez vive» con presencia de González López","Detención y liberación de Ruperti sin cargos formales tras casi dos semanas en Sebin","Vielma Mora acusa a EE.UU. de «colonialismo» bajo Doctrina Monroe","Canciller Gil rechaza OEA: «desatinado» el pronunciamiento sobre Fiscal y Defensor"] },
+      { name:"Oposición", items:["Machado en Washington: reunión con Rubio + agenda internacional + intención de retorno","Reactivación de «comanditos»: Alviarez organiza recepción MCM y preparación electoral","Marcha a Miraflores convocada 9 de abril: sindicatos y trabajadores exigen aumento salarial","Movimientos en AN para coordinar reemplazo de rectores del CNE"] },
+      { name:"Internacional", items:["España cierra vía exprés para venezolanos a partir de junio 2026 (700.000 afectados)","Shell negocia expansión gasífera: Mariscal Sucre + Loran (~20 Tcf); GNL vía Trinidad","Embajador iraní Ali Chegini aparece con colectivos en parroquia 23 de Enero","Reanudación de vuelos EE.UU.-Venezuela: 10+ aerolíneas previstas","OEA (Ramdin) exige transparencia en designación de Fiscal y Defensor","CAF reactiva plan de financiamiento eléctrico a 7 años"] },
+    ],
+    nacional: {
+      amnistia: { solicitudes:null, libertadesPlenas:null, privadosLiberados:null, cautelares:null, militares:null, fpVerificados:null, fpDetenidos:null, fpNota:"Sin datos nuevos de amnistía esta semana. Cifras anteriores vigentes: 8.146 libertades plenas, 11.559 solicitudes, 515 presos (FP)." },
+      rodriguez: [
+        { title:"OFAC levanta sanciones: nueva fase bilateral", text:"Retiro de la lista de bloqueados desbloquea activos, transacciones y cooperación directa. Abre la puerta a recuperación de Citgo y participación en procesos económicos y diplomáticos." },
+        { title:"Reconfiguración institucional continúa", text:"Remoción de Gavidia (exesposo Cilia Flores) y designación de Coronado. Constituyente Laboral activada con Piñate como comisionado. FANB retoma «Chávez vive» pese a giro de González López." },
+        { title:"Debate constitucional de los 90 días", text:"Vencimiento del primer plazo de «ausencia forzosa». Prórroga por AN es escenario base. Definición entre falta temporal y absoluta condiciona el calendario político." },
+      ],
+    },
+    economia: {
+      kpis: [
+        { value:">1,09M", label:"Exportaciones bpd marzo (máx. 6 meses)", color:"#0468B1" },
+        { value:"$2.398M", label:"Ingresos causados marzo", color:"#16a34a" },
+        { value:"-14,2%", label:"Caída acumulada Q1 exportaciones", color:"#E5243B" },
+        { value:"$3.512M", label:"Recaudación SENIAT Q1 (+26,6%)", color:"#ca8a04" },
+      ],
+      empresas: [
+        { empresa:"Shell", desarrollo:"Negocia expansión gasífera: Mariscal Sucre y campo transfronterizo Loran (~20 Tcf). Plan de procesar gas en Trinidad y Tobago como GNL. Obstáculos por intereses rusos." },
+        { empresa:"CAF", desarrollo:"Reactiva plan de financiamiento eléctrico a 7 años: termoeléctricas y renovables. Morosidad estatal obliga a canalizar vía empresas privadas." },
+        { empresa:"PDVSA", desarrollo:"Reactiva acuerdos de comercialización con EE.UU. alineados con «empresa conjunta» de Trump. Gobierno busca retomar control de Citgo." },
+        { empresa:"Aerolíneas", desarrollo:"Reanudación de vuelos: 10+ aerolíneas previstas incluyendo American Airlines, Iberia y TAP Air Portugal." },
+      ],
+    },
+    opinionPublica: {
+      protestas: {
+        total: 11,
+        promDiario: 3.6,
+        periodo: "30 mar–02 abr",
+        variacion: "↓ de 97 (semana anterior) — descompresión relativa",
+        composicion: "Vivienda · laborales · justicia · ambiente sano · derechos detenidos · participación política",
+        nota: "La conflictividad baja en volumen respecto al pico de 97 protestas pero se mantiene territorialmente dispersa (9 estados). Las demandas combinan reclamos estructurales con exigencias políticas. La convocatoria del 9 de abril a Miraflores representa un posible punto de inflexión si articula las demandas dispersas en una movilización centralizada. Salario mínimo congelado 4 años en 130 Bs (<1 USD).",
+      },
+      percepcion: {
+        fuente: "Sin nuevas encuestas esta semana — datos de S11 vigentes",
+        titulo: "Rubio: estabilización «lograda en gran medida»",
+        nota: "La declaración de Rubio sobre el cumplimiento de la fase de estabilización constituye la señal de percepción externa más significativa. Machado califica reunión con Rubio de «excelente». Carmen Meléndez entre las peores alcaldesas de Latam (28,3% positiva vs 65% negativa, CB Global Data).",
+        datos: [
+          { factor:"Carmen Meléndez imagen positiva (CB Global Data)", pct:28.3 },
+          { factor:"Carmen Meléndez imagen negativa", pct:65.0 },
+        ],
+      },
+      excarcelados: { fp:null, presos:515, militares:179, fuente:"Sin datos nuevos. Cifras S11 vigentes: 515 presos (FP), 179 militares (MCM)" },
+    },
+    escenarios: [
+      { name:"Continuidad Negociada", prob:"45%", color:"#0468B1", text:"OFAC levanta sanciones a DR + Trump «empresa conjunta» + embajada reabierta + Rubio «estabilización lograda». Exportaciones >1,09M bpd + Shell negocia Loran. Convergencia cambiaria ~10%. SENIAT Q1 +26,6%. Sube 2pp por validación bilateral. Riesgo: vacío constitucional 90 días + Q1 -14,2%." },
+      { name:"Transición Política Pacífica", prob:"32%", color:"#2d8a30", text:"Reunión Machado-Rubio en Dept. Estado. Reactivación «comanditos» (Alviarez). 90 días cumplidos: reloj constitucional presiona hacia definición electoral. Movimientos para sustituir rectores CNE. Loomer pide elecciones. Sube 2pp por presión institucional y bilateral." },
+      { name:"Resistencia Coercitiva", prob:"17%", color:"#ca8a04", text:"Baja 3pp por ausencia de señales coercitivas directas. Marcha a Miraflores 9 abril como potencial punto de inflexión. Embajador iraní con colectivos en 23 de Enero. FANB retoma «Chávez vive». Salario <1 USD congelado 4 años. 11 protestas en 9 estados. Ruperti detenido sin cargos." },
+      { name:"Colapso y Fragmentación", prob:"6%", color:"#dc2626", text:"Contenido por solidez bilateral reforzada. Q1 cierra -14,2% (fragilidad estructural). Vacío constitucional como detonante potencial si 180 días sin definición. Detención Ruperti: inestabilidad reglas del juego. Dependencia de factores coyunturales (precios, logística)." },
+    ],
+    comentarios: [
+      { tag:"Factor 1", color:"#16a34a", title:"De la estabilización a la «empresa conjunta»: salto cualitativo bilateral", text:"El levantamiento de sanciones a Rodríguez, la reapertura de la embajada, la calificación de Trump como «empresa conjunta» y la declaración de Rubio de que la estabilización se ha cumplido «en gran medida» configuran un cambio cualitativo. Venezuela pasa de objeto de contención a socio operativo en materia energética, aunque bajo supervisión y condicionalidad de Washington." },
+      { tag:"Factor 2", color:"#8b5cf6", title:"El reloj constitucional: la prueba institucional de abril", text:"El cumplimiento de los primeros 90 días de la «ausencia forzosa» obliga a una definición sobre la continuidad del interinato. La figura creada por el TSJ no existe en la Constitución. Si se agota el lapso de 180 días, la Constitución obliga a determinar falta absoluta y convocar elecciones en 30 días. La prórroga por la AN es el escenario más probable, pero su gestión será el primer test de capacidad institucional." },
+      { tag:"Factor 3", color:"#E5243B", title:"Conflictividad en transformación: de reclamos puntuales a presión estructural", text:"Las 11 protestas en 9 estados confirman un patrón sostenido que combina demandas laborales, de servicios y políticas. La convocatoria del 9 de abril a Miraflores podría marcar una escalada si el Ejecutivo no ofrece respuestas concretas. El salario mínimo lleva 4 años congelado en 130 Bs (<1 USD) — la brecha estructural no tiene válvula de escape." },
+      { tag:"Factor 4", color:"#ca8a04", title:"Irán en el 23 de Enero: señal de alerta en el equilibrio de alianzas", text:"La aparición del embajador iraní con colectivos introduce complejidad en la reconfiguración geopolítica. La persistencia de alianzas con actores como Irán puede tensionar la relación bilateral con Washington en un momento de máxima normalización. La coexistencia de la consigna «Chávez vive» en la FANB con el giro institucional de González López refleja una transición incompleta." },
+    ],
+    marcoNormativo: {
+      titulo: "Vacío Constitucional — El debate de los 90 días",
+      resumen: "El vencimiento de los primeros 90 días de la «ausencia forzosa» declarada por el TSJ abre un debate constitucional inédito. La figura no existe en la Constitución y deja en suspenso la definición entre falta temporal prorrogable y falta absoluta con convocatoria electoral obligatoria. El reloj constitucional configura el factor de presión institucional más significativo del período.",
+      cambios: [
+        { titulo:"Primer plazo de 90 días cumplido", texto:"La Constitución (art. 234) establece un primer período de 90 días para faltas temporales, prorrogable por otros 90 con autorización de la AN. El plazo se cumplió sin definición formal sobre la naturaleza de la ausencia.", color:"#0468B1" },
+        { titulo:"Prórroga formal: escenario base", texto:"La AN autoriza extensión por 90 días adicionales, llevando el mandato hasta julio 2026. Preserva estabilidad institucional y da tiempo para reformas, designaciones del Poder Ciudadano y preparación electoral.", color:"#16a34a" },
+        { titulo:"Riesgo: declaración de falta absoluta", texto:"Si el TSJ o la AN determinan que la ausencia es definitiva, se activa el art. 233: elecciones en 30 días. Políticamente improbable dadas las condiciones del CNE y la falta de consenso sobre reglas electorales.", color:"#E5243B" },
+        { titulo:"Extensión indefinida: erosión de legitimidad", texto:"El TSJ mantiene la ambigüedad jurídica sosteniendo el interinato de facto más allá de los 180 días constitucionales. Generaría presiones internas e internacionales crecientes.", color:"#ca8a04" },
+      ],
+      lecturaAnalitica: "El vacío constitucional opera como instrumento de estabilización política: al no definir la naturaleza de la ausencia presidencial, el sistema evita activar mecanismos que podrían desestabilizar la transición negociada con Washington. Sin embargo, el reloj constitucional corre y la indefinición no es sostenible indefinidamente. La prórroga de los 90 días adicionales será el primer test real de la capacidad institucional para gestionar la transición dentro del marco legal.",
+    },
+  },
 ];
 
 export const CURATED_NEWS = [
