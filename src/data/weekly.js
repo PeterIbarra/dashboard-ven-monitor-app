@@ -91,19 +91,26 @@ export const WEEKS = [
     tensiones:[{l:"green",t:"<b>Ofensiva económica:</b> FII Priority Miami · Signum Caracas · CERAWeek Houston · Repsol x3 · Petropymi-Alep Texas."},{l:"green",t:"<b>Normalización bilateral:</b> Misión diplomática Washington · sedes consulares · LG-53 · Trump «presidenta electa» · Comando Sur confirma."},{l:"green",t:"<b>Apertura sectorial:</b> OFAC licencias mineras · Siemens/GE evalúan eléctrico · CAF financiamiento · Cardón IV gas."},{l:"yellow",t:"<b>Conflictividad:</b> 97 protestas 23–26 mar en 22+ estados · pico 41 (25 mar) · eje laboral-salarial dominante."},{l:"yellow",t:"<b>Encuestas contradictorias:</b> Hinterlaces 73% vs AtlasIntel 34,6% aprobación DR · MassBehavior: DR 32/33 (9,12 pts)."},{l:"red",t:"<b>Caso Maduro:</b> Audiencia 26 mar · rechazo desestimación · cargos adicionales · financiamiento defensa sin resolver."},{l:"red",t:"<b>Amenazas MCM:</b> Colectivos: «detención por traición» · 5.000 combatientes. 515 presos + 179 militares."}],
     lectura:"E3 se mantiene como escenario dominante pero cede 4pp (47%→43%), erosionado por el escalamiento de la conflictividad social (97 protestas en 4 días, 22+ estados, pico de 41 el 25 de marzo) y el control de EE.UU. sobre los ingresos petroleros (Rubio/Tesoro), que limita el margen fiscal del Ejecutivo. La doble ofensiva económica — Rodríguez en FII Priority Miami con incentivos fiscales directos y MCM en CERAWeek Houston ante petroleras (meta 5M b/d, $150B inversión, nueva ley petrolera) — marca el tránsito de la estabilización a la ofensiva internacional para captar inversión. Signum Global Advisors reunió a decenas de fondos de cobertura en Caracas. Repsol proyecta triplicar producción para 2029. La apertura sectorial se amplía: OFAC emite licencias para minería, Siemens y GE evalúan el sistema eléctrico del Bajo Caroní, la CAF reactiva financiamiento para termoeléctricas y renovables, y se firma el primer acuerdo empresarial Texas-Venezuela (Petropymi-Alep).\n\nLa normalización bilateral alcanza su punto más avanzado: misión diplomática en Washington, recuperación de sedes consulares, LG-53 para misiones diplomáticas, Trump califica a Rodríguez de «presidenta electa», y el Comando Sur confirma cumplimiento de directrices. Sin embargo, ConocoPhillips califica las reformas de «lamentablemente inadecuadas» y Chevron demanda legislación adicional.\n\nE4 sube de 15% a 20% (+5pp), impulsado por la reactivación de la conflictividad laboral, las amenazas de colectivos contra MCM, la persistencia del esquema coercitivo (515 presos, 179 militares denunciados por MCM) y los apagones en el occidente (Táchira al 8,70%). E1 se mantiene en 30%: MCM lidera MassBehaviorResearch (123,68 pts), Guanipa segundo (119,80), Vente reabre sede. El Congreso da 180 días a Rubio para plan de transición. E2 baja a 7% (-1pp), contenido por solidez bilateral. La paradoja central: MCM (123,68) carece de poder institucional; DR (9,12) detenta la Presidencia pero ocupa posición 32/33 en apoyo popular.",
     trendSc:3, trendDrivers:["Ofensiva económica multisectorial: FII Priority + Signum + CERAWeek + Petropymi-Alep + OFAC minero","Normalización bilateral máxima: misión Washington + sedes + LG-53 + «presidenta electa»","97 protestas en 4 días (22+ estados): conflictividad social supera mecanismos de contención"] },
+  // S12: 29 marzo – 06 abril 2026
+  { label:"29m–6a", short:"S12", probs:[{sc:1,v:32,t:"up"},{sc:2,v:6,t:"down"},{sc:3,v:45,t:"up"},{sc:4,v:17,t:"down"}], xy:{x:0.34,y:0.44},
+    sem:{g:9,y:5,r:5},
+    kpis:{ energia:{exportaciones:">1,09M bpd marzo (máx. 6 meses)",ingresos:"USD 2.398M causados marzo",licencias:"Sanciones DR levantadas · Citgo en disputa",cambio:"Brent 102 · WTI 90,8 · Merey 73,3"}, economico:{inflacion:">600% interanual",ingresos_pob:"Salario <1 USD · 4 años congelado",electricidad:"CAF reactiva plan 7 años",pib:"SENIAT Q1 USD 3.512M (+26,6%)"}, opinion:{direccion:"Rubio: estabilización «lograda»",elecciones:"90 días cumplidos · debate interinato",mcm:"Machado-Rubio en Dept. Estado",eeuu:"Trump: «empresa conjunta» energética"} },
+    tensiones:[{l:"green",t:"<b>Sanciones:</b> OFAC retira a Rodríguez de lista de bloqueados · desbloquea activos · cooperación directa."},{l:"green",t:"<b>Embajada:</b> Reapertura formal EE.UU. en Caracas · Laura F. Dogu · SOUTHCOM: «hito histórico»."},{l:"green",t:"<b>Energía:</b> Exportaciones >1,09M bpd · USD 2.398M ingresos · Shell negocia Loran (~20 Tcf) · vuelos reanudados."},{l:"yellow",t:"<b>90 días:</b> Vencimiento «ausencia forzosa» · debate falta temporal vs. absoluta · prórroga AN escenario base."},{l:"yellow",t:"<b>Brecha cambiaria:</b> Convergencia USDT-banca ~10% · pero ~30% vs. oficial · mercado segmentado."},{l:"red",t:"<b>Conflictividad:</b> 11 protestas en 4 días · 9 estados · marcha a Miraflores 9 abril · salario <1 USD."},{l:"red",t:"<b>Irán:</b> Embajador iraní con colectivos en 23 de Enero · tensión con normalización Washington."}],
+    lectura:"E3 se fortalece a 45% (+2pp) por la convergencia de tres factores decisivos: el levantamiento de sanciones a Delcy Rodríguez por la OFAC, que la valida como interlocutora plena; Trump calificando la relación como «empresa conjunta» energética; y la reapertura formal de la embajada en Caracas. Rubio declara estabilización «lograda en gran medida». Exportaciones >1,09M bpd, Shell negocia Loran (~20 Tcf), 10+ aerolíneas previstas.\\n\\nEl vencimiento de los 90 días de «ausencia forzosa» introduce presión institucional sin precedente. E1 sube a 32% (+2pp) por reunión Machado-Rubio y reloj constitucional. E4 baja a 17% (-3pp) sin señales coercitivas directas, pero marcha 9 abril y embajador iraní con colectivos mantienen riesgo. E2 se contrae a 6% (-1pp), aunque Q1 cierra con -14,2% y detención Ruperti señala inestabilidad.",
+    trendSc:3, trendDrivers:["OFAC levanta sanciones a Rodríguez + Trump «empresa conjunta»: cooperación bilateral operativa","Reapertura embajada Caracas + Rubio «estabilización lograda» + Shell Loran: normalización institucionalizada","90 días constitucionales cumplidos: debate interinato como primer test institucional de la transición"] },
 ];
 
 export const TENSIONS = [
-  { level:"green", text:"Ofensiva económica multisectorial: FII Priority Miami · Signum Caracas · CERAWeek Houston · Repsol x3 · Petropymi-Alep Texas" },
-  { level:"green", text:"Normalización bilateral máxima: misión diplomática Washington · sedes consulares · LG-53 · Trump «presidenta electa» · Comando Sur" },
-  { level:"green", text:"Apertura sectorial ampliada: OFAC licencias mineras · Siemens/GE evalúan eléctrico · CAF financiamiento · Cardón IV gas" },
-  { level:"yellow", text:"Conflictividad en escalamiento: 97 protestas 23–26 mar en 22+ estados · pico 41 (25 mar) · eje laboral-salarial dominante" },
-  { level:"yellow", text:"Encuestas contradictorias: Hinterlaces 73% vs AtlasIntel 34,6% aprobación DR · MassBehavior: DR 32/33 (9,12 pts)" },
-  { level:"red", text:"Caso Maduro: audiencia 26 mar · rechazo desestimación · cargos adicionales · financiamiento defensa sin resolver" },
-  { level:"red", text:"Amenazas a MCM: colectivos «detención por traición» · 5.000 combatientes · 515 presos + 179 militares · apagones occidente" },
+  { level:"green", text:"Sanciones levantadas: OFAC retira a Rodríguez de lista de bloqueados · desbloquea activos · cooperación directa con EE.UU." },
+  { level:"green", text:"Embajada reabierta: Laura F. Dogu lidera restauración · SOUTHCOM: «hito histórico» · vuelos con 10+ aerolíneas" },
+  { level:"green", text:"Energía: Exportaciones >1,09M bpd · USD 2.398M ingresos marzo · Shell negocia Loran ~20 Tcf · CAF plan eléctrico" },
+  { level:"yellow", text:"90 días cumplidos: vencimiento «ausencia forzosa» · debate falta temporal vs. absoluta · prórroga AN escenario base" },
+  { level:"yellow", text:"Convergencia cambiaria parcial: brecha USDT-banca ~10% · pero ~30% vs. oficial · mercado segmentado" },
+  { level:"red", text:"Conflictividad: 11 protestas en 4 días (9 estados) · marcha a Miraflores 9 abril · salario <1 USD congelado 4 años" },
+  { level:"red", text:"Irán en 23 de Enero: embajador iraní con colectivos · tensión con normalización Washington · Ruperti detenido sin cargos" },
 ];
 
-export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11"];
+export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12"];
 
 
 export const ICG_HISTORY = [
@@ -118,6 +125,7 @@ export const ICG_HISTORY = [
   { week:"S9", score:72, sitrep:true, note:"Reconocimiento formal EE.UU. + 39 protestas 23 estados" },
   { week:"S10", score:68, sitrep:true, note:"Reconfiguración gabinete 42% + nueva cúpula FANB. Padrino sale. Normalización diplomática operativa" },
   { week:"S11", score:66, sitrep:true, note:"González López giro institucional FANB. Ofensiva económica. 97 protestas en 4 días. Colectivos amenazan MCM" },
+  { week:"S12", score:68, sitrep:true, note:"OFAC levanta sanciones DR. Trump «empresa conjunta». Embajada reabierta. 90 días cumplidos. Marcha 9 abril convocada" },
 ];
 
 export const CONF_SEMANAL = [
@@ -175,5 +183,13 @@ export const CONF_SEMANAL = [
       { fecha:"24 Mar", protestas:15, estados:9, tipo:"Mixto (ESCP + CPP)", exigencias:"Laborales + libertad de presos políticos" },
       { fecha:"25 Mar", protestas:41, estados:16, tipo:"ESCP dominante", exigencias:"PICO: Aumento salarial, pensiones + electricidad" },
       { fecha:"26 Mar", protestas:2, estados:2, tipo:"CPP + DESCA", exigencias:"Participación política + acceso al agua" },
+    ] },
+  { week:"S12", label:"30 mar–02 abr", protestas:11, estados:9, reprimidas:0,
+    motivos:["Vivienda","Ambiente sano","Justicia","Laborales","Derechos detenidos","Participación política"],
+    hecho:"Conflictividad sostenida y dispersa: 11 protestas en 4 días, 9 estados. Marcha a Miraflores convocada 9 abril. Salario <1 USD.",
+    dias:[
+      { fecha:"30 Mar", protestas:4, estados:3, tipo:"ESCP + DESCA", exigencias:"Vivienda, ambiente sano, justicia, laborales" },
+      { fecha:"31 Mar", protestas:3, estados:3, tipo:"ESCP + DESCA", exigencias:"Vivienda, justicia, ambiente sano" },
+      { fecha:"02 Abr", protestas:4, estados:3, tipo:"Mixto (ESCP + CPP)", exigencias:"Laborales, derechos detenidos, participación política" },
     ] },
 ];

@@ -540,4 +540,52 @@ export const CURATED_FACTCHECK = [
   { title:"Ley de Minas: 55 de 130 artículos aprobados; Fondo Nacional Minero (art.24); debate diferido post-Semana Santa", date:"2026-03-27", source:"AN", scenarios:["E3"], dims:["Político","Económico"], week:"S11" },
   { title:"Biagio Pilieri obtiene libertad plena tras 569 días de detención", date:"2026-03-21", source:"Foro Penal", scenarios:["E1"], dims:["Político"], week:"S11" },
   { title:"Eurasia Group: DR se beneficia del conflicto en Irán y del deseo de Trump de presentar a Venezuela como éxito", date:"2026-03-24", source:"Eurasia Group", scenarios:["E3"], dims:["Internacional"], week:"S11" },
+
+  // S12: 29 marzo – 06 abril 2026
+  // ── Internacional ──
+  { title:"OFAC levanta sanciones a Delcy Rodríguez: la retira de lista de bloqueados, desbloquea activos y cooperación directa", date:"2026-04-01", source:"OFAC/Tesoro", scenarios:["E3"], dims:["Internacional","Político"], week:"S12" },
+  { title:"Trump califica relación con Venezuela como «empresa conjunta» energética; vincula con operación captura Maduro", date:"2026-04-01", source:"White House", scenarios:["E3"], dims:["Internacional","Energético"], week:"S12" },
+  { title:"Reapertura formal de embajada EE.UU. en Caracas: Laura F. Dogu lidera restauración de operaciones", date:"2026-04-02", source:"Dept. of State/Embajada", scenarios:["E3"], dims:["Internacional"], week:"S12" },
+  { title:"SOUTHCOM califica reapertura de embajada como «hito histórico» para la seguridad hemisférica", date:"2026-04-02", source:"SOUTHCOM", scenarios:["E3"], dims:["Internacional"], week:"S12" },
+  { title:"Rubio declara que estabilización se ha cumplido «en gran medida»; estrategia de tres fases en marcha", date:"2026-04-01", source:"Dept. of State", scenarios:["E3"], dims:["Internacional","Político"], week:"S12" },
+  { title:"Reunión Machado-Rubio a puerta cerrada en Departamento de Estado; MCM la califica de «excelente»", date:"2026-03-31", source:"Dept. of State/Prensa", scenarios:["E1"], dims:["Internacional","Político"], week:"S12" },
+  { title:"OFAC emite guía sobre evasión de sanciones y confirma flexibilización para empresas no estadounidenses", date:"2026-04-02", source:"OFAC/Tesoro", scenarios:["E3"], dims:["Internacional","Económico"], week:"S12" },
+  { title:"Embajador iraní Ali Chegini aparece con colectivos en parroquia 23 de Enero de Caracas", date:"2026-04-03", source:"Prensa", scenarios:["E4"], dims:["Internacional","Político"], week:"S12" },
+  { title:"España eliminará vía exprés de regularización para venezolanos a partir de junio 2026 (700.000 afectados)", date:"2026-04-01", source:"Gobierno España/Prensa", scenarios:["E3","E4"], dims:["Internacional","Social"], week:"S12" },
+  { title:"Reanudación de vuelos EE.UU.-Venezuela prevista con 10+ aerolíneas (American Airlines, Iberia, TAP)", date:"2026-04-03", source:"IATA/Prensa", scenarios:["E3"], dims:["Internacional","Económico"], week:"S12" },
+  { title:"Laura Loomer pide elecciones inmediatas vinculando transición con «dominio energético» hemisférico", date:"2026-04-02", source:"Prensa/Redes", scenarios:["E1"], dims:["Internacional"], week:"S12" },
+  { title:"OEA (Ramdin) exige transparencia en designación de Fiscal y Defensor; Canciller Gil califica de «desatinado»", date:"2026-04-03", source:"OEA/Cancillería", scenarios:["E1","E4"], dims:["Internacional","Político"], week:"S12" },
+
+  // ── Político ──
+  { title:"Vencimiento de los 90 días de «ausencia forzosa»: debate constitucional sobre continuidad del interinato", date:"2026-04-03", source:"TSJ/AN/Análisis", scenarios:["E1","E3"], dims:["Político","Constitucional"], week:"S12" },
+  { title:"Remoción de Walter Gavidia (exesposo Cilia Flores) y designación de Aníbal Coronado en Corporación estatal", date:"2026-04-01", source:"Presidencia/Gaceta", scenarios:["E3"], dims:["Político"], week:"S12" },
+  { title:"Movimientos en AN para coordinar reemplazo de rectores del CNE con posibles implicaciones electorales", date:"2026-04-02", source:"AN/Prensa", scenarios:["E1"], dims:["Político"], week:"S12" },
+  { title:"Reactivación de «comanditos»: Alviarez organiza recepción de Machado, preparación electoral y propuestas de gestión", date:"2026-04-01", source:"Vente Venezuela/Prensa", scenarios:["E1"], dims:["Político"], week:"S12" },
+  { title:"Constituyente Laboral: Eduardo Piñate designado Comisionado Presidencial para redefinir modelo laboral", date:"2026-04-02", source:"Presidencia", scenarios:["E3"], dims:["Político","Social"], week:"S12" },
+  { title:"FANB retoma consigna «Chávez vive» con presencia de González López: coexistencia cambio organizacional e ideología", date:"2026-04-03", source:"Min. Defensa", scenarios:["E4"], dims:["Político"], week:"S12" },
+  { title:"Detención y liberación de Wilmer Ruperti sin cargos formales tras casi dos semanas bajo custodia del Sebin", date:"2026-04-01", source:"Prensa/Defensa Ruperti", scenarios:["E4","E2"], dims:["Político","Económico"], week:"S12" },
+  { title:"Vielma Mora acusa a EE.UU. de «colonialismo» bajo Doctrina Monroe; narrativa antisoberanía", date:"2026-04-03", source:"Prensa/PSUV", scenarios:["E4"], dims:["Político"], week:"S12" },
+  { title:"Carmen Meléndez entre peores alcaldesas de Latam: 28,3% imagen positiva vs 65% negativa (CB Global Data)", date:"2026-04-01", source:"CB Global Data", scenarios:["E4"], dims:["Político","Social"], week:"S12" },
+  { title:"Gobierno Rodríguez busca retomar control de juntas directivas de subsidiarias PDVSA en EE.UU. incluyendo Citgo", date:"2026-04-02", source:"Presidencia/Reuters", scenarios:["E3"], dims:["Político","Energético","Internacional"], week:"S12" },
+
+  // ── Energético ──
+  { title:"Exportaciones petroleras >1,09M bpd en marzo (mayor nivel 6 meses); ingresos causados USD 2.398M", date:"2026-04-01", source:"PDVSA/Tanker Trackers", scenarios:["E3"], dims:["Energético"], week:"S12" },
+  { title:"Primer trimestre cierra con caída acumulada de 14,2% en exportaciones pese a repunte de marzo", date:"2026-04-01", source:"PDVSA/Reuters", scenarios:["E2"], dims:["Energético","Económico"], week:"S12" },
+  { title:"Shell negocia expansión gasífera: Mariscal Sucre y campo transfronterizo Loran (~20 Tcf); GNL vía Trinidad", date:"2026-04-02", source:"Reuters/Shell", scenarios:["E3"], dims:["Energético","Internacional"], week:"S12" },
+  { title:"CAF reactiva plan de financiamiento eléctrico a 7 años: termoeléctricas y renovables vía empresas privadas", date:"2026-04-02", source:"CAF", scenarios:["E3"], dims:["Energético","Económico"], week:"S12" },
+  { title:"Alza del crudo: Brent 102, WTI 90,8, Merey 73,3 (+40% intermensual); impacto estimado USD 450M adicionales", date:"2026-04-01", source:"Mercado/Reuters", scenarios:["E3"], dims:["Energético","Económico"], week:"S12" },
+
+  // ── Económico ──
+  { title:"BCV retoma intervención directa: tipo de cambio 570,75 Bs/$; abandona subastas", date:"2026-04-01", source:"BCV", scenarios:["E3"], dims:["Económico"], week:"S12" },
+  { title:"Brecha cambiaria converge: USDT 630-635 vs banca 570 Bs (~10%); pero ~30% vs tasa oficial 474 Bs/$", date:"2026-04-01", source:"CriptoNoticias/BCV", scenarios:["E3"], dims:["Económico"], week:"S12" },
+  { title:"Recaudación SENIAT Q1: USD 3.512M (+26,6% real interanual); ISLR +95,5% pero IVA -7,9%", date:"2026-04-01", source:"SENIAT", scenarios:["E3"], dims:["Económico"], week:"S12" },
+  { title:"Inyección de divisas: 5 bancos reciben divisas para contener presión cambiaria", date:"2026-04-01", source:"GBM/Banca", scenarios:["E3"], dims:["Económico"], week:"S12" },
+
+  // ── Social ──
+  { title:"11 protestas en 4 días (30 mar–02 abr) en 9 estados; promedio 3,6 diario; demandas laborales, vivienda, derechos", date:"2026-04-02", source:"OVCS/Prensa", scenarios:["E4"], dims:["Social"], week:"S12" },
+  { title:"Marcha a Miraflores convocada para 9 abril: sindicatos y trabajadores públicos exigen aumento salarial", date:"2026-04-03", source:"Sindicatos/Prensa", scenarios:["E4"], dims:["Social","Político"], week:"S12" },
+  { title:"Salario mínimo congelado 4 años en 130 Bs/mes (<1 USD); brecha estructural sin válvula de escape", date:"2026-04-01", source:"Análisis/BCV", scenarios:["E4","E2"], dims:["Social","Económico"], week:"S12" },
+
+  // ── Constitucional ──
+  { title:"Tres escenarios sobre interinato: prórroga 90 días (base), declaración falta absoluta (elecciones 30 días), extensión indefinida", date:"2026-04-03", source:"Análisis constitucional", scenarios:["E1","E3","E2"], dims:["Constitucional","Político"], week:"S12" },
 ];

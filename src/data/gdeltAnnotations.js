@@ -25,5 +25,12 @@ export const GDELT_ANNOTATIONS = [
   { date:"2026-03-25", tier:"HIGH", label:"97 protestas en 4 días · pico 41 (25 mar) · 22+ estados", tierEs:"ALTA" },
   { date:"2026-03-26", tier:"MEDIUM", label:"Audiencia Maduro: rechazo desestimación · cargos adicionales", tierEs:"MEDIA" },
   { date:"2026-03-28", tier:"MEDIUM", label:"OFAC: nuevas licencias sector minero (oro, minerales)", tierEs:"MEDIA" },
+  { date:"2026-04-01", tier:"CRITICAL", label:"OFAC levanta sanciones a Delcy Rodríguez · Trump «empresa conjunta»", tierEs:"CRÍTICO" },
+  { date:"2026-04-02", tier:"HIGH", label:"Reapertura embajada EE.UU. en Caracas · Laura F. Dogu", tierEs:"ALTA" },
+  { date:"2026-04-01", tier:"HIGH", label:"Rubio: estabilización «lograda en gran medida» · fase recuperación", tierEs:"ALTA" },
+  { date:"2026-03-31", tier:"HIGH", label:"Reunión Machado-Rubio en Departamento de Estado", tierEs:"ALTA" },
+  { date:"2026-04-03", tier:"MEDIUM", label:"90 días cumplidos: debate constitucional continuidad interinato", tierEs:"MEDIA" },
+  { date:"2026-04-01", tier:"MEDIUM", label:"Exportaciones >1,09M bpd marzo · USD 2.398M ingresos", tierEs:"MEDIA" },
+  { date:"2026-04-03", tier:"MEDIUM", label:"Embajador iraní con colectivos en 23 de Enero", tierEs:"MEDIA" },
 ];
 
