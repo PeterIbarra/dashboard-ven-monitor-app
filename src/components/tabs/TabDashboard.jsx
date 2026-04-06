@@ -132,7 +132,7 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
             // Individual alerts per state
             elec.forEach(s => {
               if (s.dropPct > 40) {
-                liveAlerts.push({ name:`⚡ ${s.state}`, val:`−${s.dropPct}%`, umbral:`Apagón severo (${fmtAgo(s.lastTime)}). ${s.events} evento${s.events>1?"s":""}. BGP estable — patrón de corte eléctrico.`, level:"red" });
+                liveAlerts.push({ name:`⚡ ${s.state}`, val:`−${s.dropPct}%`, umbral:`Posible interrupción eléctrica severa (${fmtAgo(s.lastTime)}). ${s.events} evento${s.events>1?"s":""}. BGP estable — patrón consistente con corte eléctrico.`, level:"red" });
               } else if (s.dropPct > 20) {
                 liveAlerts.push({ name:`⚡ ${s.state}`, val:`−${s.dropPct}%`, umbral:`Interrupción eléctrica (${fmtAgo(s.lastTime)}). ${s.events} evento${s.events>1?"s":""}. Monitorear evolución.`, level:"yellow" });
               } else {

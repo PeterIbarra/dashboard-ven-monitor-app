@@ -315,8 +315,22 @@ function computeRegionScore(parsed, nationalTelescopeData) {
   }
   
   // Electricity index: severity based on number of events, depth, and pattern
-  let elecHealth = 100, elecLabel = "Normal";
-  const confirmedPowerEvents = powerEvents.filter(ev => bgpStable); // only count if BGP was stable
+  // Per-event BGP check: only count events where BGP was stable during that specific drop
+  let elecHealth = 100, elecLabel = "Normal", elecConfidence = null;
+  const bgpValsForCheck = parsed.map(p => p.bgp).filter(v => v !== null);
+  const bgpP95ForCheck = bgpValsForCheck.length >= 5 ? [...bgpValsForCheck].sort((a,b) => a - b)[Math.floor(bgpValsForCheck.length * 0.95)] : null;
+  
+  const confirmedPowerEvents = powerEvents.filter(ev => {
+    // Per-event: check BGP stability during this specific event window
+    if (!bgpP95ForCheck || bgpP95ForCheck < 10) return bgpStable; // fallback to global
+    const evStartIdx = Math.max(0, Math.round((ev.ts - (parsed[0]?.ts || 0)) / step));
+    const evEndIdx = Math.min(bgpValsForCheck.length - 1, evStartIdx + Math.max(2, Math.round((ev.durationSec || 600) / step)));
+    const bgpDuringEvent = bgpValsForCheck.slice(evStartIdx, evEndIdx + 1);
+    if (bgpDuringEvent.length === 0) return bgpStable;
+    const bgpMinDuring = Math.min(...bgpDuringEvent);
+    return (bgpMinDuring / bgpP95ForCheck) > 0.90; // BGP stable during THIS event
+  });
+  
   if (confirmedPowerEvents.length > 0) {
     const worstDrop = Math.max(...confirmedPowerEvents.map(e => e.dropPct));
     const totalDuration = confirmedPowerEvents.reduce((a, e) => a + (e.durationSec || 0), 0);
@@ -331,10 +345,13 @@ function computeRegionScore(parsed, nationalTelescopeData) {
     // Boost severity if telescope confirmed
     if (hasTelescopeConfirm && elecHealth > 15) elecHealth = Math.max(15, elecHealth - 20);
     
-    // Label
-    if (elecHealth <= 30) elecLabel = "Apagón severo";
-    else if (elecHealth <= 50) elecLabel = "Apagón moderado";
-    else if (elecHealth <= 70) elecLabel = "Interrupción leve";
+    // Confidence: telescope boosts (regional correlation done in post-processing)
+    elecConfidence = hasTelescopeConfirm ? "media" : "baja";
+    
+    // Label with confidence
+    if (elecHealth <= 30) elecLabel = elecConfidence === "baja" ? "Posible interrupción eléctrica severa (verificar)" : "Posible interrupción eléctrica severa";
+    else if (elecHealth <= 50) elecLabel = "Posible interrupción eléctrica moderada";
+    else if (elecHealth <= 70) elecLabel = "Posible interrupción eléctrica leve";
     else elecLabel = "Fluctuación";
   }
   
@@ -364,6 +381,7 @@ function computeRegionScore(parsed, nationalTelescopeData) {
     elecHealth,
     elecScore,
     elecLabel,
+    elecConfidence,
     elecEvents: confirmedPowerEvents.length,
     teleCoincidence,
     bgpStable,
@@ -892,17 +910,24 @@ export function TabIODA() {
         
         // Electricity index: respect IODA critical level + count
         const electricEvents = powerEvents.filter(e => e.isElectric);
-        let elecHealth = 100, elecLabel = "Normal";
+        let elecHealth = 100, elecLabel = "Normal", elecConfidence = null;
         if (electricEvents.length > 0) {
           const criticalCount = electricEvents.filter(e => e.iodaCritical).length;
           const worstDrop = Math.max(...electricEvents.map(e => e.dropPct));
           // Severity from worst drop, boosted by IODA critical count
-          if (worstDrop > 60) { elecHealth = 20; elecLabel = "Apagón severo"; }
-          else if (worstDrop > 40) { elecHealth = 40; elecLabel = "Apagón moderado"; }
-          else if (worstDrop > 25) { elecHealth = 60; elecLabel = "Interrupción"; }
-          else if (criticalCount >= 3) { elecHealth = 50; elecLabel = "Interrupciones recurrentes"; }
-          else if (criticalCount >= 1) { elecHealth = 60; elecLabel = "Interrupción detectada"; }
-          else { elecHealth = 80; elecLabel = "Fluctuación"; }
+          if (worstDrop > 60) { elecHealth = 20; }
+          else if (worstDrop > 40) { elecHealth = 40; }
+          else if (worstDrop > 25) { elecHealth = 60; }
+          else if (criticalCount >= 3) { elecHealth = 50; }
+          else if (criticalCount >= 1) { elecHealth = 60; }
+          else { elecHealth = 80; }
+          // Confidence: starts low, boosted later by regional correlation + telescope
+          elecConfidence = "baja";
+          // Label with confidence (will be upgraded in post-processing)
+          if (elecHealth <= 30) elecLabel = "Posible interrupción eléctrica severa";
+          else if (elecHealth <= 50) elecLabel = "Posible interrupción eléctrica moderada";
+          else if (elecHealth <= 70) elecLabel = "Posible interrupción eléctrica leve";
+          else elecLabel = "Fluctuación";
         } else if (powerEvents.length > 0 && !bgpStable) {
           // Ping critical + BGP critical = infrastructure/censorship, not electricity
           elecHealth = 100;
@@ -919,7 +944,7 @@ export function TabIODA() {
           healthPct: connectivityHealth,
           pingHealth, bgpHealth,
           // Electricity
-          elecHealth, elecLabel,
+          elecHealth, elecLabel, elecConfidence,
           elecEvents: electricEvents.length,
           powerEvents,
           bgpStable,
@@ -982,11 +1007,24 @@ export function TabIODA() {
               worstNatSev = matched.severity;
           } else { hasRegional = true; if (ev.dropPct > worstRegDrop) worstRegDrop = ev.dropPct; }
         });
+        // Count how many neighboring states had events at same time (±30min)
+        const neighborCount = scores.filter(other => other !== s && other.powerEvents?.some(oev =>
+          s.powerEvents.some(sev => Math.abs(oev.ts - sev.ts) < 1800)
+        )).length;
+        // Confidence: neighbors boost it, national event = high
+        let confidence = "baja";
+        if (worstNatSev) confidence = "alta"; // national = high confidence electric
+        else if (neighborCount >= 3) confidence = "alta";
+        else if (neighborCount >= 1) confidence = "media";
+        s.elecConfidence = confidence;
         if (hasRegional) {
           s.elecHealth = worstRegDrop > 60 ? 20 : worstRegDrop > 40 ? 40 : worstRegDrop > 25 ? 60 : 80;
-          s.elecLabel = s.elecHealth <= 30 ? "Apagón regional severo" : s.elecHealth <= 50 ? "Apagón regional moderado" : s.elecHealth <= 70 ? "Interrupción regional" : "Fluctuación regional";
-        } else if (worstNatSev === "blackout_severe") { s.elecHealth = 15; s.elecLabel = "Apagón nacional severo"; }
-        else if (worstNatSev === "blackout_moderate") { s.elecHealth = 40; s.elecLabel = "Apagón nacional moderado"; }
+          const sevWord = s.elecHealth <= 30 ? "severa" : s.elecHealth <= 50 ? "moderada" : s.elecHealth <= 70 ? "leve" : "";
+          s.elecLabel = confidence === "alta" ? `Interrupción eléctrica regional ${sevWord}`.trim()
+            : confidence === "media" ? `Posible interrupción eléctrica regional ${sevWord}`.trim()
+            : `Posible interrupción eléctrica ${sevWord} (verificar)`.trim();
+        } else if (worstNatSev === "blackout_severe") { s.elecHealth = 15; s.elecLabel = "Interrupción eléctrica nacional severa"; }
+        else if (worstNatSev === "blackout_moderate") { s.elecHealth = 40; s.elecLabel = "Interrupción eléctrica nacional moderada"; }
         else if (worstNatSev === "network_mild") { s.elecHealth = 80; s.elecLabel = "Degradación leve (red)"; }
         s.elecEvents = s.powerEvents.length;
       });
@@ -1378,6 +1416,7 @@ export function TabIODA() {
                         <div style={{ fontSize:10, color:elecColor, fontWeight:600 }}>
                           {rd.elecLabel}{rd.elecEvents > 0 ? ` · ${rd.elecEvents} evento${rd.elecEvents > 1 ? "s" : ""}` : ""}
                           {rd.teleCoincidence && " · 🔭"}
+                          {rd.elecConfidence && rd.elecHealth < 100 && <span style={{ marginLeft:4, fontSize:9, padding:"1px 4px", borderRadius:3, background: rd.elecConfidence === "alta" ? "#16a34a20" : rd.elecConfidence === "media" ? "#ca8a0420" : "#ef444420", color: rd.elecConfidence === "alta" ? "#16a34a" : rd.elecConfidence === "media" ? "#ca8a04" : "#ef4444" }}>confianza {rd.elecConfidence}</span>}
                         </div>
                       </div>
                     </div>
@@ -1423,7 +1462,7 @@ export function TabIODA() {
                             {!ev.isNational && <span style={{ color:"#7c3aed" }}> · 📍 regional</span>}
                           </div>
                         ))}
-                        {rd.bgpStable && <div style={{ color:"#34d399", marginTop:3 }}>✓ BGP estable — patrón consistente con apagón</div>}
+                        {rd.bgpStable && <div style={{ color:"#34d399", marginTop:3 }}>✓ BGP estable — patrón consistente con interrupción eléctrica</div>}
                         {!rd.bgpStable && <div style={{ color:"#f97316", marginTop:3 }}>⚠ BGP inestable — posible corte deliberado</div>}
                       </div>
                     )}
@@ -1537,11 +1576,11 @@ export function TabIODA() {
                       const dur = ev.duration ? `Duración: ${fmtDuration(ev.duration)}.` : "Evento posiblemente en curso.";
                       let cause = "";
                       if (ev.datasource === "ping-slash24") {
-                        if (ev.score > 3000) cause = "Score alto en sondeo — consistente con un corte severo de conectividad. Si BGP se mantuvo estable, apunta a apagón eléctrico regional.";
-                        else if (ev.score > 500) cause = "Score moderado en sondeo — indica interrupción significativa. Puede ser apagón parcial, falla de CANTV, o mantenimiento.";
+                        if (ev.score > 3000) cause = "Score alto en sondeo — consistente con un corte severo de conectividad. Si BGP se mantuvo estable, posible interrupción eléctrica regional.";
+                        else if (ev.score > 500) cause = "Score moderado en sondeo — indica interrupción significativa. Puede ser falla eléctrica parcial, falla de CANTV, o mantenimiento.";
                         else cause = "Score bajo en sondeo — interrupción breve o de bajo impacto. Posible fluctuación de red o mantenimiento programado.";
                       } else if (ev.datasource === "bgp") {
-                        cause = "Evento en rutas BGP — el proveedor dejó de anunciar prefijos. Más consistente con corte deliberado o falla de peering que con apagón eléctrico.";
+                        cause = "Evento en rutas BGP — el proveedor dejó de anunciar prefijos. Más consistente con corte deliberado o falla de peering que con interrupción eléctrica.";
                       } else {
                         cause = "Anomalía detectada por IODA en este indicador.";
                       }
