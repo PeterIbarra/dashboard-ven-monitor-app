@@ -3,22 +3,22 @@
 
 export const KPIS_LATEST = {
   energia: [
-    { k:"Cardón IV", v:"Acuerdo gas PDVSA-Repsol-Eni", c:"#22c55e" },
-    { k:"Licencias OFAC", v:"GL46B+48A+49A+51+52", c:"#38bdf8" },
-    { k:"Repsol proyección", v:"+50% 2026 · +200% 2028", c:"#22c55e" },
-    { k:"Maurel & Prom", v:"Taladro Maracaibo (1º en 8 años)", c:"#22c55e" },
+    { k:"Exportaciones marzo", v:"1,09M bpd · récord 6 meses", c:"#22c55e" },
+    { k:"Ingresos causados", v:"USD 2.398M (máx. desde dic 2018)", c:"#22c55e" },
+    { k:"Meta dic 2026", v:"1,37M bpd (Ministra Henao)", c:"#38bdf8" },
+    { k:"Refinación PDVSA", v:"31% capacidad (399K bpd)", c:"#ef4444" },
   ],
   politico: [
-    { k:"Gabinete", v:"42% modificado (14 de 33)", c:"#22c55e" },
-    { k:"Amnistía", v:"7.580 beneficiados", c:"#22c55e" },
-    { k:"Excarcelaciones verif.", v:"690 (Foro Penal)", c:"#22c55e" },
-    { k:"Presos políticos", v:"515 (Foro Penal)", c:"#ef4444" },
+    { k:"Fiscal General", v:"Larry Devoe (275 votos AN)", c:"#22c55e" },
+    { k:"Defensora del Pueblo", v:"Eglée González Lobato", c:"#22c55e" },
+    { k:"Protestas 6–9 abr", v:"72 en 4 días · 15 estados", c:"#ef4444" },
+    { k:"Vacío constitucional", v:"90 días cumplidos · prórroga pendiente", c:"#ef4444" },
   ],
   opinion: [
-    { k:"Protestas 13–19 mar", v:"46 (↓ de 65)", c:"#a17d08" },
-    { k:"Bono Guerra Econ.", v:"150 USD (+25%)", c:"#22c55e" },
-    { k:"Fondo Protección", v:"300M USD", c:"#22c55e" },
-    { k:"Inflación proy.", v:"197% (2026)", c:"#ef4444" },
+    { k:"Aprobación Rodríguez", v:"34,6% (AtlasIntel)", c:"#ef4444" },
+    { k:"MCM intención de voto", v:"68,9% (Meganálisis)", c:"#22c55e" },
+    { k:"Inflación anualizada", v:"649,5% (BCV)", c:"#ef4444" },
+    { k:"FMI consulta miembros", v:"Primer movimiento en 2 décadas", c:"#22c55e" },
   ],
 };
 
@@ -110,7 +110,7 @@ export const TENSIONS = [
   { level:"red", text:"Irán en 23 de Enero: embajador iraní con colectivos · tensión con normalización Washington · Ruperti detenido sin cargos" },
 ];
 
-export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12"];
+export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13"];
 
 
 export const ICG_HISTORY = [
@@ -126,6 +126,7 @@ export const ICG_HISTORY = [
   { week:"S10", score:68, sitrep:true, note:"Reconfiguración gabinete 42% + nueva cúpula FANB. Padrino sale. Normalización diplomática operativa" },
   { week:"S11", score:66, sitrep:true, note:"González López giro institucional FANB. Ofensiva económica. 97 protestas en 4 días. Colectivos amenazan MCM" },
   { week:"S12", score:68, sitrep:true, note:"OFAC levanta sanciones DR. Trump «empresa conjunta». Embajada reabierta. 90 días cumplidos. Marcha 9 abril convocada" },
+  { week:"S13", score:70, sitrep:true, note:"Poder Ciudadano completo: Devoe Fiscal (275 votos) + González Lobato Defensora. FMI consulta miembros. 72 protestas 9-abr. Sanciones BCV evaluadas" },
 ];
 
 export const CONF_SEMANAL = [
@@ -191,5 +192,14 @@ export const CONF_SEMANAL = [
       { fecha:"30 Mar", protestas:4, estados:3, tipo:"ESCP + DESCA", exigencias:"Vivienda, ambiente sano, justicia, laborales" },
       { fecha:"31 Mar", protestas:3, estados:3, tipo:"ESCP + DESCA", exigencias:"Vivienda, justicia, ambiente sano" },
       { fecha:"02 Abr", protestas:4, estados:3, tipo:"Mixto (ESCP + CPP)", exigencias:"Laborales, derechos detenidos, participación política" },
+    ] },
+  { week:"S13", label:"6–9 abr", protestas:72, estados:15, reprimidas:1,
+    motivos:["Laborales","Pensiones","Salarios","HCM/IPASME","ONAPRE","Justicia","Presos políticos","Vivienda","Educación","Alimentación","Agua"],
+    hecho:"Jornada 9-abr: mayor escalada laboral del período. PNB desplegada con gas pimienta. 10 periodistas SNTP agredidos. Detención Ort Betancourt (PJ). Cabello convoca marcha simultánea oficialista.",
+    dias:[
+      { fecha:"6 Abr", protestas:4, estados:3, tipo:"CPP + DESCA", exigencias:"Laborales, justicia, vivienda, educación" },
+      { fecha:"7 Abr", protestas:4, estados:3, tipo:"CPP + DESCA", exigencias:"Laborales, justicia, presos políticos, educación" },
+      { fecha:"8 Abr", protestas:10, estados:8, tipo:"DESCA + CPP", exigencias:"Laborales, justicia, presos políticos, alimentación, agua, vivienda" },
+      { fecha:"9 Abr", protestas:54, estados:15, tipo:"Laboral + CPP", exigencias:"Salarios, pensiones, HCM, IPASME, ONAPRE, contratación colectiva, eliminación ONAPRE, rechazo bonos" },
     ] },
 ];

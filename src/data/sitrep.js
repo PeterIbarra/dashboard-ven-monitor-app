@@ -483,6 +483,26 @@ export const SITREP_ALL = [
   },
 ];
 
+  // ── S13: 03 abril – 10 abril 2026 ──
+  { period:"03 – 10 de abril de 2026", periodShort:"3–10 abr 2026",
+    keyPoints:[
+      { tag:"Social", color:"#E5243B", title:"9 de abril: mayor jornada de conflictividad laboral del período", text:"72 protestas en 4 días (6–9 de abril), escalada de 3 a 15 estados. El 9 de abril, 29 protestas en 15 estados — demandas de salario, pensiones, HCM, IPASME, ONAPRE y contratación colectiva. La PNB desplegó gas pimienta y bloqueó el acceso a Miraflores. 10 periodistas del SNTP fueron agredidos y despojados de equipos. Detención de Ort Betancourt Villamizar (PJ, 20 años). Cabello convocó marcha oficialista simultánea por el 20° aniversario de la Ley de Consejos Comunales." },
+      { tag:"Financiero", color:"#16a34a", title:"FMI consulta miembros + EE.UU. evalúa sanciones al BCV", text:"El FMI inició consulta formal entre sus miembros sobre Venezuela — primer movimiento institucional en más de dos décadas. En paralelo, Bloomberg reportó que Washington evalúa levantar las sanciones al Banco Central de Venezuela, lo que desbloquearía miles de millones en ingresos petroleros y podría elevar la producción hasta un 40% adicional en 2026. Bonos soberanos de 2027 se acercaron a 48 centavos por dólar. Gobierno y oposición coordinaron conjuntamente la defensa legal de Citgo con pausa de 45 días bajo lineamientos del Departamento de Estado." },
+      { tag:"Institucional", color:"#8b5cf6", title:"Poder Ciudadano completo: Devoe y González Lobato", text:"La AN designó a Larry Devoe como Fiscal General (275 votos de 277 posibles) y a Eglée González Lobato como Defensora del Pueblo, completando la renovación del Poder Ciudadano con figuras afines al gobierno interino. La oposición (Grupo Parlamentario Libertad) propuso a Magaly Vásquez y Marialbert Barrios como alternativas y cuestionó la independencia de los designados. La OEA exigió transparencia; la Cancillería rechazó el pronunciamiento." },
+      { tag:"Energía", color:"#ca8a04", title:"Energía: señales positivas, trabas regulatorias crecientes", text:"Shell confirma primer gas de Loran-Manatee para mediados de 2027 (Reuters, 9-abr). ConocoPhillips y ExxonMobil envían equipos de evaluación — primeras visitas desde expropiaciones de 2007. Sin embargo, el Ministerio de Hidrocarburos incumplió plazos para publicar modelos de contratos (marzo y abril), bloqueando decisiones de inversión. Refinación PDVSA cayó al 31% de capacidad (399K bpd). CEO de ConocoPhillips calificó reformas de 'lamentablemente inadecuadas'. AVPG proyecta +134% en producción de gas en 10 años." },
+      { tag:"Político", color:"#0468B1", title:"Rodríguez anuncia reformas y PUD presenta hoja de ruta", text:"Rodríguez anunció aumento salarial 'responsable' para el 1° de mayo, Consejo Nacional de Economía, comisión de activos del Estado (descartando privatización de PDVSA), Ley de Celeridad de Trámites y peregrinación nacional anti-sanciones desde el 19 de abril. Sin montos ni mecanismos de indexación frente a inflación de 649,5% anual. La PUD presentó su hoja de ruta de transición el 12 de abril, congregando estructuras regionales. MCM convocó encuentro con la diáspora en Madrid (18 de abril); retorno al país calificado como 'decisión definitiva'." },
+    ],
+    sintesis:"Venezuela cierra la semana del 3 al 10 de abril con E3 reforzado (47%, +2pp) por la convergencia de la consolidación del Poder Ciudadano bajo Rodríguez y las señales más significativas de reinserción financiera del período — la consulta del FMI y la evaluación del levantamiento de sanciones al BCV por EE.UU. Sin embargo, la jornada del 9 de abril representa la advertencia estructural más clara del período: 72 protestas, 15 estados, represión documentada y primera detención política. El anuncio de aumento salarial sin montos ni indexación frente a 649,5% de inflación anual enfrenta el riesgo de ser absorbido inmediatamente. E1 se mantiene en 32% sostenido por la presión social y la hoja de ruta opositora. E4 baja a 15% por ausencia de escalada coercitiva sistémica, aunque el vector iraní-colectivos y la movilización del 16 de abril mantienen riesgo latente.",
+    actores:[
+      { name:"EE.UU.", items:["Evalúa levantar sanciones al BCV (Bloomberg): +40% producción potencial","Gobierno y oposición coordinan defensa legal de Citgo (pausa 45 días)","Trump: 'muy contento con la presidenta electa' — 83,8% venezolanos rechazan el elogio","ConocoPhillips y ExxonMobil envían equipos de evaluación a Venezuela","Reanudación de vuelos: 10 aerolíneas prevén retomar operaciones"] },
+      { name:"Gobierno Interino (Rodríguez)", items:["Anuncia aumento salarial 1° mayo + Consejo Nacional de Economía + comisión activos","Peregrinación anti-sanciones desde 19 de abril","Designación Eduardo Piñate como comisionado Constituyente Laboral","Remoción de Gavidia (exesposo Cilia Flores) de Corporación 'Juntos Todo es Posible'","Detención y liberación de Wilmer Ruperti sin cargos formales (Sebin)","Diálogo interreligioso y Hoja de Ruta para la Convivencia (Foro Cívico)"] },
+      { name:"Asamblea Nacional", items:["Designa Larry Devoe como Fiscal General (275 votos) — control Poder Ciudadano completo","Designa Eglée González Lobato como Defensora del Pueblo","Aprueba Ley de Minas por unanimidad","Designa Coromoto Godoy representante ante la ONU (reemplaza a Samuel Moncada)","Reportes de coordinaciones internas para sustituir rectores del CNE"] },
+      { name:"Oposición / Sociedad Civil", items:["PUD presenta hoja de ruta de transición democrática (12 de abril)","MCM convoca encuentro diáspora en Madrid (18 de abril); retorno 'decisión definitiva'","CNE rechaza recibir propuesta electoral de academia (cronograma 10 meses)","Foro Cívico firma Hoja de Ruta para la Convivencia con el Ejecutivo","Comité Presos Políticos: represión El Rodeo I, fallecimiento extranjero sin confirmar"] },
+      { name:"Internacional / Financiero", items:["FMI inicia consulta formal entre miembros — primer movimiento en 2 décadas","Bonos soberanos 2027 cerca de 48 ctvs/USD; bonos PDVSA también al alza","Shell: primer gas Loran-Manatee mediados 2027 (7,3 TCF reservas)","11 ONG alertan blanqueo de oro ilícito via licencias OFAC 51A/54/55","España cierra vía exprés regularización para venezolanos desde junio 2026","Caso Maduro-Flores NY: juez rechaza compartir evidencia con coacusados prófugos"] },
+    ],
+  },
+];
+
 export const CURATED_NEWS = [
   // S1: 3-15 enero
   { title:"Operación militar de EE.UU. resulta en captura de Nicolás Maduro", date:"2026-01-03", source:"Reuters", scenarios:["E2","E3"], dims:["Internacional"], week:"S1" },
@@ -670,4 +690,39 @@ export const CURATED_FACTCHECK = [
 
   // ── Constitucional ──
   { title:"Tres escenarios sobre interinato: prórroga 90 días (base), declaración falta absoluta (elecciones 30 días), extensión indefinida", date:"2026-04-03", source:"Análisis constitucional", scenarios:["E1","E3","E2"], dims:["Constitucional","Político"], week:"S12" },
+
+  // S13: 03 abril – 10 abril 2026
+  // ── Social ──
+  { title:"9 de abril: 72 protestas en 4 días, escalada de 3 a 15 estados — mayor jornada laboral del período", date:"2026-04-09", source:"OVCS/SNTP", scenarios:["E1","E4"], dims:["Social","Político"], week:"S13" },
+  { title:"PNB despliega gas pimienta en marcha a Miraflores; 10 periodistas SNTP agredidos y despojados de equipos", date:"2026-04-09", source:"SNTP", scenarios:["E4","E2"], dims:["Social","Político"], week:"S13" },
+  { title:"Detención de Ort Betancourt Villamizar (20 años, Primero Justicia) en plaza El Venezolano", date:"2026-04-09", source:"PUD/OVCS", scenarios:["E4"], dims:["Social","Político"], week:"S13" },
+  { title:"Cabello convoca marcha oficialista simultánea por 20° aniversario Ley Consejos Comunales; reivindica 5.336 comunas", date:"2026-04-09", source:"PSUV/VTV", scenarios:["E3","E4"], dims:["Social","Político"], week:"S13" },
+  { title:"Nueva movilización laboral convocada para el 16 de abril por Coalición Sindical Nacional", date:"2026-04-10", source:"CSN", scenarios:["E1","E4"], dims:["Social"], week:"S13" },
+  // ── Económico ──
+  { title:"FMI inicia consulta formal entre miembros sobre Venezuela — primer movimiento en más de dos décadas", date:"2026-04-07", source:"FMI/Bloomberg", scenarios:["E3","E1"], dims:["Económico","Internacional"], week:"S13" },
+  { title:"EE.UU. evalúa levantar sanciones al BCV: desbloquearía ingresos petroleros y podría elevar producción +40% en 2026", date:"2026-04-08", source:"Bloomberg", scenarios:["E3"], dims:["Económico","Internacional","Energético"], week:"S13" },
+  { title:"Bonos venezolanos 2027 se acercan a 48 centavos por dólar; mercado descuenta expectativas de normalización", date:"2026-04-08", source:"Bloomberg/Mercados", scenarios:["E3"], dims:["Económico","Internacional"], week:"S13" },
+  { title:"Inflación marzo: 13,1% mensual (BCV) — acumulado 2026: 71,8% — tasa anualizada: 649,5%", date:"2026-04-05", source:"BCV", scenarios:["E2","E4"], dims:["Económico"], week:"S13" },
+  { title:"PIB real 2025 equivale al 35,7% del nivel de 2012; exportaciones pasaron de USD 97.669M (2012) a USD 20.785M (2025)", date:"2026-04-06", source:"Análisis/BCV", scenarios:["E2"], dims:["Económico"], week:"S13" },
+  { title:"Gobierno y oposición coordinan defensa conjunta de Citgo: solicitud pausa 45 días bajo lineamientos Depto. Estado", date:"2026-04-07", source:"Depto. Estado/PUD", scenarios:["E3"], dims:["Económico","Internacional","Político"], week:"S13" },
+  // ── Energético ──
+  { title:"Shell confirma primer gas Loran-Manatee para mediados de 2027; gasoducto 32 pulgadas a instalación Beachfield Trinidad", date:"2026-04-09", source:"Reuters", scenarios:["E3"], dims:["Energético","Internacional"], week:"S13" },
+  { title:"ConocoPhillips envía equipo de evaluación a Venezuela — primera visita desde expropiaciones de 2007", date:"2026-04-09", source:"Reuters", scenarios:["E3"], dims:["Energético","Internacional"], week:"S13" },
+  { title:"ExxonMobil envió equipo técnico para evaluar infraestructura y oportunidades; también expropiada en 2007", date:"2026-04-08", source:"Reuters", scenarios:["E3"], dims:["Energético","Internacional"], week:"S13" },
+  { title:"Ministerio Hidrocarburos incumple plazos modelos de contratos (marzo y abril); empresas no pueden tomar decisiones de inversión", date:"2026-04-09", source:"Reuters", scenarios:["E2","E3"], dims:["Energético"], week:"S13" },
+  { title:"Refinación PDVSA cae al 31% de capacidad (399K bpd de 1,29M); fallas eléctricas en Complejo Paraguana", date:"2026-04-08", source:"Reuters", scenarios:["E2"], dims:["Energético"], week:"S13" },
+  { title:"AVPG proyecta crecimiento del 134% en producción de gas en 10 años: de 4.700 a 11.000 MMpcd", date:"2026-04-06", source:"AVPG", scenarios:["E3"], dims:["Energético"], week:"S13" },
+  { title:"Ministra Henao proyecta 1,37M bpd para diciembre 2026 ante inversionistas de EE.UU. y Canadá; 93 taladros activos", date:"2026-04-05", source:"MPPPH", scenarios:["E3"], dims:["Energético","Internacional"], week:"S13" },
+  // ── Político ──
+  { title:"AN designa Larry Devoe como Fiscal General (275 votos) y Eglée González Lobato como Defensora del Pueblo", date:"2026-04-08", source:"AN", scenarios:["E3"], dims:["Político","Constitucional"], week:"S13" },
+  { title:"Rodríguez anuncia aumento salarial 1° mayo, Consejo Nacional de Economía y peregrinación anti-sanciones 19 abril", date:"2026-04-07", source:"Gobierno/VTV", scenarios:["E3","E1"], dims:["Político","Económico","Social"], week:"S13" },
+  { title:"PUD presenta hoja de ruta de transición democrática en encuentro nacional del 12 de abril", date:"2026-04-10", source:"PUD", scenarios:["E1"], dims:["Político"], week:"S13" },
+  { title:"MCM convoca encuentro con diáspora en Madrid (18 abril); retorno al país calificado como 'decisión definitiva'", date:"2026-04-09", source:"MCM/PUD", scenarios:["E1"], dims:["Político","Internacional"], week:"S13" },
+  { title:"CNE rechaza recibir propuesta electoral de academia; Nicmer Evans: elecciones con garantías solo Q4-2026 o Q1-2027", date:"2026-04-07", source:"CNE/Análisis", scenarios:["E3","E1"], dims:["Político","Constitucional"], week:"S13" },
+  // ── Internacional ──
+  { title:"Trump: 'muy contento con la presidenta electa que tenemos ahora mismo'; 83,8% venezolanos rechazan el elogio (Meganálisis)", date:"2026-04-06", source:"White House/Meganálisis", scenarios:["E3","E2"], dims:["Internacional","Social"], week:"S13" },
+  { title:"11 ONG alertan blanqueo de oro ilícito vía licencias OFAC 51A/54/55; riesgo ambiental y comunidades indígenas en Arco Minero", date:"2026-04-07", source:"ONG nacionales/internacionales", scenarios:["E4","E2"], dims:["Internacional","Social"], week:"S13" },
+  { title:"España cierra vía exprés de regularización para venezolanos desde junio 2026; afectará ~240.000 de 700.000 residentes", date:"2026-04-08", source:"Gobierno España", scenarios:["E2"], dims:["Internacional","Social"], week:"S13" },
+  { title:"Embajador iraní Ali Chegini con colectivos en 23 de Enero: llamados a violencia y discursos antisemitas", date:"2026-04-03", source:"OSINT/Alertas", scenarios:["E4"], dims:["Internacional","Político"], week:"S13" },
 ];
+

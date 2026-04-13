@@ -32,5 +32,15 @@ export const GDELT_ANNOTATIONS = [
   { date:"2026-04-03", tier:"MEDIUM", label:"90 días cumplidos: debate constitucional continuidad interinato", tierEs:"MEDIA" },
   { date:"2026-04-01", tier:"MEDIUM", label:"Exportaciones >1,09M bpd marzo · USD 2.398M ingresos", tierEs:"MEDIA" },
   { date:"2026-04-03", tier:"MEDIUM", label:"Embajador iraní con colectivos en 23 de Enero", tierEs:"MEDIA" },
+
+  // S13: 03 abril – 10 abril 2026
+  { date:"2026-04-07", tier:"CRITICAL", label:"FMI inicia consulta formal sobre Venezuela — primer movimiento en 2 décadas", tierEs:"CRÍTICO" },
+  { date:"2026-04-08", tier:"HIGH", label:"EE.UU. evalúa levantar sanciones al BCV (Bloomberg) · +40% producción potencial", tierEs:"ALTA" },
+  { date:"2026-04-09", tier:"HIGH", label:"9 de abril: 72 protestas en 4 días · represión PNB · 10 periodistas agredidos · detención PJ", tierEs:"ALTA" },
+  { date:"2026-04-08", tier:"HIGH", label:"AN designa Devoe (Fiscal) + González Lobato (Defensora) · Poder Ciudadano completo bajo Rodríguez", tierEs:"ALTA" },
+  { date:"2026-04-09", tier:"HIGH", label:"Shell confirma primer gas Loran-Manatee mid-2027 · ConocoPhillips envía equipo evaluación Venezuela", tierEs:"ALTA" },
+  { date:"2026-04-07", tier:"MEDIUM", label:"Rodríguez anuncia aumento salarial 1° mayo + Consejo Nacional de Economía + peregrinación anti-sanciones 19-abr", tierEs:"MEDIA" },
+  { date:"2026-04-08", tier:"MEDIUM", label:"Bonos venezolanos 2027 cerca de 48 ctvs/USD · expectativas de normalización", tierEs:"MEDIA" },
+  { date:"2026-04-10", tier:"MEDIUM", label:"PUD presenta hoja de ruta de transición democrática (12 de abril)", tierEs:"MEDIA" },
 ];
 
