@@ -481,7 +481,7 @@ export const SITREP_ALL = [
       lecturaAnalitica: "El vacío constitucional opera como instrumento de estabilización política: al no definir la naturaleza de la ausencia presidencial, el sistema evita activar mecanismos que podrían desestabilizar la transición negociada con Washington. Sin embargo, el reloj constitucional corre y la indefinición no es sostenible indefinidamente. La prórroga de los 90 días adicionales será el primer test real de la capacidad institucional para gestionar la transición dentro del marco legal.",
     },
   },
-];
+
 
   // ── S13: 03 abril – 10 abril 2026 ──
   { period:"03 – 10 de abril de 2026", periodShort:"3–10 abr 2026",
