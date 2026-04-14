@@ -743,7 +743,7 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
               <div style={{ fontFamily:font, fontSize:11, color:MUTED, marginBottom:6 }}>
                 <strong>Período:</strong> {d.opinionPublica.protestas.periodo} · <strong>Composición:</strong> {d.opinionPublica.protestas.composicion}
               </div>
-              <div style={{ fontFamily:font, fontSize:10, color:MUTED, padding:"4px 8px", background:"rgba(234,179,8,0.06)", border:"1px solid rgba(234,179,8,0.15)", lineHeight:1.5, fontSize:11 }}>
+              <div style={{ fontFamily:font, fontSize:11, color:MUTED, padding:"4px 8px", background:"rgba(234,179,8,0.06)", border:"1px solid rgba(234,179,8,0.15)", lineHeight:1.5 }}>
                 ⚠ {d.opinionPublica.protestas.nota}
               </div>
               {d.opinionPublica.excarcelados && (
