@@ -500,6 +500,76 @@ export const SITREP_ALL = [
       { name:"Oposición / Sociedad Civil", items:["PUD presenta hoja de ruta de transición democrática (12 de abril)","MCM convoca encuentro diáspora en Madrid (18 de abril); retorno 'decisión definitiva'","CNE rechaza recibir propuesta electoral de academia (cronograma 10 meses)","Foro Cívico firma Hoja de Ruta para la Convivencia con el Ejecutivo","Comité Presos Políticos: represión El Rodeo I, fallecimiento extranjero sin confirmar"] },
       { name:"Internacional / Financiero", items:["FMI inicia consulta formal entre miembros — primer movimiento en 2 décadas","Bonos soberanos 2027 cerca de 48 ctvs/USD; bonos PDVSA también al alza","Shell: primer gas Loran-Manatee mediados 2027 (7,3 TCF reservas)","11 ONG alertan blanqueo de oro ilícito via licencias OFAC 51A/54/55","España cierra vía exprés regularización para venezolanos desde junio 2026","Caso Maduro-Flores NY: juez rechaza compartir evidencia con coacusados prófugos"] },
     ],
+    nacional: {
+      amnistia: { solicitudes:null, libertadesPlenas:null, privadosLiberados:null, cautelares:null, militares:null, fpVerificados:690, fpDetenidos:515, fpNota:"Sin datos oficiales nuevos de amnistía esta semana. Detención de Ort Betancourt Villamizar (PJ, 20 años) el 9 de abril. Denuncias El Rodeo I: represión de protesta de reclusos extranjeros, fallecimiento sin confirmación oficial, desmayos por deficiencias alimentarias." },
+      rodriguez: [
+        { title:"Paquete de reformas anunciado", text:"Aumento salarial 'responsable' para el 1° de mayo, Consejo Nacional de Economía, comisión de activos del Estado (descartando privatización de PDVSA), Ley de Celeridad de Trámites y peregrinación anti-sanciones desde el 19 de abril. Sin montos ni mecanismos de indexación precisos." },
+        { title:"Poder Ciudadano renovado bajo control del interinato", text:"AN designa Larry Devoe como Fiscal General (275 votos) y Eglée González Lobato como Defensora del Pueblo. Oposición propone alternativas y cuestiona independencia. OEA exige transparencia; Cancillería rechaza el pronunciamiento." },
+        { title:"Diálogo interreligioso y hoja de ruta de convivencia", text:"Rodríguez sostiene encuentro con líderes religiosos en Miraflores y promueve, junto al Foro Cívico, una 'Hoja de Ruta para la Convivencia y la Acción Social'." },
+        { title:"Remoción de Gavidia y detención-liberación de Ruperti", text:"Destitución del exesposo de Cilia Flores de la Corporación 'Juntos Todo es Posible'. Wilmer Ruperti reapareció tras casi dos semanas bajo custodia del Sebin sin cargos formales." },
+      ],
+    },
+    economia: {
+      kpis: [
+        { value:"13,1%", label:"Inflación mensual (BCV) — acumulado 2026: 71,8%", color:"#E5243B" },
+        { value:"649,5%", label:"Inflación anualizada (BCV)", color:"#dc2626" },
+        { value:"$133M", label:"Intervención BCV semana (USD)", color:"#0468B1" },
+        { value:"48 ctvs", label:"Bonos soberanos 2027 (expectativa normalización)", color:"#16a34a" },
+      ],
+      empresas: [
+        { empresa:"Shell", desarrollo:"Reuters 9-abr: primer gas Loran-Manatee para mediados de 2027. Gasoducto ampliado de 700 MMpcd a 1 bcfd (tubería 32 pulgadas a instalación Beachfield, Trinidad). Loran contiene 7,3 TCF; Manatee 2,7 TCF." },
+        { empresa:"ConocoPhillips", desarrollo:"Reuters 9-abr: envía equipo de evaluación a Venezuela — primera visita desde expropiaciones 2007. Reclama ~USD 12.000M en laudos arbitrales. CEO Ryan Lance: Venezuela necesita 'reconectar completamente' su sistema fiscal; reformas actuales 'lamentablemente inadecuadas'." },
+        { empresa:"ExxonMobil", desarrollo:"Envió equipo técnico para evaluar infraestructura y oportunidades el mes pasado. También expropiada en 2007. Ministerio Hidrocarburos incumplió plazos de publicación de modelos de contratos (marzo y abril)." },
+        { empresa:"PDVSA", desarrollo:"Refinación al 31% de capacidad instalada (399K bpd de 1,29M). Caída desde 35% de febrero. Cuatro unidades de destilación y un cracker catalítico operativos en Paraguana. Fallas eléctricas y necesidad de reparaciones mayores." },
+        { empresa:"FMI + BCV", desarrollo:"FMI inicia consulta formal entre miembros — primer movimiento institucional en más de dos décadas. EE.UU. evalúa levantar sanciones al BCV: desbloquearía miles de millones en ingresos petroleros, +40% producción potencial. Gobierno y oposición coordinan defensa de Citgo (pausa 45 días bajo Depto. Estado)." },
+      ],
+    },
+    opinionPublica: {
+      protestas: {
+        total: 72,
+        promDiario: 18.0,
+        periodo: "6–9 abr",
+        variacion: "↑ histórico — MAYOR JORNADA LABORAL DEL PERÍODO",
+        composicion: "Laboral-salarial dominante: salarios, pensiones, HCM, IPASME, ONAPRE, contratación colectiva",
+        nota: "Escalada de 3 estados (6-abr) a 15 estados (9-abr) — nacionalización del conflicto. El 9 de abril: 29 protestas en 15 estados con represión de la PNB (gas pimienta, bloqueos), 10 periodistas SNTP agredidos y detención de Ort Betancourt Villamizar (PJ, 20 años). Cabello convoca marcha oficialista simultánea. Salario mínimo congelado 4 años en 130 Bs (<1 USD). Nueva movilización convocada para el 16 de abril.",
+      },
+      percepcion: {
+        fuente: "AtlasIntel/Bloomberg (n=4.659, ±1pp) + Meganálisis (n=1.007, ±3,09%) — marzo 2026",
+        titulo: "Alta desaprobación del gobierno, optimismo moderado sobre el futuro",
+        nota: "Paradoja estructural: 92,3% en contra de que Rodríguez lidere la transición (Meganálisis) convive con 64% que espera mejoras en 6 meses (AtlasIntel). Solo el 9,3% reporta mejoras concretas. MCM lidera con 53% imagen positiva y 68,9% intención de voto. 83,8% rechaza que Trump elogie a Rodríguez. 90% de hogares con fallas eléctricas recientes.",
+        datos: [
+          { factor:"Espera mejora económica en 6 meses (AtlasIntel)", pct:64.0 },
+          { factor:"Percibe avance hacia democratización (AtlasIntel)", pct:58.0 },
+          { factor:"Influencia EE.UU. positiva (AtlasIntel)", pct:53.5 },
+          { factor:"Imagen positiva MCM (AtlasIntel)", pct:53.0 },
+          { factor:"Corrupción principal preocupación (AtlasIntel)", pct:59.0 },
+        ],
+      },
+      excarcelados: { fp:690, presos:515, militares:179, fuente:"Foro Penal — sin datos nuevos S13. Detención PJ 9-abr." },
+    },
+    escenarios: [
+      { name:"Continuidad Negociada", prob:"47%", color:"#0468B1", text:"Consolidación del Poder Ciudadano bajo Rodríguez (Devoe + González Lobato) + señales de reinserción financiera más potentes del período (FMI consulta formal + evaluación sanciones BCV). Ley de Minas unánime + Ley Celeridad TSJ constitucional + bonos 2027 cerca 48 ctvs. Sube 2pp por convergencia institucional-financiera." },
+      { name:"Transición Política Pacífica", prob:"32%", color:"#2d8a30", text:"Sostenido por presión social del 9-abr (72 protestas, 15 estados) y articulación opositora: hoja de ruta PUD 12-abr + retorno MCM como 'decisión definitiva' + encuentro diáspora Madrid 18-abr. MCM 68,9% intención de voto (Meganálisis). CNE rechaza propuesta academia. Se mantiene en 32% por ausencia de cronograma electoral." },
+      { name:"Resistencia Coercitiva", prob:"15%", color:"#ca8a04", text:"Baja 2pp por ausencia de escalada coercitiva sistémica. Persiste: represión 9-abr (gas pimienta, 10 periodistas agredidos, detención PJ), embajador iraní con colectivos en 23-Enero (llamados violencia + antisemitismo), nueva movilización 16-abr, El Rodeo I denuncias. Vector iraní-colectivos es el comodín." },
+      { name:"Colapso y Fragmentación", prob:"6%", color:"#dc2626", text:"Contenido por solidez eje bilateral EE.UU.-Venezuela y señales de reinserción financiera (FMI + BCV). Se mantiene en 6% por acumulación de fragilidades: inflación >600%, vacío constitucional 90 días, refinación 31%, modelos contratos sin publicar, conflictividad laboral sin respuestas concretas." },
+    ],
+    comentarios: [
+      { tag:"Factor 1", color:"#16a34a", title:"FMI + BCV: los movimientos más significativos de reinserción financiera del período", text:"La consulta formal del FMI entre sus miembros — primer movimiento en más de dos décadas — y la evaluación por Washington del levantamiento de sanciones al BCV son los eventos de mayor potencial transformador del período. Ambos dependen de decisiones políticas de los principales accionistas del FMI y de la administración Trump, y ninguno está consolidado. El alza de bonos venezolanos refleja expectativas de mercado, no realidades institucionales. De materializarse, desbloquearían miles de millones en ingresos petroleros y podrían elevar la producción hasta un 40% adicional en 2026." },
+      { tag:"Factor 2", color:"#E5243B", title:"9 de abril: señal de alarma estructural que E3 no puede ignorar", text:"72 protestas en 4 días, escalada de 3 a 15 estados, represión documentada con gas pimienta, agresión a 10 periodistas del SNTP y primera detención política del período configuran la advertencia estructural más clara del ciclo. El congelamiento salarial de cuatro años, inflación anualizada del 649,5% y el colapso de servicios básicos generan un sustrato de presión que el anuncio del 1° de mayo sin montos ni mecanismos de indexación puede no lograr desactivar. La convocatoria del 16 de abril indica que el ciclo de conflictividad continúa abierto." },
+      { tag:"Factor 3", color:"#8b5cf6", title:"Paradoja energética: interés estratégico real, trabas regulatorias crecientes", text:"ConocoPhillips y ExxonMobil envían equipos de evaluación por primera vez desde 2007 al mismo tiempo que el Ministerio de Hidrocarburos incumple los plazos para publicar modelos de contratos (marzo y abril). La refinación cae al 31% desde el 35% de febrero. El CEO de ConocoPhillips califica las reformas de 'lamentablemente inadecuadas'. El plan de USD 100.000M impulsado por Washington no arrancará sin modelos de contratos claros, marco fiscal reformado y BCV desbloqueado." },
+      { tag:"Factor 4", color:"#ca8a04", title:"Vacío constitucional: el reloj que el sistema prefiere ignorar", text:"Al cumplirse los primeros 90 días de la 'ausencia forzosa' declarada por el TSJ — figura inexistente en la Constitución — la prórroga formal por la AN antes de julio se convierte en el primer test real de capacidad institucional del interinato. Su gestión revelará el grado de cohesión entre los actores que sostienen el proceso y la disposición de EE.UU. a tolerar la ambigüedad jurídica como precio de la estabilidad operativa. Sin prórroga, el interinato pierde base legal y puede derivar en crisis institucional." },
+    ],
+    marcoNormativo: {
+      titulo: "Vacío constitucional: el debate de los 90 días",
+      resumen: "Al vencimiento de los primeros 90 días de la 'ausencia forzosa' declarada por el TSJ el 3 de enero, se abre el debate sobre la prórroga del interinato. La figura no existe en la Constitución — surge de una interpretación del TSJ del artículo 234 para encuadrar un hecho excepcional sin declarar de inmediato una falta absoluta. Si se agota el lapso de 180 días sin definición, la Constitución obliga a determinar si la ausencia pasa a ser absoluta, lo que implicaría convocatoria electoral en 30 días.",
+      cambios: [
+        { titulo:"E1 — Prórroga formal: escenario base", texto:"La AN autoriza extensión de 90 días adicionales, llevando el mandato encargado hasta julio 2026. Preserva la estabilidad institucional y da tiempo para avanzar en reformas y preparación electoral. Probabilidad: ALTA.", color:"#0468B1" },
+        { titulo:"E2 — Falta absoluta: elecciones en 30 días", texto:"TSJ o AN determinan que la ausencia es definitiva. Activa Art. 233 con obligación de convocar elecciones en 30 días. Políticamente improbable dado el estado actual del CNE y la ausencia de consenso. Probabilidad: BAJA.", color:"#16a34a" },
+        { titulo:"E3 — Extensión indefinida: ambigüedad jurídica", texto:"TSJ mantiene la ambigüedad, sosteniendo el interinato de facto más allá de los 180 días constitucionales. Erosionaría la legitimidad y generaría presiones internacionales, especialmente desde Washington. Probabilidad: MEDIA.", color:"#ca8a04" },
+        { titulo:"Caso Maduro-Flores NY: juez rechaza compartir evidencia", texto:"El juez Hellerstein rechazó la solicitud de la defensa para compartir material probatorio con coacusados prófugos, ratificando la orden de protección de evidencias.", color:"#E5243B" },
+      ],
+      lecturaAnalitica: "El vacío constitucional opera como instrumento de estabilización política: al no definir la naturaleza de la ausencia presidencial, el sistema evita activar mecanismos que podrían desestabilizar la transición negociada con Washington. La prórroga de los 90 días adicionales por la AN será el primer test real de la capacidad institucional para gestionar la transición dentro del marco legal. Su gestión — o evasión — revelará el grado de cohesión entre los actores que sostienen el interinato y la disposición de EE.UU. a tolerar la ambigüedad jurídica como precio de la estabilidad operativa.",
+    },
   },
 ];
 
