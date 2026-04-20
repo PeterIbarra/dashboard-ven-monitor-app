@@ -3,22 +3,22 @@
 
 export const KPIS_LATEST = {
   energia: [
-    { k:"Exportaciones marzo", v:"1,09M bpd · récord 6 meses", c:"#22c55e" },
-    { k:"Ingresos causados", v:"USD 2.398M (máx. desde dic 2018)", c:"#22c55e" },
-    { k:"Meta dic 2026", v:"1,37M bpd (Ministra Henao)", c:"#38bdf8" },
-    { k:"Refinación PDVSA", v:"31% capacidad (399K bpd)", c:"#ef4444" },
+    { k:"FMI + BM reanudan relaciones", v:"16 abr — primera vez en más de dos décadas · DEG ~USD 5.000M", c:"#22c55e" },
+    { k:"GL-56 y GL-57 OFAC", v:"Apertura financiera condicionada · GL-57 habilita BCV y banca pública", c:"#22c55e" },
+    { k:"Producción marzo (ofic.)", v:"1,09M bpd · 988 kb/d OPEP sec. · Merey USD 85,92/b", c:"#38bdf8" },
+    { k:"150M barriles desde enero", v:"Haustveit Caracas · Chevron 49% Petroindependencia · ENI+Repsol retoman", c:"#22c55e" },
   ],
   politico: [
-    { k:"Fiscal General", v:"Larry Devoe (275 votos AN)", c:"#22c55e" },
-    { k:"Defensora del Pueblo", v:"Eglée González Lobato", c:"#22c55e" },
-    { k:"Protestas 6–9 abr", v:"72 en 4 días · 15 estados", c:"#ef4444" },
-    { k:"Vacío constitucional", v:"90 días cumplidos · prórroga pendiente", c:"#ef4444" },
+    { k:"Kozak: Fase 1 cumplida", v:"EE.UU. avanza a Fase 2: CNE + KPMG + retorno libre MCM", c:"#f59e0b" },
+    { k:"MCM en Elíseo (13 abr)", v:"Macron + PM Países Bajos · retorno inminente 'decisión definitiva'", c:"#22c55e" },
+    { k:"47 protestas OVCS (10–16 abr)", v:"15 estados · politización creciente · movilización 16-abr embajada EE.UU.", c:"#f59e0b" },
+    { k:"Debate 180 días interinato", v:"Prórroga AN escenario base · registro FARA Rodríguez candidatura 2027", c:"#ef4444" },
   ],
   opinion: [
-    { k:"Aprobación Rodríguez", v:"34,6% (AtlasIntel)", c:"#ef4444" },
-    { k:"MCM intención de voto", v:"68,9% (Meganálisis)", c:"#22c55e" },
-    { k:"Inflación anualizada", v:"649,5% (BCV)", c:"#ef4444" },
-    { k:"FMI consulta miembros", v:"Primer movimiento en 2 décadas", c:"#22c55e" },
+    { k:"83,8% rechaza elogios Trump", v:"a Rodríguez (Meganálisis) · 81% indicadores transición en rojo", c:"#ef4444" },
+    { k:"100 días: 1/21 indicadores verde", v:"Percepción avance concentrada en lo económico-energético", c:"#ef4444" },
+    { k:"Inflación anualizada", v:"649,5% (BCV) · 13,1% mensual · acumulado 2026: 71,8%", c:"#ef4444" },
+    { k:"Bonos soberanos 2027", v:"Cerca de 48 centavos por dólar · PDVSA también al alza", c:"#22c55e" },
   ],
 };
 
@@ -115,16 +115,16 @@ export const WEEKS = [
 ];
 
 export const TENSIONS = [
-  { level:"green", text:"FMI consulta formal miembros: primer movimiento institucional en 2 décadas · bonos 2027 cerca 48 ctvs/USD · BCV sanciones bajo evaluación EE.UU." },
-  { level:"green", text:"Poder Ciudadano completo: Devoe (Fiscal, 275 votos) + González Lobato (Defensora) · control institucional interinato consolidado" },
-  { level:"green", text:"Shell Loran primer gas mid-2027 · COP+XOM evalúan retorno · AVPG +134% gas 10 años · 93 taladros activos · meta 1,37M bpd dic 2026" },
-  { level:"yellow", text:"Vacío constitucional: 90 días cumplidos · prórroga AN antes julio necesaria · debate falta temporal vs. absoluta sin resolución" },
-  { level:"yellow", text:"Anuncio 1° mayo sin monto: aumento salarial sin indexación · inflación 649,5% anual puede absorber cualquier ajuste · nueva marcha 16-abr" },
-  { level:"red", text:"9 de abril: 72 protestas en 4 días · escalada 3→15 estados · PNB gas pimienta · 10 periodistas SNTP agredidos · detención Ort Betancourt (PJ)" },
-  { level:"red", text:"Refinación al 31% · modelos contratos sin publicar · CEO COP: reformas 'lamentablemente inadecuadas' · vector iraní-colectivos activo" },
+  { level:"green", text:"FMI + BM reanudan relaciones (16 abr): mayor avance de reinserción multilateral en más de dos décadas · DEG ~USD 5.000M potenciales · Artículo IV habilitado" },
+  { level:"green", text:"GL-56 y GL-57 OFAC emitidas: apertura financiera condicionada · GL-57 habilita BCV y banca pública · Conindustria: 'puente hacia normalización financiera'" },
+  { level:"green", text:"Haustveit (Depto. Energía EE.UU.) en Caracas · Chevron–PDVSA: Petroindependencia 49% + Ayacucho 8 · 150M bbl desde enero · ENI+Repsol retoman mercado europeo" },
+  { level:"yellow", text:"Kozak: Fase 1 cumplida → Fase 2 fija condiciones electorales explícitas: renovación CNE + auditorías KPMG + retorno libre MCM · Wright: elecciones no son prioridad inmediata" },
+  { level:"yellow", text:"MCM en Elíseo con Macron (13 abr) + PM Países Bajos La Haya (15 abr) · retorno inminente como 'decisión definitiva' · test de garantías del acuerdo bilateral" },
+  { level:"red", text:"81% indicadores transición en rojo a 100 días · más de 400 presos políticos · debate constitucional 180 días sin resolver · FARA Rodríguez: candidatura 2027 en paralelo" },
+  { level:"red", text:"47 protestas OVCS (10–16 abr) · 15 estados · politización creciente · movilización 16-abr hacia embajada EE.UU. · crisis sanitaria: fiebre amarilla + 25.000 casos malaria" },
 ];
 
-export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13"];
+export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14"];
 
 
 export const ICG_HISTORY = [
@@ -141,6 +141,7 @@ export const ICG_HISTORY = [
   { week:"S11", score:66, sitrep:true, note:"González López giro institucional FANB. Ofensiva económica. 97 protestas en 4 días. Colectivos amenazan MCM" },
   { week:"S12", score:68, sitrep:true, note:"OFAC levanta sanciones DR. Trump «empresa conjunta». Embajada reabierta. 90 días cumplidos. Marcha 9 abril convocada" },
   { week:"S13", score:70, sitrep:true, note:"Poder Ciudadano completo: Devoe Fiscal (275 votos) + González Lobato Defensora. FMI consulta miembros. 72 protestas 9-abr. Sanciones BCV evaluadas" },
+  { week:"S14", score:72, sitrep:true, note:"FMI + BM reanudan relaciones (16 abr). GL-56/GL-57 emitidas. Haustveit Caracas. Kozak: Fase 1 cumplida. Padrino López regresa al gabinete. Registro FARA Rodríguez candidatura 2027" },
 ];
 
 export const CONF_SEMANAL = [
