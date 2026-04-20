@@ -216,4 +216,14 @@ export const CONF_SEMANAL = [
       { fecha:"8 Abr", protestas:10, estados:8, tipo:"DESCA + CPP", exigencias:"Laborales, justicia, presos políticos, alimentación, agua, vivienda" },
       { fecha:"9 Abr", protestas:54, estados:15, tipo:"Laboral + CPP", exigencias:"Salarios, pensiones, HCM, IPASME, ONAPRE, contratación colectiva, eliminación ONAPRE, rechazo bonos" },
     ] },
+  { week:"S14", label:"10–16 abr", protestas:47, estados:15, reprimidas:0,
+    motivos:["Laborales","Participación política","Justicia","Vivienda","Agua","Alimentación","Libertad de detenidos","Presos políticos","Salud"],
+    hecho:"47 protestas (10–16 abr) en 15 estados — conflictividad sostenida en desaceleración respecto al pico 9-abr (72). Movilización sindical hacia embajada EE.UU. (16 abr): primer caso de presión dirigida a actores internacionales. Politización creciente de exigencias.",
+    dias:[
+      { fecha:"10 Abr", protestas:10, estados:7, tipo:"DESCA + CPP", exigencias:"Vivienda, agua, justicia, educación, laborales, participación política" },
+      { fecha:"13 Abr", protestas:12, estados:7, tipo:"ESCP + CPP", exigencias:"Laborales, participación política, justicia, libertad de detenidos, vivienda, agua" },
+      { fecha:"14 Abr", protestas:8, estados:7, tipo:"ESCP + DESCA", exigencias:"Laborales, salud, vivienda, educación, agua, justicia, libertad de detenidos" },
+      { fecha:"15 Abr", protestas:10, estados:8, tipo:"Mixto (ESCP + CPP + DESCA)", exigencias:"Laborales, alimentación, participación política, vivienda, agua, justicia" },
+      { fecha:"16 Abr", protestas:7, estados:5, tipo:"ESCP + CPP", exigencias:"Laborales, alimentación, participación política, vivienda, justicia, presos políticos" },
+    ] },
 ];

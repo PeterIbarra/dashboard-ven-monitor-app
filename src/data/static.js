@@ -58,7 +58,18 @@ export const GDELT_ANNOTATIONS = [
   { date:"2026-04-09", tier:"HIGH", label:"Shell confirma primer gas Loran-Manatee mid-2027 · ConocoPhillips envía equipo evaluación Venezuela", tierEs:"ALTA" },
   { date:"2026-04-07", tier:"MEDIUM", label:"Rodríguez anuncia aumento salarial 1° mayo + Consejo Nacional de Economía + peregrinación anti-sanciones 19-abr", tierEs:"MEDIA" },
   { date:"2026-04-08", tier:"MEDIUM", label:"Bonos venezolanos 2027 cerca de 48 ctvs/USD · expectativas de normalización financiera", tierEs:"MEDIA" },
-  { date:"2026-04-10", tier:"MEDIUM", label:"PUD presenta hoja de ruta de transición democrática · MCM retorno planificado", tierEs:"MEDIA" },
+  { date:"2026-04-10", tier:"MEDIUM", label:"PUD presenta hoja de ruta con 8 condiciones · MCM retorno 'decisión definitiva' · Madrid 18-abr", tierEs:"MEDIA" },
+
+  // ── S14: 10 abril – 17 abril 2026 ──
+  { date:"2026-04-11", tier:"CRITICAL", label:"OFAC emite GL-56 y GL-57: apertura financiera condicionada BCV y banca pública venezolana", tierEs:"CRÍTICO" },
+  { date:"2026-04-13", tier:"HIGH", label:"MCM recibida por Macron en el Elíseo · reunión PM Países Bajos La Haya (15 abr) · gira europea respaldo internacional", tierEs:"ALTA" },
+  { date:"2026-04-14", tier:"HIGH", label:"Haustveit (Depto. Energía EE.UU.) visita Caracas · acuerdos Chevron–PDVSA: Petroindependencia 49% + Ayacucho 8", tierEs:"ALTA" },
+  { date:"2026-04-15", tier:"HIGH", label:"Kozak: Fase 1 'básicamente cumplida' · Fase 2 = recuperación + reconciliación + condiciones electorales (CNE, KPMG, MCM)", tierEs:"ALTA" },
+  { date:"2026-04-16", tier:"CRITICAL", label:"FMI y Banco Mundial reanudan relaciones con Venezuela simultáneamente — primera vez en más de dos décadas", tierEs:"CRÍTICO" },
+  { date:"2026-04-16", tier:"HIGH", label:"Movilización sindical hacia embajada EE.UU. (16 abr): primer caso de presión dirigida a actor internacional", tierEs:"ALTA" },
+  { date:"2026-04-11", tier:"MEDIUM", label:"Luis Pérez nuevo presidente BCV · Obregón ratificado PDVSA · Ley Orgánica de Minas promulgada · Padrino López al gabinete", tierEs:"MEDIA" },
+  { date:"2026-04-11", tier:"MEDIUM", label:"Registro FARA: Smaili agente extranjero de Rodríguez para cabildeo EE.UU. + 'campaña política' 2027", tierEs:"MEDIA" },
+  { date:"2026-04-12", tier:"MEDIUM", label:"47 protestas OVCS (10–16 abr) · 15 estados · desaceleración vs. pico 9-abr · politización creciente exigencias", tierEs:"MEDIA" },
 ];
 
 export const POLYMARKET_SLUGS = [
