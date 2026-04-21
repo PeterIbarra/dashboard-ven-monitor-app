@@ -18,7 +18,20 @@ export function TabMatriz({ week, setWeek }) {
   const prevWk = week > 0 ? WEEKS[week-1] : null;
   const dom = wk.probs.reduce((a,b)=>a.v>b.v?a:b);
   const domSc = SCENARIOS.find(s=>s.id===dom.sc);
-  const selDrivers = WEEK_DRIVERS[sel] || {};
+  const isCurrentWeek = week === WEEKS.length - 1;
+
+  // Para la semana actual usar WEEK_DRIVERS (más detallados)
+  // Para semanas anteriores usar los trendDrivers embebidos en WEEKS
+  const selDrivers = isCurrentWeek
+    ? (WEEK_DRIVERS[sel] || {})
+    : {
+        drivers: sel === (wk.trendSc || dom.sc)
+          ? (wk.trendDrivers || [])
+          : [],
+        signals: [],
+        _isArchive: true,
+      };
+
   const trendSc = SCENARIOS.find(s=>s.id===(wk.trendSc||dom.sc));
   const trendDriversList = wk.trendDrivers || [];
   const isSameTrend = (wk.trendSc||dom.sc) === dom.sc;
@@ -118,7 +131,15 @@ export function TabMatriz({ week, setWeek }) {
             <div style={{ fontSize:12, fontFamily:"'Syne',sans-serif", fontWeight:700, color:SC[sel], letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
               E{sel} — {SCENARIOS.find(s=>s.id===sel)?.name}
             </div>
-            {selDrivers.drivers && (
+
+            {/* Modo archivo — aviso + trendDrivers del escenario dominante */}
+            {selDrivers._isArchive && (
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, background:`${MUTED}10`, border:`1px solid ${BORDER}`, borderRadius:4, padding:"6px 10px", marginBottom:10, lineHeight:1.5 }}>
+                📁 Semana archivada · {wk.label} — mostrando drivers del escenario dominante (E{wk.trendSc || dom.sc})
+              </div>
+            )}
+
+            {selDrivers.drivers && selDrivers.drivers.length > 0 && (
               <>
                 <div style={{ fontSize:10, fontFamily:font, color:SC[sel], letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
                   Drivers estructurales
@@ -130,7 +151,15 @@ export function TabMatriz({ week, setWeek }) {
                 ))}
               </>
             )}
-            {selDrivers.signals && (
+
+            {/* Modo archivo sin datos del escenario seleccionado */}
+            {selDrivers._isArchive && selDrivers.drivers.length === 0 && (
+              <div style={{ fontSize:12, color:MUTED, fontFamily:font, lineHeight:1.6, marginTop:8 }}>
+                Los drivers detallados de E{sel} para esta semana están disponibles en la <strong>Lectura analítica</strong> ↓
+              </div>
+            )}
+
+            {selDrivers.signals && selDrivers.signals.length > 0 && (
               <>
                 <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginTop:10, marginBottom:6 }}>
                   Señales de activación

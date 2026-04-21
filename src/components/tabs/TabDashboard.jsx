@@ -629,11 +629,17 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
 
       {/* ── ROW 2: Amnistía Tracker ── */}
       {(() => {
-        const latest = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
-        const prev = AMNISTIA_TRACKER.length > 1 ? AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 2] : null;
+        // Mapear semana seleccionada al índice de AMNISTIA_TRACKER por short label
+        const wkShort = wk?.short || `S${week + 1}`;
+        const amnIdx = AMNISTIA_TRACKER.findIndex(t => t.week === wkShort);
+        const latest = amnIdx >= 0 ? AMNISTIA_TRACKER[amnIdx] : AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
+        const prev = amnIdx > 0 ? AMNISTIA_TRACKER[amnIdx - 1] : null;
+        const isCurrentWeek = week === WEEKS.length - 1;
         const gobLib = latest.gob.libertades || latest.gob.excarcelados || 0;
         const fpVerif = latest.fp.verificados || 0;
-        const brecha = gobLib && fpVerif ? Math.round((1 - fpVerif / gobLib) * 100) : null;
+        const fpPresos = latest.fp.detenidos || 0;
+        const brecha = gobLib && fpVerif ? Math.round(Math.abs(1 - fpVerif / gobLib) * 100) : null;
+        const brechaInversa = fpVerif > gobLib;
         const fpDelta = (prev?.fp?.verificados && fpVerif !== prev.fp.verificados) ? fpVerif - prev.fp.verificados : null;
         return (
           <Card>
@@ -641,7 +647,16 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
               <div style={{ fontSize:10, fontFamily:font, color:ACCENT, letterSpacing:"0.15em", textTransform:"uppercase" }}>
                 📋 Ley de Amnistía · Tracker Dual
               </div>
-              <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Act. {latest.label}</div>
+              <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                {!isCurrentWeek && (
+                  <span style={{ fontSize:8, fontFamily:font, color:MUTED, background:`${MUTED}15`, border:`1px solid ${BORDER}`, borderRadius:3, padding:"1px 5px", letterSpacing:"0.06em" }}>
+                    ARCHIVO
+                  </span>
+                )}
+                <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>
+                  {latest.label || wkShort}
+                </div>
+              </div>
             </div>
             <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"1fr 1fr 1fr 1fr", gap:mob?6:8, marginBottom:12 }}>
               {[

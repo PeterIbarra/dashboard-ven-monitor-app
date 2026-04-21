@@ -173,4 +173,16 @@ export const SCENARIO_SIGNALS = [
     { name:"Embajador iraní con colectivos", sem:"yellow", val:"23 de Enero · antisemitismo + llamados a violencia · tensión con normalización Washington", vigpierde:true },
     { name:"Vente Venezuela: exige falta absoluta", sem:"yellow", val:"Cuestiona interpretación TSJ · demanda activación Art. 233 · elecciones en 30 días", vigpierde:true },
   ]},
+  { esc:"E1", signals:[
+    { name:"MCM en Elíseo con Macron (13 abr)", sem:"green", val:"Mayor respaldo internacional de la oposición en el período · reunión PM Países Bajos La Haya (15 abr)", isNew:true },
+    { name:"EE.UU. fija condiciones Fase 2", sem:"green", val:"Renovación CNE + auditorías KPMG + retorno libre MCM · vinculadas a flujos petroleros", isNew:true },
+    { name:"PUD hoja de ruta 8 condiciones", sem:"green", val:"Articulada con Fedecámaras + CNP + SNTP · base de consenso ampliada más allá del espacio político", isNew:true },
+    { name:"Retorno MCM inminente", sem:"yellow", val:"'Decisión definitiva' · test de garantías del acuerdo bilateral · ≥40 semanas para elecciones libres", isNew:true },
+    { name:"Freddy Superlano liberado (~18 meses)", sem:"green", val:"Presos políticos como eje innegociable de cualquier proceso de transición", isNew:true },
+    { name:"Movilización 16-abr hacia embajada EE.UU.", sem:"yellow", val:"Primer caso de presión dirigida a actor internacional como canal de demanda política", isNew:true },
+    { name:"Sindicatos exigen elecciones + salarios + presos", sem:"yellow", val:"Demandas laborales se fusionan con agenda política · politización creciente de conflictividad", isNew:true },
+    { name:"CNE sin movimientos concretos", sem:"red", val:"No acepta propuesta electoral de academia · Nicmer Evans: elecciones con garantías Q4-2026/Q1-2027" },
+    { name:"Wright: elecciones no son prioridad inmediata", sem:"red", val:"EE.UU. prioriza recuperación petrolera sobre agenda electoral · podrían ocurrir 'durante la administración' Trump" },
+    { name:"Vacío constitucional 180 días sin resolver", sem:"red", val:"Prórroga AN escenario base · sin definición de falta absoluta · TSJ mantiene ambigüedad" },
+  ]},
 ];
