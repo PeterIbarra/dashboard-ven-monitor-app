@@ -29,6 +29,7 @@ import { TabMercados } from "./components/tabs/TabMercados";
 import { TabMacro } from "./components/tabs/TabMacro";
 import { NewsTicker } from "./components/NewsTicker";
 import { MethodologyFooter } from "./components/MethodologyFooter";
+import { AuthGate, UserButton } from "./components/AuthGate";
 
 const PNUD_LOGO_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 44" shape-rendering="crispEdges"><rect width="32" height="22" fill="#0468B1"/><rect x="11" y="2" width="10" height="1" fill="white"/><rect x="9" y="3" width="2" height="1" fill="white"/><rect x="21" y="3" width="2" height="1" fill="white"/><rect x="8" y="4" width="1" height="1" fill="white"/><rect x="23" y="4" width="1" height="1" fill="white"/><rect x="7" y="5" width="1" height="3" fill="white"/><rect x="24" y="5" width="1" height="3" fill="white"/><rect x="7" y="8" width="1" height="3" fill="white"/><rect x="24" y="8" width="1" height="3" fill="white"/><rect x="7" y="11" width="1" height="3" fill="white"/><rect x="24" y="11" width="1" height="3" fill="white"/><rect x="8" y="14" width="1" height="1" fill="white"/><rect x="23" y="14" width="1" height="1" fill="white"/><rect x="9" y="15" width="2" height="1" fill="white"/><rect x="21" y="15" width="2" height="1" fill="white"/><rect x="11" y="16" width="10" height="1" fill="white"/><rect x="15" y="3" width="2" height="14" fill="white" opacity="0.5"/><rect x="8" y="9" width="16" height="1" fill="white" opacity="0.5"/><rect x="13" y="4" width="6" height="1" fill="white" opacity="0.4"/><rect x="12" y="5" width="1" height="1" fill="white" opacity="0.4"/><rect x="19" y="5" width="1" height="1" fill="white" opacity="0.4"/><rect x="11" y="6" width="1" height="2" fill="white" opacity="0.4"/><rect x="20" y="6" width="1" height="2" fill="white" opacity="0.4"/><rect x="11" y="10" width="1" height="2" fill="white" opacity="0.4"/><rect x="20" y="10" width="1" height="2" fill="white" opacity="0.4"/><rect x="12" y="13" width="1" height="1" fill="white" opacity="0.4"/><rect x="19" y="13" width="1" height="1" fill="white" opacity="0.4"/><rect x="13" y="14" width="6" height="1" fill="white" opacity="0.4"/><rect x="5" y="5" width="1" height="1" fill="white" opacity="0.6"/><rect x="4" y="6" width="1" height="2" fill="white" opacity="0.6"/><rect x="4" y="8" width="1" height="3" fill="white" opacity="0.6"/><rect x="4" y="11" width="1" height="2" fill="white" opacity="0.6"/><rect x="5" y="13" width="1" height="1" fill="white" opacity="0.6"/><rect x="26" y="5" width="1" height="1" fill="white" opacity="0.6"/><rect x="27" y="6" width="1" height="2" fill="white" opacity="0.6"/><rect x="27" y="8" width="1" height="3" fill="white" opacity="0.6"/><rect x="27" y="11" width="1" height="2" fill="white" opacity="0.6"/><rect x="26" y="13" width="1" height="1" fill="white" opacity="0.6"/><rect x="15" y="17" width="2" height="2" fill="white" opacity="0.5"/><rect x="13" y="18" width="1" height="1" fill="white" opacity="0.4"/><rect x="18" y="18" width="1" height="1" fill="white" opacity="0.4"/><rect y="22" width="32" height="1" fill="#e8ecf0"/><rect y="23" width="15" height="10" fill="#0468B1"/><rect x="17" y="23" width="15" height="10" fill="#0468B1"/><rect y="33" width="32" height="1" fill="#e8ecf0"/><rect y="34" width="15" height="10" fill="#0468B1"/><rect x="17" y="34" width="15" height="10" fill="#0468B1"/><rect x="3" y="25" width="1" height="6" fill="white"/><rect x="4" y="25" width="3" height="1" fill="white"/><rect x="7" y="25" width="1" height="3" fill="white"/><rect x="4" y="28" width="3" height="1" fill="white"/><rect x="20" y="25" width="1" height="6" fill="white"/><rect x="21" y="26" width="1" height="1" fill="white"/><rect x="22" y="27" width="1" height="1" fill="white"/><rect x="23" y="28" width="1" height="1" fill="white"/><rect x="24" y="29" width="1" height="1" fill="white"/><rect x="25" y="25" width="1" height="6" fill="white"/><rect x="3" y="36" width="1" height="6" fill="white"/><rect x="9" y="36" width="1" height="6" fill="white"/><rect x="4" y="41" width="5" height="1" fill="white"/><rect x="20" y="36" width="1" height="6" fill="white"/><rect x="21" y="36" width="3" height="1" fill="white"/><rect x="24" y="37" width="1" height="4" fill="white"/><rect x="21" y="41" width="3" height="1" fill="white"/></svg>';
 const PNUD_LOGO = "data:image/svg+xml," + encodeURIComponent(PNUD_LOGO_SVG);
@@ -326,6 +327,7 @@ export default function MonitorPNUD() {
   }, []);
 
   return (
+    <AuthGate>
     <div style={{ fontFamily:fontSans, background:BG, minHeight:"100vh", color:TEXT, overflowX:"hidden" }}>
       {/* Loading splash — shown until liveData finishes first fetch */}
       {!liveData.fetched && (
@@ -466,6 +468,7 @@ export default function MonitorPNUD() {
             {WEEKS.map((w,i) => <option key={i} value={i}>{w.label}</option>)}
           </select>
           {!mob && <Badge color={week===WEEKS.length-1?"#22c55e":MUTED}>{week===WEEKS.length-1?"Más reciente":"Archivo"}</Badge>}
+          <UserButton />
         </div>
       </div>
 
@@ -504,5 +507,6 @@ export default function MonitorPNUD() {
       </div>
       <MethodologyFooter mob={mob} />
     </div>
+    </AuthGate>
   );
 }
