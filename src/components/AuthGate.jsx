@@ -287,6 +287,12 @@ function LoginScreen() {
       });
       if (result.status === "complete") {
         window.location.href = "/";
+      } else if (result.status === "needs_second_factor") {
+        // Clerk exige verificación adicional — enviamos OTP al correo
+        await signIn.prepareSecondFactor({ strategy: "email_code" });
+        setStep("second_factor");
+        setCode("");
+        setInfo("Tu contraseña es correcta. Ingresa el código de verificación enviado a tu correo.");
       } else {
         setError("Autenticación incompleta. Intenta de nuevo.");
       }
@@ -298,6 +304,34 @@ function LoginScreen() {
         setError("Cuenta bloqueada temporalmente. Intenta más tarde o usa el código por correo.");
       } else {
         setError(msg || "Error de autenticación.");
+      }
+    } finally { setLoading(false); }
+  }
+
+  // ── Segundo factor tras contraseña ──
+  async function handleSecondFactor(e) {
+    e.preventDefault();
+    if (!isLoaded || code.length < 6) return;
+    setLoading(true); setError("");
+    try {
+      const result = await signIn.attemptSecondFactor({
+        strategy: "email_code",
+        code: code.trim(),
+      });
+      if (result.status === "complete") {
+        window.location.href = "/";
+      } else {
+        setError("Verificación incompleta. Intenta de nuevo.");
+      }
+    } catch (err) {
+      const msg = err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || "";
+      if (msg.toLowerCase().includes("incorrect") || msg.toLowerCase().includes("invalid")) {
+        setError("Código incorrecto. Verifica e intenta de nuevo.");
+      } else if (msg.toLowerCase().includes("expired")) {
+        setError("El código expiró. Vuelve a ingresar tu contraseña.");
+        setStep("password"); setCode(""); setInfo("");
+      } else {
+        setError(msg || "Error de verificación.");
       }
     } finally { setLoading(false); }
   }
@@ -526,6 +560,52 @@ function LoginScreen() {
                   ← Volver
                 </button>
                 <button type="button" onClick={handleResend} disabled={loading}
+                  style={{ background:"none", border:"none", fontSize:11, fontFamily:font, color:ACCENT, cursor:"pointer", letterSpacing:"0.04em" }}>
+                  Reenviar código
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* ── PASO SEGUNDO FACTOR (contraseña + OTP) ── */}
+          {step === "second_factor" && (
+            <form onSubmit={handleSecondFactor} style={{ display:"flex", flexDirection:"column", gap:14 }}>
+              <div style={{ textAlign:"center", paddingBottom:4 }}>
+                <div style={{ fontSize:11, fontFamily:font, color:GREEN, letterSpacing:"0.06em", marginBottom:6 }}>✓ CONTRASEÑA CORRECTA</div>
+                <div style={{ fontSize:13, color:MUTED, lineHeight:1.5 }}>
+                  Verificación adicional requerida.<br />
+                  Ingresa el código enviado a<br />
+                  <strong style={{ color:TEXT }}>{email}</strong>
+                </div>
+              </div>
+              {info && <div style={{ fontSize:11, color:GREEN, fontFamily:font, textAlign:"center", padding:"6px 10px", background:`${GREEN}08`, border:`1px solid ${GREEN}20`, borderRadius:4 }}>{info}</div>}
+              <div>
+                <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.06em", marginBottom:8, textTransform:"uppercase" }}>Código de verificación</div>
+                <input
+                  type="text" inputMode="numeric" pattern="[0-9]*"
+                  maxLength={6} value={code}
+                  onChange={e => { setCode(e.target.value.replace(/\D/g,"")); setError(""); }}
+                  placeholder="000000" required autoFocus
+                  style={{ ...inputStyle, fontSize:22, fontFamily:font, textAlign:"center", letterSpacing:"0.3em" }}
+                  onFocus={e => e.target.style.borderColor=ACCENT}
+                  onBlur={e => e.target.style.borderColor=BORDER}
+                />
+              </div>
+              {error && <ErrorBox msg={error} />}
+              <button type="submit" disabled={loading || code.length < 6} style={btnPrimary}>
+                {loading ? "Verificando..." : "Ingresar al dashboard →"}
+              </button>
+              <div style={{ display:"flex", justifyContent:"space-between", marginTop:2 }}>
+                <button type="button" onClick={() => { setStep("password"); setCode(""); setError(""); setInfo(""); }}
+                  style={{ background:"none", border:"none", fontSize:11, fontFamily:font, color:MUTED, cursor:"pointer", letterSpacing:"0.04em" }}>
+                  ← Volver
+                </button>
+                <button type="button" onClick={async () => {
+                    setLoading(true); setCode(""); setInfo("");
+                    try { await signIn.prepareSecondFactor({ strategy:"email_code" }); setInfo("Código reenviado."); }
+                    catch { setError("No se pudo reenviar."); }
+                    finally { setLoading(false); }
+                  }} disabled={loading}
                   style={{ background:"none", border:"none", fontSize:11, fontFamily:font, color:ACCENT, cursor:"pointer", letterSpacing:"0.04em" }}>
                   Reenviar código
                 </button>
