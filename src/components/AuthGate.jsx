@@ -16,9 +16,40 @@ const fontSans = "'DM Sans', sans-serif";
 // ─────────────────────────────────────────
 // Modal de perfil embebido
 // ─────────────────────────────────────────
+// CSS global para ocultar elementos de Clerk
+// ─────────────────────────────────────────
+const CLERK_HIDE_CSS = `
+  /* Ocultar footer "Secured by Clerk / Development mode" */
+  .cl-userProfile-root .cl-footer,
+  .cl-footer,
+  [data-localization-key="userProfile.start.dangerSection.title"],
+  .cl-profileSectionTitle__danger,
+  .cl-profileSectionContent__danger,
+  .cl-profileSection__danger { display: none !important; }
+
+  /* Ocultar "Add email address" */
+  .cl-profileSectionPrimaryButton__emailAddresses,
+  [data-localization-key="userProfile.start.emailAddressesSection.primaryButton__addEmailAddress"] { display: none !important; }
+
+  /* Ocultar sección de contraseña (gestionada por admin) */
+  .cl-profileSection__password,
+  .cl-profileSectionContent__password { display: none !important; }
+
+  /* Fix layout en mobile — evitar que la navbar desaparezca */
+  .cl-userProfile-root .cl-scrollBox { min-height: unset !important; }
+  .cl-userProfile-root .cl-navbar { min-width: 140px !important; }
+
+  /* Quitar "Development mode" badge */
+  .cl-badge[data-clerk-development-mode],
+  .cl-developmentModeNotice { display: none !important; }
+`;
+
 function ProfileModal({ onClose }) {
   return (
-    <div
+    <>
+      {/* Inyectar CSS para ocultar elementos de Clerk */}
+      <style>{CLERK_HIDE_CSS}</style>
+      <div
       onClick={onClose}
       style={{
         position:"fixed", inset:0, zIndex:9999,
@@ -147,6 +178,7 @@ function ProfileModal({ onClose }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
@@ -240,9 +272,43 @@ function LoginScreen() {
   const [error, setError]     = useState("");
   const [info, setInfo]       = useState("");
 
+  // ── Estados para solicitud de acceso ──
+  const [showRequest, setShowRequest] = useState(false);
+  const [reqNombre, setReqNombre]     = useState("");
+  const [reqCorreo, setReqCorreo]     = useState("");
+  const [reqMotivo, setReqMotivo]     = useState("");
+  const [reqLoading, setReqLoading]   = useState(false);
+  const [reqDone, setReqDone]         = useState(false);
+  const [reqError, setReqError]       = useState("");
+
   function reset() {
     setStep("email"); setPassword(""); setCode("");
     setError(""); setInfo(""); setShowPwd(false);
+  }
+
+  // ── Enviar solicitud de acceso a Formspree ──
+  async function handleRequest(e) {
+    e.preventDefault();
+    setReqLoading(true); setReqError("");
+    try {
+      const res = await fetch("https://formspree.io/f/xpqkyzal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          nombre: reqNombre,
+          correo: reqCorreo,
+          motivo: reqMotivo || "No especificado",
+          _subject: `Solicitud de acceso — Monitor PNUD Venezuela · ${reqNombre}`,
+        }),
+      });
+      if (res.ok) {
+        setReqDone(true);
+      } else {
+        setReqError("No se pudo enviar la solicitud. Intenta de nuevo.");
+      }
+    } catch {
+      setReqError("Error de conexión. Intenta de nuevo.");
+    } finally { setReqLoading(false); }
   }
 
   function handleMethodSwitch(m) {
@@ -618,6 +684,91 @@ function LoginScreen() {
         <p style={{ fontSize:10, color:MUTED, fontFamily:font, textAlign:"center", letterSpacing:"0.04em", lineHeight:1.6, margin:0 }}>
           Acceso autorizado únicamente para personal PNUD Venezuela<br />y colaboradores habilitados · {new Date().getFullYear()}
         </p>
+
+        {/* Botón solicitar acceso */}
+        <button
+          onClick={() => { setShowRequest(true); setReqDone(false); setReqError(""); setReqNombre(""); setReqCorreo(""); setReqMotivo(""); }}
+          style={{ background:"none", border:"none", fontSize:11, fontFamily:font, color:ACCENT, cursor:"pointer", letterSpacing:"0.04em", textDecoration:"underline", padding:0 }}
+        >
+          ¿No tienes acceso? Solicítalo aquí
+        </button>
+
+        {/* Modal de solicitud */}
+        {showRequest && (
+          <div
+            onClick={() => setShowRequest(false)}
+            style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.45)", display:"flex", alignItems:"center", justifyContent:"center", padding:16, backdropFilter:"blur(2px)" }}
+          >
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{ background:BG2, border:`1px solid ${BORDER}`, borderRadius:8, padding:"28px 28px", width:"100%", maxWidth:400, boxShadow:"0 8px 40px rgba(0,0,0,0.15)" }}
+            >
+              {/* Header */}
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+                <div>
+                  <div style={{ fontSize:14, fontWeight:700, color:TEXT, fontFamily:fontSans }}>Solicitar acceso</div>
+                  <div style={{ fontSize:11, color:MUTED, fontFamily:font, marginTop:2 }}>Monitor PNUD Venezuela</div>
+                </div>
+                <button onClick={() => setShowRequest(false)}
+                  style={{ background:"none", border:`1px solid ${BORDER}`, borderRadius:4, padding:"3px 8px", fontSize:9, fontFamily:font, color:MUTED, cursor:"pointer", letterSpacing:"0.06em" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor=RED; e.currentTarget.style.color=RED; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor=BORDER; e.currentTarget.style.color=MUTED; }}
+                >✕</button>
+              </div>
+
+              {!reqDone ? (
+                <form onSubmit={handleRequest} style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                  <div>
+                    <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.06em", marginBottom:6, textTransform:"uppercase" }}>Nombre completo</div>
+                    <input type="text" value={reqNombre} onChange={e => setReqNombre(e.target.value)} placeholder="María González"
+                      required autoFocus
+                      style={{ width:"100%", boxSizing:"border-box", padding:"10px 12px", fontSize:13, fontFamily:fontSans, color:TEXT, background:BG, border:`1px solid ${BORDER}`, borderRadius:4, outline:"none" }}
+                      onFocus={e => e.target.style.borderColor=ACCENT} onBlur={e => e.target.style.borderColor=BORDER}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.06em", marginBottom:6, textTransform:"uppercase" }}>Correo electrónico</div>
+                    <input type="email" value={reqCorreo} onChange={e => setReqCorreo(e.target.value)} placeholder="nombre@undp.org"
+                      required
+                      style={{ width:"100%", boxSizing:"border-box", padding:"10px 12px", fontSize:13, fontFamily:fontSans, color:TEXT, background:BG, border:`1px solid ${BORDER}`, borderRadius:4, outline:"none" }}
+                      onFocus={e => e.target.style.borderColor=ACCENT} onBlur={e => e.target.style.borderColor=BORDER}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.06em", marginBottom:6, textTransform:"uppercase" }}>Motivo <span style={{ fontWeight:400, textTransform:"none" }}>(opcional)</span></div>
+                    <textarea value={reqMotivo} onChange={e => setReqMotivo(e.target.value)}
+                      placeholder="Ej: Soy parte del equipo de análisis de Venezuela..."
+                      rows={3}
+                      style={{ width:"100%", boxSizing:"border-box", padding:"10px 12px", fontSize:13, fontFamily:fontSans, color:TEXT, background:BG, border:`1px solid ${BORDER}`, borderRadius:4, outline:"none", resize:"vertical" }}
+                      onFocus={e => e.target.style.borderColor=ACCENT} onBlur={e => e.target.style.borderColor=BORDER}
+                    />
+                  </div>
+                  {reqError && <ErrorBox msg={reqError} />}
+                  <button type="submit" disabled={reqLoading}
+                    style={{ width:"100%", padding:"11px 0", background:reqLoading?`${ACCENT}70`:ACCENT, color:"#fff", border:"none", borderRadius:4, fontSize:11, fontFamily:font, letterSpacing:"0.1em", textTransform:"uppercase", cursor:reqLoading?"not-allowed":"pointer" }}>
+                    {reqLoading ? "Enviando..." : "Enviar solicitud →"}
+                  </button>
+                  <div style={{ fontSize:10, color:MUTED, fontFamily:font, textAlign:"center", lineHeight:1.6 }}>
+                    El administrador revisará tu solicitud y te enviará la invitación de acceso.
+                  </div>
+                </form>
+              ) : (
+                /* Confirmación */
+                <div style={{ textAlign:"center", padding:"12px 0" }}>
+                  <div style={{ fontSize:32, marginBottom:12 }}>✅</div>
+                  <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:fontSans, marginBottom:8 }}>¡Solicitud enviada!</div>
+                  <div style={{ fontSize:12, color:MUTED, fontFamily:fontSans, lineHeight:1.6, marginBottom:20 }}>
+                    Tu solicitud fue recibida. El administrador la revisará y recibirás un email de invitación cuando sea aprobada.
+                  </div>
+                  <button onClick={() => setShowRequest(false)}
+                    style={{ background:ACCENT, color:"#fff", border:"none", borderRadius:4, padding:"9px 24px", fontSize:11, fontFamily:font, letterSpacing:"0.08em", textTransform:"uppercase", cursor:"pointer" }}>
+                    Cerrar
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
