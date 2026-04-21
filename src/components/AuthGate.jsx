@@ -147,6 +147,8 @@ function LoginScreen() {
         {/* Clerk SignIn embebido */}
         <div style={{ width: "100%" }}>
           <SignIn
+            forceRedirectUrl="/"
+            fallbackRedirectUrl="/"
             appearance={{
               layout: {
                 logoPlacement: "none",
