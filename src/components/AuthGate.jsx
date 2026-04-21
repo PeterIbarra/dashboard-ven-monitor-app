@@ -16,32 +16,59 @@ const fontSans = "'DM Sans', sans-serif";
 // ─────────────────────────────────────────
 // Modal de perfil embebido
 // ─────────────────────────────────────────
-// CSS global para ocultar elementos de Clerk
+// CSS global
 // ─────────────────────────────────────────
 const CLERK_HIDE_CSS = `
-  /* Ocultar footer "Secured by Clerk / Development mode" */
+  /* Ocultar footer "Secured by Clerk / Development mode" — múltiples selectores */
   .cl-userProfile-root .cl-footer,
-  .cl-footer,
-  [data-localization-key="userProfile.start.dangerSection.title"],
-  .cl-profileSectionTitle__danger,
-  .cl-profileSectionContent__danger,
-  .cl-profileSection__danger { display: none !important; }
+  .cl-footer, .cl-internal-footer,
+  .cl-poweredByClerk, .cl-poweredByClerkText,
+  [class*="cl-footer"], [class*="poweredByClerk"],
+  [class*="developmentMode"], [class*="cl-badge"],
+  .cl-profilePage .cl-footer { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
 
   /* Ocultar "Add email address" */
   .cl-profileSectionPrimaryButton__emailAddresses,
-  [data-localization-key="userProfile.start.emailAddressesSection.primaryButton__addEmailAddress"] { display: none !important; }
+  [data-localization-key="userProfile.start.emailAddressesSection.primaryButton__addEmailAddress"],
+  [class*="profileSectionPrimaryButton__emailAddress"] { display: none !important; }
 
-  /* Ocultar sección de contraseña (gestionada por admin) */
+  /* Ocultar sección de contraseña */
   .cl-profileSection__password,
-  .cl-profileSectionContent__password { display: none !important; }
+  .cl-profileSectionContent__password,
+  [class*="profileSection__password"] { display: none !important; }
 
-  /* Fix layout en mobile — evitar que la navbar desaparezca */
-  .cl-userProfile-root .cl-scrollBox { min-height: unset !important; }
-  .cl-userProfile-root .cl-navbar { min-width: 140px !important; }
+  /* Ocultar "Delete account" */
+  .cl-profileSection__danger,
+  .cl-profileSectionContent__danger,
+  [class*="profileSection__danger"] { display: none !important; }
 
-  /* Quitar "Development mode" badge */
-  .cl-badge[data-clerk-development-mode],
-  .cl-developmentModeNotice { display: none !important; }
+  /* Fix mobile — navbar no desaparece */
+  .cl-userProfile-root { width: 100% !important; }
+  .cl-userProfile-root .cl-navbar { min-width: 130px !important; flex-shrink: 0 !important; }
+  .cl-userProfile-root .cl-pageScrollBox { padding: 16px !important; }
+  .cl-card { box-shadow: none !important; border: none !important; }
+
+  /* Animaciones del fondo de login */
+  @keyframes floatDot {
+    0%   { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.15; }
+    33%  { transform: translateY(-18px) translateX(8px) scale(1.1); opacity: 0.25; }
+    66%  { transform: translateY(-8px) translateX(-6px) scale(0.95); opacity: 0.18; }
+    100% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.15; }
+  }
+  @keyframes rotateSlow {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  @keyframes pulseRing {
+    0%   { transform: scale(0.95); opacity: 0.12; }
+    50%  { transform: scale(1.05); opacity: 0.2; }
+    100% { transform: scale(0.95); opacity: 0.12; }
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .login-animate { animation: fadeSlideUp 0.5s ease forwards; }
 `;
 
 function ProfileModal({ onClose }) {
@@ -483,16 +510,84 @@ function LoginScreen() {
   });
 
   return (
-    <div style={{ minHeight:"100vh", background:BG, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", fontFamily:fontSans, padding:24 }}>
+    <div style={{ minHeight:"100vh", background:BG, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", fontFamily:fontSans, padding:24, position:"relative", overflow:"hidden" }}>
 
-      {/* Fondo sutil */}
-      <div style={{ position:"fixed", inset:0, pointerEvents:"none", background:`radial-gradient(ellipse 70% 50% at 50% 0%, ${ACCENT}08 0%, transparent 70%)` }} />
+      {/* ── Fondo animado PNUD Venezuela ── */}
+      <style>{CLERK_HIDE_CSS}</style>
 
-      <div style={{ position:"relative", width:"100%", maxWidth:400, display:"flex", flexDirection:"column", alignItems:"center", gap:28 }}>
+      {/* Gradiente base */}
+      <div style={{ position:"fixed", inset:0, pointerEvents:"none",
+        background:`linear-gradient(135deg, ${ACCENT}06 0%, #f4f6f9 40%, #e8f4fb 100%)` }} />
+
+      {/* Anillo pulsante grande — emblema ONU */}
+      <div style={{ position:"fixed", top:"50%", left:"50%", transform:"translate(-50%,-50%)",
+        width:600, height:600, borderRadius:"50%",
+        border:`1.5px solid ${ACCENT}15`,
+        animation:"pulseRing 6s ease-in-out infinite",
+        pointerEvents:"none" }} />
+      <div style={{ position:"fixed", top:"50%", left:"50%", transform:"translate(-50%,-50%)",
+        width:400, height:400, borderRadius:"50%",
+        border:`1.5px solid ${ACCENT}12`,
+        animation:"pulseRing 6s ease-in-out infinite 2s",
+        pointerEvents:"none" }} />
+      <div style={{ position:"fixed", top:"50%", left:"50%", transform:"translate(-50%,-50%)",
+        width:220, height:220, borderRadius:"50%",
+        border:`1px solid ${ACCENT}10`,
+        animation:"pulseRing 6s ease-in-out infinite 4s",
+        pointerEvents:"none" }} />
+
+      {/* Puntos flotantes — representan los 24 estados + DC */}
+      {[
+        { x:"8%",  y:"15%", d:0,    s:8  },
+        { x:"18%", y:"72%", d:1.2,  s:6  },
+        { x:"82%", y:"20%", d:0.6,  s:10 },
+        { x:"88%", y:"65%", d:2.1,  s:7  },
+        { x:"25%", y:"30%", d:0.3,  s:5  },
+        { x:"72%", y:"80%", d:1.8,  s:9  },
+        { x:"60%", y:"12%", d:0.9,  s:6  },
+        { x:"35%", y:"85%", d:1.5,  s:7  },
+        { x:"90%", y:"40%", d:2.4,  s:5  },
+        { x:"5%",  y:"50%", d:0.7,  s:8  },
+        { x:"50%", y:"90%", d:1.1,  s:6  },
+        { x:"75%", y:"45%", d:3.0,  s:5  },
+      ].map((dot, i) => (
+        <div key={i} style={{
+          position:"fixed", left:dot.x, top:dot.y,
+          width:dot.s, height:dot.s, borderRadius:"50%",
+          background:ACCENT,
+          animation:`floatDot ${5 + i * 0.4}s ease-in-out infinite ${dot.d}s`,
+          pointerEvents:"none",
+        }} />
+      ))}
+
+      {/* Líneas de coordenadas — referencia cartográfica */}
+      <svg style={{ position:"fixed", inset:0, width:"100%", height:"100%", pointerEvents:"none", opacity:0.04 }} xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+            <path d="M 60 0 L 0 0 0 60" fill="none" stroke={ACCENT} strokeWidth="0.8"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)" />
+      </svg>
+
+      {/* Texto de fondo — coordenadas Venezuela */}
+      <div style={{
+        position:"fixed", bottom:24, right:24,
+        fontSize:9, fontFamily:font, color:`${ACCENT}25`,
+        letterSpacing:"0.1em", textAlign:"right",
+        lineHeight:1.8, pointerEvents:"none",
+        userSelect:"none",
+      }}>
+        8°N · 66°W<br />
+        VENEZUELA<br />
+        2026
+      </div>
+
+      <div className="login-animate" style={{ position:"relative", width:"100%", maxWidth:400, display:"flex", flexDirection:"column", alignItems:"center", gap:28 }}>
 
         {/* Badge institucional */}
         <div style={{ textAlign:"center" }}>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"7px 16px", border:`1px solid ${BORDER}`, borderRadius:6, background:BG2, marginBottom:20 }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"7px 16px", border:`1px solid ${BORDER}`, borderRadius:6, background:BG2, marginBottom:20, boxShadow:"0 2px 8px rgba(4,104,177,0.08)" }}>
             <span style={{ fontSize:18 }}>🇺🇳</span>
             <div style={{ textAlign:"left" }}>
               <div style={{ fontSize:10, fontFamily:font, color:ACCENT, letterSpacing:"0.1em", textTransform:"uppercase" }}>PNUD Venezuela</div>
