@@ -289,7 +289,7 @@ function LoginScreen() {
 
   // method: "password" | "otp"
   // step:   "email" | "password" | "code" | "forgot"
-  const [method, setMethod]   = useState("password");
+  const [method, setMethod]   = useState("otp");
   const [step, setStep]       = useState("email");
   const [email, setEmail]     = useState("");
   const [password, setPassword] = useState("");
@@ -604,11 +604,11 @@ function LoginScreen() {
           {/* Selector de método — solo en paso email */}
           {step === "email" && (
             <div style={{ display:"flex", gap:4, padding:4, background:BG, borderRadius:6, marginBottom:20 }}>
-              <button type="button" onClick={() => handleMethodSwitch("password")} style={tabStyle(method==="password")}>
-                🔑 Contraseña
-              </button>
               <button type="button" onClick={() => handleMethodSwitch("otp")} style={tabStyle(method==="otp")}>
                 📧 Código
+              </button>
+              <button type="button" onClick={() => handleMethodSwitch("password")} style={tabStyle(method==="password")}>
+                🔑 Contraseña
               </button>
             </div>
           )}
