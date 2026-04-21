@@ -106,9 +106,44 @@ function ProfileModal({ onClose }) {
                 badge: { background:ACCENT },
                 profileSectionPrimaryButton: { color:ACCENT },
                 accordionTriggerButton: { fontFamily:fontSans },
+                // Ocultar secciones no gestionables por el usuario
+                profileSection__danger: { display:"none" },
+                profileSectionContent__danger: { display:"none" },
+                profileSection__password: { display:"none" },
+                profileSectionContent__password: { display:"none" },
+                footer: { display:"none" },
               },
             }}
           />
+          {/* Aviso de cambio de contraseña */}
+          <div style={{
+            margin:"0 20px 20px",
+            padding:"12px 16px",
+            background:`${ACCENT}08`,
+            border:`1px solid ${ACCENT}20`,
+            borderRadius:6,
+            display:"flex",
+            gap:10,
+            alignItems:"flex-start",
+          }}>
+            <span style={{ fontSize:16, flexShrink:0 }}>🔑</span>
+            <div>
+              <div style={{ fontSize:12, fontWeight:600, color:TEXT, fontFamily:fontSans, marginBottom:3 }}>
+                ¿Necesitas cambiar tu contraseña?
+              </div>
+              <div style={{ fontSize:11, color:MUTED, fontFamily:fontSans, lineHeight:1.6 }}>
+                Por razones de seguridad, los cambios de contraseña son gestionados por el administrador del sistema.
+                Escribe a{" "}
+                <a
+                  href="mailto:peter.ibarra@undp.org?subject=Solicitud%20cambio%20de%20contrase%C3%B1a%20-%20Monitor%20PNUD"
+                  style={{ color:ACCENT, textDecoration:"none", fontWeight:600 }}
+                >
+                  peter.ibarra@undp.org
+                </a>
+                {" "}indicando tu correo de acceso y te la actualizaremos a la brevedad.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
