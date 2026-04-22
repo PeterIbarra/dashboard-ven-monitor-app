@@ -313,11 +313,11 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
             - (pe1/100)*6 - (pe3/100)*3;
           prevIndex = Math.max(0, Math.min(100, Math.round(pRaw)));
         }
-        const delta = prevIndex !== null ? index - prevIndex : null;
+        const deltaLive = prevIndex !== null ? index - prevIndex : null;
 
         const zone = index <= 25 ? { label:"Estabilidad relativa", color:"#16a34a" }
-          : index <= 50 ? { label:"Tensión moderada", color:"#ca8a04" }
-          : index <= 75 ? { label:"Inestabilidad alta", color:"#f97316" }
+          : displayIndex <= 50 ? { label:"Tensión moderada", color:"#ca8a04" }
+          : displayIndex <= 75 ? { label:"Inestabilidad alta", color:"#f97316" }
           : { label:"Crisis inminente", color:"#dc2626" };
 
         const segments = [
@@ -365,6 +365,13 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
           return Math.max(0, Math.min(100, Math.round(wr)));
         });
 
+        // ── Para semanas de archivo: usar el valor histórico calculado (no el live)
+        // ── Para la semana actual: usar el cálculo en vivo
+        const isCurrentWeekIdx = week === WEEKS.length - 1;
+        const displayIndex = isCurrentWeekIdx ? index : (histIdx[week] ?? index);
+        const displayPrev  = isCurrentWeekIdx ? prevIndex : (week > 0 ? histIdx[week - 1] : null);
+        const delta = displayPrev !== null ? displayIndex - displayPrev : deltaLive;
+
         // Breakdown items for display
         const breakdown = [
           { label:"Ind. rojos", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100), w:"9%" },
@@ -398,7 +405,7 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
               </div>
               <div style={{ display:"flex", alignItems:"flex-end", gap:6 }}>
                 <span style={{ fontSize:mob?40:52, fontWeight:900, fontFamily:"'Playfair Display',serif", color:zone.color, lineHeight:1 }}>
-                  {index}
+                  {displayIndex}
                 </span>
                 <span style={{ fontSize:14, fontFamily:font, color:MUTED, marginBottom:mob?4:8 }}>/100</span>
               </div>
@@ -428,7 +435,7 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
                   const prompt = `Eres analista senior de riesgo político del PNUD Venezuela. Escribe un análisis de dos párrafos cortos en español sobre el Índice de Inestabilidad.
 
 DATOS DEL ÍNDICE:
-- Score: ${index}/100 (zona: ${zone.label})
+- Score: ${displayIndex}/100 (zona: ${zone.label})
 - ${delta !== null && delta !== 0 ? `Cambio: ${delta > 0 ? "+" : ""}${delta}pp vs semana anterior` : "Sin cambio vs semana anterior"}
 - Factores y pesos: ${factorsSummary}
 
@@ -441,7 +448,7 @@ CONTEXTO ADICIONAL DEL DASHBOARD:
 - Tensiones clave: ${tensionsSummary}
 
 INSTRUCCIONES:
-Párrafo 1: Explica por qué el índice está en ${index}/100. Identifica los 3-4 factores que más lo impulsan al alza (protestas, cobertura territorial de protestas, brecha cambiaria, señales de colapso, etc.) y los 2-3 factores que lo contienen (probabilidades E1/E3, Brent alto si aplica, amnistía si aplica). IMPORTANTE: la cobertura territorial (${lastWeekConf?.estados || "N/D"}/24 estados) mide la extensión geográfica de las protestas, NO es un factor estabilizador — a mayor cobertura, mayor inestabilidad.
+Párrafo 1: Explica por qué el índice está en ${displayIndex}/100. Identifica los 3-4 factores que más lo impulsan al alza (protestas, cobertura territorial de protestas, brecha cambiaria, señales de colapso, etc.) y los 2-3 factores que lo contienen (probabilidades E1/E3, Brent alto si aplica, amnistía si aplica). IMPORTANTE: la cobertura territorial (${lastWeekConf?.estados || "N/D"}/24 estados) mide la extensión geográfica de las protestas, NO es un factor estabilizador — a mayor cobertura, mayor inestabilidad.
 
 Párrafo 2: Qué vigilar esta semana y qué podría hacer que el índice suba o baje. Menciona riesgos específicos basados en los datos.
 
@@ -479,13 +486,13 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
                   {segments.map((seg,i) => (
                     <div key={i} style={{ flex:1, background:seg.color, opacity:0.2 }} />
                   ))}
-                  <div style={{ position:"absolute", left:`${index}%`, top:-2, transform:"translateX(-50%)", width:4, height:16,
+                  <div style={{ position:"absolute", left:`${displayIndex}%`, top:-2, transform:"translateX(-50%)", width:4, height:16,
                     background:zone.color, borderRadius:2, boxShadow:`0 0 6px ${zone.color}60`, transition:"left 0.5s" }} />
                 </div>
                 <div style={{ display:"flex", marginTop:3 }}>
                   {segments.map((seg,i) => (
-                    <div key={i} style={{ flex:1, fontSize:8, fontFamily:font, color:index >= seg.from && index <= seg.to ? seg.color : `${MUTED}60`,
-                      fontWeight:index >= seg.from && index <= seg.to ? 700 : 400, textAlign:"center" }}>
+                    <div key={i} style={{ flex:1, fontSize:8, fontFamily:font, color:displayIndex >= seg.from && displayIndex <= seg.to ? seg.color : `${MUTED}60`,
+                      fontWeight:displayIndex >= seg.from && displayIndex <= seg.to ? 700 : 400, textAlign:"center" }}>
                       {seg.label}
                     </div>
                   ))}
@@ -635,11 +642,24 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
         const latest = amnIdx >= 0 ? AMNISTIA_TRACKER[amnIdx] : AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
         const prev = amnIdx > 0 ? AMNISTIA_TRACKER[amnIdx - 1] : null;
         const isCurrentWeek = week === WEEKS.length - 1;
-        const gobLib = latest.gob.libertades || latest.gob.excarcelados || 0;
+
+        // Libertades: usar acumulado oficial (libertades plenas)
+        const gobLib = latest.gob.libertades || 0;
         const fpVerif = latest.fp.verificados || 0;
         const fpPresos = latest.fp.detenidos || 0;
-        const brecha = gobLib && fpVerif ? Math.round(Math.abs(1 - fpVerif / gobLib) * 100) : null;
-        const brechaInversa = fpVerif > gobLib;
+
+        // Brecha solo cuando gobLib > fpVerif (gobierno reporta más que FP verifica)
+        // y cuando gobLib > 0 (hay datos comparables)
+        const brechaValida = gobLib > 0 && fpVerif > 0 && gobLib > fpVerif;
+        const brecha = brechaValida ? Math.round((1 - fpVerif / gobLib) * 100) : null;
+
+        // Detectar si los datos son carry-forward (sin nuevos datos oficiales)
+        const sinDatosNuevos = latest.gob.solicitudes !== null && prev &&
+          latest.gob.libertades === prev?.gob?.libertades &&
+          latest.gob.solicitudes === prev?.gob?.solicitudes;
+
+        // Delta de excarcelaciones nuevas esta semana
+        const excNuevos = latest.gob.excarcelados || null;
         const fpDelta = (prev?.fp?.verificados && fpVerif !== prev.fp.verificados) ? fpVerif - prev.fp.verificados : null;
         return (
           <Card>
@@ -660,20 +680,31 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
             </div>
             <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"1fr 1fr 1fr 1fr", gap:mob?6:8, marginBottom:12 }}>
               {[
-                { v:latest.gob.solicitudes?.toLocaleString() || "—", l:"Solicitudes", sub:"Gobierno", c:ACCENT },
-                { v:latest.gob.libertades?.toLocaleString() || latest.gob.excarcelados?.toLocaleString() || "—", l:"Libertades plenas", sub:"Gobierno", c:"#16a34a" },
-                { v:fpVerif.toLocaleString(), l:"Excarcelaciones verif.", sub:"Foro Penal", c:"#ca8a04", delta:fpDelta },
+                { v:latest.gob.solicitudes?.toLocaleString() || "—", l:"Solicitudes acum.", sub:"Gobierno", c:ACCENT },
+                { v:gobLib ? gobLib.toLocaleString() : "—", l:"Libertades plenas acum.", sub:"Gobierno", c:"#16a34a", delta: excNuevos ? `+${excNuevos} sem.` : null },
+                { v:fpVerif ? fpVerif.toLocaleString() : "—", l:"Excarcelaciones verif.", sub:"Foro Penal", c:"#ca8a04", delta:fpDelta },
                 { v:latest.fp.detenidos?.toLocaleString() || "—", l:"Presos políticos", sub:"Foro Penal", c:"#dc2626" },
               ].map((item, i) => (
                 <div key={i} style={{ background:BG3, padding:mob?8:12, textAlign:"center" }}>
                   <div style={{ fontFamily:fontSans, fontSize:mob?18:24, fontWeight:700, color:item.c }}>
-                    {item.v}{item.delta != null && item.delta > 0 ? <span style={{ fontSize:11, color:"#16a34a", marginLeft:4, display:"inline" }}> +{item.delta}</span> : null}
+                    {item.v}
                   </div>
-                  <div style={{ fontFamily:font, fontSize:mob?7:8, letterSpacing:"0.08em", color:MUTED, textTransform:"uppercase" }}>{item.l}</div>
+                  {item.delta && (
+                    <div style={{ fontSize:10, color:"#16a34a", fontFamily:font, marginTop:1 }}>{item.delta}</div>
+                  )}
+                  <div style={{ fontFamily:font, fontSize:mob?7:8, letterSpacing:"0.08em", color:MUTED, textTransform:"uppercase", marginTop:2 }}>{item.l}</div>
                   <div style={{ fontFamily:font, fontSize:mob?7:8, color:item.c, opacity:0.7 }}>{item.sub}</div>
                 </div>
               ))}
             </div>
+
+            {/* Nota carry-forward */}
+            {sinDatosNuevos && (
+              <div style={{ marginBottom:8, padding:"5px 10px", background:`${MUTED}08`, border:`1px solid ${BORDER}`, borderRadius:4, fontSize:10, fontFamily:font, color:MUTED }}>
+                📋 Sin nuevos datos oficiales esta semana — cifras acumuladas del último reporte disponible
+              </div>
+            )}
+
             {brecha !== null && (
               <div style={{ marginBottom:12, padding:mob?"8px 10px":"10px 14px", background:`#dc262608`, border:`1px solid #dc262620` }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
@@ -731,7 +762,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
       })()}
 
       {/* ── ROW 3: KPIs + Semáforo ── */}
-      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 200px", gap:12 }}>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 220px", gap:12 }}>
 
         {/* KPIs por dimensión — de la semana activa */}
         <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:1, background:BORDER, border:`1px solid ${BORDER}` }}>
@@ -760,9 +791,9 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
                 {sec.icon} {sec.title}
               </div>
               {sec.rows.map((r,j) => (
-                <div key={j} style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6, gap:8 }}>
-                  <span style={{ fontSize:13, color:"#5a8aaa", flexShrink:0 }}>{r.k}</span>
-                  <span title={r.v} style={{ fontSize:13, fontFamily:font, fontWeight:500, color:r.v==="—"?`${MUTED}60`:TEXT, textAlign:"right", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", minWidth:0 }}>{r.v}</span>
+                <div key={j} style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:6, gap:8 }}>
+                  <span style={{ fontSize:12, color:"#5a8aaa", flexShrink:0, paddingTop:1 }}>{r.k}</span>
+                  <span title={r.v} style={{ fontSize:12, fontFamily:font, fontWeight:500, color:r.v==="—"?`${MUTED}60`:TEXT, textAlign:"right", lineHeight:1.4, wordBreak:"break-word" }}>{r.v}</span>
                 </div>
               ))}
             </div>
@@ -772,7 +803,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
         {/* Semáforo resumen */}
         <Card>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
-            🚦 Señales
+            🚦 Señales activas
           </div>
           {[{label:"Verde",count:wk.sem.g,color:"green"},
             {label:"Amarillo",count:wk.sem.y,color:"yellow"},
@@ -780,14 +811,14 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
           ].map((s,i) => (
             <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
               <span style={{ fontSize:18, fontWeight:700, fontFamily:font, color:SEM[s.color], width:24, textAlign:"right" }}>{s.count}</span>
-              <span style={{ fontSize:12, color:SEM[s.color], width:46, letterSpacing:"0.06em", textTransform:"uppercase" }}>{s.label}</span>
+              <span style={{ fontSize:11, color:SEM[s.color], width:52, letterSpacing:"0.06em", textTransform:"uppercase" }}>{s.label}</span>
               <div style={{ flex:1, height:5, background:BORDER, borderRadius:2 }}>
                 <div style={{ height:5, background:SEM[s.color], width:`${(s.count/semTotal)*100}%`, borderRadius:2, transition:"width 0.4s" }} />
               </div>
             </div>
           ))}
           <div style={{ marginTop:10, paddingTop:10, borderTop:`1px solid ${BORDER}`, textAlign:"center" }}>
-            <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Dominante</div>
+            <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Dominante</div>
             <div style={{ fontSize:16, fontWeight:800, color:domSc.color, fontFamily:"'Syne',sans-serif" }}>E{domSc.id} · {dom.v}%</div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>{domSc.short}</div>
           </div>
