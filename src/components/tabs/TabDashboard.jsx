@@ -644,14 +644,13 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
         const isCurrentWeek = week === WEEKS.length - 1;
 
         // Libertades: usar acumulado oficial (libertades plenas)
-        const gobLib = latest.gob.libertades || 0;
-        const fpVerif = latest.fp.verificados || 0;
-        const fpPresos = latest.fp.detenidos || 0;
+        const trkGobLib = latest.gob.libertades || 0;
+        const trkFpVerif = latest.fp.verificados || 0;
+        const trkFpPresos = latest.fp.detenidos || 0;
 
-        // Brecha solo cuando gobLib > fpVerif (gobierno reporta más que FP verifica)
-        // y cuando gobLib > 0 (hay datos comparables)
-        const brechaValida = gobLib > 0 && fpVerif > 0 && gobLib > fpVerif;
-        const brecha = brechaValida ? Math.round((1 - fpVerif / gobLib) * 100) : null;
+        // Brecha solo cuando trkGobLib > trkFpVerif (gobierno reporta más que FP verifica)
+        const trkBrechaValida = trkGobLib > 0 && trkFpVerif > 0 && trkGobLib > trkFpVerif;
+        const trkBrecha = trkBrechaValida ? Math.round((1 - trkFpVerif / trkGobLib) * 100) : null;
 
         // Detectar si los datos son carry-forward (sin nuevos datos oficiales)
         const sinDatosNuevos = latest.gob.solicitudes !== null && prev &&
@@ -660,7 +659,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
 
         // Delta de excarcelaciones nuevas esta semana
         const excNuevos = latest.gob.excarcelados || null;
-        const fpDelta = (prev?.fp?.verificados && fpVerif !== prev.fp.verificados) ? fpVerif - prev.fp.verificados : null;
+        const trkFpDelta = (prev?.fp?.verificados && trkFpVerif !== prev.fp.verificados) ? trkFpVerif - prev.fp.verificados : null;
         return (
           <Card>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
@@ -681,16 +680,16 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
             <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"1fr 1fr 1fr 1fr", gap:mob?6:8, marginBottom:12 }}>
               {[
                 { v:latest.gob.solicitudes?.toLocaleString() || "—", l:"Solicitudes acum.", sub:"Gobierno", c:ACCENT },
-                { v:gobLib ? gobLib.toLocaleString() : "—", l:"Libertades plenas acum.", sub:"Gobierno", c:"#16a34a", delta: excNuevos ? `+${excNuevos} sem.` : null },
-                { v:fpVerif ? fpVerif.toLocaleString() : "—", l:"Excarcelaciones verif.", sub:"Foro Penal", c:"#ca8a04", delta:fpDelta },
+                { v:trkGobLib ? trkGobLib.toLocaleString() : "—", l:"Libertades plenas acum.", sub:"Gobierno", c:"#16a34a", extra: excNuevos ? `+${excNuevos} sem.` : null },
+                { v:trkFpVerif ? trkFpVerif.toLocaleString() : "—", l:"Excarcelaciones verif.", sub:"Foro Penal", c:"#ca8a04", extra: trkFpDelta ? `+${trkFpDelta}` : null },
                 { v:latest.fp.detenidos?.toLocaleString() || "—", l:"Presos políticos", sub:"Foro Penal", c:"#dc2626" },
               ].map((item, i) => (
                 <div key={i} style={{ background:BG3, padding:mob?8:12, textAlign:"center" }}>
                   <div style={{ fontFamily:fontSans, fontSize:mob?18:24, fontWeight:700, color:item.c }}>
                     {item.v}
                   </div>
-                  {item.delta && (
-                    <div style={{ fontSize:10, color:"#16a34a", fontFamily:font, marginTop:1 }}>{item.delta}</div>
+                  {item.extra && (
+                    <div style={{ fontSize:10, color:"#16a34a", fontFamily:font, marginTop:1 }}>{item.extra}</div>
                   )}
                   <div style={{ fontFamily:font, fontSize:mob?7:8, letterSpacing:"0.08em", color:MUTED, textTransform:"uppercase", marginTop:2 }}>{item.l}</div>
                   <div style={{ fontFamily:font, fontSize:mob?7:8, color:item.c, opacity:0.7 }}>{item.sub}</div>
@@ -705,18 +704,18 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
               </div>
             )}
 
-            {brecha !== null && (
+            {trkBrecha !== null && (
               <div style={{ marginBottom:12, padding:mob?"8px 10px":"10px 14px", background:`#dc262608`, border:`1px solid #dc262620` }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
                   <span style={{ fontSize:11, fontFamily:font, color:"#dc2626", letterSpacing:"0.1em", textTransform:"uppercase" }}>Brecha verificación</span>
-                  <span style={{ fontSize:16, fontFamily:fontSans, fontWeight:700, color:"#dc2626" }}>{brecha}%</span>
+                  <span style={{ fontSize:16, fontFamily:fontSans, fontWeight:700, color:"#dc2626" }}>{trkBrecha}%</span>
                 </div>
                 <div style={{ height:6, background:BORDER, borderRadius:3 }}>
-                  <div style={{ height:6, borderRadius:3, background:`linear-gradient(90deg, #16a34a ${100-brecha}%, #dc2626 ${100-brecha}%)`, width:"100%" }} />
+                  <div style={{ height:6, borderRadius:3, background:`linear-gradient(90deg, #16a34a ${100-trkBrecha}%, #dc2626 ${100-trkBrecha}%)`, width:"100%" }} />
                 </div>
                 <div style={{ display:"flex", justifyContent:"space-between", marginTop:4 }}>
-                  <span style={{ fontSize:9, fontFamily:font, color:"#16a34a" }}>Foro Penal: {fpVerif.toLocaleString()}</span>
-                  <span style={{ fontSize:9, fontFamily:font, color:ACCENT }}>Gobierno: {gobLib.toLocaleString()}</span>
+                  <span style={{ fontSize:9, fontFamily:font, color:"#16a34a" }}>Foro Penal: {trkFpVerif.toLocaleString()}</span>
+                  <span style={{ fontSize:9, fontFamily:font, color:ACCENT }}>Gobierno: {trkGobLib.toLocaleString()}</span>
                 </div>
               </div>
             )}
