@@ -315,11 +315,6 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
         }
         const deltaLive = prevIndex !== null ? index - prevIndex : null;
 
-        const zone = index <= 25 ? { label:"Estabilidad relativa", color:"#16a34a" }
-          : displayIndex <= 50 ? { label:"Tensión moderada", color:"#ca8a04" }
-          : displayIndex <= 75 ? { label:"Inestabilidad alta", color:"#f97316" }
-          : { label:"Crisis inminente", color:"#dc2626" };
-
         const segments = [
           { from:0, to:25, color:"#16a34a", label:"Estable" },
           { from:25, to:50, color:"#ca8a04", label:"Tensión" },
@@ -371,6 +366,11 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
         const displayIndex = isCurrentWeekIdx ? index : (histIdx[week] ?? index);
         const displayPrev  = isCurrentWeekIdx ? prevIndex : (week > 0 ? histIdx[week - 1] : null);
         const delta = displayPrev !== null ? displayIndex - displayPrev : deltaLive;
+
+        const zone = displayIndex <= 25 ? { label:"Estabilidad relativa", color:"#16a34a" }
+          : displayIndex <= 50 ? { label:"Tensión moderada", color:"#ca8a04" }
+          : displayIndex <= 75 ? { label:"Inestabilidad alta", color:"#f97316" }
+          : { label:"Crisis inminente", color:"#dc2626" };
 
         // Breakdown items for display
         const breakdown = [
