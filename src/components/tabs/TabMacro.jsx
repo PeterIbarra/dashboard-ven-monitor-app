@@ -7,6 +7,8 @@ import { SocioeconomicPanel } from "../SocioeconomicPanel";
 import { TradingViewMini } from "../charts/TradingViewMini";
 import { BG2, BORDER, TEXT, MUTED, ACCENT, font } from "../../constants";
 import { IS_DEPLOYED } from "../../utils";
+import { MACRO_SERIES, MACRO_SERIES_META, MACRO_GROUPS } from "../../data/macroSeries.js";
+import { HistoricoPanel } from "../HistoricoPanel.jsx";
 
 export function TabMacro() {
   const mob = useIsMobile();
@@ -154,15 +156,17 @@ export function TabMacro() {
   // Static macro indicators (update weekly/monthly)
   const MACRO = [
     { k:"PIB proyectado 2025", v:"10–15%", c:"#22c55e", s:"FMI / Ecoanalítica · crecimiento estimado" },
-    { k:"Inflación anual", v:"~100%", c:"#E5243B", s:"FMI: tres dígitos · BCV sin publicar" },
-    { k:"Reservas internacionales", v:"~$9.5B", c:"#f59e0b", s:"BCV · incluye oro monetario" },
+    { k:"Inflación mensual (mar 2026)", v:"13.1%", c:"#E5243B", s:"BCV · var. mensual avance · INPC" },
+    { k:"Reservas internacionales", v:"$13,239M", c:"#f59e0b", s:"BCV mar 2026 · incluye oro monetario" },
     { k:"Deuda externa", v:">$150B", c:"#E5243B", s:"FMI: >180% del PIB · en default" },
-    { k:"Salario mínimo", v:"130 Bs", c:"#E5243B", s:"~$0.30 al paralelo · 47+ meses sin ajuste" },
-    { k:"Canasta alimentaria", v:"~$550", c:"#f59e0b", s:"CENDA · ingreso promedio ~$270" },
-    { k:"Producción petrolera", v:"903 kbd", c:"#22c55e", s:"Feb 2026 · OPEC MOMR fuentes sec. · ↑80 kbd vs ene" },
-    { k:"Liquidez monetaria", v:"Expansión", c:"#f59e0b", s:"BCV inyecta vía subastas semanales" },
-    { k:"Crudo Merey", v:"$52.31/b", c:"#f59e0b", s:"Feb 2026 · Cesta OPEC · ↑$9.10 vs ene" },
-    { k:"Plataformas (Rigs)", v:"2", c:"#E5243B", s:"Ene 2026 · Mínimo operativo · OPEC" },
+    { k:"Ingreso mínimo integral", v:"~$38.85", c:"#E5243B", s:"Mar 2026 · sector privado · BCV/IGTF" },
+    { k:"Canasta básica (CENDAS)", v:"$503.73", c:"#f59e0b", s:"Abr 2025 · última publicación disponible" },
+    { k:"Producción petrolera (OPEP)", v:"903 kbd", c:"#22c55e", s:"Feb 2026 · fuentes sec. OPEP" },
+    { k:"Producción petrolera (PDVSA)", v:"1,021 kbd", c:"#22c55e", s:"Feb 2026 · cifras oficiales PDVSA" },
+    { k:"Precio Merey (cesta VEN)", v:"$73.33/bl", c:"#f59e0b", s:"Mar 2026 · OPEP" },
+    { k:"Crédito bancario", v:"$3,234M", c:"#22c55e", s:"Mar 2026 · SUDEBAN · cartera bruta total" },
+    { k:"Recaudación SENIAT", v:"$1,606M", c:"#22c55e", s:"Mar 2026 · ingresos no petroleros" },
+    { k:"Liquidez M2", v:"$2,430M", c:"#f59e0b", s:"Mar 2026 · BCV · agregados monetarios" },
   ];
 
   return (
@@ -175,7 +179,7 @@ export function TabMacro() {
           <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Tipo de cambio en vivo · Actualiza cada 5 min · Mercado cambiario</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
-          {[{id:"cambio",label:"Tipo de cambio"},{id:"indicadores",label:"Indicadores"},{id:"charts",label:"Gráficos"},{id:"socioeco",label:"Socioeconómico"}].map(s => (
+          {[{id:"cambio",label:"Tipo de cambio"},{id:"indicadores",label:"Indicadores"},{id:"charts",label:"Gráficos"},{id:"historico",label:"Series históricas"},{id:"socioeco",label:"Socioeconómico"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:12, fontFamily:font, padding:"6px 12px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
@@ -338,6 +342,9 @@ export function TabMacro() {
 
       {/* ── SOCIOECONÓMICO (World Bank + IMF + R4V) ── */}
       {seccion === "socioeco" && <SocioeconomicPanel mob={mob} />}
+
+      {/* ── SERIES HISTÓRICAS ── */}
+      {seccion === "historico" && <HistoricoPanel mob={mob} />}
     </div>
   );
 }
