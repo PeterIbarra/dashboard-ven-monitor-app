@@ -104,14 +104,32 @@ function renderInline(text) {
 function buildContext({ weeks, liveData, signals, weekDrivers, indicators, sitrep, prospectiva }) {
   const lines = [];
 
-  // Historial semanal compacto
+  // Historial semanal con probabilidades explícitas por escenario
   lines.push("=== HISTORIAL SEMANAL (S1–S" + weeks.length + ") ===");
+  lines.push("NOTA: Las probabilidades son E1=Transición, E2=Colapso, E3=Continuidad, E4=Resistencia.");
   weeks.forEach((w, i) => {
-    const dom = w.probs?.reduce((a, b) => (a.v > b.v ? a : b));
-    const prob = dom ? `E${dom.sc} ${dom.v}%` : "";
+    const sNum = `S${i + 1}`;
+    // Probabilities: build full breakdown, not just dominant
+    const probStr = w.probs
+      ? w.probs
+          .slice()
+          .sort((a, b) => b.v - a.v)
+          .map((p) => `E${p.sc}=${p.v}%`)
+          .join(", ")
+      : "sin datos";
     const sintesis = w.lectura ? w.lectura.slice(0, 130) + "..." : "";
-    lines.push(`S${i + 1} (${w.label}): dom ${prob} | ${sintesis}`);
+    lines.push(`${sNum} (${w.label}) → Probabilidades: [${probStr}] | ${sintesis}`);
   });
+  // Resumen explícito de semana actual
+  const lastWeek = weeks[weeks.length - 1];
+  if (lastWeek?.probs) {
+    const sorted = [...lastWeek.probs].sort((a, b) => b.v - a.v);
+    lines.push(`\nSEMANA ACTUAL (${lastWeek.label}) — desglose exacto:`);
+    sorted.forEach((p) => {
+      const names = { 1: "Transición democrática", 2: "Colapso y fragmentación", 3: "Continuidad negociada", 4: "Resistencia y escalada" };
+      lines.push(`  E${p.sc} (${names[p.sc] || ""}): ${p.v}%`);
+    });
+  }
 
   // Señales activas por escenario
   lines.push("\n=== SEÑALES ACTIVAS (semana actual) ===");
@@ -318,16 +336,18 @@ export function ChatBot({ weeks, liveData, signals, weekDrivers, indicators, sit
 
   return (
     <>
-      {/* ── FAB button ── */}
-      <button
-        style={fabStyle}
-        onClick={() => setOpen((v) => !v)}
-        title="Asistente del Monitor"
-        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.08)")}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-      >
-        {open ? "✕" : "💬"}
-      </button>
+      {/* ── FAB button — oculto en pantalla completa ── */}
+      {!expanded && (
+        <button
+          style={fabStyle}
+          onClick={() => setOpen((v) => !v)}
+          title="Asistente del Monitor"
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.08)")}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        >
+          {open ? "✕" : "💬"}
+        </button>
+      )}
 
       {/* ── Chat panel ── */}
       {open && (
@@ -357,6 +377,15 @@ export function ChatBot({ weeks, liveData, signals, weekDrivers, indicators, sit
               )}
             </div>
             <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
+              {messages.length > 0 && (
+                <button onClick={() => { setMessages([]); setProvider(null); setError(null); }} style={{
+                  fontFamily: font, fontSize: 9, color: MUTED,
+                  background: "transparent", border: `1px solid ${BORDER}`,
+                  borderRadius: 6, padding: "3px 8px", cursor: "pointer",
+                }}>
+                  limpiar
+                </button>
+              )}
               <button
                 onClick={() => setExpanded(v => !v)}
                 title={expanded ? "Modo ventana" : "Pantalla completa"}
@@ -517,22 +546,6 @@ export function ChatBot({ weeks, liveData, signals, weekDrivers, indicators, sit
           </div>
 
           {/* Clear conversation */}
-          {messages.length > 0 && (
-            <div style={{
-              padding: "4px 12px 8px",
-              textAlign: "right",
-              background: BG2,
-              flexShrink: 0,
-            }}>
-              <button onClick={() => { setMessages([]); setProvider(null); setError(null); }} style={{
-                fontFamily: font, fontSize: 9, color: MUTED,
-                background: "transparent", border: "none", cursor: "pointer",
-              }}>
-                limpiar conversación
-              </button>
-            </div>
-          )}
-
         </div>
       )}
 
