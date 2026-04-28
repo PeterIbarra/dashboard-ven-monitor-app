@@ -168,6 +168,8 @@ export const ICG_HISTORY = [
   { week:"S12", score:68, sitrep:true, note:"OFAC levanta sanciones DR. Trump «empresa conjunta». Embajada reabierta. 90 días cumplidos. Marcha 9 abril convocada" },
   { week:"S13", score:70, sitrep:true, note:"Poder Ciudadano completo: Devoe Fiscal (275 votos) + González Lobato Defensora. FMI consulta miembros. 72 protestas 9-abr. Sanciones BCV evaluadas" },
   { week:"S14", score:72, sitrep:true, note:"FMI + BM reanudan relaciones (16 abr). GL-56/GL-57 emitidas. Haustveit Caracas. Kozak: Fase 1 cumplida. Padrino López regresa al gabinete. Registro FARA Rodríguez candidatura 2027" },
+  { week:"S15", score:68, sitrep:true, note:"Barrett Fase 2 + FMI/BM/BID simultáneos + Peregrinación Nacional + Ley Minas G.O.7.020. MCM anuncia regreso desde Puerta del Sol. Petro propone cogobernanza 1-2 años. 46 protestas pico 27 (22 abr) paro universitario. Motín Yare III 5 fallecidos. 473 presos políticos" },
+
 ];
 
 export const CONF_SEMANAL = [
@@ -253,4 +255,14 @@ export const CONF_SEMANAL = [
       { fecha:"15 Abr", protestas:10, estados:8, tipo:"Mixto (ESCP + CPP + DESCA)", exigencias:"Laborales, alimentación, participación política, vivienda, agua, justicia" },
       { fecha:"16 Abr", protestas:7, estados:5, tipo:"ESCP + CPP", exigencias:"Laborales, alimentación, participación política, vivienda, justicia, presos políticos" },
     ] },
+  { week:"S15", label:"17–23 abr", protestas:46, estados:18, reprimidas:0,
+    motivos:["Laborales","Seguridad social","Contratación colectiva","Justicia","Presos políticos","Educación","Vivienda","Gasolina","Derechos de la mujer"],
+    hecho:"46 protestas (17–23 abr). Pico 27 el 22 de abril — paro universitario nacional en 18 estados: mayor coordinación sectorial del mes. Motín Yare III (20 abr): 5 fallecidos en centro de máxima seguridad. Convergencia 1° mayo: Gran Peregrinación oficialista vs. movilización laboral con salario <1 USD.",
+    dias:[
+      { fecha:"17 Abr", protestas:5, estados:5, tipo:"DESCA + CPP", exigencias:"Vivienda, agua, laborales, salud" },
+      { fecha:"21 Abr", protestas:8, estados:7, tipo:"Mixto (ESCP + CPP)", exigencias:"Laborales, seguridad social, justicia, presos políticos, educación" },
+      { fecha:"22 Abr", protestas:27, estados:18, tipo:"Laboral + ESCP", exigencias:"PARO UNIVERSITARIO: salario ajustado, seguridad social, contratación colectiva" },
+      { fecha:"23 Abr", protestas:6, estados:6, tipo:"Mixto (DESCA + CPP)", exigencias:"Laborales, justicia, vivienda, gasolina, derechos de la mujer" },
+    ] },
+
 ];
