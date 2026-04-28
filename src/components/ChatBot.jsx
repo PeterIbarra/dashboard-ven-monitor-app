@@ -17,17 +17,86 @@ const SUGGESTED = [
 
 // ── markdown renderer ─────────────────────────────────────────────────────────
 
-function renderMarkdown(text) {
-  const html = text
+function renderMarkdown(raw) {
+  const lines = raw.split("\n");
+  const out = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Table block: starts with |
+    if (line.trim().startsWith("|")) {
+      const tableLines = [];
+      while (i < lines.length && lines[i].trim().startsWith("|")) {
+        tableLines.push(lines[i]);
+        i++;
+      }
+      // filter out separator rows (---|---)
+      const rows = tableLines.filter(l => !/^\s*\|[\s\-|:]+\|\s*$/.test(l));
+      if (rows.length > 0) {
+        const tableStyle = `style="width:100%;border-collapse:collapse;font-size:11px;margin:8px 0"`;
+        const cellStyle = (header) =>
+          header
+            ? `style="text-align:left;padding:5px 8px;border:1px solid #d0d7e0;background:#eef1f5;font-weight:600;color:#5a6a7a;white-space:nowrap"`
+            : `style="text-align:left;padding:5px 8px;border:1px solid #d0d7e0;color:#1a202c;vertical-align:top"`;
+        let tableHtml = `<table ${tableStyle}>`;
+        rows.forEach((row, ri) => {
+          const cells = row.split("|").map(c => c.trim()).filter((c, ci, arr) => ci > 0 && ci < arr.length - 1);
+          const tag = ri === 0 ? "th" : "td";
+          tableHtml += `<tr>${cells.map(c => `<${tag} ${cellStyle(ri === 0)}>${renderInline(c)}</${tag}>`).join("")}</tr>`;
+        });
+        tableHtml += "</table>";
+        out.push(tableHtml);
+      }
+      continue;
+    }
+
+    // Headings (####, ###, ##, #) — render as bold text, no literal #
+    const headingMatch = line.match(/^#{1,4} (.+)$/);
+    if (headingMatch) {
+      out.push(`<div style="font-weight:700;margin:8px 0 4px;color:#1a202c">${renderInline(headingMatch[1])}</div>`);
+      i++;
+      continue;
+    }
+
+    // Unordered list
+    const ulMatch = line.match(/^[\-\*] (.+)$/);
+    if (ulMatch) {
+      out.push(`<div style="padding-left:12px;margin:2px 0">&#8226;&nbsp;${renderInline(ulMatch[1])}</div>`);
+      i++;
+      continue;
+    }
+
+    // Ordered list
+    const olMatch = line.match(/^(\d+)\. (.+)$/);
+    if (olMatch) {
+      out.push(`<div style="padding-left:12px;margin:2px 0">${olMatch[1]}.&nbsp;${renderInline(olMatch[2])}</div>`);
+      i++;
+      continue;
+    }
+
+    // Blank line → paragraph break
+    if (line.trim() === "") {
+      out.push("<div style='height:6px'></div>");
+      i++;
+      continue;
+    }
+
+    // Normal paragraph
+    out.push(`<div style="margin:2px 0">${renderInline(line)}</div>`);
+    i++;
+  }
+
+  return out.join("");
+}
+
+function renderInline(text) {
+  return text
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/^#{1,3} (.+)$/gm, "<strong>$1</strong>")
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/^[\-\*] (.+)$/gm, "&#8226;&nbsp;$1")
-    .replace(/^\d+\. (.+)$/gm, (_, p) => `<span style="margin-right:4px">${_}</span>`)
-    .replace(/\n{2,}/g, "<br/><br/>")
-    .replace(/\n/g, "<br/>");
-  return html;
+    .replace(/`(.+?)`/g, `<code style="background:#eef1f5;padding:1px 4px;border-radius:3px;font-size:10px">$1</code>`);
 }
 
 // ── context builder ──────────────────────────────────────────────────────────
@@ -131,6 +200,7 @@ Asistente:`;
 
 export function ChatBot({ weeks, liveData, signals, weekDrivers, indicators, sitrep, prospectiva }) {
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -196,7 +266,20 @@ export function ChatBot({ weeks, liveData, signals, weekDrivers, indicators, sit
 
   // ── styles ──
 
-  const panelStyle = {
+  const panelStyle = expanded ? {
+    position: "fixed",
+    top: 0, left: 0, right: 0, bottom: 0,
+    width: "100vw", height: "100vh",
+    maxWidth: "none", maxHeight: "none",
+    background: BG2,
+    border: "none",
+    borderRadius: 0,
+    boxShadow: "none",
+    display: "flex",
+    flexDirection: "column",
+    zIndex: 1000,
+    overflow: "hidden",
+  } : {
     position: "fixed",
     bottom: 80,
     right: 20,
@@ -256,22 +339,51 @@ export function ChatBot({ weeks, liveData, signals, weekDrivers, indicators, sit
             borderBottom: `1px solid ${BORDER}`,
             background: `linear-gradient(135deg, ${ACCENT}12, ${BG3})`,
             flexShrink: 0,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
           }}>
-            <div style={{ fontFamily: font, fontSize: 12, color: ACCENT, marginBottom: 2 }}>
-              ASISTENTE · MONITOR VEN 2026
-            </div>
-            <div style={{ fontFamily: fontSans, fontSize: 12, color: MUTED }}>
-              Consultas sobre el dashboard · S1–S{weeks.length} en contexto
-            </div>
-            {provider && (
-              <div style={{ fontFamily: font, fontSize: 9, color: MUTED, marginTop: 4 }}>
-                vía {provider}
+            <div>
+              <div style={{ fontFamily: font, fontSize: 12, color: ACCENT, marginBottom: 2 }}>
+                ASISTENTE · MONITOR VEN 2026
               </div>
-            )}
+              <div style={{ fontFamily: fontSans, fontSize: 12, color: MUTED }}>
+                Consultas sobre el dashboard · S1–S{weeks.length} en contexto
+              </div>
+              {provider && (
+                <div style={{ fontFamily: font, fontSize: 9, color: MUTED, marginTop: 4 }}>
+                  vía {provider}
+                </div>
+              )}
+            </div>
+            <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
+              <button
+                onClick={() => setExpanded(v => !v)}
+                title={expanded ? "Modo ventana" : "Pantalla completa"}
+                style={{
+                  background: "transparent", border: `1px solid ${BORDER}`,
+                  borderRadius: 6, width: 26, height: 26, cursor: "pointer",
+                  color: MUTED, fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center",
+                }}
+              >
+                {expanded ? "⊡" : "⊞"}
+              </button>
+              <button
+                onClick={() => { setOpen(false); setExpanded(false); }}
+                title="Cerrar"
+                style={{
+                  background: "transparent", border: `1px solid ${BORDER}`,
+                  borderRadius: 6, width: 26, height: 26, cursor: "pointer",
+                  color: MUTED, fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center",
+                }}
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {/* Messages area */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: expanded ? "20px calc(50% - 380px)" : "12px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
 
             {/* Empty state — suggested questions */}
             {messages.length === 0 && (
