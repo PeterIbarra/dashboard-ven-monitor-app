@@ -1,21 +1,21 @@
 // Latest KPI snapshot — updated each SITREP cycle
 export const KPIS_LATEST = {
   energia: [
-    { k:"Exportaciones", v:"Repsol x3 meta 2029", c:"#22c55e" },
-    { k:"Ingresos proy.", v:"FII Priority · Signum", c:"#22c55e" },
-    { k:"Licencias OFAC", v:"GL-53 + OFAC minero", c:"#38bdf8" },
-    { k:"Eléctrico", v:"Siemens/GE + CAF", c:"#a17d08" },
+    { k:"FMI + BM + BID reanudan vínculos", v:"3 multilaterales simultáneos · DEG ~USD 5.137M", c:"#22c55e" },
+    { k:"Barrett llega (Fase 2)", v:"Encargado EE.UU. · Rubio negocia BCV con Deloitte", c:"#22c55e" },
+    { k:"Producción 1,1M bpd", v:"Meta 1,37M dic 2026 · Halliburton evalúa retorno", c:"#38bdf8" },
+    { k:"Ley Minas G.O. 7.020", v:"3 entes · 50 años · apertura capital extranjero", c:"#22c55e" },
   ],
   politico: [
-    { k:"Amnistía", v:"8.146 libertades plenas", c:"#22c55e" },
-    { k:"Presos políticos", v:"515 + 179 militares", c:"#ef4444" },
-    { k:"Agenda electoral", v:"180 días plan Rubio", c:"#a17d08" },
-    { k:"Poder Ciudadano", v:"Prórroga 48h · Villegas retira", c:"#a17d08" },
+    { k:"MCM: «regreso a casa»", v:"Puerta del Sol + PM Portugal · coordinado con EE.UU.", c:"#22c55e" },
+    { k:"E3-E1: 8pp de brecha", v:"La más estrecha del ciclo — 46% vs 38%", c:"#a17d08" },
+    { k:"46 protestas · Yare III", v:"Pico 27 (22 abr) paro universitario · 5 fallecidos", c:"#ef4444" },
+    { k:"180 días + cogobernanza", v:"Petro 1-2 años · Cabello: «cuando sean»", c:"#ef4444" },
   ],
   opinion: [
-    { k:"País más democrático", v:"58% (AtlasIntel)", c:"#22c55e" },
-    { k:"Aprobación DR", v:"34,6% (Atlas) / 73% (Hint.)", c:"#a17d08" },
-    { k:"MCM liderazgo", v:"123,68/137 pts (#1)", c:"#22c55e" },
-    { k:"Conflictividad", v:"97 protestas · 22+ estados", c:"#ef4444" },
+    { k:"Gran Peregrinación", v:"19 abr – 1° mayo · test convergencia laboral-oficial", c:"#a17d08" },
+    { k:"473 presos políticos", v:"187 militares · amnistía <30% (ONG) · Paparoni det.", c:"#ef4444" },
+    { k:"Inflación ~650% anual", v:"FMI «camino muy difícil» · DEG no son presupuesto", c:"#ef4444" },
+    { k:"PNUD: 7,4% crecimiento", v:"Base 35,7% nivel 2012 · salario <1 USD congelado", c:"#a17d08" },
   ],
 };

@@ -660,6 +660,23 @@ export const SITREP_ALL = [
   },
 
 
+
+  // S15: 17 - 24 abril 2026
+  { period:"17 – 24 de abril de 2026", periodShort:"17–24 abr 2026",
+    keyPoints:[
+      { tag:"Multilateral", color:"#16a34a", title:"FMI, Banco Mundial y BID reanudan vínculos simultáneamente", text:"Georgieva y Rodríguez acuerdan agenda técnica de 3 ejes: calidad de datos, política pública e institucionalidad. El Banco Mundial celebra la apertura y el BID se prepara para reanudar operaciones. Acceso potencial a DEG ~USD 5.137M sujeto a acuerdos técnicos no concluidos." },
+      { tag:"Diplomacia", color:"#0468B1", title:"Barrett llega a Caracas — EE.UU. activa Fase 2", text:"John Barrett asume como encargado de negocios en sustitución de Laura Dogu. Kozak-Figuera reafirman respaldo a la AN de 2015. Reportes extraoficiales: Rubio coordina negociación gobierno-Machado para renovar autoridades del BCV con auditoría de Deloitte." },
+      { tag:"Oposición", color:"#ca8a04", title:"MCM: «hoy comienza el regreso a casa»", text:"Desde una abarrotada Puerta del Sol, Machado anuncia su retorno inminente. Recibe medalla de la Comunidad de Madrid y se reúne con el primer ministro de Portugal. Propone un gran acuerdo nacional con rutas simultáneas, con liberación de presos y retorno de migrantes como condiciones mínimas." },
+    ],
+    sintesis:"Venezuela cierra la semana en un punto de convergencia de cuatro tensiones estructurales: la brecha entre la narrativa de reinserción financiera y los plazos reales (FMI advierte «camino muy difícil»); la superposición del 1° de mayo como fecha de la Gran Peregrinación oficialista y de la nueva movilización laboral; el retorno inminente de MCM que redefinirá la geometría política; y la ambigüedad sobre el calendario electoral con el interinato avanzando hacia su límite de 180 días. La brecha entre E3 (46%) y E1 (38%) es la más estrecha del ciclo.",
+    actores:[
+      { name:"EE.UU.", items:["John Barrett llega como encargado de negocios (23 abr) — Fase 2 centrada en resultados","Kozak-Figuera: respaldo a la AN de 2015 como referente institucional de la transición","~USD 3.000M en fondo venezolano bajo administración EE.UU. · KPMG elaborará informes trimestrales","Reportes: Rubio coordina renovación BCV + Deloitte audita instituto emisor","Tesoro valora positivamente reanudación con el FMI"] },
+      { name:"Gobierno Interino", items:["Balance 100 días: amnistía 8.616, PDVSA 1,1M bpd, relaciones FMI-BM, seguridad","Gran Peregrinación Nacional 19 abr – 1° mayo: instrumento de legitimación interna","Comisión Clasificación de Activos Públicos instalada (Pisella sector privado)","Ley Orgánica de Minas G.O. 7.020: 3 entes, 50 años concesiones, apertura capital","Conversaciones con Siemens y GE para rehabilitar eléctrico del Zulia"] },
+      { name:"Oposición", items:["MCM: «hoy comienza el regreso a casa» — Puerta del Sol · medalla Madrid · PM Portugal","Propuesta de acuerdo nacional con rutas simultáneas — presos y migrantes como condiciones","Reconfiguración opositora: Darwin González en PUD; Alianza Nacional de Centro creada","Detención de Paparoni (DGCIM) como señal disuasiva hacia la dirigencia opositora","Machado: retrasar elecciones es más riesgoso que acelerarlas — 40 semanas técnicas"] },
+      { name:"Internacional", items:["Petro viaja a Caracas (24 abr): propone cogobernanza 1-2 años — tensión con MCM","Chile busca restablecer relaciones consulares motivado por gestión migratoria","Mercosur evalúa retorno de Venezuela — Brasil impulsa revisar suspensión","FMI: Georgieva advierte «camino muy difícil» · vicepresidente aclara: no es plan de financiamiento","Caso PDVSA-Cripto avanza a juicio: El Aissami, Roa y Samark López"] },
+    ],
+  },
+
 ];
 
 export const CURATED_NEWS = [
@@ -928,5 +945,27 @@ export const CURATED_FACTCHECK = [
   { title:"Grupo Cisneros anuncia fondo USD 1.000M para invertir en Venezuela — orientado a agricultura e inmobiliario", date:"2026-04-15", source:"Grupo Cisneros", scenarios:["E3"], dims:["Económico","Internacional"], week:"S14" },
   { title:"Conindustria: GL-56 y GL-57 son 'el puente hacia la normalización financiera' — 66% tributos como restricción principal (encuesta Q4 2025)", date:"2026-04-12", source:"Conindustria", scenarios:["E3","E2"], dims:["Económico"], week:"S14" },
   { title:"Inflación marzo: 13,1% mensual BCV · acumulado 2026: 71,8% · tasa anualizada: 649,5% — Macroconsultores: 11,1–14,1% mensual", date:"2026-04-10", source:"BCV/Macroconsultores", scenarios:["E2","E4"], dims:["Económico"], week:"S14" },
-];
 
+  // S15: 17 – 24 abril 2026
+  { title:"John Barrett asume como encargado de negocios de EE.UU. en Venezuela (23 abr) — releva a Laura Dogu · mensaje: resultados concretos para ciudadanos de ambos países", date:"2026-04-23", source:"Depto. Estado EE.UU.", scenarios:["E3"], dims:["Político","Internacional"], week:"S15" },
+  { title:"Kozak-Figuera en Washington: EE.UU. reafirma respaldo a la AN de 2015 para una transición estable, ordenada y sostenible", date:"2026-04-23", source:"Depto. Estado EE.UU.", scenarios:["E1","E3"], dims:["Político","Internacional"], week:"S15" },
+  { title:"Reportes extraoficiales: Rubio coordina negociación gobierno interino-Machado para renovar autoridades del BCV; Deloitte habría sido contratada para auditar el instituto emisor", date:"2026-04-22", source:"Bitácora Económica/Prensa", scenarios:["E3","E1"], dims:["Político","Económico","Internacional"], week:"S15" },
+  { title:"FMI + Banco Mundial + BID reanudan vínculos con Venezuela simultáneamente — Georgieva acuerda agenda técnica de 3 ejes con Rodríguez", date:"2026-04-19", source:"FMI/BM/BID", scenarios:["E3"], dims:["Económico","Internacional"], week:"S15" },
+  { title:"Georgieva (FMI) advierte: «el camino hacia la estabilidad será muy difícil» — inflación de tres dígitos y economía contraída en dos tercios", date:"2026-04-19", source:"FMI", scenarios:["E2","E3"], dims:["Económico","Internacional"], week:"S15" },
+  { title:"DEG ~USD 5.137M: acceso potencial sujeto a acuerdos técnicos — uso consistente como reserva monetaria, no gasto corriente ni presupuesto ejecutable", date:"2026-04-19", source:"FMI/BCV", scenarios:["E3","E2"], dims:["Económico"], week:"S15" },
+  { title:"PNUD proyecta crecimiento económico del 7,4% para Venezuela en 2026 — desde base equivalente al 35,7% del nivel de 2012", date:"2026-04-21", source:"PNUD", scenarios:["E3"], dims:["Económico"], week:"S15" },
+  { title:"MCM anuncia «hoy comienza el regreso a casa» desde Puerta del Sol abarrotada · recibe medalla de la Comunidad de Madrid", date:"2026-04-19", source:"MCM/Gobierno Madrid", scenarios:["E1"], dims:["Político","Internacional"], week:"S15" },
+  { title:"MCM recibida por PM de Portugal Luís Montenegro en Palacio de São Bento · propone gran acuerdo nacional con rutas simultáneas para la transición", date:"2026-04-21", source:"MCM/Gobierno Portugal", scenarios:["E1"], dims:["Político","Internacional"], week:"S15" },
+  { title:"Gran Peregrinación Nacional anti-sanciones: lanzada el 19 de abril desde Zulia (Rodríguez), Táchira (Cabello) y Amazonas (J. Rodríguez) — 13 días, culmina 1° mayo Caracas", date:"2026-04-19", source:"Gobierno VEN/VTV", scenarios:["E3","E4"], dims:["Político","Social"], week:"S15" },
+  { title:"Comisión de Clasificación de Activos Públicos instalada: 4 categorías (estratégicos, PPP, oferta, liquidación) · Luigi Pisella como representante del sector privado", date:"2026-04-23", source:"Gobierno VEN", scenarios:["E3"], dims:["Político","Económico"], week:"S15" },
+  { title:"Ley Orgánica de Minas publicada en G.O. Ext. 7.020 (16 abr): 3 nuevos entes, concesiones hasta 50 años, derogación Ley del Oro 2015, apertura al capital extranjero · Gold Reserve celebra", date:"2026-04-16", source:"AN/G.O./Gold Reserve", scenarios:["E3"], dims:["Político","Energético"], week:"S15" },
+  { title:"AN designa Comisión Preliminar del TSJ presidida por Alessandrello e integrada con presencia de distintos sectores políticos — composición formalmente mixta", date:"2026-04-21", source:"AN", scenarios:["E3","E1"], dims:["Político","Constitucional"], week:"S15" },
+  { title:"Detención de Alexis Paparoni (DGCIM Maiquetía): PJ detenido por orden de aprehensión de 2022 · liberado bajo presentación mensual y prohibición de salida · Machado: señal disuasiva", date:"2026-04-17", source:"PJ/PUD/MCM", scenarios:["E4"], dims:["Político","Social"], week:"S15" },
+  { title:"46 protestas semana 17–23 abr · pico de 27 el 22 de abril (paro universitario nacional, 18 estados) · demandas: salario, seguridad social, contratación colectiva", date:"2026-04-22", source:"OVCS", scenarios:["E4","E1"], dims:["Social"], week:"S15" },
+  { title:"Motín Yare III (20 abr): 5 fallecidos en Centro Penitenciario Región Capital · MP inicia investigaciones · tensiones estructurales del sistema penitenciario", date:"2026-04-20", source:"MP/Prensa", scenarios:["E4","E2"], dims:["Social"], week:"S15" },
+  { title:"Petro viaja a Caracas (24 abr): propone cogobernanza oficialismo-oposición por 1-2 años · agenda: seguridad fronteriza, grupos armados, narcotráfico", date:"2026-04-24", source:"Presidencia Colombia", scenarios:["E3"], dims:["Internacional","Político"], week:"S15" },
+  { title:"Halliburton evalúa retorno a Venezuela — infraestructura en mejores condiciones de lo esperado · recuperación requeriría hasta USD 10.000M anuales de inversión sostenida", date:"2026-04-20", source:"Halliburton/Prensa", scenarios:["E3"], dims:["Energético"], week:"S15" },
+  { title:"Eni y Repsol planean iniciar exportaciones GNL desde Venezuela hacia finales de 2031 — reactivación proyecto offshore Perla/Cardón IV con reservas estimadas de hasta 17 TCF", date:"2026-04-18", source:"Eni/Repsol", scenarios:["E3"], dims:["Energético","Internacional"], week:"S15" },
+  { title:"Rodríguez: balance 100 días — amnistía 8.616 libertades, 3 hom/100K, PDVSA 1,1M bpd, FMI-BM restablecidos, 5.000 migrantes retornados", date:"2026-04-19", source:"Gobierno VEN/VTV", scenarios:["E3"], dims:["Político","Económico","Social"], week:"S15" },
+
+];

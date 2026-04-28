@@ -3,22 +3,22 @@
 
 export const KPIS_LATEST = {
   energia: [
-    { k:"FMI + BM reanudan relaciones", v:"16 abr — primera vez en más de dos décadas · DEG ~USD 5.000M", c:"#22c55e" },
-    { k:"GL-56 y GL-57 OFAC", v:"Apertura financiera condicionada · GL-57 habilita BCV y banca pública", c:"#22c55e" },
-    { k:"Producción marzo (ofic.)", v:"1,09M bpd · 988 kb/d OPEP sec. · Merey USD 85,92/b", c:"#38bdf8" },
-    { k:"150M barriles desde enero", v:"Haustveit Caracas · Chevron 49% Petroindependencia · ENI+Repsol retoman", c:"#22c55e" },
+    { k:"FMI + BM + BID reanudan vínculos", v:"3 multilaterales simultáneos · agenda técnica · DEG ~USD 5.137M", c:"#22c55e" },
+    { k:"Barrett llega a Venezuela (Fase 2)", v:"Encargado EE.UU. releva a Dogu · Kozak-Figuera + Rubio negocia BCV", c:"#22c55e" },
+    { k:"Producción PDVSA 1,1M bpd", v:"Meta 1,37M dic 2026 · 93 taladros · Halliburton evalúa retorno", c:"#38bdf8" },
+    { k:"Ley Orgánica de Minas G.O. 7.020", v:"3 nuevos entes · concesiones 50 años · apertura capital extranjero", c:"#22c55e" },
   ],
   politico: [
-    { k:"Kozak: Fase 1 cumplida", v:"EE.UU. avanza a Fase 2: CNE + KPMG + retorno libre MCM", c:"#f59e0b" },
-    { k:"MCM en Elíseo (13 abr)", v:"Macron + PM Países Bajos · retorno inminente 'decisión definitiva'", c:"#22c55e" },
-    { k:"47 protestas OVCS (10–16 abr)", v:"15 estados · politización creciente · movilización 16-abr embajada EE.UU.", c:"#f59e0b" },
-    { k:"Debate 180 días interinato", v:"Prórroga AN escenario base · registro FARA Rodríguez candidatura 2027", c:"#ef4444" },
+    { k:"MCM: «hoy comienza el regreso»", v:"Puerta del Sol + PM Portugal · retorno coordinado con EE.UU.", c:"#22c55e" },
+    { k:"E3-E1: brecha de 8pp", v:"La más estrecha del ciclo — 46% vs 38%", c:"#f59e0b" },
+    { k:"46 protestas (17–23 abr)", v:"Pico 27 (22 abr) paro universitario · 18 estados · motín Yare III", c:"#ef4444" },
+    { k:"180 días interinato + cogobernanza", v:"Petro propone 1-2 años · Cabello: «elecciones cuando sean»", c:"#ef4444" },
   ],
   opinion: [
-    { k:"83,8% rechaza elogios Trump", v:"a Rodríguez (Meganálisis) · 81% indicadores transición en rojo", c:"#ef4444" },
-    { k:"100 días: 1/21 indicadores verde", v:"Percepción avance concentrada en lo económico-energético", c:"#ef4444" },
-    { k:"Inflación anualizada", v:"649,5% (BCV) · 13,1% mensual · acumulado 2026: 71,8%", c:"#ef4444" },
-    { k:"Bonos soberanos 2027", v:"Cerca de 48 centavos por dólar · PDVSA también al alza", c:"#22c55e" },
+    { k:"Gran Peregrinación 19 abr – 1° mayo", v:"Legitimación interna interinato · convergencia laboral-oficialista 1° mayo", c:"#f59e0b" },
+    { k:"473 presos políticos (Foro Penal)", v:"187 militares · amnistía <30% según ONG · Paparoni detenido-liberado", c:"#ef4444" },
+    { k:"Inflación ~650% anualizada", v:"FMI advierte «camino muy difícil» · DEG no ejecutables como presupuesto", c:"#ef4444" },
+    { k:"PNUD proyecta 7,4% crecimiento 2026", v:"Desde base 35,7% del nivel 2012 · salario <1 USD congelado", c:"#f59e0b" },
   ],
 };
 
@@ -126,19 +126,31 @@ export const WEEKS = [
     ],
     lectura:"La semana del 10 al 17 de abril marca el punto de mayor avance en la reinserción internacional de Venezuela en más de dos décadas: la reanudación simultánea de relaciones con el FMI y el Banco Mundial, la emisión de las licencias GL-56 y GL-57, la primera visita oficial del Departamento de Energía de EE.UU. a Caracas y la declaración de la Fase 1 cumplida por Kozak configuran una acumulación sin precedente. E3 se sostiene en 47% (=0pp) absorbiendo estos eventos como confirmación del escenario de continuidad negociada. E1 sube a 35% (+3pp) impulsado por la tracción internacional de MCM — recibida por Macron en el Elíseo, con reunión en La Haya — y por las condiciones electorales explícitas que fija EE.UU. en la Fase 2. Esta subida no desplaza a E3 porque Washington no prioriza elecciones inmediatas (Chris Wright) y el CNE no muestra movimientos concretos. E4 baja a 13% (−2pp): la movilización del 16 de abril fue absorbida sin represión mayor y la detención de Paparoni fue breve y sin cargos. E2 cede a 5% (−1pp) por la solidez del eje multilateral recién activado. La tensión estructural persiste: apertura económica bajo vigilancia internacional coexiste con sistema político cerrado — 81% indicadores de transición en rojo, más de 400 presos políticos, debate constitucional de 180 días sin resolver, registro FARA de Rodríguez confirma candidatura 2027 avanzando en paralelo.",
     trendSc:3, trendDrivers:["FMI + BM reanudan relaciones + GL-56/57 + Haustveit Caracas: mayor acumulación de señales de reinserción internacional del proceso","MCM en Elíseo + condiciones Fase 2 EE.UU. (CNE, KPMG, retorno MCM): E1 sube a 35% como presión de transición activa","81% indicadores transición en rojo + vacío constitucional 180 días + candidatura FARA Rodríguez: sistema político permanece cerrado"] },
+  { label:"17–24 abr", short:"S15", probs:[{sc:1,v:38,t:"up"},{sc:2,v:4,t:"down"},{sc:3,v:46,t:"down"},{sc:4,v:12,t:"down"}], xy:{x:0.07,y:0.44},
+    sem:{g:9,y:5,r:4},
+    kpis:{ energia:{exportaciones:"1,1M bpd · meta 1,37M dic 2026",ingresos:"USD 3.000M fondo bajo EE.UU. · KPMG",licencias:"GL-56/57 + GL-55 minería",cambio:"Halliburton evalúa retorno · Brent ~100"}, economico:{inflacion:"~650% anualizada · FMI: camino «muy difícil»",ingresos_pob:"Salario <1 USD · 1° mayo sin montos ni indexación",electricidad:"Siemens/GE conversan Zulia · CAF activa",pib:"7,4% proy. 2026 (PNUD) · base 35,7% nivel 2012"}, opinion:{direccion:"Brecha E3-E1 de 8pp — la más estrecha del ciclo",elecciones:"MCM: 40 sem. · Cabello: «cuando sean» · Petro: cogob.",mcm:"«Hoy comienza el regreso a casa» Puerta del Sol",eeuu:"Barrett Fase 2 + Kozak-Figuera + Rubio negocia BCV"} },
+    tensiones:[
+      {l:"green",t:"<b>FMI + BM + BID:</b> 3 multilaterales reanudan vínculos simultáneamente — mayor consolidación multilateral del período."},
+      {l:"green",t:"<b>Barrett llega (23 abr):</b> Nuevo encargado EE.UU. confirma Fase 2 — mensaje centrado en resultados concretos."},
+      {l:"green",t:"<b>Reconfiguración institucional:</b> Ley de Minas G.O. 7.020 + Comisión Activos Públicos + Comisión TSJ + 100 días gestión."},
+      {l:"yellow",t:"<b>Gran Peregrinación 19 abr – 1° mayo:</b> Legitimación interna del interinato. 1° mayo como test de colisión de agendas."},
+      {l:"yellow",t:"<b>MCM: «hoy comienza el regreso a casa»:</b> Puerta del Sol — retorno inminente como próximo test real del acuerdo bilateral."},
+      {l:"red",t:"<b>46 protestas · motín Yare III:</b> Pico 27 (22 abr) paro universitario · 5 fallecidos · 473 presos políticos (Foro Penal)."},
+    ],
+    lectura:"E3 cede 1pp a 46% sin perder su posición dominante, en una semana de consolidación institucional y diplomática que profundiza la arquitectura de continuidad negociada. La llegada de John Barrett confirma la continuidad estratégica de la Fase 2; los tres organismos multilaterales —FMI, Banco Mundial y BID— reanudan vínculos de forma simultánea; y la batería de reformas institucionales (Ley de Minas G.O. 7.020, Comisión de Activos Públicos, Comisión Preliminar del TSJ) consolida la arquitectura del interinato con apertura selectiva al capital privado. La propuesta de cogobernanza de Petro refuerza la lógica de transición gestionada. E1 sube 3pp a 38% —brecha más estrecha del período— impulsado por el anuncio de retorno de MCM desde la Puerta del Sol, la reunión con el primer ministro de Portugal y la propuesta de acuerdo nacional con rutas simultáneas. E4 baja 1pp a 12% por ausencia de escalada coercitiva sistémica. E2 cede a 4% por la solidez del entramado multilateral. El 1° de mayo y el retorno inminente de MCM son los dos test más críticos del proceso.",
+    trendSc:3, trendDrivers:["FMI + BM + BID simultáneos + Barrett Fase 2: mayor acumulación multilateral del período", "Brecha E3-E1 de 8pp — mínima del ciclo: MCM anuncia regreso desde Puerta del Sol", "1° mayo: convergencia Gran Peregrinación + movilización laboral — próximo test decisivo del acuerdo de estabilización"] },
 ];
 
 export const TENSIONS = [
-  { level:"green", text:"FMI + BM reanudan relaciones (16 abr): mayor avance de reinserción multilateral en más de dos décadas · DEG ~USD 5.000M potenciales · Artículo IV habilitado" },
-  { level:"green", text:"GL-56 y GL-57 OFAC emitidas: apertura financiera condicionada · GL-57 habilita BCV y banca pública · Conindustria: 'puente hacia normalización financiera'" },
-  { level:"green", text:"Haustveit (Depto. Energía EE.UU.) en Caracas · Chevron–PDVSA: Petroindependencia 49% + Ayacucho 8 · 150M bbl desde enero · ENI+Repsol retoman mercado europeo" },
-  { level:"yellow", text:"Kozak: Fase 1 cumplida → Fase 2 fija condiciones electorales explícitas: renovación CNE + auditorías KPMG + retorno libre MCM · Wright: elecciones no son prioridad inmediata" },
-  { level:"yellow", text:"MCM en Elíseo con Macron (13 abr) + PM Países Bajos La Haya (15 abr) · retorno inminente como 'decisión definitiva' · test de garantías del acuerdo bilateral" },
-  { level:"red", text:"81% indicadores transición en rojo a 100 días · más de 400 presos políticos · debate constitucional 180 días sin resolver · FARA Rodríguez: candidatura 2027 en paralelo" },
-  { level:"red", text:"47 protestas OVCS (10–16 abr) · 15 estados · politización creciente · movilización 16-abr hacia embajada EE.UU. · crisis sanitaria: fiebre amarilla + 25.000 casos malaria" },
+  { level:"green", text:"FMI + BM + BID reanudan vínculos simultáneamente (17–24 abr): 3 multilaterales · agenda técnica · DEG ~USD 5.137M · BID prepara reanudación operaciones" },
+  { level:"green", text:"Barrett llega a Venezuela (23 abr): nuevo encargado EE.UU. confirma Fase 2 · Kozak-Figuera: respaldo AN-2015 · Rubio negocia renovación BCV con Deloitte" },
+  { level:"green", text:"Reconfiguración institucional: Ley de Minas G.O. 7.020 (3 entes + 50 años concesiones) + Comisión Activos Públicos + Comisión Preliminar TSJ + 100 días gestión" },
+  { level:"yellow", text:"Gran Peregrinación Nacional 19 abr – 1° mayo: legitimación interna interinato · 1° mayo como test de convergencia Gran Peregrinación y movilización laboral" },
+  { level:"yellow", text:"MCM: «hoy comienza el regreso a casa» — Puerta del Sol + medalla Madrid + PM Portugal · retorno coordinado con EE.UU. como próximo test del acuerdo bilateral" },
+  { level:"red", text:"46 protestas (17–23 abr) · pico 27 (22 abr) paro universitario · 18 estados · motín Yare III: 5 fallecidos · 473 presos políticos (Foro Penal) · amnistía <30% según ONG" },
 ];
 
-export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14"];
+export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15"];
 
 
 export const ICG_HISTORY = [

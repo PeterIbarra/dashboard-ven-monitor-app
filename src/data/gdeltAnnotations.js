@@ -42,5 +42,27 @@ export const GDELT_ANNOTATIONS = [
   { date:"2026-04-07", tier:"MEDIUM", label:"Rodríguez anuncia aumento salarial 1° mayo + Consejo Nacional de Economía + peregrinación anti-sanciones 19-abr", tierEs:"MEDIA" },
   { date:"2026-04-08", tier:"MEDIUM", label:"Bonos venezolanos 2027 cerca de 48 ctvs/USD · expectativas de normalización", tierEs:"MEDIA" },
   { date:"2026-04-10", tier:"MEDIUM", label:"PUD presenta hoja de ruta de transición democrática (12 de abril)", tierEs:"MEDIA" },
+
+  // S14: 10 abril – 17 abril 2026
+  { date:"2026-04-11", tier:"HIGH", label:"GL-56 y GL-57 OFAC: apertura financiera condicionada · GL-57 habilita BCV y banca pública", tierEs:"ALTA" },
+  { date:"2026-04-14", tier:"HIGH", label:"Chevron eleva participación en Petroindependencia al 49% + Ayacucho 8 · 150M bbl desde enero", tierEs:"ALTA" },
+  { date:"2026-04-15", tier:"HIGH", label:"Kozak: Fase 1 cumplida → Fase 2: CNE + KPMG + retorno libre MCM", tierEs:"ALTA" },
+  { date:"2026-04-13", tier:"HIGH", label:"MCM recibida por Macron en el Elíseo · reunión PM Países Bajos · retorno 'decisión definitiva'", tierEs:"ALTA" },
+  { date:"2026-04-16", tier:"MEDIUM", label:"FMI y BM reanudan relaciones con Venezuela (16 abr) — primera vez en más de dos décadas", tierEs:"MEDIA" },
+  { date:"2026-04-12", tier:"MEDIUM", label:"PUD hoja de ruta 8 condiciones · movilización 16-abr embajada EE.UU.", tierEs:"MEDIA" },
+  { date:"2026-04-11", tier:"MEDIUM", label:"Ley Orgánica de Minas promulgada · registro FARA Rodríguez candidatura 2027", tierEs:"MEDIA" },
+
+  // S15: 17 abril – 24 abril 2026
+  { date:"2026-04-19", tier:"CRITICAL", label:"Gran Peregrinación Nacional anti-sanciones: lanzada desde Zulia-Táchira-Amazonas · 100 días de gestión Rodríguez", tierEs:"CRÍTICO" },
+  { date:"2026-04-19", tier:"HIGH", label:"MCM en Puerta del Sol: «hoy comienza el regreso a casa» · medalla Madrid · PM Portugal", tierEs:"ALTA" },
+  { date:"2026-04-23", tier:"HIGH", label:"John Barrett llega a Venezuela como encargado EE.UU. — Fase 2: resultados concretos · Kozak-Figuera respaldo AN-2015", tierEs:"ALTA" },
+  { date:"2026-04-19", tier:"HIGH", label:"FMI + BM + BID reanudan vínculos simultáneamente — mayor consolidación multilateral del período", tierEs:"ALTA" },
+  { date:"2026-04-22", tier:"HIGH", label:"Paro universitario nacional: 27 protestas en 1 día · 18 estados · 46 protestas semana 17-23 abr", tierEs:"ALTA" },
+  { date:"2026-04-20", tier:"HIGH", label:"Motín Yare III: 5 fallecidos · MP inicia investigaciones · sistema penitenciario bajo tensión", tierEs:"ALTA" },
+  { date:"2026-04-24", tier:"HIGH", label:"Petro viaja a Caracas: propone cogobernanza 1-2 años oficialismo-oposición", tierEs:"ALTA" },
+  { date:"2026-04-19", tier:"MEDIUM", label:"Ley Orgánica de Minas G.O. 7.020 publicada · 3 entes · concesiones 50 años · apertura capital extranjero", tierEs:"MEDIA" },
+  { date:"2026-04-23", tier:"MEDIUM", label:"Comisión Clasificación Activos Públicos instalada (Pisella) · Comisión Preliminar TSJ designada", tierEs:"MEDIA" },
+  { date:"2026-04-19", tier:"MEDIUM", label:"FMI: Georgieva advierte «el camino será muy difícil» · DEG ~USD 5.137M como reserva, no presupuesto", tierEs:"MEDIA" },
+  { date:"2026-04-23", tier:"MEDIUM", label:"Detención-liberación Paparoni (DGCIM Maiquetía) bajo presentación mensual · señal disuasiva opositora", tierEs:"MEDIA" },
 ];
 
