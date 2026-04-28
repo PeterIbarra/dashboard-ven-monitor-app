@@ -15,6 +15,21 @@ const SUGGESTED = [
   "¿Qué pasó con las IFIs en las últimas semanas?",
 ];
 
+// ── markdown renderer ─────────────────────────────────────────────────────────
+
+function renderMarkdown(text) {
+  const html = text
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/^#{1,3} (.+)$/gm, "<strong>$1</strong>")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/^[\-\*] (.+)$/gm, "&#8226;&nbsp;$1")
+    .replace(/^\d+\. (.+)$/gm, (_, p) => `<span style="margin-right:4px">${_}</span>`)
+    .replace(/\n{2,}/g, "<br/><br/>")
+    .replace(/\n/g, "<br/>");
+  return html;
+}
+
 // ── context builder ──────────────────────────────────────────────────────────
 
 function buildContext({ weeks, liveData, signals, weekDrivers, indicators, sitrep, prospectiva }) {
@@ -151,7 +166,7 @@ export function ChatBot({ weeks, liveData, signals, weekDrivers, indicators, sit
       const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, max_tokens: 1200 }),
+        body: JSON.stringify({ prompt, max_tokens: 2500 }),
       });
 
       const data = await res.json();
@@ -299,9 +314,14 @@ export function ChatBot({ weeks, liveData, signals, weekDrivers, indicators, sit
                   background: m.role === "user" ? ACCENT : BG3,
                   color: m.role === "user" ? "white" : TEXT,
                   border: m.role === "user" ? "none" : `1px solid ${BORDER}`,
-                  whiteSpace: "pre-wrap",
-                }}>
-                  {m.content}
+                  whiteSpace: m.role === "user" ? "pre-wrap" : "normal",
+                }}
+                  dangerouslySetInnerHTML={m.role === "assistant"
+                    ? { __html: renderMarkdown(m.content) }
+                    : undefined
+                  }
+                >
+                  {m.role === "user" ? m.content : undefined}
                 </div>
               </div>
             ))}
