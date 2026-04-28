@@ -4,14 +4,21 @@ import { WEEKS } from "../../data/weekly.js";
 import { SCENARIOS } from "../../data/static.js";
 import { INDICATORS, SCENARIO_SIGNALS } from "../../data/indicators.js";
 import { WEEK_DRIVERS } from "../../data/weekDrivers.js";
-import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SC, SEM, font } from "../../constants";
+import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SC, SEM, font, fontSans } from "../../constants";
 import { Card } from "../Card";
 import { SemDot } from "../SemDot";
 import { FullMatrix } from "../charts/FullMatrix";
 import { Sparkline } from "../charts/Sparkline";
+import { TabProspectiva } from "./TabProspectiva";
+
+const SUBTABS = [
+  { id: "escenarios", label: "Escenarios" },
+  { id: "prospectivas", label: "Prospectivas" },
+];
 
 export function TabMatriz({ week, setWeek }) {
   const mob = useIsMobile();
+  const [subtab, setSubtab] = useState("escenarios");
   const [sel, setSel] = useState(3);
   const [showTrend, setShowTrend] = useState(false);
   const wk = WEEKS[week];
@@ -40,6 +47,22 @@ export function TabMatriz({ week, setWeek }) {
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+      {/* ── SUBTAB NAV ── */}
+      <div style={{ display:"flex", gap:6, borderBottom:`1px solid ${BORDER}`, paddingBottom:0 }}>
+        {SUBTABS.map(st => (
+          <button key={st.id} onClick={() => setSubtab(st.id)} style={{
+            fontFamily: font, fontSize:12, fontWeight: subtab===st.id ? 700 : 400,
+            color: subtab===st.id ? ACCENT : MUTED,
+            background:"transparent", border:"none", borderBottom: subtab===st.id ? `3px solid ${ACCENT}` : "3px solid transparent",
+            padding:"6px 14px 8px", cursor:"pointer", transition:"all 0.15s",
+          }}>{st.label}</button>
+        ))}
+      </div>
+
+      {subtab === "prospectivas" && <TabProspectiva />}
+
+      {subtab === "escenarios" && <>
 
       {/* ── ROW 1: Matrix + Sidebar ── */}
       <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 320px", gap:14 }}>
@@ -222,6 +245,7 @@ export function TabMatriz({ week, setWeek }) {
           </div>
         </div>
       )}
+      </>}
     </div>
   );
 }

@@ -2,7 +2,7 @@
 export const TABS = [
   { id:"dashboard", label:"Dashboard", icon:"📊" },
   { id:"sitrep", label:"SITREP", icon:"📋" },
-  { id:"matriz", label:"Matriz", icon:"🎯" },
+  { id:"matriz", label:"Escenarios & Prospectiva", icon:"🎯" },
   { id:"monitor", label:"Monitor", icon:"🚦" },
   { id:"clima", label:"Clima Social", icon:"🌡️" },
   { id:"gdelt", label:"Medios", icon:"📡" },
