@@ -64,5 +64,20 @@ export const GDELT_ANNOTATIONS = [
   { date:"2026-04-23", tier:"MEDIUM", label:"Comisión Clasificación Activos Públicos instalada (Pisella) · Comisión Preliminar TSJ designada", tierEs:"MEDIA" },
   { date:"2026-04-19", tier:"MEDIUM", label:"FMI: Georgieva advierte «el camino será muy difícil» · DEG ~USD 5.137M como reserva, no presupuesto", tierEs:"MEDIA" },
   { date:"2026-04-23", tier:"MEDIUM", label:"Detención-liberación Paparoni (DGCIM Maiquetía) bajo presentación mensual · señal disuasiva opositora", tierEs:"MEDIA" },
-];
+  // S16: 24 abril – 01 mayo 2026
+  { date:"2026-04-24", tier:"HIGH", tierEs:"ALTA", label:"Delegación Casa Blanca (Jarrod Agen) llega a Caracas en el primer vuelo directo de American Airlines en siete años." },
+  { date:"2026-04-24", tier:"HIGH", tierEs:"ALTA", label:"Barrett se reúne con Rodríguez en Miraflores: primer encuentro del nuevo encargado de negocios de EE.UU. centrado en plan de tres fases." },
+  { date:"2026-04-26", tier:"HIGH", tierEs:"ALTA", label:"Shell instala equipo técnico en Vepica (Caracas) para el proyecto Carito-Pirital en Monagas — despliegue operativo concreto." },
+  { date:"2026-04-27", tier:"HIGH", tierEs:"ALTA", label:"Eni firma con PDVSA el relanzamiento del proyecto Junín 5: 35.000 millones de barriles en sitio certificado." },
+  { date:"2026-04-27", tier:"HIGH", tierEs:"ALTA", label:"BP suscribe MOU para la Plataforma Deltana (gas costa afuera) y anuncia apertura de oficina permanente en Caracas." },
+  { date:"2026-04-28", tier:"HIGH", tierEs:"ALTA", label:"CEO de Repsol (Josu Jon Imaz): producción en Venezuela se triplicará en 3 años; +50% bruto en 12 meses." },
+  { date:"2026-04-28", tier:"CRITICAL", tierEs:"CRÍTICO", label:"MOU energéticos y mineros firmados con delegación de la Casa Blanca: petróleo, gas, oro, aluminio y carbón." },
+  { date:"2026-04-28", tier:"MEDIUM", tierEs:"MEDIA", label:"Rodríguez anuncia ingreso mínimo integral de USD 240 desde el 1° de mayo — salario base permanece en ~USD 0,27." },
+  { date:"2026-04-28", tier:"MEDIUM", tierEs:"MEDIA", label:"Reunión Rodríguez-Petro (III Comisión de Vecindad, USD 1.200M): seguridad, energía, electricidad, gas, comercio bilateral." },
+  { date:"2026-04-29", tier:"HIGH", tierEs:"ALTA", label:"TSJ jubilaría extraoficialmente a 8 magistrados incluido Maikel Moreno, precedidos de 227 sentencias en una semana." },
+  { date:"2026-04-29", tier:"HIGH", tierEs:"ALTA", label:"Parlamento Europeo aprueba resolución 507-31 condicionando sanciones UE a avances democráticos concretos." },
+  { date:"2026-04-29", tier:"MEDIUM", tierEs:"MEDIA", label:"OEA: Ramdin reconoce públicamente que Rodríguez 'está al mando' y formaliza comunicaciones institucionales." },
+  { date:"2026-04-30", tier:"HIGH", tierEs:"ALTA", label:"Cordón policial PNB bloquea marchas laborales en Caracas — señal de control coercitivo sobre movilización social." },
+  { date:"2026-04-27", tier:"MEDIUM", tierEs:"MEDIA", label:"MCM confirma candidatura presidencial en entrevista con Piers Morgan; Vente Venezuela: 1,5M inscritos en el RE en 6 semanas." },
 
+];

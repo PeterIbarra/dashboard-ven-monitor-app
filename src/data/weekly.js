@@ -3,22 +3,22 @@
 
 export const KPIS_LATEST = {
   energia: [
-    { k:"FMI + BM + BID reanudan vínculos", v:"3 multilaterales simultáneos · agenda técnica · DEG ~USD 5.137M", c:"#22c55e" },
-    { k:"Barrett llega a Venezuela (Fase 2)", v:"Encargado EE.UU. releva a Dogu · Kozak-Figuera + Rubio negocia BCV", c:"#22c55e" },
-    { k:"Producción PDVSA 1,1M bpd", v:"Meta 1,37M dic 2026 · 93 taladros · Halliburton evalúa retorno", c:"#38bdf8" },
-    { k:"Ley Orgánica de Minas G.O. 7.020", v:"3 nuevos entes · concesiones 50 años · apertura capital extranjero", c:"#22c55e" },
+    { k:"Exportaciones a EE.UU.", v:"499k bpd", c:"#22c55e" },
+    { k:"Acuerdos energéticos S16", v:"Shell+Ení+BP+Repsol+MOU", c:"#22c55e" },
+    { k:"Licencias OFAC", v:"MOU Casa Blanca activos", c:"#22c55e" },
+    { k:"Tipo de cambio BCV", v:"~570 Bs/USD estable", c:"#38bdf8" },
   ],
   politico: [
-    { k:"MCM: «hoy comienza el regreso»", v:"Puerta del Sol + PM Portugal · retorno coordinado con EE.UU.", c:"#22c55e" },
-    { k:"E3-E1: brecha de 8pp", v:"La más estrecha del ciclo — 46% vs 38%", c:"#f59e0b" },
-    { k:"46 protestas (17–23 abr)", v:"Pico 27 (22 abr) paro universitario · 18 estados · motín Yare III", c:"#ef4444" },
-    { k:"180 días interinato + cogobernanza", v:"Petro propone 1-2 años · Cabello: «elecciones cuando sean»", c:"#ef4444" },
+    { k:"Escenario dominante", v:"E3 50% (+4pp)", c:"#22c55e" },
+    { k:"TSJ jubilados", v:"8 magistrados (incl. Moreno)", c:"#f59e0b" },
+    { k:"Ingreso mínimo 1° mayo", v:"USD 240 (sin reforma salarial)", c:"#f59e0b" },
+    { k:"Presos políticos (FP)", v:"~470 activos", c:"#ef4444" },
   ],
   opinion: [
-    { k:"Gran Peregrinación 19 abr – 1° mayo", v:"Legitimación interna interinato · convergencia laboral-oficialista 1° mayo", c:"#f59e0b" },
-    { k:"473 presos políticos (Foro Penal)", v:"187 militares · amnistía <30% según ONG · Paparoni detenido-liberado", c:"#ef4444" },
-    { k:"Inflación ~650% anualizada", v:"FMI advierte «camino muy difícil» · DEG no ejecutables como presupuesto", c:"#ef4444" },
-    { k:"PNUD proyecta 7,4% crecimiento 2026", v:"Desde base 35,7% del nivel 2012 · salario <1 USD congelado", c:"#f59e0b" },
+    { k:"Aprobación Rodríguez", v:"31,4% (↓ desde 37%)", c:"#ef4444" },
+    { k:"Intención voto MCM", v:"71,25% (Meganálisis)", c:"#22c55e" },
+    { k:"Elecciones 2026 (Polymarket)", v:"45%", c:"#f59e0b" },
+    { k:"Protestas 24–29 abr", v:"33 en 6 días", c:"#f59e0b" },
   ],
 };
 
@@ -139,18 +139,27 @@ export const WEEKS = [
     ],
     lectura:"E3 cede 1pp a 46% sin perder su posición dominante, en una semana de consolidación institucional y diplomática que profundiza la arquitectura de continuidad negociada. La llegada de John Barrett confirma la continuidad estratégica de la Fase 2; los tres organismos multilaterales —FMI, Banco Mundial y BID— reanudan vínculos de forma simultánea; y la batería de reformas institucionales (Ley de Minas G.O. 7.020, Comisión de Activos Públicos, Comisión Preliminar del TSJ) consolida la arquitectura del interinato con apertura selectiva al capital privado. La propuesta de cogobernanza de Petro refuerza la lógica de transición gestionada. E1 sube 3pp a 38% —brecha más estrecha del período— impulsado por el anuncio de retorno de MCM desde la Puerta del Sol, la reunión con el primer ministro de Portugal y la propuesta de acuerdo nacional con rutas simultáneas. E4 baja 1pp a 12% por ausencia de escalada coercitiva sistémica. E2 cede a 4% por la solidez del entramado multilateral. El 1° de mayo y el retorno inminente de MCM son los dos test más críticos del proceso.",
     trendSc:3, trendDrivers:["FMI + BM + BID simultáneos + Barrett Fase 2: mayor acumulación multilateral del período", "Brecha E3-E1 de 8pp — mínima del ciclo: MCM anuncia regreso desde Puerta del Sol", "1° mayo: convergencia Gran Peregrinación + movilización laboral — próximo test decisivo del acuerdo de estabilización"] },
+
+  // ── S16: 24 abril – 01 mayo 2026 ──
+  { label:"24 abr–1 may", short:"S16", probs:[{sc:1,v:35,t:"down"},{sc:2,v:4,t:"flat"},{sc:3,v:50,t:"up"},{sc:4,v:11,t:"down"}], xy:{x:0.05,y:0.46},
+    sem:{g:11,y:4,r:3},
+    kpis:{ energia:{exportaciones:"499k bpd a EE.UU. · 26,3M bbl acum.",ingresos:"Shell Monagas · Eni Junín 5 · BP Deltana · Repsol x3",licencias:"MOU Casa Blanca: petróleo, gas, oro, aluminio, carbón",cambio:"BCV ~570 Bs/USD · USDT ~630 · brecha ofic. ~29%"}, economico:{inflacion:"FMI 4% · CEPAL 6,5% · PNUD 7,4% proy. 2026",ingresos_pob:"$240 ingreso mínimo (bonos) · base Bs 130 (~$0,27)",electricidad:"BCV 20 trim. crecimiento · auditorías paralelas EE.UU.-Vzla",pib:"Reservas ~USD 13.600M · 5.000M DEG FMI"}, opinion:{direccion:"AtlasIntel: 31,4% aprueba DR · 47,1% desaprueba",elecciones:"Polymarket: 45% elecciones 2026 · MCM candidatura confirmada",mcm:"Meganálisis: MCM 71,25% intención voto · 84,36% vs. DR",eeuu:"OEA reconoce a Rodríguez como interlocutora operativa"} },
+    tensiones:[{l:"green",t:"<b>Delegación Casa Blanca:</b> Jarrod Agen + vuelo AA directo Miami-Caracas + MOU petróleo, gas, oro, aluminio y carbón."},{l:"green",t:"<b>Acuerdos energéticos:</b> Shell Monagas · Eni Junín 5 · BP Deltana · Repsol CEO: producción x3."},{l:"green",t:"<b>Diplomacia activa:</b> Rodríguez-Petro USD 1.200M · Barbados · Iberoamericana · Zambrano-España."},{l:"yellow",t:"<b>$240 sin reforma salarial:</b> Base Bs 130 (~$0,27) · bloqueo marchas laborales Caracas (30 abr)."},{l:"yellow",t:"<b>TSJ jubila 8 magistrados:</b> Moreno + 7 más · 227 sentencias 1 semana · postulaciones bajo AN interinato."},{l:"red",t:"<b>Conflictividad laboral:</b> 33 protestas 24–29 abr · 9 estados · politización creciente."},{l:"red",t:"<b>Eurocámara 507–31:</b> Sanciones condicionadas a avances democráticos — contraste con normalización EE.UU."}],
+    lectura:"E3 sube 4pp a 50% —el nivel más alto desde el inicio del período post-Maduro— sobre la base de la semana de mayor densidad bilateral y energética del ciclo. Delegación de la Casa Blanca en el primer vuelo directo de AA en 7 años, MOU en petróleo/gas/minerales, Shell instalada en Monagas, Eni firmando Junín 5, BP con Plataforma Deltana y Repsol anunciando triplicar producción configuran la masa crítica de compromisos más significativa del proceso. La jubilación extraoficial de 8 magistrados del TSJ —incluido Maikel Moreno— precedida de 227 sentencias en una semana completa la reconfiguración del Poder Judicial bajo control del interinato. E1 cede 3pp a 35% pese a la confirmación de candidatura de MCM y 1,5M inscritos en el RE: la dinámica de 'normalización sin transición' (Americas Quarterly) absorbe el espacio político sin condicionamientos verificables. La brecha E3-E1 se amplía a 15pp, la mayor del ciclo. E4 baja 1pp a 11%; E2 se mantiene en 4% contenido por el compromiso bilateral más robusto del período.",
+    trendSc:3, trendDrivers:["Delegación Casa Blanca + vuelo AA + 5 acuerdos energéticos: semana de mayor densidad bilateral del período post-Maduro","Jubilación 8 magistrados TSJ + 227 sentencias + postulaciones bajo AN: reconfiguración judicial como acumulación institucional","'Normalización sin transición' (Americas Quarterly): E3 alcanza 50%, el máximo del ciclo"] },
 ];
 
 export const TENSIONS = [
-  { level:"green", text:"FMI + BM + BID reanudan vínculos simultáneamente (17–24 abr): 3 multilaterales · agenda técnica · DEG ~USD 5.137M · BID prepara reanudación operaciones" },
-  { level:"green", text:"Barrett llega a Venezuela (23 abr): nuevo encargado EE.UU. confirma Fase 2 · Kozak-Figuera: respaldo AN-2015 · Rubio negocia renovación BCV con Deloitte" },
-  { level:"green", text:"Reconfiguración institucional: Ley de Minas G.O. 7.020 (3 entes + 50 años concesiones) + Comisión Activos Públicos + Comisión Preliminar TSJ + 100 días gestión" },
-  { level:"yellow", text:"Gran Peregrinación Nacional 19 abr – 1° mayo: legitimación interna interinato · 1° mayo como test de convergencia Gran Peregrinación y movilización laboral" },
-  { level:"yellow", text:"MCM: «hoy comienza el regreso a casa» — Puerta del Sol + medalla Madrid + PM Portugal · retorno coordinado con EE.UU. como próximo test del acuerdo bilateral" },
-  { level:"red", text:"46 protestas (17–23 abr) · pico 27 (22 abr) paro universitario · 18 estados · motín Yare III: 5 fallecidos · 473 presos políticos (Foro Penal) · amnistía <30% según ONG" },
+  { level:"green", text:"Delegación Casa Blanca + vuelo AA directo + MOU petróleo, gas, oro, aluminio, carbón — cooperación operativa bilateral activada" },
+  { level:"green", text:"Shell instala equipo en Monagas · Eni firma Junín 5 (35.000M bbl) · BP MOU Plataforma Deltana · Repsol CEO: producción x3 en 3 años" },
+  { level:"green", text:"Rodríguez-Petro bilateral USD 1.200M · visita Barbados · invitación Cumbre Iberoamericana Madrid · Zambrano propuesto embajador España" },
+  { level:"yellow", text:"$240 ingreso mínimo desde 1° mayo — base permanece Bs 130 (~$0,27) · bloqueo marchas laborales en Caracas por cordón policial" },
+  { level:"yellow", text:"TSJ jubila 8 magistrados (incl. Moreno) · 227 sentencias en una semana · proceso postulaciones bajo control AN interinato" },
+  { level:"red", text:"33 protestas 24–29 abr · 9 estados · convocatorias escalonadas 30 abr – 1° mayo · transición de demandas ESCP a participación política" },
+  { level:"red", text:"Eurocámara 507–31 condiciona sanciones UE a avances democráticos concretos — tensión con normalización sin condicionamientos de EE.UU." },
 ];
 
-export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15"];
+export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16"];
 
 
 export const ICG_HISTORY = [
@@ -169,6 +178,8 @@ export const ICG_HISTORY = [
   { week:"S13", score:70, sitrep:true, note:"Poder Ciudadano completo: Devoe Fiscal (275 votos) + González Lobato Defensora. FMI consulta miembros. 72 protestas 9-abr. Sanciones BCV evaluadas" },
   { week:"S14", score:72, sitrep:true, note:"FMI + BM reanudan relaciones (16 abr). GL-56/GL-57 emitidas. Haustveit Caracas. Kozak: Fase 1 cumplida. Padrino López regresa al gabinete. Registro FARA Rodríguez candidatura 2027" },
   { week:"S15", score:68, sitrep:true, note:"Barrett Fase 2 + FMI/BM/BID simultáneos + Peregrinación Nacional + Ley Minas G.O.7.020. MCM anuncia regreso desde Puerta del Sol. Petro propone cogobernanza 1-2 años. 46 protestas pico 27 (22 abr) paro universitario. Motín Yare III 5 fallecidos. 473 presos políticos" },
+
+  { week:"S16", score:71, sitrep:true, note:"Delegación Casa Blanca + MOU energéticos (Shell/Eni/BP/Repsol) + TSJ jubilación 8 magistrados (incl. Moreno). E3 sube a 50%. $240 ingreso mínimo gestiona expectativas 1° mayo. 33 protestas; marchas laborales bloqueadas en Caracas." },
 
 ];
 
@@ -264,5 +275,16 @@ export const CONF_SEMANAL = [
       { fecha:"22 Abr", protestas:27, estados:18, tipo:"Laboral + ESCP", exigencias:"PARO UNIVERSITARIO: salario ajustado, seguridad social, contratación colectiva" },
       { fecha:"23 Abr", protestas:6, estados:6, tipo:"Mixto (DESCA + CPP)", exigencias:"Laborales, justicia, vivienda, gasolina, derechos de la mujer" },
     ] },
+
+  { week:"S16", label:"24–29 abr", protestas:33, estados:9, reprimidas:1,
+    motivos:["Vivienda","Agua","Laborales","Participación política","Seguridad social","Justicia","Seguridad ciudadana"],
+    hecho:"Bloqueo policial de marchas laborales en Caracas (30 abr): cordón PNB impide llegada de trabajadores a Miraflores. Convocatorias escalonadas: marcha laboral 30 abr + movilización 1° mayo. Transición cualitativa: demandas ESCP clásicas hacia participación política y justicia.",
+    dias:[
+      { fecha:"24 Abr", protestas:10, estados:9, tipo:"ESCP + CPP", exigencias:"Vivienda, agua, justicia, laborales; docentes en Amazonas exigen reincorporación y salario" },
+      { fecha:"27 Abr", protestas:1, estados:1, tipo:"DESCA", exigencias:"Vivienda, agua (Cumaná, Sucre)" },
+      { fecha:"28 Abr", protestas:11, estados:8, tipo:"Mixto (ESCP + CPP)", exigencias:"Vivienda, agua, laborales, participación política, seguridad social; convocatoria marcha laboral 30 abr" },
+      { fecha:"29 Abr", protestas:11, estados:7, tipo:"Mixto (ESCP + CPP)", exigencias:"Vivienda, agua, laborales, justicia, seguridad ciudadana; jubilados convocan protesta 1° mayo" },
+    ]
+  },
 
 ];

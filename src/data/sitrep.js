@@ -768,6 +768,133 @@ export const SITREP_ALL = [
     ],
   },
 
+
+  // ── S16: 24 abril – 01 mayo 2026 ──
+  { period:"24 de abril – 01 de mayo de 2026", periodShort:"24 abr – 1 may 2026",
+    keyPoints:[
+      { tag:"Bilateral", color:"#0468B1", title:"Delegación Casa Blanca + MOU energéticos", text:"Delegación encabezada por Jarrod Agen en el primer vuelo directo de American Airlines en 7 años. MOU firmados en petróleo, gas, oro, aluminio y carbón con Venezuela: transición de la estabilización a la cooperación operativa directa con Washington." },
+      { tag:"Energético", color:"#22c55e", title:"Masa crítica de acuerdos energéticos", text:"Shell instala equipo en Vepica (Monagas) para Carito-Pirital; Ení firma Junín 5 (35.000M bbl); BP suscribe MOU para Plataforma Deltana y abre oficina permanente; Repsol CEO anuncia producción x3 en 3 años. Mayor convergencia de compromisos en una sola semana del período." },
+      { tag:"Institucional", color:"#f59e0b", title:"TSJ: 8 magistrados jubilados — reconfiguración del Poder Judicial", text:"La Sala Plena jubilaría extraoficialmente a Moreno, Gavidia, Gil, Gómez, Alves, Damiani, Timaure e Hidalgo, precedidos de 227 sentencias en una semana (168 en un día). Proceso de postulaciones en la AN bajo control del interinato: el TSJ pasa de baluarte del madurismo a instrumento del rodriguismo." },
+      { tag:"Político", color:"#f59e0b", title:"$240 ingreso mínimo integral sin reforma salarial estructural", text:"Delcy Rodríguez anuncia USD 240 desde el 1° de mayo. Salario base permanece en Bs 130 (~USD 0,27) sin incidencia en prestaciones. Bloqueo policial de marchas laborales en Caracas. Capriles: 'burla'. Reproduce la lógica de incremento por bonos sin cambio estructural." },
+      { tag:"Internacional", color:"#8b5cf6", title:"Eurocámara 507-31 vs. normalización Washington", text:"Parlamento Europeo condiciona levantamiento de sanciones a presos políticos, cese represión y elecciones libres. Contrasta con la normalización sin condicionamientos que impulsa EE.UU. España invita a Rodríguez a la Cumbre Iberoamericana de Madrid a pesar de sanciones vigentes de la UE." },
+    ],
+    sintesis:"La semana del 24 de abril al 1° de mayo de 2026 marca el tránsito de Venezuela a una fase de ejecución bilateral acelerada. La llegada de la delegación de la Casa Blanca en el primer vuelo comercial directo de American Airlines en siete años y la firma de MOU en petróleo, gas y minerales consolidan un entendimiento operativo con Washington que ya no requiere negociación, sino implementación. El anuncio del ingreso mínimo integral en USD 240 cumple la expectativa del 1° de mayo, pero reproduce la lógica de ajuste por bonos sin tocar el salario base. Mientras tanto, la jubilación de 8 magistrados del TSJ —incluyendo a Maikel Moreno— y el proceso de rediseñación en marcha confirman que la acumulación institucional del Ejecutivo avanza en todos los poderes del Estado. La tensión entre la normalización económica impulsada por Washington y las exigencias de democracia efectiva del Parlamento Europeo (507 votos contra 31) define el principal vector de presión externa. La confirmación de candidatura de MCM y el registro de 1,5 millones de votantes en seis semanas señalan que la oposición construye capacidad electoral en paralelo, aunque la dinámica dominante —‘normalización sin transición’ según Americas Quarterly— absorbe el espacio político sin condicionamientos verificables.",
+    actores:[
+      { name:"EE.UU.", items:[
+        "Delegación Casa Blanca (Jarrod Agen): primer vuelo directo AA Miami-Caracas en 7 años; firma MOU en petróleo, gas, oro, aluminio y carbón.",
+        "Barrett se reúne con Rodríguez en Miraflores (24 abr): plan de tres fases — estabilización cumplida, avanza a Fase 2.",
+        "ITA lanza Centro de Información de Negocios sobre Venezuela (trade.gov/venezuela): infraestructura comercial bilateral activada.",
+        "OFAC emite licencias enmendadas para financiar la defensa legal de Maduro y Flores con fondos estatales posteriores al 5 de marzo de 2026.",
+        "Barrett se reúne con VenAmCham: sector privado como pilar de la transformación económica.",
+        "Blue Water Acquisition Corp. IV (~USD 490M) anuncia plan para PetroUrdaneta. ArtCap Strategies (~USD 300M) financia proveedores locales.",
+      ]},
+      { name:"Gobierno Interino / Ejecutivo (Rodríguez)", items:[
+        "Reunión bilateral con Petro (III Comisión de Vecindad): seguridad, energía, interconexiones, comercio ~USD 1.200M.",
+        "Visita a Barbados: vínculos diplomáticos y comerciales; hub exportador hacia Caribe y África.",
+        "Ingreso mínimo integral USD 240 (bonos) y pensiones USD 70 desde 1° de mayo. Base: Bs 130 (~USD 0,27). Sin incidencia en prestaciones.",
+        "Propuesta de Timoteo Zambrano para España y Enrique Ochoa Antich para Alemania: cooptación diplomática de figuras opositoras moderadas.",
+        "Invitación de España a la Cumbre Iberoamericana de Madrid (4-5 noviembre); Albares vincula revisión de sanciones UE a avances en diálogo.",
+        "Americas Quarterly: patrón de la semana apunta a 'normalización sin transición' — avance económico con acumulación institucional paralela.",
+      ]},
+      { name:"Asamblea Nacional y Poder Judicial", items:[
+        "AN inicia recepción de credenciales para el Comité de Postulaciones Judiciales (24 abr – 1 may): definirá perfiles para nuevos magistrados del TSJ.",
+        "Sala Plena jubilaría extraoficialmente a 8 magistrados: Maikel Moreno, Edgar Gavidia, Malaquías Gil, Elsa Gómez, Carmen Alves, Luis Damiani, Henry Timaure y Juan Carlos Hidalgo.",
+        "TSJ dictó 227 sentencias entre el 21 y el 27 de abril —168 en un solo día (24 abr)— en dinámica que analistas calificaron de 'justicia exprés'.",
+        "Delegación AN en Parlasur (Montevideo): gestión para retorno pleno de Venezuela al organismo del que fue suspendida en 2017.",
+      ]},
+      { name:"Oposición / Sociedad Civil", items:[
+        "MCM confirma candidatura presidencial ante Piers Morgan; se presentará si se convocan elecciones. Apoya tres fases de Trump.",
+        "Vente Venezuela: 1,5 millones de inscritos en el Registro Electoral en seis semanas.",
+        "PUD: carta pública a Petro con hoja de ruta de 8 puntos — presos, cese represión, reinstitucionalización, apertura cívica, elecciones verificables, retorno exiliados.",
+        "Stalin González cuestiona el anuncio del 'fin' de la Ley de Amnistía; Arreaza aclara que sigue vigente con mecanismos alternos.",
+        "Capriles califica el aumento salarial de 'burla'; Rosales pide nuevo CNE y elecciones libres.",
+        "Fracturas en Baruta: presunta coordinación Fuerza Vecinal-PSUV para desplazar directiva del Concejo Municipal.",
+        "Provea se reúne con fiscal Devoe: plan de trabajo con CICR para atención a privados de libertad.",
+      ]},
+      { name:"Comunidad Internacional", items:[
+        "OEA: Ramdin reconoce públicamente que Rodríguez 'está al mando' en Venezuela; comunicaciones institucionales formalizadas.",
+        "Parlamento Europeo: resolución 507-31 condicionando levantamiento de sanciones a avances democráticos; ~470 detenidos políticos pendientes.",
+        "Shell equipo instalado en Vepica (Carito-Pirital, Monagas); Ení firma Junín 5; BP MOU Plataforma Deltana + oficina permanente.",
+        "Repsol CEO: producción x3 en 3 años; +50% bruto en 12 meses; Ení-Repsol elevan Cardón IV de 580 a 645 MMpcd.",
+        "Foro Venezuela Energética 2026 (900+ participantes); Caracas Investment Week 2026: Venezuela ante fondos e inversores globales.",
+      ]},
+    ],
+    nacional:{
+      amnistia:{
+        solicitudes:12187, libertades:8616, privadosLiberados:314,
+        cautelares:8302, militares:187,
+        fpVerificados:690, fpDetenidos:470,
+        fpNota:"Stalin González cuestiona el anuncio del 'fin' de la Ley de Amnistía; Arreaza aclara que sigue vigente con mecanismos alternos para casos no contemplados. Parlamento Europeo estima ~470 detenidos políticos pendientes. Provea acuerda con fiscal Devoe acceso del CICR a privados de libertad.",
+      },
+      rodriguez:[
+        { title:"Acuerdos energéticos con Casa Blanca", text:"Delegación Jarrod Agen + vuelo AA directo + MOU en petróleo, gas, oro, aluminio y carbón consolidan la fase de cooperación operativa directa. El vuelo directo es el símbolo más elocuente del tránsito de estabilización a ejecución." },
+        { title:"Diplomacia activa: Colombia, Barbados, España", text:"III Comisión de Vecindad con Petro: agenda binacional con seguridad fronteriza, energía e interconexiones. Visita a Barbados como hub exportador Caribe-África. Invitación Iberoamericana Madrid (nov.): gestión de la normalización con Europa." },
+        { title:"Ingreso mínimo $240 y gestión del 1° de mayo", text:"Anuncio de ingreso integral USD 240 (bonos + salario) y pensiones USD 70. Sin reforma del salario base (~$0,27). Bloqueo policial de marchas laborales en Caracas el 30 de abril como señal de control coercitivo contenido." },
+        { title:"Cooptación diplomática de figuras opositoras", text:"Timoteo Zambrano propuesto embajador en España y Enrique Ochoa Antich para Alemania: figuras dialoguistas aceptables para la UE colocadas en posiciones clave para gestionar la normalización con Europa sin ceder en el frente político interno." },
+        { title:"'Normalización sin transición' (Americas Quarterly)", text:"Cada avance económico sin condicionamientos políticos reduce la presión internacional y amplía el margen de maniobra interno. La incorporación de figuras opositoras moderadas, las auditorías del BCV y la gestión selectiva de la Amnistía forman una secuencia coherente de cooptación." },
+      ],
+      mcmAgenda:["Candidatura presidencial confirmada (Piers Morgan): elecciones como única solución pacífica","1,5 millones inscritos en el RE en 6 semanas: plan de 40 semanas de empadronamiento","PUD a Petro: hoja de ruta de 8 puntos para condiciones de transición democrática"],
+    },
+    economia:{
+      kpis:[
+        { value:"FMI 4% · CEPAL 6,5% · PNUD 7,4%", label:"Proyecciones PIB 2026", color:"#22c55e" },
+        { value:"~570 Bs/USD", label:"Tipo de cambio BCV estable", color:"#38bdf8" },
+        { value:"~USD 13.600M", label:"Reservas internacionales", color:"#38bdf8" },
+        { value:"~650% anual", label:"Inflación proyectada", color:"#ef4444" },
+        { value:"$240 integral · $0,27 base", label:"Ingreso mínimo desde 1° mayo", color:"#f59e0b" },
+      ],
+      empresas:[
+        { empresa:"Shell", desarrollo:"Equipo técnico instalado en Vepica (Caracas) para Carito-Pirital en Monagas; transferencia de conocimiento e integración local." },
+        { empresa:"Ení", desarrollo:"Firma con PDVSA el relanzamiento de Junín 5 (35.000M barriles en sitio); plan de inversión antes de fin de año. Con Repsol elevan Cardón IV de 580 a 645 MMpcd." },
+        { empresa:"BP", desarrollo:"MOU para Plataforma Deltana (gas costa afuera) + oficina permanente en Caracas: primer paso hacia presencia operativa sostenida." },
+        { empresa:"Repsol", desarrollo:"CEO: producción x3 en 3 años; +50% bruto en 12 meses. ArtCap Strategies (~USD 300M) financia proveedores locales de servicios petroleros." },
+      ],
+    },
+    opinionPublica:{
+      protestas:{
+        total:33, promDiario:8.25, periodo:"24–29 abr",
+        variacion:"Descenso respecto al pico de S15 (46) pero con creciente politización y coordinación: convocatorias escalonadas para el 30 de abril y el 1° de mayo.",
+        composicion:"Demandas de vivienda y agua como eje clásico (ESCP), con creciente presencia de participación política, justicia y derechos civiles (CPP). Bloqueo policial de la marcha del 30 de abril en Miraflores.",
+        nota:"33 protestas en 6 días, hasta 9 estados simultáneos. Corredores activos: DC, Miranda, Sucre, Bolívar, Táchira. Transición cualitativa: de demandas socioeconómicas clásicas hacia participación política, justicia y derechos civiles.",
+      },
+      percepcion:{
+        fuente:"Meganálisis (abril 2026) + AtlasIntel/Bloomberg (abril 2026) + Polymarket",
+        titulo:"MCM 71,25% intención voto abierta · 87,24% considera necesaria elección presidencial en 2026",
+        nota:"78,26% dice que la situación va 'mal' (Meganálisis). Aprobación de Rodríguez cae a 31,4% (desde 37% en febrero). El 55% espera que el país mejore en 6 meses; el 70,17% cree que empeoraría mucho.",
+        datos:[
+          { factor:"Situación va 'mal' (Meganálisis)", pct:78.26 },
+          { factor:"Aprobación Rodríguez (AtlasIntel)", pct:31.4 },
+          { factor:"MCM intención voto abierta (Meganálisis)", pct:71.25 },
+          { factor:"Necesaria elección presidencial 2026 (Meganálisis)", pct:87.24 },
+          { factor:"Probabilidad elecciones 2026 (Polymarket)", pct:45.0 },
+        ],
+      },
+      excarcelados:{ fp:690, presos:470, militares:187, fuente:"Foro Penal / Parlamento Europeo" },
+    },
+    marcoNormativo:{
+      titulo:"Ley de Amnistía: continuidad con mecanismos alternos — Comité Postulaciones TSJ activo",
+      resumen:"El debate sobre la Ley de Amnistía se centra en su continuidad: Stalin González cuestiona el anuncio del 'fin', Arreaza aclara que sigue vigente con mecanismos alternos para casos no contemplados. El Parlamento Europeo estima ~470 detenidos políticos pendientes. La AN inicia la recepción de credenciales para el Comité de Postulaciones Judiciales (24 abr – 1 may), parte de la reconfiguración del TSJ bajo control del interinato.",
+      cambios:[
+        { titulo:"Continuidad Ley de Amnistía con mecanismos alternos", texto:"Sigue vigente; mecanismos alternos para casos no cubiertos. ~470 presos políticos pendientes según el Parlamento Europeo.", color:"#f59e0b" },
+        { titulo:"Comité de Postulaciones Judiciales TSJ (24 abr – 1 may)", texto:"AN inicia recepción de credenciales para proceso de postulación de nuevos magistrados del TSJ, reemplazando a los 8 jubilados.", color:"#f59e0b" },
+        { titulo:"OFAC: licencias para defensa legal de Maduro", texto:"Licencias enmendadas que permiten financiar con fondos estatales venezolanos (post-5 mar 2026) la defensa de Maduro y Flores en Nueva York.", color:"#38bdf8" },
+        { titulo:"Reconfiguración del BCV", texto:"Auditorías paralelas EE.UU.-Venezuela y reestructuración profunda del BCV en curso (Eurasia Group). Posible incorporación de perfiles tecnocráticos.", color:"#38bdf8" },
+      ],
+      lecturaAnalitica:"La 'normalización sin transición' se completa institucionalmente: Poder Judicial (TSJ), Poder Ciudadano, política exterior (Zambrano, Ochoa Antich) y banco central (auditorías bilaterales) convergen en una arquitectura donde cada reforma refuerza el control del interinato sin requerir acuerdo político amplio. El Parlamento Europeo (507-31) es el único freno externo activo mientras Washington facilita la normalización económica sin condicionamientos democráticos.",
+    },
+    escenarios:[
+      { name:"Continuidad Negociada (E3)", prob:"50%", color:"#0468B1", text:"E3 sube 4pp a 50%, el mayor nivel desde el inicio del período post-Maduro. La convergencia de la delegación Casa Blanca, vuelos directos AA, cinco acuerdos energéticos (Shell, Ení, BP, Repsol + MOU), la reconfiguración del TSJ y la proyección de estabilidad del BCV configura el momento de mayor consolidación del interinato desde enero." },
+      { name:"Transición Política Pacífica (E1)", prob:"35%", color:"#2d8a30", text:"E1 cede 3pp a 35% pese a MCM confirma candidatura, 1,5M inscritos en el RE y PUD con hoja de ruta a Petro. La dinámica de 'normalización sin transición' absorbe el espacio político. La brecha E3-E1 se amplía a 15pp. E1 recupera si EE.UU. ejerce presión vinculando licencias OFAC a avances concretos." },
+      { name:"Resistencia Coercitiva (E4)", prob:"11%", color:"#ca8a04", text:"E4 baja 1pp a 11%: bloqueo policial de marchas y discurso de Cabello son señales coercitivas contenidas. El eje bilateral EE.UU. opera como freno estructural. E4 recupera puntos si el retorno de MCM o el 1° de mayo producen respuesta coercitiva mayor." },
+      { name:"Colapso y Fragmentación (E2)", prob:"4%", color:"#dc2626", text:"E2 se mantiene en 4% por el compromiso bilateral más robusto del período. Fragilidades: salario base ~$0,27, inflación ~650% y vacío constitucional de los 180 días sin prórroga formal." },
+    ],
+    comentarios:[
+      { tag:"Factor 1: La fase operativa bilateral", color:"#0468B1", title:"De los memorandos a la ejecución directa", text:"La delegación de la Casa Blanca en el primer vuelo directo de American Airlines en siete años consolida el tránsito a cooperación energética activa. Los MOU en petróleo, gas, oro, aluminio y carbón crean un marco operativo con compromisos verificables que fortalece la inercia de normalización. La revisión contractual de julio será el siguiente test decisivo." },
+      { tag:"Factor 2: Acumulación institucional", color:"#f59e0b", title:"TSJ, BCV y diplomacia: el patrón de control selectivo", text:"La jubilación de 8 magistrados del TSJ —incluido Maikel Moreno— configura un vaciamiento y renovación controlada del Poder Judicial. El BCV transita hacia una coadministración bajo supervisión bilateral. La incorporación de Zambrano y Ochoa Antich en posiciones diplomáticas representa la cooptación más visible de la semana: perfiles opositores dialoguistas aceptables para la UE colocados en posiciones clave." },
+      { tag:"Factor 3: Presión democrática acumulada", color:"#dc2626", title:"La brecha entre normalización y expectativas democráticas", text:"La resolución del PE (507-31), la candidatura de MCM con 71,25% en intención de voto, el registro de 1,5M en el RE y el 87,24% que considera necesaria una elección en 2026 configuran una masa de presión democrática que E3 no puede absorber indefinidamente. La Eurocámara resiste; Washington, por ahora, no la frena." },
+      { tag:"Factor 4: El tablero electoral", color:"#2d8a30", title:"MCM candidata, Polymarket al 45%: el escenario electoral se materializa", text:"MCM confirma candidatura y la oposición registra 1,5M de votantes en 6 semanas. Polymarket proyecta 45% de probabilidad de elecciones en 2026. El escenario más riesgoso: elecciones con TSJ y CNE alineados al gobierno, comunidad internacional que ya otorgó concesiones y Amnistía de alcance limitado — normalización sin transformación democrática sustantiva." },
+    ],
+  },
 ];
 
 export const CURATED_NEWS = [
@@ -825,6 +952,137 @@ export const CURATED_NEWS = [
   { title:"Henry Ramos Allup (AD Resistencia) declara respaldo a candidatura de MCM", date:"2026-03-04", source:"Prensa", scenarios:["E1"], dims:["Político"], week:"S8" },
   { title:"Exxon enviará equipo técnico a Venezuela; Shell firma acuerdos de exploración", date:"2026-03-05", source:"Reuters", scenarios:["E3"], dims:["Energético"], week:"S8" },
   { title:"Índice MassBehaviorResearch: MCM lidera con 106,84/137 pts; Maduro en 5,02", date:"2026-03-06", source:"MassBehavior", scenarios:["E1"], dims:["Político"], week:"S8" },
+  // ── S16: 24 abril – 01 mayo 2026 ──
+  { period:"24 de abril – 01 de mayo de 2026", periodShort:"24 abr – 1 may 2026",
+    keyPoints:[
+      { tag:"Bilateral", color:"#0468B1", title:"Delegación Casa Blanca + MOU energéticos", text:"Delegación encabezada por Jarrod Agen en el primer vuelo directo de American Airlines en 7 años. MOU firmados en petróleo, gas, oro, aluminio y carbón con Venezuela: transición de la estabilización a la cooperación operativa directa con Washington." },
+      { tag:"Energético", color:"#22c55e", title:"Masa crítica de acuerdos energéticos", text:"Shell instala equipo en Vepica (Monagas) para Carito-Pirital; Eni firma Junín 5 (35.000M bbl); BP suscribe MOU para Plataforma Deltana y abre oficina permanente; Repsol CEO anuncia producción x3 en 3 años. Mayor convergencia de compromisos en una sola semana del período." },
+      { tag:"Institucional", color:"#f59e0b", title:"TSJ: 8 magistrados jubilados — reconfiguración del Poder Judicial", text:"La Sala Plena jubilaría extraoficialmente a Moreno, Gavidia, Gil, Gómez, Alves, Damiani, Timaure e Hidalgo, precedidos de 227 sentencias en una semana (168 en un día). Proceso de postulaciones en la AN bajo control del interinato: el TSJ pasa de baluarte del madurismo a instrumento del rodriguismo." },
+      { tag:"Político", color:"#f59e0b", title:"$240 ingreso mínimo integral sin reforma salarial estructural", text:"Delcy Rodríguez anuncia USD 240 desde el 1° de mayo. Salario base permanece en Bs 130 (~USD 0,27) sin incidencia en prestaciones. Bloqueo policial de marchas laborales en Caracas. Capriles: 'burla'. Reproduce la lógica de incremento por bonos sin cambio estructural." },
+      { tag:"Internacional", color:"#8b5cf6", title:"Eurocámara 507-31 vs. normalización Washington", text:"Parlamento Europeo condiciona levantamiento de sanciones a presos políticos, cese represión y elecciones libres. Contrasta con la normalización sin condicionamientos que impulsa EE.UU. España invita a Rodríguez a la Cumbre Iberoamericana de Madrid a pesar de sanciones vigentes de la UE." },
+    ],
+    sintesis:"La semana del 24 de abril al 1° de mayo de 2026 marca el tránsito de Venezuela a una fase de ejecución bilateral acelerada. La llegada de la delegación de la Casa Blanca en el primer vuelo comercial directo de American Airlines en siete años y la firma de MOU en petróleo, gas y minerales consolidan un entendimiento operativo con Washington que ya no requiere negociación, sino implementación. El anuncio del ingreso mínimo integral en USD 240 cumple la expectativa del 1° de mayo, pero reproduce la lógica de ajuste por bonos sin tocar el salario base. Mientras tanto, la jubilación de 8 magistrados del TSJ —incluyendo a Maikel Moreno— y el proceso de redesignación en marcha confirman que la acumulación institucional del Ejecutivo avanza en todos los poderes del Estado. La tensión entre la normalización económica impulsada por Washington y las exigencias de democracia efectiva del Parlamento Europeo (507 votos contra 31) define el principal vector de presión externa. La confirmación de candidatura de MCM y el registro de 1,5 millones de votantes en seis semanas señalan que la oposición construye capacidad electoral en paralelo, aunque la dinámica dominante —'normalización sin transición' según Americas Quarterly— absorbe el espacio político sin condicionamientos verificables.",
+    actores:[
+      { name:"EE.UU.", items:[
+        "Delegación Casa Blanca (Jarrod Agen, director Consejo Nacional de Dominio Energético): primer vuelo directo AA Miami-Caracas en 7 años; firma MOU en petróleo, gas, oro, aluminio y carbón.",
+        "Barrett se reúne con Rodríguez en Miraflores (24 abr): primer encuentro oficial del nuevo encargado de negocios centrado en implementación del plan de tres fases.",
+        "ITA lanza Centro de Información de Negocios sobre Venezuela (trade.gov/venezuela): infraestructura comercial bilateral para exportaciones y orientación sobre sanciones.",
+        "OFAC emite licencias enmendadas para financiar la defensa legal de Maduro y Flores con fondos estatales posteriores al 5 de marzo de 2026.",
+        "Barrett se reúne con VenAmCham: sector privado como pilar de la transformación económica.",
+        "Blue Water Acquisition Corp. IV: plan de adquisición de filiales de Maha Capital AB para participar en PetroUrdaneta (~USD 490M de valoración).",
+      ]},
+      { name:"Gobierno Interino / Ejecutivo (Rodríguez)", items:[
+        "Reunión bilateral con Petro (III Comisión de Vecindad): intercambio de inteligencia, planes anticrimen transfronterizo, interconexión eléctrica y gasífera, comercio ~USD 1.200M.",
+        "Visita a Barbados: vínculos diplomáticos y comerciales; propone participación barbadense en producción agrícola venezolana y hub exportador hacia Caribe y África.",
+        "Ingreso mínimo integral USD 240 (incl. bonos) y pensiones en USD 70 desde 1° de mayo. Base permanece en Bs 130 (~USD 0,27). Primeros bonos: salud, educación, policías, FANB.",
+        "Propuesta de Timoteo Zambrano (opositor moderado) como embajador en España y Enrique Ochoa Antich para Alemania: cooptación diplomática de figuras dialoguistas.",
+        "Invitación de España a la Cumbre Iberoamericana de Madrid (4-5 noviembre) a pesar de sanciones UE; canciller Albares vincula revisión de sanciones a avances en diálogo político.",
+        "Peregrinación Nacional cierra el 30 de abril en Caracas; Diosdado Cabello defiende el aumento 'responsable' y descarta discusión electoral inmediata.",
+        "Americas Quarterly: patrón de la semana apunta a 'normalización sin transición' — recuperación económica con acumulación institucional paralela sin condicionamientos políticos.",
+      ]},
+      { name:"Asamblea Nacional y Poder Judicial", items:[
+        "AN inicia recepción de credenciales para el Comité de Postulaciones Judiciales (24 abr – 1 may): proceso que definirá perfiles para nuevos magistrados del TSJ.",
+        "Sala Plena jubilaría extraoficialmente a 8 magistrados: Maikel Moreno, Edgar Gavidia, Malaquías Gil, Elsa Gómez, Carmen Alves, Luis Damiani, Henry Timaure y Juan Carlos Hidalgo.",
+        "Entre el 21 y el 27 de abril el TSJ dictó 227 sentencias —168 en un solo día (24 abr)— en dinámica que analistas calificaron de 'justicia exprés'.",
+        "Delegación AN en Parlasur (Montevideo): gestión para retorno pleno de Venezuela al organismo del que fue suspendida en 2017.",
+        "Carmen Meléndez encabeza reunión en sede histórica de AD con representantes de partidos intervenidos judicialmente, enmarcada en la Peregrinación Nacional.",
+      ]},
+      { name:"Oposición / Sociedad Civil", items:[
+        "MCM confirma candidatura presidencial en entrevista con Piers Morgan: se presentará si se convocan elecciones; apoya las tres fases de Trump.",
+        "Vente Venezuela: 1,5 millones de inscritos en el plan de actualización del Registro Electoral en seis semanas.",
+        "PUD: carta pública a Petro con hoja de ruta de 8 puntos — liberación de presos, cese represión, reinstitucionalización, apertura cívica, elecciones verificables, retorno exiliados.",
+        "Stalin González cuestiona el anuncio del 'fin' de la Ley de Amnistía; Arreaza aclara que sigue vigente con mecanismos alternos para casos no contemplados.",
+        "Capriles califica el aumento salarial de 'burla'; Rosales pide priorizar nuevo CNE y elecciones libres.",
+        "Fracturas en Baruta: presunta coordinación Fuerza Vecinal-PSUV para desplazar directiva del Concejo Municipal — nueva fractura interna en la oposición.",
+        "Provea se reúne con fiscal general Larry Devoe: plan de trabajo con CICR para atención a privados de libertad e invitación a la reforma de la justicia penal.",
+      ]},
+      { name:"Comunidad Internacional", items:[
+        "OEA: secretario general Albert Ramdin reconoce públicamente que Rodríguez 'está al mando' en Venezuela y formaliza comunicaciones institucionales con ella.",
+        "Parlamento Europeo: resolución 507-31 instando a no levantar sanciones sin avances democráticos concretos; cuestiona el alcance de la Ley de Amnistía (~470 pendientes).",
+        "Shell equipo instalado en Vepica (Carito-Pirital, Monagas); Eni firma Junín 5 (35.000M bbl); BP MOU Plataforma Deltana + oficina permanente.",
+        "Repsol CEO (Josu Jon Imaz): producción se triplicará en 3 años; +50% bruto en 12 meses; Eni-Repsol buscan elevar Cardón IV de 580 a 645 MMpcd.",
+        "ArtCap Strategies (ex-Credit Suisse, ~USD 300M) anuncia financiación a proveedores locales de servicios petroleros.",
+        "Foro Venezuela Energética 2026: más de 900 participantes con Barrett, quien describe el vínculo energético bilateral como aquel que 'definirá el futuro del hemisferio'.",
+        "Caracas Investment Week 2026 posicionó a Venezuela ante fondos, banca de inversión y actores institucionales globales.",
+      ]},
+    ],
+    nacional:{
+      amnistia:{
+        solicitudes:12187, libertades:8616, privadosLiberados:314,
+        cautelares:8302, militares:187,
+        fpVerificados:690, fpDetenidos:470,
+        fpNota:"Stalin González cuestiona el anuncio del 'fin' de la Ley de Amnistía; Arreaza aclara que sigue vigente con mecanismos alternos para casos no contemplados. Parlamento Europeo estima ~470 detenidos políticos pendientes. Provea acuerda con fiscal Devoe acceso del CICR a privados de libertad.",
+      },
+      rodriguez:[
+        { title:"Acuerdos energéticos con Casa Blanca", text:"Delegación de Jarrod Agen + vuelo AA directo + MOU en petróleo, gas, oro, aluminio y carbón consolidan la fase de cooperación operativa directa. El vuelo directo es el símbolo más elocuente del tránsito de estabilización a ejecución." },
+        { title:"Diplomacia activa: Colombia, Barbados, España", text:"Reunión con Petro (III Comisión de Vecindad): agenda binacional con seguridad fronteriza, energía e interconexión. Visita a Barbados como hub exportador Caribe-África. Invitación Iberoamericana Madrid (nov.): gestión de la normalización con Europa." },
+        { title:"Ingreso mínimo $240 y gestión del 1° de mayo", text:"Anuncio de ingreso integral USD 240 (bonos + salario) y pensiones en USD 70 desde el Día del Trabajador. Sin reforma del salario base (~$0,27). Peregrinación Nacional como movilización de legitimación interna que converge con las protestas laborales el 1° de mayo." },
+        { title:"Cooptación diplomática de figuras opositoras", text:"Timoteo Zambrano propuesto embajador en España y Enrique Ochoa Antich para Alemania — figuras opositoras con trayectoria dialoguista aceptables para la UE, colocadas en posiciones clave para gestionar la normalización con Europa." },
+        { title:"'Normalización sin transición' (Americas Quarterly)", text:"El patrón de la semana — MOU energéticos, reconfiguración TSJ y BCV, cooptación opositora moderada, $240 sin reforma estructural — apunta a una estrategia donde cada avance económico sin condicionamientos políticos reduce la presión internacional y amplía el margen de maniobra interno." },
+      ],
+      mcmAgenda:["Candidatura presidencial confirmada (Piers Morgan): única solución pacífica son las elecciones","1,5 millones inscritos en el RE en 6 semanas: plan de 40 semanas de empadronamiento","PUD a Petro: hoja de ruta de 8 puntos para condiciones de transición democrática"],
+    },
+    economia:{
+      kpis:[
+        { value:"FMI 4% · CEPAL 6,5% · PNUD 7,4%", label:"Proyecciones PIB 2026", color:"#22c55e" },
+        { value:"~570 Bs/USD", label:"Tipo de cambio BCV estable", color:"#38bdf8" },
+        { value:"~USD 13.600M", label:"Reservas internacionales", color:"#38bdf8" },
+        { value:"~650% anual", label:"Inflación proyectada", color:"#ef4444" },
+        { value:"$240 integral · $0,27 base", label:"Ingreso mínimo desde 1° mayo", color:"#f59e0b" },
+      ],
+      empresas:[
+        { empresa:"Shell (Royal Dutch)", desarrollo:"Equipo técnico instalado en Vepica (Caracas) para proyecto Carito-Pirital en Monagas; transferencia de conocimiento e integración con proveedores locales." },
+        { empresa:"Eni", desarrollo:"Firma con PDVSA y Ministerio de Petróleo el relanzamiento del proyecto Junín 5 (35.000M barriles en sitio certificado); plan de inversión antes de fin de año. Con Repsol buscan elevar Cardón IV de 580 a 645 MMpcd." },
+        { empresa:"BP", desarrollo:"Suscribe MOU para la Plataforma Deltana (gas costa afuera, reservas de alto potencial) y anuncia apertura de oficina permanente en Caracas — primer paso hacia presencia operativa sostenida." },
+        { empresa:"Repsol", desarrollo:"CEO Josu Jon Imaz: producción en Venezuela se triplicará en 3 años; +50% bruto en 12 meses. ArtCap Strategies anuncia financiación ~USD 300M a proveedores locales de servicios petroleros." },
+        { empresa:"Blue Water / ArtCap", desarrollo:"Blue Water Acquisition Corp. IV (~USD 490M valoración) anuncia plan para PetroUrdaneta. ArtCap Strategies (ex-Credit Suisse) financia proveedores locales de servicios petroleros." },
+      ],
+    },
+    opinionPublica:{
+      protestas:{
+        total:33, promDiario:8.25, periodo:"24–29 abr",
+        variacion:"Descenso respecto al pico de S15 (46) pero con creciente politización y coordinación: convocatorias escalonadas para el 30 de abril (marcha laboral) y el 1° de mayo (movilización general).",
+        composicion:"Demandas de vivienda y agua como eje clásico (ESCP), con creciente presencia de participación política, justicia y derechos civiles (CPP). Bloqueo policial de la marcha del 30 de abril en Miraflores marca la semana como un momento de alta tensión en el terreno social.",
+        nota:"El período 24-29 de abril registra 33 protestas en 6 días, con presencia en hasta 9 estados simultáneos. Los estados más recurrentes —Distrito Capital, Miranda, Sucre, Bolívar, Táchira— confirman corredores de conflictividad activos. La conflictividad muestra una transición cualitativa: de demandas socioeconómicas clásicas hacia participación política, justicia y derechos civiles, con convocatorias escalonadas articuladas alrededor del 1° de mayo. El bloqueo policial de marchas laborales en Caracas y el despliegue logístico oficialista paralelo marcan la semana como un momento de alta tensión social.",
+      },
+      percepcion:{
+        fuente:"Meganálisis (abril 2026) + AtlasIntel/Bloomberg (abril 2026) + Polymarket",
+        titulo:"MCM 71,25% intención voto abierta · 87,24% considera necesaria elección presidencial en 2026",
+        nota:"Profunda brecha entre la consolidación del interinato (E3 al 50%) y la percepción ciudadana: 78,26% dice que la situación va 'mal' y 95,33% desaprueba la gestión económica (Meganálisis). La aprobación de Rodríguez cae a 31,4% (desde 37% en febrero, AtlasIntel). El 55% espera que el país mejore en 6 meses, pero el 70,17% cree que empeoraría mucho.",
+        datos:[
+          { factor:"Situación va 'mal' (Meganálisis)", pct:78.26 },
+          { factor:"Aprobación Rodríguez (AtlasIntel)", pct:31.4 },
+          { factor:"MCM intención voto abierta (Meganálisis)", pct:71.25 },
+          { factor:"Necesaria elección presidencial 2026 (Meganálisis)", pct:87.24 },
+          { factor:"Probabilidad elecciones 2026 (Polymarket)", pct:45.0 },
+        ],
+      },
+      excarcelados:{ fp:690, presos:470, militares:187, fuente:"Foro Penal / Parlamento Europeo" },
+    },
+    marcoNormativo:{
+      titulo:"Ley de Amnistía: continuidad con mecanismos alternos — Comité Postulaciones TSJ activo",
+      resumen:"El debate sobre la Ley de Amnistía se centra en su continuidad: Stalin González cuestiona el anuncio del 'fin', mientras Arreaza aclara que sigue vigente con mecanismos alternos para casos no contemplados. El Parlamento Europeo estima ~470 detenidos políticos pendientes, cuestionando el alcance real de la ley. Simultáneamente, la AN inicia la recepción de credenciales para el Comité de Postulaciones Judiciales (24 abr – 1 may), pieza central de la reconfiguración del TSJ bajo control del interinato.",
+      cambios:[
+        { titulo:"Continuidad Ley de Amnistía con mecanismos alternos", texto:"Arreaza aclara que la Ley sigue vigente; se abrirán mecanismos alternos para casos no cubiertos. ~470 presos políticos pendientes según el Parlamento Europeo — brecha entre alcance oficial y verificado.", color:"#f59e0b" },
+        { titulo:"Comité de Postulaciones Judiciales TSJ (24 abr – 1 may)", texto:"La AN inicia la recepción de credenciales para el proceso de postulación de nuevos magistrados del TSJ, parte de la reforma judicial en curso. Definirá los perfiles para reemplazar a los 8 magistrados jubilados.", color:"#f59e0b" },
+        { titulo:"OFAC: licencias para defensa legal de Maduro", texto:"La OFAC emite licencias enmendadas que permiten financiar con fondos estatales venezolanos (posteriores al 5 de marzo de 2026) la defensa legal de Maduro y Flores en el caso federal de Nueva York.", color:"#38bdf8" },
+        { titulo:"Proceso de reconfiguración del BCV", texto:"Auditorías paralelas EE.UU.-Venezuela sobre fondos externos y reestructuración profunda del BCV en curso (Eurasia Group). Posible incorporación de perfiles tecnocráticos en el directorio según reportes.", color:"#38bdf8" },
+      ],
+      lecturaAnalitica:"La 'normalización sin transición' se completa en la dimensión institucional esta semana: el Poder Judicial (TSJ con 8 magistrados jubilados y proceso de postulación bajo la AN), el Poder Ciudadano (Devoe y González Lobato), la política exterior (Zambrano, Ochoa Antich) y el banco central (auditorías bilaterales) convergen en una arquitectura de acumulación institucional donde cada reforma refuerza el control del interinato sin requerir un acuerdo político amplio con la oposición. El Parlamento Europeo representa el único freno externo activo —507 votos contra 31— mientras Washington continúa facilitando la normalización económica sin condicionamientos democráticos verificables.",
+    },
+    escenarios:[
+      { name:"Continuidad Negociada (E3)", prob:"50%", color:"#0468B1", text:"E3 sube 4pp a 50%, el mayor nivel desde el inicio del período post-Maduro. La convergencia simultánea de la delegación Casa Blanca, la reanudación de vuelos directos AA, cinco acuerdos energéticos de gran escala (Shell, Eni, BP, Repsol + MOU gubernamentales), la reconfiguración del TSJ y la proyección de estabilidad del BCV configura el momento de mayor consolidación del interinato desde enero. El riesgo principal: la acumulación de expectativas democráticas no satisfechas puede revertir el factor tiempo de ventaja estratégica a presión acumulada." },
+      { name:"Transición Política Pacífica (E1)", prob:"35%", color:"#2d8a30", text:"E1 cede 3pp a 35% a pesar de señales activas: MCM confirma candidatura, la oposición registra 1,5M de electores en 6 semanas, el PUD presenta una hoja de ruta a Petro. La dinámica de 'normalización sin transición' absorbe el espacio político sin traducirlo en condiciones institucionales verificables. La brecha E3-E1 se amplía a 15pp. E1 recupera puntos si EE.UU. ejerce presión vinculando licencias OFAC a avances concretos o si el retorno de MCM produce un efecto movilizador." },
+      { name:"Resistencia Coercitiva (E4)", prob:"11%", color:"#ca8a04", text:"E4 baja 1pp a 11%: el bloqueo policial de marchas en Caracas y el discurso de Cabello son señales coercitivas contenidas. La dinámica bilateral con EE.UU. opera como freno estructural. Sin embargo, el patrón de control selectivo activo (bloqueo de marchas, reuniones en AD con partidos intervenidos, tensiones en Baruta) confirma que el vector coercitivo no ha desaparecido. E4 recupera puntos rápidamente si el retorno de MCM o el 1° de mayo producen respuesta coercitiva mayor." },
+      { name:"Colapso y Fragmentación (E2)", prob:"4%", color:"#dc2626", text:"E2 se mantiene estable en 4% porque el compromiso bilateral con EE.UU. esta semana es el más robusto del período. Sin embargo, las fragilidades estructurales persisten: salario base ~$0,27, inflación ~650% anualizada y vacío constitucional de los 180 días sin prórroga formal son factores de riesgo que podrían converger de forma no anticipada." },
+    ],
+    comentarios:[
+      { tag:"Factor 1: La fase operativa bilateral", color:"#0468B1", title:"De los memorandos a la ejecución directa", text:"La llegada de la delegación de la Casa Blanca en el primer vuelo directo de American Airlines en siete años consolida el tránsito a una fase de cooperación energética y minera activa. Los MOU firmados en petróleo, gas, oro, aluminio y carbón no implican aumento inmediato de producción, pero crean un marco operativo con compromisos verificables que fortalece la inercia de normalización. La revisión contractual de julio será el siguiente test: si los MOU se convierten en contratos operativos con cronogramas de inversión, E3 se consolida a mediano plazo." },
+      { tag:"Factor 2: Acumulación institucional", color:"#f59e0b", title:"TSJ, BCV y diplomacia: el patrón de control selectivo", text:"La jubilación de 8 magistrados del TSJ —incluyendo a Maikel Moreno, el rostro más visible del tribunal en el período madurista— configura un vaciamiento y renovación controlada del Poder Judicial. El BCV transita hacia una coadministración bajo supervisión bilateral. La incorporación de Zambrano y Ochoa Antich en posiciones diplomáticas representa la cooptación más visible de figuras opositoras: perfiles dialoguistas aceptables para la UE en posiciones clave sin que ello implique transición política. El patrón, identificado por Americas Quarterly como 'normalización sin transición', se completa esta semana en su expresión más densa." },
+      { tag:"Factor 3: Presión democrática acumulada", color:"#dc2626", title:"La brecha entre normalización y expectativas democráticas", text:"La resolución del Parlamento Europeo (507-31), la confirmación de candidatura de MCM con 71,25% en intención de voto (Meganálisis), el registro de 1,5 millones en el RE y el 87,24% que considera necesaria una elección presidencial en 2026 configuran una masa de presión democrática que E3 no puede absorber indefinidamente. El reloj constitucional de los 180 días, los acuerdos energéticos en curso y el nivel de inversión comprometida crean una inercia de normalización que opera con independencia de los avances democráticos. La Eurocámara resiste esa dinámica; Washington, por ahora, no la frena." },
+      { tag:"Factor 4: El tablero electoral", color:"#2d8a30", title:"MCM candidata, Polymarket al 45%: el escenario electoral se materializa", text:"La confirmación de candidatura de MCM y el registro de 1,5 millones de votantes en seis semanas indican que la oposición construye capacidad electoral con o sin fecha de comicios. Polymarket proyecta 45% de probabilidad de elecciones en 2026. El escenario más riesgoso identificado: que se convoquen elecciones con TSJ y CNE alineados al gobierno, con una comunidad internacional que ya otorgó concesiones económicas y con una Ley de Amnistía de alcance limitado. En ese escenario, Venezuela alcanzaría una normalización sin transformación democrática sustantiva." },
+    ],
+  },
 ];
 
 export const CURATED_FACTCHECK = [
@@ -1058,5 +1316,32 @@ export const CURATED_FACTCHECK = [
   { title:"Halliburton evalúa retorno a Venezuela — infraestructura en mejores condiciones de lo esperado · recuperación requeriría hasta USD 10.000M anuales de inversión sostenida", date:"2026-04-20", source:"Halliburton/Prensa", scenarios:["E3"], dims:["Energético"], week:"S15" },
   { title:"Eni y Repsol planean iniciar exportaciones GNL desde Venezuela hacia finales de 2031 — reactivación proyecto offshore Perla/Cardón IV con reservas estimadas de hasta 17 TCF", date:"2026-04-18", source:"Eni/Repsol", scenarios:["E3"], dims:["Energético","Internacional"], week:"S15" },
   { title:"Rodríguez: balance 100 días — amnistía 8.616 libertades, 3 hom/100K, PDVSA 1,1M bpd, FMI-BM restablecidos, 5.000 migrantes retornados", date:"2026-04-19", source:"Gobierno VEN/VTV", scenarios:["E3"], dims:["Político","Económico","Social"], week:"S15" },
+
+  // S16: 24 – 01 mayo 2026
+  // ── Internacional ──
+  { title:"Delegación de la Casa Blanca (Jarrod Agen) llega a Caracas en el primer vuelo directo de American Airlines en 7 años y firma MOU en petróleo, gas, oro, aluminio y carbón.", date:"2026-04-30", source:"Casa Blanca / AA", scenarios:["E3"], dims:["Internacional","Energético"], week:"S16" },
+  { title:"Barrett se reúne con Rodríguez en Miraflores: primer encuentro del nuevo encargado de negocios de EE.UU. centrado en el plan de tres fases (estabilización cumplida).", date:"2026-04-24", source:"Depto. Estado EE.UU.", scenarios:["E3"], dims:["Internacional","Político"], week:"S16" },
+  { title:"OEA: Ramdin reconoce públicamente que Rodríguez 'está al mando' en Venezuela — comunicaciones institucionales formalizadas con el gobierno interino.", date:"2026-04-29", source:"OEA", scenarios:["E3"], dims:["Internacional","Político"], week:"S16" },
+  { title:"Parlamento Europeo aprueba resolución 507-31 condicionando el levantamiento de sanciones UE a avances democráticos concretos: presos políticos, cese represión y elecciones libres.", date:"2026-04-29", source:"Parlamento Europeo", scenarios:["E1","E4"], dims:["Internacional","Político"], week:"S16" },
+  { title:"España confirma invitación a Rodríguez a la Cumbre Iberoamericana de Madrid (4-5 noviembre) a pesar de sus sanciones vigentes en la UE.", date:"2026-04-30", source:"Gobierno España / Albares", scenarios:["E3"], dims:["Internacional","Político"], week:"S16" },
+  // ── Energético ──
+  { title:"Shell instala equipo técnico en la sede de Vepica en Caracas para el proyecto Carito-Pirital en Monagas — despliegue operativo concreto.", date:"2026-04-26", source:"Shell / PDVSA", scenarios:["E3"], dims:["Energético"], week:"S16" },
+  { title:"Eni firma con PDVSA y el Ministerio de Petróleo el relanzamiento del proyecto Junín 5: 35.000 millones de barriles en sitio certificado; plan de inversión antes de fin de año.", date:"2026-04-27", source:"Eni / PDVSA", scenarios:["E3"], dims:["Energético","Internacional"], week:"S16" },
+  { title:"BP suscribe MOU para la Plataforma Deltana (gas costa afuera) y anuncia apertura de oficina permanente en Caracas — presencia operativa sostenida.", date:"2026-04-28", source:"BP / PDVSA", scenarios:["E3"], dims:["Energético","Internacional"], week:"S16" },
+  { title:"CEO de Repsol (Josu Jon Imaz): la producción en Venezuela se triplicará en 3 años y aumentará un 50% bruto en 12 meses; Eni-Repsol buscan elevar Cardón IV de 580 a 645 MMpcd.", date:"2026-04-28", source:"Repsol", scenarios:["E3"], dims:["Energético","Internacional"], week:"S16" },
+  { title:"Exportaciones de crudo venezolano a EE.UU.: 499.000 bpd en la semana del 17 de abril — 26,3 millones de barriles acumulados (52% del total 2025); promedio móvil 4 sem.: 357k bpd.", date:"2026-04-24", source:"EIA / Reuters", scenarios:["E3"], dims:["Energético","Internacional"], week:"S16" },
+  // ── Político ──
+  { title:"Jubilación extraoficial de 8 magistrados del TSJ incluido Maikel Moreno — Sala Plena reconfigurada precedida de 227 sentencias en una semana (168 en un día).", date:"2026-04-29", source:"TSJ / Prensa", scenarios:["E3","E1"], dims:["Político","Constitucional"], week:"S16" },
+  { title:"AN inicia recepción de credenciales para el Comité de Postulaciones Judiciales (24 abr – 1 may): proceso bajo control del interinato para designar nuevos magistrados del TSJ.", date:"2026-04-24", source:"AN Venezuela", scenarios:["E3"], dims:["Político","Constitucional"], week:"S16" },
+  { title:"Rodríguez propone a Timoteo Zambrano (opositor moderado) como embajador en España y a Enrique Ochoa Antich para Alemania — cooptación diplomática inédita en dos décadas.", date:"2026-04-28", source:"Gobierno VEN / Prensa", scenarios:["E3"], dims:["Político","Internacional"], week:"S16" },
+  { title:"Rodríguez anuncia ingreso mínimo integral de USD 240 y pensiones de USD 70 desde el 1° de mayo — salario base permanece en Bs 130 (~USD 0,27); sin incidencia en prestaciones.", date:"2026-04-28", source:"Gobierno VEN / VTV", scenarios:["E3","E4"], dims:["Político","Económico","Social"], week:"S16" },
+  { title:"MCM confirma candidatura presidencial en entrevista con Piers Morgan; Vente Venezuela reporta 1,5 millones de inscritos en el RE en 6 semanas.", date:"2026-04-27", source:"MCM / Vente Venezuela", scenarios:["E1"], dims:["Político"], week:"S16" },
+  // ── Social ──
+  { title:"33 protestas en 6 días (24-29 abr, OVCS) en hasta 9 estados simultáneos — transición de demandas ESCP hacia participación política, justicia y derechos civiles.", date:"2026-04-29", source:"OVCS", scenarios:["E4","E1"], dims:["Social","Político"], week:"S16" },
+  { title:"Bloqueo policial de marchas laborales en Caracas (30 abr): cordón de la PNB impide llegada de trabajadores a Miraflores — señal de control coercitivo sobre la movilización social.", date:"2026-04-30", source:"Sindicatos / OVCS / Prensa", scenarios:["E4"], dims:["Social","Político"], week:"S16" },
+  // ── Económico ──
+  { title:"BCV proyecta estabilidad cambiaria con brecha USDT-banca comprimida al ~10%; auditorías paralelas EE.UU.-Venezuela sobre fondos externos como mecanismo de confianza bilateral.", date:"2026-04-26", source:"BCV / Prensa financiera", scenarios:["E3"], dims:["Económico"], week:"S16" },
+  { title:"Meganálisis abril 2026: 95,33% desaprueba la gestión económica; 87,24% considera necesaria una elección presidencial; MCM 71,25% en intención de voto abierta.", date:"2026-04-28", source:"Meganálisis", scenarios:["E1","E4"], dims:["Social","Político"], week:"S16" },
+  { title:"AtlasIntel/Bloomberg abril 2026: aprobación de Rodríguez cae a 31,4% (desde 37% en febrero); 47,1% desaprueba; Polymarket: 45% probabilidad de elecciones en 2026.", date:"2026-04-29", source:"AtlasIntel / Bloomberg / Polymarket", scenarios:["E1","E4"], dims:["Social","Político"], week:"S16" },
 
 ];

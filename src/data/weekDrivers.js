@@ -1,8 +1,81 @@
-// Scenario drivers and signals per scenario (current week S15)
-// Updated each SITREP cycle
+// Week drivers — updated weekly (Matrix tab)
+// S16: 24 abril – 01 mayo 2026
+
 export const WEEK_DRIVERS = {
-  1: { label:"Alta (en ascenso)", drivers:["MCM anuncia «hoy comienza el regreso a casa» desde una abarrotada Puerta del Sol — declaración de retorno inminente coordinado con EE.UU. como acto político de mayor impacto simbólico del período","Medalla de la Comunidad de Madrid + reunión con PM de Portugal Luís Montenegro en São Bento: respaldo europeo institucional al más alto nivel, ampliando la coalición internacional","Propuesta de acuerdo nacional con rutas simultáneas: articulación política, institucional y social en paralelo, con liberación de presos políticos y retorno de migrantes como condiciones mínimas","Reunión Figuera-Kozak en Washington: EE.UU. reafirma respaldo a la AN de 2015 como referente institucional de la transición — canal opositor activo confirmado","Reconfiguración opositora interna: Darwin González se une a PUD como independiente; Fuerza Vecinal + Vamos Cojedes + MIN Unidad crean Alianza Nacional de Centro","Machado: retrasar elecciones es más riesgoso que acelerarlas — estima 40 semanas para organizar comicios con garantías adecuadas","Capriles exige debate salarial real: demanda convergente con conflictividad laboral como plataforma de presión transversal","46 protestas semanales con pico de 27 el 22 de abril (paro universitario): conflictividad laboral-salarial como motor de presión hacia la transición"], signals:["Retorno efectivo de MCM a Venezuela sin represalia: primer test real de las garantías implícitas del acuerdo bilateral","Anuncio de fecha electoral o cronograma con mínimo consenso de actores clave, incluido EE.UU.","Movimientos concretos en la AN hacia renovación del CNE con equilibrio multipartidista","Respuesta salarial 1° mayo con monto suficiente para descomprimir conflictividad laboral","Liberación de un número significativo de los más de 400 presos políticos restantes","Prórroga formal de los 180 días aprobada por la AN antes de julio","Articulación opositora con actores empresariales (Fedecámaras) en agenda pública compartida"] },
-  2: { label:"Muy baja", drivers:["Inflación ~650% anualizada: Georgieva (FMI) advierte que el camino hacia la estabilidad será muy difícil — economía contraída en dos tercios vs. 2012","Brecha salarial estructural: cubrir canasta básica para 3,1M empleados públicos y 5,7M pensionados requeriría >USD 21.000M anuales — 3 veces los DEG del FMI","Vacío constitucional de 180 días sin resolución: prórroga AN es el primer test institucional; indefinición genera riesgo de crisis de legitimidad","Brecha cambiaria ~30% vs. tasa oficial persiste pese a habilitación GL-57 del BCV — segmentación estructural no resuelta","DEG ≠ presupuesto ejecutable: vicepresidente económico del FMI aclara que el proceso no responde a ningún plan de financiamiento inmediato","Motín Yare III (20 abr): 5 fallecidos en centro de máxima seguridad — tensiones estructurales del sistema penitenciario","Crisis sanitaria: epidemia activa fiebre amarilla (14 estados) + más de 25.000 casos malaria en 2026"], signals:["Fractura interna del gobierno interino o confrontación entre facciones del chavismo","Colapso del acuerdo energético con EE.UU. o revocación de licencias OFAC ante evento político disruptivo","Vencimiento de los 180 días constitucionales sin definición formal: crisis de legitimidad del interinato","Escalada violenta de protestas con represión masiva y quiebre del orden público","Reversión de señales positivas del FMI o BM ante eventos políticos disruptivos","Desplome abrupto de la producción petrolera por factores operativos o geopolíticos"] },
-  3: { label:"Alta (dominante)", drivers:["John Barrett llega a Venezuela (23 abr) como encargado de negocios en sustitución de Laura Dogu — relevo confirma continuidad estratégica de EE.UU. en la Fase 2, centrada en resultados concretos","FMI, Banco Mundial y BID reanudan vínculos de forma simultánea: Georgieva-Rodríguez acuerdan agenda técnica de 3 ejes (datos, política pública, institucionalidad); BM y BID en fase preparatoria","Gran Peregrinación Nacional 19 abr – 1° mayo: lanzada desde Zulia-Táchira-Amazonas en simultáneo, opera como principal mecanismo de legitimación interna del interinato","Petro viaja a Caracas (24 abr) y propone cogobernanza de 1-2 años entre oficialismo y oposición: el actor regional de mayor influencia refuerza la lógica de transición gestionada y prolongada","Cabello descarta explícitamente calendario electoral en el corto y mediano plazo: desde Washington se comunicaría que no se contemplan elecciones próximas","Reconfiguración institucional: Ley de Minas G.O. 7.020 (3 entes, 50 años concesiones, apertura capital minero); Comisión Activos Públicos (Pisella sector privado); Comisión Preliminar TSJ","Reportes extraoficiales: Rubio coordina negociación gobierno-Machado para renovar autoridades BCV — Deloitte auditaría el instituto emisor bajo supervisión bilateral","Balance 100 días: amnistía 8.616 libertades, PDVSA 1,1M bpd, restablecimiento FMI-BM, 3 homicidios/100K hab — narrativa de gestión con hitos verificables"], signals:["Prórroga formal de los 180 días aprobada por la AN antes de julio: test de legalidad del interinato","Retorno de MCM a Venezuela sin represalia: primer test real de las garantías implícitas del acuerdo bilateral","Respuesta salarial 1° mayo con monto suficiente para descomprimir la presión laboral","Confirmación pública de la negociación BCV con Deloitte y perfil técnico consensuado","Inicio de la revisión Artículo IV del FMI: primer hito técnico concreto de la reinserción multilateral","Avances concretos en renovación del CNE con participación multipartidista","Acuerdos concretos de la reunión Petro-Rodríguez sobre frontera y seguridad regional"] },
-  4: { label:"Media-baja", drivers:["Detención de Alexis Paparoni (DGCIM Maiquetía): detenido al intentar viajar a Mérida por orden de aprehensión de 2022 — liberado bajo presentación mensual y prohibición de salida — MCM lo interpreta como señal disuasiva directa","46 protestas (17–23 abr) con pico de 27 el 22 de abril (paro universitario nacional, 18 estados): ciclo laboral-salarial-seguridad social sostenido pese a anuncio del 1° de mayo","Motín Yare III (20 abr): 5 fallecidos en Centro Penitenciario Región Capital — tensiones estructurales del sistema penitenciario en centro de máxima seguridad","473 presos políticos (Foro Penal) y 672 (Justicia, Encuentro y Perdón): sistema de control judicial selectivo activo pese a la amnistía — menos del 30% beneficiados según ONG","Cabello: «las elecciones serán cuando sean» — discurso de resistencia al calendario electoral desde el ala dura del chavismo","Cogobernanza de Petro genera alarma en la oposición: Machado rechaza narrativa de «miedo a venganza política» — tensión con la estrategia de retorno","Denuncia contra Gorrín, El Asmar y Perdomo por Casino CCCT: instrumentalización selectiva del sistema judicial en el frente empresarial"], signals:["Bloqueo o represalia al retorno de MCM: activaría E4 de forma inmediata con impacto directo en la relación bilateral","Represión desproporcionada del 1° de mayo si la respuesta salarial es insuficiente y la movilización escala","Detenciones masivas de líderes sindicales, gremiales u opositores a raíz de la conflictividad laboral del 1° de mayo","Colisión abierta entre Gran Peregrinación oficialista y movilización laboral en el espacio público","Expansión del control coercitivo hacia el sector empresarial o periodístico","Vencimiento de 180 días sin definición constitucional: crisis de legitimidad del interinato"] },
+  1: {
+    label:"Media (en descenso)",
+    drivers:[
+      "MCM confirma candidatura presidencial ante Piers Morgan: se presentará si se convocan elecciones; apoya las tres fases de Trump. Capital electoral intacto pero sin traducción institucional.",
+      "Vente Venezuela: 1,5 millones de inscritos en el plan de actualización del Registro Electoral en seis semanas. Plan de 40 semanas con meta de empadronamiento directo.",
+      "PUD dirige carta pública a Petro con hoja de ruta de 8 puntos: liberación de presos, cese represión, reinstitucionalización, apertura cívica, elecciones verificables y retorno de exiliados.",
+      "Eurocámara 507-31: resolución que condiciona el levantamiento de sanciones UE a avances democráticos concretos — introduce presión externa que EE.UU. no ejerce.",
+      "Polymarket: 45% de probabilidad de elecciones en Venezuela en 2026; Meganálisis: 87,24% de la ciudadanía las considera necesarias.",
+      "E1 cede 3pp a 35% por la dinámica de 'normalización sin transición': la confirmación de candidatura y el registro electoral son señales reales, pero la dinámica dominante absorbe el espacio político sin condicionamientos verificables.",
+    ],
+    signals:[
+      "Retorno efectivo de MCM a Venezuela sin represalia: test real del acuerdo implícito con EE.UU. y señal de activación de E1.",
+      "Anuncio de cronograma electoral formal con consenso mínimo de actores clave.",
+      "Presión explícita de EE.UU. vinculando licencias OFAC a avances políticos concretos.",
+      "Renovación del CNE con equilibrio multipartidista: condición mínima para E1 en dimensión electoral.",
+      "Liberación significativa de los ~470 presos políticos activos.",
+    ],
+  },
+  2: {
+    label:"Baja (estable)",
+    drivers:[
+      "Salario mínimo base permanece en Bs 130 (~USD 0,27): brecha salarial estructural que erosiona el tejido social aunque el país registra crecimiento macroeconómico.",
+      "~650% inflación anualizada: principal factor de fragilidad del poder adquisitivo pese a proyecciones de crecimiento CEPAL (6,5%) y FMI (4%).",
+      "Vacío constitucional de los 180 días: si la AN no resuelve la prórroga formal antes de julio, el interinato pierde base legal y puede derivar en crisis institucional.",
+      "Eurocámara 507-31 introduce presión externa adicional sin impacto sistémico inmediato pero que puede converger con fragilidades internas.",
+      "E2 se mantiene estable en 4% porque el compromiso bilateral con EE.UU. esta semana es el más robusto del período: delegación de la Casa Blanca, MOU energéticos y auditorías paralelas configuran una red de actores internacionales con incentivos activos para la estabilidad.",
+    ],
+    signals:[
+      "Fractura interna del gobierno interino: bloque pragmático (rodriguistas) vs. ala ideológica (Cabello) vs. militar.",
+      "Colapso del acuerdo energético con EE.UU. o revocación de licencias OFAC ante evento político disruptivo.",
+      "Crisis constitucional por vencimiento de 180 días sin definición formal de la AN.",
+      "Desplome abrupto de la producción petrolera por factores operativos o geopolíticos no anticipados.",
+      "Represalia sistémica contra MCM u oposición que active sanciones en cascada desde EE.UU. y UE.",
+    ],
+  },
+  3: {
+    label:"Alta (en consolidación)",
+    drivers:[
+      "Delegación de la Casa Blanca (Jarrod Agen) llega en el primer vuelo directo de American Airlines en siete años y firma MOU en petróleo, gas, oro, aluminio y carbón: transición de la estabilización a la cooperación energética operativa directa.",
+      "Convergencia sin precedente de majors en una semana: Shell instala equipo en Monagas (Carito-Pirital), Eni firma Junín 5 (35.000M bbl), BP suscribe MOU Plataforma Deltana y abre oficina permanente, Repsol CEO anuncia producción x3 en 3 años.",
+      "Jubilación extraoficial de 8 magistrados del TSJ —incluyendo a Maikel Moreno— precedida de 227 sentencias en una semana y seguida de proceso de postulaciones bajo control de la AN del interinato: el Poder Judicial pasa de baluarte del madurismo a instrumento del rodriguismo.",
+      "Americas Quarterly nombra explícitamente la estrategia como 'normalización sin transición': cada avance económico sin condicionamientos políticos reduce la presión internacional y amplía el margen de maniobra interno.",
+      "Rodríguez-Petro bilateral (III Comisión de Vecindad): agenda de seguridad, energía, interconexiones y comercio ~USD 1.200M. Visita a Barbados. Invitación Cumbre Iberoamericana Madrid (nov.). Zambrano propuesto embajador España.",
+      "BCV proyecta estabilidad cambiaria; auditorías paralelas EE.UU.-Venezuela; 20 trimestres consecutivos de crecimiento del PIB; proyecciones FMI 4%, CEPAL 6,5%, PNUD 7,4%.",
+      "OEA reconoce a Rodríguez como interlocutora: Ramdin formaliza comunicaciones institucionales con el gobierno interino.",
+      "E3 sube 4pp a 50%, el mayor nivel desde el inicio del período post-Maduro. La brecha E3-E1 se amplía a 15pp, la mayor del ciclo.",
+    ],
+    signals:[
+      "Revisión contractual energética completa antes de julio: éxito o fractura en transformar MOU en contratos operativos con cronogramas de inversión.",
+      "Designación de nuevos magistrados del TSJ con perfil técnico-mixto aceptable internacionalmente: test de la narrativa de reforma judicial.",
+      "Reestructuración del BCV con incorporación de perfiles tecnocráticos: señal del alcance real de la apertura institucional.",
+      "Prórroga constitucional de los 180 días aprobada por la AN: test de legalidad del interinato.",
+      "Anuncio de nuevo CNE con composición consensuada: señal de que E3 incorpora apertura electoral mínima.",
+      "Extensión de licencias OFAC sin condicionamientos políticos: confirma la normalización económica sin reformas democráticas paralelas.",
+      "Retorno de MCM a Venezuela sin represalia: primer test real del acuerdo implícito con EE.UU.",
+    ],
+  },
+  4: {
+    label:"Baja (descendente)",
+    drivers:[
+      "Bloqueo policial de marchas laborales en Caracas (30 abr): trabajadores que intentaban llegar a Miraflores fueron detenidos por cordones de la PNB — señal de control coercitivo sobre la movilización social.",
+      "Cabello: 'no es tiempo de elecciones' — descarta explícitamente el calendario electoral desde el ala dura del chavismo.",
+      "33 protestas en 6 días (24-29 abr, OVCS): creciente politización de las demandas. Convocatorias escalonadas articuladas alrededor del 1° de mayo.",
+      "Fracturas en Baruta: presunta coordinación Fuerza Vecinal-PSUV para desplazar directiva del Concejo Municipal — tácticas de infiltración en estructuras opositoras locales.",
+      "Salario base en ~USD 0,27: sindicalistas denuncian que el $240 es bonificación, no reforma, y no genera efectos en prestaciones.",
+      "E4 baja 1pp a 11% por ausencia de escalada coercitiva sistémica: el eje bilateral EE.UU.-Venezuela opera como freno estructural. Sin embargo, el patrón de control selectivo activo no ha desaparecido.",
+    ],
+    signals:[
+      "Bloqueo o represalia al eventual retorno de MCM: activaría E4 de forma inmediata con impacto directo en la relación bilateral.",
+      "Represión desproporcionada de las movilizaciones del 1° de mayo si la respuesta salarial es percibida como insuficiente.",
+      "Detenciones masivas de líderes sindicales, gremiales u opositores a raíz de la conflictividad laboral.",
+      "Designación del CNE sin participación opositora con perfil abiertamente coercitivo.",
+      "Ruptura explícita del acuerdo implícito con EE.UU. ante un evento político disruptivo.",
+      "Respuesta judicial a las fracturas opositoras (Baruta) que implique intervención directa de estructuras locales.",
+    ],
+  },
 };

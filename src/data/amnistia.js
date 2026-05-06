@@ -17,4 +17,9 @@ export const AMNISTIA_TRACKER = [
   { week:"S13", label:"3–10 abr", gob:{ solicitudes:11559, libertades:8146, excarcelados:null, cautelares:7836, militares:null }, fp:{ verificados:690, detenidos:515, militares:179 }, hito:"Sin nuevos datos oficiales S13 · Detención Ort Betancourt Villamizar (PJ, 20 años) el 9-abr · denuncias El Rodeo I (fallecimiento extranjero sin confirmar, desmayos por desnutrición)" },
   { week:"S14", label:"10–17 abr", gob:{ solicitudes:11559, libertades:8146, excarcelados:51, cautelares:7836, militares:null }, fp:{ verificados:690, detenidos:400, militares:179 }, hito:"Liberación 51 detenidos caso PDVSA Obrero en Yare sin comunicación oficial clara · Más de 400 presos políticos según análisis 100 días gestión · Freddy Superlano libre (~18 meses) · Alexis Paparoni detenido-liberado DGCIM Maiquetía (régimen de presentación)" },
   { week:"S15", label:"17–24 abr", gob:{ solicitudes:12187, libertades:8616, privadosLiberados:314, cautelares:8302, militares:187 }, fp:{ verificados:690, detenidos:473, militares:187 }, hito:"Arreaza: 12.187 solicitudes válidas · 8.616 libertades (314 privados de libertad + 8.302 cautelares) · ONG: <30% de presos políticos beneficiados · 473 presos activos (FP, 20 abr): 427H+46M; 286 civiles+187 militares · JEP: 672 casos, 49 enfermos graves, 22 adultos mayores · Paparoni detenido-liberado (DGCIM)" },
+  { week:"S16", label:"24 abr–1 may",
+    gob:{ solicitudes:12187, libertades:8616, privadosLiberados:314, cautelares:8302, militares:187 },
+    fp:{ verificados:690, detenidos:470, militares:187 },
+    hito:"Debate sobre continuidad de la Ley de Amnistía: Stalin González cuestiona anuncio de 'fin', Arreaza aclara mecanismos alternos vigentes. Parlamento Europeo: ~470 detenidos pendientes. Provea-Devoe acuerdan acceso CICR a privados de libertad. Sin nuevos datos oficiales de libertades S16."
+  },
 ];
