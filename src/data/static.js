@@ -70,6 +70,31 @@ export const GDELT_ANNOTATIONS = [
   { date:"2026-04-11", tier:"MEDIUM", label:"Luis Pérez nuevo presidente BCV · Obregón ratificado PDVSA · Ley Orgánica de Minas promulgada · Padrino López al gabinete", tierEs:"MEDIA" },
   { date:"2026-04-11", tier:"MEDIUM", label:"Registro FARA: Smaili agente extranjero de Rodríguez para cabildeo EE.UU. + 'campaña política' 2027", tierEs:"MEDIA" },
   { date:"2026-04-12", tier:"MEDIUM", label:"47 protestas OVCS (10–16 abr) · 15 estados · desaceleración vs. pico 9-abr · politización creciente exigencias", tierEs:"MEDIA" },
+
+  // ── S15: 17 abril – 24 abril 2026 ──
+  { date:"2026-04-19", tier:"CRITICAL", label:"FMI + Banco Mundial + BID reanudan vínculos con Venezuela simultáneamente — mayor consolidación multilateral del período", tierEs:"CRÍTICO" },
+  { date:"2026-04-19", tier:"HIGH", label:"MCM: «hoy comienza el regreso a casa» desde Puerta del Sol abarrotada · medalla Comunidad de Madrid", tierEs:"ALTA" },
+  { date:"2026-04-19", tier:"HIGH", label:"Barrett llega como nuevo encargado de negocios EE.UU. en Venezuela (releva a Dogu) · confirma Fase 2", tierEs:"ALTA" },
+  { date:"2026-04-21", tier:"HIGH", label:"PNUD proyecta 7,4% crecimiento 2026 · BID abre asistencia técnica · AN instala Comisión Preliminar TSJ (composición mixta)", tierEs:"ALTA" },
+  { date:"2026-04-22", tier:"HIGH", label:"Paro universitario nacional: 27 protestas en 1 día · 18 estados — mayor coordinación sectorial del mes", tierEs:"ALTA" },
+  { date:"2026-04-20", tier:"MEDIUM", label:"Motín Yare III: 5 fallecidos en centro penitenciario · MP inicia investigaciones", tierEs:"MEDIA" },
+  { date:"2026-04-23", tier:"MEDIUM", label:"Comisión de Clasificación de Activos Públicos instalada · Ley Orgánica de Minas G.O. 7.020 publicada", tierEs:"MEDIA" },
+  { date:"2026-04-24", tier:"MEDIUM", label:"Petro viaja a Caracas: propone cogobernanza oficialismo-oposición por 1-2 años · III Comisión de Vecindad", tierEs:"MEDIA" },
+
+  // ── S16: 24 abril – 01 mayo 2026 ──
+  { date:"2026-04-24", tier:"HIGH", label:"Delegación de la Casa Blanca (Jarrod Agen) llega en el primer vuelo directo de AA en 7 años", tierEs:"ALTA" },
+  { date:"2026-04-24", tier:"HIGH", label:"Barrett se reúne con Rodríguez en Miraflores: implementación del plan de tres fases", tierEs:"ALTA" },
+  { date:"2026-04-26", tier:"HIGH", label:"Shell instala equipo técnico en Vepica (Monagas) para Carito-Pirital — despliegue operativo concreto", tierEs:"ALTA" },
+  { date:"2026-04-27", tier:"HIGH", label:"Eni firma Junín 5 (35.000M bbl); BP suscribe MOU Plataforma Deltana + abre oficina permanente", tierEs:"ALTA" },
+  { date:"2026-04-28", tier:"CRITICAL", label:"MOU energéticos y mineros firmados con Casa Blanca: petróleo, gas, oro, aluminio y carbón", tierEs:"CRÍTICO" },
+  { date:"2026-04-28", tier:"HIGH", label:"Repsol CEO: producción x3 en 3 años · +50% bruto en 12 meses · Eni-Repsol elevan Cardón IV a 645 MMpcd", tierEs:"ALTA" },
+  { date:"2026-04-28", tier:"MEDIUM", label:"Rodríguez anuncia ingreso mínimo integral $240 desde 1° mayo — salario base permanece en ~$0,27", tierEs:"MEDIA" },
+  { date:"2026-04-28", tier:"MEDIUM", label:"Rodríguez-Petro bilateral (III Comisión de Vecindad): seguridad, energía, electricidad, gas, USD 1.200M", tierEs:"MEDIA" },
+  { date:"2026-04-29", tier:"HIGH", label:"TSJ jubilaría extraoficialmente a 8 magistrados incluido Maikel Moreno · 227 sentencias en 1 semana", tierEs:"ALTA" },
+  { date:"2026-04-29", tier:"HIGH", label:"Parlamento Europeo 507-31: sanciones UE condicionadas a avances democráticos concretos", tierEs:"ALTA" },
+  { date:"2026-04-29", tier:"MEDIUM", label:"OEA reconoce a Rodríguez como interlocutora · comunicaciones institucionales formalizadas", tierEs:"MEDIA" },
+  { date:"2026-04-30", tier:"HIGH", label:"Cordón PNB bloquea marchas laborales en Caracas — control coercitivo sobre movilización social", tierEs:"ALTA" },
+  { date:"2026-04-27", tier:"MEDIUM", label:"MCM confirma candidatura presidencial (Piers Morgan) · Vente Venezuela: 1,5M inscritos en RE en 6 semanas", tierEs:"MEDIA" },
 ];
 
 export const POLYMARKET_SLUGS = [
