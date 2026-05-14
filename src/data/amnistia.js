@@ -22,4 +22,9 @@ export const AMNISTIA_TRACKER = [
     fp:{ verificados:690, detenidos:470, militares:187 },
     hito:"Debate sobre continuidad de la Ley de Amnistía: Stalin González cuestiona anuncio de 'fin', Arreaza aclara mecanismos alternos vigentes. Parlamento Europeo: ~470 detenidos pendientes. Provea-Devoe acuerdan acceso CICR a privados de libertad. Sin nuevos datos oficiales de libertades S16."
   },
+  { week:"S17", label:"1–8 may",
+    gob:{ solicitudes:12187, libertades:8616, privadosLiberados:314, cautelares:8302, militares:187 },
+    fp:{ verificados:690, detenidos:470, militares:187 },
+    hito:"Caso Víctor Hugo Quero Navas: fallecido el 24 de julio de 2025 (tromboembolismo pulmonar, Hospital Militar Carlos Arvelo), pero informado como vivo por la Defensoría del Pueblo a su madre en octubre de 2025. CIDH advierte que el artículo 9 de la Ley de Amnistía podría usarse contra opositores con vínculos internacionales. MCM y OEA exigen liberación de más de 500 presos políticos. Sin nuevos datos oficiales de libertades S17."
+  },
 ];

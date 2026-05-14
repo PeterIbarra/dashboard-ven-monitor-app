@@ -895,7 +895,138 @@ export const SITREP_ALL = [
       { tag:"Factor 4: El tablero electoral", color:"#2d8a30", title:"MCM candidata, Polymarket al 45%: el escenario electoral se materializa", text:"MCM confirma candidatura y la oposición registra 1,5M de votantes en 6 semanas. Polymarket proyecta 45% de probabilidad de elecciones en 2026. El escenario más riesgoso: elecciones con TSJ y CNE alineados al gobierno, comunidad internacional que ya otorgó concesiones y Amnistía de alcance limitado — normalización sin transformación democrática sustantiva." },
     ],
   },
-];
+  // ── S17: 01 mayo – 08 mayo 2026 ──
+  { period:"01 – 08 de mayo de 2026", periodShort:"1–8 may 2026",
+    keyPoints:[
+      { tag:"Internacional", color:"#38bdf8", title:"GL-58 OFAC — ventana técnica para reestructuración de deuda soberana", text:"La OFAC emitió la Licencia General 58, que autoriza servicios legales, financieros y de consultoría al gobierno venezolano, PDVSA y entidades vinculadas para una posible reestructuración de deuda soberana. Los bonos venezolanos reaccionaron con un rally de hasta +7,1% diario y ganancias acumuladas en 2026 superiores al 87%. Marca el tránsito de la estabilización energética a la normalización financiera." },
+      { tag:"Energético", color:"#22c55e", title:"Exportaciones de crudo 1,23 mbd — máximo desde enero de 2019", text:"Las exportaciones de crudo alcanzaron 1,23 mbd en abril (+14% vs. marzo), con EE.UU. como principal destino (~445.000 bpd). ExxonMobil transitó de calificar el sector como 'ininvertible' en enero a describirlo como 'recurso inmenso que ahora se abre al mundo'. Chevron acordó aumentar participación en Petroindependencia a 49% y Hunt Oil/Crossover firmaron MOU por hasta USD 2.000M en Monagas." },
+      { tag:"Institucional", color:"#a78bfa", title:"Reforma TSJ 20→32 magistrados y reconfiguración judicial profunda", text:"La AN incluyó en agenda la reforma parcial de la Ley Orgánica del TSJ que amplía el tribunal de 20 a 32 magistrados. Simultáneamente, publicó la lista de preseleccionados para el Comité de Postulaciones Judiciales. Caryslia Rodríguez fue ratificada presidenta; Elías Bittar incorporado como primer vicepresidente. Es la reconfiguración judicial más profunda desde el inicio del interinato." },
+      { tag:"Político", color:"#f59e0b", title:"Brecha E3–E1 se estrecha a 10pp — Wright fija elecciones como Fase 3", text:"El secretario de Energía Chris Wright declaró que Venezuela transita la 'primera fase' del plan de tres fases (estabilización → instituciones → elecciones), fijando explícitamente las elecciones como destino de la Fase 3. Delcy Rodríguez respondió 'No lo sé. En algún momento' al ser preguntada sobre fechas electorales. La brecha E3–E1 se estrecha de 15 a 10pp, la compresión más significativa en dos meses." },
+      { tag:"Social", color:"#ef4444", title:"ENCOVI 2025: 68,5% en pobreza — 42 protestas con exigencias de cambio de gobierno", text:"La ENCOVI 2025 (UCAB) confirma que el 68,5% de los hogares está en pobreza monetaria y el 31,7% en pobreza extrema. Entre el 1 y el 6 de mayo se registraron 42 protestas con pico de 35 el 1° de mayo (Día del Trabajo) en 16 estados, contenidas por camiones 'murciélagos' del PNB/GNB. El OVCS registró por primera vez exigencias de cambio de gobierno junto con demandas laborales." }
+    ],
+    sintesis:"La semana del 1 al 8 de mayo de 2026 marca el tránsito de Venezuela a una fase de normalización financiera acelerada, articulada en torno a tres movimientos convergentes: la GL-58 de la OFAC que abre la ventana técnica para la reestructuración de deuda soberana y de PDVSA; el proceso de reconfiguración del Poder Judicial con la reforma que llevaría el TSJ a 32 magistrados; y la cristalización de la principal fractura política del período —la divergencia entre el timing electoral que exige la oposición y el calendario faseado que impone Washington bajo el plan de tres fases. En el plano energético, Venezuela confirma su reposicionamiento estratégico en el mapa hemisférico: 1,23 mbd en exportaciones (máximo desde 2019), ExxonMobil transitando del escepticismo al optimismo, y Trump coordinando personalmente la estrategia con Chevron y Exxon. En el plano social, la ENCOVI 2025 confirma que el 68,5% de los hogares vive en pobreza y las 42 protestas del período —con pico histórico el 1° de mayo— exponen que la estabilización macroeconómica aún no absorbe la presión estructural. La tensión central queda definida con precisión: la normalización económica avanza más rápido que las reformas democráticas, pero por primera vez el cronograma de Washington incluye esas reformas como destino.",
+    actores:[
+      { name:"EE.UU.", items:[
+        "GL-58 OFAC: autoriza servicios legales y de consultoría para posible reestructuración de deuda soberana y PDVSA — primera licencia de este alcance desde 2019.",
+        "Trump informó haberse reunido con Chevron y ExxonMobil para coordinar estrategia de reapertura energética. Venezuela produce 'más petróleo que en décadas'.",
+        "Chris Wright (Secretaría de Energía): Venezuela está en la 'primera fase' del plan de tres fases. Elecciones condicionadas a consolidación económica previa.",
+        "Barrett sostuvo reuniones con GE Vernova, Cashea, Cámara Petrolera y ministra de Hidrocarburos Paula Henao para mejorar clima de inversión.",
+        "CITGO protegida hasta 19 de junio — licencia OFAC prorroga proceso de subasta en Delaware. Amber Energy mantiene compromisos de ~USD 11.000M.",
+        "Ambigüedad sobre recompensa Cabello: Rubio no aclaró si se mantienen los USD 25M, generando zona gris con presión sin cerrar márgenes de negociación."
+      ]},
+      { name:"Gobierno Interino (Rodríguez)", items:[
+        "FMI/DEG: Calixto Ortega Sánchez designado Gobernador ante el FMI con objetivo de acceder a ~USD 5.000M en Derechos Especiales de Giro.",
+        "Ingreso mínimo integral: Bono Guerra Económica sube de USD 150 a USD 200; pensionados de USD 60 a USD 70; jubilados de USD 133 a USD 168. Salario base permanece en Bs 130.",
+        "Ministro Castillo confirmó que no habrá aumento salarial formal para no presionar la inflación.",
+        "Sistema eléctrico: pico de 15.579 MW el 7 de mayo — máximo en 9 años. Plan de Recuperación convocado con participación privada, académica y científica.",
+        "Reforma inmobiliaria: 500.000 viviendas 'congeladas' por inseguridad jurídica propuestas para mercado de arrendamiento.",
+        "Rodríguez: 'No lo sé. En algún momento' — esquiva fecha electoral con precisión mientras consolida recuperación económica e institucional."
+      ]},
+      { name:"Asamblea Nacional", items:[
+        "Reforma Ley Orgánica del TSJ: propone ampliar de 20 a 32 magistrados (7 en Sala Constitucional, 5 en cada una de las otras 5 salas).",
+        "Publicó lista de preseleccionados del Comité de Postulaciones Judiciales conforme al artículo 270 de la Constitución.",
+        "Sala Plena ratificó a Caryslia Rodríguez como presidenta e incorporó a Elías Bittar como primer vicepresidente.",
+        "Designó a Ernesto Villegas como embajador ante la UNESCO en el marco de reacomodos diplomáticos del Estado venezolano.",
+        "Audiencia Maduro-Flores (SDNY): próxima audiencia fijada para el 30 de junio."
+      ]},
+      { name:"Oposición / Sociedad Civil", items:[
+        "MCM exigió desde Washington: CNE renovado, depuración del Registro Electoral, observación internacional continua y liberación de más de 500 presos políticos como condiciones previas.",
+        "Magalli Meda afirmó que Machado regresará a Venezuela antes de que finalice 2026 y que el retorno es 'decisión política propia', no depende de 'bendición' de Trump.",
+        "Guanipa anunció 6 actos masivos de la Plataforma Unitaria en Táchira, Barinas, Zulia, Yaracuy, Carabobo y Anzoátegui.",
+        "Guanipa informó retorno a Venezuela como parte de estrategia de reposicionamiento territorial de la dirigencia opositora.",
+        "Tensión interna: Guanipa acusó a Ochoa Antich y Zambrano de actuar como 'fachada' al aceptar designaciones diplomáticas.",
+        "Foro Penal emplazó a Jorge Rodríguez a revisar expedientes caso por caso. CIDH advirtió que el artículo 9 de la Ley de Amnistía podría usarse contra opositores con vínculos internacionales."
+      ]},
+      { name:"Comunidad Internacional", items:[
+        "España prepara solicitud de waiver ante la UE para permitir la entrada de Delcy Rodríguez a la Cumbre Iberoamericana de noviembre (mecanismo silencio administrativo 48h).",
+        "CIJ/Guayana Esequiba: Venezuela participó desde el 4 de mayo en audiencias en La Haya. Disputa cubre ~160.000 km² con reservas significativas de petróleo y gas.",
+        "ONU/CERF: USD 2 millones para familias del estado Sucre que llevan más de 20 días sin agua potable tras un sismo — programas WASH y recuperación hídrica.",
+        "OEA/Ramdin: reiteró llamado a liberación de presos políticos. CIDH: artículo 9 de Ley de Amnistía como dispositivo jurídico con potencial coercitivo.",
+        "Coalición sindical ante Embajada EE.UU.: entregaron pliego exigiendo que Washington priorice salarios dignos, elecciones generales y liberación de presos políticos."
+      ]}
+    ],
+    nacional:{
+      amnistia:{
+        solicitudes:null, libertades:null, privadosLiberados:null,
+        cautelares:null, militares:null,
+        fpVerificados:690, fpDetenidos:470,
+        fpNota:"Foro Penal emplazó a Jorge Rodríguez a revisar expedientes caso por caso. La CIDH advirtió que el artículo 9 de la Ley de Amnistía podría ser utilizado contra opositores con vínculos internacionales, constituyendo un dispositivo jurídico con potencial coercitivo. El caso Víctor Hugo Quero Navas —fallecido el 24 de julio de 2025, pero informado como vivo por la Defensoría del Pueblo en octubre de 2025— expone una contradicción institucional grave que erosiona la credibilidad del proceso ante la CIDH y la OEA.",
+      },
+      rodriguez:[
+        { title:"Normalización financiera y acceso a FMI", text:"Calixto Ortega Sánchez fue designado Gobernador de Venezuela ante el FMI con objetivo de acceder a ~USD 5.000M en DEG. Rodríguez anunció destino parcial a Gran Misión Vivienda y dotación hospitalaria. Acuerdos con clínicas privadas para atender cirugías urgentes." },
+        { title:"Ingreso mínimo integral sin reforma salarial", text:"El Bono de Guerra Económica aumentó de USD 150 a USD 200; pensionados de USD 60 a USD 70; jubilados de USD 133 a USD 168. El salario mínimo base permanece congelado en Bs 130 (~USD 0,27). El ministro Castillo confirmó que no habrá aumento salarial formal para no presionar la inflación." },
+        { title:"Sistema eléctrico y Plan de Recuperación", text:"El 7 de mayo la demanda alcanzó 15.579 MW — pico máximo en 9 años, atribuido a altas temperaturas y mayor actividad económica. El Ejecutivo convocó al sector privado para presentar el Plan de Recuperación y Transformación del Sistema Eléctrico Nacional y reiteró la prohibición de minería digital." },
+        { title:"Reconfiguración judicial y designaciones", text:"Impulsó la reforma del TSJ de 20 a 32 magistrados con Comité de Postulaciones activado. Ernesto Villegas designado embajador UNESCO. Elías Bittar incorporado como primer vicepresidente del TSJ." },
+        { title:"Agenda diplomática y reforma inmobiliaria", text:"Propuso incorporar 500.000 viviendas 'congeladas' por inseguridad jurídica al mercado de arrendamiento. Esquivó toda pregunta sobre calendario electoral: 'No lo sé. En algún momento.'" }
+      ]
+    },
+    economia:{
+      kpis:[
+        { value:"10,6%", label:"Inflación mensual (abril) — 3er mes de descenso", color:"#f59e0b" },
+        { value:"USD 1.500M", label:"Intervención BCV abril — récord desde ene. 2023", color:"#38bdf8" },
+        { value:"+87%", label:"Rally bonos VENZ/PDVSA acumulado 2026 (tras GL-58)", color:"#22c55e" },
+        { value:"USD 240", label:"Ingreso mínimo integral — salario base Bs 130 (~$0,27)", color:"#f59e0b" },
+        { value:"68,5%", label:"Hogares en pobreza monetaria (ENCOVI 2025, UCAB)", color:"#ef4444" }
+      ],
+      empresas:[
+        { empresa:"ExxonMobil", desarrollo:"Transitó de calificar el sector como 'ininvertible' en enero a describirlo como 'recurso inmenso que ahora se abre de forma más libre al mundo'. Envió equipos técnicos y coordinó con Trump estrategia de entrada." },
+        { empresa:"Chevron", desarrollo:"Acordó con PDVSA aumentar participación en Petroindependencia de 35,8% a 49% y obtener derechos en Ayacucho 8 (Faja del Orinoco) a través de Petropiar. Produce ~250.000 bpd." },
+        { empresa:"Hunt Oil / Crossover Energy", desarrollo:"Firmaron MOU con PDVSA para exploración y producción en Monagas (potencial petrolero y gasífero). Compromisos de hasta USD 2.000M." },
+        { empresa:"Mercuria / Heeney Capital", desarrollo:"Acuerdos respaldados por la Casa Blanca para desbloquear USD 2.200M anuales en exportación minera, con evaluación adicional de aluminio, níquel y ferrosos (~USD 3.000M adicionales anuales)." },
+        { empresa:"Latam Energy / Lionheart Capital", desarrollo:"Crearon fondo de USD 500M para adquirir y rehabilitar activos petroleros abandonados o subinvertidos en Venezuela." }
+      ]
+    },
+    opinionPublica:{
+      protestas:{
+        total:42, promDiario:7, periodo:"1–6 may",
+        variacion:"Pico de 35 protestas el 1° de mayo (Día del Trabajo) en 16 estados — el más alto del período. Descenso a 7 protestas el 5–6 de mayo.",
+        composicion:"Predominio de demandas laborales y salariales. Primera incorporación de exigencias de cambio de gobierno en el registro del OVCS, señalando politización creciente.",
+        nota:"El 1° de mayo fue contenido mediante despliegue de camiones 'murciélagos' del PNB/GNB que impidieron el avance hacia Miraflores, aunque manifestantes lograron llegar a la Defensoría del Pueblo. El caso Quero Navas — fallecido en julio 2025 pero informado como vivo por la Defensoría en octubre 2025 — expone brechas institucionales que erosionan la credibilidad del proceso de amnistía.",
+      },
+      percepcion:{
+        fuente:"ENCOVI 2025 (UCAB) — presentada en mayo 2026",
+        titulo:"ENCOVI 2025: 68,5% en pobreza monetaria — IPM desciende a 55% (↓ desde 59% en 2023)",
+        nota:"La ENCOVI 2025 confirma una mejora en el Índice de Pobreza Multidimensional (55% en 2025 vs 59% en 2023), con mayor reducción en los 5 deciles más bajos (+70-80% de mejora). Sin embargo, el 68,5% sigue en pobreza monetaria y el 31,7% en pobreza extrema, evidenciando que la estabilización macroeconómica no se traduce en mejoras verificables para los sectores laborales y populares.",
+        datos:[
+          { factor:"Pobreza monetaria", pct:68.5 },
+          { factor:"Pobreza extrema", pct:31.7 },
+          { factor:"Índice Pobreza Multidimensional (IPM)", pct:55.0 },
+          { factor:"Hogares que dependen de bonos", pct:76.7 }
+        ],
+      },
+      excarcelados:{ fp:690, presos:470, militares:187, fuente:"MCM/OEA/Foro Penal — may 2026" },
+    },
+    marcoNormativo:{
+      titulo:"Reforma del TSJ: de 20 a 32 magistrados — reconfiguración judicial profunda",
+      resumen:"La Asamblea Nacional incluyó en agenda la reforma parcial de la Ley Orgánica del TSJ, que propone ampliar el tribunal de 20 a 32 magistrados: 7 en la Sala Constitucional y 5 en cada una de las otras 5 salas. Simultáneamente, publicó la lista de preseleccionados para el Comité de Postulaciones Judiciales. La Sala Plena ratificó a Caryslia Rodríguez como presidenta e incorporó 8 magistrados suplentes, operando con 8 principales y 12 suplentes mientras aguarda designaciones definitivas.",
+      cambios:[
+        { titulo:"Ampliación del TSJ: 20 a 32 magistrados", texto:"Propone 7 magistrados en la Sala Constitucional y 5 en cada una de las otras 5 salas, revirtiendo la reducción aprobada hace 4 años.", color:"#f59e0b" },
+        { titulo:"Comité de Postulaciones Judiciales activado", texto:"La AN publicó lista de preseleccionados que superaron evaluación e impugnaciones (período: 2–5 de mayo) conforme al artículo 270 de la Constitución.", color:"#38bdf8" },
+        { titulo:"Estructura transitoria operativa", texto:"Tribunal opera con 8 magistrados principales y 12 suplentes. Caryslia Rodríguez ratificada presidenta; Elías Bittar incorporado como primer vicepresidente en reemplazo de Edgar Gavidia.", color:"#22c55e" },
+        { titulo:"Designaciones diplomáticas: Villegas y Ortega", texto:"AN designó a Ernesto Villegas embajador ante la UNESCO. Calixto Ortega Sánchez designado Gobernador ante el FMI para gestionar acceso a ~USD 5.000M en DEG.", color:"#a78bfa" }
+      ],
+      comparativaHeaders:["Configuración anterior","Nueva configuración propuesta"],
+      comparativa:[
+        { dim:"Sala Constitucional", antes:"4 magistrados", despues:"7 magistrados" },
+        { dim:"Otras 5 salas", antes:"3-4 magistrados c/u", despues:"5 magistrados c/u" },
+        { dim:"Total magistrados", antes:"20 magistrados", despues:"32 magistrados" },
+        { dim:"Estado actual", antes:"8 principales + 12 suplentes", despues:"Awaiting designaciones definitivas" }
+      ],
+      lecturaAnalitica:"La coincidencia entre la reforma legal y la activación del Comité de Postulaciones no es casual: apunta a un reacomodo judicial de gran alcance, con efectos sobre la Sala Constitucional como árbitro de controversias políticas y electorales. El interinato avanza en la acumulación institucional sobre todos los poderes del Estado. La GL-58 en el plano financiero y la reforma del TSJ en el plano judicial son las dos piezas que definirán la arquitectura del proceso venezolano en el segundo semestre de 2026.",
+    },
+    escenarios:[
+      { name:"Continuidad Negociada (E3)", prob:"48%", color:"#0468B1", text:"E3 desciende 2pp pero sigue siendo el eje organizador. La GL-58 y el plan de tres fases operacionalizan su horizonte temporal: la reforma del TSJ, el ingreso integral sin reforma salarial y el boom exportador son componentes activos. Washington ha fijado un desenlace (elecciones como Fase 3) pero el ritmo lo controla el interinato." },
+      { name:"Transición Política Pacífica (E1)", prob:"38%", color:"#2d8a30", text:"E1 sube 3pp a 38% — la brecha E3–E1 se estrecha a 10pp, la más baja en dos meses. La GL-58 instala el prerrequisito financiero; Wright fija las elecciones como Fase 3; y la Plataforma Unitaria intensifica presencia territorial (6 actos masivos, anuncio retorno MCM). E1 ya no es solo aspiración opositora: es parte del cronograma de Washington." },
+      { name:"Resistencia Coercitiva (E4)", prob:"11%", color:"#ca8a04", text:"E4 se mantiene en 11%. El boom energético-financiero reduce el incentivo para represión masiva, pero el patrón de control selectivo sigue activo: murciélagos el 1° de mayo, caso Quero Navas con contradicción institucional, y demandas de cambio de gobierno en el registro del OVCS." },
+      { name:"Colapso y Fragmentación (E2)", prob:"3%", color:"#dc2626", text:"E2 baja a 3%, mínimo del período. GL-58 + FMI/DEG + exportaciones récord + Brent USD 117/b + coordinación bilateral activa alejan cualquier escenario de colapso fiscal o cambiario de corto plazo." }
+    ],
+    comentarios:[
+      { tag:"GL-58 y arquitectura de la Fase 2", color:"#38bdf8", title:"GL-58 OFAC: el movimiento financiero más significativo del período", text:"La GL-58 es el movimiento financiero más significativo de Washington desde el inicio del interinato. Al habilitar asesoría técnica sin autorizar todavía negociaciones directas, EE.UU. mantiene el control del ritmo del proceso: abre ventanas técnicas pero preserva la arquitectura de sanciones como palanca de presión política. El condicionamiento electoral de Wright es estructuralmente compatible con la lógica del interinato. El rally de bonos (+87% acumulado) refleja expectativa de recuperación futura, no solución inmediata al default." },
+      { tag:"Reposicionamiento energético hemisférico", color:"#22c55e", title:"ExxonMobil: de «ininvertible» a «recurso inmenso» en cuatro meses", text:"El giro de ExxonMobil refleja cuán acelerado ha sido el reposicionamiento estratégico de Venezuela como fuente de crudo pesado compatible con las refinerías del Golfo de México en un contexto de tensiones geopolíticas (Brent USD 117/b) y alza de precios. La advertencia del NYT sobre la persistencia de redes opacas en el manejo de los ingresos petroleros —exportaciones no pagadas estimadas entre USD 11.000 y 13.000M entre 2019 y 2022— es el principal factor de riesgo estructural para la sostenibilidad de esta apertura." },
+      { tag:"Tensión estructural social", color:"#ef4444", title:"ENCOVI 2025: la estabilización macro no llega a los hogares", text:"La ENCOVI 2025 y las 42 protestas del período revelan la tensión estructural central: la estabilización macroeconómica no se traduce en mejoras verificables para los sectores laborales y populares. El caso Quero Navas —con la contradicción entre la Defensoría y el Ministerio Penitenciario— expone brechas institucionales que erosionan la credibilidad del proceso de amnistía ante la CIDH y la OEA. El pico eléctrico de 15.579 MW añade una presión estructural adicional que anticipa tensión durante los meses de mayor calor." },
+      { tag:"La pregunta del período", color:"#a78bfa", title:"El cronograma ahora tiene nombre: la pregunta es el ritmo, no el horizonte", text:"Por primera vez en el proceso, el cronograma de Washington incluye las reformas democráticas como destino explícito. El secretario Wright fijó la secuencia: estabilización (Fase 1, declarada completa) → instituciones económicas (Fase 2, iniciada con GL-58) → elecciones (Fase 3). La pregunta del período no es si habrá transición, sino cuándo. La semana del 8–15 de mayo —con los actos masivos opositores, la reforma del TSJ en debate y los primeros movimientos de la GL-58— definirá si la compresión del diferencial E3–E1 es un punto de inflexión o una oscilación." }
+    ]
+  }];
 
 export const CURATED_NEWS = [
   // S1: 3-15 enero
@@ -1083,6 +1214,7 @@ export const CURATED_NEWS = [
       { tag:"Factor 4: El tablero electoral", color:"#2d8a30", title:"MCM candidata, Polymarket al 45%: el escenario electoral se materializa", text:"La confirmación de candidatura de MCM y el registro de 1,5 millones de votantes en seis semanas indican que la oposición construye capacidad electoral con o sin fecha de comicios. Polymarket proyecta 45% de probabilidad de elecciones en 2026. El escenario más riesgoso identificado: que se convoquen elecciones con TSJ y CNE alineados al gobierno, con una comunidad internacional que ya otorgó concesiones económicas y con una Ley de Amnistía de alcance limitado. En ese escenario, Venezuela alcanzaría una normalización sin transformación democrática sustantiva." },
     ],
   },
+
 ];
 
 export const CURATED_FACTCHECK = [
@@ -1342,6 +1474,27 @@ export const CURATED_FACTCHECK = [
   // ── Económico ──
   { title:"BCV proyecta estabilidad cambiaria con brecha USDT-banca comprimida al ~10%; auditorías paralelas EE.UU.-Venezuela sobre fondos externos como mecanismo de confianza bilateral.", date:"2026-04-26", source:"BCV / Prensa financiera", scenarios:["E3"], dims:["Económico"], week:"S16" },
   { title:"Meganálisis abril 2026: 95,33% desaprueba la gestión económica; 87,24% considera necesaria una elección presidencial; MCM 71,25% en intención de voto abierta.", date:"2026-04-28", source:"Meganálisis", scenarios:["E1","E4"], dims:["Social","Político"], week:"S16" },
-  { title:"AtlasIntel/Bloomberg abril 2026: aprobación de Rodríguez cae a 31,4% (desde 37% en febrero); 47,1% desaprueba; Polymarket: 45% probabilidad de elecciones en 2026.", date:"2026-04-29", source:"AtlasIntel / Bloomberg / Polymarket", scenarios:["E1","E4"], dims:["Social","Político"], week:"S16" },
+  { title:"AtlasIntel/Bloomberg abril 2026: aprobación de Rodríguez cae a 31,4% (desde 37% en febrero); 47,1% desaprueba; Polymarket: 45% probabilidad de elecciones en 2026.", date:"2026-04-29", source:"AtlasIntel / Bloomberg / Polymarket", scenarios:["E1","E4"], dims:["Social","Político"], week:"S16" },,
+  // ── S17: 01 mayo – 08 mayo 2026 ──
+  { title:"OFAC emite Licencia General 58 habilitando asesoría técnica para reestructuración de deuda venezolana.", date:"2026-05-02", source:"U.S. Treasury / Reuters", scenarios:["E3","E1"], dims:["Internacional","Económico"], week:"S17" },
+  { title:"Bonos venezolanos registran rally de hasta 7,1% diario tras GL-58; ganancias acumuladas 2026 superan el 87%.", date:"2026-05-02", source:"Bloomberg / Reuters", scenarios:["E3","E1"], dims:["Internacional","Económico"], week:"S17" },
+  { title:"Exportaciones de crudo venezolano alcanzan 1,23 mbd en abril — máximo desde enero de 2019.", date:"2026-05-06", source:"Reuters / PDVSA", scenarios:["E3"], dims:["Energético"], week:"S17" },
+  { title:"ExxonMobil califica Venezuela como recurso inmenso que ahora se abre al mundo; envía equipos técnicos.", date:"2026-05-05", source:"Reuters / Bloomberg", scenarios:["E3","E1"], dims:["Energético","Internacional"], week:"S17" },
+  { title:"Chevron acordó con PDVSA aumentar participación en Petroindependencia de 35,8% a 49% y obtener derechos en Ayacucho 8.", date:"2026-05-06", source:"Reuters", scenarios:["E3"], dims:["Energético","Internacional"], week:"S17" },
+  { title:"Hunt Oil y Crossover Energy firmaron MOU con PDVSA para exploración en Monagas con compromisos de hasta USD 2.000M.", date:"2026-05-07", source:"Reuters / PDVSA", scenarios:["E3"], dims:["Energético","Internacional"], week:"S17" },
+  { title:"Mercuria y Heeney Capital anuncian acuerdo de offtake minero respaldado por Casa Blanca por USD 2.200M anuales.", date:"2026-05-07", source:"Reuters", scenarios:["E3"], dims:["Energético","Internacional"], week:"S17" },
+  { title:"AN impulsa reforma del TSJ de 20 a 32 magistrados y activa Comité de Postulaciones Judiciales.", date:"2026-05-05", source:"AN Venezuela / Reuters", scenarios:["E3"], dims:["Político","Institucional"], week:"S17" },
+  { title:"Sala Plena ratifica a Caryslia Rodríguez como presidenta del TSJ e incorpora a Elías Bittar como primer vicepresidente.", date:"2026-05-06", source:"TSJ Venezuela", scenarios:["E3"], dims:["Político","Institucional"], week:"S17" },
+  { title:"Calixto Ortega Sánchez designado Gobernador de Venezuela ante el FMI para gestionar acceso a USD 5.000M en DEG.", date:"2026-05-04", source:"PNUD / Reuters", scenarios:["E3","E1"], dims:["Económico","Internacional"], week:"S17" },
+  { title:"Chris Wright declara Venezuela en la primera fase del plan de tres fases; elecciones condicionadas a consolidación económica.", date:"2026-05-03", source:"Reuters / AFP", scenarios:["E3","E4"], dims:["Internacional","Político"], week:"S17" },
+  { title:"Plataforma Unitaria anuncia seis actos masivos en Táchira, Barinas, Zulia, Yaracuy, Carabobo y Anzoátegui.", date:"2026-05-05", source:"PUD Venezuela", scenarios:["E1"], dims:["Político","Social"], week:"S17" },
+  { title:"Magalli Meda confirma que MCM regresará a Venezuela antes de que finalice 2026 por decisión política propia.", date:"2026-05-04", source:"AFP / Reuters", scenarios:["E1"], dims:["Político"], week:"S17" },
+  { title:"ENCOVI 2025 (UCAB): 68,5% de hogares en pobreza monetaria y 31,7% en pobreza extrema en Venezuela.", date:"2026-05-08", source:"UCAB / ENCOVI 2025", scenarios:["E4","E2"], dims:["Social","Económico"], week:"S17" },
+  { title:"42 protestas entre el 1 y el 6 de mayo — pico de 35 el 1° de mayo (Día del Trabajo) en 16 estados.", date:"2026-05-06", source:"OVCS", scenarios:["E4"], dims:["Social"], week:"S17" },
+  { title:"Camiones murciélagos del PNB/GNB impidieron el 1° de mayo avance de manifestantes hacia Miraflores.", date:"2026-05-01", source:"Reuters / OVCS", scenarios:["E4"], dims:["Social","Político"], week:"S17" },
+  { title:"Demanda eléctrica alcanzó 15.579 MW el 7 de mayo — pico máximo en 9 años — atribuido a altas temperaturas.", date:"2026-05-07", source:"Ejecutivo venezolano", scenarios:["E4"], dims:["Energético","Social"], week:"S17" },
+  { title:"Caso Quero Navas: fallecido julio 2025 pero informado como vivo por Defensoría del Pueblo en octubre 2025.", date:"2026-05-06", source:"Foro Penal / Reuters", scenarios:["E4"], dims:["Social","Político"], week:"S17" },
+  { title:"CERF/ONU destina USD 2 millones para familias del estado Sucre con más de 20 días sin agua potable.", date:"2026-05-05", source:"ONU / CERF", scenarios:["E4"], dims:["Social","Internacional"], week:"S17" },
+  { title:"España prepara waiver ante la UE para permitir entrada de Delcy Rodríguez a Cumbre Iberoamericana de noviembre.", date:"2026-05-07", source:"Reuters / El País", scenarios:["E3"], dims:["Internacional"], week:"S17" }
 
 ];

@@ -80,4 +80,14 @@ export const GDELT_ANNOTATIONS = [
   { date:"2026-04-30", tier:"HIGH", tierEs:"ALTA", label:"Cordón policial PNB bloquea marchas laborales en Caracas — señal de control coercitivo sobre movilización social." },
   { date:"2026-04-27", tier:"MEDIUM", tierEs:"MEDIA", label:"MCM confirma candidatura presidencial en entrevista con Piers Morgan; Vente Venezuela: 1,5M inscritos en el RE en 6 semanas." },
 
+  { date:"2026-05-02", tier:"CRITICAL", tierEs:"CRÍTICO", label:"OFAC emite GL-58: autoriza asesoría técnica para reestructuración de deuda soberana venezolana y PDVSA — bonos registran rally de hasta +7,1% diario." },
+  { date:"2026-05-03", tier:"HIGH", tierEs:"ALTA", label:"Chris Wright declara Venezuela en Fase 1 del plan de tres fases; elecciones condicionadas a consolidación económica previa." },
+  { date:"2026-05-04", tier:"HIGH", tierEs:"ALTA", label:"Calixto Ortega Sánchez designado Gobernador de Venezuela ante el FMI para gestionar acceso a USD 5.000M en Derechos Especiales de Giro." },
+  { date:"2026-05-05", tier:"HIGH", tierEs:"ALTA", label:"AN impulsa reforma del TSJ de 20 a 32 magistrados y activa Comité de Postulaciones Judiciales; Caryslia Rodríguez ratificada como presidenta." },
+  { date:"2026-05-05", tier:"MEDIUM", tierEs:"MEDIA", label:"Plataforma Unitaria anuncia 6 actos masivos en Táchira, Barinas, Zulia, Yaracuy, Carabobo y Anzoátegui; Guanipa anuncia retorno a Venezuela." },
+  { date:"2026-05-06", tier:"HIGH", tierEs:"ALTA", label:"Exportaciones de crudo venezolano alcanzan 1,23 mbd en abril — máximo desde enero de 2019 (+14% vs. marzo)." },
+  { date:"2026-05-06", tier:"HIGH", tierEs:"ALTA", label:"ExxonMobil pasa de calificar Venezuela como ininvertible a recurso inmenso; envía equipos técnicos y coordina con Trump." },
+  { date:"2026-05-06", tier:"MEDIUM", tierEs:"MEDIA", label:"Caso Quero Navas: fallecido julio 2025 pero informado como vivo por la Defensoría en octubre 2025 — contradicción institucional grave." },
+  { date:"2026-05-07", tier:"HIGH", tierEs:"ALTA", label:"Hunt Oil y Crossover Energy firman MOU con PDVSA para exploración en Monagas; Mercuria-Heeney Capital anuncian offtake minero USD 2.200M." },
+  { date:"2026-05-07", tier:"MEDIUM", tierEs:"MEDIA", label:"Demanda eléctrica alcanza pico de 15.579 MW el 7 de mayo — máximo en 9 años; Ejecutivo convoca Plan de Recuperación del Sistema Eléctrico." },
 ];

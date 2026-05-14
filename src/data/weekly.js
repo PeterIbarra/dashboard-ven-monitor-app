@@ -3,25 +3,24 @@
 
 export const KPIS_LATEST = {
   energia: [
-    { k:"Exportaciones a EE.UU.", v:"499k bpd", c:"#22c55e" },
-    { k:"Acuerdos energéticos S16", v:"Shell+Ení+BP+Repsol+MOU", c:"#22c55e" },
-    { k:"Licencias OFAC", v:"MOU Casa Blanca activos", c:"#22c55e" },
-    { k:"Tipo de cambio BCV", v:"~570 Bs/USD estable", c:"#38bdf8" },
+    { k:"Exportaciones crudo", v:"1,23 mbd", c:"#22c55e" },
+    { k:"Cesta Merey", v:"USD 90,4/b", c:"#22c55e" },
+    { k:"GL-58 OFAC", v:"Fase 2 activa", c:"#22c55e" },
+    { k:"Bonos VENZ/PDVSA", v:"+87% acum.", c:"#22c55e" }
   ],
   politico: [
-    { k:"Escenario dominante", v:"E3 50% (+4pp)", c:"#22c55e" },
-    { k:"TSJ jubilados", v:"8 magistrados (incl. Moreno)", c:"#f59e0b" },
-    { k:"Ingreso mínimo 1° mayo", v:"USD 240 (sin reforma salarial)", c:"#f59e0b" },
-    { k:"Presos políticos (FP)", v:"~470 activos", c:"#ef4444" },
+    { k:"Inflación mensual", v:"10,6% abr.", c:"#f59e0b" },
+    { k:"Ingreso integral", v:"USD 240", c:"#f59e0b" },
+    { k:"Salario base", v:"Bs 130 (~$0,27)", c:"#ef4444" },
+    { k:"FMI / DEG", v:"USD 5.000M", c:"#38bdf8" }
   ],
   opinion: [
-    { k:"Aprobación Rodríguez", v:"31,4% (↓ desde 37%)", c:"#ef4444" },
-    { k:"Intención voto MCM", v:"71,25% (Meganálisis)", c:"#22c55e" },
-    { k:"Elecciones 2026 (Polymarket)", v:"45%", c:"#f59e0b" },
-    { k:"Protestas 24–29 abr", v:"33 en 6 días", c:"#f59e0b" },
+    { k:"Pico dem. eléctrica", v:"15.579 MW", c:"#ef4444" },
+    { k:"Pobreza (ENCOVI)", v:"68,5% hogares", c:"#ef4444" },
+    { k:"Protestas 1–6 mayo", v:"42 (pico: 35)", c:"#f59e0b" },
+    { k:"Brecha E3–E1", v:"10pp (↓ 15pp)", c:"#38bdf8" }
   ],
 };
-
 export const WEEKS = [
   { label:"3–15 ene", short:"S1", probs:[{sc:1,v:5,t:"flat"},{sc:2,v:45,t:"flat"},{sc:3,v:40,t:"flat"},{sc:4,v:10,t:"flat"}], xy:{x:0.53,y:0.50},
     sem:{g:2,y:4,r:7},
@@ -147,19 +146,39 @@ export const WEEKS = [
     tensiones:[{l:"green",t:"<b>Delegación Casa Blanca:</b> Jarrod Agen + vuelo AA directo Miami-Caracas + MOU petróleo, gas, oro, aluminio y carbón."},{l:"green",t:"<b>Acuerdos energéticos:</b> Shell Monagas · Eni Junín 5 · BP Deltana · Repsol CEO: producción x3."},{l:"green",t:"<b>Diplomacia activa:</b> Rodríguez-Petro USD 1.200M · Barbados · Iberoamericana · Zambrano-España."},{l:"yellow",t:"<b>$240 sin reforma salarial:</b> Base Bs 130 (~$0,27) · bloqueo marchas laborales Caracas (30 abr)."},{l:"yellow",t:"<b>TSJ jubila 8 magistrados:</b> Moreno + 7 más · 227 sentencias 1 semana · postulaciones bajo AN interinato."},{l:"red",t:"<b>Conflictividad laboral:</b> 33 protestas 24–29 abr · 9 estados · politización creciente."},{l:"red",t:"<b>Eurocámara 507–31:</b> Sanciones condicionadas a avances democráticos — contraste con normalización EE.UU."}],
     lectura:"E3 sube 4pp a 50% —el nivel más alto desde el inicio del período post-Maduro— sobre la base de la semana de mayor densidad bilateral y energética del ciclo. Delegación de la Casa Blanca en el primer vuelo directo de AA en 7 años, MOU en petróleo/gas/minerales, Shell instalada en Monagas, Eni firmando Junín 5, BP con Plataforma Deltana y Repsol anunciando triplicar producción configuran la masa crítica de compromisos más significativa del proceso. La jubilación extraoficial de 8 magistrados del TSJ —incluido Maikel Moreno— precedida de 227 sentencias en una semana completa la reconfiguración del Poder Judicial bajo control del interinato. E1 cede 3pp a 35% pese a la confirmación de candidatura de MCM y 1,5M inscritos en el RE: la dinámica de 'normalización sin transición' (Americas Quarterly) absorbe el espacio político sin condicionamientos verificables. La brecha E3-E1 se amplía a 15pp, la mayor del ciclo. E4 baja 1pp a 11%; E2 se mantiene en 4% contenido por el compromiso bilateral más robusto del período.",
     trendSc:3, trendDrivers:["Delegación Casa Blanca + vuelo AA + 5 acuerdos energéticos: semana de mayor densidad bilateral del período post-Maduro","Jubilación 8 magistrados TSJ + 227 sentencias + postulaciones bajo AN: reconfiguración judicial como acumulación institucional","'Normalización sin transición' (Americas Quarterly): E3 alcanza 50%, el máximo del ciclo"] },
+  { label:"1–8 may", short:"S17",
+    probs:[{sc:1,v:38,t:"up"},{sc:2,v:3,t:"down"},{sc:3,v:48,t:"down"},{sc:4,v:11,t:"flat"}],
+    xy:{x:0.04,y:0.44},
+    sem:{g:10,y:5,r:3},
+    kpis:{
+      energia:{exportaciones:"1,23 mbd abril (máx. desde ene. 2019)",ingresos:"Merey USD 90,4/b · Brent USD 117,3/b · +87% bonos",licencias:"GL-58 OFAC: asesoría reestructuración deuda soberana",cambio:"BCV ~Bs 493,4/USD · intervención Bs ~715/EUR"},
+      economico:{inflacion:"10,6% mensual abril (3er mes ↓)",ingresos_pob:"USD 240 ingreso integral · base Bs 130 (~$0,27)",electricidad:"Pico 15.579 MW (7 may) · máx. en 9 años",pib:"ENCOVI 2025: 68,5% pobreza · 31,7% extrema"},
+      opinion:{direccion:"Wright: Fase 2 iniciada · elecciones Fase 3",elecciones:"Brecha E3-E1: 10pp — compresión más significativa 2 meses",mcm:"MCM: retorno antes fin 2026 · CNE renovado",eeuu:"GL-58 + 6 actos masivos PUD · 500+ presos políticos"}
+    },
+    tensiones:[
+      {l:"green",t:"<b>GL-58 OFAC:</b> Asesoría técnica reestructuración deuda soberana y PDVSA · bonos acum. +87% en 2026 · rally +7,1% diario."},
+      {l:"green",t:"<b>Exportaciones récord:</b> 1,23 mbd abril (máx. ene. 2019) · ExxonMobil: de «ininvertible» a «recurso inmenso» · Trump coordina con Chevron y Exxon."},
+      {l:"green",t:"<b>FMI/DEG USD 5.000M:</b> Ortega designado Gobernador · destino Gran Misión Vivienda y hospitales."},
+      {l:"yellow",t:"<b>Reforma TSJ 20→32 magistrados:</b> Comité de Postulaciones activado · Caryslia presidenta · reconfiguración judicial más profunda del interinato."},
+      {l:"yellow",t:"<b>42 protestas 1–6 mayo:</b> Pico 35 el 1° mayo · 16 estados · demandas laborales y cambio de gobierno · contenidas con «murciélagos» y PNB."},
+      {l:"red",t:"<b>Brecha salarial:</b> Ingreso integral USD 240 vs. base Bs 130 (~USD 0,27) · ENCOVI 2025: 68,5% pobreza · 31,7% extrema."},
+      {l:"red",t:"<b>Caso Quero Navas + pico eléctrico:</b> Muerto jul. 2025 pero informado vivo por Defensoría oct. 2025 · 15.579 MW el 7 may — infraestructura bajo presión crítica."}
+    ],
+    lectura:"E3 desciende 2pp a 48% no porque el escenario pierda consistencia, sino porque la GL-58 y el plan de tres fases de Wright operacionalizan un horizonte temporal que antes era solo retórico. Al declarar la Fase 1 completada y fijar las elecciones como Fase 3, Washington delimita el alcance de E3 y convierte a E1 en un endpoint planificado del cronograma bilateral. Sin embargo, la brecha E3–E1 se estrecha de 15 a 10pp, la compresión más significativa en dos meses. E1 sube 3pp a 38% por la GL-58, el roadmap de Wright y la intensificación territorial opositora. E4 se mantiene en 11% por la ausencia de escalada sistémica. E2 baja a 3%, mínimo del período.",
+    trendSc:3,
+    trendDrivers:["GL-58 OFAC + rally bonos +87%: normalización financiera acelera hacia Fase 2 del plan de tres fases de Washington","Exportaciones 1,23 mbd (máx. 2019) + ExxonMobil de «ininvertible» a «recurso inmenso»: reposicionamiento energético hemisférico","Brecha E3–E1 se estrecha a 10pp: Wright fija elecciones como Fase 3 — transición ya en cronograma de Washington"] }
 ];
 
 export const TENSIONS = [
-  { level:"green", text:"Delegación Casa Blanca + vuelo AA directo + MOU petróleo, gas, oro, aluminio, carbón — cooperación operativa bilateral activada" },
-  { level:"green", text:"Shell instala equipo en Monagas · Eni firma Junín 5 (35.000M bbl) · BP MOU Plataforma Deltana · Repsol CEO: producción x3 en 3 años" },
-  { level:"green", text:"Rodríguez-Petro bilateral USD 1.200M · visita Barbados · invitación Cumbre Iberoamericana Madrid · Zambrano propuesto embajador España" },
-  { level:"yellow", text:"$240 ingreso mínimo desde 1° mayo — base permanece Bs 130 (~$0,27) · bloqueo marchas laborales en Caracas por cordón policial" },
-  { level:"yellow", text:"TSJ jubila 8 magistrados (incl. Moreno) · 227 sentencias en una semana · proceso postulaciones bajo control AN interinato" },
-  { level:"red", text:"33 protestas 24–29 abr · 9 estados · convocatorias escalonadas 30 abr – 1° mayo · transición de demandas ESCP a participación política" },
-  { level:"red", text:"Eurocámara 507–31 condiciona sanciones UE a avances democráticos concretos — tensión con normalización sin condicionamientos de EE.UU." },
+  { level:"green", text:"GL-58 OFAC habilita asesoría técnica para reestructuración de deuda soberana y PDVSA. Bonos venezolanos acumulan +87% en 2026 tras rally de hasta +7,1% diario." },
+  { level:"green", text:"Exportaciones de crudo alcanzan 1,23 mbd en abril — máximo desde enero de 2019. ExxonMobil transita de «ininvertible» a «recurso inmenso». Trump coordina estrategia energética con Chevron y Exxon." },
+  { level:"green", text:"FMI: Ortega Sánchez designado Gobernador para gestionar ~USD 5.000M en DEG. Destino parcial: Gran Misión Vivienda y dotación hospitalaria." },
+  { level:"yellow", text:"Reforma TSJ de 20 a 32 magistrados en debate. Comité de Postulaciones Judiciales activado. Caryslia Rodríguez ratificada presidenta. Reconfiguración judicial más profunda del interinato." },
+  { level:"yellow", text:"42 protestas entre el 1 y el 6 de mayo — pico de 35 el 1° de mayo en 16 estados. Exigencias laborales y de cambio de gobierno contenidas con camiones «murciélagos» y PNB/GNB." },
+  { level:"red", text:"ENCOVI 2025: 68,5% de hogares en pobreza monetaria y 31,7% en pobreza extrema. Ingreso integral USD 240 sin incidencia en salario base (Bs 130, ~USD 0,27). Brecha entre estabilización macro y bienestar de los hogares." },
+  { level:"red", text:"Caso Quero Navas: fallecido julio 2025, informado como vivo por la Defensoría en octubre 2025 — contradicción institucional grave. Pico de demanda eléctrica de 15.579 MW el 7 de mayo — máximo en 9 años." }
 ];
-
-export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16"];
+export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16","S17"];
 
 
 export const ICG_HISTORY = [
@@ -181,6 +200,7 @@ export const ICG_HISTORY = [
 
   { week:"S16", score:71, sitrep:true, note:"Delegación Casa Blanca + MOU energéticos (Shell/Eni/BP/Repsol) + TSJ jubilación 8 magistrados (incl. Moreno). E3 sube a 50%. $240 ingreso mínimo gestiona expectativas 1° mayo. 33 protestas; marchas laborales bloqueadas en Caracas." },
 
+  { week:"S17", score:60, sitrep:true, note:"GL-58 OFAC habilita asesoría técnica para reestructuración de deuda soberana y PDVSA. Reforma del TSJ de 20 a 32 magistrados con Comité de Postulaciones activado. Wright declara elecciones como Fase 3 del plan de tres fases. Brecha E3–E1 se estrecha a 10pp." }
 ];
 
 export const CONF_SEMANAL = [
@@ -287,4 +307,14 @@ export const CONF_SEMANAL = [
     ]
   },
 
+,
+  { week:"S17", label:"1–8 may", protestas:42, estados:16, reprimidas:1,
+    motivos:["Exigencias laborales y salariales","Seguridad social y pensiones","Vivienda","Cambio de gobierno","Participación política"],
+    hecho:"El 1° de mayo (Día del Trabajo), 35 protestas simultáneas en 16 estados — pico más alto del período — fueron contenidas mediante despliegue de camiones «murciélagos» del PNB/GNB. El OVCS registró por primera vez exigencias de cambio de gobierno junto con demandas laborales, señalando politización creciente de la conflictividad.",
+    dias:[
+      { fecha:"1 Mayo", protestas:35, estados:16, tipo:"Mixto", exigencias:"Vivienda, derechos laborales, seguridad social, participación política, cambio de gobierno" },
+      { fecha:"5 Mayo", protestas:3, estados:3, tipo:"Laboral", exigencias:"Derechos laborales, seguridad social, educación" },
+      { fecha:"6 Mayo", protestas:4, estados:4, tipo:"Laboral", exigencias:"Vivienda, participación política, derechos laborales" }
+    ]
+  }
 ];
