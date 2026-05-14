@@ -307,7 +307,6 @@ export const CONF_SEMANAL = [
     ]
   },
 
-,
   { week:"S17", label:"1–8 may", protestas:42, estados:16, reprimidas:1,
     motivos:["Exigencias laborales y salariales","Seguridad social y pensiones","Vivienda","Cambio de gobierno","Participación política"],
     hecho:"El 1° de mayo (Día del Trabajo), 35 protestas simultáneas en 16 estados — pico más alto del período — fueron contenidas mediante despliegue de camiones «murciélagos» del PNB/GNB. El OVCS registró por primera vez exigencias de cambio de gobierno junto con demandas laborales, señalando politización creciente de la conflictividad.",
