@@ -747,9 +747,11 @@ export function TabIODA() {
   const [selectedStateLoading, setSelectedStateLoading] = useState(false);
   const [aiExplain, setAiExplain] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
-  const [subView, setSubView] = useState("nacional"); // nacional | estados | eventos
+  const [subView, setSubView] = useState("estados"); // estados | eventos | nacional
   const [focusEvent, setFocusEvent] = useState(null); // timestamp to zoom chart to
   const [expandedEvent, setExpandedEvent] = useState(null); // index of event to show explanation
+  const [eventsBack, setEventsBack] = useState(0); // number of periods to go back in Eventos view
+  const [eventsStateFilter, setEventsStateFilter] = useState(null); // null = all states
 
   // ── Unified time window (stable — only recalculates on user action) ──
   const [timePreset, setTimePreset] = useState("24h"); // 24h | 48h | 7d | 30d | custom
@@ -758,7 +760,7 @@ export function TabIODA() {
   const [timeEpoch, setTimeEpoch] = useState(() => Math.floor(Date.now() / 1000)); // frozen "now"
   
   // Refreeze "now" when preset changes (not on every render)
-  const changePreset = (p) => { setTimePreset(p); setTimeEpoch(Math.floor(Date.now() / 1000)); setRegionScores([]); };
+  const changePreset = (p) => { setTimePreset(p); setTimeEpoch(Math.floor(Date.now() / 1000)); setRegionScores([]); setEventsBack(0); setEventsStateFilter(null); };
   
   // Compute actual from/until epoch — memoized to prevent re-renders
   const twFrom = useMemo(() => {
@@ -787,12 +789,16 @@ export function TabIODA() {
   }, [twFrom, twUntil]);
 
   // ── 2. Detect outage events from national + regional signal analysis ──
-  const loadEvents = useCallback(async () => {
+  const loadEvents = useCallback(async (backOffset = 0) => {
     const allEvents = [];
+    // Compute period window for events (may differ from main window when navigating back)
+    const periodLen = twUntil - twFrom; // duration in seconds
+    const evFrom = twFrom - backOffset * periodLen;
+    const evUntil = twUntil - backOffset * periodLen;
     
     // National events
     try {
-      const natJson = await iodaFetch(`outages/events`, { entityType: "country", entityCode: "VE", from: twFrom, until: twUntil });
+      const natJson = await iodaFetch(`outages/events`, { entityType: "country", entityCode: "VE", from: evFrom, until: evUntil });
       const natEvents = Array.isArray(natJson?.data) ? natJson.data : [];
       natEvents.forEach(ev => {
         const severity = ev.score > 5000 ? "critical" : ev.score > 1000 ? "high" : "medium";
@@ -812,7 +818,7 @@ export function TabIODA() {
     
     const regionResults = await Promise.allSettled(
       statesToQuery.map(async (st) => {
-        const json = await iodaFetch(`outages/events`, { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil });
+        const json = await iodaFetch(`outages/events`, { entityType: "region", entityCode: st.code, from: evFrom, until: evUntil });
         const evts = Array.isArray(json?.data) ? json.data : [];
         return evts.map(ev => {
           const severity = ev.score > 3000 ? "critical" : ev.score > 500 ? "high" : "medium";
@@ -827,7 +833,7 @@ export function TabIODA() {
     regionResults.forEach(r => { if (r.status === "fulfilled" && r.value) allEvents.push(...r.value); });
     
     allEvents.sort((a,b) => b.time - a.time);
-    setEvents(allEvents.slice(0, 60));
+    setEvents(allEvents.slice(0, 80));
   }, [twFrom, twUntil]);
 
   // ── 3. Load regional data using IODA outage endpoints (lightweight) ──
@@ -1035,8 +1041,10 @@ export function TabIODA() {
     setRegionLoading(false);
   }, [twFrom, twUntil]);
 
-  useEffect(() => { loadNational(); loadEvents(); }, [loadNational, loadEvents]);
+  useEffect(() => { loadNational(); loadEvents(0); }, [loadNational, loadEvents]);
   useEffect(() => { if (subView === "estados") loadRegions(); }, [subView, loadRegions]);
+  // Reload events when eventsBack changes
+  useEffect(() => { loadEvents(eventsBack); }, [eventsBack]);
   
   // Auto-refresh every 5 min for 24h/48h modes
   useEffect(() => {
@@ -1102,7 +1110,24 @@ export function TabIODA() {
     })();
   }, [selectedState, twFrom, twUntil]);
 
-  // ── 4. AI Explain ──
+  // ── Auto-select worst state when data loads ──
+  useEffect(() => {
+    if (selectedState) return; // don't override user selection
+    if (regionScores.length === 0) return;
+    // Select the most affected state (lowest connectivityHealth or elecHealth)
+    const worst = [...regionScores].sort((a, b) => {
+      const aScore = Math.min(a.connectivityHealth ?? 100, a.elecHealth ?? 100);
+      const bScore = Math.min(b.connectivityHealth ?? 100, b.elecHealth ?? 100);
+      return aScore - bScore;
+    })[0];
+    if (worst && (worst.connectivityHealth < 100 || worst.elecHealth < 100)) {
+      setSelectedState(worst.name);
+    } else if (worst) {
+      setSelectedState(worst.name); // even if all normal, show first
+    }
+  }, [regionScores]);
+
+
   const explainWithAI = async () => {
     setAiLoading(true); setAiExplain(null);
     const ctx = [];
@@ -1300,7 +1325,7 @@ export function TabIODA() {
 
       {/* ── Sub-navigation ── */}
       <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, marginBottom:14 }}>
-        {[{id:"nacional",label:"📡 Nacional"},{id:"estados",label:"🗺 Estados"},{id:"eventos",label:"⚡ Eventos"}].map(s => (
+        {[{id:"estados",label:"🗺 Estados"},{id:"eventos",label:"⚡ Eventos"},{id:"nacional",label:"📡 Nacional"}].map(s => (
           <button key={s.id} onClick={() => setSubView(s.id)}
             style={{ fontSize:12, fontFamily:font, padding:"7px 16px", border:"none", flex:1,
               background:subView===s.id?ACCENT:"transparent", color:subView===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>{s.label}</button>
@@ -1534,14 +1559,60 @@ export function TabIODA() {
       {/* ══════ EVENTOS ══════ */}
       {subView === "eventos" && (
         <Card accent="#f59e0b">
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
+          {/* Period navigation row */}
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10, flexWrap:"wrap", gap:8 }}>
             <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-              Eventos Detectados · {timeLabel}
+              Eventos Detectados
             </div>
-            <span style={{ fontSize:12, fontFamily:font, color:events.length > 0 ? "#dc2626" : MUTED }}>
-              {events.length} detectados
-            </span>
+            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+              {/* Period back/forward controls */}
+              <button onClick={() => { setEventsBack(b => b + 1); setExpandedEvent(null); }}
+                style={{ fontSize:11, fontFamily:font, padding:"4px 10px", background:"transparent", border:`1px solid ${BORDER}`, color:MUTED, cursor:"pointer", borderRadius:3 }}>← Anterior</button>
+              <span style={{ fontSize:11, fontFamily:font, color:MUTED, minWidth:80, textAlign:"center" }}>
+                {eventsBack === 0 ? "Período actual" : `−${eventsBack} período${eventsBack > 1 ? "s" : ""}`}
+              </span>
+              <button onClick={() => { setEventsBack(b => Math.max(0, b - 1)); setExpandedEvent(null); }}
+                disabled={eventsBack === 0}
+                style={{ fontSize:11, fontFamily:font, padding:"4px 10px", background:"transparent", border:`1px solid ${BORDER}`, color:eventsBack===0?`${MUTED}40`:MUTED, cursor:eventsBack===0?"default":"pointer", borderRadius:3 }}>Siguiente →</button>
+              <span style={{ fontSize:11, fontFamily:font, color:eventsBack===0?"#dc2626":MUTED }}>
+                {events.length} detectados
+              </span>
+            </div>
           </div>
+          {/* Period label */}
+          {eventsBack > 0 && (() => {
+            const periodLen = twUntil - twFrom;
+            const evFrom = twFrom - eventsBack * periodLen;
+            const evUntil = twUntil - eventsBack * periodLen;
+            return (
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginBottom:8, padding:"3px 8px", background:`${BORDER}10`, borderRadius:3 }}>
+                📅 Mostrando: {new Date(evFrom * 1000).toLocaleString("es-VE", { timeZone:"America/Caracas", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", hour12:false })} — {new Date(evUntil * 1000).toLocaleString("es-VE", { timeZone:"America/Caracas", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", hour12:false })}
+              </div>
+            );
+          })()}
+          {/* State filter chips */}
+          {events.length > 0 && (() => {
+            const statesInEvents = ["Todos", ...Array.from(new Set(events.map(e => e.region).filter(r => r !== "🇻🇪 Nacional"))).sort(), "🇻🇪 Nacional"];
+            return (
+              <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:10, paddingBottom:8, borderBottom:`1px solid ${BORDER}30` }}>
+                <span style={{ fontSize:10, fontFamily:font, color:MUTED, alignSelf:"center", letterSpacing:"0.08em" }}>ESTADO:</span>
+                {statesInEvents.map(s => {
+                  const isAll = s === "Todos";
+                  const active = isAll ? eventsStateFilter === null : eventsStateFilter === s;
+                  return (
+                    <button key={s} onClick={() => setEventsStateFilter(isAll ? null : (eventsStateFilter === s ? null : s))}
+                      style={{ fontSize:10, fontFamily:font, padding:"2px 8px", borderRadius:12,
+                        background:active ? ACCENT : `${BORDER}20`,
+                        color:active ? "#fff" : MUTED,
+                        border:active ? `1px solid ${ACCENT}` : `1px solid ${BORDER}40`,
+                        cursor:"pointer", whiteSpace:"nowrap" }}>
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })()}
           {events.length === 0 ? (
             <div style={{ textAlign:"center", padding:"30px 0", color:MUTED, fontSize:13 }}>
               No se detectaron eventos de interrupción en este período.
@@ -1560,7 +1631,7 @@ export function TabIODA() {
                   </tr>
                 </thead>
                 <tbody>
-                  {events.map((ev, i) => {
+                  {events.filter(ev => !eventsStateFilter || ev.region === eventsStateFilter).map((ev, i) => {
                     const sevColor = ev.condition === "critical" ? "#ef4444" : ev.condition === "high" ? "#f97316" : ev.condition === "medium" ? "#fbbf24" : MUTED;
                     const dsColor = ev.datasource === "bgp" ? "#7c3aed" : ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "#f59e0b" : ev.datasource === "packet-loss" ? "#dc2626" : "#dc2626";
                     const dsLabel = ev.datasource === "bgp" ? "BGP" : ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "SONDEO" : ev.datasource === "telescope" ? "TELESCOPIO" : ev.datasource === "packet-loss" ? "LOSS" : (ev.datasource || "?").toUpperCase();
@@ -1630,8 +1701,9 @@ export function TabIODA() {
               </table>
             </div>
           )}
-          <div style={{ fontSize:10, color:`${MUTED}60`, marginTop:8 }}>
-            Click en un evento para ver en la gráfica · Incluye eventos nacionales y regionales
+          <div style={{ fontSize:10, color:`${MUTED}60`, marginTop:8, display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:4 }}>
+            <span>Click en un evento para ver en la gráfica · Incluye eventos nacionales y regionales</span>
+            {eventsStateFilter && <span style={{ color:MUTED }}>Filtrado: {eventsStateFilter} · <button onClick={() => setEventsStateFilter(null)} style={{ fontSize:10, fontFamily:font, background:"none", border:"none", color:ACCENT, cursor:"pointer", padding:0 }}>ver todos</button></span>}
           </div>
         </Card>
       )}
