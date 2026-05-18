@@ -874,12 +874,13 @@ export function TabIODA() {
   const loadRegions = useCallback(async () => {
     setRegionLoading(true);
     
-    // Fetch summary + alerts for all states in parallel
+    // Fetch summary + alerts + events for all states in parallel
     const results = await Promise.allSettled(
       VE_REGIONS.map(async (st) => {
-        const [summaryJson, alertsJson] = await Promise.all([
+        const [summaryJson, alertsJson, eventsJson] = await Promise.all([
           iodaFetch(`outages/summary`, { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }),
-          iodaFetch(`outages/alerts`, { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }),
+          iodaFetch(`outages/alerts`,  { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }),
+          iodaFetch(`outages/events`,  { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }), // C4
         ]);
         
         // Parse summary
@@ -889,17 +890,25 @@ export function TabIODA() {
         const bgpScore = summary.scores?.["bgp.median"] ?? 0;
         const eventCnt = summary.event_cnt ?? 0;
         
-        // Parse alerts
+        // C4: parse IODA-detected events (independent signal)
+        const iodaEvents = Array.isArray(eventsJson?.data) ? eventsJson.data : [];
+        const iodaPingEvents = iodaEvents.filter(e => e.datasource === "ping-slash24");
+        
+        // Parse alerts — C2: include both critical AND warning
         const alerts = Array.isArray(alertsJson?.data) ? alertsJson.data : [];
-        const pingAlerts = alerts.filter(a => a.datasource === "ping-slash24");
-        const bgpAlerts = alerts.filter(a => a.datasource === "bgp");
+        const pingAlerts    = alerts.filter(a => a.datasource === "ping-slash24");
+        const pingCritical  = pingAlerts.filter(a => a.level === "critical").sort((a,b) => a.time - b.time);
+        const pingWarning   = pingAlerts.filter(a => a.level === "warning").sort((a,b) => a.time - b.time);
+        const bgpAlerts     = alerts.filter(a => a.datasource === "bgp");
+        const bgpCritical   = bgpAlerts.filter(a => a.level === "critical");
+        const bgpWarning    = bgpAlerts.filter(a => a.level === "warning");
         
         // Current connectivity health
         const lastPingAlert = pingAlerts[pingAlerts.length - 1];
-        const lastBgpAlert = bgpAlerts[bgpAlerts.length - 1];
+        const lastBgpAlert  = bgpAlerts[bgpAlerts.length - 1];
         // Use WORST critical alert in period
-        const worstPingAlert = pingAlerts
-          .filter(a => a.level === "critical" && a.historyValue > 0)
+        const worstPingAlert = pingCritical
+          .filter(a => a.historyValue > 0)
           .sort((a, b) => (a.value / a.historyValue) - (b.value / b.historyValue))[0];
         
         let pingHealth;
@@ -908,7 +917,6 @@ export function TabIODA() {
         } else if (lastPingAlert?.historyValue > 0) {
           pingHealth = Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100));
         } else {
-          // No alerts at all — use score to estimate health
           if (overallScore > 50000) pingHealth = 30;
           else if (overallScore > 20000) pingHealth = 50;
           else if (overallScore > 10000) pingHealth = 60;
@@ -923,100 +931,159 @@ export function TabIODA() {
           : 100;
         const connectivityHealth = Math.min(pingHealth, bgpHealth);
         
-        // Electricity: find critical ping events where BGP was NOT also critical at same time
-        const criticalPing = pingAlerts.filter(a => a.level === "critical").sort((a,b) => a.time - b.time);
-        const criticalBgp = bgpAlerts.filter(a => a.level === "critical");
+        // ── Electricity detection ── C1+C2+C3+C4 ──
         
-        // R3+R5: Cluster adjacent critical alerts (within ~30min) into composite events.
-        // This lets us compute duration, dropRate (abrupt vs gradual), and accumulated score.
-        const ALERT_CLUSTER_GAP = 1800; // seconds between alerts to consider same event
-        const rawClusters = [];
-        let currentCluster = null;
-        for (const alert of criticalPing) {
-          if (!currentCluster || (alert.time - currentCluster.lastTime) > ALERT_CLUSTER_GAP) {
-            currentCluster = { alerts: [alert], firstTime: alert.time, lastTime: alert.time };
-            rawClusters.push(currentCluster);
-          } else {
-            currentCluster.alerts.push(alert);
-            currentCluster.lastTime = alert.time;
+        // C1: BGP disqualifier by MAGNITUDE, not presence.
+        // A BGP drop < BGP_VETO_THRESHOLD of its historyValue is considered noise, not censorship.
+        const BGP_VETO_THRESHOLD = 0.15; // BGP must drop >15% to veto an electric event
+        const isBgpVeto = (clusterFirstTime, clusterLastTime) => {
+          // Find BGP alerts (critical or warning) overlapping this event window ±30min
+          const allBgpAlerts = [...bgpCritical, ...bgpWarning];
+          return allBgpAlerts.some(b => {
+            if (b.time < clusterFirstTime - 1800 || b.time > clusterLastTime + 1800) return false;
+            if (!b.historyValue || b.historyValue === 0) return false;
+            const bgpDropPct = (b.historyValue - b.value) / b.historyValue;
+            return bgpDropPct > BGP_VETO_THRESHOLD; // only veto if drop is substantial
+          });
+        };
+        
+        // Helper: build composite events from an array of sorted alerts
+        const buildClusters = (alertList, isCritical) => {
+          const clusters = [];
+          let cur = null;
+          for (const alert of alertList) {
+            if (!cur || (alert.time - cur.lastTime) > 1800) {
+              cur = { alerts: [alert], firstTime: alert.time, lastTime: alert.time, isCritical };
+              clusters.push(cur);
+            } else {
+              cur.alerts.push(alert);
+              cur.lastTime = alert.time;
+            }
           }
-        }
+          return clusters;
+        };
+        
+        // C2: build clusters from both critical and warning alerts
+        const criticalClusters = buildClusters(pingCritical, true);
+        const warningClusters  = buildClusters(pingWarning,  false);
         
         const powerEvents = [];
-        const bgpStable = criticalBgp.length === 0;
+        const bgpStable = bgpCritical.length === 0 && bgpWarning.length === 0;
         
-        for (const cluster of rawClusters) {
-          // Compute drop metrics for this composite event
+        const processCluster = (cluster) => {
           const drops = cluster.alerts.map(a =>
             a.historyValue > 0 ? Math.round(((a.historyValue - a.value) / a.historyValue) * 100) : 0
           );
-          const maxDrop = Math.max(...drops);
+          const maxDrop   = Math.max(...drops);
           const firstDrop = drops[0];
-          const durationSec = Math.max(600, cluster.lastTime - cluster.firstTime); // min 10min
-          
-          // R3: dropRate — how abrupt was the descent?
-          // If the FIRST alert already shows the worst drop → abrupt (consistent with power/censorship)
-          // If drop grew gradually across alerts → gradual (more likely congestion/maintenance)
-          // dropRate = "depth reached per 10-min bucket" measured at start of event
-          const dropRate = firstDrop; // % already dropped at the first alert (10-min granularity)
-          const isAbrupt = firstDrop >= maxDrop * 0.8; // first alert already near peak severity
+          const durationSec = Math.max(600, cluster.lastTime - cluster.firstTime);
+          const isAbrupt    = firstDrop >= maxDrop * 0.8;
           const dropPattern = isAbrupt ? "abrupto" : "gradual";
           
-          // Check if BGP also critical anywhere in this cluster's time window (±30min)
-          const bgpAlsoDown = criticalBgp.some(b =>
-            b.time >= cluster.firstTime - 1800 && b.time <= cluster.lastTime + 1800
+          // C1: use magnitude-based BGP veto instead of presence-based
+          const bgpAlsoDown = isBgpVeto(cluster.firstTime, cluster.lastTime);
+          
+          // C3: single alert with drop >50% counts regardless of cluster size
+          const isSingleSevere = cluster.alerts.length === 1 && maxDrop > 50;
+          
+          // C4: does IODA independently confirm an event in this window?
+          const iodaConfirms = iodaPingEvents.some(e =>
+            Math.abs((e.start || e.time || 0) - cluster.firstTime) < 3600
           );
           
-          // Use the worst alert as representative
-          const peakAlert = cluster.alerts[drops.indexOf(maxDrop)];
+          // C2: warning-only clusters need ≥2 alerts OR ioda confirmation to count
+          if (!cluster.isCritical) {
+            const qualifies = cluster.alerts.length >= 2 || iodaConfirms;
+            if (!qualifies) return null;
+          }
           
-          powerEvents.push({
+          const peakAlert = cluster.alerts[drops.indexOf(maxDrop)];
+          return {
             ts: cluster.firstTime,
             tsEnd: cluster.lastTime,
             durationSec,
             dropPct: maxDrop,
             firstDrop,
-            dropRate,
-            dropPattern,    // R3: "abrupto" | "gradual"
-            isAbrupt,       // R3: boolean flag for downstream confidence boost
+            dropRate: firstDrop,
+            dropPattern,
+            isAbrupt,
+            isSingleSevere,     // C3
+            iodaConfirmed: iodaConfirms, // C4
+            isWarningOnly: !cluster.isCritical, // C2
             alertCount: cluster.alerts.length,
             value: peakAlert.value,
             historyValue: peakAlert.historyValue,
             bgpAlsoDown,
             isElectric: !bgpAlsoDown,
-            iodaCritical: true,
-          });
+            iodaCritical: cluster.isCritical,
+          };
+        };
+        
+        // Process critical clusters first, then warning
+        for (const cluster of criticalClusters) {
+          const ev = processCluster(cluster);
+          if (ev) powerEvents.push(ev);
+        }
+        for (const cluster of warningClusters) {
+          const ev = processCluster(cluster);
+          if (!ev) continue;
+          // C2: skip warning events that overlap an already-captured critical event
+          const overlapsExisting = powerEvents.some(existing =>
+            Math.abs(existing.ts - ev.ts) < 1800
+          );
+          if (!overlapsExisting) powerEvents.push(ev);
         }
         
-        // Electricity index: respect IODA critical level + count
+        // Sort by time
+        powerEvents.sort((a, b) => a.ts - b.ts);
+        
+        // Classify electric vs infra
         const electricEvents = powerEvents.filter(e => e.isElectric);
         let elecHealth = 100, elecLabel = "Normal", elecConfidence = null;
-        // R5: elecScore = sum of (dropPct × duration_in_10min_buckets) across electric events
+
+        // R5: elecScore = sum of (dropPct × duration_in_10min_buckets)
         const elecScore = electricEvents.reduce((acc, e) =>
           acc + e.dropPct * Math.max(1, Math.round(e.durationSec / 600)), 0
         );
+        
         if (electricEvents.length > 0) {
-          const criticalCount = electricEvents.length; // all are critical by construction now
-          const worstDrop = Math.max(...electricEvents.map(e => e.dropPct));
-          // Severity from worst drop, boosted by IODA critical count
-          if (worstDrop > 60) { elecHealth = 20; }
-          else if (worstDrop > 40) { elecHealth = 40; }
-          else if (worstDrop > 25) { elecHealth = 60; }
-          else if (criticalCount >= 3) { elecHealth = 50; }
-          else if (criticalCount >= 1) { elecHealth = 60; }
-          else { elecHealth = 80; }
-          // R3: abrupt-pattern events boost severity (more consistent with electric outage)
-          const hasAbruptEvent = electricEvents.some(e => e.isAbrupt && e.dropPct > 30);
-          if (hasAbruptEvent && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
-          // Confidence: starts low, boosted later by regional correlation + telescope
-          elecConfidence = "baja";
-          // Label with confidence (will be upgraded in post-processing)
+          const worstDrop   = Math.max(...electricEvents.map(e => e.dropPct));
+          const critCount   = electricEvents.filter(e => !e.isWarningOnly).length;
+          const warnCount   = electricEvents.filter(e => e.isWarningOnly).length;
+          const hasAbrupt   = electricEvents.some(e => e.isAbrupt && e.dropPct > 30);
+          const hasIodaConf = electricEvents.some(e => e.iodaConfirmed);
+          const hasSingleSev = electricEvents.some(e => e.isSingleSevere);
+          
+          // Base severity — critical alerts drive the scale; warnings cap at 70
+          if (!electricEvents.every(e => e.isWarningOnly)) {
+            // At least one critical event
+            if (worstDrop > 60 || hasSingleSevere) elecHealth = 20;   // C3: single severe counts
+            else if (worstDrop > 40) elecHealth = 40;
+            else if (worstDrop > 25) elecHealth = 60;
+            else if (critCount >= 3)  elecHealth = 50;
+            else if (critCount >= 1)  elecHealth = 60;
+            else elecHealth = 80;
+          } else {
+            // C2: warning-only path — capped at 70
+            elecHealth = warnCount >= 3 ? 60 : warnCount >= 2 ? 70 : 75;
+            elecHealth = Math.max(70, elecHealth); // hard cap for warnings
+          }
+          
+          // Severity boosts
+          if (hasAbrupt && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
+          if (hasIodaConf && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 5); // C4 boost
+          
+          // Confidence starts low, post-processing will upgrade via regional correlation
+          elecConfidence = hasIodaConf ? "media" : "baja"; // C4: ioda confirmation → start at media
+          
+          // Label
           if (elecHealth <= 30) elecLabel = "Posible interrupción eléctrica severa";
           else if (elecHealth <= 50) elecLabel = "Posible interrupción eléctrica moderada";
-          else if (elecHealth <= 70) elecLabel = "Posible interrupción eléctrica leve";
+          else if (elecHealth <= 70) elecLabel = electricEvents.every(e => e.isWarningOnly)
+            ? "Posible interrupción eléctrica leve (señal débil)"
+            : "Posible interrupción eléctrica leve";
           else elecLabel = "Fluctuación";
         } else if (powerEvents.length > 0 && !bgpStable) {
-          // Ping critical + BGP critical = infrastructure/censorship, not electricity
           elecHealth = 100;
           elecLabel = "Normal (corte infra.)";
         }
@@ -1107,7 +1174,9 @@ export function TabIODA() {
         // R3: an abrupt drop pattern is additional evidence for electric outage.
         // Upgrade baja→media when the worst event of the state shows an abrupt drop ≥30%.
         const hasAbruptStrongDrop = s.powerEvents.some(ev => ev.isAbrupt && ev.dropPct >= 30 && !ev.bgpAlsoDown);
-        if (hasAbruptStrongDrop && confidence === "baja") confidence = "media";
+        // C4: IODA-confirmed events also upgrade confidence
+        const hasIodaConfirmed = s.powerEvents.some(ev => ev.iodaConfirmed && !ev.bgpAlsoDown);
+        if ((hasAbruptStrongDrop || hasIodaConfirmed) && confidence === "baja") confidence = "media";
         s.elecConfidence = confidence;
         if (hasRegional) {
           s.elecHealth = worstRegDrop > 60 ? 20 : worstRegDrop > 40 ? 40 : worstRegDrop > 25 ? 60 : 80;

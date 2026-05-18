@@ -3,24 +3,25 @@
 
 export const KPIS_LATEST = {
   energia: [
-    { k:"Exportaciones crudo", v:"1,23 mbd", c:"#22c55e" },
-    { k:"Cesta Merey", v:"USD 90,4/b", c:"#22c55e" },
-    { k:"GL-58 OFAC", v:"Fase 2 activa", c:"#22c55e" },
-    { k:"Bonos VENZ/PDVSA", v:"+87% acum.", c:"#22c55e" }
+    { k:"Cardón IV", v:"Acuerdo gas PDVSA-Repsol-Eni", c:"#22c55e" },
+    { k:"Licencias OFAC", v:"GL46B+48A+49A+51+52", c:"#38bdf8" },
+    { k:"Repsol proyección", v:"+50% 2026 · +200% 2028", c:"#22c55e" },
+    { k:"Maurel & Prom", v:"Taladro Maracaibo (1º en 8 años)", c:"#22c55e" },
   ],
   politico: [
-    { k:"Inflación mensual", v:"10,6% abr.", c:"#f59e0b" },
-    { k:"Ingreso integral", v:"USD 240", c:"#f59e0b" },
-    { k:"Salario base", v:"Bs 130 (~$0,27)", c:"#ef4444" },
-    { k:"FMI / DEG", v:"USD 5.000M", c:"#38bdf8" }
+    { k:"Gabinete", v:"42% modificado (14 de 33)", c:"#22c55e" },
+    { k:"Amnistía", v:"7.580 beneficiados", c:"#22c55e" },
+    { k:"Excarcelaciones verif.", v:"690 (Foro Penal)", c:"#22c55e" },
+    { k:"Presos políticos", v:"515 (Foro Penal)", c:"#ef4444" },
   ],
   opinion: [
-    { k:"Pico dem. eléctrica", v:"15.579 MW", c:"#ef4444" },
-    { k:"Pobreza (ENCOVI)", v:"68,5% hogares", c:"#ef4444" },
-    { k:"Protestas 1–6 mayo", v:"42 (pico: 35)", c:"#f59e0b" },
-    { k:"Brecha E3–E1", v:"10pp (↓ 15pp)", c:"#38bdf8" }
+    { k:"Protestas 13–19 mar", v:"46 (↓ de 65)", c:"#a17d08" },
+    { k:"Bono Guerra Econ.", v:"150 USD (+25%)", c:"#22c55e" },
+    { k:"Fondo Protección", v:"300M USD", c:"#22c55e" },
+    { k:"Inflación proy.", v:"197% (2026)", c:"#ef4444" },
   ],
 };
+
 export const WEEKS = [
   { label:"3–15 ene", short:"S1", probs:[{sc:1,v:5,t:"flat"},{sc:2,v:45,t:"flat"},{sc:3,v:40,t:"flat"},{sc:4,v:10,t:"flat"}], xy:{x:0.53,y:0.50},
     sem:{g:2,y:4,r:7},
@@ -97,88 +98,19 @@ export const WEEKS = [
     tensiones:[{l:"green",t:"<b>Sanciones:</b> OFAC retira a Rodríguez de lista de bloqueados · desbloquea activos · cooperación directa."},{l:"green",t:"<b>Embajada:</b> Reapertura formal EE.UU. en Caracas · Laura F. Dogu · SOUTHCOM: «hito histórico»."},{l:"green",t:"<b>Energía:</b> Exportaciones >1,09M bpd · USD 2.398M ingresos · Shell negocia Loran (~20 Tcf) · vuelos reanudados."},{l:"yellow",t:"<b>90 días:</b> Vencimiento «ausencia forzosa» · debate falta temporal vs. absoluta · prórroga AN escenario base."},{l:"yellow",t:"<b>Brecha cambiaria:</b> Convergencia USDT-banca ~10% · pero ~30% vs. oficial · mercado segmentado."},{l:"red",t:"<b>Conflictividad:</b> 11 protestas en 4 días · 9 estados · marcha a Miraflores 9 abril · salario <1 USD."},{l:"red",t:"<b>Irán:</b> Embajador iraní con colectivos en 23 de Enero · tensión con normalización Washington."}],
     lectura:"E3 se fortalece a 45% (+2pp) por la convergencia de tres factores decisivos: el levantamiento de sanciones a Delcy Rodríguez por la OFAC, que la valida como interlocutora plena; Trump calificando la relación como «empresa conjunta» energética; y la reapertura formal de la embajada en Caracas. Rubio declara estabilización «lograda en gran medida». Exportaciones >1,09M bpd, Shell negocia Loran (~20 Tcf), 10+ aerolíneas previstas.\\n\\nEl vencimiento de los 90 días de «ausencia forzosa» introduce presión institucional sin precedente. E1 sube a 32% (+2pp) por reunión Machado-Rubio y reloj constitucional. E4 baja a 17% (-3pp) sin señales coercitivas directas, pero marcha 9 abril y embajador iraní con colectivos mantienen riesgo. E2 se contrae a 6% (-1pp), aunque Q1 cierra con -14,2% y detención Ruperti señala inestabilidad.",
     trendSc:3, trendDrivers:["OFAC levanta sanciones a Rodríguez + Trump «empresa conjunta»: cooperación bilateral operativa","Reapertura embajada Caracas + Rubio «estabilización lograda» + Shell Loran: normalización institucionalizada","90 días constitucionales cumplidos: debate interinato como primer test institucional de la transición"] },
-  // ── S13: 03 abril – 10 abril 2026 ──
-  { label:"3–10 abr", short:"S13", probs:[{sc:1,v:32,t:"flat"},{sc:2,v:6,t:"flat"},{sc:3,v:47,t:"up"},{sc:4,v:15,t:"down"}], xy:{x:0.09,y:0.43},
-    sem:{g:9,y:4,r:6},
-    kpis:{ energia:{exportaciones:"1,09M bpd marzo (récord 6 meses)",ingresos:"USD 2.398M causados",licencias:"BCV sanciones bajo evaluación EE.UU.",cambio:"Brent ~102 · Q1 -14,2% acum."}, economico:{inflacion:"13,1% mensual · 649,5% anual (BCV)",ingresos_pob:"Salario <1 USD · 4 años congelado",electricidad:"Refinación PDVSA al 31%",pib:"PIB 2025 = 35,7% del nivel 2012"}, opinion:{direccion:"Aprobación Rodríguez 34,6% (AtlasIntel)",elecciones:"MCM 68,9% intención voto (Meganálisis)",mcm:"Madrid 18 abr · retorno planificado",eeuu:"83,8% rechaza elogios Trump a Rodríguez"} },
-    tensiones:[
-      {l:"red",t:"<b>9 de abril — 72 protestas:</b> Escalada laboral histórica. PNB con gas pimienta, 10 periodistas agredidos, detención PJ."},
-      {l:"red",t:"<b>Vacío constitucional:</b> 90 días cumplidos. Prórroga formal ante AN necesaria antes de julio."},
-      {l:"yellow",t:"<b>FMI consulta miembros:</b> Primer movimiento en dos décadas. Bonos cerca de 48 ctvs/USD. BCV evaluado."},
-      {l:"yellow",t:"<b>Anuncio salarial 1° mayo:</b> Sin monto ni mecanismo de indexación. Inflación 649,5% puede absorberlo."},
-      {l:"green",t:"<b>Poder Ciudadano renovado:</b> Devoe (Fiscal, 275 votos) + González Lobato (Defensora). Control institucional completo."},
-      {l:"green",t:"<b>Reinserción financiera:</b> Bonos +, COP+XOM evalúan retorno, Shell Loran primer gas 2027."},
-    ],
-    lectura:"La semana del 3 al 10 de abril consolida E3 como escenario dominante con 47% (+2pp), impulsada por la convergencia de dos avances institucionales: la designación del Fiscal General Larry Devoe (275 votos) y la Defensora del Pueblo Eglée González Lobato, que completan el control del Poder Ciudadano; y las señales más claras de reinserción financiera del período — la consulta formal del FMI entre sus miembros y la evaluación por Washington del levantamiento de sanciones al BCV, que podría desbloquear hasta un 40% adicional en producción petrolera. El hecho estructurante es la jornada del 9 de abril: 72 protestas en 4 días, escalada de 3 a 15 estados, represión con gas pimienta, agresión a 10 periodistas del SNTP y primera detención política del período (Ort Betancourt Villamizar, PJ). El anuncio de aumento salarial para el 1° de mayo sin montos ni indexación frente a 649,5% de inflación anual enfrenta el riesgo de ser absorbido de inmediato. E1 se mantiene en 32% sostenido por la presión social y la hoja de ruta opositora del 12 de abril. E4 baja a 15% por ausencia de escalada coercitiva sistémica, aunque el vector iraní-colectivos y la movilización del 16 de abril mantienen el riesgo latente. La paradoja del período: ConocoPhillips y ExxonMobil envían equipos de evaluación por primera vez desde 2007 mientras los modelos de contratos siguen sin publicarse y la refinación cae al 31%.",
-    trendSc:3, trendDrivers:["Poder Ciudadano completo bajo Rodríguez + FMI consulta formal + evaluación sanciones BCV: reinserción financiera avanza","Conflictividad laboral 9-abr (72 protestas, 15 estados) erosiona narrativa estabilización pero no desplaza E3","Hoja de ruta PUD 12-abr + retorno planificado Machado mantiene E1 en 32% como presión de transición activa"] },
-  { label:"10–17 abr", short:"S14", probs:[{sc:1,v:35,t:"up"},{sc:2,v:5,t:"down"},{sc:3,v:47,t:"flat"},{sc:4,v:13,t:"down"}], xy:{x:0.08,y:0.44},
-    sem:{g:10,y:4,r:5},
-    kpis:{ energia:{exportaciones:"1,09M bpd mar (ofic.) · 988 kbd OPEP sec.",ingresos:"150M bbl desde ene · Merey USD 85,92/b",licencias:"GL-56 + GL-57 OFAC emitidas",cambio:"570,75 Bs/USD ofic. · ~636 par · brecha ~30%"}, economico:{inflacion:"13,1% mensual (BCV) · 649,5% anual",ingresos_pob:"Salario <1 USD · aumento 1° mayo sin monto",electricidad:"Sin datos nuevos · fallas refinación",pib:"BCV publica balanza pagos: sup. cta. corriente USD 3.336M"}, opinion:{direccion:"83,8% rechaza elogios Trump a Rodríguez (Meganálisis)",elecciones:"EE.UU. Fase 2: CNE + KPMG + retorno libre MCM",mcm:"MCM en Elíseo con Macron (13 abr) · retorno inminente",eeuu:"GL-56/57 + Kozak: Fase 1 cumplida → Fase 2"} },
-    tensiones:[
-      {l:"green",t:"<b>FMI + BM reanudan relaciones (16 abr):</b> Mayor avance de reinserción multilateral en más de dos décadas. DEG ~USD 5.000M potenciales."},
-      {l:"green",t:"<b>GL-56 y GL-57 OFAC:</b> Apertura financiera condicionada. GL-57 habilita BCV y banca pública. Conindustria: 'puente hacia normalización'."},
-      {l:"green",t:"<b>Haustveit Caracas + Chevron–PDVSA:</b> Primer Depto. Energía EE.UU. 150M bbl desde enero. Petroindependencia 49% + Ayacucho 8."},
-      {l:"yellow",t:"<b>Kozak: Fase 1 cumplida → Fase 2:</b> Condiciones electorales explícitas: CNE, auditorías KPMG, retorno libre MCM. Wright: elecciones no son prioridad inmediata."},
-      {l:"yellow",t:"<b>MCM en Elíseo + retorno inminente:</b> Macron (13 abr) + PM Países Bajos La Haya (15 abr). Test de garantías del acuerdo bilateral."},
-      {l:"red",t:"<b>81% indicadores transición en rojo:</b> 100 días gestión Rodríguez. Más de 400 presos políticos. Debate 180 días sin resolver. FARA: candidatura 2027 en paralelo."},
-      {l:"red",t:"<b>47 protestas OVCS (10–16 abr):</b> 15 estados. Politización creciente. Crisis sanitaria: fiebre amarilla (55,3% letalidad) + 25.000 casos malaria."},
-    ],
-    lectura:"La semana del 10 al 17 de abril marca el punto de mayor avance en la reinserción internacional de Venezuela en más de dos décadas: la reanudación simultánea de relaciones con el FMI y el Banco Mundial, la emisión de las licencias GL-56 y GL-57, la primera visita oficial del Departamento de Energía de EE.UU. a Caracas y la declaración de la Fase 1 cumplida por Kozak configuran una acumulación sin precedente. E3 se sostiene en 47% (=0pp) absorbiendo estos eventos como confirmación del escenario de continuidad negociada. E1 sube a 35% (+3pp) impulsado por la tracción internacional de MCM — recibida por Macron en el Elíseo, con reunión en La Haya — y por las condiciones electorales explícitas que fija EE.UU. en la Fase 2. Esta subida no desplaza a E3 porque Washington no prioriza elecciones inmediatas (Chris Wright) y el CNE no muestra movimientos concretos. E4 baja a 13% (−2pp): la movilización del 16 de abril fue absorbida sin represión mayor y la detención de Paparoni fue breve y sin cargos. E2 cede a 5% (−1pp) por la solidez del eje multilateral recién activado. La tensión estructural persiste: apertura económica bajo vigilancia internacional coexiste con sistema político cerrado — 81% indicadores de transición en rojo, más de 400 presos políticos, debate constitucional de 180 días sin resolver, registro FARA de Rodríguez confirma candidatura 2027 avanzando en paralelo.",
-    trendSc:3, trendDrivers:["FMI + BM reanudan relaciones + GL-56/57 + Haustveit Caracas: mayor acumulación de señales de reinserción internacional del proceso","MCM en Elíseo + condiciones Fase 2 EE.UU. (CNE, KPMG, retorno MCM): E1 sube a 35% como presión de transición activa","81% indicadores transición en rojo + vacío constitucional 180 días + candidatura FARA Rodríguez: sistema político permanece cerrado"] },
-  { label:"17–24 abr", short:"S15", probs:[{sc:1,v:38,t:"up"},{sc:2,v:4,t:"down"},{sc:3,v:46,t:"down"},{sc:4,v:12,t:"down"}], xy:{x:0.07,y:0.44},
-    sem:{g:9,y:5,r:4},
-    kpis:{ energia:{exportaciones:"1,1M bpd · meta 1,37M dic 2026",ingresos:"USD 3.000M fondo bajo EE.UU. · KPMG",licencias:"GL-56/57 + GL-55 minería",cambio:"Halliburton evalúa retorno · Brent ~100"}, economico:{inflacion:"~650% anualizada · FMI: camino «muy difícil»",ingresos_pob:"Salario <1 USD · 1° mayo sin montos ni indexación",electricidad:"Siemens/GE conversan Zulia · CAF activa",pib:"7,4% proy. 2026 (PNUD) · base 35,7% nivel 2012"}, opinion:{direccion:"Brecha E3-E1 de 8pp — la más estrecha del ciclo",elecciones:"MCM: 40 sem. · Cabello: «cuando sean» · Petro: cogob.",mcm:"«Hoy comienza el regreso a casa» Puerta del Sol",eeuu:"Barrett Fase 2 + Kozak-Figuera + Rubio negocia BCV"} },
-    tensiones:[
-      {l:"green",t:"<b>FMI + BM + BID:</b> 3 multilaterales reanudan vínculos simultáneamente — mayor consolidación multilateral del período."},
-      {l:"green",t:"<b>Barrett llega (23 abr):</b> Nuevo encargado EE.UU. confirma Fase 2 — mensaje centrado en resultados concretos."},
-      {l:"green",t:"<b>Reconfiguración institucional:</b> Ley de Minas G.O. 7.020 + Comisión Activos Públicos + Comisión TSJ + 100 días gestión."},
-      {l:"yellow",t:"<b>Gran Peregrinación 19 abr – 1° mayo:</b> Legitimación interna del interinato. 1° mayo como test de colisión de agendas."},
-      {l:"yellow",t:"<b>MCM: «hoy comienza el regreso a casa»:</b> Puerta del Sol — retorno inminente como próximo test real del acuerdo bilateral."},
-      {l:"red",t:"<b>46 protestas · motín Yare III:</b> Pico 27 (22 abr) paro universitario · 5 fallecidos · 473 presos políticos (Foro Penal)."},
-    ],
-    lectura:"E3 cede 1pp a 46% sin perder su posición dominante, en una semana de consolidación institucional y diplomática que profundiza la arquitectura de continuidad negociada. La llegada de John Barrett confirma la continuidad estratégica de la Fase 2; los tres organismos multilaterales —FMI, Banco Mundial y BID— reanudan vínculos de forma simultánea; y la batería de reformas institucionales (Ley de Minas G.O. 7.020, Comisión de Activos Públicos, Comisión Preliminar del TSJ) consolida la arquitectura del interinato con apertura selectiva al capital privado. La propuesta de cogobernanza de Petro refuerza la lógica de transición gestionada. E1 sube 3pp a 38% —brecha más estrecha del período— impulsado por el anuncio de retorno de MCM desde la Puerta del Sol, la reunión con el primer ministro de Portugal y la propuesta de acuerdo nacional con rutas simultáneas. E4 baja 1pp a 12% por ausencia de escalada coercitiva sistémica. E2 cede a 4% por la solidez del entramado multilateral. El 1° de mayo y el retorno inminente de MCM son los dos test más críticos del proceso.",
-    trendSc:3, trendDrivers:["FMI + BM + BID simultáneos + Barrett Fase 2: mayor acumulación multilateral del período", "Brecha E3-E1 de 8pp — mínima del ciclo: MCM anuncia regreso desde Puerta del Sol", "1° mayo: convergencia Gran Peregrinación + movilización laboral — próximo test decisivo del acuerdo de estabilización"] },
-
-  // ── S16: 24 abril – 01 mayo 2026 ──
-  { label:"24 abr–1 may", short:"S16", probs:[{sc:1,v:35,t:"down"},{sc:2,v:4,t:"flat"},{sc:3,v:50,t:"up"},{sc:4,v:11,t:"down"}], xy:{x:0.05,y:0.46},
-    sem:{g:11,y:4,r:3},
-    kpis:{ energia:{exportaciones:"499k bpd a EE.UU. · 26,3M bbl acum.",ingresos:"Shell Monagas · Eni Junín 5 · BP Deltana · Repsol x3",licencias:"MOU Casa Blanca: petróleo, gas, oro, aluminio, carbón",cambio:"BCV ~570 Bs/USD · USDT ~630 · brecha ofic. ~29%"}, economico:{inflacion:"FMI 4% · CEPAL 6,5% · PNUD 7,4% proy. 2026",ingresos_pob:"$240 ingreso mínimo (bonos) · base Bs 130 (~$0,27)",electricidad:"BCV 20 trim. crecimiento · auditorías paralelas EE.UU.-Vzla",pib:"Reservas ~USD 13.600M · 5.000M DEG FMI"}, opinion:{direccion:"AtlasIntel: 31,4% aprueba DR · 47,1% desaprueba",elecciones:"Polymarket: 45% elecciones 2026 · MCM candidatura confirmada",mcm:"Meganálisis: MCM 71,25% intención voto · 84,36% vs. DR",eeuu:"OEA reconoce a Rodríguez como interlocutora operativa"} },
-    tensiones:[{l:"green",t:"<b>Delegación Casa Blanca:</b> Jarrod Agen + vuelo AA directo Miami-Caracas + MOU petróleo, gas, oro, aluminio y carbón."},{l:"green",t:"<b>Acuerdos energéticos:</b> Shell Monagas · Eni Junín 5 · BP Deltana · Repsol CEO: producción x3."},{l:"green",t:"<b>Diplomacia activa:</b> Rodríguez-Petro USD 1.200M · Barbados · Iberoamericana · Zambrano-España."},{l:"yellow",t:"<b>$240 sin reforma salarial:</b> Base Bs 130 (~$0,27) · bloqueo marchas laborales Caracas (30 abr)."},{l:"yellow",t:"<b>TSJ jubila 8 magistrados:</b> Moreno + 7 más · 227 sentencias 1 semana · postulaciones bajo AN interinato."},{l:"red",t:"<b>Conflictividad laboral:</b> 33 protestas 24–29 abr · 9 estados · politización creciente."},{l:"red",t:"<b>Eurocámara 507–31:</b> Sanciones condicionadas a avances democráticos — contraste con normalización EE.UU."}],
-    lectura:"E3 sube 4pp a 50% —el nivel más alto desde el inicio del período post-Maduro— sobre la base de la semana de mayor densidad bilateral y energética del ciclo. Delegación de la Casa Blanca en el primer vuelo directo de AA en 7 años, MOU en petróleo/gas/minerales, Shell instalada en Monagas, Eni firmando Junín 5, BP con Plataforma Deltana y Repsol anunciando triplicar producción configuran la masa crítica de compromisos más significativa del proceso. La jubilación extraoficial de 8 magistrados del TSJ —incluido Maikel Moreno— precedida de 227 sentencias en una semana completa la reconfiguración del Poder Judicial bajo control del interinato. E1 cede 3pp a 35% pese a la confirmación de candidatura de MCM y 1,5M inscritos en el RE: la dinámica de 'normalización sin transición' (Americas Quarterly) absorbe el espacio político sin condicionamientos verificables. La brecha E3-E1 se amplía a 15pp, la mayor del ciclo. E4 baja 1pp a 11%; E2 se mantiene en 4% contenido por el compromiso bilateral más robusto del período.",
-    trendSc:3, trendDrivers:["Delegación Casa Blanca + vuelo AA + 5 acuerdos energéticos: semana de mayor densidad bilateral del período post-Maduro","Jubilación 8 magistrados TSJ + 227 sentencias + postulaciones bajo AN: reconfiguración judicial como acumulación institucional","'Normalización sin transición' (Americas Quarterly): E3 alcanza 50%, el máximo del ciclo"] },
-  { label:"1–8 may", short:"S17",
-    probs:[{sc:1,v:38,t:"up"},{sc:2,v:3,t:"down"},{sc:3,v:48,t:"down"},{sc:4,v:11,t:"flat"}],
-    xy:{x:0.04,y:0.44},
-    sem:{g:10,y:5,r:3},
-    kpis:{
-      energia:{exportaciones:"1,23 mbd abril (máx. desde ene. 2019)",ingresos:"Merey USD 90,4/b · Brent USD 117,3/b · +87% bonos",licencias:"GL-58 OFAC: asesoría reestructuración deuda soberana",cambio:"BCV ~Bs 493,4/USD · intervención Bs ~715/EUR"},
-      economico:{inflacion:"10,6% mensual abril (3er mes ↓)",ingresos_pob:"USD 240 ingreso integral · base Bs 130 (~$0,27)",electricidad:"Pico 15.579 MW (7 may) · máx. en 9 años",pib:"ENCOVI 2025: 68,5% pobreza · 31,7% extrema"},
-      opinion:{direccion:"Wright: Fase 2 iniciada · elecciones Fase 3",elecciones:"Brecha E3-E1: 10pp — compresión más significativa 2 meses",mcm:"MCM: retorno antes fin 2026 · CNE renovado",eeuu:"GL-58 + 6 actos masivos PUD · 500+ presos políticos"}
-    },
-    tensiones:[
-      {l:"green",t:"<b>GL-58 OFAC:</b> Asesoría técnica reestructuración deuda soberana y PDVSA · bonos acum. +87% en 2026 · rally +7,1% diario."},
-      {l:"green",t:"<b>Exportaciones récord:</b> 1,23 mbd abril (máx. ene. 2019) · ExxonMobil: de «ininvertible» a «recurso inmenso» · Trump coordina con Chevron y Exxon."},
-      {l:"green",t:"<b>FMI/DEG USD 5.000M:</b> Ortega designado Gobernador · destino Gran Misión Vivienda y hospitales."},
-      {l:"yellow",t:"<b>Reforma TSJ 20→32 magistrados:</b> Comité de Postulaciones activado · Caryslia presidenta · reconfiguración judicial más profunda del interinato."},
-      {l:"yellow",t:"<b>42 protestas 1–6 mayo:</b> Pico 35 el 1° mayo · 16 estados · demandas laborales y cambio de gobierno · contenidas con «murciélagos» y PNB."},
-      {l:"red",t:"<b>Brecha salarial:</b> Ingreso integral USD 240 vs. base Bs 130 (~USD 0,27) · ENCOVI 2025: 68,5% pobreza · 31,7% extrema."},
-      {l:"red",t:"<b>Caso Quero Navas + pico eléctrico:</b> Muerto jul. 2025 pero informado vivo por Defensoría oct. 2025 · 15.579 MW el 7 may — infraestructura bajo presión crítica."}
-    ],
-    lectura:"E3 desciende 2pp a 48% no porque el escenario pierda consistencia, sino porque la GL-58 y el plan de tres fases de Wright operacionalizan un horizonte temporal que antes era solo retórico. Al declarar la Fase 1 completada y fijar las elecciones como Fase 3, Washington delimita el alcance de E3 y convierte a E1 en un endpoint planificado del cronograma bilateral. Sin embargo, la brecha E3–E1 se estrecha de 15 a 10pp, la compresión más significativa en dos meses. E1 sube 3pp a 38% por la GL-58, el roadmap de Wright y la intensificación territorial opositora. E4 se mantiene en 11% por la ausencia de escalada sistémica. E2 baja a 3%, mínimo del período.",
-    trendSc:3,
-    trendDrivers:["GL-58 OFAC + rally bonos +87%: normalización financiera acelera hacia Fase 2 del plan de tres fases de Washington","Exportaciones 1,23 mbd (máx. 2019) + ExxonMobil de «ininvertible» a «recurso inmenso»: reposicionamiento energético hemisférico","Brecha E3–E1 se estrecha a 10pp: Wright fija elecciones como Fase 3 — transición ya en cronograma de Washington"] }
 ];
 
 export const TENSIONS = [
-  { level:"green", text:"GL-58 OFAC habilita asesoría técnica para reestructuración de deuda soberana y PDVSA. Bonos venezolanos acumulan +87% en 2026 tras rally de hasta +7,1% diario." },
-  { level:"green", text:"Exportaciones de crudo alcanzan 1,23 mbd en abril — máximo desde enero de 2019. ExxonMobil transita de «ininvertible» a «recurso inmenso». Trump coordina estrategia energética con Chevron y Exxon." },
-  { level:"green", text:"FMI: Ortega Sánchez designado Gobernador para gestionar ~USD 5.000M en DEG. Destino parcial: Gran Misión Vivienda y dotación hospitalaria." },
-  { level:"yellow", text:"Reforma TSJ de 20 a 32 magistrados en debate. Comité de Postulaciones Judiciales activado. Caryslia Rodríguez ratificada presidenta. Reconfiguración judicial más profunda del interinato." },
-  { level:"yellow", text:"42 protestas entre el 1 y el 6 de mayo — pico de 35 el 1° de mayo en 16 estados. Exigencias laborales y de cambio de gobierno contenidas con camiones «murciélagos» y PNB/GNB." },
-  { level:"red", text:"ENCOVI 2025: 68,5% de hogares en pobreza monetaria y 31,7% en pobreza extrema. Ingreso integral USD 240 sin incidencia en salario base (Bs 130, ~USD 0,27). Brecha entre estabilización macro y bienestar de los hogares." },
-  { level:"red", text:"Caso Quero Navas: fallecido julio 2025, informado como vivo por la Defensoría en octubre 2025 — contradicción institucional grave. Pico de demanda eléctrica de 15.579 MW el 7 de mayo — máximo en 9 años." }
+  { level:"green", text:"Sanciones levantadas: OFAC retira a Rodríguez de lista de bloqueados · desbloquea activos · cooperación directa con EE.UU." },
+  { level:"green", text:"Embajada reabierta: Laura F. Dogu lidera restauración · SOUTHCOM: «hito histórico» · vuelos con 10+ aerolíneas" },
+  { level:"green", text:"Energía: Exportaciones >1,09M bpd · USD 2.398M ingresos marzo · Shell negocia Loran ~20 Tcf · CAF plan eléctrico" },
+  { level:"yellow", text:"90 días cumplidos: vencimiento «ausencia forzosa» · debate falta temporal vs. absoluta · prórroga AN escenario base" },
+  { level:"yellow", text:"Convergencia cambiaria parcial: brecha USDT-banca ~10% · pero ~30% vs. oficial · mercado segmentado" },
+  { level:"red", text:"Conflictividad: 11 protestas en 4 días (9 estados) · marcha a Miraflores 9 abril · salario <1 USD congelado 4 años" },
+  { level:"red", text:"Irán en 23 de Enero: embajador iraní con colectivos · tensión con normalización Washington · Ruperti detenido sin cargos" },
 ];
-export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16","S17"];
+
+export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12"];
 
 
 export const ICG_HISTORY = [
@@ -194,13 +126,6 @@ export const ICG_HISTORY = [
   { week:"S10", score:68, sitrep:true, note:"Reconfiguración gabinete 42% + nueva cúpula FANB. Padrino sale. Normalización diplomática operativa" },
   { week:"S11", score:66, sitrep:true, note:"González López giro institucional FANB. Ofensiva económica. 97 protestas en 4 días. Colectivos amenazan MCM" },
   { week:"S12", score:68, sitrep:true, note:"OFAC levanta sanciones DR. Trump «empresa conjunta». Embajada reabierta. 90 días cumplidos. Marcha 9 abril convocada" },
-  { week:"S13", score:70, sitrep:true, note:"Poder Ciudadano completo: Devoe Fiscal (275 votos) + González Lobato Defensora. FMI consulta miembros. 72 protestas 9-abr. Sanciones BCV evaluadas" },
-  { week:"S14", score:72, sitrep:true, note:"FMI + BM reanudan relaciones (16 abr). GL-56/GL-57 emitidas. Haustveit Caracas. Kozak: Fase 1 cumplida. Padrino López regresa al gabinete. Registro FARA Rodríguez candidatura 2027" },
-  { week:"S15", score:68, sitrep:true, note:"Barrett Fase 2 + FMI/BM/BID simultáneos + Peregrinación Nacional + Ley Minas G.O.7.020. MCM anuncia regreso desde Puerta del Sol. Petro propone cogobernanza 1-2 años. 46 protestas pico 27 (22 abr) paro universitario. Motín Yare III 5 fallecidos. 473 presos políticos" },
-
-  { week:"S16", score:71, sitrep:true, note:"Delegación Casa Blanca + MOU energéticos (Shell/Eni/BP/Repsol) + TSJ jubilación 8 magistrados (incl. Moreno). E3 sube a 50%. $240 ingreso mínimo gestiona expectativas 1° mayo. 33 protestas; marchas laborales bloqueadas en Caracas." },
-
-  { week:"S17", score:60, sitrep:true, note:"GL-58 OFAC habilita asesoría técnica para reestructuración de deuda soberana y PDVSA. Reforma del TSJ de 20 a 32 magistrados con Comité de Postulaciones activado. Wright declara elecciones como Fase 3 del plan de tres fases. Brecha E3–E1 se estrecha a 10pp." }
 ];
 
 export const CONF_SEMANAL = [
@@ -267,53 +192,4 @@ export const CONF_SEMANAL = [
       { fecha:"31 Mar", protestas:3, estados:3, tipo:"ESCP + DESCA", exigencias:"Vivienda, justicia, ambiente sano" },
       { fecha:"02 Abr", protestas:4, estados:3, tipo:"Mixto (ESCP + CPP)", exigencias:"Laborales, derechos detenidos, participación política" },
     ] },
-  { week:"S13", label:"6–9 abr", protestas:72, estados:15, reprimidas:1,
-    motivos:["Laborales","Pensiones","Salarios","HCM/IPASME","ONAPRE","Justicia","Presos políticos","Vivienda","Educación","Alimentación","Agua"],
-    hecho:"Jornada 9-abr: mayor escalada laboral del período. PNB desplegada con gas pimienta. 10 periodistas SNTP agredidos. Detención Ort Betancourt (PJ). Cabello convoca marcha simultánea oficialista.",
-    dias:[
-      { fecha:"6 Abr", protestas:4, estados:3, tipo:"CPP + DESCA", exigencias:"Laborales, justicia, vivienda, educación" },
-      { fecha:"7 Abr", protestas:4, estados:3, tipo:"CPP + DESCA", exigencias:"Laborales, justicia, presos políticos, educación" },
-      { fecha:"8 Abr", protestas:10, estados:8, tipo:"DESCA + CPP", exigencias:"Laborales, justicia, presos políticos, alimentación, agua, vivienda" },
-      { fecha:"9 Abr", protestas:54, estados:15, tipo:"Laboral + CPP", exigencias:"Salarios, pensiones, HCM, IPASME, ONAPRE, contratación colectiva, eliminación ONAPRE, rechazo bonos" },
-    ] },
-  { week:"S14", label:"10–16 abr", protestas:47, estados:15, reprimidas:0,
-    motivos:["Laborales","Participación política","Justicia","Vivienda","Agua","Alimentación","Libertad de detenidos","Presos políticos","Salud"],
-    hecho:"47 protestas (10–16 abr) en 15 estados — conflictividad sostenida en desaceleración respecto al pico 9-abr (72). Movilización sindical hacia embajada EE.UU. (16 abr): primer caso de presión dirigida a actores internacionales. Politización creciente de exigencias.",
-    dias:[
-      { fecha:"10 Abr", protestas:10, estados:7, tipo:"DESCA + CPP", exigencias:"Vivienda, agua, justicia, educación, laborales, participación política" },
-      { fecha:"13 Abr", protestas:12, estados:7, tipo:"ESCP + CPP", exigencias:"Laborales, participación política, justicia, libertad de detenidos, vivienda, agua" },
-      { fecha:"14 Abr", protestas:8, estados:7, tipo:"ESCP + DESCA", exigencias:"Laborales, salud, vivienda, educación, agua, justicia, libertad de detenidos" },
-      { fecha:"15 Abr", protestas:10, estados:8, tipo:"Mixto (ESCP + CPP + DESCA)", exigencias:"Laborales, alimentación, participación política, vivienda, agua, justicia" },
-      { fecha:"16 Abr", protestas:7, estados:5, tipo:"ESCP + CPP", exigencias:"Laborales, alimentación, participación política, vivienda, justicia, presos políticos" },
-    ] },
-  { week:"S15", label:"17–23 abr", protestas:46, estados:18, reprimidas:0,
-    motivos:["Laborales","Seguridad social","Contratación colectiva","Justicia","Presos políticos","Educación","Vivienda","Gasolina","Derechos de la mujer"],
-    hecho:"46 protestas (17–23 abr). Pico 27 el 22 de abril — paro universitario nacional en 18 estados: mayor coordinación sectorial del mes. Motín Yare III (20 abr): 5 fallecidos en centro de máxima seguridad. Convergencia 1° mayo: Gran Peregrinación oficialista vs. movilización laboral con salario <1 USD.",
-    dias:[
-      { fecha:"17 Abr", protestas:5, estados:5, tipo:"DESCA + CPP", exigencias:"Vivienda, agua, laborales, salud" },
-      { fecha:"21 Abr", protestas:8, estados:7, tipo:"Mixto (ESCP + CPP)", exigencias:"Laborales, seguridad social, justicia, presos políticos, educación" },
-      { fecha:"22 Abr", protestas:27, estados:18, tipo:"Laboral + ESCP", exigencias:"PARO UNIVERSITARIO: salario ajustado, seguridad social, contratación colectiva" },
-      { fecha:"23 Abr", protestas:6, estados:6, tipo:"Mixto (DESCA + CPP)", exigencias:"Laborales, justicia, vivienda, gasolina, derechos de la mujer" },
-    ] },
-
-  { week:"S16", label:"24–29 abr", protestas:33, estados:9, reprimidas:1,
-    motivos:["Vivienda","Agua","Laborales","Participación política","Seguridad social","Justicia","Seguridad ciudadana"],
-    hecho:"Bloqueo policial de marchas laborales en Caracas (30 abr): cordón PNB impide llegada de trabajadores a Miraflores. Convocatorias escalonadas: marcha laboral 30 abr + movilización 1° mayo. Transición cualitativa: demandas ESCP clásicas hacia participación política y justicia.",
-    dias:[
-      { fecha:"24 Abr", protestas:10, estados:9, tipo:"ESCP + CPP", exigencias:"Vivienda, agua, justicia, laborales; docentes en Amazonas exigen reincorporación y salario" },
-      { fecha:"27 Abr", protestas:1, estados:1, tipo:"DESCA", exigencias:"Vivienda, agua (Cumaná, Sucre)" },
-      { fecha:"28 Abr", protestas:11, estados:8, tipo:"Mixto (ESCP + CPP)", exigencias:"Vivienda, agua, laborales, participación política, seguridad social; convocatoria marcha laboral 30 abr" },
-      { fecha:"29 Abr", protestas:11, estados:7, tipo:"Mixto (ESCP + CPP)", exigencias:"Vivienda, agua, laborales, justicia, seguridad ciudadana; jubilados convocan protesta 1° mayo" },
-    ]
-  },
-
-  { week:"S17", label:"1–8 may", protestas:42, estados:16, reprimidas:1,
-    motivos:["Exigencias laborales y salariales","Seguridad social y pensiones","Vivienda","Cambio de gobierno","Participación política"],
-    hecho:"El 1° de mayo (Día del Trabajo), 35 protestas simultáneas en 16 estados — pico más alto del período — fueron contenidas mediante despliegue de camiones «murciélagos» del PNB/GNB. El OVCS registró por primera vez exigencias de cambio de gobierno junto con demandas laborales, señalando politización creciente de la conflictividad.",
-    dias:[
-      { fecha:"1 Mayo", protestas:35, estados:16, tipo:"Mixto", exigencias:"Vivienda, derechos laborales, seguridad social, participación política, cambio de gobierno" },
-      { fecha:"5 Mayo", protestas:3, estados:3, tipo:"Laboral", exigencias:"Derechos laborales, seguridad social, educación" },
-      { fecha:"6 Mayo", protestas:4, estados:4, tipo:"Laboral", exigencias:"Vivienda, participación política, derechos laborales" }
-    ]
-  }
 ];
