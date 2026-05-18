@@ -738,6 +738,8 @@ export function TabIODA() {
   eventsRef.current = events;
   const [regionLoading, setRegionLoading] = useState(false);
   const [rawEnriching, setRawEnriching] = useState(false); // Fase 2: enriching with signals/raw
+  const [loadingSteps, setLoadingSteps] = useState([]); // [{msg, done, active}]
+  const [rawProgress, setRawProgress] = useState({ current: 0, total: 0 }); // Phase 2 progress
   const [selectedState, setSelectedState] = useState(null);
   const [selectedStateData, setSelectedStateData] = useState(null); // signals/raw for selected state
   const [selectedStateLoading, setSelectedStateLoading] = useState(false);
@@ -842,8 +844,21 @@ export function TabIODA() {
   // ── 3. Load regional data using IODA outage endpoints (lightweight) ──
   const loadRegions = useCallback(async () => {
     setRegionLoading(true);
+    setRawProgress({ current: 0, total: 0 });
+    setLoadingSteps([
+      { id: "connect", msg: "Conectando con IODA · Georgia Tech", done: false, active: true },
+      { id: "alerts",  msg: "Obteniendo alertas de los 24 estados",   done: false, active: false },
+      { id: "analysis",msg: "Analizando índices de conectividad y electricidad", done: false, active: false },
+      { id: "raw",     msg: "Enriqueciendo con señal cruda",           done: false, active: false },
+    ]);
+
+    const stepDone = (id, nextId) => setLoadingSteps(prev => prev.map(s =>
+      s.id === id    ? { ...s, done: true,  active: false } :
+      s.id === nextId ? { ...s, active: true } : s
+    ));
     
     // Fetch summary + alerts for all states in parallel (2 calls per state — same as before)
+    stepDone("connect", "alerts");
     const results = await Promise.allSettled(
       VE_REGIONS.map(async (st) => {
         const [summaryJson, alertsJson] = await Promise.all([
@@ -1090,6 +1105,7 @@ export function TabIODA() {
       })
     );
     
+    stepDone("alerts", "analysis");
     const scores = results
       .filter(r => r.status === "fulfilled" && r.value)
       .map(r => r.value);
@@ -1164,8 +1180,9 @@ export function TabIODA() {
     }
     
     scores.sort((a,b) => b.dropScore - a.dropScore || a.healthPct - b.healthPct);
+    stepDone("analysis", "raw");
     setRegionScores(scores);
-    setRegionLoading(false);
+    // Note: regionLoading stays true until enrichWithRaw completes — loading screen stays visible
   }, [twFrom, twUntil]);
 
   // ── Fase 2: Enrich with signals/raw for candidate states ──
@@ -1187,8 +1204,13 @@ export function TabIODA() {
       return aSev - bSev;
     });
 
-    if (candidates.length === 0) return;
+    if (candidates.length === 0) {
+      setLoadingSteps(prev => prev.map(s => s.id === "raw" ? { ...s, done: true, active: false } : s));
+      setRegionLoading(false);
+      return;
+    }
     setRawEnriching(true);
+    setRawProgress({ current: 0, total: candidates.length });
 
     // Get national telescope series for coincidence check
     const natTeleData = nationalData
@@ -1208,7 +1230,6 @@ export function TabIODA() {
           const json = await iodaFetch(`signals/raw/region/${st.code}`, { from: twFrom, until: twUntil });
           const parsed = json ? parseSignals(json) : null;
           if (!parsed || parsed.length < 10) return;
-
           // Calibrated baseline: max historyValue from Phase 1 ping alerts
           // This is IODA's own long-term baseline — not contaminated by current crisis
           const pingAlerts = (st.alerts || []).filter(a => a.datasource === "ping-slash24");
@@ -1282,6 +1303,8 @@ export function TabIODA() {
           }));
         } catch (e) {
           // Silent fail — Phase 1 data is still valid
+        } finally {
+          setRawProgress(p => ({ ...p, current: p.current + 1 }));
         }
       }));
 
@@ -1292,6 +1315,8 @@ export function TabIODA() {
     }
 
     setRawEnriching(false);
+    setLoadingSteps(prev => prev.map(s => s.id === "raw" ? { ...s, done: true, active: false } : s));
+    setRegionLoading(false); // Loading screen released — show full results
   }, [twFrom, twUntil]);
 
   useEffect(() => { loadNational(); loadEvents(0); }, [loadNational, loadEvents]);
@@ -1870,9 +1895,87 @@ export function TabIODA() {
       {subView === "estados" && (() => {
         return (<>
         {regionLoading ? (
-          <Card><div style={{ textAlign:"center", padding:40, color:MUTED, fontSize:14, fontFamily:font }}>
-            <div style={{ fontSize:20, marginBottom:8 }}>🗺</div>Cargando datos por estado...<div style={{ fontSize:12, marginTop:4, color:`${MUTED}80` }}>24 estados · Probing + BGP · puede tardar 15-20s</div>
-          </div></Card>
+          <Card accent="#7c3aed">
+            <div style={{ padding:"32px 24px", fontFamily:font }}>
+              {/* Header */}
+              <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:24 }}>
+                <div style={{ fontSize:22 }}>🗺</div>
+                <div>
+                  <div style={{ fontSize:14, fontWeight:700, color:TEXT }}>Cargando Monitor de Conectividad</div>
+                  <div style={{ fontSize:11, color:MUTED, marginTop:2 }}>24 estados · Análisis en dos fases · puede tardar 20-40s</div>
+                </div>
+              </div>
+
+              {/* Steps */}
+              <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:20 }}>
+                {loadingSteps.map((step, idx) => {
+                  const isRaw = step.id === "raw";
+                  const rawPct = isRaw && rawProgress.total > 0
+                    ? Math.round((rawProgress.current / rawProgress.total) * 100)
+                    : 0;
+                  return (
+                    <div key={step.id} style={{ display:"flex", alignItems:"flex-start", gap:10 }}>
+                      {/* Step indicator */}
+                      <div style={{ width:18, height:18, borderRadius:"50%", flexShrink:0, marginTop:1,
+                        display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:700,
+                        background: step.done ? "#34d399" : step.active ? ACCENT : `${BORDER}40`,
+                        color: step.done || step.active ? "#fff" : MUTED,
+                        border: step.active ? `2px solid ${ACCENT}` : "none",
+                        transition:"all 0.3s" }}>
+                        {step.done ? "✓" : idx + 1}
+                      </div>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:12, color: step.done ? "#34d399" : step.active ? TEXT : `${MUTED}80`,
+                          fontWeight: step.active ? 600 : 400, transition:"all 0.3s" }}>
+                          {step.msg}
+                          {step.active && !step.done && <span style={{ marginLeft:6, color:ACCENT }}>...</span>}
+                          {step.done && <span style={{ marginLeft:6, color:"#34d399", fontSize:10 }}>✓ completado</span>}
+                        </div>
+                        {/* Raw enrichment progress bar */}
+                        {isRaw && step.active && rawProgress.total > 0 && (
+                          <div style={{ marginTop:5 }}>
+                            <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
+                              <span style={{ fontSize:9, color:MUTED }}>{rawProgress.current} / {rawProgress.total} estados analizados</span>
+                              <span style={{ fontSize:9, color:ACCENT, fontWeight:700 }}>{rawPct}%</span>
+                            </div>
+                            <div style={{ height:4, background:`${BORDER}30`, borderRadius:2, overflow:"hidden" }}>
+                              <div style={{ height:4, width:`${rawPct}%`, background:ACCENT, borderRadius:2, transition:"width 0.4s ease" }} />
+                            </div>
+                            <div style={{ fontSize:9, color:`${MUTED}70`, marginTop:3 }}>
+                              Señal cruda · baseline calibrado con historyValue de IODA · umbrales sub-críticos
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Overall progress bar */}
+              {(() => {
+                const doneCount = loadingSteps.filter(s => s.done).length;
+                const pct = loadingSteps.length > 0
+                  ? Math.round(((doneCount + (rawProgress.total > 0 ? rawProgress.current / rawProgress.total : 0)) / loadingSteps.length) * 100)
+                  : 0;
+                return (
+                  <div>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
+                      <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>Progreso total</span>
+                      <span style={{ fontSize:10, fontFamily:font, color:ACCENT, fontWeight:700 }}>{pct}%</span>
+                    </div>
+                    <div style={{ height:6, background:`${BORDER}30`, borderRadius:3, overflow:"hidden" }}>
+                      <div style={{ height:6, width:`${pct}%`, background:`linear-gradient(90deg, ${ACCENT}, #7c3aed)`,
+                        borderRadius:3, transition:"width 0.4s ease" }} />
+                    </div>
+                    <div style={{ fontSize:9, color:`${MUTED}60`, marginTop:6, textAlign:"right" }}>
+                      Fuente: Georgia Tech IODA · /outages/alerts + /outages/summary + /signals/raw
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </Card>
         ) : (
           <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 320px", gap:14 }}>
             {/* Leaflet Map */}
