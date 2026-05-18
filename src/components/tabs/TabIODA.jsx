@@ -897,53 +897,115 @@ export function TabIODA() {
           : 100;
         const connectivityHealth = Math.min(pingHealth, bgpHealth);
         
-        // Electricity: find critical ping events where BGP was NOT also critical at same time
-        const criticalPing = pingAlerts.filter(a => a.level === "critical");
-        const criticalBgp = bgpAlerts.filter(a => a.level === "critical");
-        
+        // ── Electricity detection ── C1+C2+C3+C4 ──
+
+        // Separate by level
+        const pingCritical = pingAlerts.filter(a => a.level === "critical").sort((a,b) => a.time - b.time);
+        const pingWarning  = pingAlerts.filter(a => a.level === "warning").sort((a,b) => a.time - b.time);
+        const bgpCritical  = bgpAlerts.filter(a => a.level === "critical");
+
+        // C1: BGP veto by magnitude — only critical BGP alerts that drop >20% of historyValue veto
+        const isBgpVeto = (t1, t2) => bgpCritical.some(b => {
+          if (b.time < t1 - 1800 || b.time > t2 + 1800) return false;
+          if (!b.historyValue || b.historyValue === 0) return false;
+          return (b.historyValue - b.value) / b.historyValue > 0.20;
+        });
+
+        // Helper: cluster adjacent alerts (≤45min gap) into composite events
+        const buildClusters = (list, isCritical) => {
+          const out = []; let cur = null;
+          for (const a of list) {
+            if (!cur || (a.time - cur.lastTime) > 2700) {
+              cur = { alerts:[a], firstTime:a.time, lastTime:a.time, isCritical };
+              out.push(cur);
+            } else { cur.alerts.push(a); cur.lastTime = a.time; }
+          }
+          return out;
+        };
+
+        // C4: use already-loaded events (eventsRef) as independent confirmation signal
+        const cachedEvts = eventsRef.current;
+        const iodaConfirmsState = (t1, t2) => cachedEvts.some(e =>
+          e.region === st.name && e.datasource === "ping-slash24" &&
+          e.time >= t1 - 3600 && e.time <= t2 + 3600
+        );
+
+        const processCluster = (cluster) => {
+          const drops = cluster.alerts.map(a =>
+            a.historyValue > 0 ? Math.round(((a.historyValue - a.value) / a.historyValue) * 100) : 0
+          );
+          const maxDrop   = Math.max(...drops);
+          const firstDrop = drops[0];
+          const durationSec = Math.max(600, cluster.lastTime - cluster.firstTime);
+          const isAbrupt    = firstDrop >= maxDrop * 0.65; // C3 lowered from 0.80
+          const bgpAlsoDown = isBgpVeto(cluster.firstTime, cluster.lastTime);
+          const iodaConfirmed = iodaConfirmsState(cluster.firstTime, cluster.lastTime); // C4
+          // C3: single alert with drop >35% counts as direct evidence
+          const isSingleSevere = cluster.alerts.length === 1 && maxDrop > 35;
+          // C2: warning clusters need ≥2 alerts or IODA confirmation
+          if (!cluster.isCritical && cluster.alerts.length < 2 && !iodaConfirmed) return null;
+          const peakAlert = cluster.alerts[drops.indexOf(maxDrop)];
+          return {
+            ts: cluster.firstTime, tsEnd: cluster.lastTime, durationSec,
+            dropPct: maxDrop, firstDrop, isAbrupt, isSingleSevere, iodaConfirmed,
+            isWarningOnly: !cluster.isCritical, alertCount: cluster.alerts.length,
+            value: peakAlert.value, historyValue: peakAlert.historyValue,
+            bgpAlsoDown, isElectric: !bgpAlsoDown,
+          };
+        };
+
         const powerEvents = [];
-        const bgpStable = criticalBgp.length === 0;
-        
-        for (const alert of criticalPing) {
-          const dropPct = alert.historyValue > 0
-            ? Math.round(((alert.historyValue - alert.value) / alert.historyValue) * 100)
-            : 0;
-          // Check if BGP also critical within ±30min
-          const bgpAlsoDown = criticalBgp.some(b => Math.abs(b.time - alert.time) < 1800);
-          
-          powerEvents.push({
-            ts: alert.time,
-            dropPct,
-            value: alert.value,
-            historyValue: alert.historyValue,
-            bgpAlsoDown,
-            isElectric: !bgpAlsoDown,
-            iodaCritical: alert.level === "critical", // ping down + BGP stable = likely electric
-          });
+        const bgpStable = bgpCritical.length === 0;
+
+        for (const c of buildClusters(pingCritical, true)) {
+          const ev = processCluster(c); if (ev) powerEvents.push(ev);
         }
-        
-        // Electricity index: respect IODA critical level + count
+        for (const c of buildClusters(pingWarning, false)) {
+          const ev = processCluster(c); if (!ev) continue;
+          // Don't overlap with an existing critical event
+          if (!powerEvents.some(e => Math.abs(e.ts - ev.ts) < 1800)) powerEvents.push(ev);
+        }
+        powerEvents.sort((a,b) => a.ts - b.ts);
+
         const electricEvents = powerEvents.filter(e => e.isElectric);
+        // R5: elecScore = Σ(dropPct × 10min-buckets)
+        const elecScore = electricEvents.reduce((acc, e) =>
+          acc + e.dropPct * Math.max(1, Math.round(e.durationSec / 600)), 0);
+
         let elecHealth = 100, elecLabel = "Normal", elecConfidence = null;
         if (electricEvents.length > 0) {
-          const criticalCount = electricEvents.filter(e => e.iodaCritical).length;
-          const worstDrop = Math.max(...electricEvents.map(e => e.dropPct));
-          // Severity from worst drop, boosted by IODA critical count
-          if (worstDrop > 60) { elecHealth = 20; }
-          else if (worstDrop > 40) { elecHealth = 40; }
-          else if (worstDrop > 25) { elecHealth = 60; }
-          else if (criticalCount >= 3) { elecHealth = 50; }
-          else if (criticalCount >= 1) { elecHealth = 60; }
-          else { elecHealth = 80; }
-          // Confidence: starts low, boosted later by regional correlation + telescope
-          elecConfidence = "baja";
-          // Label with confidence (will be upgraded in post-processing)
+          const worstDrop   = Math.max(...electricEvents.map(e => e.dropPct));
+          const critCount   = electricEvents.filter(e => !e.isWarningOnly).length;
+          const warnOnly    = electricEvents.every(e => e.isWarningOnly);
+          const hasAbrupt   = electricEvents.some(e => e.isAbrupt && e.dropPct >= 20);
+          const hasIodaConf = electricEvents.some(e => e.iodaConfirmed);
+          const hasSingle   = electricEvents.some(e => e.isSingleSevere);
+
+          if (!warnOnly) {
+            // Lower thresholds: 60/40/25 → 45/28/15
+            if (worstDrop > 45 || hasSingle) elecHealth = 20;
+            else if (worstDrop > 28) elecHealth = 40;
+            else if (worstDrop > 15) elecHealth = 60;
+            else if (critCount >= 3)  elecHealth = 50;
+            else if (critCount >= 1)  elecHealth = 60;
+            else elecHealth = 80;
+          } else {
+            // C2: warning-only path — capped at 65
+            elecHealth = Math.max(65, electricEvents.length >= 3 ? 55 : electricEvents.length >= 2 ? 65 : 70);
+          }
+          // Boosts
+          if (hasAbrupt   && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
+          if (hasIodaConf && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 5);
+
+          elecConfidence = hasIodaConf ? "media" : "baja";
+
           if (elecHealth <= 30) elecLabel = "Posible interrupción eléctrica severa";
           else if (elecHealth <= 50) elecLabel = "Posible interrupción eléctrica moderada";
-          else if (elecHealth <= 70) elecLabel = "Posible interrupción eléctrica leve";
+          else if (elecHealth <= 70) elecLabel = warnOnly
+            ? "Posible interrupción eléctrica leve (señal débil)"
+            : "Posible interrupción eléctrica leve";
           else elecLabel = "Fluctuación";
         } else if (powerEvents.length > 0 && !bgpStable) {
-          // Ping critical + BGP critical = infrastructure/censorship, not electricity
           elecHealth = 100;
           elecLabel = "Normal (corte infra.)";
         }
@@ -960,6 +1022,7 @@ export function TabIODA() {
           // Electricity
           elecHealth, elecLabel, elecConfidence,
           elecEvents: electricEvents.length,
+          elecScore,
           powerEvents,
           bgpStable,
           // Raw alert data for detail panel
@@ -995,7 +1058,7 @@ export function TabIODA() {
       if (alreadyClustered) continue;
       
       const affectedStates = scores.filter(s => s.powerEvents?.some(ev => Math.abs(ev.ts - t) < 1800));
-      if (affectedStates.length > scores.length * 0.5) {
+      if (affectedStates.length > scores.length * 0.35) { // lowered from 0.5
         const drops = affectedStates.map(s => {
           const ev = s.powerEvents.find(ev => Math.abs(ev.ts - t) < 1800);
           return ev?.dropPct || 0;
@@ -1025,14 +1088,18 @@ export function TabIODA() {
         const neighborCount = scores.filter(other => other !== s && other.powerEvents?.some(oev =>
           s.powerEvents.some(sev => Math.abs(oev.ts - sev.ts) < 1800)
         )).length;
-        // Confidence: neighbors boost it, national event = high
+        // Confidence: neighbors boost, national = high
         let confidence = "baja";
-        if (worstNatSev) confidence = "alta"; // national = high confidence electric
-        else if (neighborCount >= 3) confidence = "alta";
+        if (worstNatSev) confidence = "alta";
+        else if (neighborCount >= 2) confidence = "alta"; // lowered from 3
         else if (neighborCount >= 1) confidence = "media";
+        // Abrupt pattern or IODA confirmation upgrade baja → media
+        const hasAbruptStrong = s.powerEvents.some(ev => ev.isAbrupt && ev.dropPct >= 20 && !ev.bgpAlsoDown);
+        const hasIodaConf     = s.powerEvents.some(ev => ev.iodaConfirmed && !ev.bgpAlsoDown);
+        if ((hasAbruptStrong || hasIodaConf) && confidence === "baja") confidence = "media";
         s.elecConfidence = confidence;
         if (hasRegional) {
-          s.elecHealth = worstRegDrop > 60 ? 20 : worstRegDrop > 40 ? 40 : worstRegDrop > 25 ? 60 : 80;
+          s.elecHealth = worstRegDrop > 45 ? 20 : worstRegDrop > 28 ? 40 : worstRegDrop > 15 ? 60 : 80;
           const sevWord = s.elecHealth <= 30 ? "severa" : s.elecHealth <= 50 ? "moderada" : s.elecHealth <= 70 ? "leve" : "";
           s.elecLabel = confidence === "alta" ? `Interrupción eléctrica regional ${sevWord}`.trim()
             : confidence === "media" ? `Posible interrupción eléctrica regional ${sevWord}`.trim()
@@ -1686,14 +1753,20 @@ export function TabIODA() {
                   <div style={{ display:"flex", justifyContent:"space-between", padding:"4px 8px", borderBottom:`1px solid ${BORDER}`, marginBottom:4 }}>
                     <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", flex:1 }}>Región</span>
                     <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", width:55, textAlign:"center" }}>🌐 Internet</span>
-                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", width:55, textAlign:"center" }}>⚡ Elec.</span>
+                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", width:80, textAlign:"center" }}>⚡ Elec.</span>
                   </div>
                   <div style={{ maxHeight:400, overflowY:"auto" }}>
                     {activeData.map((r, i) => {
                       const elecC = r.elecHealth >= 90 ? "#34d399" : r.elecHealth >= 60 ? "#fbbf24" : r.elecHealth >= 40 ? "#f97316" : "#ef4444";
+                      // R7: confidence badge
+                      const confColor = r.elecConfidence === "alta" ? "#16a34a" : r.elecConfidence === "media" ? "#ca8a04" : "#94a3b8";
+                      const confLabel = r.elecConfidence === "alta" ? "A" : r.elecConfidence === "media" ? "M" : "B";
+                      // R3: abrupt pattern from worst event
+                      const hasAbrupt = r.powerEvents?.some(ev => ev.isAbrupt && ev.dropPct >= 20 && !ev.bgpAlsoDown);
                       return (
                         <div key={r.code}
                           onClick={() => setSelectedState(selectedState === r.name ? null : r.name)}
+                          title={r.elecScore > 0 ? `Score eléctrico: ${r.elecScore}${r.elecConfidence ? ` · Confianza ${r.elecConfidence}` : ""}${hasAbrupt ? " · Caída abrupta" : ""}` : ""}
                           style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px",
                             background:selectedState === r.name ? `${ACCENT}15` : i % 2 ? "rgba(0,0,0,0.02)" : "transparent",
                             cursor:"pointer", borderRadius:3 }}>
@@ -1706,15 +1779,30 @@ export function TabIODA() {
                               {r.connectivityHealth}%
                             </span>
                           </div>
-                          <div style={{ width:55, textAlign:"center" }}>
+                          <div style={{ width:80, textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center", gap:3 }}>
                             <span style={{ fontSize:12, fontWeight:700, fontFamily:font, color:elecC }}>
                               {r.elecHealth}%
                             </span>
-                            {r.elecEvents > 0 && <span style={{ fontSize:8, color:elecC }}> ⚡{r.elecEvents}</span>}
+                            {r.elecEvents > 0 && <span style={{ fontSize:8, color:elecC }}>⚡{r.elecEvents}</span>}
+                            {/* R7: confidence badge — only shown when there's an electric event */}
+                            {r.elecConfidence && r.elecHealth < 100 && (
+                              <span title={`Confianza ${r.elecConfidence}${hasAbrupt ? " · patrón abrupto" : ""}`}
+                                style={{ fontSize:8, fontFamily:font, fontWeight:700, padding:"1px 3px",
+                                  borderRadius:2, background:`${confColor}25`, color:confColor, lineHeight:1.2 }}>
+                                {confLabel}{hasAbrupt ? "↓" : ""}
+                              </span>
+                            )}
                           </div>
                         </div>
                       );
                     })}
+                  </div>
+                  {/* R5+R7: legend */}
+                  <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}80`, marginTop:5, padding:"4px 8px",
+                    borderTop:`1px solid ${BORDER}40`, display:"flex", gap:10, flexWrap:"wrap" }}>
+                    <span>⚡N = N° eventos</span>
+                    <span>A/M/B = confianza Alta/Media/Baja</span>
+                    <span>↓ = caída abrupta</span>
                   </div>
                 </>)}
               </Card>
