@@ -1298,12 +1298,13 @@ export function TabIODA() {
   useEffect(() => { if (subView === "estados") loadRegions(); }, [subView, loadRegions]);
   // Reload events when eventsBack changes
   useEffect(() => { loadEvents(eventsBack); }, [eventsBack]);
-  // Fase 2: enrich with raw signals after Phase 1 regions load
+  // Fase 2: enrich with raw signals after Phase 1 completes
+  // Depend on regionLoading (false = just finished) + twFrom to re-run on time window change
   useEffect(() => {
     if (regionScores.length > 0 && !regionLoading) {
       enrichWithRaw(regionScores, signals);
     }
-  }, [regionScores.length, regionLoading]); // eslint-disable-line
+  }, [regionLoading, twFrom, twUntil]); // eslint-disable-line
   
   // Auto-refresh every 5 min for 24h/48h modes
   useEffect(() => {
@@ -1880,10 +1881,19 @@ export function TabIODA() {
                 <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
                   Mapa de Interrupciones · {timeLabel}
                 </div>
-                <button onClick={() => { setExportOpen(true); setExportError(null); }}
-                  style={{ fontSize:11, fontFamily:font, padding:"4px 12px", background:"transparent", border:`1px solid ${BORDER}`, color:MUTED, cursor:"pointer", borderRadius:3, display:"flex", alignItems:"center", gap:4 }}>
-                  ⬇ Exportar XLSX
-                </button>
+                <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                  <button onClick={() => { setRegionScores([]); loadRegions(); }}
+                    disabled={regionLoading || rawEnriching}
+                    style={{ fontSize:11, fontFamily:font, padding:"4px 10px", background:"transparent",
+                      border:`1px solid ${BORDER}`, color:regionLoading||rawEnriching?`${MUTED}40`:MUTED,
+                      cursor:regionLoading||rawEnriching?"wait":"pointer", borderRadius:3 }}>
+                    ↻ Actualizar
+                  </button>
+                  <button onClick={() => { setExportOpen(true); setExportError(null); }}
+                    style={{ fontSize:11, fontFamily:font, padding:"4px 12px", background:"transparent", border:`1px solid ${BORDER}`, color:MUTED, cursor:"pointer", borderRadius:3 }}>
+                    ⬇ Exportar XLSX
+                  </button>
+                </div>
               </div>
               <div style={{ display:"flex", gap:12, marginBottom:6, flexWrap:"wrap" }}>
                 <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>
