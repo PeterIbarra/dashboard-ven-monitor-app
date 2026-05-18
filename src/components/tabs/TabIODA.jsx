@@ -766,8 +766,10 @@ export function TabIODA() {
   const [events, setEvents] = useState([]);
   const [regionScores, setRegionScores] = useState([]);
   const regionScoresRef = useRef([]);
-  // Keep ref in sync
+  const eventsRef = useRef([]);
+  // Keep refs in sync
   regionScoresRef.current = regionScores;
+  eventsRef.current = events;
   const [regionLoading, setRegionLoading] = useState(false);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedStateData, setSelectedStateData] = useState(null); // signals/raw for selected state
@@ -874,13 +876,12 @@ export function TabIODA() {
   const loadRegions = useCallback(async () => {
     setRegionLoading(true);
     
-    // Fetch summary + alerts + events for all states in parallel
+    // Fetch summary + alerts for all states in parallel (2 calls per state — same as before)
     const results = await Promise.allSettled(
       VE_REGIONS.map(async (st) => {
-        const [summaryJson, alertsJson, eventsJson] = await Promise.all([
+        const [summaryJson, alertsJson] = await Promise.all([
           iodaFetch(`outages/summary`, { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }),
           iodaFetch(`outages/alerts`,  { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }),
-          iodaFetch(`outages/events`,  { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }), // C4
         ]);
         
         // Parse summary
@@ -890,9 +891,12 @@ export function TabIODA() {
         const bgpScore = summary.scores?.["bgp.median"] ?? 0;
         const eventCnt = summary.event_cnt ?? 0;
         
-        // C4: parse IODA-detected events (independent signal)
-        const iodaEvents = Array.isArray(eventsJson?.data) ? eventsJson.data : [];
-        const iodaPingEvents = iodaEvents.filter(e => e.datasource === "ping-slash24");
+        // C4: use already-loaded events from eventsRef (no extra API call)
+        // loadEvents() already fetched /outages/events for the same time window
+        const cachedEvents = eventsRef.current;
+        const iodaPingEvents = cachedEvents.filter(e =>
+          e.region === st.name && e.datasource === "ping-slash24"
+        );
         
         // Parse alerts — C2: include both critical AND warning
         const alerts = Array.isArray(alertsJson?.data) ? alertsJson.data : [];
