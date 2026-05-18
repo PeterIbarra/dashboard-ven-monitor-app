@@ -6,6 +6,7 @@ import { Badge } from "../Badge";
 import { Card } from "../Card";
 import { TwitterTimeline } from "../TwitterTimeline";
 import { loadScript, loadCSS } from "../../utils";
+import * as XLSX from "xlsx";
 
 // ── IODA Venezuelan state codes (confirmed from API) ──
 const VE_REGIONS = [
@@ -748,8 +749,17 @@ export function TabIODA() {
   const [aiExplain, setAiExplain] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [subView, setSubView] = useState("estados"); // estados | eventos | nacional
-  const [focusEvent, setFocusEvent] = useState(null); // timestamp to zoom chart to
-  const [expandedEvent, setExpandedEvent] = useState(null); // index of event to show explanation
+  const [focusEvent, setFocusEvent] = useState(null);
+  const [expandedEvent, setExpandedEvent] = useState(null);
+  const [eventsBack, setEventsBack] = useState(0);
+  const [eventsStateFilter, setEventsStateFilter] = useState(null);
+  // ── Export modal ──
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportPreset, setExportPreset] = useState("7d");
+  const [exportCustomFrom, setExportCustomFrom] = useState("");
+  const [exportCustomUntil, setExportCustomUntil] = useState("");
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportError, setExportError] = useState(null);
 
   // ── Unified time window (stable — only recalculates on user action) ──
   const [timePreset, setTimePreset] = useState("24h"); // 24h | 48h | 7d | 30d | custom
@@ -758,7 +768,7 @@ export function TabIODA() {
   const [timeEpoch, setTimeEpoch] = useState(() => Math.floor(Date.now() / 1000)); // frozen "now"
   
   // Refreeze "now" when preset changes (not on every render)
-  const changePreset = (p) => { setTimePreset(p); setTimeEpoch(Math.floor(Date.now() / 1000)); setRegionScores([]); };
+  const changePreset = (p) => { setTimePreset(p); setTimeEpoch(Math.floor(Date.now() / 1000)); setRegionScores([]); setEventsBack(0); setEventsStateFilter(null); };
   
   // Compute actual from/until epoch — memoized to prevent re-renders
   const twFrom = useMemo(() => {
@@ -787,12 +797,16 @@ export function TabIODA() {
   }, [twFrom, twUntil]);
 
   // ── 2. Detect outage events from national + regional signal analysis ──
-  const loadEvents = useCallback(async () => {
+  const loadEvents = useCallback(async (backOffset = 0) => {
     const allEvents = [];
-    
+    // Compute time window — may differ from main window when navigating back
+    const periodLen = twUntil - twFrom;
+    const evFrom  = twFrom  - backOffset * periodLen;
+    const evUntil = twUntil - backOffset * periodLen;
+
     // National events
     try {
-      const natJson = await iodaFetch(`outages/events`, { entityType: "country", entityCode: "VE", from: twFrom, until: twUntil });
+      const natJson = await iodaFetch(`outages/events`, { entityType: "country", entityCode: "VE", from: evFrom, until: evUntil });
       const natEvents = Array.isArray(natJson?.data) ? natJson.data : [];
       natEvents.forEach(ev => {
         const severity = ev.score > 5000 ? "critical" : ev.score > 1000 ? "high" : "medium";
@@ -812,7 +826,7 @@ export function TabIODA() {
     
     const regionResults = await Promise.allSettled(
       statesToQuery.map(async (st) => {
-        const json = await iodaFetch(`outages/events`, { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil });
+        const json = await iodaFetch(`outages/events`, { entityType: "region", entityCode: st.code, from: evFrom, until: evUntil });
         const evts = Array.isArray(json?.data) ? json.data : [];
         return evts.map(ev => {
           const severity = ev.score > 3000 ? "critical" : ev.score > 500 ? "high" : "medium";
@@ -827,7 +841,7 @@ export function TabIODA() {
     regionResults.forEach(r => { if (r.status === "fulfilled" && r.value) allEvents.push(...r.value); });
     
     allEvents.sort((a,b) => b.time - a.time);
-    setEvents(allEvents.slice(0, 60));
+    setEvents(allEvents.slice(0, 80));
   }, [twFrom, twUntil]);
 
   // ── 3. Load regional data using IODA outage endpoints (lightweight) ──
@@ -1035,8 +1049,9 @@ export function TabIODA() {
     setRegionLoading(false);
   }, [twFrom, twUntil]);
 
-  useEffect(() => { loadNational(); loadEvents(); }, [loadNational, loadEvents]);
+  useEffect(() => { loadNational(); loadEvents(0); }, [loadNational, loadEvents]);
   useEffect(() => { if (subView === "estados") loadRegions(); }, [subView, loadRegions]);
+  useEffect(() => { loadEvents(eventsBack); }, [eventsBack]); // reload when navigating back
   
   // Auto-refresh every 5 min for 24h/48h modes
   useEffect(() => {
@@ -1257,8 +1272,159 @@ export function TabIODA() {
     displayScore: r.dropScore || 0,
   })).sort((a,b) => b.displayScore - a.displayScore || a.healthPct - b.healthPct);
 
+  // ── Export XLSX ──
+  const runExport = async () => {
+    setExportLoading(true); setExportError(null);
+    try {
+      const now = Math.floor(Date.now() / 1000);
+      let expFrom, expUntil;
+      if (exportPreset === "custom") {
+        if (!exportCustomFrom || !exportCustomUntil) { setExportError("Selecciona fechas de inicio y fin."); setExportLoading(false); return; }
+        expFrom  = Math.floor(new Date(exportCustomFrom).getTime()  / 1000);
+        expUntil = Math.floor(new Date(exportCustomUntil).getTime() / 1000);
+      } else {
+        const hrs = { "24h":24, "48h":48, "7d":168, "30d":720 }[exportPreset] || 168;
+        expFrom = now - hrs * 3600; expUntil = now;
+      }
+      const periodLabel = exportPreset === "custom"
+        ? `${new Date(expFrom*1000).toLocaleDateString("es-VE")} — ${new Date(expUntil*1000).toLocaleDateString("es-VE")}`
+        : exportPreset;
+      const fmtDate = ts => ts ? new Date(ts*1000).toLocaleString("es-VE",{timeZone:"America/Caracas",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}) : "";
+
+      // Fetch events
+      const allEvts = [];
+      try {
+        const natJson = await iodaFetch("outages/events",{entityType:"country",entityCode:"VE",from:expFrom,until:expUntil});
+        (Array.isArray(natJson?.data)?natJson.data:[]).forEach(ev => allEvts.push({time:ev.start,region:"🇻🇪 Nacional",datasource:ev.datasource,condition:ev.score>5000?"critical":ev.score>1000?"high":"medium",score:ev.score||0,duration:ev.duration||0}));
+      } catch {}
+      const regEvts = await Promise.allSettled(VE_REGIONS.map(async st => {
+        const json = await iodaFetch("outages/events",{entityType:"region",entityCode:st.code,from:expFrom,until:expUntil});
+        return (Array.isArray(json?.data)?json.data:[]).map(ev=>({time:ev.start,region:st.name,datasource:ev.datasource,condition:ev.score>3000?"critical":ev.score>500?"high":"medium",score:ev.score||0,duration:ev.duration||0}));
+      }));
+      regEvts.forEach(r=>{if(r.status==="fulfilled"&&r.value)allEvts.push(...r.value);});
+      allEvts.sort((a,b)=>b.time-a.time);
+
+      // Fetch region scores
+      const regScores = await Promise.allSettled(VE_REGIONS.map(async st => {
+        const [sumJson, altJson] = await Promise.all([
+          iodaFetch("outages/summary",{entityType:"region",entityCode:st.code,from:expFrom,until:expUntil}),
+          iodaFetch("outages/alerts", {entityType:"region",entityCode:st.code,from:expFrom,until:expUntil}),
+        ]);
+        const summary = sumJson?.data?.[0]||{};
+        const alerts  = Array.isArray(altJson?.data)?altJson.data:[];
+        const ping = alerts.filter(a=>a.datasource==="ping-slash24");
+        const bgp  = alerts.filter(a=>a.datasource==="bgp");
+        const critPing = ping.filter(a=>a.level==="critical");
+        const critBgp  = bgp.filter(a=>a.level==="critical");
+        const elecEvts = critPing.filter(a=>!critBgp.some(b=>Math.abs(b.time-a.time)<1800));
+        const worstPing = critPing.sort((a,b)=>(a.value/a.historyValue)-(b.value/b.historyValue))[0];
+        const lastPing  = ping[ping.length-1];
+        const lastBgp   = bgp[bgp.length-1];
+        const overallScore = summary.scores?.overall??0;
+        let pingHealth = worstPing?.historyValue>0 ? Math.min(100,Math.round((worstPing.value/worstPing.historyValue)*100))
+          : lastPing?.historyValue>0 ? Math.min(100,Math.round((lastPing.value/lastPing.historyValue)*100))
+          : overallScore>50000?30:overallScore>20000?50:overallScore>10000?60:overallScore>5000?70:overallScore>1000?85:overallScore>0?90:100;
+        const bgpHealth = lastBgp?.historyValue>0?Math.min(100,Math.round((lastBgp.value/lastBgp.historyValue)*100)):100;
+        const connHealth = Math.min(pingHealth,bgpHealth);
+        let elecHealth=100,elecLabel="Normal";
+        if(elecEvts.length>0){const wd=Math.max(...elecEvts.map(e=>e.historyValue>0?Math.round(((e.historyValue-e.value)/e.historyValue)*100):0));elecHealth=wd>60?20:wd>40?40:wd>25?60:elecEvts.length>=3?50:60;elecLabel=elecHealth<=30?"Posible interrupción eléctrica severa":elecHealth<=50?"Posible interrupción eléctrica moderada":"Posible interrupción eléctrica leve";}
+        return {name:st.name,connHealth,elecHealth,elecLabel,elecEvents:elecEvts.length,overallScore,eventCnt:summary.event_cnt??0};
+      }));
+      const regionRows = regScores.filter(r=>r.status==="fulfilled"&&r.value).map(r=>r.value).sort((a,b)=>a.connHealth-b.connHealth);
+
+      // Build workbook
+      const wb = XLSX.utils.book_new();
+      const ws1 = XLSX.utils.json_to_sheet(allEvts.length>0 ? allEvts.map(ev=>({
+        "Fecha (VET)":fmtDate(ev.time),"Región":ev.region,"Fuente":ev.datasource||"",
+        "Severidad":ev.condition==="critical"?"CRÍTICO":ev.condition==="high"?"ALTO":"MEDIO",
+        "Score IODA":ev.score,"Duración":ev.duration>0?(ev.duration<3600?`${Math.round(ev.duration/60)}m`:`${Math.floor(ev.duration/3600)}h ${Math.round((ev.duration%3600)/60)}m`):"en curso",
+      })) : [{"Fecha (VET)":"Sin eventos","Región":"","Fuente":"","Severidad":"","Score IODA":"","Duración":""}]);
+      ws1["!cols"]=[{wch:18},{wch:20},{wch:12},{wch:10},{wch:12},{wch:10}];
+      XLSX.utils.book_append_sheet(wb,ws1,"Eventos");
+      const ws2 = XLSX.utils.json_to_sheet(regionRows.length>0 ? regionRows.map(r=>({
+        "Estado":r.name,"Conectividad %":r.connHealth,"Electricidad %":r.elecHealth,
+        "Estado eléctrico":r.elecLabel,"Eventos eléctricos":r.elecEvents,
+        "Score IODA total":r.overallScore,"N° eventos IODA":r.eventCnt,
+      })) : [{"Estado":"Sin datos"}]);
+      ws2["!cols"]=[{wch:20},{wch:15},{wch:15},{wch:38},{wch:18},{wch:18},{wch:16}];
+      XLSX.utils.book_append_sheet(wb,ws2,"Ranking Estados");
+      const ws3 = XLSX.utils.json_to_sheet([
+        {"Campo":"Fuente","Valor":"IODA — Georgia Tech INETINTEL"},
+        {"Campo":"Período","Valor":periodLabel},
+        {"Campo":"Desde (UTC)","Valor":new Date(expFrom*1000).toISOString()},
+        {"Campo":"Hasta (UTC)","Valor":new Date(expUntil*1000).toISOString()},
+        {"Campo":"Generado","Valor":new Date().toLocaleString("es-VE",{timeZone:"America/Caracas"})},
+        {"Campo":"Total eventos","Valor":allEvts.length},
+        {"Campo":"Estados analizados","Valor":regionRows.length},
+      ]);
+      ws3["!cols"]=[{wch:20},{wch:45}];
+      XLSX.utils.book_append_sheet(wb,ws3,"Metadata");
+      XLSX.writeFile(wb,`IODA_Venezuela_${exportPreset}_${new Date().toISOString().slice(0,10)}.xlsx`);
+      setExportOpen(false);
+    } catch(e) { setExportError("Error al generar el archivo: "+e.message); }
+    setExportLoading(false);
+  };
+
+  const ExportModal = () => {
+    if (!exportOpen) return null;
+    return (
+      <div onClick={e=>{if(e.target===e.currentTarget)setExportOpen(false);}}
+        style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <div style={{background:"#fff",borderRadius:6,padding:24,minWidth:340,maxWidth:420,boxShadow:"0 8px 32px rgba(0,0,0,0.18)",fontFamily:font}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+            <div style={{fontSize:15,fontWeight:700,color:TEXT}}>📥 Exportar a XLSX</div>
+            <button onClick={()=>setExportOpen(false)} style={{background:"none",border:"none",fontSize:18,cursor:"pointer",color:MUTED}}>✕</button>
+          </div>
+          <div style={{fontSize:11,color:MUTED,marginBottom:12,lineHeight:1.5}}>
+            Genera un XLSX con datos directamente de IODA para el período seleccionado.<br/>
+            Incluye: <b>Eventos</b>, <b>Ranking Estados</b> y <b>Metadata</b>.
+          </div>
+          <div style={{marginBottom:14}}>
+            <div style={{fontSize:11,color:MUTED,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:6}}>Período</div>
+            <div style={{display:"flex",gap:0,border:`1px solid ${BORDER}`,borderRadius:3,overflow:"hidden"}}>
+              {["24h","48h","7d","30d","custom"].map(p=>(
+                <button key={p} onClick={()=>setExportPreset(p)}
+                  style={{flex:1,fontSize:11,fontFamily:font,padding:"6px 4px",border:"none",
+                    background:exportPreset===p?ACCENT:"transparent",color:exportPreset===p?"#fff":MUTED,cursor:"pointer"}}>
+                  {p==="custom"?"📅":p}
+                </button>
+              ))}
+            </div>
+            {exportPreset==="custom"&&(
+              <div style={{marginTop:8,display:"flex",flexDirection:"column",gap:6}}>
+                <div>
+                  <div style={{fontSize:10,color:MUTED,marginBottom:2}}>Desde</div>
+                  <input type="datetime-local" value={exportCustomFrom} onChange={e=>setExportCustomFrom(e.target.value)}
+                    style={{width:"100%",fontSize:11,fontFamily:font,padding:"5px 8px",border:`1px solid ${BORDER}`,borderRadius:3,background:"transparent",color:TEXT,boxSizing:"border-box"}}/>
+                </div>
+                <div>
+                  <div style={{fontSize:10,color:MUTED,marginBottom:2}}>Hasta</div>
+                  <input type="datetime-local" value={exportCustomUntil} onChange={e=>setExportCustomUntil(e.target.value)}
+                    style={{width:"100%",fontSize:11,fontFamily:font,padding:"5px 8px",border:`1px solid ${BORDER}`,borderRadius:3,background:"transparent",color:TEXT,boxSizing:"border-box"}}/>
+                </div>
+              </div>
+            )}
+          </div>
+          <div style={{fontSize:11,color:MUTED,padding:"8px 10px",background:`${BORDER}12`,borderRadius:4,marginBottom:14,lineHeight:1.6}}>
+            📊 <b>Eventos:</b> fecha, región, fuente, severidad, score, duración<br/>
+            🗺 <b>Ranking Estados:</b> conectividad %, electricidad %, etiqueta, score IODA<br/>
+            📋 <b>Metadata:</b> fuente, período, fecha de generación
+          </div>
+          {exportError&&<div style={{fontSize:11,color:"#dc2626",marginBottom:10,padding:"6px 10px",background:"#fef2f2",borderRadius:3}}>{exportError}</div>}
+          <button onClick={runExport} disabled={exportLoading}
+            style={{width:"100%",fontSize:13,fontFamily:font,padding:"10px",background:exportLoading?`${BORDER}30`:ACCENT,
+              color:exportLoading?MUTED:"#fff",border:"none",borderRadius:4,cursor:exportLoading?"wait":"pointer",fontWeight:600}}>
+            {exportLoading?"⏳ Generando archivo...":"⬇ Generar y descargar XLSX"}
+          </button>
+          {exportLoading&&<div style={{fontSize:10,color:MUTED,marginTop:8,textAlign:"center"}}>Puede tardar 20–30s (consulta 24 estados a IODA)</div>}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
+      <ExportModal />
       {/* ── Header + Unified Time Picker ── */}
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:10, flexWrap:"wrap" }}>
         <span style={{ fontSize:16 }}>🌐</span>
@@ -1370,14 +1536,21 @@ export function TabIODA() {
                 <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
                   Mapa de Interrupciones · {timeLabel}
                 </div>
-                <button
-                  onClick={() => { setSelectedState(null); setRegionScores([]); loadRegions(); }}
-                  disabled={regionLoading}
-                  style={{ fontSize:11, fontFamily:font, padding:"4px 10px", background:"transparent",
-                    border:`1px solid ${BORDER}`, color:regionLoading ? `${MUTED}40` : MUTED,
-                    cursor:regionLoading ? "wait" : "pointer", borderRadius:3 }}>
-                  ↻ Actualizar
-                </button>
+                <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                  <button
+                    onClick={() => { setSelectedState(null); setRegionScores([]); loadRegions(); }}
+                    disabled={regionLoading}
+                    style={{ fontSize:11, fontFamily:font, padding:"4px 10px", background:"transparent",
+                      border:`1px solid ${BORDER}`, color:regionLoading ? `${MUTED}40` : MUTED,
+                      cursor:regionLoading ? "wait" : "pointer", borderRadius:3 }}>
+                    ↻ Actualizar
+                  </button>
+                  <button onClick={() => { setExportOpen(true); setExportError(null); }}
+                    style={{ fontSize:11, fontFamily:font, padding:"4px 10px", background:"transparent",
+                      border:`1px solid ${BORDER}`, color:MUTED, cursor:"pointer", borderRadius:3 }}>
+                    ⬇ Exportar XLSX
+                  </button>
+                </div>
               </div>
               <div style={{ display:"flex", gap:12, marginBottom:6, flexWrap:"wrap" }}>
                 <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>
@@ -1554,14 +1727,82 @@ export function TabIODA() {
       {/* ══════ EVENTOS ══════ */}
       {subView === "eventos" && (
         <Card accent="#f59e0b">
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
+          {/* Period navigation */}
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10, flexWrap:"wrap", gap:8 }}>
             <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-              Eventos Detectados · {timeLabel}
+              Eventos Detectados
             </div>
-            <span style={{ fontSize:12, fontFamily:font, color:events.length > 0 ? "#dc2626" : MUTED }}>
-              {events.length} detectados
-            </span>
+            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+              <button onClick={() => { setEventsBack(b => b + 1); setExpandedEvent(null); }}
+                style={{ fontSize:11, fontFamily:font, padding:"4px 10px", background:"transparent",
+                  border:`1px solid ${BORDER}`, color:MUTED, cursor:"pointer", borderRadius:3 }}>
+                ← Anterior
+              </button>
+              <span style={{ fontSize:11, fontFamily:font, color:MUTED, minWidth:90, textAlign:"center" }}>
+                {eventsBack === 0 ? "Período actual" : `−${eventsBack} período${eventsBack > 1 ? "s" : ""}`}
+              </span>
+              <button onClick={() => { setEventsBack(b => Math.max(0, b - 1)); setExpandedEvent(null); }}
+                disabled={eventsBack === 0}
+                style={{ fontSize:11, fontFamily:font, padding:"4px 10px", background:"transparent",
+                  border:`1px solid ${BORDER}`, color:eventsBack === 0 ? `${MUTED}30` : MUTED,
+                  cursor:eventsBack === 0 ? "default" : "pointer", borderRadius:3 }}>
+                Siguiente →
+              </button>
+              <button onClick={() => { setExportOpen(true); setExportError(null); }}
+                style={{ fontSize:11, fontFamily:font, padding:"4px 10px", background:"transparent",
+                  border:`1px solid ${BORDER}`, color:MUTED, cursor:"pointer", borderRadius:3 }}>
+                ⬇ Exportar XLSX
+              </button>
+              <span style={{ fontSize:11, fontFamily:font, color:events.length > 0 ? "#dc2626" : MUTED }}>
+                {events.length} detectados
+              </span>
+            </div>
           </div>
+
+          {/* Period date label when navigating back */}
+          {eventsBack > 0 && (() => {
+            const periodLen = twUntil - twFrom;
+            const evFrom  = twFrom  - eventsBack * periodLen;
+            const evUntil = twUntil - eventsBack * periodLen;
+            const fmt = ts => new Date(ts * 1000).toLocaleString("es-VE", { timeZone:"America/Caracas",
+              month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", hour12:false });
+            return (
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginBottom:8,
+                padding:"3px 8px", background:`${BORDER}15`, borderRadius:3 }}>
+                📅 {fmt(evFrom)} — {fmt(evUntil)}
+              </div>
+            );
+          })()}
+
+          {/* State filter chips */}
+          {events.length > 0 && (() => {
+            const stateList = ["Todos",
+              ...Array.from(new Set(events.map(e => e.region).filter(r => r !== "🇻🇪 Nacional"))).sort(),
+              "🇻🇪 Nacional"];
+            return (
+              <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:10,
+                paddingBottom:8, borderBottom:`1px solid ${BORDER}30` }}>
+                <span style={{ fontSize:10, fontFamily:font, color:MUTED, alignSelf:"center",
+                  letterSpacing:"0.08em", flexShrink:0 }}>ESTADO:</span>
+                {stateList.map(s => {
+                  const isAll  = s === "Todos";
+                  const active = isAll ? eventsStateFilter === null : eventsStateFilter === s;
+                  return (
+                    <button key={s}
+                      onClick={() => setEventsStateFilter(isAll ? null : eventsStateFilter === s ? null : s)}
+                      style={{ fontSize:10, fontFamily:font, padding:"2px 8px", borderRadius:12,
+                        background: active ? ACCENT : `${BORDER}20`,
+                        color: active ? "#fff" : MUTED,
+                        border: active ? `1px solid ${ACCENT}` : `1px solid ${BORDER}40`,
+                        cursor:"pointer", whiteSpace:"nowrap" }}>
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })()}
+
           {events.length === 0 ? (
             <div style={{ textAlign:"center", padding:"30px 0", color:MUTED, fontSize:13 }}>
               No se detectaron eventos de interrupción en este período.
@@ -1580,30 +1821,24 @@ export function TabIODA() {
                   </tr>
                 </thead>
                 <tbody>
-                  {events.map((ev, i) => {
-                    const sevColor = ev.condition === "critical" ? "#ef4444" : ev.condition === "high" ? "#f97316" : ev.condition === "medium" ? "#fbbf24" : MUTED;
-                    const dsColor = ev.datasource === "bgp" ? "#7c3aed" : ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "#f59e0b" : ev.datasource === "packet-loss" ? "#dc2626" : "#dc2626";
+                  {events.filter(ev => !eventsStateFilter || ev.region === eventsStateFilter).map((ev, i) => {
+                    const sevColor = ev.condition === "critical" ? "#ef4444" : ev.condition === "high" ? "#f97316" : "#fbbf24";
+                    const dsColor = ev.datasource === "bgp" ? "#7c3aed" : ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "#f59e0b" : "#dc2626";
                     const dsLabel = ev.datasource === "bgp" ? "BGP" : ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "SONDEO" : ev.datasource === "telescope" ? "TELESCOPIO" : ev.datasource === "packet-loss" ? "LOSS" : (ev.datasource || "?").toUpperCase();
                     const isExpanded = expandedEvent === i;
-                    // Generate explanation based on event characteristics
                     const explain = (() => {
                       const region = ev.region === "🇻🇪 Nacional" ? "a nivel nacional" : `en ${ev.region}`;
-                      const src = ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "sondeo activo (hosts que responden)"
-                        : ev.datasource === "bgp" ? "rutas BGP (anuncios de red)"
-                        : ev.datasource === "telescope" ? "telescopio de red (tráfico de fondo)"
-                        : ev.datasource === "packet-loss" ? "pérdida de paquetes" : ev.datasource;
+                      const src = ev.datasource === "probing" || ev.datasource === "ping-slash24" ? "sondeo activo"
+                        : ev.datasource === "bgp" ? "rutas BGP" : ev.datasource === "telescope" ? "telescopio de red" : ev.datasource;
                       const sev = ev.condition === "critical" ? "Evento crítico" : ev.condition === "high" ? "Evento significativo" : "Evento moderado";
                       const dur = ev.duration ? `Duración: ${fmtDuration(ev.duration)}.` : "Evento posiblemente en curso.";
-                      let cause = "";
-                      if (ev.datasource === "ping-slash24") {
-                        if (ev.score > 3000) cause = "Score alto en sondeo — consistente con un corte severo de conectividad. Si BGP se mantuvo estable, posible interrupción eléctrica regional.";
-                        else if (ev.score > 500) cause = "Score moderado en sondeo — indica interrupción significativa. Puede ser falla eléctrica parcial, falla de CANTV, o mantenimiento.";
-                        else cause = "Score bajo en sondeo — interrupción breve o de bajo impacto. Posible fluctuación de red o mantenimiento programado.";
-                      } else if (ev.datasource === "bgp") {
-                        cause = "Evento en rutas BGP — el proveedor dejó de anunciar prefijos. Más consistente con corte deliberado o falla de peering que con interrupción eléctrica.";
-                      } else {
-                        cause = "Anomalía detectada por IODA en este indicador.";
-                      }
+                      let cause = ev.datasource === "ping-slash24"
+                        ? (ev.score > 3000 ? "Score alto — consistente con corte severo. Si BGP estable, posible interrupción eléctrica regional."
+                          : ev.score > 500 ? "Score moderado — interrupción significativa. Posible falla eléctrica parcial o falla de CANTV."
+                          : "Score bajo — interrupción breve o fluctuación de red.")
+                        : ev.datasource === "bgp"
+                          ? "Evento BGP — el proveedor dejó de anunciar prefijos. Más consistente con corte deliberado que con interrupción eléctrica."
+                          : "Anomalía detectada por IODA en este indicador.";
                       return `${sev} ${region} detectado en ${src}. Score IODA: ${fmtVal(ev.score || ev.value)}. ${dur} ${cause}`;
                     })();
                     return (
@@ -1612,22 +1847,18 @@ export function TabIODA() {
                           style={{ borderBottom: isExpanded ? "none" : `1px solid ${BORDER}30`, cursor:"pointer", background: isExpanded ? `${ACCENT}06` : "transparent" }}
                           onMouseEnter={e => { if (!isExpanded) e.currentTarget.style.background = `${ACCENT}08`; }}
                           onMouseLeave={e => { if (!isExpanded) e.currentTarget.style.background = "transparent"; }}>
-                          <td style={{ padding:"8px" }}>
-                            <div style={{ color:TEXT, fontWeight:600 }}>{ev.time ? fmtTime(ev.time) : "—"}</div>
-                          </td>
+                          <td style={{ padding:"8px" }}><div style={{ color:TEXT, fontWeight:600 }}>{ev.time ? fmtTime(ev.time) : "—"}</div></td>
                           <td style={{ padding:"8px" }}>
                             <span style={{ fontSize:11, color: ev.region === "🇻🇪 Nacional" ? "#7c3aed" : TEXT, fontWeight: ev.region === "🇻🇪 Nacional" ? 600 : 400 }}>
                               {ev.region || "—"}
                             </span>
                           </td>
                           <td style={{ padding:"8px", color:MUTED, fontSize:11 }}>{ev.duration ? fmtDuration(ev.duration) : "en curso"}</td>
+                          <td style={{ padding:"8px" }}><Badge color={dsColor}>{dsLabel}</Badge></td>
                           <td style={{ padding:"8px" }}>
-                            <Badge color={dsColor}>{dsLabel}</Badge>
-                          </td>
-                          <td style={{ padding:"8px" }}>
-                            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                              <span style={{ fontSize:12, fontWeight:700, color:sevColor, textTransform:"uppercase" }}>{ev.condition === "critical" ? "CRÍTICO" : ev.condition === "high" ? "ALTO" : "MEDIO"}</span>
-                            </div>
+                            <span style={{ fontSize:12, fontWeight:700, color:sevColor, textTransform:"uppercase" }}>
+                              {ev.condition === "critical" ? "CRÍTICO" : ev.condition === "high" ? "ALTO" : "MEDIO"}
+                            </span>
                           </td>
                           <td style={{ padding:"8px", textAlign:"right" }}>
                             <span style={{ fontWeight:700, color:sevColor, fontSize:13 }}>{fmtVal(ev.score || ev.value)}</span>
@@ -1637,9 +1868,7 @@ export function TabIODA() {
                         {isExpanded && (
                           <tr style={{ borderBottom:`1px solid ${BORDER}30` }}>
                             <td colSpan={6} style={{ padding:"8px 12px 12px", background:`${ACCENT}04` }}>
-                              <div style={{ fontSize:12, color:TEXT, lineHeight:1.6, borderLeft:`3px solid ${sevColor}`, paddingLeft:10 }}>
-                                {explain}
-                              </div>
+                              <div style={{ fontSize:12, color:TEXT, lineHeight:1.6, borderLeft:`3px solid ${sevColor}`, paddingLeft:10 }}>{explain}</div>
                             </td>
                           </tr>
                         )}
@@ -1650,8 +1879,17 @@ export function TabIODA() {
               </table>
             </div>
           )}
-          <div style={{ fontSize:10, color:`${MUTED}60`, marginTop:8 }}>
-            Click en un evento para ver en la gráfica · Incluye eventos nacionales y regionales
+          <div style={{ fontSize:10, color:`${MUTED}60`, marginTop:8, display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:4 }}>
+            <span>Click en un evento para ver en la gráfica · Incluye eventos nacionales y regionales</span>
+            {eventsStateFilter && (
+              <span style={{ color:MUTED }}>
+                Filtrado: {eventsStateFilter} ·{" "}
+                <button onClick={() => setEventsStateFilter(null)}
+                  style={{ fontSize:10, fontFamily:font, background:"none", border:"none", color:ACCENT, cursor:"pointer", padding:0 }}>
+                  ver todos
+                </button>
+              </span>
+            )}
           </div>
         </Card>
       )}
