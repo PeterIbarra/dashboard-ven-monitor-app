@@ -934,12 +934,11 @@ export function TabIODA() {
         // ── Electricity detection ── C1+C2+C3+C4 ──
         
         // C1: BGP disqualifier by MAGNITUDE, not presence.
-        // A BGP drop < BGP_VETO_THRESHOLD of its historyValue is considered noise, not censorship.
-        const BGP_VETO_THRESHOLD = 0.15; // BGP must drop >15% to veto an electric event
+        // Only BGP CRITICAL alerts can veto an electric event — warnings are noise.
+        // A BGP critical drop < BGP_VETO_THRESHOLD of its historyValue is also considered noise.
+        const BGP_VETO_THRESHOLD = 0.15; // BGP critical must drop >15% to veto
         const isBgpVeto = (clusterFirstTime, clusterLastTime) => {
-          // Find BGP alerts (critical or warning) overlapping this event window ±30min
-          const allBgpAlerts = [...bgpCritical, ...bgpWarning];
-          return allBgpAlerts.some(b => {
+          return bgpCritical.some(b => {
             if (b.time < clusterFirstTime - 1800 || b.time > clusterLastTime + 1800) return false;
             if (!b.historyValue || b.historyValue === 0) return false;
             const bgpDropPct = (b.historyValue - b.value) / b.historyValue;
@@ -968,7 +967,9 @@ export function TabIODA() {
         const warningClusters  = buildClusters(pingWarning,  false);
         
         const powerEvents = [];
-        const bgpStable = bgpCritical.length === 0 && bgpWarning.length === 0;
+        // bgpStable: only BGP critical alerts count as "infrastructure down"
+        // BGP warnings are not sufficient to classify a ping drop as censorship/infra
+        const bgpStable = bgpCritical.length === 0;
         
         const processCluster = (cluster) => {
           const drops = cluster.alerts.map(a =>
