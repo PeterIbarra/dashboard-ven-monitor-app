@@ -740,8 +740,10 @@ export function TabIODA() {
   const [events, setEvents] = useState([]);
   const [regionScores, setRegionScores] = useState([]);
   const regionScoresRef = useRef([]);
-  // Keep ref in sync
+  const eventsRef = useRef([]);
+  // Keep refs in sync
   regionScoresRef.current = regionScores;
+  eventsRef.current = events;
   const [regionLoading, setRegionLoading] = useState(false);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedStateData, setSelectedStateData] = useState(null); // signals/raw for selected state
@@ -847,6 +849,7 @@ export function TabIODA() {
   // ── 3. Load regional data using IODA outage endpoints (lightweight) ──
   const loadRegions = useCallback(async () => {
     setRegionLoading(true);
+    try {
     
     // Fetch summary + alerts for all states in parallel
     const results = await Promise.allSettled(
@@ -1113,7 +1116,11 @@ export function TabIODA() {
     
     scores.sort((a,b) => b.dropScore - a.dropScore || a.healthPct - b.healthPct);
     setRegionScores(scores);
-    setRegionLoading(false);
+    } catch(e) {
+      console.error("loadRegions error:", e);
+    } finally {
+      setRegionLoading(false);
+    }
   }, [twFrom, twUntil]);
 
   useEffect(() => { loadNational(); loadEvents(0); }, [loadNational, loadEvents]);
