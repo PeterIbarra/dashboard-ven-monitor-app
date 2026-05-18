@@ -156,23 +156,8 @@ function computeRegionScore(parsed, nationalTelescopeData) {
   const probVals = parsed.map(p => p.probing).filter(v => v !== null);
   if (probVals.length < 5) return null;
   
-  // R2: Dynamic baseline — when window is long enough, compute P95 over the FIRST 60% of
-  // values as a "cleaner" reference period. This prevents the baseline from being dragged
-  // down when a state has been in prolonged crisis throughout the window. We take the MAX
-  // of (baseline-period P95, full-window P95) so that if the early period was actually
-  // worse (state improving), we fall back to the full-window estimate.
-  let probP95;
-  if (probVals.length >= 20) {
-    const baselineSlice = probVals.slice(0, Math.floor(probVals.length * 0.6));
-    const baselineSorted = [...baselineSlice].sort((a,b) => a - b);
-    const p95Baseline = baselineSorted[Math.floor(baselineSorted.length * 0.95)] || 0;
-    const fullSorted = [...probVals].sort((a,b) => a - b);
-    const p95Full = fullSorted[Math.floor(probVals.length * 0.95)] || 0;
-    probP95 = Math.max(p95Baseline, p95Full);
-  } else {
-    const probSorted = [...probVals].sort((a,b) => a - b);
-    probP95 = probSorted[Math.floor(probSorted.length * 0.95)];
-  }
+  const probSorted = [...probVals].sort((a,b) => a - b);
+  const probP95 = probSorted[Math.floor(probSorted.length * 0.95)];
   if (probP95 < 10) return null;
   
   const probTail = probVals.slice(-Math.min(36, probVals.length));
@@ -282,19 +267,8 @@ function computeRegionScore(parsed, nationalTelescopeData) {
   const bgpVals = parsed.map(p => p.bgp).filter(v => v !== null);
   let bgpInfo = null, bgpStable = true;
   if (bgpVals.length >= 5) {
-    // R2: dynamic baseline for BGP too (same logic as probing)
-    let bgpP95;
-    if (bgpVals.length >= 20) {
-      const bgpBaseSlice = bgpVals.slice(0, Math.floor(bgpVals.length * 0.6));
-      const bgpBaseSorted = [...bgpBaseSlice].sort((a,b) => a - b);
-      const bgpP95Base = bgpBaseSorted[Math.floor(bgpBaseSorted.length * 0.95)] || 0;
-      const bgpFullSorted = [...bgpVals].sort((a,b) => a - b);
-      const bgpP95Full = bgpFullSorted[Math.floor(bgpVals.length * 0.95)] || 0;
-      bgpP95 = Math.max(bgpP95Base, bgpP95Full);
-    } else {
-      const bgpSorted = [...bgpVals].sort((a,b) => a - b);
-      bgpP95 = bgpSorted[Math.floor(bgpSorted.length * 0.95)];
-    }
+    const bgpSorted = [...bgpVals].sort((a,b) => a - b);
+    const bgpP95 = bgpSorted[Math.floor(bgpSorted.length * 0.95)];
     if (bgpP95 >= 10) {
       const bgpCurrent = bgpVals[bgpVals.length - 1];
       const bgpHealth = Math.min(100, Math.round((bgpCurrent / bgpP95) * 100));
@@ -766,10 +740,8 @@ export function TabIODA() {
   const [events, setEvents] = useState([]);
   const [regionScores, setRegionScores] = useState([]);
   const regionScoresRef = useRef([]);
-  const eventsRef = useRef([]);
-  // Keep refs in sync
+  // Keep ref in sync
   regionScoresRef.current = regionScores;
-  eventsRef.current = events;
   const [regionLoading, setRegionLoading] = useState(false);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedStateData, setSelectedStateData] = useState(null); // signals/raw for selected state
@@ -876,12 +848,12 @@ export function TabIODA() {
   const loadRegions = useCallback(async () => {
     setRegionLoading(true);
     
-    // Fetch summary + alerts for all states in parallel (2 calls per state — same as before)
+    // Fetch summary + alerts for all states in parallel
     const results = await Promise.allSettled(
       VE_REGIONS.map(async (st) => {
         const [summaryJson, alertsJson] = await Promise.all([
           iodaFetch(`outages/summary`, { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }),
-          iodaFetch(`outages/alerts`,  { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }),
+          iodaFetch(`outages/alerts`, { entityType: "region", entityCode: st.code, from: twFrom, until: twUntil }),
         ]);
         
         // Parse summary
@@ -891,28 +863,17 @@ export function TabIODA() {
         const bgpScore = summary.scores?.["bgp.median"] ?? 0;
         const eventCnt = summary.event_cnt ?? 0;
         
-        // C4: use already-loaded events from eventsRef (no extra API call)
-        // loadEvents() already fetched /outages/events for the same time window
-        const cachedEvents = eventsRef.current;
-        const iodaPingEvents = cachedEvents.filter(e =>
-          e.region === st.name && e.datasource === "ping-slash24"
-        );
-        
-        // Parse alerts — C2: include both critical AND warning
+        // Parse alerts
         const alerts = Array.isArray(alertsJson?.data) ? alertsJson.data : [];
-        const pingAlerts    = alerts.filter(a => a.datasource === "ping-slash24");
-        const pingCritical  = pingAlerts.filter(a => a.level === "critical").sort((a,b) => a.time - b.time);
-        const pingWarning   = pingAlerts.filter(a => a.level === "warning").sort((a,b) => a.time - b.time);
-        const bgpAlerts     = alerts.filter(a => a.datasource === "bgp");
-        const bgpCritical   = bgpAlerts.filter(a => a.level === "critical");
-        const bgpWarning    = bgpAlerts.filter(a => a.level === "warning");
+        const pingAlerts = alerts.filter(a => a.datasource === "ping-slash24");
+        const bgpAlerts = alerts.filter(a => a.datasource === "bgp");
         
         // Current connectivity health
         const lastPingAlert = pingAlerts[pingAlerts.length - 1];
-        const lastBgpAlert  = bgpAlerts[bgpAlerts.length - 1];
+        const lastBgpAlert = bgpAlerts[bgpAlerts.length - 1];
         // Use WORST critical alert in period
-        const worstPingAlert = pingCritical
-          .filter(a => a.historyValue > 0)
+        const worstPingAlert = pingAlerts
+          .filter(a => a.level === "critical" && a.historyValue > 0)
           .sort((a, b) => (a.value / a.historyValue) - (b.value / b.historyValue))[0];
         
         let pingHealth;
@@ -921,6 +882,7 @@ export function TabIODA() {
         } else if (lastPingAlert?.historyValue > 0) {
           pingHealth = Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100));
         } else {
+          // No alerts at all — use score to estimate health
           if (overallScore > 50000) pingHealth = 30;
           else if (overallScore > 20000) pingHealth = 50;
           else if (overallScore > 10000) pingHealth = 60;
@@ -935,160 +897,53 @@ export function TabIODA() {
           : 100;
         const connectivityHealth = Math.min(pingHealth, bgpHealth);
         
-        // ── Electricity detection ── C1+C2+C3+C4 ──
-        
-        // C1: BGP disqualifier by MAGNITUDE, not presence.
-        // Only BGP CRITICAL alerts can veto an electric event — warnings are noise.
-        // A BGP critical drop < BGP_VETO_THRESHOLD of its historyValue is also considered noise.
-        const BGP_VETO_THRESHOLD = 0.15; // BGP critical must drop >15% to veto
-        const isBgpVeto = (clusterFirstTime, clusterLastTime) => {
-          return bgpCritical.some(b => {
-            if (b.time < clusterFirstTime - 1800 || b.time > clusterLastTime + 1800) return false;
-            if (!b.historyValue || b.historyValue === 0) return false;
-            const bgpDropPct = (b.historyValue - b.value) / b.historyValue;
-            return bgpDropPct > BGP_VETO_THRESHOLD; // only veto if drop is substantial
-          });
-        };
-        
-        // Helper: build composite events from an array of sorted alerts
-        const buildClusters = (alertList, isCritical) => {
-          const clusters = [];
-          let cur = null;
-          for (const alert of alertList) {
-            if (!cur || (alert.time - cur.lastTime) > 1800) {
-              cur = { alerts: [alert], firstTime: alert.time, lastTime: alert.time, isCritical };
-              clusters.push(cur);
-            } else {
-              cur.alerts.push(alert);
-              cur.lastTime = alert.time;
-            }
-          }
-          return clusters;
-        };
-        
-        // C2: build clusters from both critical and warning alerts
-        const criticalClusters = buildClusters(pingCritical, true);
-        const warningClusters  = buildClusters(pingWarning,  false);
+        // Electricity: find critical ping events where BGP was NOT also critical at same time
+        const criticalPing = pingAlerts.filter(a => a.level === "critical");
+        const criticalBgp = bgpAlerts.filter(a => a.level === "critical");
         
         const powerEvents = [];
-        // bgpStable: only BGP critical alerts count as "infrastructure down"
-        // BGP warnings are not sufficient to classify a ping drop as censorship/infra
-        const bgpStable = bgpCritical.length === 0;
+        const bgpStable = criticalBgp.length === 0;
         
-        const processCluster = (cluster) => {
-          const drops = cluster.alerts.map(a =>
-            a.historyValue > 0 ? Math.round(((a.historyValue - a.value) / a.historyValue) * 100) : 0
-          );
-          const maxDrop   = Math.max(...drops);
-          const firstDrop = drops[0];
-          const durationSec = Math.max(600, cluster.lastTime - cluster.firstTime);
-          const isAbrupt    = firstDrop >= maxDrop * 0.8;
-          const dropPattern = isAbrupt ? "abrupto" : "gradual";
+        for (const alert of criticalPing) {
+          const dropPct = alert.historyValue > 0
+            ? Math.round(((alert.historyValue - alert.value) / alert.historyValue) * 100)
+            : 0;
+          // Check if BGP also critical within ±30min
+          const bgpAlsoDown = criticalBgp.some(b => Math.abs(b.time - alert.time) < 1800);
           
-          // C1: use magnitude-based BGP veto instead of presence-based
-          const bgpAlsoDown = isBgpVeto(cluster.firstTime, cluster.lastTime);
-          
-          // C3: single alert with drop >50% counts regardless of cluster size
-          const isSingleSevere = cluster.alerts.length === 1 && maxDrop > 50;
-          
-          // C4: does IODA independently confirm an event in this window?
-          const iodaConfirms = iodaPingEvents.some(e =>
-            Math.abs((e.start || e.time || 0) - cluster.firstTime) < 3600
-          );
-          
-          // C2: warning-only clusters need ≥2 alerts OR ioda confirmation to count
-          if (!cluster.isCritical) {
-            const qualifies = cluster.alerts.length >= 2 || iodaConfirms;
-            if (!qualifies) return null;
-          }
-          
-          const peakAlert = cluster.alerts[drops.indexOf(maxDrop)];
-          return {
-            ts: cluster.firstTime,
-            tsEnd: cluster.lastTime,
-            durationSec,
-            dropPct: maxDrop,
-            firstDrop,
-            dropRate: firstDrop,
-            dropPattern,
-            isAbrupt,
-            isSingleSevere,     // C3
-            iodaConfirmed: iodaConfirms, // C4
-            isWarningOnly: !cluster.isCritical, // C2
-            alertCount: cluster.alerts.length,
-            value: peakAlert.value,
-            historyValue: peakAlert.historyValue,
+          powerEvents.push({
+            ts: alert.time,
+            dropPct,
+            value: alert.value,
+            historyValue: alert.historyValue,
             bgpAlsoDown,
             isElectric: !bgpAlsoDown,
-            iodaCritical: cluster.isCritical,
-          };
-        };
-        
-        // Process critical clusters first, then warning
-        for (const cluster of criticalClusters) {
-          const ev = processCluster(cluster);
-          if (ev) powerEvents.push(ev);
-        }
-        for (const cluster of warningClusters) {
-          const ev = processCluster(cluster);
-          if (!ev) continue;
-          // C2: skip warning events that overlap an already-captured critical event
-          const overlapsExisting = powerEvents.some(existing =>
-            Math.abs(existing.ts - ev.ts) < 1800
-          );
-          if (!overlapsExisting) powerEvents.push(ev);
+            iodaCritical: alert.level === "critical", // ping down + BGP stable = likely electric
+          });
         }
         
-        // Sort by time
-        powerEvents.sort((a, b) => a.ts - b.ts);
-        
-        // Classify electric vs infra
+        // Electricity index: respect IODA critical level + count
         const electricEvents = powerEvents.filter(e => e.isElectric);
         let elecHealth = 100, elecLabel = "Normal", elecConfidence = null;
-
-        // R5: elecScore = sum of (dropPct × duration_in_10min_buckets)
-        const elecScore = electricEvents.reduce((acc, e) =>
-          acc + e.dropPct * Math.max(1, Math.round(e.durationSec / 600)), 0
-        );
-        
         if (electricEvents.length > 0) {
-          const worstDrop   = Math.max(...electricEvents.map(e => e.dropPct));
-          const critCount   = electricEvents.filter(e => !e.isWarningOnly).length;
-          const warnCount   = electricEvents.filter(e => e.isWarningOnly).length;
-          const hasAbrupt   = electricEvents.some(e => e.isAbrupt && e.dropPct > 30);
-          const hasIodaConf = electricEvents.some(e => e.iodaConfirmed);
-          const hasSingleSev = electricEvents.some(e => e.isSingleSevere);
-          
-          // Base severity — critical alerts drive the scale; warnings cap at 70
-          if (!electricEvents.every(e => e.isWarningOnly)) {
-            // At least one critical event
-            if (worstDrop > 60 || hasSingleSevere) elecHealth = 20;   // C3: single severe counts
-            else if (worstDrop > 40) elecHealth = 40;
-            else if (worstDrop > 25) elecHealth = 60;
-            else if (critCount >= 3)  elecHealth = 50;
-            else if (critCount >= 1)  elecHealth = 60;
-            else elecHealth = 80;
-          } else {
-            // C2: warning-only path — capped at 70
-            elecHealth = warnCount >= 3 ? 60 : warnCount >= 2 ? 70 : 75;
-            elecHealth = Math.max(70, elecHealth); // hard cap for warnings
-          }
-          
-          // Severity boosts
-          if (hasAbrupt && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
-          if (hasIodaConf && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 5); // C4 boost
-          
-          // Confidence starts low, post-processing will upgrade via regional correlation
-          elecConfidence = hasIodaConf ? "media" : "baja"; // C4: ioda confirmation → start at media
-          
-          // Label
+          const criticalCount = electricEvents.filter(e => e.iodaCritical).length;
+          const worstDrop = Math.max(...electricEvents.map(e => e.dropPct));
+          // Severity from worst drop, boosted by IODA critical count
+          if (worstDrop > 60) { elecHealth = 20; }
+          else if (worstDrop > 40) { elecHealth = 40; }
+          else if (worstDrop > 25) { elecHealth = 60; }
+          else if (criticalCount >= 3) { elecHealth = 50; }
+          else if (criticalCount >= 1) { elecHealth = 60; }
+          else { elecHealth = 80; }
+          // Confidence: starts low, boosted later by regional correlation + telescope
+          elecConfidence = "baja";
+          // Label with confidence (will be upgraded in post-processing)
           if (elecHealth <= 30) elecLabel = "Posible interrupción eléctrica severa";
           else if (elecHealth <= 50) elecLabel = "Posible interrupción eléctrica moderada";
-          else if (elecHealth <= 70) elecLabel = electricEvents.every(e => e.isWarningOnly)
-            ? "Posible interrupción eléctrica leve (señal débil)"
-            : "Posible interrupción eléctrica leve";
+          else if (elecHealth <= 70) elecLabel = "Posible interrupción eléctrica leve";
           else elecLabel = "Fluctuación";
         } else if (powerEvents.length > 0 && !bgpStable) {
+          // Ping critical + BGP critical = infrastructure/censorship, not electricity
           elecHealth = 100;
           elecLabel = "Normal (corte infra.)";
         }
@@ -1105,7 +960,6 @@ export function TabIODA() {
           // Electricity
           elecHealth, elecLabel, elecConfidence,
           elecEvents: electricEvents.length,
-          elecScore,
           powerEvents,
           bgpStable,
           // Raw alert data for detail panel
@@ -1176,12 +1030,6 @@ export function TabIODA() {
         if (worstNatSev) confidence = "alta"; // national = high confidence electric
         else if (neighborCount >= 3) confidence = "alta";
         else if (neighborCount >= 1) confidence = "media";
-        // R3: an abrupt drop pattern is additional evidence for electric outage.
-        // Upgrade baja→media when the worst event of the state shows an abrupt drop ≥30%.
-        const hasAbruptStrongDrop = s.powerEvents.some(ev => ev.isAbrupt && ev.dropPct >= 30 && !ev.bgpAlsoDown);
-        // C4: IODA-confirmed events also upgrade confidence
-        const hasIodaConfirmed = s.powerEvents.some(ev => ev.iodaConfirmed && !ev.bgpAlsoDown);
-        if ((hasAbruptStrongDrop || hasIodaConfirmed) && confidence === "baja") confidence = "media";
         s.elecConfidence = confidence;
         if (hasRegional) {
           s.elecHealth = worstRegDrop > 60 ? 20 : worstRegDrop > 40 ? 40 : worstRegDrop > 25 ? 60 : 80;
@@ -1391,55 +1239,20 @@ export function TabIODA() {
             : overallScore>50000?30:overallScore>20000?50:overallScore>10000?60:overallScore>5000?70:overallScore>1000?85:overallScore>0?90:100;
           const bgpHealth = lastBgp?.historyValue>0 ? Math.min(100,Math.round((lastBgp.value/lastBgp.historyValue)*100)) : 100;
           const connectivityHealth = Math.min(pingHealth, bgpHealth);
-          const critPing = pingAlerts.filter(a=>a.level==="critical").sort((a,b)=>a.time-b.time);
+          const critPing = pingAlerts.filter(a=>a.level==="critical");
           const critBgp  = bgpAlerts.filter(a=>a.level==="critical");
-          // R3+R5: cluster adjacent critical alerts (≤30min apart) into composite events
-          const clusters = [];
-          let cur = null;
-          for (const a of critPing) {
-            if (!cur || (a.time - cur.lastTime) > 1800) { cur = { alerts:[a], firstTime:a.time, lastTime:a.time }; clusters.push(cur); }
-            else { cur.alerts.push(a); cur.lastTime = a.time; }
-          }
-          const events = clusters.map(c => {
-            const drops = c.alerts.map(a => a.historyValue>0 ? Math.round(((a.historyValue-a.value)/a.historyValue)*100) : 0);
-            const maxDrop = Math.max(...drops);
-            const firstDrop = drops[0];
-            const durationSec = Math.max(600, c.lastTime - c.firstTime);
-            const isAbrupt = firstDrop >= maxDrop * 0.8;
-            const bgpAlsoDown = critBgp.some(b => b.time >= c.firstTime - 1800 && b.time <= c.lastTime + 1800);
-            return { ts:c.firstTime, durationSec, dropPct:maxDrop, firstDrop, isAbrupt, bgpAlsoDown };
-          });
-          const electricEvents = events.filter(e => !e.bgpAlsoDown);
-          // R5: elecScore = sum(dropPct × 10min-buckets)
-          const elecScore = electricEvents.reduce((acc,e) => acc + e.dropPct * Math.max(1, Math.round(e.durationSec/600)), 0);
-          const hasAbrupt = electricEvents.some(e => e.isAbrupt && e.dropPct >= 30);
+          const electricEvents = critPing.filter(a => !critBgp.some(b=>Math.abs(b.time-a.time)<1800));
           let elecHealth=100, elecLabel="Normal";
           if (electricEvents.length>0) {
-            const wd = Math.max(...electricEvents.map(e=>e.dropPct));
+            const wd = Math.max(...electricEvents.map(e=>e.historyValue>0?Math.round(((e.historyValue-e.value)/e.historyValue)*100):0));
             elecHealth = wd>60?20:wd>40?40:wd>25?60:electricEvents.length>=3?50:electricEvents.length>=1?60:80;
-            if (hasAbrupt && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
             elecLabel = elecHealth<=30?"Posible interrupción eléctrica severa":elecHealth<=50?"Posible interrupción eléctrica moderada":elecHealth<=70?"Posible interrupción eléctrica leve":"Fluctuación";
           }
-          return { code:st.code, name:st.name, connectivityHealth, elecHealth, elecLabel, elecEvents:electricEvents.length,
-            elecScore, hasAbrupt, eventsRaw:electricEvents, overallScore, eventCnt:summary.event_cnt??0 };
+          return { name:st.name, connectivityHealth, elecHealth, elecLabel, elecEvents:electricEvents.length, overallScore, eventCnt:summary.event_cnt??0 };
         })
       );
-      const regionRowsRaw = regResults.filter(r=>r.status==="fulfilled"&&r.value).map(r=>r.value);
-
-      // R7: post-process confidence using regional correlation (same logic as live view)
-      regionRowsRaw.forEach(s => {
-        if (s.eventsRaw.length === 0) { s.elecConfidence = null; return; }
-        const neighborCount = regionRowsRaw.filter(o => o !== s && o.eventsRaw.some(oe =>
-          s.eventsRaw.some(se => Math.abs(oe.ts - se.ts) < 1800)
-        )).length;
-        let confidence = "baja";
-        if (neighborCount >= 3) confidence = "alta";
-        else if (neighborCount >= 1) confidence = "media";
-        if (s.hasAbrupt && confidence === "baja") confidence = "media";
-        s.elecConfidence = confidence;
-      });
-
-      const regionRows = regionRowsRaw.sort((a,b)=>a.connectivityHealth-b.connectivityHealth);
+      const regionRows = regResults.filter(r=>r.status==="fulfilled"&&r.value).map(r=>r.value)
+        .sort((a,b)=>a.connectivityHealth-b.connectivityHealth);
 
       // ── Build workbook ──
       const wb = XLSX.utils.book_new();
@@ -1463,15 +1276,12 @@ export function TabIODA() {
         "Conectividad %": r.connectivityHealth,
         "Electricidad %": r.elecHealth,
         "Estado eléctrico": r.elecLabel,
-        "Confianza": r.elecConfidence || "—",
-        "Patrón": r.hasAbrupt ? "Abrupto" : (r.elecEvents > 0 ? "Gradual" : "—"),
         "Eventos eléctricos": r.elecEvents,
-        "Score eléctrico": r.elecScore || 0,
         "Score IODA total": r.overallScore,
         "N° eventos IODA": r.eventCnt,
       }));
       const ws2 = XLSX.utils.json_to_sheet(stRows.length > 0 ? stRows : [{ "Estado":"Sin datos en el período" }]);
-      ws2["!cols"] = [{ wch:20 },{ wch:15 },{ wch:15 },{ wch:38 },{ wch:10 },{ wch:10 },{ wch:18 },{ wch:14 },{ wch:18 },{ wch:16 }];
+      ws2["!cols"] = [{ wch:20 },{ wch:15 },{ wch:15 },{ wch:35 },{ wch:18 },{ wch:18 },{ wch:16 }];
       XLSX.utils.book_append_sheet(wb, ws2, "Ranking Estados");
 
       // Sheet 3 — Metadata
@@ -1544,7 +1354,7 @@ export function TabIODA() {
           {/* Content summary */}
           <div style={{ fontSize:11, color:MUTED, padding:"8px 10px", background:`${BORDER}12`, borderRadius:4, marginBottom:14, lineHeight:1.6 }}>
             📊 <b>Hoja 1 — Eventos:</b> fecha, región, fuente, severidad, score, duración<br/>
-            🗺 <b>Hoja 2 — Ranking Estados:</b> conectividad %, electricidad %, confianza, patrón, score eléctrico<br/>
+            🗺 <b>Hoja 2 — Ranking Estados:</b> conectividad %, electricidad %, etiqueta, score IODA<br/>
             📋 <b>Hoja 3 — Metadata:</b> fuente, período, fecha de generación
           </div>
           {exportError && (
@@ -1920,20 +1730,14 @@ export function TabIODA() {
                   <div style={{ display:"flex", justifyContent:"space-between", padding:"4px 8px", borderBottom:`1px solid ${BORDER}`, marginBottom:4 }}>
                     <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", flex:1 }}>Región</span>
                     <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", width:55, textAlign:"center" }}>🌐 Internet</span>
-                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", width:80, textAlign:"center" }}>⚡ Elec.</span>
+                    <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", width:55, textAlign:"center" }}>⚡ Elec.</span>
                   </div>
                   <div style={{ maxHeight:400, overflowY:"auto" }}>
                     {activeData.map((r, i) => {
                       const elecC = r.elecHealth >= 90 ? "#34d399" : r.elecHealth >= 60 ? "#fbbf24" : r.elecHealth >= 40 ? "#f97316" : "#ef4444";
-                      // R7: confidence color + abbreviation
-                      const confColor = r.elecConfidence === "alta" ? "#16a34a" : r.elecConfidence === "media" ? "#ca8a04" : "#94a3b8";
-                      const confLabel = r.elecConfidence === "alta" ? "A" : r.elecConfidence === "media" ? "M" : "B";
-                      // R3: abruptness indicator from worst event
-                      const hasAbrupt = r.powerEvents?.some(ev => ev.isAbrupt && ev.dropPct >= 30 && !ev.bgpAlsoDown);
                       return (
                         <div key={r.code}
                           onClick={() => setSelectedState(selectedState === r.name ? null : r.name)}
-                          title={r.elecScore > 0 ? `Score eléctrico acumulado: ${r.elecScore}${r.elecConfidence ? ` · Confianza ${r.elecConfidence}` : ""}${hasAbrupt ? " · Patrón abrupto" : ""}` : ""}
                           style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px",
                             background:selectedState === r.name ? `${ACCENT}15` : i % 2 ? "rgba(0,0,0,0.02)" : "transparent",
                             cursor:"pointer", borderRadius:3 }}>
@@ -1946,28 +1750,15 @@ export function TabIODA() {
                               {r.connectivityHealth}%
                             </span>
                           </div>
-                          <div style={{ width:80, textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center", gap:3 }}>
+                          <div style={{ width:55, textAlign:"center" }}>
                             <span style={{ fontSize:12, fontWeight:700, fontFamily:font, color:elecC }}>
                               {r.elecHealth}%
                             </span>
-                            {r.elecEvents > 0 && <span style={{ fontSize:8, color:elecC }}>⚡{r.elecEvents}</span>}
-                            {/* R7: confidence badge */}
-                            {r.elecConfidence && r.elecHealth < 100 && (
-                              <span title={`Confianza ${r.elecConfidence}${hasAbrupt ? " · patrón abrupto" : ""}`}
-                                style={{ fontSize:8, fontFamily:font, fontWeight:700, padding:"1px 3px", borderRadius:2, background:`${confColor}25`, color:confColor, lineHeight:1 }}>
-                                {confLabel}{hasAbrupt ? "↓" : ""}
-                              </span>
-                            )}
+                            {r.elecEvents > 0 && <span style={{ fontSize:8, color:elecC }}> ⚡{r.elecEvents}</span>}
                           </div>
                         </div>
                       );
                     })}
-                  </div>
-                  {/* R5+R7: legend */}
-                  <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}90`, marginTop:6, padding:"4px 8px", borderTop:`1px solid ${BORDER}40`, display:"flex", gap:10, flexWrap:"wrap" }}>
-                    <span>⚡N = N° eventos</span>
-                    <span>A/M/B = confianza Alta/Media/Baja</span>
-                    <span>↓ = caída abrupta</span>
                   </div>
                 </>)}
               </Card>
