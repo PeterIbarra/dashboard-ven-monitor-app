@@ -499,7 +499,7 @@ export default function MonitorPNUD() {
       {/* CONTENT */}
       <div style={{ maxWidth:1340, margin:"0 auto", padding:mob?"12px 10px 40px":"24px 24px 60px" }}>
         {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} setTab={setTab} />}
-        {tab === "sitrep" && <TabSitrep liveData={liveData} />}
+        {tab === "sitrep" && <TabSitrep week={week} liveData={liveData} />}
         {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
         {tab === "clima" && <TabClimaSocial liveData={liveData} />}

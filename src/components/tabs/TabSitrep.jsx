@@ -8,9 +8,9 @@ import { AMNISTIA_TRACKER } from "../../data/amnistia.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SEM, font, fontSans } from "../../constants";
 import { IS_DEPLOYED, loadScript } from "../../utils";
 
-export function TabSitrep({ liveData = {} }) {
+export function TabSitrep({ liveData = {}, week }) {
   const mob = useIsMobile();
-  const [sitrepWeek, setSitrepWeek] = useState(SITREP_ALL.length - 1);
+  const [sitrepWeek, setSitrepWeek] = useState(week ?? SITREP_ALL.length - 1);
   const d = SITREP_ALL[sitrepWeek];
   const isLatest = sitrepWeek === SITREP_ALL.length - 1;
   const hasDetail = !!d.nacional; // S8 has extra detail sections
