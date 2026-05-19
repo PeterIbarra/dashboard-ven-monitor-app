@@ -730,8 +730,11 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
       if (!coords) return;
       const severity = r.connectivityHealth ?? r.healthPct ?? 100;
       const elecSev = r.elecHealth ?? 100;
-      // Color: worst of connectivity or electricity
-      const worstSev = Math.min(severity, elecSev);
+      // Color: connectivity drives the dot color (as before), electricity shown via border
+      // Use min of both only when elecHealth is explicitly detected (not inferred from connectivity)
+      // This prevents double-penalizing states where elecHealth mirrors connectivityHealth
+      const isInferred = r.elecLabel?.includes("racionamiento eléctrico") && !r.elecEvents;
+      const worstSev = isInferred ? severity : Math.min(severity, elecSev);
       const color = worstSev >= 90 ? "#34d399" : worstSev >= 70 ? "#fbbf24" : worstSev >= 50 ? "#f97316" : "#ef4444";
       const ds = r.displayScore || r.dropScore || 0;
       // Always visible: minimum radius 12 for all states
@@ -1233,10 +1236,11 @@ export function TabIODA() {
   const enrichWithRaw = useCallback(async (scores) => {
     if (!scores || scores.length === 0) return;
 
-    // Candidate states: any degradation signal worth investigating
-    const candidates = scores
-      .filter(s => s.connectivityHealth < 90 || s.elecHealth < 100 || (s.dropScore && s.dropScore > 200))
-      .sort((a,b) => Math.min(a.connectivityHealth, a.elecHealth) - Math.min(b.connectivityHealth, b.elecHealth));
+    // Phase 2 queries all 24 states — raw signal gives deeper detection than alerts alone
+    // Most affected states processed first so map updates with critical info earliest
+    const candidates = [...scores].sort((a,b) =>
+      Math.min(a.connectivityHealth, a.elecHealth) - Math.min(b.connectivityHealth, b.elecHealth)
+    );
 
     if (candidates.length === 0) return;
     setRawEnriching(true);
