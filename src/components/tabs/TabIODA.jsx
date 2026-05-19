@@ -338,9 +338,9 @@ function computeRegionScore(parsed, nationalTelescopeData) {
     const hasTelescopeConfirm = teleCoincidence;
     
     // Base severity from worst drop
-    if (worstDrop > 60) elecHealth = 20;
-    else if (worstDrop > 40) elecHealth = 40;
-    else if (worstDrop > 25) elecHealth = 60;
+    if (worstDrop > 35) elecHealth = 20;
+    else if (worstDrop > 20) elecHealth = 40;
+    else if (worstDrop > 10) elecHealth = 60;
     else elecHealth = 80;
     
     // Boost severity if telescope confirmed
@@ -911,14 +911,14 @@ export function TabIODA() {
         const isBgpVeto = (t1, t2) => bgpCritical.some(b => {
           if (b.time < t1 - 1800 || b.time > t2 + 1800) return false;
           if (!b.historyValue || b.historyValue === 0) return false;
-          return (b.historyValue - b.value) / b.historyValue > 0.20;
+          return (b.historyValue - b.value) / b.historyValue > 0.25;
         });
 
         // Helper: cluster adjacent alerts (≤45min gap) into composite events
         const buildClusters = (list, isCritical) => {
           const out = []; let cur = null;
           for (const a of list) {
-            if (!cur || (a.time - cur.lastTime) > 2700) {
+            if (!cur || (a.time - cur.lastTime) > 3600) {
               cur = { alerts:[a], firstTime:a.time, lastTime:a.time, isCritical };
               out.push(cur);
             } else { cur.alerts.push(a); cur.lastTime = a.time; }
@@ -940,11 +940,11 @@ export function TabIODA() {
           const maxDrop   = Math.max(...drops);
           const firstDrop = drops[0];
           const durationSec = Math.max(600, cluster.lastTime - cluster.firstTime);
-          const isAbrupt    = firstDrop >= maxDrop * 0.65; // C3 lowered from 0.80
+          const isAbrupt    = firstDrop >= maxDrop * 0.50; // C3 lowered from 0.80
           const bgpAlsoDown = isBgpVeto(cluster.firstTime, cluster.lastTime);
           const iodaConfirmed = iodaConfirmsState(cluster.firstTime, cluster.lastTime); // C4
           // C3: single alert with drop >35% counts as direct evidence
-          const isSingleSevere = cluster.alerts.length === 1 && maxDrop > 35;
+          const isSingleSevere = cluster.alerts.length === 1 && maxDrop > 25;
           // C2: warning clusters need ≥2 alerts or IODA confirmation
           if (!cluster.isCritical && cluster.alerts.length < 2 && !iodaConfirmed) return null;
           const peakAlert = cluster.alerts[drops.indexOf(maxDrop)];
@@ -986,15 +986,15 @@ export function TabIODA() {
 
           if (!warnOnly) {
             // Lower thresholds: 60/40/25 → 45/28/15
-            if (worstDrop > 45 || hasSingle) elecHealth = 20;
-            else if (worstDrop > 28) elecHealth = 40;
-            else if (worstDrop > 15) elecHealth = 60;
+            if (worstDrop > 35 || hasSingle) elecHealth = 20;
+            else if (worstDrop > 20) elecHealth = 40;
+            else if (worstDrop > 10) elecHealth = 60;
             else if (critCount >= 3)  elecHealth = 50;
             else if (critCount >= 1)  elecHealth = 60;
             else elecHealth = 80;
           } else {
             // C2: warning-only path — capped at 65
-            elecHealth = Math.max(65, electricEvents.length >= 3 ? 55 : electricEvents.length >= 2 ? 65 : 70);
+            elecHealth = Math.max(55, electricEvents.length >= 3 ? 45 : electricEvents.length >= 2 ? 55 : 60);
           }
           // Boosts
           if (hasAbrupt   && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
@@ -1061,7 +1061,7 @@ export function TabIODA() {
       if (alreadyClustered) continue;
       
       const affectedStates = scores.filter(s => s.powerEvents?.some(ev => Math.abs(ev.ts - t) < 1800));
-      if (affectedStates.length > scores.length * 0.35) { // lowered from 0.5
+      if (affectedStates.length > scores.length * 0.25) { // lowered from 0.5
         const drops = affectedStates.map(s => {
           const ev = s.powerEvents.find(ev => Math.abs(ev.ts - t) < 1800);
           return ev?.dropPct || 0;
@@ -1094,15 +1094,15 @@ export function TabIODA() {
         // Confidence: neighbors boost, national = high
         let confidence = "baja";
         if (worstNatSev) confidence = "alta";
-        else if (neighborCount >= 2) confidence = "alta"; // lowered from 3
+        else if (neighborCount >= 1) confidence = "alta"; // lowered from 2
         else if (neighborCount >= 1) confidence = "media";
         // Abrupt pattern or IODA confirmation upgrade baja → media
-        const hasAbruptStrong = s.powerEvents.some(ev => ev.isAbrupt && ev.dropPct >= 20 && !ev.bgpAlsoDown);
+        const hasAbruptStrong = s.powerEvents.some(ev => ev.isAbrupt && ev.dropPct >= 15 && !ev.bgpAlsoDown);
         const hasIodaConf     = s.powerEvents.some(ev => ev.iodaConfirmed && !ev.bgpAlsoDown);
         if ((hasAbruptStrong || hasIodaConf) && confidence === "baja") confidence = "media";
         s.elecConfidence = confidence;
         if (hasRegional) {
-          s.elecHealth = worstRegDrop > 45 ? 20 : worstRegDrop > 28 ? 40 : worstRegDrop > 15 ? 60 : 80;
+          s.elecHealth = worstRegDrop > 35 ? 20 : worstRegDrop > 20 ? 40 : worstRegDrop > 10 ? 60 : 80;
           const sevWord = s.elecHealth <= 30 ? "severa" : s.elecHealth <= 50 ? "moderada" : s.elecHealth <= 70 ? "leve" : "";
           s.elecLabel = confidence === "alta" ? `Interrupción eléctrica regional ${sevWord}`.trim()
             : confidence === "media" ? `Posible interrupción eléctrica regional ${sevWord}`.trim()
@@ -1769,7 +1769,7 @@ export function TabIODA() {
                       const confColor = r.elecConfidence === "alta" ? "#16a34a" : r.elecConfidence === "media" ? "#ca8a04" : "#94a3b8";
                       const confLabel = r.elecConfidence === "alta" ? "A" : r.elecConfidence === "media" ? "M" : "B";
                       // R3: abrupt pattern from worst event
-                      const hasAbrupt = r.powerEvents?.some(ev => ev.isAbrupt && ev.dropPct >= 20 && !ev.bgpAlsoDown);
+                      const hasAbrupt = r.powerEvents?.some(ev => ev.isAbrupt && ev.dropPct >= 15 && !ev.bgpAlsoDown);
                       return (
                         <div key={r.code}
                           onClick={() => setSelectedState(selectedState === r.name ? null : r.name)}
