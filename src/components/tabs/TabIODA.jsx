@@ -23,6 +23,46 @@ const VE_REGIONS = [
 const IODA_BASE = "https://api.ioda.inetintel.cc.gatech.edu/v2";
 const hoursMap = { "24h":24, "48h":48, "7d":168, "30d":720 };
 
+// ── Rationing prior: known CORPOELEC rationing schedule per state ──
+// Update manually when new data is published (e.g. La Patilla / VeSinFiltro maps).
+// tier: 1=severe(≥8h), 2=moderate(4-8h), 3=light(≤4h), 0=none
+// thresholdMult: multiplier applied to detection thresholds (lower = more sensitive)
+// confidenceBase: starting confidence level when an event is detected
+// hoursPerDay: daily rationing hours (midpoint of range when variable)
+// blockDurationSec: typical block duration in seconds (used for intra-day accumulation)
+const RATIONING_PRIOR = {
+  // ── Tier 1: severe ≥8h/day ──
+  "Táchira":          { tier:1, hoursPerDay:12,  thresholdMult:0.60, confidenceBase:"alta",  blockDurationSec:9000  },
+  "Mérida":           { tier:1, hoursPerDay:8,   thresholdMult:0.62, confidenceBase:"alta",  blockDurationSec:9000  },
+  "Trujillo":         { tier:1, hoursPerDay:9,   thresholdMult:0.65, confidenceBase:"alta",  blockDurationSec:10800 },
+  "Sucre":            { tier:1, hoursPerDay:8,   thresholdMult:0.62, confidenceBase:"alta",  blockDurationSec:9000  },
+  // ── Tier 2: moderate 4-8h/day ──
+  "Miranda":          { tier:2, hoursPerDay:8,   thresholdMult:0.78, confidenceBase:"media", blockDurationSec:7200  },
+  "Carabobo":         { tier:2, hoursPerDay:7,   thresholdMult:0.80, confidenceBase:"media", blockDurationSec:7200  },
+  "Aragua":           { tier:2, hoursPerDay:7,   thresholdMult:0.80, confidenceBase:"media", blockDurationSec:7200  },
+  "Guárico":          { tier:2, hoursPerDay:7,   thresholdMult:0.80, confidenceBase:"media", blockDurationSec:7200  },
+  "Cojedes":          { tier:2, hoursPerDay:6.5, thresholdMult:0.80, confidenceBase:"media", blockDurationSec:7200  },
+  "Nueva Esparta":    { tier:2, hoursPerDay:7,   thresholdMult:0.80, confidenceBase:"media", blockDurationSec:7200  },
+  "Zulia":            { tier:2, hoursPerDay:6.5, thresholdMult:0.80, confidenceBase:"media", blockDurationSec:7200  },
+  "Yaracuy":          { tier:2, hoursPerDay:6,   thresholdMult:0.80, confidenceBase:"media", blockDurationSec:7200  },
+  "Lara":             { tier:2, hoursPerDay:5,   thresholdMult:0.82, confidenceBase:"media", blockDurationSec:5400  },
+  "Portuguesa":       { tier:2, hoursPerDay:5,   thresholdMult:0.82, confidenceBase:"media", blockDurationSec:5400  },
+  "Falcón":           { tier:2, hoursPerDay:5,   thresholdMult:0.82, confidenceBase:"media", blockDurationSec:5400  },
+  "Barinas":          { tier:2, hoursPerDay:5.5, thresholdMult:0.82, confidenceBase:"media", blockDurationSec:5400  },
+  // ── Tier 3: light ≤5h/day ──
+  "Apure":            { tier:3, hoursPerDay:5.5, thresholdMult:0.88, confidenceBase:"baja",  blockDurationSec:5400  },
+  "Amazonas":         { tier:3, hoursPerDay:4,   thresholdMult:0.88, confidenceBase:"baja",  blockDurationSec:3600  },
+  "Anzoátegui":       { tier:3, hoursPerDay:4.5, thresholdMult:0.88, confidenceBase:"baja",  blockDurationSec:3600  },
+  "Monagas":          { tier:3, hoursPerDay:4.5, thresholdMult:0.88, confidenceBase:"baja",  blockDurationSec:3600  },
+  "Vargas":           { tier:3, hoursPerDay:4,   thresholdMult:0.88, confidenceBase:"baja",  blockDurationSec:3600  },
+  // ── Tier 0: no rationing declared ──
+  "Distrito Capital": { tier:0, hoursPerDay:0,   thresholdMult:1.0,  confidenceBase:"baja",  blockDurationSec:0     },
+  "Bolívar":          { tier:0, hoursPerDay:0,   thresholdMult:1.0,  confidenceBase:"baja",  blockDurationSec:0     },
+  "Delta Amacuro":    { tier:0, hoursPerDay:0,   thresholdMult:1.0,  confidenceBase:"baja",  blockDurationSec:0     },
+};
+// Helper: get prior for a state, defaulting to Tier 3 if not in list
+const getPrior = (name) => RATIONING_PRIOR[name] || { tier:3, hoursPerDay:4, thresholdMult:0.88, confidenceBase:"baja", blockDurationSec:3600 };
+
 // ── Helper: fetch with cascade (Vercel proxy → CORS proxies) ──
 async function iodaFetch(path, params = {}) {
   const qs = new URLSearchParams(params).toString();
@@ -149,8 +189,9 @@ function interpretPattern(perSource, telescopeMultiplier) {
 // ── Compute region scores: two indices per state ──
 // INDEX 1 — Connectivity: probing health + loss + latency (internet quality)
 // INDEX 2 — Electricity: abrupt probing drops + national telescope coincidence + BGP stable
-function computeRegionScore(parsed, nationalTelescopeData) {
+function computeRegionScore(parsed, nationalTelescopeData, calibratedBaseline = null, prior = null) {
   if (!parsed || parsed.length === 0) return null;
+  const pm = prior?.thresholdMult ?? 1.0; // threshold multiplier from rationing prior
   
   // ── Probing base metrics (shared by both indices) ──
   const probVals = parsed.map(p => p.probing).filter(v => v !== null);
@@ -334,20 +375,17 @@ function computeRegionScore(parsed, nationalTelescopeData) {
   
   if (confirmedPowerEvents.length > 0) {
     const worstDrop = Math.max(...confirmedPowerEvents.map(e => e.dropPct));
-    const totalDuration = confirmedPowerEvents.reduce((a, e) => a + (e.durationSec || 0), 0);
     const hasTelescopeConfirm = teleCoincidence;
-    
-    // Base severity from worst drop
-    if (worstDrop > 35) elecHealth = 20;
-    else if (worstDrop > 20) elecHealth = 40;
-    else if (worstDrop > 10) elecHealth = 60;
+    // Scale severity thresholds by rationing prior
+    const tSevere   = Math.round(35 * pm);
+    const tModerate = Math.round(20 * pm);
+    const tLeve     = Math.round(10 * pm);
+    if (worstDrop > tSevere) elecHealth = 20;
+    else if (worstDrop > tModerate) elecHealth = 40;
+    else if (worstDrop > tLeve)     elecHealth = 60;
     else elecHealth = 80;
-    
-    // Boost severity if telescope confirmed
     if (hasTelescopeConfirm && elecHealth > 15) elecHealth = Math.max(15, elecHealth - 20);
-    
-    // Confidence: telescope boosts (regional correlation done in post-processing)
-    elecConfidence = hasTelescopeConfirm ? "media" : "baja";
+    elecConfidence = prior?.tier <= 1 ? "alta" : prior?.tier === 2 ? "media" : hasTelescopeConfirm ? "media" : "baja";
     
     // Label with confidence
     if (elecHealth <= 30) elecLabel = elecConfidence === "baja" ? "Posible interrupción eléctrica severa (verificar)" : "Posible interrupción eléctrica severa";
@@ -902,18 +940,23 @@ export function TabIODA() {
           : 100;
         const connectivityHealth = Math.min(pingHealth, bgpHealth);
         
-        // ── Electricity detection ── C1+C2+C3+C4 ──
+        // ── Electricity detection ── C1+C2+C3+C4 + RATIONING PRIOR ──
+
+        // Apply rationing prior for this state
+        const prior = getPrior(st.name);
+        const pm = prior.thresholdMult; // threshold multiplier
 
         // Separate by level
         const pingCritical = pingAlerts.filter(a => a.level === "critical").sort((a,b) => a.time - b.time);
         const pingWarning  = pingAlerts.filter(a => a.level === "warning").sort((a,b) => a.time - b.time);
         const bgpCritical  = bgpAlerts.filter(a => a.level === "critical");
 
-        // C1: BGP veto by magnitude — only critical BGP alerts that drop >20% of historyValue veto
+        // C1: BGP veto by magnitude — scaled by prior (Tier 1 states need bigger BGP drop to veto)
+        const bgpVetoThreshold = 0.25 * pm; // e.g. Táchira: 0.25×0.60=0.15 → BGP must drop >15%
         const isBgpVeto = (t1, t2) => bgpCritical.some(b => {
           if (b.time < t1 - 1800 || b.time > t2 + 1800) return false;
           if (!b.historyValue || b.historyValue === 0) return false;
-          return (b.historyValue - b.value) / b.historyValue > 0.25;
+          return (b.historyValue - b.value) / b.historyValue > bgpVetoThreshold;
         });
 
         // Helper: cluster adjacent alerts (≤45min gap) into composite events
@@ -982,27 +1025,44 @@ export function TabIODA() {
           const worstDrop   = Math.max(...electricEvents.map(e => e.dropPct));
           const critCount   = electricEvents.filter(e => !e.isWarningOnly).length;
           const warnOnly    = electricEvents.every(e => e.isWarningOnly);
-          const hasAbrupt   = electricEvents.some(e => e.isAbrupt && e.dropPct >= 20);
+          const hasAbrupt   = electricEvents.some(e => e.isAbrupt && e.dropPct >= 15);
           const hasIodaConf = electricEvents.some(e => e.iodaConfirmed);
           const hasSingle   = electricEvents.some(e => e.isSingleSevere);
 
+          // Apply rationing prior — scale thresholds by state multiplier
+          // e.g. Táchira (pm=0.60): severe threshold = 35×0.60 = 21% drop
+          const tSevere   = Math.round(35 * pm);
+          const tModerate = Math.round(20 * pm);
+          const tLeve     = Math.round(10 * pm);
+
           if (!warnOnly) {
-            // Lower thresholds: 60/40/25 → 45/28/15
-            if (worstDrop > 35 || hasSingle) elecHealth = 20;
-            else if (worstDrop > 20) elecHealth = 40;
-            else if (worstDrop > 10) elecHealth = 60;
-            else if (critCount >= 3)  elecHealth = 50;
-            else if (critCount >= 1)  elecHealth = 60;
+            if (worstDrop > tSevere || hasSingle) elecHealth = 20;
+            else if (worstDrop > tModerate)       elecHealth = 40;
+            else if (worstDrop > tLeve)           elecHealth = 60;
+            else if (critCount >= 3)              elecHealth = 50;
+            else if (critCount >= 1)              elecHealth = 60;
             else elecHealth = 80;
           } else {
-            // C2: warning-only path — capped at 65
-            elecHealth = Math.max(55, electricEvents.length >= 3 ? 45 : electricEvents.length >= 2 ? 55 : 60);
+            // C2: warning-only — cap adjusted by tier
+            const warnCap = prior.tier <= 1 ? 55 : prior.tier === 2 ? 60 : 65;
+            elecHealth = Math.max(warnCap, electricEvents.length >= 3 ? warnCap - 10 : electricEvents.length >= 2 ? warnCap - 5 : warnCap);
           }
           // Boosts
           if (hasAbrupt   && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
           if (hasIodaConf && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 5);
 
-          elecConfidence = hasIodaConf ? "media" : "baja";
+          // Confidence: start from prior base
+          elecConfidence = prior.confidenceBase;
+          if (hasIodaConf && elecConfidence === "baja") elecConfidence = "media";
+          // Intra-day accumulation: if elecScore exceeds ~50% of expected daily block score,
+          // the pattern of repeated blocks confirms the rationing signal
+          const expectedDailyScore = prior.hoursPerDay > 0
+            ? Math.round(prior.hoursPerDay * 6 * 15) // 6 buckets/h × avg 15% drop
+            : 9999;
+          if (prior.tier >= 1 && elecScore >= expectedDailyScore * 0.5) {
+            if (elecConfidence === "baja") elecConfidence = "media";
+            else if (elecConfidence === "media") elecConfidence = "alta";
+          }
 
           if (elecHealth <= 30) elecLabel = "Posible interrupción eléctrica severa";
           else if (elecHealth <= 50) elecLabel = "Posible interrupción eléctrica moderada";
@@ -1155,12 +1215,13 @@ export function TabIODA() {
           const parsed = json ? parseSignals(json) : null;
           if (!parsed || parsed.length < 10) return;
 
-          // Calibrated baseline from IODA historyValue — immune to crisis contamination
+          // Calibrated baseline + rationing prior
           const pingAlerts = (st.alerts || []).filter(a => a.datasource === "ping-slash24");
           const hvs = pingAlerts.map(a => a.historyValue).filter(v => v > 0);
           const calibratedBaseline = hvs.length > 0 ? Math.max(...hvs) : null;
+          const prior = getPrior(st.name);
 
-          const rawResult = computeRegionScore(parsed, natTeleData, calibratedBaseline);
+          const rawResult = computeRegionScore(parsed, natTeleData, calibratedBaseline, prior);
           if (!rawResult) return;
 
           // ── Telescope as PRIMARY indicator ──
@@ -1172,14 +1233,15 @@ export function TabIODA() {
             const teleSorted = [...teleVals].sort((a,b) => a - b);
             const teleP95 = teleSorted[Math.floor(teleSorted.length * 0.95)];
             if (teleP95 >= 0.2) {
-              // Detect sustained telescope drops (≥2 consecutive points below 70% of P95)
-              const teleThresh = teleP95 * 0.70;
+              // Telescope drop threshold scaled by rationing prior
+              // Tier 1 states: 70%×0.60=42% → only need 42% drop to trigger
+              const teleDropThresh = teleP95 * (0.70 * prior.thresholdMult);
               const step = parsed.length > 1
                 ? (parsed[parsed.length-1].ts - parsed[0].ts) / (parsed.length - 1) : 600;
               let teleEvents = [];
               let inDrop = false, dropStart = null, dropMin = Infinity;
               for (let j = 0; j < teleVals.length; j++) {
-                if (teleVals[j] < teleThresh) {
+                if (teleVals[j] < teleDropThresh) {
                   if (!inDrop) { inDrop = true; dropStart = j; dropMin = teleVals[j]; }
                   else if (teleVals[j] < dropMin) dropMin = teleVals[j];
                 } else if (inDrop) {
@@ -1211,17 +1273,22 @@ export function TabIODA() {
               });
               if (confirmedTeleEvents.length > 0) {
                 const worstDrop = Math.max(...confirmedTeleEvents.map(e => e.dropPct));
-                const teleElecHealth = worstDrop > 60 ? 25 : worstDrop > 45 ? 40 : worstDrop > 30 ? 60 : 75;
+                // Scale severity thresholds by prior
+                const tS = Math.round(60 * prior.thresholdMult);
+                const tM = Math.round(45 * prior.thresholdMult);
+                const tL = Math.round(30 * prior.thresholdMult);
+                const teleElecHealth = worstDrop > tS ? 25 : worstDrop > tM ? 40 : worstDrop > tL ? 60 : 75;
                 const teleElecScore = confirmedTeleEvents.reduce((acc, e) =>
                   acc + e.dropPct * Math.max(1, Math.round(e.durationSec / 600)), 0);
+                // Confidence: telescope is independent → start at prior base, min "media" for Tier 1
+                const teleConf = prior.tier <= 1 ? "alta" : prior.tier === 2 ? "media" : "media";
                 teleElecSignal = {
-                  elecHealth: teleElecHealth,
-                  elecScore: teleElecScore,
+                  elecHealth: teleElecHealth, elecScore: teleElecScore,
                   elecEvents: confirmedTeleEvents.length,
                   elecLabel: teleElecHealth <= 30 ? "Posible interrupción eléctrica severa (telescopio)"
                     : teleElecHealth <= 50 ? "Posible interrupción eléctrica moderada (telescopio)"
                     : "Posible interrupción eléctrica leve (telescopio)",
-                  elecConfidence: "media", // telescope is independent signal → media directly
+                  elecConfidence: teleConf,
                   fromTelescope: true,
                 };
               }
@@ -1290,12 +1357,14 @@ export function TabIODA() {
   useEffect(() => { loadNational(); loadEvents(0); }, [loadNational, loadEvents]);
   useEffect(() => { if (subView === "estados") loadRegions(); }, [subView, loadRegions]);
   useEffect(() => { loadEvents(eventsBack); }, [eventsBack]);
-  // Phase 2: fire after Phase 1 completes, re-run on time window change
+  // Phase 2: fire when Phase 1 just finished (regionLoading goes false with scores loaded)
+  const prevRegionLoadingRef = useRef(false);
   useEffect(() => {
-    if (regionScores.length > 0 && !regionLoading) {
+    if (prevRegionLoadingRef.current === true && regionLoading === false && regionScores.length > 0) {
       enrichWithRaw(regionScores);
     }
-  }, [regionLoading, twFrom, twUntil]); // eslint-disable-line // reload when navigating back
+    prevRegionLoadingRef.current = regionLoading;
+  }, [regionLoading]); // eslint-disable-line
   
   // Auto-refresh every 5 min for 24h/48h modes
   useEffect(() => {
@@ -1975,6 +2044,19 @@ export function TabIODA() {
                           <div style={{ display:"flex", alignItems:"center", gap:5, flex:1, minWidth:0 }}>
                             <span style={{ width:7, height:7, borderRadius:"50%", background:getSeverityColor(r.connectivityHealth), flexShrink:0 }} />
                             <span style={{ fontSize:12, color:TEXT, fontWeight:r.connectivityHealth < 70 ? 700 : 400, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{r.name}</span>
+                            {(() => {
+                              const p = getPrior(r.name);
+                              if (p.tier === 0) return null;
+                              const tierColor = p.tier === 1 ? "#ef4444" : p.tier === 2 ? "#f97316" : "#fbbf24";
+                              const tierBg = p.tier === 1 ? "#fef2f2" : p.tier === 2 ? "#fff7ed" : "#fffbeb";
+                              return (
+                                <span title={`Racionamiento T${p.tier}: ~${p.hoursPerDay}h/día`}
+                                  style={{ fontSize:7, fontFamily:font, padding:"1px 3px", borderRadius:2,
+                                    background:tierBg, color:tierColor, flexShrink:0, lineHeight:1.2, fontWeight:700 }}>
+                                  T{p.tier}
+                                </span>
+                              );
+                            })()}
                             {r.teleDetected && (
                               <span title="Detectado por telescopio de red"
                                 style={{ fontSize:7, fontFamily:font, padding:"1px 3px", borderRadius:2,
@@ -2013,8 +2095,9 @@ export function TabIODA() {
                   <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}80`, marginTop:5, padding:"4px 8px",
                     borderTop:`1px solid ${BORDER}40`, display:"flex", gap:10, flexWrap:"wrap" }}>
                     <span>⚡N = N° eventos</span>
-                    <span>A/M/B = confianza Alta/Media/Baja</span>
+                    <span>A/M/B = confianza</span>
                     <span>↓ = caída abrupta</span>
+                    <span>T1/T2/T3 = tier racionamiento</span>
                     <span>📡 = telescopio · RAW = señal cruda</span>
                   </div>
                 </>)}
