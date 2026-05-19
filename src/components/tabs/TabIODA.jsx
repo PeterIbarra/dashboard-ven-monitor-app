@@ -377,21 +377,31 @@ function computeRegionScore(parsed, nationalTelescopeData, calibratedBaseline = 
     const worstDrop = Math.max(...confirmedPowerEvents.map(e => e.dropPct));
     const hasTelescopeConfirm = teleCoincidence;
     // Scale severity thresholds by rationing prior
-    const tSevere   = Math.round(35 * pm);
-    const tModerate = Math.round(20 * pm);
-    const tLeve     = Math.round(10 * pm);
+    const tSevere   = prior?.tier === 0 ? 50 : Math.round(35 * pm);
+    const tModerate = prior?.tier === 0 ? 35 : Math.round(20 * pm);
+    const tLeve     = prior?.tier === 0 ? 20 : Math.round(10 * pm);
     if (worstDrop > tSevere) elecHealth = 20;
     else if (worstDrop > tModerate) elecHealth = 40;
     else if (worstDrop > tLeve)     elecHealth = 60;
     else elecHealth = 80;
     if (hasTelescopeConfirm && elecHealth > 15) elecHealth = Math.max(15, elecHealth - 20);
-    elecConfidence = prior?.tier <= 1 ? "alta" : prior?.tier === 2 ? "media" : hasTelescopeConfirm ? "media" : "baja";
-    
-    // Label with confidence
-    if (elecHealth <= 30) elecLabel = elecConfidence === "baja" ? "Posible interrupción eléctrica severa (verificar)" : "Posible interrupción eléctrica severa";
-    else if (elecHealth <= 50) elecLabel = "Posible interrupción eléctrica moderada";
-    else if (elecHealth <= 70) elecLabel = "Posible interrupción eléctrica leve";
-    else elecLabel = "Fluctuación";
+    elecConfidence = prior?.tier === 0 ? "baja"
+      : prior?.tier <= 1 ? "alta"
+      : prior?.tier === 2 ? "media"
+      : hasTelescopeConfirm ? "media" : "baja";
+
+    // T0: label as network degradation, not electric
+    if (prior?.tier === 0) {
+      elecLabel = elecHealth <= 30 ? "Degradación severa de red"
+        : elecHealth <= 50 ? "Degradación moderada de red"
+        : "Degradación leve de red";
+    } else {
+      // Label with confidence
+      if (elecHealth <= 30) elecLabel = elecConfidence === "baja" ? "Posible interrupción eléctrica severa (verificar)" : "Posible interrupción eléctrica severa";
+      else if (elecHealth <= 50) elecLabel = "Posible interrupción eléctrica moderada";
+      else if (elecHealth <= 70) elecLabel = "Posible interrupción eléctrica leve";
+      else elecLabel = "Fluctuación";
+    }
   }
   
   const elecScore = confirmedPowerEvents.reduce((a, e) => a + e.dropPct * Math.max(1, Math.round(e.durationSec / 600)), 0);
@@ -739,8 +749,8 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
       const ds = r.displayScore || r.dropScore || 0;
       // Radius: IODA score as base, boosted by electric tier and event count
       const prior = getPrior(r.name);
-      const elecBonus = elecSev < 100 ? (
-        // T1 states with electric events get bigger circles
+      const elecBonus = elecSev < 100 && prior.tier >= 1 ? (
+        // T1/T2/T3 states with electric events get bigger circles; T0 gets no bonus
         (prior.tier === 1 ? 10 : prior.tier === 2 ? 6 : 3) +
         Math.min(8, (r.elecEvents || 0) * 2) // up to +8 for many events
       ) : 0;
@@ -1047,9 +1057,10 @@ export function TabIODA() {
 
           // Apply rationing prior — scale thresholds by state multiplier
           // e.g. Táchira (pm=0.60): severe threshold = 35×0.60 = 21% drop
-          const tSevere   = Math.round(35 * pm);
-          const tModerate = Math.round(20 * pm);
-          const tLeve     = Math.round(10 * pm);
+          // T0 states (no declared rationing): higher thresholds — drops more likely congestion
+          const tSevere   = prior.tier === 0 ? 50 : Math.round(35 * pm);
+          const tModerate = prior.tier === 0 ? 35 : Math.round(20 * pm);
+          const tLeve     = prior.tier === 0 ? 20 : Math.round(10 * pm);
 
           if (!warnOnly) {
             if (worstDrop > tSevere || hasSingle) elecHealth = 20;
@@ -1067,9 +1078,9 @@ export function TabIODA() {
           if (hasAbrupt   && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
           if (hasIodaConf && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 5);
 
-          // Confidence: start from prior base
-          elecConfidence = prior.confidenceBase;
-          if (hasIodaConf && elecConfidence === "baja") elecConfidence = "media";
+          // Confidence: start from prior base; T0 states capped at "baja"
+          elecConfidence = prior.tier === 0 ? "baja" : prior.confidenceBase;
+          if (hasIodaConf && elecConfidence === "baja" && prior.tier > 0) elecConfidence = "media";
           // Intra-day accumulation: if elecScore exceeds ~50% of expected daily block score,
           // the pattern of repeated blocks confirms the rationing signal
           const expectedDailyScore = prior.hoursPerDay > 0
@@ -1080,12 +1091,20 @@ export function TabIODA() {
             else if (elecConfidence === "media") elecConfidence = "alta";
           }
 
-          if (elecHealth <= 30) elecLabel = "Posible interrupción eléctrica severa";
-          else if (elecHealth <= 50) elecLabel = "Posible interrupción eléctrica moderada";
-          else if (elecHealth <= 70) elecLabel = warnOnly
-            ? "Posible interrupción eléctrica leve (señal débil)"
-            : "Posible interrupción eléctrica leve";
-          else elecLabel = "Fluctuación";
+          if (prior.tier === 0) {
+            // T0: no declared rationing — label as network degradation, not electric outage
+            if (elecHealth <= 30) elecLabel = "Degradación severa de red (sin racionamiento declarado)";
+            else if (elecHealth <= 50) elecLabel = "Degradación moderada de red";
+            else if (elecHealth <= 70) elecLabel = "Degradación leve de red";
+            else elecLabel = "Fluctuación de red";
+          } else {
+            if (elecHealth <= 30) elecLabel = "Posible interrupción eléctrica severa";
+            else if (elecHealth <= 50) elecLabel = "Posible interrupción eléctrica moderada";
+            else if (elecHealth <= 70) elecLabel = warnOnly
+              ? "Posible interrupción eléctrica leve (señal débil)"
+              : "Posible interrupción eléctrica leve";
+            else elecLabel = "Fluctuación";
+          }
         } else if (powerEvents.length > 0 && !bgpStable) {
           elecHealth = 100;
           elecLabel = "Normal (corte infra.)";
@@ -2093,11 +2112,11 @@ export function TabIODA() {
                           title={r.elecScore > 0 ? `Score eléctrico: ${r.elecScore}${r.elecConfidence ? ` · Confianza ${r.elecConfidence}` : ""}${hasAbrupt ? " · Caída abrupta" : ""}` : ""}
                           style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px",
                             background: selectedState === r.name ? `${ACCENT}15`
-                              : r.elecHealth < 80 && prior.tier <= 1 ? `#ef444408`  // T1 with electric: red tint
-                              : r.elecHealth < 80 && prior.tier === 2 ? `#f9731608` // T2 with electric: orange tint
+                              : r.elecHealth < 80 && prior.tier === 1 ? `#ef444408`
+                              : r.elecHealth < 80 && prior.tier === 2 ? `#f9731608`
                               : i % 2 ? "rgba(0,0,0,0.02)" : "transparent",
                             cursor:"pointer", borderRadius:3,
-                            borderLeft: r.elecHealth < 80 && prior.tier <= 1 ? "2px solid #ef444440"
+                            borderLeft: r.elecHealth < 80 && prior.tier === 1 ? "2px solid #ef444440"
                               : r.elecHealth < 80 && prior.tier === 2 ? "2px solid #f9731640"
                               : "2px solid transparent" }}>
                           <div style={{ display:"flex", alignItems:"center", gap:5, flex:1, minWidth:0 }}>
