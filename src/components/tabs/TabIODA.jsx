@@ -306,7 +306,7 @@ function computeRegionScore(parsed, nationalTelescopeData) {
   if (teleVals.length >= 5) {
     const teleSorted = [...teleVals].sort((a,b) => a - b);
     const teleP95 = teleSorted[Math.floor(teleSorted.length * 0.95)];
-    if (teleP95 >= 0.5) {
+    if (teleP95 >= 0.2) {
       const teleTail = teleVals.slice(-Math.min(12, teleVals.length));
       const teleWorst = Math.min(...teleTail);
       const teleHealth = Math.min(100, Math.round((teleWorst / teleP95) * 100));
@@ -329,7 +329,7 @@ function computeRegionScore(parsed, nationalTelescopeData) {
     const bgpDuringEvent = bgpValsForCheck.slice(evStartIdx, evEndIdx + 1);
     if (bgpDuringEvent.length === 0) return bgpStable;
     const bgpMinDuring = Math.min(...bgpDuringEvent);
-    return (bgpMinDuring / bgpP95ForCheck) > 0.90; // BGP stable during THIS event
+    return (bgpMinDuring / bgpP95ForCheck) > 0.85; // BGP stable during THIS event
   });
   
   if (confirmedPowerEvents.length > 0) {
@@ -745,6 +745,8 @@ export function TabIODA() {
   regionScoresRef.current = regionScores;
   eventsRef.current = events;
   const [regionLoading, setRegionLoading] = useState(false);
+  const [rawEnriching, setRawEnriching] = useState(false);
+  const [rawProgress, setRawProgress] = useState({ current: 0, total: 0 });
   const [selectedState, setSelectedState] = useState(null);
   const [selectedStateData, setSelectedStateData] = useState(null); // signals/raw for selected state
   const [selectedStateLoading, setSelectedStateLoading] = useState(false);
@@ -770,7 +772,7 @@ export function TabIODA() {
   const [timeEpoch, setTimeEpoch] = useState(() => Math.floor(Date.now() / 1000)); // frozen "now"
   
   // Refreeze "now" when preset changes (not on every render)
-  const changePreset = (p) => { setTimePreset(p); setTimeEpoch(Math.floor(Date.now() / 1000)); setRegionScores([]); setEventsBack(0); setEventsStateFilter(null); };
+  const changePreset = (p) => { setTimePreset(p); setTimeEpoch(Math.floor(Date.now() / 1000)); setRegionScores([]); setEventsBack(0); setEventsStateFilter(null); setRawProgress({ current:0, total:0 }); setRawEnriching(false); };
   
   // Compute actual from/until epoch — memoized to prevent re-renders
   const twFrom = useMemo(() => {
@@ -1123,9 +1125,177 @@ export function TabIODA() {
     }
   }, [twFrom, twUntil]);
 
+  // ── Phase 2: Enrich with signals/raw ──
+  // Runs in background after Phase 1 — never blocks UI.
+  // Uses calibratedBaseline from IODA historyValue.
+  // Telescope treated as PRIMARY indicator, not just confirmator.
+  const enrichWithRaw = useCallback(async (scores) => {
+    if (!scores || scores.length === 0) return;
+
+    // Candidate states: any degradation signal worth investigating
+    const candidates = scores
+      .filter(s => s.connectivityHealth < 90 || s.elecHealth < 100 || (s.dropScore && s.dropScore > 200))
+      .sort((a,b) => Math.min(a.connectivityHealth, a.elecHealth) - Math.min(b.connectivityHealth, b.elecHealth));
+
+    if (candidates.length === 0) return;
+    setRawEnriching(true);
+    setRawProgress({ current: 0, total: candidates.length });
+
+    // Get national telescope for coincidence check
+    const natTeleData = signals ? signals.map(p => p.telescope).filter(v => v !== null) : [];
+
+    const BATCH = 3;
+    const DELAY = 400;
+
+    for (let i = 0; i < candidates.length; i += BATCH) {
+      const batch = candidates.slice(i, i + BATCH);
+      await Promise.allSettled(batch.map(async (st) => {
+        try {
+          const json = await iodaFetch(`signals/raw/region/${st.code}`, { from: twFrom, until: twUntil });
+          const parsed = json ? parseSignals(json) : null;
+          if (!parsed || parsed.length < 10) return;
+
+          // Calibrated baseline from IODA historyValue — immune to crisis contamination
+          const pingAlerts = (st.alerts || []).filter(a => a.datasource === "ping-slash24");
+          const hvs = pingAlerts.map(a => a.historyValue).filter(v => v > 0);
+          const calibratedBaseline = hvs.length > 0 ? Math.max(...hvs) : null;
+
+          const rawResult = computeRegionScore(parsed, natTeleData, calibratedBaseline);
+          if (!rawResult) return;
+
+          // ── Telescope as PRIMARY indicator ──
+          // If telescope drops significantly with BGP stable → electric outage signal
+          // independent of whether probing reached alert threshold
+          const teleVals = parsed.map(p => p.telescope).filter(v => v !== null);
+          let teleElecSignal = null;
+          if (teleVals.length >= 10) {
+            const teleSorted = [...teleVals].sort((a,b) => a - b);
+            const teleP95 = teleSorted[Math.floor(teleSorted.length * 0.95)];
+            if (teleP95 >= 0.2) {
+              // Detect sustained telescope drops (≥2 consecutive points below 70% of P95)
+              const teleThresh = teleP95 * 0.70;
+              const step = parsed.length > 1
+                ? (parsed[parsed.length-1].ts - parsed[0].ts) / (parsed.length - 1) : 600;
+              let teleEvents = [];
+              let inDrop = false, dropStart = null, dropMin = Infinity;
+              for (let j = 0; j < teleVals.length; j++) {
+                if (teleVals[j] < teleThresh) {
+                  if (!inDrop) { inDrop = true; dropStart = j; dropMin = teleVals[j]; }
+                  else if (teleVals[j] < dropMin) dropMin = teleVals[j];
+                } else if (inDrop) {
+                  const dur = (j - dropStart) * step;
+                  const dropPct = Math.round(((teleP95 - dropMin) / teleP95) * 100);
+                  if (dur >= 1200 && dropPct >= 30) { // ≥20min, ≥30% drop
+                    teleEvents.push({ ts: parsed[dropStart]?.ts || 0, dropPct, durationSec: dur });
+                  }
+                  inDrop = false; dropMin = Infinity;
+                }
+              }
+              // Open event at end
+              if (inDrop) {
+                const dur = (teleVals.length - dropStart) * step;
+                const dropPct = Math.round(((teleP95 - dropMin) / teleP95) * 100);
+                if (dur >= 1200 && dropPct >= 30) {
+                  teleEvents.push({ ts: parsed[dropStart]?.ts || 0, dropPct, durationSec: dur });
+                }
+              }
+              // Check BGP stable during telescope events
+              const bgpVals = parsed.map(p => p.bgp).filter(v => v !== null);
+              const bgpP95 = bgpVals.length >= 5
+                ? [...bgpVals].sort((a,b) => a - b)[Math.floor(bgpVals.length * 0.95)] : null;
+              const confirmedTeleEvents = teleEvents.filter(ev => {
+                if (!bgpP95 || bgpP95 < 10) return true; // no BGP data = assume stable
+                const evIdx = Math.max(0, Math.round((ev.ts - (parsed[0]?.ts || 0)) / step));
+                const window = bgpVals.slice(evIdx, evIdx + Math.max(2, Math.round(ev.durationSec / step)));
+                return window.length === 0 || Math.min(...window) / bgpP95 > 0.85;
+              });
+              if (confirmedTeleEvents.length > 0) {
+                const worstDrop = Math.max(...confirmedTeleEvents.map(e => e.dropPct));
+                const teleElecHealth = worstDrop > 60 ? 25 : worstDrop > 45 ? 40 : worstDrop > 30 ? 60 : 75;
+                const teleElecScore = confirmedTeleEvents.reduce((acc, e) =>
+                  acc + e.dropPct * Math.max(1, Math.round(e.durationSec / 600)), 0);
+                teleElecSignal = {
+                  elecHealth: teleElecHealth,
+                  elecScore: teleElecScore,
+                  elecEvents: confirmedTeleEvents.length,
+                  elecLabel: teleElecHealth <= 30 ? "Posible interrupción eléctrica severa (telescopio)"
+                    : teleElecHealth <= 50 ? "Posible interrupción eléctrica moderada (telescopio)"
+                    : "Posible interrupción eléctrica leve (telescopio)",
+                  elecConfidence: "media", // telescope is independent signal → media directly
+                  fromTelescope: true,
+                };
+              }
+            }
+          }
+
+          // Merge: raw + telescope can only increase severity, cap at -15pts from Phase 1
+          setRegionScores(prev => prev.map(r => {
+            if (r.code !== st.code) return r;
+            const phase1Elec = r.elecHealth ?? 100;
+            const phase1Conn = r.connectivityHealth ?? 100;
+
+            // Best electric signal: min of raw probing result and telescope result
+            const rawElec  = rawResult.elecHealth ?? 100;
+            const teleElec = teleElecSignal?.elecHealth ?? 100;
+            const bestElec = Math.min(rawElec, teleElec);
+
+            // Cap: raw cannot push more than 15pts below Phase 1
+            const cappedElec = Math.max(phase1Elec - 15, bestElec);
+            const mergedElec = Math.min(phase1Elec, cappedElec);
+            const mergedConn = Math.min(phase1Conn, rawResult.connectivityHealth ?? 100);
+
+            const improvedElec = mergedElec < phase1Elec;
+            const improvedConn = mergedConn < phase1Conn;
+
+            // Choose label and confidence from whichever source found worst
+            let newLabel = r.elecLabel, newConf = r.elecConfidence, newScore = r.elecScore || 0;
+            if (teleElecSignal && teleElec <= rawElec && teleElec < phase1Elec) {
+              newLabel = teleElecSignal.elecLabel;
+              newConf  = teleElecSignal.elecConfidence;
+              newScore = Math.max(newScore, teleElecSignal.elecScore);
+            } else if (rawElec < phase1Elec) {
+              newLabel = rawResult.elecLabel || r.elecLabel;
+              newConf  = r.elecConfidence === "alta" ? "alta" : "media";
+              newScore = Math.max(newScore, rawResult.elecScore || 0);
+            }
+
+            return {
+              ...r,
+              connectivityHealth: mergedConn,
+              healthPct: mergedConn,
+              elecHealth: mergedElec,
+              elecLabel: newLabel,
+              elecConfidence: newConf,
+              elecScore: newScore,
+              elecEvents: Math.max(r.elecEvents || 0, rawResult.elecEvents || 0, teleElecSignal?.elecEvents || 0),
+              perSource: {
+                ...r.perSource,
+                ...(rawResult.perSource?.loss      ? { loss:      rawResult.perSource.loss      } : {}),
+                ...(rawResult.perSource?.latency   ? { latency:   rawResult.perSource.latency   } : {}),
+                ...(rawResult.perSource?.telescope ? { telescope: rawResult.perSource.telescope } : {}),
+              },
+              rawEnriched: true,
+              rawDetectedNew: improvedElec,
+              teleDetected: teleElecSignal && teleElec < phase1Elec,
+            };
+          }));
+        } catch { /* silent fail — Phase 1 data remains valid */ }
+        finally { setRawProgress(p => ({ ...p, current: p.current + 1 })); }
+      }));
+      if (i + BATCH < candidates.length) await new Promise(r => setTimeout(r, DELAY));
+    }
+    setRawEnriching(false);
+  }, [twFrom, twUntil]);
+
   useEffect(() => { loadNational(); loadEvents(0); }, [loadNational, loadEvents]);
   useEffect(() => { if (subView === "estados") loadRegions(); }, [subView, loadRegions]);
-  useEffect(() => { loadEvents(eventsBack); }, [eventsBack]); // reload when navigating back
+  useEffect(() => { loadEvents(eventsBack); }, [eventsBack]);
+  // Phase 2: fire after Phase 1 completes, re-run on time window change
+  useEffect(() => {
+    if (regionScores.length > 0 && !regionLoading) {
+      enrichWithRaw(regionScores);
+    }
+  }, [regionLoading, twFrom, twUntil]); // eslint-disable-line // reload when navigating back
   
   // Auto-refresh every 5 min for 24h/48h modes
   useEffect(() => {
@@ -1174,7 +1344,7 @@ export function TabIODA() {
           if (teleVals.length >= 5) {
             const teleSorted = [...teleVals].sort((a,b) => a - b);
             const teleP95 = teleSorted[Math.floor(teleSorted.length * 0.95)];
-            if (teleP95 >= 0.5) {
+            if (teleP95 >= 0.2) {
               const teleCurrent = teleVals[teleVals.length - 1];
               ps.telescope = { health: Math.min(100, Math.round((teleCurrent / teleP95) * 100)), current: Math.round(teleCurrent * 10) / 10, baseline: Math.round(teleP95 * 10) / 10 };
             }
@@ -1748,11 +1918,36 @@ export function TabIODA() {
 
               {/* Ranking table — dual index */}
               <Card accent="#f59e0b">
-                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                  <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-                    Ranking por Estado · {timeLabel}
+                <div style={{ marginBottom:8 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                    <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+                      Ranking por Estado · {timeLabel}
+                    </div>
+                    <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                      {regionLoading && <span style={{ fontSize:9, fontFamily:font, color:"#a17d08" }}>⏳ fase 1...</span>}
+                      {rawEnriching && (
+                        <span style={{ fontSize:9, fontFamily:font, color:"#7c3aed", display:"flex", alignItems:"center", gap:4 }}>
+                          🔬 refinando señal cruda · {rawProgress.current}/{rawProgress.total}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  {regionLoading && <span style={{ fontSize:9, fontFamily:font, color:"#a17d08" }}>⏳ cargando...</span>}
+                  {/* Phase 2 progress bar — only visible while enriching */}
+                  {(rawEnriching || (rawProgress.total > 0 && rawProgress.current < rawProgress.total)) && (
+                    <div style={{ marginTop:5 }}>
+                      <div style={{ height:3, background:`${BORDER}30`, borderRadius:2, overflow:"hidden" }}>
+                        <div style={{
+                          height:3,
+                          width: rawProgress.total > 0 ? `${Math.round((rawProgress.current / rawProgress.total) * 100)}%` : "0%",
+                          background:"linear-gradient(90deg, #7c3aed, #a855f7)",
+                          borderRadius:2, transition:"width 0.5s ease"
+                        }} />
+                      </div>
+                      <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}70`, marginTop:2 }}>
+                        Análisis de señal cruda + telescopio · los scores se actualizan al completarse
+                      </div>
+                    </div>
+                  )}
                 </div>
                 {activeData.length === 0 ? (
                   <div style={{ fontSize:12, color:MUTED, padding:8 }}>Cargando...</div>
@@ -1780,6 +1975,16 @@ export function TabIODA() {
                           <div style={{ display:"flex", alignItems:"center", gap:5, flex:1, minWidth:0 }}>
                             <span style={{ width:7, height:7, borderRadius:"50%", background:getSeverityColor(r.connectivityHealth), flexShrink:0 }} />
                             <span style={{ fontSize:12, color:TEXT, fontWeight:r.connectivityHealth < 70 ? 700 : 400, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{r.name}</span>
+                            {r.teleDetected && (
+                              <span title="Detectado por telescopio de red"
+                                style={{ fontSize:7, fontFamily:font, padding:"1px 3px", borderRadius:2,
+                                  background:"#7c3aed20", color:"#7c3aed", flexShrink:0, lineHeight:1.2 }}>📡</span>
+                            )}
+                            {r.rawDetectedNew && !r.teleDetected && (
+                              <span title="Detectado por señal cruda (sub-umbral IODA)"
+                                style={{ fontSize:7, fontFamily:font, padding:"1px 3px", borderRadius:2,
+                                  background:"#0891b220", color:"#0891b2", flexShrink:0, lineHeight:1.2 }}>RAW</span>
+                            )}
                           </div>
                           <div style={{ width:55, textAlign:"center" }}>
                             <span style={{ fontSize:12, fontWeight:700, fontFamily:font, color:getSeverityColor(r.connectivityHealth) }}>
@@ -1810,6 +2015,7 @@ export function TabIODA() {
                     <span>⚡N = N° eventos</span>
                     <span>A/M/B = confianza Alta/Media/Baja</span>
                     <span>↓ = caída abrupta</span>
+                    <span>📡 = telescopio · RAW = señal cruda</span>
                   </div>
                 </>)}
               </Card>
