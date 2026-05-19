@@ -951,8 +951,12 @@ export function TabIODA() {
         const pingWarning  = pingAlerts.filter(a => a.level === "warning").sort((a,b) => a.time - b.time);
         const bgpCritical  = bgpAlerts.filter(a => a.level === "critical");
 
-        // C1: BGP veto by magnitude — scaled by prior (Tier 1 states need bigger BGP drop to veto)
-        const bgpVetoThreshold = 0.25 * pm; // e.g. Táchira: 0.25×0.60=0.15 → BGP must drop >15%
+        // C1: BGP veto by magnitude — scaled by prior
+        // Base raised to 0.35 (was 0.25) — during widespread rationing, BGP can show
+        // secondary fluctuations from power recovery; we need larger drops to veto.
+        // e.g. Táchira T1 (pm=0.60): BGP must drop > 0.35×0.60 = 21% to veto
+        // e.g. Distrito Capital T0 (pm=1.0): BGP must drop > 35% to veto
+        const bgpVetoThreshold = 0.35 * pm;
         const isBgpVeto = (t1, t2) => bgpCritical.some(b => {
           if (b.time < t1 - 1800 || b.time > t2 + 1800) return false;
           if (!b.historyValue || b.historyValue === 0) return false;
@@ -1073,6 +1077,43 @@ export function TabIODA() {
         } else if (powerEvents.length > 0 && !bgpStable) {
           elecHealth = 100;
           elecLabel = "Normal (corte infra.)";
+        }
+
+        // ── Inferred electric from connectivity degradation (T1/T2 states) ──
+        // If no explicit electric events detected BUT connectivity is significantly degraded
+        // in a state with known rationing — infer electric contribution.
+        // This catches cases where IODA adapted its baseline to chronic rationing
+        // and stopped emitting alerts even during real outages.
+        if (elecHealth === 100 && prior.tier <= 2 && prior.hoursPerDay > 0) {
+          const connDegradation = 100 - connectivityHealth; // e.g. 75 for Mérida at 25%
+          // Infer threshold: % connectivity drop needed, scaled by tier
+          // T1: ~9% degradation infers electric (very sensitive for 12h/day states)
+          // T2: ~15% degradation needed
+          const inferThreshold = prior.tier === 1 ? Math.round(9 * pm) : Math.round(15 * pm);
+
+          if (connDegradation > inferThreshold) {
+            // BGP check: for T1, even BGP instability doesn't override rationing knowledge
+            // For T2, require BGP to be stable
+            const bgpOk = bgpStable || prior.tier === 1;
+
+            if (bgpOk) {
+              // Set elecHealth proportional to connectivity degradation
+              // but capped — inferred is less certain than directly detected
+              if (connDegradation > 60) elecHealth = Math.max(25, Math.round(connectivityHealth));
+              else if (connDegradation > 40) elecHealth = Math.max(40, Math.round(connectivityHealth));
+              else if (connDegradation > 20) elecHealth = Math.max(60, Math.round(connectivityHealth));
+              else elecHealth = 75;
+
+              // T1 with severe degradation: higher confidence
+              elecConfidence = prior.tier === 1 && connDegradation > 40 ? "media" : "baja";
+              elecLabel = `Posible racionamiento eléctrico · ~${prior.hoursPerDay}h/día declaradas`;
+            } else if (prior.tier === 1 && connDegradation > 50) {
+              // T1 + severe degradation + BGP unstable: still flag but with low confidence
+              elecHealth = Math.max(60, Math.round(connectivityHealth));
+              elecConfidence = "baja";
+              elecLabel = "Posible racionamiento eléctrico (verificar BGP)";
+            }
+          }
         }
         
         return {
