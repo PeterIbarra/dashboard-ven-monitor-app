@@ -737,8 +737,17 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
       const worstSev = isInferred ? severity : Math.min(severity, elecSev);
       const color = worstSev >= 90 ? "#34d399" : worstSev >= 70 ? "#fbbf24" : worstSev >= 50 ? "#f97316" : "#ef4444";
       const ds = r.displayScore || r.dropScore || 0;
-      // Always visible: minimum radius 12 for all states
-      const radius = ds > 0 ? Math.max(12, Math.min(40, (ds / maxScore) * 40)) : (worstSev >= 90 ? 12 : worstSev >= 70 ? 16 : worstSev >= 50 ? 24 : 32);
+      // Radius: IODA score as base, boosted by electric tier and event count
+      const prior = getPrior(r.name);
+      const elecBonus = elecSev < 100 ? (
+        // T1 states with electric events get bigger circles
+        (prior.tier === 1 ? 10 : prior.tier === 2 ? 6 : 3) +
+        Math.min(8, (r.elecEvents || 0) * 2) // up to +8 for many events
+      ) : 0;
+      const baseRadius = ds > 0
+        ? Math.max(12, Math.min(36, (ds / maxScore) * 36))
+        : (worstSev >= 90 ? 12 : worstSev >= 70 ? 16 : worstSev >= 50 ? 22 : 28);
+      const radius = Math.min(44, baseRadius + elecBonus);
       const circle = L.circleMarker(coords, {
         radius, fillColor: color, color: selectedState === r.name ? "#fff" : color,
         weight: selectedState === r.name ? 3 : 1.5, opacity: 0.9, fillOpacity: 0.65,
@@ -1464,11 +1473,9 @@ export function TabIODA() {
             }
           }
           // Connectivity = primarily probing, with loss/latency as secondary penalties (max -15 and -10 pts)
-          const basePing = r.pingHealth || 100;
-          const lossPenalty = ps.loss ? Math.min(15, Math.round((100 - ps.loss.health) * 0.15)) : 0;
-          const latPenalty = ps.latency ? Math.min(10, Math.round((100 - ps.latency.health) * 0.10)) : 0;
-          const connHealth = Math.max(10, basePing - lossPenalty - latPenalty);
-          return { ...r, perSource: ps, connectivityHealth: connHealth, healthPct: connHealth };
+          // NOTE: we do NOT update connectivityHealth in regionScores from here —
+          // that would cause visible jumps when clicking a state. perSource is for display only.
+          return { ...r, perSource: ps };
         }));
       }
       setSelectedStateLoading(false);
@@ -2077,6 +2084,7 @@ export function TabIODA() {
                       // R7: confidence badge
                       const confColor = r.elecConfidence === "alta" ? "#16a34a" : r.elecConfidence === "media" ? "#ca8a04" : "#94a3b8";
                       const confLabel = r.elecConfidence === "alta" ? "A" : r.elecConfidence === "media" ? "M" : "B";
+                      const prior = getPrior(r.name);
                       // R3: abrupt pattern from worst event
                       const hasAbrupt = r.powerEvents?.some(ev => ev.isAbrupt && ev.dropPct >= 15 && !ev.bgpAlsoDown);
                       return (
@@ -2084,8 +2092,14 @@ export function TabIODA() {
                           onClick={() => setSelectedState(selectedState === r.name ? null : r.name)}
                           title={r.elecScore > 0 ? `Score eléctrico: ${r.elecScore}${r.elecConfidence ? ` · Confianza ${r.elecConfidence}` : ""}${hasAbrupt ? " · Caída abrupta" : ""}` : ""}
                           style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px",
-                            background:selectedState === r.name ? `${ACCENT}15` : i % 2 ? "rgba(0,0,0,0.02)" : "transparent",
-                            cursor:"pointer", borderRadius:3 }}>
+                            background: selectedState === r.name ? `${ACCENT}15`
+                              : r.elecHealth < 80 && prior.tier <= 1 ? `#ef444408`  // T1 with electric: red tint
+                              : r.elecHealth < 80 && prior.tier === 2 ? `#f9731608` // T2 with electric: orange tint
+                              : i % 2 ? "rgba(0,0,0,0.02)" : "transparent",
+                            cursor:"pointer", borderRadius:3,
+                            borderLeft: r.elecHealth < 80 && prior.tier <= 1 ? "2px solid #ef444440"
+                              : r.elecHealth < 80 && prior.tier === 2 ? "2px solid #f9731640"
+                              : "2px solid transparent" }}>
                           <div style={{ display:"flex", alignItems:"center", gap:5, flex:1, minWidth:0 }}>
                             <span style={{ width:7, height:7, borderRadius:"50%", background:getSeverityColor(r.connectivityHealth), flexShrink:0 }} />
                             <span style={{ fontSize:12, color:TEXT, fontWeight:r.connectivityHealth < 70 ? 700 : 400, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{r.name}</span>
