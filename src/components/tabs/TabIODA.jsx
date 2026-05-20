@@ -739,23 +739,26 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
       const coords = STATE_COORDS[r.name];
       if (!coords) return;
       const severity = r.connectivityHealth ?? r.healthPct ?? 100;
-      const elecSev = r.elecHealth ?? 100;
-      // Color: connectivity drives the dot color (as before), electricity shown via border
-      // Use min of both only when elecHealth is explicitly detected (not inferred from connectivity)
-      // This prevents double-penalizing states where elecHealth mirrors connectivityHealth
-      const isInferred = r.elecLabel?.includes("racionamiento eléctrico") && !r.elecEvents;
-      const worstSev = isInferred ? severity : Math.min(severity, elecSev);
-      const color = worstSev >= 90 ? "#34d399" : worstSev >= 70 ? "#fbbf24" : worstSev >= 50 ? "#f97316" : "#ef4444";
+      const elecSev  = r.elecHealth ?? 100;
+      const prior    = getPrior(r.name);
+
+      // Color: electricity takes precedence (as requested)
+      // For T0 states (no rationing): average of connectivity and elec (not worst)
+      // For T1/T2/T3: elecHealth drives the color when events detected
+      const colorSev = prior.tier === 0
+        ? Math.round((severity + elecSev) / 2)  // T0: average of both
+        : elecSev < 100
+          ? Math.min(elecSev, severity + 10)
+          : severity;
+      const color = colorSev >= 90 ? "#34d399" : colorSev >= 70 ? "#fbbf24" : colorSev >= 50 ? "#f97316" : "#ef4444";
       const ds = r.displayScore || r.dropScore || 0;
-      // Radius: IODA score as base, boosted by electric tier and event count
-      const prior = getPrior(r.name);
       const elecBonus = elecSev < 100 && prior.tier >= 1 ? (
         (prior.tier === 1 ? 5 : prior.tier === 2 ? 3 : 1) +
         Math.min(4, (r.elecEvents || 0) * 1)
       ) : 0;
       const baseRadius = ds > 0
         ? Math.max(6, Math.min(20, (ds / maxScore) * 20))
-        : (worstSev >= 90 ? 6 : worstSev >= 70 ? 8 : worstSev >= 50 ? 12 : 16);
+        : (colorSev >= 90 ? 6 : colorSev >= 70 ? 8 : colorSev >= 50 ? 12 : 16);
       const radius = Math.min(24, baseRadius + elecBonus);
       const circle = L.circleMarker(coords, {
         radius, fillColor: color, color: selectedState === r.name ? "#fff" : color,
@@ -932,16 +935,15 @@ export function TabIODA() {
         const pingAlerts = alerts.filter(a => a.datasource === "ping-slash24");
         const bgpAlerts = alerts.filter(a => a.datasource === "bgp");
         
-        // ── Connectivity: use IODA's own score directly ──
-        // IODA computes this with weeks of historical context — we trust it over our own recalculation.
-        // Convert overallScore to a 0-100 health index using IODA's documented thresholds.
-        // If IODA emitted a critical ping alert, that overrides the score-based estimate.
+        // ── Connectivity: trust IODA's own signal scores directly ──
+        // Priority: (1) alert historyValue ratio (most precise), (2) pingScore from summary,
+        // (3) overallScore fallback. All from IODA — no recomputation.
         const lastPingAlert  = pingAlerts[pingAlerts.length - 1];
         const lastBgpAlert   = bgpAlerts[bgpAlerts.length - 1];
         const worstPingAlert = pingAlerts
           .filter(a => a.level === "critical" && a.historyValue > 0)
           .sort((a, b) => (a.value / a.historyValue) - (b.value / b.historyValue))[0];
-        let pingHealth = 100, bgpHealth = 100; // preserved for perSource panel
+        let pingHealth = 100, bgpHealth = 100;
         let connectivityHealth;
         if (worstPingAlert && worstPingAlert.historyValue > 0) {
           pingHealth = Math.min(100, Math.round((worstPingAlert.value / worstPingAlert.historyValue) * 100));
@@ -949,22 +951,24 @@ export function TabIODA() {
         } else if (lastPingAlert?.historyValue > 0) {
           pingHealth = Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100));
           connectivityHealth = pingHealth;
+        } else if (pingScore > 0) {
+          // Use IODA's pingScore directly (separate from BGP/telescope)
+          connectivityHealth = pingScore > 50000 ? 20 : pingScore > 30000 ? 35
+            : pingScore > 15000 ? 50 : pingScore > 7000 ? 65
+            : pingScore > 3000 ? 78 : pingScore > 500 ? 90 : 100;
         } else {
-          // No alerts — use IODA overallScore as-is (their accumulated outage metric)
-          connectivityHealth = overallScore > 50000 ? 20
-            : overallScore > 30000 ? 35
-            : overallScore > 15000 ? 50
-            : overallScore > 7000  ? 65
-            : overallScore > 3000  ? 78
-            : overallScore > 1000  ? 90
-            : overallScore > 0     ? 95
-            : 100;
+          // overallScore includes BGP + telescope + ping — broadest signal
+          connectivityHealth = overallScore > 50000 ? 20 : overallScore > 30000 ? 35
+            : overallScore > 15000 ? 50 : overallScore > 7000 ? 65
+            : overallScore > 3000 ? 78 : overallScore > 1000 ? 90
+            : overallScore > 0 ? 95 : 100;
         }
-        // BGP degradation can also affect connectivity
-        const bgpHealthCalc = lastBgpAlert?.historyValue > 0
-          ? Math.min(100, Math.round((lastBgpAlert.value / lastBgpAlert.historyValue) * 100))
-          : 100;
-        bgpHealth = bgpHealthCalc;
+        // BGP: use alert ratio if available, else bgpScore from summary
+        if (lastBgpAlert?.historyValue > 0) {
+          bgpHealth = Math.min(100, Math.round((lastBgpAlert.value / lastBgpAlert.historyValue) * 100));
+        } else if (bgpScore > 0) {
+          bgpHealth = bgpScore > 10000 ? 40 : bgpScore > 3000 ? 60 : bgpScore > 500 ? 85 : 100;
+        }
         connectivityHealth = Math.min(connectivityHealth, bgpHealth);
         
         // ── Electricity detection ── C1+C2+C3+C4 + RATIONING PRIOR ──
@@ -1074,6 +1078,13 @@ export function TabIODA() {
             else if (critCount >= 3)              elecHealth = 50;
             else if (critCount >= 1)              elecHealth = 60;
             else elecHealth = 80;
+            // Event count penalty: each additional electric event reduces elecHealth
+            // Cap at -30pts so the floor remains meaningful (reserved for direct severe drops)
+            // e.g. 5 events × 4pts = -20pts: elecHealth 60 → 40
+            if (electricEvents.length > 1) {
+              const eventPenalty = Math.min(30, (electricEvents.length - 1) * 4);
+              elecHealth = Math.max(22, elecHealth - eventPenalty);
+            }
             // Tier amplification: known heavy rationing → push severity one level lower
             // T1 (12h/day): same drop is more significant → -15pts
             // T2 (5-8h/day): moderate amplification → -10pts
