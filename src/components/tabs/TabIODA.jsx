@@ -776,7 +776,7 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
       group.addLayer(circle);
 
       // Add label for non-normal states (connectivity OR electricity)
-      if (worstSev < 90 || ds > maxScore * 0.05) {
+      if (colorSev < 90 || ds > maxScore * 0.05) {
         const label = L.divIcon({
           className: "ioda-label",
           html: `<div style="font:bold 10px monospace;color:${color};text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap">${r.name}</div>`,
