@@ -747,9 +747,11 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
       // For T1/T2/T3: elecHealth drives the color when events detected
       const colorSev = prior.tier === 0
         ? Math.round((severity + elecSev) / 2)  // T0: average of both
-        : elecSev < 100
-          ? Math.min(elecSev, severity + 10)
-          : severity;
+        : elecSev < 80
+          ? elecSev                               // T1-T3 with real electric signal: elec drives fully
+          : elecSev < 100
+            ? Math.min(elecSev, severity + 15)   // T1-T3 with mild electric: elec primary, connectivity secondary
+            : severity;                           // no electric: connectivity drives
       const color = colorSev >= 90 ? "#34d399" : colorSev >= 70 ? "#fbbf24" : colorSev >= 50 ? "#f97316" : "#ef4444";
       const ds = r.displayScore || r.dropScore || 0;
       const elecBonus = elecSev < 100 && prior.tier >= 1 ? (
@@ -1094,9 +1096,12 @@ export function TabIODA() {
               elecHealth = Math.max(30, elecHealth - 10);
             }
           } else {
-            // C2: warning-only — cap tighter for high-tier states
+            // C2: warning-only — cap tighter for high-tier states, with event count penalty
             const warnCap = prior.tier <= 1 ? 45 : prior.tier === 2 ? 55 : 65;
-            elecHealth = Math.max(warnCap, electricEvents.length >= 3 ? warnCap - 10 : electricEvents.length >= 2 ? warnCap - 5 : warnCap);
+            const warnBase = electricEvents.length >= 3 ? warnCap - 10 : electricEvents.length >= 2 ? warnCap - 5 : warnCap;
+            // Event count penalty applies here too
+            const warnEventPenalty = Math.min(20, (electricEvents.length - 1) * 3);
+            elecHealth = Math.max(warnCap - 15, warnBase - warnEventPenalty);
           }
           // Boosts
           if (hasAbrupt   && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
