@@ -750,14 +750,13 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
       // Radius: IODA score as base, boosted by electric tier and event count
       const prior = getPrior(r.name);
       const elecBonus = elecSev < 100 && prior.tier >= 1 ? (
-        // T1/T2/T3 states with electric events get bigger circles; T0 gets no bonus
-        (prior.tier === 1 ? 10 : prior.tier === 2 ? 6 : 3) +
-        Math.min(8, (r.elecEvents || 0) * 2) // up to +8 for many events
+        (prior.tier === 1 ? 5 : prior.tier === 2 ? 3 : 1) +
+        Math.min(4, (r.elecEvents || 0) * 1)
       ) : 0;
       const baseRadius = ds > 0
-        ? Math.max(12, Math.min(36, (ds / maxScore) * 36))
-        : (worstSev >= 90 ? 12 : worstSev >= 70 ? 16 : worstSev >= 50 ? 22 : 28);
-      const radius = Math.min(44, baseRadius + elecBonus);
+        ? Math.max(6, Math.min(20, (ds / maxScore) * 20))
+        : (worstSev >= 90 ? 6 : worstSev >= 70 ? 8 : worstSev >= 50 ? 12 : 16);
+      const radius = Math.min(24, baseRadius + elecBonus);
       const circle = L.circleMarker(coords, {
         radius, fillColor: color, color: selectedState === r.name ? "#fff" : color,
         weight: selectedState === r.name ? 3 : 1.5, opacity: 0.9, fillOpacity: 0.65,
