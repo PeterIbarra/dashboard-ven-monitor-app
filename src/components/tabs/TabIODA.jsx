@@ -936,12 +936,19 @@ export function TabIODA() {
         // IODA computes this with weeks of historical context — we trust it over our own recalculation.
         // Convert overallScore to a 0-100 health index using IODA's documented thresholds.
         // If IODA emitted a critical ping alert, that overrides the score-based estimate.
+        const lastPingAlert  = pingAlerts[pingAlerts.length - 1];
+        const lastBgpAlert   = bgpAlerts[bgpAlerts.length - 1];
+        const worstPingAlert = pingAlerts
+          .filter(a => a.level === "critical" && a.historyValue > 0)
+          .sort((a, b) => (a.value / a.historyValue) - (b.value / b.historyValue))[0];
+        let pingHealth = 100, bgpHealth = 100; // preserved for perSource panel
         let connectivityHealth;
         if (worstPingAlert && worstPingAlert.historyValue > 0) {
-          // IODA flagged a specific degradation event — use the ratio directly
-          connectivityHealth = Math.min(100, Math.round((worstPingAlert.value / worstPingAlert.historyValue) * 100));
+          pingHealth = Math.min(100, Math.round((worstPingAlert.value / worstPingAlert.historyValue) * 100));
+          connectivityHealth = pingHealth;
         } else if (lastPingAlert?.historyValue > 0) {
-          connectivityHealth = Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100));
+          pingHealth = Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100));
+          connectivityHealth = pingHealth;
         } else {
           // No alerts — use IODA overallScore as-is (their accumulated outage metric)
           connectivityHealth = overallScore > 50000 ? 20
@@ -954,10 +961,10 @@ export function TabIODA() {
             : 100;
         }
         // BGP degradation can also affect connectivity
-        const bgpHealth = lastBgpAlert?.historyValue > 0
+        const bgpHealthCalc = lastBgpAlert?.historyValue > 0
           ? Math.min(100, Math.round((lastBgpAlert.value / lastBgpAlert.historyValue) * 100))
           : 100;
-        // Take minimum — if BGP collapsed, connectivity is definitely degraded
+        bgpHealth = bgpHealthCalc;
         connectivityHealth = Math.min(connectivityHealth, bgpHealth);
         
         // ── Electricity detection ── C1+C2+C3+C4 + RATIONING PRIOR ──
