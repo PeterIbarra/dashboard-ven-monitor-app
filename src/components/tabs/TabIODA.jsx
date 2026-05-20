@@ -1421,12 +1421,17 @@ export function TabIODA() {
             const teleElec = teleElecSignal?.elecHealth ?? 100;
             const bestElec = Math.min(rawElec, teleElec);
 
-            // Cap: only apply when Phase 1 already detected something (phase1Elec < 100).
-            // When Phase 1 found nothing, Phase 2 can freely report any value.
-            // This was causing Phase 2 to floor at 85 (100-15) even when telescope found 75.
-            const cappedElec = phase1Elec < 100
-              ? Math.max(phase1Elec - 15, bestElec)
-              : bestElec;
+            // Cap: tier-based floor when Phase 1 found nothing (phase1Elec = 100).
+            // Prevents noisy telescope signals from pulling all states to critical.
+            // When Phase 1 already found something, cap at -15pts from Phase 1.
+            let cappedElec;
+            if (phase1Elec < 100) {
+              cappedElec = Math.max(phase1Elec - 15, bestElec);
+            } else {
+              // Phase 1 found nothing — apply tier-based minimum floor
+              const floorByTier = prior.tier <= 1 ? 25 : prior.tier === 2 ? 35 : 55;
+              cappedElec = Math.max(floorByTier, bestElec);
+            }
             const mergedElec = Math.min(phase1Elec, cappedElec);
             const mergedConn = Math.min(phase1Conn, rawResult.connectivityHealth ?? 100);
 
