@@ -955,9 +955,9 @@ export function TabIODA() {
             : overallScore > 30000 ? 35
             : overallScore > 15000 ? 50
             : overallScore > 7000  ? 65
-            : overallScore > 3000  ? 75
-            : overallScore > 1000  ? 85
-            : overallScore > 0     ? 92
+            : overallScore > 3000  ? 78
+            : overallScore > 1000  ? 90
+            : overallScore > 0     ? 95
             : 100;
         }
         // BGP degradation can also affect connectivity
@@ -1250,15 +1250,27 @@ export function TabIODA() {
         if (prior.tier > 0 && (hasAbruptStrong || hasIodaConf) && confidence === "baja") confidence = "media";
         s.elecConfidence = confidence;
         if (hasRegional) {
-          s.elecHealth = worstRegDrop > 35 ? 20 : worstRegDrop > 20 ? 40 : worstRegDrop > 10 ? 60 : 80;
-          const sevWord = s.elecHealth <= 30 ? "severa" : s.elecHealth <= 50 ? "moderada" : s.elecHealth <= 70 ? "leve" : "";
-          s.elecLabel = confidence === "alta" ? `Interrupción eléctrica regional ${sevWord}`.trim()
-            : confidence === "media" ? `Posible interrupción eléctrica regional ${sevWord}`.trim()
-            : `Posible interrupción eléctrica ${sevWord} (verificar)`.trim();
-        } else if (worstNatSev === "blackout_severe") { s.elecHealth = 15; s.elecLabel = "Interrupción eléctrica nacional severa"; }
-        else if (worstNatSev === "blackout_moderate") { s.elecHealth = 40; s.elecLabel = "Interrupción eléctrica nacional moderada"; }
-        else if (worstNatSev === "network_mild") { s.elecHealth = 80; s.elecLabel = "Degradación leve (red)"; }
-        s.elecEvents = s.powerEvents.length;
+          // Only update if post-processing found worse severity than per-state calculation
+          const postElec = worstRegDrop > 35 ? 20 : worstRegDrop > 20 ? 40 : worstRegDrop > 10 ? 60 : 80;
+          // Apply tier prior to post-processing too
+          const postElecAdjusted = prior.tier === 1 && postElec > 20 && postElec <= 60
+            ? Math.max(20, postElec - 15)
+            : prior.tier === 2 && postElec > 40 && postElec <= 60
+            ? Math.max(30, postElec - 10)
+            : postElec;
+          // Only override if post-processing is more severe
+          if (postElecAdjusted < s.elecHealth) {
+            s.elecHealth = postElecAdjusted;
+            const sevWord = s.elecHealth <= 30 ? "severa" : s.elecHealth <= 50 ? "moderada" : s.elecHealth <= 70 ? "leve" : "";
+            s.elecLabel = confidence === "alta" ? `Interrupción eléctrica regional ${sevWord}`.trim()
+              : confidence === "media" ? `Posible interrupción eléctrica regional ${sevWord}`.trim()
+              : `Posible interrupción eléctrica ${sevWord} (verificar)`.trim();
+          }
+        } else if (worstNatSev === "blackout_severe") { s.elecHealth = Math.min(s.elecHealth, 15); s.elecLabel = "Interrupción eléctrica nacional severa"; }
+        else if (worstNatSev === "blackout_moderate") { s.elecHealth = Math.min(s.elecHealth, 40); s.elecLabel = "Interrupción eléctrica nacional moderada"; }
+        // network_mild: don't override — per-state calculation already handled this
+        // Fix: use electricEvents count, not total powerEvents
+        s.elecEvents = s.powerEvents.filter(ev => ev.isElectric).length;
       });
     }
     
