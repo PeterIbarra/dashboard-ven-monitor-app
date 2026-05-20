@@ -932,34 +932,33 @@ export function TabIODA() {
         const pingAlerts = alerts.filter(a => a.datasource === "ping-slash24");
         const bgpAlerts = alerts.filter(a => a.datasource === "bgp");
         
-        // Current connectivity health
-        const lastPingAlert = pingAlerts[pingAlerts.length - 1];
-        const lastBgpAlert = bgpAlerts[bgpAlerts.length - 1];
-        // Use WORST critical alert in period
-        const worstPingAlert = pingAlerts
-          .filter(a => a.level === "critical" && a.historyValue > 0)
-          .sort((a, b) => (a.value / a.historyValue) - (b.value / b.historyValue))[0];
-        
-        let pingHealth;
-        if (worstPingAlert) {
-          pingHealth = Math.min(100, Math.round((worstPingAlert.value / worstPingAlert.historyValue) * 100));
+        // ── Connectivity: use IODA's own score directly ──
+        // IODA computes this with weeks of historical context — we trust it over our own recalculation.
+        // Convert overallScore to a 0-100 health index using IODA's documented thresholds.
+        // If IODA emitted a critical ping alert, that overrides the score-based estimate.
+        let connectivityHealth;
+        if (worstPingAlert && worstPingAlert.historyValue > 0) {
+          // IODA flagged a specific degradation event — use the ratio directly
+          connectivityHealth = Math.min(100, Math.round((worstPingAlert.value / worstPingAlert.historyValue) * 100));
         } else if (lastPingAlert?.historyValue > 0) {
-          pingHealth = Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100));
+          connectivityHealth = Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100));
         } else {
-          // No alerts at all — use score to estimate health
-          if (overallScore > 50000) pingHealth = 30;
-          else if (overallScore > 20000) pingHealth = 50;
-          else if (overallScore > 10000) pingHealth = 60;
-          else if (overallScore > 5000) pingHealth = 70;
-          else if (overallScore > 1000) pingHealth = 85;
-          else if (overallScore > 0) pingHealth = 90;
-          else pingHealth = 100;
+          // No alerts — use IODA overallScore as-is (their accumulated outage metric)
+          connectivityHealth = overallScore > 50000 ? 20
+            : overallScore > 30000 ? 35
+            : overallScore > 15000 ? 50
+            : overallScore > 7000  ? 65
+            : overallScore > 3000  ? 75
+            : overallScore > 1000  ? 85
+            : overallScore > 0     ? 92
+            : 100;
         }
-        
+        // BGP degradation can also affect connectivity
         const bgpHealth = lastBgpAlert?.historyValue > 0
           ? Math.min(100, Math.round((lastBgpAlert.value / lastBgpAlert.historyValue) * 100))
           : 100;
-        const connectivityHealth = Math.min(pingHealth, bgpHealth);
+        // Take minimum — if BGP collapsed, connectivity is definitely degraded
+        connectivityHealth = Math.min(connectivityHealth, bgpHealth);
         
         // ── Electricity detection ── C1+C2+C3+C4 + RATIONING PRIOR ──
 
@@ -1068,24 +1067,36 @@ export function TabIODA() {
             else if (critCount >= 3)              elecHealth = 50;
             else if (critCount >= 1)              elecHealth = 60;
             else elecHealth = 80;
+            // Tier amplification: known heavy rationing → push severity one level lower
+            // T1 (12h/day): same drop is more significant → -15pts
+            // T2 (5-8h/day): moderate amplification → -10pts
+            if (prior.tier === 1 && elecHealth > 20 && elecHealth <= 60) {
+              elecHealth = Math.max(20, elecHealth - 15);
+            } else if (prior.tier === 2 && elecHealth > 40 && elecHealth <= 60) {
+              elecHealth = Math.max(30, elecHealth - 10);
+            }
           } else {
-            // C2: warning-only — cap adjusted by tier
-            const warnCap = prior.tier <= 1 ? 55 : prior.tier === 2 ? 60 : 65;
+            // C2: warning-only — cap tighter for high-tier states
+            const warnCap = prior.tier <= 1 ? 45 : prior.tier === 2 ? 55 : 65;
             elecHealth = Math.max(warnCap, electricEvents.length >= 3 ? warnCap - 10 : electricEvents.length >= 2 ? warnCap - 5 : warnCap);
           }
           // Boosts
           if (hasAbrupt   && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
           if (hasIodaConf && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 5);
 
-          // Confidence: start from prior base; T0 states capped at "baja"
+          // Confidence: start from prior base; T0 capped at "baja"
           elecConfidence = prior.tier === 0 ? "baja" : prior.confidenceBase;
           if (hasIodaConf && elecConfidence === "baja" && prior.tier > 0) elecConfidence = "media";
-          // Intra-day accumulation: if elecScore exceeds ~50% of expected daily block score,
-          // the pattern of repeated blocks confirms the rationing signal
+
+          // Intra-day accumulation: repeated blocks confirm rationing pattern
+          // T1 threshold lowered to 35% of expected — more sensitive
           const expectedDailyScore = prior.hoursPerDay > 0
-            ? Math.round(prior.hoursPerDay * 6 * 15) // 6 buckets/h × avg 15% drop
+            ? Math.round(prior.hoursPerDay * 6 * 15)
             : 9999;
-          if (prior.tier >= 1 && elecScore >= expectedDailyScore * 0.5) {
+          if (prior.tier === 1 && elecScore >= expectedDailyScore * 0.35) {
+            elecConfidence = "alta";
+            if (elecHealth > 40) elecHealth = Math.min(elecHealth, 40);
+          } else if (prior.tier <= 2 && elecScore >= expectedDailyScore * 0.5) {
             if (elecConfidence === "baja") elecConfidence = "media";
             else if (elecConfidence === "media") elecConfidence = "alta";
           }
