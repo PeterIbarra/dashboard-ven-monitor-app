@@ -1127,40 +1127,29 @@ export function TabIODA() {
           elecLabel = "Normal (corte infra.)";
         }
 
-        // ── Inferred electric from connectivity degradation (T1/T2 states) ──
-        // If no explicit electric events detected BUT connectivity is significantly degraded
-        // in a state with known rationing — infer electric contribution.
-        // This catches cases where IODA adapted its baseline to chronic rationing
-        // and stopped emitting alerts even during real outages.
+        // ── Inferred electric from connectivity degradation (T1/T2 states only) ──
+        // Only runs when NO explicit electric events were detected.
+        // Uses FIXED tier-based values — does NOT mirror connectivityHealth
+        // (mirroring caused all states to converge on the same elecHealth value).
+        // Thresholds raised significantly to avoid triggering on chronic degradation.
         if (elecHealth === 100 && prior.tier <= 2 && prior.hoursPerDay > 0) {
-          const connDegradation = 100 - connectivityHealth; // e.g. 75 for Mérida at 25%
-          // Infer threshold: % connectivity drop needed, scaled by tier
-          // T1: ~9% degradation infers electric (very sensitive for 12h/day states)
-          // T2: ~15% degradation needed
-          const inferThreshold = prior.tier === 1 ? Math.round(9 * pm) : Math.round(15 * pm);
+          const connDegradation = 100 - connectivityHealth;
+          // Require meaningful degradation — raised from 9/15% to 20/30%
+          const inferThreshold = prior.tier === 1 ? 20 : 30;
 
-          if (connDegradation > inferThreshold) {
-            // BGP check: for T1, even BGP instability doesn't override rationing knowledge
-            // For T2, require BGP to be stable
-            const bgpOk = bgpStable || prior.tier === 1;
-
-            if (bgpOk) {
-              // Set elecHealth proportional to connectivity degradation
-              // but capped — inferred is less certain than directly detected
-              if (connDegradation > 60) elecHealth = Math.max(25, Math.round(connectivityHealth));
-              else if (connDegradation > 40) elecHealth = Math.max(40, Math.round(connectivityHealth));
-              else if (connDegradation > 20) elecHealth = Math.max(60, Math.round(connectivityHealth));
-              else elecHealth = 75;
-
-              // T1 with severe degradation: higher confidence
-              elecConfidence = prior.tier === 1 && connDegradation > 40 ? "media" : "baja";
-              elecLabel = `Posible racionamiento eléctrico · ~${prior.hoursPerDay}h/día declaradas`;
-            } else if (prior.tier === 1 && connDegradation > 50) {
-              // T1 + severe degradation + BGP unstable: still flag but with low confidence
-              elecHealth = Math.max(60, Math.round(connectivityHealth));
-              elecConfidence = "baja";
-              elecLabel = "Posible racionamiento eléctrico (verificar BGP)";
+          if (connDegradation > inferThreshold && bgpStable) {
+            // Fixed tier-based values (NOT derived from connectivityHealth)
+            if (prior.tier === 1) {
+              if      (connDegradation > 60) { elecHealth = 25; elecConfidence = "media"; }
+              else if (connDegradation > 40) { elecHealth = 40; elecConfidence = "media"; }
+              else if (connDegradation > 25) { elecHealth = 55; elecConfidence = "baja";  }
+              else                           { elecHealth = 70; elecConfidence = "baja";  }
+            } else { // T2
+              if      (connDegradation > 50) { elecHealth = 35; elecConfidence = "baja";  }
+              else if (connDegradation > 35) { elecHealth = 50; elecConfidence = "baja";  }
+              else                           { elecHealth = 65; elecConfidence = "baja";  }
             }
+            elecLabel = `Posible racionamiento eléctrico · ~${prior.hoursPerDay}h/día declaradas`;
           }
         }
         
@@ -1243,14 +1232,22 @@ export function TabIODA() {
           s.powerEvents.some(sev => Math.abs(oev.ts - sev.ts) < 1800)
         )).length;
         // Confidence: neighbors boost, national = high
+        // T0 states (no rationing): capped at "baja" regardless of neighbors
+        const prior = getPrior(s.name);
         let confidence = "baja";
-        if (worstNatSev) confidence = "alta";
-        else if (neighborCount >= 1) confidence = "alta"; // lowered from 2
-        else if (neighborCount >= 1) confidence = "media";
-        // Abrupt pattern or IODA confirmation upgrade baja → media
+        if (prior.tier === 0) {
+          confidence = "baja"; // T0 never gets boosted by neighbors
+        } else if (worstNatSev) {
+          confidence = "alta";
+        } else if (neighborCount >= 2) {
+          confidence = "alta";
+        } else if (neighborCount >= 1) {
+          confidence = "media";
+        }
+        // Abrupt pattern or IODA confirmation upgrade baja → media (not for T0)
         const hasAbruptStrong = s.powerEvents.some(ev => ev.isAbrupt && ev.dropPct >= 15 && !ev.bgpAlsoDown);
         const hasIodaConf     = s.powerEvents.some(ev => ev.iodaConfirmed && !ev.bgpAlsoDown);
-        if ((hasAbruptStrong || hasIodaConf) && confidence === "baja") confidence = "media";
+        if (prior.tier > 0 && (hasAbruptStrong || hasIodaConf) && confidence === "baja") confidence = "media";
         s.elecConfidence = confidence;
         if (hasRegional) {
           s.elecHealth = worstRegDrop > 35 ? 20 : worstRegDrop > 20 ? 40 : worstRegDrop > 10 ? 60 : 80;
