@@ -1421,8 +1421,12 @@ export function TabIODA() {
             const teleElec = teleElecSignal?.elecHealth ?? 100;
             const bestElec = Math.min(rawElec, teleElec);
 
-            // Cap: raw cannot push more than 15pts below Phase 1
-            const cappedElec = Math.max(phase1Elec - 15, bestElec);
+            // Cap: only apply when Phase 1 already detected something (phase1Elec < 100).
+            // When Phase 1 found nothing, Phase 2 can freely report any value.
+            // This was causing Phase 2 to floor at 85 (100-15) even when telescope found 75.
+            const cappedElec = phase1Elec < 100
+              ? Math.max(phase1Elec - 15, bestElec)
+              : bestElec;
             const mergedElec = Math.min(phase1Elec, cappedElec);
             const mergedConn = Math.min(phase1Conn, rawResult.connectivityHealth ?? 100);
 
