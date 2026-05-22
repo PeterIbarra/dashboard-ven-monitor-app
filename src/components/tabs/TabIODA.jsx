@@ -1073,35 +1073,16 @@ export function TabIODA() {
           const tModerate = prior.tier === 0 ? 35 : Math.round(20 * pm);
           const tLeve     = prior.tier === 0 ? 20 : Math.round(10 * pm);
 
-          if (!warnOnly) {
-            if (worstDrop > tSevere || hasSingle) elecHealth = 20;
-            else if (worstDrop > tModerate)       elecHealth = 40;
-            else if (worstDrop > tLeve)           elecHealth = 60;
-            else if (critCount >= 3)              elecHealth = 50;
-            else if (critCount >= 1)              elecHealth = 60;
-            else elecHealth = 80;
-            // Event count penalty: each additional electric event reduces elecHealth
-            // Cap at -30pts so the floor remains meaningful (reserved for direct severe drops)
-            // e.g. 5 events × 4pts = -20pts: elecHealth 60 → 40
-            if (electricEvents.length > 1) {
-              const eventPenalty = Math.min(30, (electricEvents.length - 1) * 4);
-              elecHealth = Math.max(22, elecHealth - eventPenalty);
-            }
-            // Tier amplification: known heavy rationing → push severity one level lower
-            // T1 (12h/day): same drop is more significant → -15pts
-            // T2 (5-8h/day): moderate amplification → -10pts
-            if (prior.tier === 1 && elecHealth > 20 && elecHealth <= 60) {
-              elecHealth = Math.max(20, elecHealth - 15);
-            } else if (prior.tier === 2 && elecHealth > 40 && elecHealth <= 60) {
-              elecHealth = Math.max(30, elecHealth - 10);
-            }
-          } else {
-            // C2: warning-only — cap tighter for high-tier states, with event count penalty
-            const warnCap = prior.tier <= 1 ? 45 : prior.tier === 2 ? 55 : 65;
-            const warnBase = electricEvents.length >= 3 ? warnCap - 10 : electricEvents.length >= 2 ? warnCap - 5 : warnCap;
-            // Event count penalty applies here too
-            const warnEventPenalty = Math.min(20, (electricEvents.length - 1) * 3);
-            elecHealth = Math.max(warnCap - 15, warnBase - warnEventPenalty);
+          {
+            // Continuous formula — produces varied non-round values
+            // nDrop: tier-normalized drop (higher tier = same drop counts more)
+            // nEvents: tier-normalized event accumulation
+            const evCount = warnOnly ? electricEvents.length * 0.6 : electricEvents.length;
+            const nDrop   = worstDrop / pm;
+            const nEvents = Math.max(0, evCount - 1) / pm;
+            const tierMin = prior.tier === 0 ? 55 : prior.tier <= 1 ? 20 : prior.tier === 2 ? 25 : 35;
+            elecHealth = Math.max(tierMin, Math.round(100 - nDrop * 1.2 - nEvents * 2.5));
+            // Abrupt and IODA confirmation still apply as additional evidence
           }
           // Boosts
           if (hasAbrupt   && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
@@ -1389,10 +1370,11 @@ export function TabIODA() {
               if (confirmedTeleEvents.length > 0) {
                 const worstDrop = Math.max(...confirmedTeleEvents.map(e => e.dropPct));
                 // Scale severity thresholds by prior
-                const tS = Math.round(60 * prior.thresholdMult);
-                const tM = Math.round(45 * prior.thresholdMult);
-                const tL = Math.round(30 * prior.thresholdMult);
-                const teleElecHealth = worstDrop > tS ? 25 : worstDrop > tM ? 40 : worstDrop > tL ? 60 : 75;
+                // Continuous formula for telescope severity
+                const teleNDrop   = worstDrop / prior.thresholdMult;
+                const teleNEvents = Math.max(0, confirmedTeleEvents.length - 1) / prior.thresholdMult;
+                const teleTierMin = prior.tier === 0 ? 55 : prior.tier <= 1 ? 20 : prior.tier === 2 ? 25 : 35;
+                const teleElecHealth = Math.max(teleTierMin, Math.round(100 - teleNDrop * 1.2 - teleNEvents * 2.5));
                 const teleElecScore = confirmedTeleEvents.reduce((acc, e) =>
                   acc + e.dropPct * Math.max(1, Math.round(e.durationSec / 600)), 0);
                 // Confidence: telescope is independent → start at prior base, min "media" for Tier 1
@@ -1428,8 +1410,8 @@ export function TabIODA() {
             if (phase1Elec < 100) {
               cappedElec = Math.max(phase1Elec - 15, bestElec);
             } else {
-              // Phase 1 found nothing — apply tier-based minimum floor
-              const floorByTier = prior.tier <= 1 ? 25 : prior.tier === 2 ? 35 : 55;
+              // Phase 1 found nothing — tier-based floor, matched to continuous formula minimums
+              const floorByTier = prior.tier === 0 ? 55 : prior.tier <= 1 ? 20 : prior.tier === 2 ? 25 : 35;
               cappedElec = Math.max(floorByTier, bestElec);
             }
             const mergedElec = Math.min(phase1Elec, cappedElec);
@@ -1454,7 +1436,7 @@ export function TabIODA() {
               ...r,
               connectivityHealth: mergedConn,
               healthPct: mergedConn,
-              elecHealth: mergedElec,
+              elecHealth: prior.tier === 0 ? Math.max(55, mergedElec) : mergedElec,
               elecLabel: newLabel,
               elecConfidence: newConf,
               elecScore: newScore,
