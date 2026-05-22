@@ -130,6 +130,23 @@ function parseSignals(json) {
 const fmtVal = v => v == null ? "—" : v >= 1e6 ? `${(v/1e6).toFixed(1)}M` : v >= 1e3 ? `${(v/1e3).toFixed(1)}K` : v.toFixed(0);
 const fmtTime = epoch => new Date(epoch * 1000).toLocaleString("es-VE", { timeZone:"America/Caracas", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", hour12:false });
 const fmtDuration = secs => { if (!secs || isNaN(secs) || secs <= 0) return "—"; if (secs < 3600) return `${Math.round(secs/60)}m`; const h = Math.floor(secs/3600), m = Math.round((secs%3600)/60); return m > 0 ? `${h}h ${m}m` : `${h}h`; };
+const signalPoints = (series, key) => (series || [])
+  .filter(p => p?.[key] !== null && typeof p?.[key] === "number")
+  .map(p => ({ ts: p.ts, value: p[key] }));
+const pointValues = points => points.map(p => p.value);
+const percentile = (vals, p) => {
+  if (!vals.length) return null;
+  const sorted = [...vals].sort((a,b) => a - b);
+  return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))];
+};
+const normalizedTelescopePoints = (data) => (data || [])
+  .map(p => {
+    if (typeof p === "number") return null;
+    if (typeof p?.value === "number") return p;
+    if (typeof p?.telescope === "number") return { ts: p.ts, value: p.telescope };
+    return null;
+  })
+  .filter(Boolean);
 
 // ── Interpret connectivity pattern from per-source data ──
 function interpretPattern(perSource, telescopeMultiplier) {
@@ -194,18 +211,17 @@ function computeRegionScore(parsed, nationalTelescopeData, calibratedBaseline = 
   const pm = prior?.thresholdMult ?? 1.0; // threshold multiplier from rationing prior
   
   // ── Probing base metrics (shared by both indices) ──
-  const probVals = parsed.map(p => p.probing).filter(v => v !== null);
+  const probPoints = signalPoints(parsed, "probing");
+  const probVals = pointValues(probPoints);
   if (probVals.length < 5) return null;
   
-  const probSorted = [...probVals].sort((a,b) => a - b);
-  const probP95 = probSorted[Math.floor(probSorted.length * 0.95)];
+  const rawProbP95 = percentile(probVals, 0.95);
+  const probP95 = calibratedBaseline && calibratedBaseline >= 10 ? calibratedBaseline : rawProbP95;
   if (probP95 < 10) return null;
   
-  const probTail = probVals.slice(-Math.min(36, probVals.length));
-  const probWorst = Math.min(...probTail);
-  const probHealth = Math.min(100, Math.round((probWorst / probP95) * 100));
   const probRecent = probVals.slice(-5);
   const probCurrent = probRecent.reduce((a,b) => a+b, 0) / probRecent.length;
+  const probHealth = Math.min(100, Math.round((probCurrent / probP95) * 100));
   const probLiveDrop = Math.max(0, Math.round(probP95 - probCurrent));
   
   // Probing score
@@ -252,15 +268,15 @@ function computeRegionScore(parsed, nationalTelescopeData, calibratedBaseline = 
   // ══════ INDEX 2: ELECTRICITY ══════
   // Detect probing drops vs P95 baseline (not moving average — avoids smoothing away events)
   // Threshold: >15% below P95 for 2+ consecutive points = potential power outage
-  const step = parsed.length > 1 ? (parsed[parsed.length-1].ts - parsed[0].ts) / (parsed.length - 1) : 600;
-  const elecThreshold = probP95 * 0.85; // 15% below baseline
-  const elecRecovery = probP95 * 0.92; // recovered when back to within 8% of baseline
+  const step = probPoints.length > 1 ? (probPoints[probPoints.length-1].ts - probPoints[0].ts) / (probPoints.length - 1) : 600;
+  const elecThreshold = probP95 * 0.75; // 25% below baseline
+  const elecRecovery = probP95 * 0.88; // recovered when back to within 12% of baseline
   
   let powerEvents = [];
   let inDrop = false, dropStart = null, dropMinVal = Infinity, consecutiveBelow = 0;
   
-  for (let i = 0; i < probVals.length; i++) {
-    const v = probVals[i];
+  for (let i = 0; i < probPoints.length; i++) {
+    const v = probPoints[i].value;
     const dropPct = probP95 > 0 ? ((probP95 - v) / probP95) * 100 : 0;
     
     if (v < elecThreshold) {
@@ -269,7 +285,7 @@ function computeRegionScore(parsed, nationalTelescopeData, calibratedBaseline = 
         // Confirmed drop start (2+ consecutive points below threshold)
         inDrop = true;
         dropStart = i - 1; // include the first point that crossed
-        dropMinVal = Math.min(v, probVals[i - 1] || v);
+        dropMinVal = Math.min(v, probPoints[i - 1]?.value ?? v);
       } else if (inDrop) {
         if (v < dropMinVal) dropMinVal = v;
       }
@@ -279,11 +295,11 @@ function computeRegionScore(parsed, nationalTelescopeData, calibratedBaseline = 
         // Event ended — recovered
         const durationPts = i - dropStart;
         const maxDropPct = probP95 > 0 ? Math.round(((probP95 - dropMinVal) / probP95) * 100) : 0;
-        if (maxDropPct >= 15 && durationPts >= 2) {
+        if (maxDropPct >= 25 && durationPts >= 3) {
           powerEvents.push({
-            ts: parsed[dropStart]?.ts || 0,
+            ts: probPoints[dropStart]?.ts || 0,
             dropPct: maxDropPct,
-            durationSec: Math.round(durationPts * step),
+            durationSec: Math.max(600, Math.round((probPoints[i]?.ts || probPoints[probPoints.length - 1]?.ts || 0) - (probPoints[dropStart]?.ts || 0))),
             recovered: true,
           });
         }
@@ -294,22 +310,22 @@ function computeRegionScore(parsed, nationalTelescopeData, calibratedBaseline = 
   // Still in drop at end of data
   if (inDrop) {
     const maxDropPct = probP95 > 0 ? Math.round(((probP95 - dropMinVal) / probP95) * 100) : 0;
-    if (maxDropPct >= 15) {
+    if (maxDropPct >= 25) {
       powerEvents.push({
-        ts: parsed[dropStart]?.ts || 0,
+        ts: probPoints[dropStart]?.ts || 0,
         dropPct: maxDropPct,
-        durationSec: Math.round((probVals.length - dropStart) * step),
+        durationSec: Math.max(600, Math.round((probPoints[probPoints.length - 1]?.ts || 0) - (probPoints[dropStart]?.ts || 0) + step)),
         recovered: false,
       });
     }
   }
   
   // BGP stability check — if BGP also dropped, it's more likely censorship than power
-  const bgpVals = parsed.map(p => p.bgp).filter(v => v !== null);
+  const bgpPoints = signalPoints(parsed, "bgp");
+  const bgpVals = pointValues(bgpPoints);
   let bgpInfo = null, bgpStable = true;
   if (bgpVals.length >= 5) {
-    const bgpSorted = [...bgpVals].sort((a,b) => a - b);
-    const bgpP95 = bgpSorted[Math.floor(bgpSorted.length * 0.95)];
+    const bgpP95 = percentile(bgpVals, 0.95);
     if (bgpP95 >= 10) {
       const bgpCurrent = bgpVals[bgpVals.length - 1];
       const bgpHealth = Math.min(100, Math.round((bgpCurrent / bgpP95) * 100));
@@ -322,20 +338,19 @@ function computeRegionScore(parsed, nationalTelescopeData, calibratedBaseline = 
   // National telescope coincidence
   let teleCoincidence = false;
   if (nationalTelescopeData && nationalTelescopeData.length > 0 && powerEvents.length > 0) {
-    const ntVals = nationalTelescopeData.filter(v => v !== null);
-    if (ntVals.length > 10) {
-      const ntSorted = [...ntVals].sort((a,b) => a - b);
-      const ntP95 = ntSorted[Math.floor(ntSorted.length * 0.95)];
+    const ntPoints = normalizedTelescopePoints(nationalTelescopeData);
+    const ntVals = pointValues(ntPoints);
+    if (ntPoints.length > 10) {
+      const ntP95 = percentile(ntVals, 0.95);
       if (ntP95 > 5) {
-        const ntStep = ntVals.length > 1 ? Math.round((parsed[parsed.length-1].ts - parsed[0].ts) / ntVals.length) : 600;
         for (const ev of powerEvents) {
-          for (let i = 0; i < ntVals.length; i++) {
-            if (ntVals[i] < ntP95 * 0.80) {
-              const approxTs = parsed[0].ts + i * ntStep;
-              if (Math.abs(ev.ts - approxTs) < 1800) { teleCoincidence = true; break; }
-            }
+          const coincident = ntPoints.some(pt => (
+            pt.value < ntP95 * 0.80 && Math.abs(ev.ts - pt.ts) < 1800
+          ));
+          if (coincident) {
+            teleCoincidence = true;
+            break;
           }
-          if (teleCoincidence) break;
         }
       }
     }
@@ -359,15 +374,15 @@ function computeRegionScore(parsed, nationalTelescopeData, calibratedBaseline = 
   // Electricity index: severity based on number of events, depth, and pattern
   // Per-event BGP check: only count events where BGP was stable during that specific drop
   let elecHealth = 100, elecLabel = "Normal", elecConfidence = null;
-  const bgpValsForCheck = parsed.map(p => p.bgp).filter(v => v !== null);
-  const bgpP95ForCheck = bgpValsForCheck.length >= 5 ? [...bgpValsForCheck].sort((a,b) => a - b)[Math.floor(bgpValsForCheck.length * 0.95)] : null;
+  const bgpP95ForCheck = bgpVals.length >= 5 ? percentile(bgpVals, 0.95) : null;
   
   const confirmedPowerEvents = powerEvents.filter(ev => {
     // Per-event: check BGP stability during this specific event window
     if (!bgpP95ForCheck || bgpP95ForCheck < 10) return bgpStable; // fallback to global
-    const evStartIdx = Math.max(0, Math.round((ev.ts - (parsed[0]?.ts || 0)) / step));
-    const evEndIdx = Math.min(bgpValsForCheck.length - 1, evStartIdx + Math.max(2, Math.round((ev.durationSec || 600) / step)));
-    const bgpDuringEvent = bgpValsForCheck.slice(evStartIdx, evEndIdx + 1);
+    const evEnd = ev.ts + (ev.durationSec || 600);
+    const bgpDuringEvent = bgpPoints
+      .filter(pt => pt.ts >= ev.ts - 300 && pt.ts <= evEnd + 300)
+      .map(pt => pt.value);
     if (bgpDuringEvent.length === 0) return bgpStable;
     const bgpMinDuring = Math.min(...bgpDuringEvent);
     return (bgpMinDuring / bgpP95ForCheck) > 0.85; // BGP stable during THIS event
@@ -377,14 +392,14 @@ function computeRegionScore(parsed, nationalTelescopeData, calibratedBaseline = 
     const worstDrop = Math.max(...confirmedPowerEvents.map(e => e.dropPct));
     const hasTelescopeConfirm = teleCoincidence;
     // Scale severity thresholds by rationing prior
-    const tSevere   = prior?.tier === 0 ? 50 : Math.round(35 * pm);
-    const tModerate = prior?.tier === 0 ? 35 : Math.round(20 * pm);
-    const tLeve     = prior?.tier === 0 ? 20 : Math.round(10 * pm);
-    if (worstDrop > tSevere) elecHealth = 20;
-    else if (worstDrop > tModerate) elecHealth = 40;
+    const tSevere   = prior?.tier === 0 ? 65 : Math.max(45, Math.round(55 * pm));
+    const tModerate = prior?.tier === 0 ? 50 : Math.max(35, Math.round(42 * pm));
+    const tLeve     = prior?.tier === 0 ? 35 : Math.max(25, Math.round(30 * pm));
+    if (worstDrop > tSevere) elecHealth = 30;
+    else if (worstDrop > tModerate) elecHealth = 45;
     else if (worstDrop > tLeve)     elecHealth = 60;
     else elecHealth = 80;
-    if (hasTelescopeConfirm && elecHealth > 15) elecHealth = Math.max(15, elecHealth - 20);
+    if (hasTelescopeConfirm && elecHealth > 35 && worstDrop > tModerate) elecHealth = Math.max(35, elecHealth - 10);
     elecConfidence = prior?.tier === 0 ? "baja"
       : prior?.tier <= 1 ? "alta"
       : prior?.tier === 2 ? "media"
@@ -696,7 +711,6 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
   const mapRef = useRef(null);
   const mapInst = useRef(null);
   const markersRef = useRef(null);
-  const geoLayerRef = useRef(null);
 
   // Load Leaflet + init map
   useEffect(() => {
@@ -708,17 +722,6 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
       L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", { maxZoom: 12 }).addTo(map);
       L.control.attribution({ prefix: false }).addTo(map).addAttribution("© OSM · CARTO · IODA");
       mapInst.current = map;
-      // Try to load GeoJSON for state boundaries
-      fetch("https://raw.githubusercontent.com/deldersveld/topojson/master/countries/venezuela/venezuela-estados.json")
-        .then(r => r.json())
-        .then(topo => {
-          // Convert TopoJSON to GeoJSON if needed
-          if (topo.type === "Topology" && window.topojson) {
-            const key = Object.keys(topo.objects)[0];
-            const geo = window.topojson.feature(topo, topo.objects[key]);
-            geoLayerRef.current = geo;
-          }
-        }).catch(() => {});
     });
     return () => { if (mapInst.current) { mapInst.current.remove(); mapInst.current = null; } };
   }, []);
@@ -741,16 +744,17 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
       const severity = r.connectivityHealth ?? r.healthPct ?? 100;
       const elecSev  = r.elecHealth ?? 100;
       const prior    = getPrior(r.name);
+      const elecForColor = r.elecConfidence === "baja" ? Math.max(65, elecSev) : elecSev;
 
       // Color: electricity takes precedence (as requested)
       // For T0 states (no rationing): average of connectivity and elec (not worst)
       // For T1/T2/T3: elecHealth drives the color when events detected
       const colorSev = prior.tier === 0
-        ? Math.round((severity + elecSev) / 2)  // T0: average of both
-        : elecSev < 80
-          ? elecSev                               // T1-T3 with real electric signal: elec drives fully
-          : elecSev < 100
-            ? Math.min(elecSev, severity + 15)   // T1-T3 with mild electric: elec primary, connectivity secondary
+        ? Math.round((severity + elecForColor) / 2) // T0: average of both
+        : elecForColor < 80
+          ? elecForColor                            // T1-T3 with real electric signal: elec drives fully
+          : elecForColor < 100
+            ? Math.min(elecForColor, severity + 15) // T1-T3 with mild electric: elec primary, connectivity secondary
             : severity;                           // no electric: connectivity drives
       const color = colorSev >= 90 ? "#34d399" : colorSev >= 70 ? "#fbbf24" : colorSev >= 50 ? "#f97316" : "#ef4444";
       const ds = r.displayScore || r.dropScore || 0;
@@ -802,6 +806,7 @@ export function TabIODA() {
   const [error, setError] = useState(null);
   const [hover, setHover] = useState(null);
   const [events, setEvents] = useState([]);
+  const [eventsLoaded, setEventsLoaded] = useState(false);
   const [regionScores, setRegionScores] = useState([]);
   const regionScoresRef = useRef([]);
   const eventsRef = useRef([]);
@@ -836,7 +841,7 @@ export function TabIODA() {
   const [timeEpoch, setTimeEpoch] = useState(() => Math.floor(Date.now() / 1000)); // frozen "now"
   
   // Refreeze "now" when preset changes (not on every render)
-  const changePreset = (p) => { setTimePreset(p); setTimeEpoch(Math.floor(Date.now() / 1000)); setRegionScores([]); setEventsBack(0); setEventsStateFilter(null); setRawProgress({ current:0, total:0 }); setRawEnriching(false); };
+  const changePreset = (p) => { setTimePreset(p); setTimeEpoch(Math.floor(Date.now() / 1000)); setRegionScores([]); setEventsLoaded(false); setEventsBack(0); setEventsStateFilter(null); setRawProgress({ current:0, total:0 }); setRawEnriching(false); };
   
   // Compute actual from/until epoch — memoized to prevent re-renders
   const twFrom = useMemo(() => {
@@ -866,6 +871,7 @@ export function TabIODA() {
 
   // ── 2. Detect outage events from national + regional signal analysis ──
   const loadEvents = useCallback(async (backOffset = 0) => {
+    setEventsLoaded(false);
     const allEvents = [];
     // Compute time window — may differ from main window when navigating back
     const periodLen = twUntil - twFrom;
@@ -910,6 +916,7 @@ export function TabIODA() {
     
     allEvents.sort((a,b) => b.time - a.time);
     setEvents(allEvents.slice(0, 80));
+    setEventsLoaded(true);
   }, [twFrom, twUntil]);
 
   // ── 3. Load regional data using IODA outage endpoints (lightweight) ──
@@ -937,39 +944,28 @@ export function TabIODA() {
         const pingAlerts = alerts.filter(a => a.datasource === "ping-slash24");
         const bgpAlerts = alerts.filter(a => a.datasource === "bgp");
         
-        // ── Connectivity: trust IODA's own signal scores directly ──
-        // Priority: (1) alert historyValue ratio (most precise), (2) pingScore from summary,
-        // (3) overallScore fallback. All from IODA — no recomputation.
+        // ── Connectivity: IODA current/recent alerts only ──
+        // Do not infer internet health from accumulated scores or raw signals.
+        // Accumulated IODA scores remain visible as impact/ranking metadata.
         const lastPingAlert  = pingAlerts[pingAlerts.length - 1];
         const lastBgpAlert   = bgpAlerts[bgpAlerts.length - 1];
-        const worstPingAlert = pingAlerts
+        const isRecentAlert = (a) => !a?.time || twUntil - a.time <= 2 * 3600;
+        const worstRecentPingAlert = pingAlerts
           .filter(a => a.level === "critical" && a.historyValue > 0)
+          .filter(isRecentAlert)
           .sort((a, b) => (a.value / a.historyValue) - (b.value / b.historyValue))[0];
         let pingHealth = 100, bgpHealth = 100;
-        let connectivityHealth;
-        if (worstPingAlert && worstPingAlert.historyValue > 0) {
-          pingHealth = Math.min(100, Math.round((worstPingAlert.value / worstPingAlert.historyValue) * 100));
+        let connectivityHealth = 100;
+        if (worstRecentPingAlert && worstRecentPingAlert.historyValue > 0) {
+          pingHealth = Math.min(100, Math.round((worstRecentPingAlert.value / worstRecentPingAlert.historyValue) * 100));
           connectivityHealth = pingHealth;
-        } else if (lastPingAlert?.historyValue > 0) {
+        } else if (lastPingAlert?.historyValue > 0 && isRecentAlert(lastPingAlert)) {
           pingHealth = Math.min(100, Math.round((lastPingAlert.value / lastPingAlert.historyValue) * 100));
           connectivityHealth = pingHealth;
-        } else if (pingScore > 0) {
-          // Use IODA's pingScore directly (separate from BGP/telescope)
-          connectivityHealth = pingScore > 50000 ? 20 : pingScore > 30000 ? 35
-            : pingScore > 15000 ? 50 : pingScore > 7000 ? 65
-            : pingScore > 3000 ? 78 : pingScore > 500 ? 90 : 100;
-        } else {
-          // overallScore includes BGP + telescope + ping — broadest signal
-          connectivityHealth = overallScore > 50000 ? 20 : overallScore > 30000 ? 35
-            : overallScore > 15000 ? 50 : overallScore > 7000 ? 65
-            : overallScore > 3000 ? 78 : overallScore > 1000 ? 90
-            : overallScore > 0 ? 95 : 100;
         }
-        // BGP: use alert ratio if available, else bgpScore from summary
-        if (lastBgpAlert?.historyValue > 0) {
+        // BGP: use only recent IODA alert ratio, never accumulated summary score.
+        if (lastBgpAlert?.historyValue > 0 && isRecentAlert(lastBgpAlert)) {
           bgpHealth = Math.min(100, Math.round((lastBgpAlert.value / lastBgpAlert.historyValue) * 100));
-        } else if (bgpScore > 0) {
-          bgpHealth = bgpScore > 10000 ? 40 : bgpScore > 3000 ? 60 : bgpScore > 500 ? 85 : 100;
         }
         connectivityHealth = Math.min(connectivityHealth, bgpHealth);
         
@@ -1080,13 +1076,13 @@ export function TabIODA() {
             const evCount = warnOnly ? electricEvents.length * 0.6 : electricEvents.length;
             const nDrop   = worstDrop / pm;
             const nEvents = Math.max(0, evCount - 1) / pm;
-            const tierMin = prior.tier === 0 ? 55 : prior.tier <= 1 ? 20 : prior.tier === 2 ? 25 : 35;
-            elecHealth = Math.max(tierMin, Math.round(100 - nDrop * 1.2 - nEvents * 2.5));
+            const tierMin = prior.tier === 0 ? 70 : prior.tier <= 1 ? 45 : prior.tier === 2 ? 50 : 60;
+            elecHealth = Math.max(tierMin, Math.round(100 - nDrop * 0.75 - nEvents * 1.5));
             // Abrupt and IODA confirmation still apply as additional evidence
           }
           // Boosts
-          if (hasAbrupt   && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 10);
-          if (hasIodaConf && elecHealth > 20) elecHealth = Math.max(20, elecHealth - 5);
+          if (hasAbrupt   && worstDrop >= 45 && elecHealth > 40) elecHealth = Math.max(40, elecHealth - 6);
+          if (hasIodaConf && worstDrop >= 35 && elecHealth > 40) elecHealth = Math.max(40, elecHealth - 4);
 
           // Confidence: start from prior base; T0 capped at "baja"
           elecConfidence = prior.tier === 0 ? "baja" : prior.confidenceBase;
@@ -1097,10 +1093,10 @@ export function TabIODA() {
           const expectedDailyScore = prior.hoursPerDay > 0
             ? Math.round(prior.hoursPerDay * 6 * 15)
             : 9999;
-          if (prior.tier === 1 && elecScore >= expectedDailyScore * 0.35) {
+          if (prior.tier === 1 && elecScore >= expectedDailyScore * 0.75) {
             elecConfidence = "alta";
-            if (elecHealth > 40) elecHealth = Math.min(elecHealth, 40);
-          } else if (prior.tier <= 2 && elecScore >= expectedDailyScore * 0.5) {
+            if (elecHealth > 55) elecHealth = Math.min(elecHealth, 55);
+          } else if (prior.tier <= 2 && elecScore >= expectedDailyScore * 0.9) {
             if (elecConfidence === "baja") elecConfidence = "media";
             else if (elecConfidence === "media") elecConfidence = "alta";
           }
@@ -1132,19 +1128,17 @@ export function TabIODA() {
         if (elecHealth === 100 && prior.tier <= 2 && prior.hoursPerDay > 0) {
           const connDegradation = 100 - connectivityHealth;
           // Require meaningful degradation — raised from 9/15% to 20/30%
-          const inferThreshold = prior.tier === 1 ? 20 : 30;
+          const inferThreshold = prior.tier === 1 ? 45 : 55;
 
           if (connDegradation > inferThreshold && bgpStable) {
             // Fixed tier-based values (NOT derived from connectivityHealth)
             if (prior.tier === 1) {
-              if      (connDegradation > 60) { elecHealth = 25; elecConfidence = "media"; }
-              else if (connDegradation > 40) { elecHealth = 40; elecConfidence = "media"; }
-              else if (connDegradation > 25) { elecHealth = 55; elecConfidence = "baja";  }
-              else                           { elecHealth = 70; elecConfidence = "baja";  }
+              if      (connDegradation > 70) { elecHealth = 55; elecConfidence = "baja"; }
+              else if (connDegradation > 55) { elecHealth = 65; elecConfidence = "baja"; }
+              else                           { elecHealth = 75; elecConfidence = "baja"; }
             } else { // T2
-              if      (connDegradation > 50) { elecHealth = 35; elecConfidence = "baja";  }
-              else if (connDegradation > 35) { elecHealth = 50; elecConfidence = "baja";  }
-              else                           { elecHealth = 65; elecConfidence = "baja";  }
+              if      (connDegradation > 70) { elecHealth = 60; elecConfidence = "baja";  }
+              else                           { elecHealth = 75; elecConfidence = "baja";  }
             }
             elecLabel = `Posible racionamiento eléctrico · ~${prior.hoursPerDay}h/día declaradas`;
           }
@@ -1297,8 +1291,8 @@ export function TabIODA() {
     setRawEnriching(true);
     setRawProgress({ current: 0, total: candidates.length });
 
-    // Get national telescope for coincidence check
-    const natTeleData = signals ? signals.map(p => p.telescope).filter(v => v !== null) : [];
+    // Get national telescope with timestamps for coincidence checks.
+    const natTeleData = signals ? signalPoints(signals, "telescope") : [];
 
     const BATCH = 3;
     const DELAY = 400;
@@ -1323,7 +1317,8 @@ export function TabIODA() {
           // ── Telescope as PRIMARY indicator ──
           // If telescope drops significantly with BGP stable → electric outage signal
           // independent of whether probing reached alert threshold
-          const teleVals = parsed.map(p => p.telescope).filter(v => v !== null);
+          const telePoints = signalPoints(parsed, "telescope");
+          const teleVals = pointValues(telePoints);
           let teleElecSignal = null;
           if (teleVals.length >= 10) {
             const teleSorted = [...teleVals].sort((a,b) => a - b);
@@ -1336,36 +1331,39 @@ export function TabIODA() {
                 ? (parsed[parsed.length-1].ts - parsed[0].ts) / (parsed.length - 1) : 600;
               let teleEvents = [];
               let inDrop = false, dropStart = null, dropMin = Infinity;
-              for (let j = 0; j < teleVals.length; j++) {
-                if (teleVals[j] < teleDropThresh) {
-                  if (!inDrop) { inDrop = true; dropStart = j; dropMin = teleVals[j]; }
-                  else if (teleVals[j] < dropMin) dropMin = teleVals[j];
+              for (let j = 0; j < telePoints.length; j++) {
+                const teleValue = telePoints[j].value;
+                if (teleValue < teleDropThresh) {
+                  if (!inDrop) { inDrop = true; dropStart = j; dropMin = teleValue; }
+                  else if (teleValue < dropMin) dropMin = teleValue;
                 } else if (inDrop) {
-                  const dur = (j - dropStart) * step;
+                  const dur = Math.max(0, telePoints[j].ts - telePoints[dropStart].ts);
                   const dropPct = Math.round(((teleP95 - dropMin) / teleP95) * 100);
                   if (dur >= 1200 && dropPct >= 30) { // ≥20min, ≥30% drop
-                    teleEvents.push({ ts: parsed[dropStart]?.ts || 0, dropPct, durationSec: dur });
+                    teleEvents.push({ ts: telePoints[dropStart]?.ts || 0, dropPct, durationSec: dur });
                   }
                   inDrop = false; dropMin = Infinity;
                 }
               }
               // Open event at end
               if (inDrop) {
-                const dur = (teleVals.length - dropStart) * step;
+                const dur = Math.max(0, (telePoints[telePoints.length - 1]?.ts || 0) - (telePoints[dropStart]?.ts || 0) + step);
                 const dropPct = Math.round(((teleP95 - dropMin) / teleP95) * 100);
                 if (dur >= 1200 && dropPct >= 30) {
-                  teleEvents.push({ ts: parsed[dropStart]?.ts || 0, dropPct, durationSec: dur });
+                  teleEvents.push({ ts: telePoints[dropStart]?.ts || 0, dropPct, durationSec: dur });
                 }
               }
               // Check BGP stable during telescope events
-              const bgpVals = parsed.map(p => p.bgp).filter(v => v !== null);
-              const bgpP95 = bgpVals.length >= 5
-                ? [...bgpVals].sort((a,b) => a - b)[Math.floor(bgpVals.length * 0.95)] : null;
+              const bgpPoints = signalPoints(parsed, "bgp");
+              const bgpVals = pointValues(bgpPoints);
+              const bgpP95 = bgpVals.length >= 5 ? percentile(bgpVals, 0.95) : null;
               const confirmedTeleEvents = teleEvents.filter(ev => {
                 if (!bgpP95 || bgpP95 < 10) return true; // no BGP data = assume stable
-                const evIdx = Math.max(0, Math.round((ev.ts - (parsed[0]?.ts || 0)) / step));
-                const window = bgpVals.slice(evIdx, evIdx + Math.max(2, Math.round(ev.durationSec / step)));
-                return window.length === 0 || Math.min(...window) / bgpP95 > 0.85;
+                const evEnd = ev.ts + (ev.durationSec || 600);
+                const bgpWindow = bgpPoints
+                  .filter(pt => pt.ts >= ev.ts - 300 && pt.ts <= evEnd + 300)
+                  .map(pt => pt.value);
+                return bgpWindow.length === 0 || Math.min(...bgpWindow) / bgpP95 > 0.85;
               });
               if (confirmedTeleEvents.length > 0) {
                 const worstDrop = Math.max(...confirmedTeleEvents.map(e => e.dropPct));
@@ -1373,8 +1371,8 @@ export function TabIODA() {
                 // Continuous formula for telescope severity
                 const teleNDrop   = worstDrop / prior.thresholdMult;
                 const teleNEvents = Math.max(0, confirmedTeleEvents.length - 1) / prior.thresholdMult;
-                const teleTierMin = prior.tier === 0 ? 55 : prior.tier <= 1 ? 20 : prior.tier === 2 ? 25 : 35;
-                const teleElecHealth = Math.max(teleTierMin, Math.round(100 - teleNDrop * 1.2 - teleNEvents * 2.5));
+                const teleTierMin = prior.tier === 0 ? 70 : prior.tier <= 1 ? 45 : prior.tier === 2 ? 50 : 60;
+                const teleElecHealth = Math.max(teleTierMin, Math.round(100 - teleNDrop * 0.75 - teleNEvents * 1.5));
                 const teleElecScore = confirmedTeleEvents.reduce((acc, e) =>
                   acc + e.dropPct * Math.max(1, Math.round(e.durationSec / 600)), 0);
                 // Confidence: telescope is independent → start at prior base, min "media" for Tier 1
@@ -1396,8 +1394,6 @@ export function TabIODA() {
           setRegionScores(prev => prev.map(r => {
             if (r.code !== st.code) return r;
             const phase1Elec = r.elecHealth ?? 100;
-            const phase1Conn = r.connectivityHealth ?? 100;
-
             // Best electric signal: min of raw probing result and telescope result
             const rawElec  = rawResult.elecHealth ?? 100;
             const teleElec = teleElecSignal?.elecHealth ?? 100;
@@ -1411,14 +1407,12 @@ export function TabIODA() {
               cappedElec = Math.max(phase1Elec - 15, bestElec);
             } else {
               // Phase 1 found nothing — tier-based floor, matched to continuous formula minimums
-              const floorByTier = prior.tier === 0 ? 55 : prior.tier <= 1 ? 20 : prior.tier === 2 ? 25 : 35;
+              const floorByTier = prior.tier === 0 ? 70 : prior.tier <= 1 ? 45 : prior.tier === 2 ? 50 : 60;
               cappedElec = Math.max(floorByTier, bestElec);
             }
             const mergedElec = Math.min(phase1Elec, cappedElec);
-            const mergedConn = Math.min(phase1Conn, rawResult.connectivityHealth ?? 100);
 
             const improvedElec = mergedElec < phase1Elec;
-            const improvedConn = mergedConn < phase1Conn;
 
             // Choose label and confidence from whichever source found worst
             let newLabel = r.elecLabel, newConf = r.elecConfidence, newScore = r.elecScore || 0;
@@ -1434,8 +1428,9 @@ export function TabIODA() {
 
             return {
               ...r,
-              connectivityHealth: mergedConn,
-              healthPct: mergedConn,
+              // Connectivity remains the direct IODA alert state from Phase 1.
+              connectivityHealth: r.connectivityHealth,
+              healthPct: r.healthPct,
               elecHealth: prior.tier === 0 ? Math.max(55, mergedElec) : mergedElec,
               elecLabel: newLabel,
               elecConfidence: newConf,
@@ -1458,11 +1453,11 @@ export function TabIODA() {
       if (i + BATCH < candidates.length) await new Promise(r => setTimeout(r, DELAY));
     }
     setRawEnriching(false);
-  }, [twFrom, twUntil]);
+  }, [signals, twFrom, twUntil]);
 
-  useEffect(() => { loadNational(); loadEvents(0); }, [loadNational, loadEvents]);
-  useEffect(() => { if (subView === "estados") loadRegions(); }, [subView, loadRegions]);
-  useEffect(() => { loadEvents(eventsBack); }, [eventsBack]);
+  useEffect(() => { loadNational(); }, [loadNational]);
+  useEffect(() => { if (subView === "estados" && eventsLoaded) loadRegions(); }, [subView, eventsLoaded, loadRegions]);
+  useEffect(() => { loadEvents(eventsBack); }, [eventsBack, loadEvents]);
   // Phase 2: fire when Phase 1 just finished (regionLoading goes false with scores loaded)
   const prevRegionLoadingRef = useRef(false);
   useEffect(() => {
@@ -1470,7 +1465,7 @@ export function TabIODA() {
       enrichWithRaw(regionScores);
     }
     prevRegionLoadingRef.current = regionLoading;
-  }, [regionLoading]); // eslint-disable-line
+  }, [regionLoading, regionScores, enrichWithRaw]);
   
   // Auto-refresh every 5 min for 24h/48h modes
   useEffect(() => {
@@ -1655,7 +1650,7 @@ export function TabIODA() {
           })}
           {/* Drop zone shading — highlight areas below 80% of baseline */}
           {avg > 0 && (() => {
-            let zones = "";
+            const zones = [];
             let inDrop = false, startX = 0;
             data.forEach((d, i) => {
               const v = d[key];
@@ -1663,11 +1658,15 @@ export function TabIODA() {
                 if (!inDrop) { inDrop = true; startX = toX(i); }
               } else if (inDrop) {
                 inDrop = false;
-                zones += `<rect x="${startX}" y="${pT}" width="${toX(i) - startX}" height="${cH}" fill="rgba(220,38,38,0.06)" />`;
+                zones.push({ x: startX, width: toX(i) - startX });
               }
             });
-            if (inDrop) zones += `<rect x="${startX}" y="${pT}" width="${toX(data.length-1) - startX}" height="${cH}" fill="rgba(220,38,38,0.06)" />`;
-            return zones ? <g dangerouslySetInnerHTML={{ __html: zones }} /> : null;
+            if (inDrop) zones.push({ x: startX, width: toX(data.length-1) - startX });
+            return zones.length ? (
+              <g>{zones.map((z, i) => (
+                <rect key={i} x={z.x} y={pT} width={z.width} height={cH} fill="rgba(220,38,38,0.06)" />
+              ))}</g>
+            ) : null;
           })()}
           {/* Hover */}
           {hover && hover.key === key && hover.idx < data.length && data[hover.idx][key] !== null && (<>
