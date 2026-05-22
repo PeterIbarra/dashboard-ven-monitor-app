@@ -21,7 +21,8 @@ export const INDICATORS = [
       ["green","up","GL-56/57 + 150M bbl desde ene · ENI+Repsol retoman Europa · Chevron 49% Petroindependencia"],
       ["green","flat","1,1M bpd · meta 1,37M dic 2026 · 93 taladros · Halliburton evalúa retorno"],
       ["green","up","499k bpd a EE.UU. (sem. 17 abr) · prom. móvil 4 sem. 357k bpd · 26,3M bbl acum. (52% total 2025)"],
-      ["green","up","1,23 mbd en abril — máximo desde ene. 2019; +14% vs. marzo · 66 buques · EE.UU. principal destino (~445k bpd)"]
+      ["green","up","1,23 mbd en abril — máximo desde ene. 2019; +14% vs. marzo · 66 buques · EE.UU. principal destino (~445k bpd)"],
+      ["green","flat","S18 update marker: 08-15 may · 1,031 M bpd OPEP abril; ancla petrolera sostiene E3"]
     ] },
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Ventas petroleras (ingresos)", desc:"Acuerdos bajo GL49 y GL50/50A",
     umbral:"Flujo regular a banca PDVSA. Interrupción >2 sem activa E2.",
@@ -42,7 +43,8 @@ export const INDICATORS = [
       ["green","up","Merey USD 85,92/b · 150M bbl comercializados · bonos soberanos 48 ctvs/USD"],
       ["green","flat","USD 3.000M fondo bajo EE.UU. · KPMG trim. · BID + FMI abren canal técnico"],
       ["green","up","Shell Monagas + Eni Junín 5 + BP Deltana + Repsol CEO x3 — mayor convergencia de acuerdos energéticos del período"],
-      ["green","up","Merey USD 90,4/b (+59% interanual) · Brent USD 117,3/b · acumulado ene-abr USD 68/b (+8,9% interanual)"]
+      ["green","up","Merey USD 90,4/b (+59% interanual) · Brent USD 117,3/b · acumulado ene-abr USD 68/b (+8,9% interanual)"],
+      ["green","up","S18 update marker: 08-15 may · Merey USD 90,47/b; Repsol-Cardón IV +10%"]
     ] },
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Licencias OFAC activas", desc:"GL49, GL50, GL50A — cobertura operativa",
     umbral:"Revocación activa E2/E4. FAQ 1238 incluye Cuba condicionado.",
@@ -63,7 +65,8 @@ export const INDICATORS = [
       ["green","up","GL-56 + GL-57 emitidas · apertura financiera condicionada BCV + banca pública"],
       ["green","flat","GL-56/57 operativas · GL-55 minería · sin cambios OFAC esta semana"],
       ["green","up","MOU Casa Blanca: petróleo, gas, oro, aluminio, carbón · OFAC autoriza financiamiento defensa Maduro"],
-      ["green","up","GL-58: asesoría técnica reestructuración deuda soberana y PDVSA · CITGO protegida hasta 19 jun · no habilita negociaciones directas"]
+      ["green","up","GL-58: asesoría técnica reestructuración deuda soberana y PDVSA · CITGO protegida hasta 19 jun · no habilita negociaciones directas"],
+      ["green","flat","S18 update marker: 08-15 may · GL-58 en ejecución vía Centerview/White & Case; DSA junio"]
     ] },
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Producción Chevron / Majors", desc:"Operaciones de empresas occidentales en bloques venezolanos",
     umbral:"Expansión confirma E3. Suspensión reactiva E2.",
@@ -84,7 +87,8 @@ export const INDICATORS = [
       ["green","up","Chevron 49% Petroindependencia + Ayacucho 8 · Shell Loran operador · ENI+Repsol x3 · Suelopetrol cuestiona gobernanza"],
       ["yellow","flat","Chevron Petroindependencia 49% activo · Halliburton evalúa · Eni-Repsol GNL 2031"],
       ["green","up","Shell instalada Monagas · Eni Junín 5 firmado (35.000M bbl) · BP oficina permanente Caracas · Repsol CEO: x3 en 3 años"],
-      ["green","up","ExxonMobil de «ininvertible» a «recurso inmenso» · Chevron sube a 49% Petroindependencia · Hunt/Crossover MOU USD 2.000M Monagas"]
+      ["green","up","ExxonMobil de «ininvertible» a «recurso inmenso» · Chevron sube a 49% Petroindependencia · Hunt/Crossover MOU USD 2.000M Monagas"],
+      ["green","up","S18 update marker: 08-15 may · Hunt/HKN/Crossover MOU; Repsol-Cardón IV 580→640 MMpcd"]
     ] },
   { dim:"Energético", icon:"⚡", esc:"E2", name:"Infraestructura de refinación", desc:"Capacidad operativa refinerías nacionales",
     umbral:"Operación <25% capacidad instalada. Mantenimiento diferido.",
@@ -105,7 +109,8 @@ export const INDICATORS = [
       ["red","flat","Sin datos nuevos · 31% capacidad persiste · 2 taladros activos (mar) · fallas eléctricas"],
       ["red","flat","31% capacidad persiste · fallas eléctricas · sin datos nuevos S15"],
       ["red","flat","31% capacidad persiste · revisión contractual completa en julio pendiente · sin datos nuevos S16"],
-      ["red","flat","Sin datos nuevos S17 · opacidad en flujos petroleros señalada por NYT · exportaciones no pagadas USD 11–13.000M estimadas 2019-2022"]
+      ["red","flat","Sin datos nuevos S17 · opacidad en flujos petroleros señalada por NYT · exportaciones no pagadas USD 11–13.000M estimadas 2019-2022"],
+      ["yellow","flat","S18 update marker: 08-15 may · Sin dato nuevo de refinación; riesgo estructural persiste"]
     ] },
   { dim:"Energético", icon:"⚡", esc:"E2", name:"Taladros activos", desc:"Operaciones de perforación nuevas",
     umbral:"<30 taladros activos. Recuperación <5% anual vs 2014.",
@@ -126,7 +131,8 @@ export const INDICATORS = [
       ["yellow","flat","2 taladros activos marzo (OPEP) · sin variación vs. feb · leve mejora vs. promedio 1 en 2025"],
       ["yellow","flat","93 taladros activos · Halliburton evalúa retorno · tendencia al alza sostenida"],
       ["yellow","flat","9 plataformas reacondicionadas · 5 en evaluación · revisión contractual julio · Repsol +50% bruto en 12 meses"],
-      ["yellow","flat","Mercuria/Heeney offtake minero USD 2.200M anual respaldado por Casa Blanca · fondo USD 500M rehabilitación campos abandonados"]
+      ["yellow","flat","Mercuria/Heeney offtake minero USD 2.200M anual respaldado por Casa Blanca · fondo USD 500M rehabilitación campos abandonados"],
+      ["yellow","flat","S18 update marker: 08-15 may · Sin dato nuevo de taladros; inversión condicionada a contratos"]
     ] },
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Recaudación fiscal", desc:"SENIAT y flujo tributario asociado al repunte energético",
     umbral:"Caída >20% mensual activa E2. Crecimiento sostenido confirma E3.", addedWeek:8,
@@ -141,7 +147,8 @@ export const INDICATORS = [
       ["yellow","flat","Sin datos nuevos S15 · base SENIAT Q1 USD 3.512M como referencia"],
       ["yellow","flat","Sin datos nuevos S16 · BCV proyecta estabilidad cambiaria · base SENIAT Q1 USD 3.512M como referencia"],
       ["yellow", "up", "GL-58 y FMI/DEG ~USD 5.000M activan canales de ingresos fiscales extraordinarios. BCV proyecta normalizacion 2do semestre 2026."],
-      ["green","up","Exportaciones récord 1,23 mbd + Brent USD 117,3/b — ingresos proyectados en ascenso para el 2do semestre de 2026"]
+      ["green","up","Exportaciones récord 1,23 mbd + Brent USD 117,3/b — ingresos proyectados en ascenso para el 2do semestre de 2026"],
+      ["yellow","flat","S18 update marker: 08-15 may · DSA junio y deuda USD 150–170B; ingresos dependen del crudo"]
     ] },
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Apertura sector minero", desc:"Reformas y licencias para inversión extranjera en minería",
     umbral:"Aprobación reforma + inversiones verificables = E3 consolidado.", addedWeek:8,
@@ -156,7 +163,8 @@ export const INDICATORS = [
       ["green","up","Ley Orgánica de Minas G.O. 7.020 publicada · 3 entes · concesiones 50 años"],
       ["green","flat","MOU Casa Blanca incluye oro · Ley Orgánica de Minas G.O. 7.020 operativa · OFAC minero vigente"],
       ["green", "up", "Mercuria y Heeney Capital: offtake minero USD 2.200M anuales (respaldado Casa Blanca). Potencial adicional aluminio+niquel+ferrosos USD 3.000M."],
-      ["green","up","Mercuria/Heeney USD 2.200M anuales exportación minera · evaluación aluminio, níquel, ferrosos (~USD 3.000M adicionales anuales)"]
+      ["green","up","Mercuria/Heeney USD 2.200M anuales exportación minera · evaluación aluminio, níquel, ferrosos (~USD 3.000M adicionales anuales)"],
+      ["green","flat","S18 update marker: 08-15 may · Mercuria/Heeney y MOU mineros siguen como señal de apertura"]
     ] },
   { dim:"Energético", icon:"⚡", esc:"E3", name:"Diversificación gas natural", desc:"Desarrollo de gas como producto estratégico de exportación",
     umbral:"Cardón IV operativo + exportaciones GLP = diversificación real.", addedWeek:10,
@@ -169,7 +177,8 @@ export const INDICATORS = [
       ["green","flat","Eni-Repsol GNL 2031 (Perla 17 TCF) · Shell-Loran mid-2027 · Cardón IV activo"],
       ["green","up","BP MOU Plataforma Deltana · Eni-Repsol Cardón IV: meta 645 MMpcd (desde 580) · Shell Loran mid-2027 en curso"],
       ["green", "flat", "MOU Hunt Oil en Monagas cubre potencial gasifero. BP: MOU Plataforma Deltana activo. Sin nuevos contratos firmados esta semana."],
-      ["green","flat","Hunt/Crossover MOU incluye potencial gasífero en Monagas · sin nuevos acuerdos gasíferos específicos confirmados en S17"]
+      ["green","flat","Hunt/Crossover MOU incluye potencial gasífero en Monagas · sin nuevos acuerdos gasíferos específicos confirmados en S17"],
+      ["green","up","S18 update marker: 08-15 may · Cardón IV +10%; gas como vector de diversificación"]
     ] },
 
   // ── POLÍTICO ──
@@ -192,7 +201,8 @@ export const INDICATORS = [
       ["green","flat","Liberación 51 detenidos PDVSA Obrero Yare sin datos oficiales claros · amnistía prórroga activa"],
       ["green","flat","8.616 libertades (100 días) · ONG: <30% beneficiados · cierre ciclo anunciado"],
       ["yellow","flat","Debate continuidad · Arreaza: sigue vigente con mecanismos alternos · ~470 presos pendientes (Parlamento Europeo)"],
-      ["yellow","flat","CIDH advierte: artículo 9 Ley Amnistía podría usarse contra opositores con vínculos internacionales · Foro Penal emplaza a J. Rodríguez"]
+      ["yellow","flat","CIDH advierte: artículo 9 Ley Amnistía podría usarse contra opositores con vínculos internacionales · Foro Penal emplaza a J. Rodríguez"],
+      ["yellow","flat","S18 update marker: 08-15 may · Amnistía bajo presión por cobros indebidos y pendientes"]
     ] },
   { dim:"Político", icon:"🏛", esc:"E3", name:"Excarcelaciones verificadas", desc:"Foro Penal: presos políticos activos",
     umbral:"Ritmo <20/sem o reversión activa E4.",
@@ -213,7 +223,8 @@ export const INDICATORS = [
       ["yellow","up","Más de 400 presos (análisis 100 días) · Superlano libre · Paparoni detenido-liberado · 51 PDVSA Obrero"],
       ["yellow","down","473 presos políticos (Foro Penal) · 672 (JEP) · amnistía <30% según ONG"],
       ["yellow","flat","~470 presos políticos activos (Parlamento Europeo) · Provea-Devoe acuerdan acceso CICR · sin nuevos datos verificados S16"],
-      ["yellow","flat","500+ presos políticos exigidos por MCM/OEA · Foro Penal: caso Quero Navas (muerto jul. 2025, informado vivo oct. 2025) — contradicción institucional"]
+      ["yellow","flat","500+ presos políticos exigidos por MCM/OEA · Foro Penal: caso Quero Navas (muerto jul. 2025, informado vivo oct. 2025) — contradicción institucional"],
+      ["red","down","S18 update marker: 08-15 may · FP: 746 excarcelaciones verificadas y 457 presos políticos; primer aumento desde enero"]
     ] },
   { dim:"Político", icon:"🏛", esc:"E4", name:"Cautelares vigentes", desc:"Personas bajo medidas restrictivas no resueltas",
     umbral:">10.000 cautelares sin resolver activa E4.", addedWeek:8,
@@ -228,7 +239,8 @@ export const INDICATORS = [
       ["red","flat",">11.000 cautelares vigentes · Paparoni bajo presentación mensual"],
       ["red","flat",">11.000 cautelares vigentes · sin datos nuevos S16"],
       ["red", "flat", "Sin nuevos datos oficiales. Caso Quero Navas (fallecido jul. 2025, informado vivo oct. 2025) expone fallas sistemicas en seguimiento de privados de libertad."],
-      ["red","flat","Sin cambios estructurales S17 · caso Quero Navas expone brecha coordinación interinstitucional en sistema de justicia penitenciaria"]
+      ["red","flat","Sin cambios estructurales S17 · caso Quero Navas expone brecha coordinación interinstitucional en sistema de justicia penitenciaria"],
+      ["yellow","flat","S18 update marker: 08-15 may · Cautelares oficiales sin dato nuevo; trazabilidad cuestionada"]
     ] },
   { dim:"Político", icon:"🏛", esc:"E4", name:"Cohesión FANB", desc:"Señales de fractura o lealtad institucional",
     umbral:"Fractura visible = E4/E2 inmediato.",
@@ -249,7 +261,8 @@ export const INDICATORS = [
       ["yellow","flat","Padrino López regresa al gabinete (Agricultura) · interrogantes acuerdos implícitos con Washington"],
       ["yellow","flat","Sin datos nuevos · FANB postura oficial de respaldo al interinato"],
       ["yellow","flat","Sin datos nuevos · FANB respaldo oficial al interinato · Cabello descarta elecciones"],
-      ["yellow","flat","Sin datos nuevos S17 · despliegue PNB/GNB el 1° mayo · murciélagos conteniendo protestas laborales — perfil coercitivo selectivo"]
+      ["yellow","flat","Sin datos nuevos S17 · despliegue PNB/GNB el 1° mayo · murciélagos conteniendo protestas laborales — perfil coercitivo selectivo"],
+      ["yellow","flat","S18 update marker: 08-15 may · Cohesión institucional alta pero juicio El Aissami expone tensión interna"]
     ] },
   { dim:"Político", icon:"🏛", esc:"E3", name:"Reorganización del Ejecutivo", desc:"Capacidad de gestión institucional",
     umbral:"Reconfiguración técnica → E1. Política → E4.",
@@ -270,7 +283,8 @@ export const INDICATORS = [
       ["green","up","Luis Pérez nuevo presidente BCV · Obregón ratificado PDVSA · Padrino López gabinete · Dogu relevada por Barrett"],
       ["green","flat","Comisión Activos Públicos + Comisión TSJ + ministro Salud Alvarado"],
       ["green","up","Jubilación 8 magistrados TSJ + proceso postulaciones bajo AN · Zambrano propuesto España · Ochoa Antich Alemania"],
-      ["green","up","Reforma TSJ 20→32 magistrados · Comité Postulaciones activado · Caryslia presidenta · Bittar vicepresidente · Villegas UNESCO · Ortega FMI"]
+      ["green","up","Reforma TSJ 20→32 magistrados · Comité Postulaciones activado · Caryslia presidenta · Bittar vicepresidente · Villegas UNESCO · Ortega FMI"],
+      ["green","flat","S18 update marker: 08-15 may · 100 días programa convivencia; reestructuración y auditoría BCV"]
     ] },
   { dim:"Político", icon:"🏛", esc:"E1", name:"Agenda electoral", desc:"Calendario y compromisos electorales concretos",
     umbral:"Anuncio formal de fecha = E1 gana probabilidad.",
@@ -291,7 +305,8 @@ export const INDICATORS = [
       ["yellow","up","EE.UU. Fase 2: renovación CNE + auditorías KPMG + retorno libre MCM · MCM: mín. 40 semanas para elecciones"],
       ["yellow","down","Cabello: «cuando sean» · cogobernanza Petro 1-2 años · sin cronograma CNE"],
       ["yellow","down","Cabello: «no es tiempo de elecciones» · Polymarket 45% · MCM candidatura confirmada · brecha E3-E1 a 15pp"],
-      ["yellow","flat","Wright: elecciones Fase 3 del plan de tres fases · Rodríguez: «No lo sé. En algún momento.» · brecha E3-E1 se estrecha a 10pp"]
+      ["yellow","flat","Wright: elecciones Fase 3 del plan de tres fases · Rodríguez: «No lo sé. En algún momento.» · brecha E3-E1 se estrecha a 10pp"],
+      ["green","up","S18 update marker: 08-15 may · MCM coordina retorno con Rubio; E1 sube a 40%"]
     ] },
   { dim:"Político", icon:"🏛", esc:"E4", name:"Marcos restrictivos vigentes", desc:"Leyes de odio, terrorismo, delitos de expresión",
     umbral:"Activación contra oposición = E4. Derogación = E1.",
@@ -312,7 +327,8 @@ export const INDICATORS = [
       ["red","flat","Sin cambios · J. Rodríguez descarta transición · Cabello: elecciones serán cuando sean"],
       ["red","flat","473 presos + 672 JEP · Paparoni detenido-liberado · menos del 30% amnistía (ONG)"],
       ["red","flat","~470 presos · bloqueo marchas Caracas (30 abr) · sin derogación marcos coercitivos"],
-      ["red","flat","500+ presos políticos · contención laboral con murciélagos 1° mayo · CIDH: art. 9 Ley Amnistía con potencial coercitivo contra oposición"]
+      ["red","flat","500+ presos políticos · contención laboral con murciélagos 1° mayo · CIDH: art. 9 Ley Amnistía con potencial coercitivo contra oposición"],
+      ["yellow","flat","S18 update marker: 08-15 may · Amnistía y TSJ concentran riesgos jurídicos"]
     ] },
   { dim:"Político", icon:"🏛", esc:"E1", name:"Liderazgo opositor", desc:"Índice de liderazgo y capacidad de articulación opositora",
     umbral:"MCM >100 pts consolida E1. Fragmentación debilita.", addedWeek:8,
@@ -327,7 +343,8 @@ export const INDICATORS = [
       ["green","up","MCM: «hoy comienza el regreso a casa» Puerta del Sol · PM Portugal · medalla Madrid"],
       ["green","flat","MCM confirma candidatura · 1,5M inscritos RE en 6 semanas · PUD carta Petro 8 puntos"],
       ["green", "up", "MCM: retorno antes fin 2026 anunciado (Magalli Meda). Plataforma Unitaria: 6 actos masivos. Guanipa retorna a Venezuela. Tension interna con colaboracionistas."],
-      ["green","up","MCM: retorno antes fin 2026 (Magalli Meda) · 6 actos masivos PUD en Táchira, Barinas, Zulia, Yaracuy, Carabobo, Anzoátegui · Guanipa retorna"]
+      ["green","up","MCM: retorno antes fin 2026 (Magalli Meda) · 6 actos masivos PUD en Táchira, Barinas, Zulia, Yaracuy, Carabobo, Anzoátegui · Guanipa retorna"],
+      ["green","up","S18 update marker: 08-15 may · Retorno MCM vinculado a cronograma electoral"]
     ] },
 
   // ── ECONÓMICO ──
@@ -350,7 +367,8 @@ export const INDICATORS = [
       ["yellow","flat","BCV mantiene 570,75 Bs/USD · paralelo ~636 Bs/USD · brecha ~30% · GL-57 habilita BCV internacionalmente"],
       ["yellow","flat","Brecha ~30% vs. oficial · GL-57 no resuelve segmentación estructural"],
       ["yellow","flat","BCV ~570 · USDT ~630 · brecha ofic. ~29% · auditorías paralelas EE.UU.-Vzla sobre fondos externos"],
-      ["yellow","flat","BCV ~Bs 493,4/USD ofic. · intervención Bs ~715/EUR · tres referencias cambiarias simultáneas generando distorsiones en precios y costos"]
+      ["yellow","flat","BCV ~Bs 493,4/USD ofic. · intervención Bs ~715/EUR · tres referencias cambiarias simultáneas generando distorsiones en precios y costos"],
+      ["yellow","flat","S18 update marker: 08-15 may · Sin dato cambiario nuevo; expansión monetaria +18% advierte presión"]
     ] },
   { dim:"Económico", icon:"📊", esc:"E2", name:"Inflación", desc:"Tasa mensual proyectada",
     umbral:"Retorno a >30% mensual activa E2.",
@@ -371,7 +389,8 @@ export const INDICATORS = [
       ["red","flat","13,1% mensual (BCV) · 649,5% anual · acumulado 2026: 71,8% · canasta alimentos +10,7% mensual"],
       ["red","flat","~650% anualizada · FMI: «camino muy difícil» · salario <1 USD · 1° mayo sin montos"],
       ["red","flat","~650% anualizada · proyecciones divergentes: FMI 4% PIB · CEPAL 6,5% · PNUD 7,4% · salario base ~$0,27"],
-      ["yellow","up","10,6% mensual abril — tercer mes consecutivo de descenso desde 13,1% en marzo · BCV proyecta normalización 2do sem. 2026"]
+      ["yellow","up","10,6% mensual abril — tercer mes consecutivo de descenso desde 13,1% en marzo · BCV proyecta normalización 2do sem. 2026"],
+      ["red","up","S18 update marker: 08-15 may · Base monetaria +18% en dos semanas; riesgo inflacionario"]
     ] },
   { dim:"Económico", icon:"📊", esc:"E2", name:"Ingresos de la población", desc:"Salario mínimo y poder adquisitivo real",
     umbral:"47 meses sin ajuste. Ingreso ~USD 256 vs canasta USD 550.",
@@ -392,7 +411,8 @@ export const INDICATORS = [
       ["red","flat","Salario <1 USD congelado · aumento 1° mayo sin monto · inflación 649,5% anual absorbe cualquier ajuste"],
       ["red","flat","Salario <1 USD 4 años · canasta >USD 550 · brecha >USD 21.000M anual"],
       ["red","up","$240 ingreso mínimo integral (bonos) desde 1° mayo · salario base Bs 130 (~$0,27) sin incidencia prestaciones"],
-      ["red","flat","ENCOVI 2025: 68,5% pobreza monetaria · 31,7% extrema · bono USD 37,6 prom. mensual · salario base Bs 130 · 76,7% hogares dependen de bonos"]
+      ["red","flat","ENCOVI 2025: 68,5% pobreza monetaria · 31,7% extrema · bono USD 37,6 prom. mensual · salario base Bs 130 · 76,7% hogares dependen de bonos"],
+      ["red","flat","S18 update marker: 08-15 may · Sector universitario presiona por salarios; paro 19 mayo"]
     ] },
   { dim:"Económico", icon:"📊", esc:"E2", name:"Sistema eléctrico", desc:"Disponibilidad y frecuencia de cortes",
     umbral:"Cortes >4h/día en zonas urbanas activa presión social.",
@@ -413,7 +433,8 @@ export const INDICATORS = [
       ["yellow","flat","Sin datos nuevos · crisis sanitaria: fiebre amarilla (55,3% letalidad) + 25.000 casos malaria"],
       ["yellow","flat","Siemens y GE en conversaciones Zulia · sin acuerdo firmado · CAF activa"],
       ["yellow","flat","Sin datos nuevos S16 · Siemens/GE negociaciones Zulia en curso · sin acuerdo firmado"],
-      ["red","down","Pico 15.579 MW el 7 may — máximo en 9 años · Plan Recuperación convocado con sector privado y academia · prohibición minería digital reiterada"]
+      ["red","down","Pico 15.579 MW el 7 may — máximo en 9 años · Plan Recuperación convocado con sector privado y academia · prohibición minería digital reiterada"],
+      ["yellow","flat","S18 update marker: 08-15 may · Sin dato IODA nuevo; no se interpreta conectividad como señal eléctrica"]
     ] },
   { dim:"Económico", icon:"📊", esc:"E3", name:"Percepción dirección del país", desc:"Encuestas de opinión pública",
     umbral:">60% percepción positiva sostiene E3.",
@@ -434,7 +455,8 @@ export const INDICATORS = [
       ["yellow","down","83,8% rechaza elogios Trump a Rodríguez · 100 días: 1/21 en verde · 81% indicadores en rojo"],
       ["yellow","flat","Georgieva: «camino muy difícil» · PNUD 7,4% proy. 2026 · base reducida"],
       ["yellow","down","AtlasIntel: 31,4% aprueba DR (↓ desde 37%) · 78,26% situación «mal» (Meganálisis) · 95,33% desaprueba economía"],
-      ["yellow","flat","Sin nuevos datos encuestales S17 · ENCOVI 2025 confirma deterioro estructural condiciones de vida pese a mejora del IPM (55% ↓ desde 59%)"]
+      ["yellow","flat","Sin nuevos datos encuestales S17 · ENCOVI 2025 confirma deterioro estructural condiciones de vida pese a mejora del IPM (55% ↓ desde 59%)"],
+      ["yellow","flat","S18 update marker: 08-15 may · Brecha E3-E1 a 7pp refleja expectativa de transición"]
     ] },
   { dim:"Económico", icon:"📊", esc:"E3", name:"PIB trimestral", desc:"Crecimiento económico confirmado",
     umbral:"Crecimiento positivo sostiene E3. Contracción activa E2.", addedWeek:8,
@@ -449,7 +471,8 @@ export const INDICATORS = [
       ["green","flat","PNUD 7,4% para 2026 · desde base 35,7% nivel 2012 · BID abre asistencia técnica"],
       ["green","up","FMI 4% · CEPAL 6,5% · PNUD 7,4% proy. 2026 · 20 trimestres crecimiento consecutivo"],
       ["green", "up", "BCV: 20 trimestres consecutivos de crecimiento. FMI/DEG USD 5.000M + GL-58 refuerzan perspectivas de crecimiento 2026. PNUD proyecta 7,4%."],
-      ["green","up","BCV estima normalización para 2do sem. 2026 · exportaciones récord y GL-58 refuerzan proyecciones positivas · FMI/DEG activos"]
+      ["green","up","BCV estima normalización para 2do sem. 2026 · exportaciones récord y GL-58 refuerzan proyecciones positivas · FMI/DEG activos"],
+      ["green","flat","S18 update marker: 08-15 may · Reestructuración y petróleo sostienen base macro; FMI fuera del DSA"]
     ] },
 
   // ── INTERNACIONAL ──
@@ -472,7 +495,8 @@ export const INDICATORS = [
       ["green","up","GL-56+GL-57 emitidas · Haustveit Caracas · Kozak: Fase 1 cumplida · Fase 2 con condiciones electorales"],
       ["green","flat","Barrett + Kozak-Figuera + Rubio negocia BCV · Fase 2 operativa"],
       ["green","up","Delegación Casa Blanca + vuelo AA + MOU energéticos y mineros + Centro ITA + OFAC defensa Maduro"],
-      ["green","up","GL-58 OFAC + Trump coordina con Chevron/Exxon + Barrett activo + CITGO protegida hasta jun · ambigüedad sobre recompensa Cabello USD 25M"]
+      ["green","up","GL-58 OFAC + Trump coordina con Chevron/Exxon + Barrett activo + CITGO protegida hasta jun · ambigüedad sobre recompensa Cabello USD 25M"],
+      ["green","up","S18 update marker: 08-15 may · Agen en Caracas; United Houston-Caracas; NNSA retira uranio RV-1"]
     ] },
   { dim:"Internacional", icon:"🌐", esc:"E3", name:"Sanciones UE", desc:"Estado de sanciones europeas",
     umbral:"Levantamiento parcial fortalece E3.",
@@ -493,7 +517,8 @@ export const INDICATORS = [
       ["yellow","up","Macron recibe MCM en Elíseo (13-abr) · PM Países Bajos La Haya (15-abr) · UE delegación venezolana"],
       ["yellow","flat","Sin datos nuevos · sanciones UE pendientes de evaluación"],
       ["red","down","Eurocámara 507-31: condicionadas a avances democráticos · España propone levantar pero resolución limita"],
-      ["red","flat","España prepara waiver para Delcy en Cumbre Iberoamericana nov. · mecanismo silencio administrativo 48h sin modificar régimen general sanciones"]
+      ["red","flat","España prepara waiver para Delcy en Cumbre Iberoamericana nov. · mecanismo silencio administrativo 48h sin modificar régimen general sanciones"],
+      ["yellow","flat","S18 update marker: 08-15 may · Albares descarta excepción especial para Delcy; sanciones UE siguen sensibles"]
     ] },
   { dim:"Internacional", icon:"🌐", esc:"E3", name:"China y Rusia", desc:"Balanza estratégica en contexto acercamiento EE.UU.",
     umbral:"Ruptura con China/Rusia por presión EE.UU. fragiliza E3.",
@@ -514,7 +539,8 @@ export const INDICATORS = [
       ["yellow","flat","Rubio: EE.UU. no permitirá control sector por China/Rusia/Irán · sin señales nuevas cooperación rusa/china"],
       ["yellow","flat","Sin datos nuevos · Petro-Rodríguez (24 abr) nueva variable regional"],
       ["yellow","flat","Sin datos nuevos · marco bilateral EE.UU. sigue activo · Eni-Repsol con intereses rusos en Cardón IV"],
-      ["yellow","flat","Sin datos nuevos S17 · marco bilateral EE.UU. domina agenda · normalización avanza sin mención explícita de socios China/Rusia"]
+      ["yellow","flat","Sin datos nuevos S17 · marco bilateral EE.UU. domina agenda · normalización avanza sin mención explícita de socios China/Rusia"],
+      ["yellow","flat","S18 update marker: 08-15 may · China y Rusia sin hito nuevo; Qatar gana centralidad"]
     ] },
   { dim:"Internacional", icon:"🌐", esc:"E1", name:"FMI y reinserción financiera", desc:"Diálogo con IFIs y acceso a mercados",
     umbral:"Acuerdo FMI = E1 clave. 'Intensa Fragilidad' sostiene E2.",
@@ -535,7 +561,8 @@ export const INDICATORS = [
       ["green","up","FMI + BM reanudan relaciones (16 abr) · DEG ~USD 5.000M potenciales · Bessent respalda · Artículo IV habilitado"],
       ["green","up","FMI + BM + BID simultáneos · DEG ~USD 5.137M · Artículo IV habilitado"],
       ["green","flat","Auditorías paralelas BCV · Eurasia Group: reestructuración profunda BCV · DEG en proceso técnico · sin acuerdo nuevo"],
-      ["green","up","GL-58 + Ortega designado Gobernador FMI + DEG ~USD 5.000M gestionados · rally bonos VENZ/PDVSA +87% acum. 2026 · Brent USD 117,3/b"]
+      ["green","up","GL-58 + Ortega designado Gobernador FMI + DEG ~USD 5.000M gestionados · rally bonos VENZ/PDVSA +87% acum. 2026 · Brent USD 117,3/b"],
+      ["yellow","up","S18 update marker: 08-15 may · BCV irá a Washington, pero FMI no participa en DSA"]
     ] },
   { dim:"Internacional", icon:"🌐", esc:"E3", name:"Normalización diplomática", desc:"Reapertura embajadas y relaciones bilaterales",
     umbral:"Reapertura embajada EE.UU. = E1/E3 consolidado.",
@@ -556,7 +583,8 @@ export const INDICATORS = [
       ["green","up","Haustveit Caracas · FMI+BM reanudan · Macron recibe MCM · UE delegación · Barrett sucesor de Dogu"],
       ["green","flat","Barrett Fase 2 + Chile consular + Mercosur evalúa retorno + BID"],
       ["green","up","Rodríguez-Petro III Comisión · Barbados · OEA reconoce interlocución · Barrett en Miraflores · Iberoamericana nov."],
-      ["green","flat","CIJ/Guayana Esequiba: audiencias desde 4 mayo · España waiver UE · CERF USD 2M para Sucre · OEA/Ramdin exige liberación presos políticos"]
+      ["green","flat","CIJ/Guayana Esequiba: audiencias desde 4 mayo · España waiver UE · CERF USD 2M para Sucre · OEA/Ramdin exige liberación presos políticos"],
+      ["green","up","S18 update marker: 08-15 may · Qatar Airways y United refuerzan normalización diplomática-logística"]
     ] },
   { dim:"Internacional", icon:"🌐", esc:"E1", name:"Presión legislativa EE.UU.", desc:"Proyectos de ley y condicionalidades del Congreso",
     umbral:"Aprobación legislativa condiciona E3 y empuja E1.", addedWeek:8,
@@ -571,7 +599,8 @@ export const INDICATORS = [
       ["yellow","flat","Sin datos nuevos · H.R. 7674 activo · 180 días como referencia"],
       ["yellow","flat","ITA Centro Negocios Venezuela lanzado · OFAC autoriza financiamiento defensa Maduro · sin condicionamientos nuevos"],
       ["yellow", "flat", "Ambiguedad Rubio sobre recompensa USD 25M a Diosdado Cabello. CITGO prorrogada hasta 19 jun. Plan 3 fases como marco operativo explicito."],
-      ["yellow","flat","Ambigüedad recompensa Cabello USD 25M · EE.UU. ajusta sanciones para financiar defensa Maduro-SDNY · próxima audiencia 30 junio"]
+      ["yellow","flat","Ambigüedad recompensa Cabello USD 25M · EE.UU. ajusta sanciones para financiar defensa Maduro-SDNY · próxima audiencia 30 junio"],
+      ["green","up","S18 update marker: 08-15 may · Washington incluye transición como endpoint; MCM-Rubio activo"]
     ] },
   { dim:"Internacional", icon:"🌐", esc:"E3", name:"Relación Venezuela-Colombia", desc:"Agenda bilateral y cooperación fronteriza",
     umbral:"Ruptura bilateral = E2. Integración energética = E3.", addedWeek:10,
@@ -584,7 +613,8 @@ export const INDICATORS = [
       ["yellow","up","Petro a Caracas (24 abr): cogobernanza 1-2 años · frontera · narcotráfico"],
       ["green","up","III Comisión de Vecindad: seguridad, energía, electricidad, gas, comercio USD 1.200M · Barbados hub Caribe"],
       ["green", "flat", "Sin desarrollos nuevos esta semana. MOU energeticos con Casa Blanca dominan agenda bilateral."],
-      ["green","flat","Sin datos nuevos S17 sobre Colombia-Venezuela · marco bilateral activo · no hay nueva Comisión de Vecindad reportada en el período"]
+      ["green","flat","Sin datos nuevos S17 sobre Colombia-Venezuela · marco bilateral activo · no hay nueva Comisión de Vecindad reportada en el período"],
+      ["green","flat","S18 update marker: 08-15 may · Colombia sin hito mayor; eje Qatar/EE.UU. domina"]
     ] },
   { dim:"Internacional", icon:"🌐", esc:"E3", name:"Proceso judicial Maduro", desc:"Caso narco en Distrito Sur de Nueva York",
     umbral:"Desestimación = fortalece DR. Condena = consolida separación. Financiamiento = zona gris.", addedWeek:11,
@@ -596,7 +626,8 @@ export const INDICATORS = [
       ["yellow","flat","Sin datos nuevos · caso Maduro activo en EE.UU."],
       ["yellow","up","OFAC autoriza financiamiento defensa Maduro con fondos estatales post-5 mar 2026 · caso activo en NY"],
       ["yellow", "up", "Proxima audiencia SDNY fijada para 30 de junio. EE.UU. ajusto sanciones para financiar defensa. Maduro Guerra: primera entrevista publica."],
-      ["yellow","flat","Audiencia SDNY fijada para 30 jun · Nicolás Maduro Guerra primera entrevista: padre «espiritual y resistente» · EE.UU. ajusta sanciones defensa"]
+      ["yellow","flat","Audiencia SDNY fijada para 30 jun · Nicolás Maduro Guerra primera entrevista: padre «espiritual y resistente» · EE.UU. ajusta sanciones defensa"],
+      ["yellow","flat","S18 update marker: 08-15 may · Segundo Circuito PDVSA 2020/CITGO sigue como riesgo financiero"]
     ] },
 
   // ── SOCIAL ──
@@ -619,7 +650,8 @@ export const INDICATORS = [
       ["yellow","down","47 protestas (10-16 abr) · 15 estados · desaceleración vs. pico 9-abr · movilización 16-abr hacia embajada EE.UU."],
       ["red","up","46 protestas (17-23 abr) · pico 27 (22 abr) paro universitario 18 estados"],
       ["yellow","down","33 protestas 24–29 abr · 9 estados · bloqueo marchas Caracas 30 abr · convocatorias 1° mayo"],
-      ["yellow","up","42 protestas 1–6 mayo · pico 35 el 1° mayo · 16 estados · demandas laborales + cambio de gobierno en OVCS · contenidas con murciélagos"]
+      ["yellow","up","42 protestas 1–6 mayo · pico 35 el 1° mayo · 16 estados · demandas laborales + cambio de gobierno en OVCS · contenidas con murciélagos"],
+      ["yellow","up","S18 update marker: 08-15 may · 44 protestas; paro universitario 19 mayo como próximo test"]
     ] },
   { dim:"Social", icon:"✊", esc:"E4", name:"Cobertura territorial protestas", desc:"Estados con movilizaciones activas",
     umbral:">18 estados = alcance casi nacional. >12 = multi-regional.",
@@ -640,7 +672,8 @@ export const INDICATORS = [
       ["yellow","down","15 estados (10-16 abr) · promedio 6 estados/día · DC presencia constante · politización creciente"],
       ["red","up","18 estados en 1 día (22 abr) · motín Yare III 5 fallecidos · coordinación sectorial"],
       ["yellow","down","9 estados · pico 24 abr (10 protestas, 9 estados) · descenso vs. 18 estados S15"],
-      ["yellow","up","16 estados cubiertos el 1° mayo — máximo territorial del período · OVCS registra primera incorporación de exigencias de cambio de gobierno"]
+      ["yellow","up","16 estados cubiertos el 1° mayo — máximo territorial del período · OVCS registra primera incorporación de exigencias de cambio de gobierno"],
+      ["yellow","flat","S18 update marker: 08-15 may · Protestas en 14 entidades; conflictividad distribuida"]
     ] },
   { dim:"Social", icon:"✊", esc:"E4", name:"Conectividad y electricidad", desc:"Apagones e impacto en conectividad regional",
     umbral:"Conectividad nacional <80% = alerta. Estado <30% = crítico.", addedWeek:10,
@@ -653,7 +686,8 @@ export const INDICATORS = [
       ["yellow","flat","Sin datos IODA nuevos S15 · Siemens/GE conversan Zulia como señal"],
       ["yellow","flat","Sin datos IODA nuevos S16 · Siemens/GE negociaciones Zulia como señal"],
       ["yellow", "down", "Pico demanda electrica 15.579 MW (7 may). Crisis hidrica Sucre (ONU CERF USD 2M, +20 dias sin agua). Infraestructura bajo presion estructural."],
-      ["red","down","Pico eléctrico 15.579 MW (7 may) máx. 9 años · crisis hídrica Sucre: +20 días sin agua · CERF USD 2M · infraestructura bajo presión crítica"]
+      ["red","down","Pico eléctrico 15.579 MW (7 may) máx. 9 años · crisis hídrica Sucre: +20 días sin agua · CERF USD 2M · infraestructura bajo presión crítica"],
+      ["yellow","flat","S18 update marker: 08-15 may · Sin dato IODA nuevo; conectividad no se interpreta como electricidad"]
     ] },
   { dim:"Social", icon:"✊", esc:"E3", name:"Percepción pública", desc:"Encuestas de aprobación y dirección del país",
     umbral:"Aprobación DR <30% = erosión E3. Percepción democrática >50% = sostiene E1.", addedWeek:11,
@@ -665,7 +699,8 @@ export const INDICATORS = [
       ["yellow","flat","PNUD 7,4% · 100 días balance positivo vs. FMI «camino muy difícil»"],
       ["yellow","down","AtlasIntel: 31,4% aprueba DR · 47,1% desaprueba · Meganálisis: 78,26% situación «mal»"],
       ["yellow", "flat", "42 protestas con politizacion creciente. ENCOVI 2025: 68,5% pobreza, 31,7% extrema. 76,7% hogares dependen de bonos."],
-      ["red","flat","ENCOVI 2025: 68,5% pobreza · IPM 55% · 76,7% hogares con bonos · brecha entre estabilización macro y bienestar real de los hogares persiste"]
+      ["red","flat","ENCOVI 2025: 68,5% pobreza · IPM 55% · 76,7% hogares con bonos · brecha entre estabilización macro y bienestar real de los hogares persiste"],
+      ["yellow","flat","S18 update marker: 08-15 may · Expectativa de transición convive con presión por presos"]
     ] },
 
   // ── ECONÓMICO (nuevos) ──
@@ -679,7 +714,8 @@ export const INDICATORS = [
       ["green","flat","Halliburton evalúa retorno · Alvorada Brasil amplía Faja · interés creciente"],
       ["green","up","Shell/Eni/BP/Repsol despliegue + MOU Casa Blanca + Blue Water SPAC $490M + ArtCap $300M"],
       ["green", "up", "GL-58 + rally bonos +87% + ExxonMobil + Hunt/Crossover MOU + Mercuria offtake USD 2.200M + Fondo USD 500M rehabilitacion campos."],
-      ["green","up","Hunt/Crossover USD 2.000M (Monagas) · Mercuria/Heeney USD 2.200M minero · Fondo USD 500M rehabilitación · Amber Energy USD 11.000M CITGO"]
+      ["green","up","Hunt/Crossover USD 2.000M (Monagas) · Mercuria/Heeney USD 2.200M minero · Fondo USD 500M rehabilitación · Amber Energy USD 11.000M CITGO"],
+      ["green","up","S18 update marker: 08-15 may · Fink/BlackRock optimista; Coinbase/Paradigm discute stablecoins"]
     ] },
   { dim:"Económico", icon:"📊", esc:"E2", name:"Sistema eléctrico nacional", desc:"Rehabilitación como precondición para reactivación",
     umbral:"Sin rehabilitación eléctrica no hay reactivación sostenible. Inversión est. $40.000M.", addedWeek:11,
@@ -691,7 +727,8 @@ export const INDICATORS = [
       ["yellow","flat","Siemens y GE en conversaciones Zulia · sin acuerdo firmado · CAF activa"],
       ["yellow","flat","Sin datos S16 · Siemens/GE negociaciones en curso · sin acuerdo firmado"],
       ["yellow", "down", "Pico 15.579 MW (7 may) — maximo 9 anios. Plan de Recuperacion convocado urgentemente. Presion se mantendra en meses de calor."],
-      ["red","down","15.579 MW pico histórico (9 años) el 7 mayo · Plan de Recuperación convocado con sector privado, académico y científico · minería digital prohibida"]
+      ["red","down","15.579 MW pico histórico (9 años) el 7 mayo · Plan de Recuperación convocado con sector privado, académico y científico · minería digital prohibida"],
+      ["yellow","flat","S18 update marker: 08-15 may · Sin dato técnico eléctrico nuevo; foco en presión social"]
     ] },
 
   // ── POLÍTICO/CONSTITUCIONAL (nuevo S12) ──
@@ -704,50 +741,51 @@ export const INDICATORS = [
       ["red","flat","180 días sin prórroga formal · Cabello descarta elecciones · AN debe actuar antes de julio"],
       ["yellow","flat","180 días sin prórroga formal · Comité Postulaciones TSJ activo · test julio · AN debe actuar antes de agosto"],
       ["yellow", "flat", "Rodriguez esquiva fecha electoral: no lo se, en algun momento. Reforma TSJ 20-32 magistrados. Comite de Postulaciones activo. Interinato avanza acumulacion institucional."],
-      ["yellow","flat","Sin prórroga formal del período de 180 días · reforma TSJ en debate · Rodríguez: «En algún momento» sobre elecciones · CNE sin movimientos"]
+      ["yellow","flat","Sin prórroga formal del período de 180 días · reforma TSJ en debate · Rodríguez: «En algún momento» sobre elecciones · CNE sin movimientos"],
+      ["yellow","up","S18 update marker: 08-15 may · TSJ 32 y retorno MCM tensionan continuidad constitucional"]
     ] },
 ];
 
 export const SCENARIO_SIGNALS = [
   { esc:"E3", signals:[
-    { name:"GL-58 OFAC activa", sem:"green", val:"Asesoría técnica reestructuración deuda soberana y PDVSA — bonos +87% acum. 2026", isNew:true },
-    { name:"Exportaciones 1,23 mbd", sem:"green", val:"Máximo desde enero 2019 (+14% vs. marzo) — EE.UU. ~445k bpd principal destino", isNew:true },
-    { name:"FMI/DEG USD 5.000M", sem:"green", val:"Ortega designado Gobernador · destino Gran Misión Vivienda y hospitales", isNew:true },
-    { name:"Reforma TSJ 20→32 magistrados", sem:"yellow", val:"AN activa Comité de Postulaciones · Caryslia presidenta · reconfiguración más profunda del interinato", isNew:true },
-    { name:"Plan 3 fases — Wright", sem:"yellow", val:"Fase 1 declarada completa · Fase 2 iniciada · elecciones condicionadas a consolidación económica", isNew:false },
-    { name:"BCV intervención récord", sem:"green", val:"USD 1.500M vendidos en abril · inflación baja a 10,6% (3er mes consecutivo ↓)", isNew:false },
-    { name:"Delcy Rodríguez: «No lo sé. En algún momento.»", sem:"yellow", val:"Fecha electoral esquivada con precisión — interinato preserva margen de maniobra sobre timing político", isNew:false },
-    { name:"ExxonMobil: de «ininvertible» a «recurso inmenso»", sem:"green", val:"CEO Darren Woods · envía equipos técnicos · coordina con Trump estrategia de entrada", isNew:true },
-    { name:"Hunt Oil + Crossover + Mercuria MOU", sem:"green", val:"USD 2.000M Monagas + USD 2.200M offtake minero (Casa Blanca) + Fondo USD 500M rehabilitación campos", isNew:true },
-    { name:"Chevron participación Petroindependencia 49%", sem:"green", val:"Sube de 35,8% a 49% + derechos Ayacucho 8 — produce ~250k bpd en Venezuela", isNew:false },
-    { name:"CITGO protegida hasta 19 junio", sem:"yellow", val:"OFAC prorroga licencia — subasta Delaware postponida — Amber Energy compromisos USD 11.000M", isNew:false },
-    { name:"Ingreso integral USD 240 sin reforma salarial", sem:"yellow", val:"Salario base Bs. 130 (~USD 0,27) congelado — austeridad laboral como ancla antiinflacionaria", isNew:false, vigpierde:false },
+    { name:"Reestructuración formal de deuda", sem:"green", val:"Centerview Partners designado asesor financiero; DSA previsto para junio; White & Case defiende CITGO", isNew:true },
+    { name:"GL-58 en fase operativa", sem:"green", val:"La licencia pasa de habilitación técnica a arquitectura concreta de normalización financiera", isNew:true },
+    { name:"TSJ sancionado a 32 magistrados", sem:"yellow", val:"AN revierte reducción de 2022; nuevo tribunal será árbitro de controversias electorales", isNew:true },
+    { name:"Rodríguez como interlocutora de Washington", sem:"green", val:"CNN/Qatar revela que MCM no fue incorporada al diseño pos-Maduro mediado por Qatar", isNew:true },
+    { name:"100 días del Programa de Convivencia", sem:"yellow", val:"Balance oficial: 500 horas de reuniones y más de 9.000 beneficiarios, con reconocimiento de cobros indebidos", isNew:true },
+    { name:"Producción OPEP 1,031 M bpd", sem:"green", val:"Abril confirma al petróleo como ancla fiscal; cesta Merey USD 90,47/b", isNew:true },
+    { name:"Cardón IV +10%", sem:"green", val:"Repsol anuncia incremento de gas de 580 a 640 MMpcd; ENI reinicia levantamientos", isNew:true },
+    { name:"Agen en Caracas", sem:"green", val:"Consejo Nacional de Dominio Energético confirma fase de estabilidad y facilita MOU Hunt/HKN/Crossover", isNew:true },
+    { name:"United y Qatar Airways", sem:"green", val:"Houston–Caracas desde agosto y Caracas–Bogotá desde julio refuerzan reinserción aérea", isNew:true },
+    { name:"FMI no participa en el DSA", sem:"yellow", val:"Kozack aclara que el Fondo está fuera del diseño; sin Artículo IV desde 2004", isNew:true },
+    { name:"BCV Washington a finales de mayo", sem:"yellow", val:"Primeros contactos exploratorios definirán si la normalización financiera gana credibilidad técnica", isNew:false },
+    { name:"Continuidad negociada pierde horizonte", sem:"green", val:"E3 sigue dominante pero baja a 47% porque cada avance operativo acorta la distancia con E1", isNew:false, vigpierde:true }
   ]},
   { esc:"E1", signals:[
-    { name:"GL-58 prerrequisito de E1", sem:"green", val:"Reestructuración técnica de deuda soberana como arquitectura financiera previa a transición política creíble", isNew:true },
-    { name:"Wright fija elecciones como Fase 3", sem:"green", val:"Primera vez que EE.UU. incluye elecciones en cronograma oficial — E1 como objetivo de política exterior", isNew:true },
-    { name:"MCM retorno antes fin 2026", sem:"green", val:"Magalli Meda: «por decisión política propia, no bendición de Trump» — test real del acuerdo bilateral", isNew:true },
-    { name:"6 actos masivos PUD — 6 estados", sem:"yellow", val:"Táchira, Barinas, Zulia, Yaracuy, Carabobo, Anzoátegui — Guanipa retorna a Venezuela", isNew:true },
-    { name:"Brecha E3–E1: 10pp (↓ desde 15pp)", sem:"yellow", val:"Compresión más significativa en dos meses — E1 ya no hipótesis: parte del cronograma de Washington", isNew:true },
-    { name:"Rally bonos +87% acumulado 2026", sem:"green", val:"VENZ 2019 +85,51%; PDVSA 2022 +88,60% — mercado interpreta señal de mayor probabilidad de recuperación", isNew:true },
-    { name:"CIDH + OEA presión sobre presos políticos", sem:"yellow", val:"Ramdin: liberación; CIDH: artículo 9 Ley Amnistía como riesgo para opositores con vínculos internacionales", isNew:false },
-    { name:"Tensión interna opositora contenida", sem:"yellow", val:"Guanipa vs. Ochoa Antich/Zambrano («fachada») — fractura visible pero sin fragmentación de la coalición", isNew:false },
+    { name:"MCM coordina retorno con Rubio", sem:"green", val:"El protocolo de regreso queda ligado a garantías de seguridad y cronograma electoral", isNew:true },
+    { name:"Brecha E3–E1 cae a 7pp", sem:"green", val:"E1 sube a 40%, probabilidad más alta del ciclo; la transición se vuelve endpoint del cronograma financiero", isNew:true },
+    { name:"Alviarez vincula retorno a elecciones", sem:"green", val:"Vente Venezuela conecta regreso de MCM con anuncio de cronograma electoral", isNew:true },
+    { name:"Rubio: riqueza beneficia al pueblo", sem:"green", val:"Washington presenta mejoría venezolana y mantiene coordinación directa con MCM", isNew:true },
+    { name:"Reforma TSJ como condición indirecta", sem:"yellow", val:"La composición del nuevo tribunal revelará si hay apertura electoral real o reacomodo controlado", isNew:true },
+    { name:"Qatar excluye a MCM del diseño", sem:"yellow", val:"La transición pacífica gana probabilidad, pero no necesariamente bajo conducción opositora plena", isNew:true },
+    { name:"Foro Penal presiona por pendientes", sem:"yellow", val:"457 presos políticos limitan credibilidad de cualquier apertura electoral", isNew:true }
   ]},
   { esc:"E2", signals:[
-    { name:"GL-58 y FMI/DEG alejan colapso", sem:"green", val:"Normalización financiera reduce materialmente la posibilidad de colapso fiscal o cambiario de corto plazo", isNew:true },
-    { name:"Exportaciones récord + Brent USD 117,3/b", sem:"green", val:"1,23 mbd + precios en máximos por tensiones Estrecho de Ormuz — base fiscal sólida del interinato", isNew:true },
-    { name:"Coordinación bilateral EE.UU.–Venezuela activa", sem:"green", val:"GL-58 + Barrett + plan 3 fases operativo — Washington como garante externo de la estabilidad del interinato", isNew:false },
-    { name:"Sistema Patria USD 13.500M proyectados 2026", sem:"green", val:"9,3M beneficiarios — amortiguador social que opera como contención de conflictividad potencial", isNew:false },
-    { name:"Ruptura bilateral como única vía realista a E2", sem:"red", val:"Colapso precio petróleo <USD 50/b o fracaso GL-58 como únicos vectores — baja probabilidad corto plazo", isNew:false, vigpierde:false },
+    { name:"E2 en mínimo del período", sem:"green", val:"Baja a 2% por acumulación de factores anti-colapso: deuda, petróleo, conectividad y coordinación bilateral", isNew:true },
+    { name:"Reestructuración reduce riesgo financiero", sem:"green", val:"Centerview, White & Case y DSA organizan pasivos que superan USD 150.000M", isNew:true },
+    { name:"Aerolíneas internacionales regresan", sem:"green", val:"United y Qatar Airways son señales de normalización logística y confianza externa", isNew:true },
+    { name:"Inversores globales observan oportunidades", sem:"green", val:"Larry Fink se declara optimista; Coinbase/Paradigm instala conversación de stablecoins y tokenización", isNew:true },
+    { name:"Expansión monetaria +18%", sem:"yellow", val:"Arcay advierte financiamiento fiscal vía emisión pese al repunte petrolero; riesgo macro, no fragmentación inmediata", isNew:true },
+    { name:"FMI fuera del DSA", sem:"yellow", val:"Sin respaldo técnico del Fondo, la credibilidad depende de estadística y disciplina fiscal", isNew:true }
   ]},
   { esc:"E4", signals:[
-    { name:"Camiones «murciélagos» el 1° mayo", sem:"yellow", val:"PNB/GNB desplegados — control coercitivo selectivo: impiden avance hacia Miraflores pero no escalada masiva", isNew:true },
-    { name:"42 protestas en 6 días — politización creciente", sem:"yellow", val:"Pico 35 el 1° mayo · 16 estados · OVCS registra demandas de cambio de gobierno por primera vez", isNew:true },
-    { name:"Caso Quero Navas — contradicción institucional", sem:"red", val:"Fallecido jul. 2025; informado vivo por Defensoría oct. 2025 — brechas sistémicas en garantías penitenciarias", isNew:true },
-    { name:"CIDH / artículo 9 Ley Amnistía", sem:"yellow", val:"Potencial dispositivo coercitivo contra opositores con vínculos internacionales — advertencia CIDH activa", isNew:true },
-    { name:"Pico eléctrico 15.579 MW", sem:"red", val:"Máximo en 9 años (7 mayo) — infraestructura bajo presión crítica · meses de calor como fuente de agitación", isNew:true },
-    { name:"Salario base Bs. 130 (~USD 0,27)", sem:"red", val:"Brecha estructural: ingreso integral USD 240 vs. salario formal — combustible de conflictividad latente", isNew:false },
-    { name:"Represalia al retorno de MCM: activador potente E4", sem:"red", val:"Test de las garantías implícitas del acuerdo bilateral — una represalia activaría E4 de inmediato", isNew:false },
-    { name:"Boom energético-financiero frena escalada represiva", sem:"green", val:"GL-58 + bonos + ExxonMobil: costo bilateral de represión masiva sería altísimo en este momento", isNew:false, vigpierde:false },
+    { name:"457 presos políticos", sem:"red", val:"Primer aumento desde enero: 454 el 27 abr → 457 el 4 may; distensión estancada", isNew:true },
+    { name:"746 excarcelaciones FP", sem:"yellow", val:"Avance verificable desde el 8 de enero, pero insuficiente frente a pendientes y nuevas detenciones", isNew:true },
+    { name:"44 protestas en 14 entidades", sem:"yellow", val:"8–13 mayo: conflictividad distribuida, sectorializada y cruzada con justicia y derechos de detenidos", isNew:true },
+    { name:"Paro universitario 19 mayo", sem:"yellow", val:"FAPUV/APUCV convocan primera paralización sectorial con fecha precisa del período", isNew:true },
+    { name:"Denuncias de tortura El Aissami", sem:"red", val:"Celda con reflector 24h, imposición de Clonazepam y bloqueo de defensa privada tensionan garantías procesales", isNew:true },
+    { name:"Caso Quero Navas", sem:"red", val:"MP ordena exhumación tras muerte bajo custodia y comunicación oficial posterior que lo ubicaba vivo", isNew:true },
+    { name:"Cobros indebidos en amnistía", sem:"yellow", val:"Rodríguez pide sancionar jueces que cobran por aplicar beneficios; reconoce falla sensible del mecanismo", isNew:true },
+    { name:"Supervisión EE.UU. contiene escalada", sem:"green", val:"Normalización financiera y energética eleva el costo de represión sistémica", isNew:false, vigpierde:true }
   ]},
 ];

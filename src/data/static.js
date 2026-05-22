@@ -104,7 +104,17 @@ export const GDELT_ANNOTATIONS = [
   { date:"2026-05-06", tier:"HIGH", tierEs:"ALTA", label:"ExxonMobil pasa de calificar Venezuela como ininvertible a recurso inmenso; envía equipos técnicos y coordina con Trump." },
   { date:"2026-05-06", tier:"MEDIUM", tierEs:"MEDIA", label:"Caso Quero Navas: fallecido julio 2025 pero informado como vivo por la Defensoría en octubre 2025 — contradicción institucional grave." },
   { date:"2026-05-07", tier:"HIGH", tierEs:"ALTA", label:"Hunt Oil y Crossover Energy firman MOU con PDVSA para exploración en Monagas; Mercuria-Heeney Capital anuncian offtake minero USD 2.200M." },
-  { date:"2026-05-07", tier:"MEDIUM", tierEs:"MEDIA", label:"Demanda eléctrica alcanza pico de 15.579 MW el 7 de mayo — máximo en 9 años; Ejecutivo convoca Plan de Recuperación del Sistema Eléctrico." },
+  { date:"2026-05-07", tier:"MEDIUM", tierEs:"MEDIA", label:"Demanda eléctrica alcanza pico de 15.579 MW el 7 de mayo — máximo en 9 años; Ejecutivo convoca Plan de Recuperación del Sistema Eléctrico." },,
+  { date:"2026-05-08", tier:"HIGH", tierEs:"ALTA", label:"OVCS registra pico de 19 protestas en 11 estados; reclamos de vivienda, agua, justicia, educación y derechos laborales." },
+  { date:"2026-05-09", tier:"MEDIUM", tierEs:"MEDIA", label:"Venezuela anuncia formalmente inicio de reestructuración de deuda soberana y PDVSA con Centerview Partners como asesor financiero." },
+  { date:"2026-05-10", tier:"MEDIUM", tierEs:"MEDIA", label:"Agen sostiene reuniones en Caracas y facilita MOU energéticos con Hunt Oil, HKN Energy y Crossover Energy." },
+  { date:"2026-05-11", tier:"HIGH", tierEs:"ALTA", label:"Rodríguez presenta alegatos finales sobre el Esequibo ante la CIJ y rechaza presiones de Guterres y Trump." },
+  { date:"2026-05-11", tier:"HIGH", tierEs:"ALTA", label:"Juicio de Tarek El Aissami incorpora denuncias públicas de tortura y bloqueo de defensa privada." },
+  { date:"2026-05-12", tier:"MEDIUM", tierEs:"MEDIA", label:"Docentes APUCV protestan frente al MPPEU por salarios y exclusión del bono de responsabilidad profesional." },
+  { date:"2026-05-12", tier:"HIGH", tierEs:"ALTA", label:"United Airlines anuncia ruta Houston–Caracas desde el 11 de agosto, sujeta a aprobación gubernamental." },
+  { date:"2026-05-13", tier:"HIGH", tierEs:"ALTA", label:"Estudiantes UCV cierran la autopista Francisco Fajardo y exigen libertad de presos políticos." },
+  { date:"2026-05-14", tier:"MEDIUM", tierEs:"MEDIA", label:"Qatar Airways anuncia ruta Caracas–Bogotá desde el 22 de julio, primera aerolínea del Golfo en servir Venezuela." },
+  { date:"2026-05-15", tier:"CRITICAL", tierEs:"CRÍTICO", label:"Matriz semanal ubica E3 en 47% y E1 en 40%, la brecha más estrecha del período; E2 cae a 2%." }
 ];
 
 export const POLYMARKET_SLUGS = [
@@ -298,4 +308,5 @@ export const VZ_MAP = [
   {id:"Bolívar",d:"M 288,118 L 368,110 L 430,122 L 448,165 L 442,225 L 415,270 L 370,288 L 315,275 L 280,245 L 268,200 L 265,158Z"},
   {id:"Amazonas",d:"M 148,170 L 265,158 L 272,210 L 268,265 L 255,310 L 230,348 L 200,365 L 172,348 L 155,310 L 145,255 L 142,210Z"},
   {id:"Apure",d:"M 55,185 L 148,170 L 158,210 L 148,245 L 120,255 L 85,245 L 62,225 L 50,205Z"},
+
 ];

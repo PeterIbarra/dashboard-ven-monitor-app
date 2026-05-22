@@ -1,76 +1,79 @@
 export const WEEK_DRIVERS = {
   3: {
-    label:"Alta (en consolidación)",
+    label:"Alta (dominante, pero acotada)",
     drivers:[
-      "GL-58 (OFAC) habilita asesoría técnica para reestructuración de deuda soberana y PDVSA: mayor licencia financiera desde 2019 — marca el tránsito de Fase 1 (estabilización) a Fase 2 (instituciones económicas) del plan de Washington.",
-      "Exportaciones de crudo alcanzan 1,23 mbd en abril — máximo desde enero de 2019, con crecimiento del 14% respecto a marzo. EE.UU. consolida posición como principal destino (~445k bpd). Boom exportador como soporte político de E3.",
-      "Reforma del TSJ de 20 a 32 magistrados y activación del Comité de Postulaciones Judiciales: reconfiguración judicial más profunda desde el inicio del interinato, con composición bajo control de la AN del rodriguismo.",
-      "BCV intervención récord USD 1.500M en abril + USD 1.350M proyectados en mayo: inflación desciende a 10,6% (tercer mes consecutivo de caída). El interinato gestiona la estabilización macro como activo político frente a EE.UU.",
-      "Chris Wright declara Fase 1 completada y Fase 2 iniciada: el plan de tres fases operacionaliza un horizonte temporal que antes era solo retórico — E3 sigue siendo el eje organizador pero con horizonte delimitado.",
-      "Delcy Rodríguez esquiva fecha electoral con precisión quirúrgica: «No lo sé. En algún momento.» El Ejecutivo preserva margen de maniobra sobre timing político mientras consolida recuperación económica e institucional.",
-      "Fondo USD 500M (Latam Energy Partners + Lionheart Capital) para rehabilitar campos petroleros abandonados; MOU Hunt Oil/Crossover (USD 2.000M en Monagas) y Mercuria/Heeney (USD 2.200M offtake minero) consolidan el ciclo de acuerdos más denso del período.",
+      "La reestructuración formal de deuda soberana y PDVSA pasa del anuncio a la operación: Centerview Partners queda como asesor financiero, White & Case entra en la defensa de CITGO y el Ejecutivo promete un DSA para junio.",
+      "La GL-58 se convierte en arquitectura concreta de Fase 2: no habilita aún negociaciones directas con acreedores, pero organiza el marco técnico que permite normalización financiera bajo supervisión estadounidense.",
+      "La reforma del TSJ a 32 magistrados consolida el control del árbitro institucional de futuras controversias electorales, sosteniendo E3 como transición gestionada desde el interinato.",
+      "Washington privilegia interlocución con Rodríguez en las conversaciones mediadas por Qatar sobre el escenario pos-Maduro, lo que confirma que el canal operativo pasa por el gobierno interino y no por una transferencia inmediata a la oposición.",
+      "El ancla energética permanece sólida: producción OPEP de 1,031 M bpd, cesta Merey USD 90,47/b, Repsol-Cardón IV +10% y nuevos MOU energéticos con Hunt Oil, HKN y Crossover.",
+      "La conectividad internacional refuerza normalización práctica: United anuncia Houston–Caracas desde agosto y Qatar Airways abre ruta Caracas–Bogotá desde julio.",
+      "E3 baja a 47% porque su propia operacionalización delimita su horizonte: cada avance técnico reduce la distancia hacia E1, pero la continuidad negociada sigue siendo el marco real de la semana."
     ],
     signals:[
-      "Formalización contractual de MOU energéticos (Hunt/Crossover/Mercuria) antes de julio: test de sostenibilidad del boom exportador.",
-      "Designación definitiva de magistrados del TSJ: composición del nuevo tribunal revela el alcance real de la apertura institucional.",
-      "GL-58 en ejecución: primeros contratos firmados con asesores legales y financieros internacionales confirmarían que la Fase 2 está operativa.",
-      "Actos masivos opositores (6 estados) y respuesta del Ejecutivo: test del margen de movilización en un E3 con apertura política contenida.",
-      "Acceso a DEG del FMI (Gobernador Ortega): ritmo de las gestiones como primera señal de normalización financiera multilateral.",
-      "Prórroga CITGO al 19 de junio: el desenlace de la subasta en Delaware como test de la coordinación bilateral en el plano financiero.",
-    ],
+      "Presentación del DSA en junio y calidad del marco macroeconómico.",
+      "Composición definitiva del TSJ ampliado a 32 magistrados.",
+      "Primeros contactos del BCV en Washington a finales de mayo.",
+      "Ejecución contractual de MOU energéticos y gasíferos.",
+      "Evolución del caso CITGO/PDVSA 2020 en el Segundo Circuito.",
+      "Tratamiento institucional de irregularidades en la Ley de Amnistía."
+    ]
   },
   1: {
-    label:"Alta (en ascenso — compresión E3-E1)",
+    label:"Alta (en ascenso)",
     drivers:[
-      "GL-58 instala la arquitectura financiera prerrequisito de cualquier transición política creíble: al habilitar asesoría técnica para reestructuración de deuda soberana y PDVSA, EE.UU. crea el andamiaje económico previo a E1.",
-      "Chris Wright fija las elecciones como Fase 3 del plan de Trump: por primera vez un funcionario de alto rango convierte a E1 en objetivo explícito de la política exterior estadounidense — no solo expectativa opositora.",
-      "MCM anuncia retorno a Venezuela antes de fin de 2026 (Magalli Meda): «por decisión política propia, no bendición de Trump» — test real de las garantías implícitas del acuerdo bilateral.",
-      "Plataforma Unitaria intensifica presencia territorial con 6 actos masivos en Táchira, Barinas, Zulia, Yaracuy, Carabobo y Anzoátegui: Guanipa retorna a Venezuela como parte de la estrategia de reposicionamiento territorial.",
-      "Brecha E3-E1 se estrecha a 10pp — la más baja en dos meses: la compresión más significativa del diferencial en el período, impulsada por la convergencia simultánea de GL-58 + Wright + intensificación opositora.",
-      "Rally de bonos venezolanos +87% acumulado 2026: VENZ 2019 +85,51%; PDVSA 2022 +88,60% — la normalización financiera reduce el costo de una transición política para los acreedores internacionales.",
+      "E1 sube a 40%, su punto más alto del ciclo, porque la transición ya no aparece solo como exigencia opositora sino como endpoint implícito de la normalización financiera de Washington.",
+      "MCM revela que coordina con Marco Rubio el protocolo de su retorno, vinculándolo a garantías de seguridad y a un cronograma electoral verificable.",
+      "Henry Alviarez conecta públicamente el retorno de MCM con el anuncio esperado de elecciones, elevando el costo político de mantener indefinidamente la ambigüedad electoral.",
+      "Rubio sostiene que la riqueza venezolana beneficia al pueblo y califica la situación como mejor que hace cuatro meses, presentando el proceso como éxito de política exterior con fase política pendiente.",
+      "La brecha E3–E1 se comprime a 7pp, la más estrecha del período, por la convergencia simultánea de deuda, TSJ, MCM–Rubio y mayor presión sobre garantías.",
+      "El problema de E1 es su dependencia de garantías que aún no aparecen: 457 presos políticos, amnistía incompleta, TSJ bajo control del interinato y diseño Qatar sin MCM como eje central."
     ],
     signals:[
-      "Retorno efectivo de MCM a Venezuela: primer test real de las garantías implícitas del acuerdo bilateral — una represalia activaría E4; un retorno sin incidente aceleraría E1.",
-      "CNE renovado con composición consensuada: condición mínima verificable para E1 en dimensión electoral.",
-      "Presión explícita de EE.UU. vinculando licencias OFAC a avances políticos: si Washington condiciona la Fase 2 a compromisos electorales concretos, E1 sube de forma inmediata.",
-      "Liberación masiva de presos políticos: MCM/OEA exigen más de 500 — un anuncio de alcance significativo sería la señal más potente de apertura hacia E1.",
-      "Resultado de actos masivos opositores en 6 estados: volumen, composición y respuesta del gobierno revelan el espacio real de movilización.",
-      "Designación del CNE con equilibrio multipartidista: señal de que E3 incorpora apertura electoral mínima que puede derivar en E1.",
-    ],
-  },
-  4: {
-    label:"Latente — sin escalada sistémica",
-    drivers:[
-      "Despliegue de camiones «murciélagos» y PNB/GNB el 1° de mayo: control coercitivo selectivo — impiden el avance hacia Miraflores pero no generan represión masiva. El patrón de contención selectiva sigue vigente.",
-      "42 protestas entre el 1 y el 6 de mayo en 16 estados (OVCS): pico de 35 el 1° de mayo con incorporación de demandas de cambio de gobierno en el registro — politización creciente de la movilización social.",
-      "Caso Víctor Hugo Quero Navas: fallecido el 24 de julio de 2025 pero informado como vivo por la Defensoría en octubre de 2025 — contradicción institucional grave que expone brechas en garantías penitenciarias.",
-      "CIDH advierte que el artículo 9 de la Ley de Amnistía podría usarse contra opositores con vínculos internacionales: dispositivo jurídico con potencial coercitivo que no ha sido eliminado.",
-      "Pico eléctrico de 15.579 MW el 7 de mayo — máximo en 9 años: presión estructural sobre infraestructura degradada que puede convertirse en fuente de frustración social durante los meses de mayor calor.",
-      "Brecha estructural: salario mínimo Bs. 130 (~USD 0,27) vs. ingreso integral USD 240 vía bonos — combustible de conflictividad laboral que el boom macroeconómico no ha resuelto.",
-    ],
-    signals:[
-      "Represalia al retorno de MCM: activador más potente de E4 — cambiaría de inmediato la dinámica bilateral y la postura de EE.UU.",
-      "Represión desproporcionada en actos masivos opositores (Táchira, Zulia, Carabobo): umbral de escalada coercitiva que definiría si E4 sube de forma sistémica.",
-      "Designación del CNE sin participación opositora y con perfil coercitivo: señal de que E3 deriva hacia E4 en el plano electoral.",
-      "Detenciones de líderes sindicales o gremiales por conflictividad laboral: indicaría escalada más allá del control selectivo.",
-      "Nueva muerte de preso político en custodia sin rendición de cuentas institucional: agravaría las tensiones con la CIDH y la OEA.",
-      "Colapso del sistema eléctrico en plena temporada de calor: fuente potencial de agitación social que el gobierno podría responder con represión.",
-    ],
+      "Retorno efectivo de MCM sin represalias ni restricciones.",
+      "Anuncio de cronograma electoral con renovación o reequilibrio del CNE.",
+      "Liberación significativa de presos políticos pendientes.",
+      "Garantías de seguridad para actos opositores masivos.",
+      "Presión explícita de Rubio/Departamento de Estado vinculando Fase 2 financiera con Fase 3 electoral.",
+      "Composición del TSJ que reduzca riesgo de judicialización del proceso electoral."
+    ]
   },
   2: {
-    label:"Muy baja — mínimo del período",
+    label:"Muy baja",
     drivers:[
-      "GL-58 y acceso a DEG del FMI (~USD 5.000M): la normalización financiera reduce materialmente la posibilidad de un colapso fiscal o cambiario de corto plazo — los más sólidos factores anti-colapso acumulados en el período.",
-      "Exportaciones récord 1,23 mbd + Brent USD 117,3/b: los ingresos petroleros proveen la base fiscal necesaria para mantener la estabilidad macroeconómica y la gestión del gasto social.",
-      "BCV intervención USD 1.500M: el control cambiario activo absorbe presiones sobre el bolívar y mantiene la inflación en descenso. El BCV proyecta normalización para el segundo semestre de 2026.",
-      "Coordinación bilateral EE.UU.-Venezuela: la presencia activa de Washington (GL-58, Barrett, plan 3 fases) funciona como garante externo de la estabilidad del interinato, reduciendo el riesgo de fragmentación interna.",
-      "Sistema Patria con USD 13.500M proyectados para 2026 (+42% vs. 2025): mecanismo de contención social que opera como amortiguador de la conflictividad potencial — 9,3 millones de beneficiarios.",
+      "E2 baja a 2%, mínimo del período, por la acumulación de factores anti-colapso más sólida desde enero: deuda en reestructuración, petróleo por encima del millón de barriles y conectividad internacional en expansión.",
+      "La designación de Centerview Partners y White & Case da un cauce institucional a pasivos estimados por encima de USD 150.000M, reduciendo el riesgo de desorden financiero inmediato.",
+      "El regreso de United y Qatar Airways indica que actores externos empiezan a tratar a Venezuela como mercado operable, no como economía aislada.",
+      "La producción petrolera, la cesta Merey y el primer cargamento europeo de crudo venezolano como pago de gas Repsol-Cardón IV sostienen la base fiscal y externa del interinato.",
+      "El riesgo relevante no es fragmentación inmediata sino deterioro macro: Arcay advierte expansión monetaria de 18% en dos semanas y dudas sobre el universo real de deuda reconocido por el BCV.",
+      "El FMI se mantiene fuera del DSA y no hay Artículo IV desde 2004, por lo que una reestructuración sin respaldo estadístico creíble podría reabrir tensiones más adelante."
     ],
     signals:[
-      "Ruptura del acuerdo bilateral EE.UU.-Venezuela por evento político disruptivo: única vía realista de activación de E2 en el marco actual.",
-      "Colapso del precio del petróleo a niveles inferiores a USD 50/b: destruiría la base fiscal del interinato y podría desencadenar crisis cambiaria.",
-      "Fracaso de la GL-58: si la reestructuración de deuda no avanza y el default acumula efectos sistémicos, el riesgo financiero volvería al primer plano.",
-      "Ruptura interna del interinato por disputas de poder: señal de fragmentación — sin indicadores actuales pero es el único vector endógeno de E2.",
-    ],
+      "Fracaso o retraso sustantivo del DSA de junio.",
+      "Ruptura del canal financiero con Washington o sanciones renovadas sobre BCV/PDVSA.",
+      "Caída abrupta del precio del petróleo o interrupción de exportaciones.",
+      "Escalada cambiaria derivada de expansión monetaria sin corrección fiscal.",
+      "Conflicto entre acreedores que comprometa CITGO o activos clave.",
+      "Fractura interna del interinato por disputa sobre deuda o distribución de ingresos petroleros."
+    ]
   },
+  4: {
+    label:"Latente",
+    drivers:[
+      "E4 se mantiene en 11% porque no hay escalada represiva sistémica, pero el patrón coercitivo permanece activo y visible en derechos humanos, protesta social y garantías judiciales.",
+      "Foro Penal registra 457 presos políticos, el primer aumento desde enero, y 746 excarcelaciones verificadas desde el 8 de enero: avance parcial con reversión simbólica relevante.",
+      "Las denuncias de Tarek El Aissami sobre torturas en Fuerte Tiuna introducen una señal de alto costo institucional sobre garantías procesales en casos sensibles del antiguo poder.",
+      "El caso Víctor Hugo Quero Navas expone una brecha grave de trazabilidad penitenciaria: muerte bajo custodia, familia no informada y comunicación oficial posterior indicando que seguía recluido.",
+      "La conflictividad social suma 44 protestas entre 8–13 mayo en 14 entidades, con demandas laborales y de servicios cruzadas con justicia, derechos de detenidos y presos políticos.",
+      "El paro universitario convocado para el 19 de mayo es el primer hito sectorial con fecha precisa del período y puede ampliar la presión laboral hacia una agenda política de garantías."
+    ],
+    signals:[
+      "Represalia o detención vinculada al retorno de MCM.",
+      "Represión del paro universitario del 19 de mayo o detenciones gremiales.",
+      "Nuevo aumento semanal de presos políticos o suspensión práctica de la amnistía.",
+      "Resultados de exhumación Quero Navas que confirmen responsabilidad estatal sin rendición de cuentas.",
+      "Uso del artículo 9 de la Ley de Amnistía contra opositores con vínculos internacionales.",
+      "Escalada de protestas territoriales por salarios, salud, agua y derechos de detenidos."
+    ]
+  }
 };

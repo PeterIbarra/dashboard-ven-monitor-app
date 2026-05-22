@@ -3,22 +3,22 @@
 
 export const KPIS_LATEST = {
   energia: [
-    { k:"Exportaciones crudo", v:"1,23 mbd", c:"#22c55e" },
-    { k:"Cesta Merey", v:"USD 90,4/b", c:"#22c55e" },
-    { k:"GL-58 OFAC", v:"Fase 2 activa", c:"#22c55e" },
-    { k:"Bonos VENZ/PDVSA", v:"+87% acum.", c:"#22c55e" }
+    { k:"Producción OPEP", v:"1,031 M bpd", c:"#22c55e" },
+    { k:"Cesta Merey", v:"USD 90,47/b", c:"#22c55e" },
+    { k:"Cardón IV gas", v:"580→640 MMpcd", c:"#22c55e" },
+    { k:"Reestructuración", v:"DSA en junio", c:"#38bdf8" }
   ],
   politico: [
-    { k:"Inflación mensual", v:"10,6% abr.", c:"#f59e0b" },
-    { k:"Ingreso integral", v:"USD 240", c:"#f59e0b" },
-    { k:"Salario base", v:"Bs 130 (~$0,27)", c:"#ef4444" },
-    { k:"FMI / DEG", v:"USD 5.000M", c:"#38bdf8" }
+    { k:"Deuda estimada", v:"USD 150–170B", c:"#f59e0b" },
+    { k:"Base monetaria", v:"+18% / 2 sem.", c:"#ef4444" },
+    { k:"TSJ", v:"32 magistrados", c:"#f59e0b" },
+    { k:"Presos políticos", v:"457", c:"#ef4444" }
   ],
   opinion: [
-    { k:"Pico dem. eléctrica", v:"15.579 MW", c:"#ef4444" },
-    { k:"Pobreza (ENCOVI)", v:"68,5% hogares", c:"#ef4444" },
-    { k:"Protestas 1–6 mayo", v:"42 (pico: 35)", c:"#f59e0b" },
-    { k:"Brecha E3–E1", v:"10pp (↓ 15pp)", c:"#38bdf8" }
+    { k:"Excarcelaciones FP", v:"746", c:"#f59e0b" },
+    { k:"Protestas 8–13 may", v:"44 / 14 estados", c:"#f59e0b" },
+    { k:"Brecha E3–E1", v:"7pp", c:"#38bdf8" },
+    { k:"MCM–Rubio", v:"retorno coordinado", c:"#22c55e" }
   ],
 };
 export const WEEKS = [
@@ -166,19 +166,42 @@ export const WEEKS = [
     ],
     lectura:"E3 desciende 2pp a 48% no porque el escenario pierda consistencia, sino porque la GL-58 y el plan de tres fases de Wright operacionalizan un horizonte temporal que antes era solo retórico. Al declarar la Fase 1 completada y fijar las elecciones como Fase 3, Washington delimita el alcance de E3 y convierte a E1 en un endpoint planificado del cronograma bilateral. Sin embargo, la brecha E3–E1 se estrecha de 15 a 10pp, la compresión más significativa en dos meses. E1 sube 3pp a 38% por la GL-58, el roadmap de Wright y la intensificación territorial opositora. E4 se mantiene en 11% por la ausencia de escalada sistémica. E2 baja a 3%, mínimo del período.",
     trendSc:3,
-    trendDrivers:["GL-58 OFAC + rally bonos +87%: normalización financiera acelera hacia Fase 2 del plan de tres fases de Washington","Exportaciones 1,23 mbd (máx. 2019) + ExxonMobil de «ininvertible» a «recurso inmenso»: reposicionamiento energético hemisférico","Brecha E3–E1 se estrecha a 10pp: Wright fija elecciones como Fase 3 — transición ya en cronograma de Washington"] }
+    trendDrivers:["GL-58 OFAC + rally bonos +87%: normalización financiera acelera hacia Fase 2 del plan de tres fases de Washington","Exportaciones 1,23 mbd (máx. 2019) + ExxonMobil de «ininvertible» a «recurso inmenso»: reposicionamiento energético hemisférico","Brecha E3–E1 se estrecha a 10pp: Wright fija elecciones como Fase 3 — transición ya en cronograma de Washington"] },
+
+  { label:"8–15 may", short:"S18",
+    probs:[{sc:1,v:40,t:"up"},{sc:2,v:2,t:"down"},{sc:3,v:47,t:"down"},{sc:4,v:11,t:"flat"}],
+    xy:{x:0.03,y:0.43},
+    sem:{g:9,y:6,r:3},
+    kpis:{
+      energia:{exportaciones:"1,031 M bpd OPEP abril",ingresos:"Merey USD 90,47/b",licencias:"Reestructuración: Centerview + White & Case",cambio:"Cardón IV 580→640 MMpcd"},
+      economico:{inflacion:"Base monetaria +18% en 2 sem.",ingresos_pob:"Salarios universitarios bajo tensión",electricidad:"Sin dato IODA nuevo",pib:"Deuda USD 150–170B"},
+      opinion:{direccion:"E3-E1: brecha 7pp",elecciones:"MCM coordina retorno con Rubio",mcm:"Retorno ligado a cronograma electoral",eeuu:"Qatar revela diseño pos-Maduro sin MCM"}
+    },
+    tensiones:[
+      {l:"green",t:"<b>Reestructuración operacional:</b> Centerview Partners y White & Case convierten la GL-58 en arquitectura concreta de negociación de deuda."},
+      {l:"green",t:"<b>Energía y conectividad:</b> Agen en Caracas, MOU Hunt/HKN/Crossover, United Houston–Caracas y Qatar Airways amplían la normalización externa."},
+      {l:"green",t:"<b>Petróleo:</b> Producción OPEP de 1,031 M bpd y cesta Merey en USD 90,47/b sostienen el ancla fiscal del interinato."},
+      {l:"yellow",t:"<b>TSJ 32 magistrados:</b> La reforma sancionada define el árbitro institucional de controversias electorales futuras."},
+      {l:"yellow",t:"<b>Conflictividad:</b> 44 protestas en 14 entidades entre 8–13 mayo; demandas laborales, justicia, vivienda, agua y derechos de detenidos."},
+      {l:"red",t:"<b>Presos políticos:</b> Foro Penal registra 457 detenidos y primer aumento desde enero; 746 excarcelaciones verificadas desde el 8 de enero."},
+      {l:"red",t:"<b>Garantías procesales:</b> Denuncias de tortura de Tarek El Aissami y caso Quero Navas tensionan la credibilidad de la amnistía."}
+    ],
+    lectura:"La semana del 8 al 15 de mayo produce el estrechamiento más relevante de la brecha E3–E1 en todo el ciclo reciente: E3 baja a 47% y E1 sube a 40%, dejando apenas 7 puntos entre continuidad negociada y transición política pacífica. La continuidad negociada sigue siendo dominante porque Washington y el interinato operan sobre una arquitectura de normalización ya concreta: Venezuela anuncia formalmente la reestructuración de deuda soberana y de PDVSA, designa a Centerview Partners como asesor financiero, incorpora a White & Case en la defensa de CITGO y prepara un DSA para junio. Esa secuencia confirma que la GL-58 pasó de instrumento potencial a mecanismo operativo. Al mismo tiempo, la reforma del TSJ a 32 magistrados consolida el control del árbitro institucional de futuras controversias electorales y preserva el margen de maniobra de Rodríguez. Sin embargo, cada avance operativo de E3 acorta su propio horizonte: MCM coordina con Rubio el protocolo de su retorno, Alviarez lo vincula a un cronograma electoral, y Rubio declara que la riqueza venezolana empieza a beneficiar a la población. Por eso E1 sube: ya no depende solo de presión opositora, sino de una transición que Washington empieza a organizar como destino de la normalización financiera. E4 se mantiene en 11% porque no hay escalada represiva sistémica, pero la presión coercitiva sigue activa: Foro Penal registra 457 presos políticos, el primer aumento desde enero; las excarcelaciones verificadas desde el 8 de enero llegan a 746, pero el proceso se estanca; el juicio de Tarek El Aissami incorpora denuncias detalladas de tortura; y el caso Quero Navas expone fallas graves de trazabilidad penitenciaria. E2 baja a 2%, mínimo del período, por la acumulación de factores anti-colapso: deuda en reestructuración, petróleo por encima del millón de barriles, United y Qatar Airways, BCV en ruta a Washington y coordinación energética activa. La tensión central queda nítida: la normalización económica avanza más rápido que las garantías políticas, sociales y judiciales que deberían sostenerla.",
+    trendSc:3,
+    trendDrivers:["Reestructuración formal de deuda y DSA en junio convierten la GL-58 en arquitectura operativa de continuidad negociada","MCM–Rubio y retorno ligado a cronograma electoral elevan E1 a 40%, la probabilidad más alta del ciclo","457 presos políticos y 44 protestas muestran que la normalización financiera coexiste con presión social y déficit de garantías"] }
+
 ];
 
 export const TENSIONS = [
-  { level:"green", text:"GL-58 OFAC habilita asesoría técnica para reestructuración de deuda soberana y PDVSA. Bonos venezolanos acumulan +87% en 2026 tras rally de hasta +7,1% diario." },
-  { level:"green", text:"Exportaciones de crudo alcanzan 1,23 mbd en abril — máximo desde enero de 2019. ExxonMobil transita de «ininvertible» a «recurso inmenso». Trump coordina estrategia energética con Chevron y Exxon." },
-  { level:"green", text:"FMI: Ortega Sánchez designado Gobernador para gestionar ~USD 5.000M en DEG. Destino parcial: Gran Misión Vivienda y dotación hospitalaria." },
-  { level:"yellow", text:"Reforma TSJ de 20 a 32 magistrados en debate. Comité de Postulaciones Judiciales activado. Caryslia Rodríguez ratificada presidenta. Reconfiguración judicial más profunda del interinato." },
-  { level:"yellow", text:"42 protestas entre el 1 y el 6 de mayo — pico de 35 el 1° de mayo en 16 estados. Exigencias laborales y de cambio de gobierno contenidas con camiones «murciélagos» y PNB/GNB." },
-  { level:"red", text:"ENCOVI 2025: 68,5% de hogares en pobreza monetaria y 31,7% en pobreza extrema. Ingreso integral USD 240 sin incidencia en salario base (Bs 130, ~USD 0,27). Brecha entre estabilización macro y bienestar de los hogares." },
-  { level:"red", text:"Caso Quero Navas: fallecido julio 2025, informado como vivo por la Defensoría en octubre 2025 — contradicción institucional grave. Pico de demanda eléctrica de 15.579 MW el 7 de mayo — máximo en 9 años." }
+  { level:"green", text:"Reestructuración de deuda soberana y PDVSA entra en fase operativa: Centerview Partners, White & Case y DSA previsto para junio convierten la GL-58 en arquitectura concreta." },
+  { level:"green", text:"Sector energético sostiene la normalización: producción OPEP de 1,031 M bpd, cesta Merey en USD 90,47/b, Repsol-Cardón IV +10% y MOU con Hunt Oil, HKN y Crossover." },
+  { level:"green", text:"Conectividad internacional se amplía: United anuncia Houston–Caracas desde agosto y Qatar Airways ruta Caracas–Bogotá desde julio, señales de reinserción operacional." },
+  { level:"yellow", text:"E3 baja a 47% y E1 sube a 40%: la brecha se comprime a 7pp por la coordinación MCM–Rubio y el retorno ligado a cronograma electoral." },
+  { level:"yellow", text:"AN sanciona reforma del TSJ a 32 magistrados; el nuevo tribunal será árbitro de controversias electorales futuras y pieza central de la arquitectura institucional." },
+  { level:"red", text:"Foro Penal registra 457 presos políticos y 746 excarcelaciones verificadas desde el 8 de enero: primer aumento de detenidos desde enero y estancamiento de la distensión." },
+  { level:"red", text:"44 protestas en 14 entidades entre 8–13 mayo, más denuncias de tortura en el juicio El Aissami y el caso Quero Navas, elevan el costo político de la normalización sin garantías." }
 ];
-export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16","S17"];
+export const MONITOR_WEEKS = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16","S17","S18"];
 
 
 export const ICG_HISTORY = [
@@ -200,7 +223,9 @@ export const ICG_HISTORY = [
 
   { week:"S16", score:71, sitrep:true, note:"Delegación Casa Blanca + MOU energéticos (Shell/Eni/BP/Repsol) + TSJ jubilación 8 magistrados (incl. Moreno). E3 sube a 50%. $240 ingreso mínimo gestiona expectativas 1° mayo. 33 protestas; marchas laborales bloqueadas en Caracas." },
 
-  { week:"S17", score:60, sitrep:true, note:"GL-58 OFAC habilita asesoría técnica para reestructuración de deuda soberana y PDVSA. Reforma del TSJ de 20 a 32 magistrados con Comité de Postulaciones activado. Wright declara elecciones como Fase 3 del plan de tres fases. Brecha E3–E1 se estrecha a 10pp." }
+  { week:"S17", score:60, sitrep:true, note:"GL-58 OFAC habilita asesoría técnica para reestructuración de deuda soberana y PDVSA. Reforma del TSJ de 20 a 32 magistrados con Comité de Postulaciones activado. Wright declara elecciones como Fase 3 del plan de tres fases. Brecha E3–E1 se estrecha a 10pp." },
+  { week:"S18", score:62, sitrep:true, note:"Reestructuración formal de deuda + TSJ 32 magistrados consolidan control institucional. Pero 457 presos políticos, denuncias de tortura y 44 protestas elevan presión sobre garantías." }
+
 ];
 
 export const CONF_SEMANAL = [
@@ -315,5 +340,15 @@ export const CONF_SEMANAL = [
       { fecha:"5 Mayo", protestas:3, estados:3, tipo:"Laboral", exigencias:"Derechos laborales, seguridad social, educación" },
       { fecha:"6 Mayo", protestas:4, estados:4, tipo:"Laboral", exigencias:"Vivienda, participación política, derechos laborales" }
     ]
-  }
+  },
+  { week:"S18", label:"8–13 may", protestas:44, estados:14, reprimidas:1,
+    motivos:["Derechos laborales","Justicia","Vivienda","Agua","Salud","Derechos de detenidos","Educación"],
+    hecho:"44 protestas entre el 8 y el 13 de mayo en 14 entidades. Pico de 19 protestas el 8 de mayo. La conflictividad cruza demandas ESCP con justicia, presos políticos, fe de vida y derechos de detenidos.",
+    dias:[
+      { fecha:"8 Mayo", protestas:19, estados:11, tipo:"Mixto", exigencias:"Vivienda, agua, justicia, educación, derechos laborales, participación política; Lara: libertad, fe de vida y caso Quero Navas" },
+      { fecha:"11 Mayo", protestas:8, estados:6, tipo:"Mixto", exigencias:"Vivienda, agua, justicia, derechos laborales, salud, derechos de detenidos, seguridad social" },
+      { fecha:"12 Mayo", protestas:8, estados:6, tipo:"Laboral", exigencias:"Vivienda, laborales, seguridad social, justicia, derechos de detenidos; docentes APUCV frente al MPPEU" },
+      { fecha:"13 Mayo", protestas:9, estados:7, tipo:"Mixto", exigencias:"Alimentación, educación, laborales, vivienda, salud, agua; estudiantes UCV exigen libertad de presos políticos" }
+    ] }
+
 ];

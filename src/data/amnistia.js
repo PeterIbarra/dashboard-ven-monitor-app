@@ -27,4 +27,10 @@ export const AMNISTIA_TRACKER = [
     fp:{ verificados:690, detenidos:470, militares:187 },
     hito:"Caso Víctor Hugo Quero Navas: fallecido el 24 de julio de 2025 (tromboembolismo pulmonar, Hospital Militar Carlos Arvelo), pero informado como vivo por la Defensoría del Pueblo a su madre en octubre de 2025. CIDH advierte que el artículo 9 de la Ley de Amnistía podría usarse contra opositores con vínculos internacionales. MCM y OEA exigen liberación de más de 500 presos políticos. Sin nuevos datos oficiales de libertades S17."
   },
+  { week:"S18", label:"8–15 may",
+    gob:{ solicitudes:12187, libertades:8616, privadosLiberados:314, cautelares:8302, militares:187 },
+    fp:{ verificados:746, detenidos:457, militares:187 },
+    hito:"Foro Penal registra 457 presos políticos (primer aumento desde enero: 454 el 27 abr → 457 el 4 may) y 746 excarcelaciones verificadas desde el 8 de enero de 2026. El estancamiento tensiona la narrativa de distensión; caso Quero Navas y denuncias de tortura en juicio El Aissami elevan presión sobre trazabilidad penitenciaria."
+  }
+
 ];

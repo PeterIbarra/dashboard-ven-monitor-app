@@ -1026,7 +1026,82 @@ export const SITREP_ALL = [
       { tag:"Tensión estructural social", color:"#ef4444", title:"ENCOVI 2025: la estabilización macro no llega a los hogares", text:"La ENCOVI 2025 y las 42 protestas del período revelan la tensión estructural central: la estabilización macroeconómica no se traduce en mejoras verificables para los sectores laborales y populares. El caso Quero Navas —con la contradicción entre la Defensoría y el Ministerio Penitenciario— expone brechas institucionales que erosionan la credibilidad del proceso de amnistía ante la CIDH y la OEA. El pico eléctrico de 15.579 MW añade una presión estructural adicional que anticipa tensión durante los meses de mayor calor." },
       { tag:"La pregunta del período", color:"#a78bfa", title:"El cronograma ahora tiene nombre: la pregunta es el ritmo, no el horizonte", text:"Por primera vez en el proceso, el cronograma de Washington incluye las reformas democráticas como destino explícito. El secretario Wright fijó la secuencia: estabilización (Fase 1, declarada completa) → instituciones económicas (Fase 2, iniciada con GL-58) → elecciones (Fase 3). La pregunta del período no es si habrá transición, sino cuándo. La semana del 8–15 de mayo —con los actos masivos opositores, la reforma del TSJ en debate y los primeros movimientos de la GL-58— definirá si la compresión del diferencial E3–E1 es un punto de inflexión o una oscilación." }
     ]
-  }];
+  },
+{ period:"8 – 15 de mayo de 2026", periodShort:"8–15 may 2026",
+    keyPoints:[
+      { tag:"Financiero", color:"#0468B1", title:"Reestructuración de deuda entra en fase operativa", text:"Venezuela inicia formalmente la reestructuración de deuda soberana y PDVSA, designa a Centerview Partners y prepara un DSA para junio; White & Case asume defensa de CITGO." },
+      { tag:"Político", color:"#ca8a04", title:"TSJ a 32 magistrados y transición bajo control", text:"La AN sanciona la reforma del TSJ y revierte la reducción de 2022; el tribunal ampliado será árbitro de controversias electorales futuras." },
+      { tag:"Oposición", color:"#16a34a", title:"MCM coordina retorno con Rubio", text:"Machado vincula su regreso a garantías de seguridad y cronograma electoral, mientras fuentes qataríes revelan que no fue parte del diseño pos-Maduro mediado por Qatar." },
+      { tag:"Social", color:"#dc2626", title:"Presos políticos y conflictividad tensionan garantías", text:"Foro Penal registra 457 presos políticos y 746 excarcelaciones verificadas desde el 8 de enero; OVCS documenta 44 protestas en 14 entidades." },
+      { tag:"Energético", color:"#22c55e", title:"Petróleo y conectividad sostienen normalización", text:"Producción OPEP de 1,031 M bpd, Merey USD 90,47/b, Cardón IV +10%, United Houston–Caracas y Qatar Airways Caracas–Bogotá amplían reinserción." }
+    ],
+    sintesis:"La semana del 8 al 15 de mayo marca el tránsito de la normalización financiera del anuncio a la operación. La reestructuración de deuda soberana y PDVSA, Centerview Partners, White & Case, el DSA previsto para junio y los contactos del BCV en Washington convierten la GL-58 en arquitectura concreta. Al mismo tiempo, la AN sanciona la ampliación del TSJ a 32 magistrados, reforzando el control institucional del interinato sobre el árbitro judicial de futuras controversias electorales. La brecha E3–E1 se comprime a 7 puntos: E3 sigue dominante en 47%, pero E1 sube a 40% por la coordinación MCM–Rubio, el retorno ligado a cronograma electoral y la percepción de que la Fase 2 financiera prepara una Fase 3 política. La tensión crítica es que la normalización económica avanza más rápido que las garantías: 457 presos políticos, 746 excarcelaciones verificadas desde el 8 de enero, denuncias de tortura en el juicio El Aissami, caso Quero Navas y 44 protestas en 14 entidades muestran que la distensión no es lineal.",
+    actores:[
+      { name:"EE.UU.", items:["Jarrod Agen visita Caracas y confirma fase de estabilidad energética","Facilita MOU con Hunt Oil, HKN Energy y Crossover Energy","Rubio coordina con MCM el protocolo de retorno","Trump propone convertir a Venezuela en estado 51 y tensiona narrativa soberanista","NNSA retira 13,5 kg de uranio enriquecido del RV-1","United anuncia Houston–Caracas desde el 11 de agosto"] },
+      { name:"Gobierno Interino (Rodríguez)", items:["Inicia reestructuración formal de deuda soberana y PDVSA","Designa Centerview Partners y prepara DSA para junio","Presenta balance de 100 días del Programa de Convivencia Democrática","Solicita al TSJ sancionar jueces por cobros indebidos en amnistía","Encabeza defensa del Esequibo ante la CIJ","Rechaza declaraciones de Trump y Guterres desde clave soberanista"] },
+      { name:"Asamblea Nacional", items:["Sanciona reforma del TSJ a 32 magistrados","Aprueba acuerdo unánime de respaldo a la defensa del Esequibo","Jorge Rodríguez pide al Comité de Postulaciones incorporar el nuevo número","Publica comunicado sobre caso Víctor Hugo Quero Navas"] },
+      { name:"Oposición / Sociedad Civil", items:["MCM coordina retorno con Marco Rubio","Alviarez vincula retorno de MCM con cronograma electoral","Foro Penal registra 457 presos políticos","Panel registra 746 excarcelaciones verificadas desde el 8 de enero","FAPUV/APUCV convocan paro universitario para el 19 de mayo","Estudiantes UCV exigen libertad de presos políticos","Familiares reclaman fe de vida y justicia por Quero Navas"] },
+      { name:"Comunidad Internacional", items:["Guterres habla de grandes complicidades internas en el proceso venezolano","CIJ entra en deliberación sobre el Esequibo tras audiencias orales","FMI aclara que no participa en el DSA venezolano","Qatar emerge como mediador financiero y político","Qatar Airways anuncia ruta Caracas–Bogotá","Albares descarta excepción especial para Delcy en España","Larry Fink declara optimismo sobre oportunidades de inversión"] }
+    ],
+    nacional:{
+      amnistia:{ solicitudes:12187, libertades:8616, privadosLiberados:314, cautelares:8302, militares:187, fpVerificados:746, fpDetenidos:457, fpNota:"Foro Penal registra 457 presos políticos al 4 de mayo, primer aumento desde enero (454 el 27 de abril). El panel actualizado indica 746 excarcelaciones verificadas desde el 8 de enero de 2026." },
+      rodriguez:[
+        { title:"Reestructuración y DSA", text:"El Ejecutivo activa la reestructuración de deuda soberana y PDVSA, con Centerview Partners y un marco macroeconómico previsto para junio." },
+        { title:"100 días de convivencia democrática", text:"Rodríguez presenta 500 horas de reuniones, más de 9.000 beneficiarios de la amnistía y denuncia cobros indebidos de jueces." },
+        { title:"Doctrina de la diversidad", text:"Pide al TSJ desarrollar una doctrina de diversidad como derecho humano extendida a la diversidad política." },
+        { title:"Esequibo y soberanía", text:"Encabeza alegatos ante la CIJ y responde tanto a Guterres como a Trump desde una narrativa soberanista." }
+      ],
+      mcmAgenda:["Retorno coordinado con Rubio bajo garantías de seguridad","Cronograma electoral como condición política del regreso","Consolidación de presión internacional y territorial opositora"]
+    },
+    economia:{
+      kpis:[
+        { value:"USD 150–170B", label:"Deuda soberana estimada en proceso de reestructuración", color:"#f59e0b" },
+        { value:"+18%", label:"Expansión de base monetaria en dos semanas (Arcay)", color:"#ef4444" },
+        { value:"96,53%", label:"Exportaciones a EE.UU. concentradas en petróleo", color:"#f59e0b" },
+        { value:"1,031 M bpd", label:"Producción OPEP abril", color:"#22c55e" },
+        { value:"USD 90,47/b", label:"Cesta Merey abril", color:"#22c55e" }
+      ],
+      empresas:[
+        { empresa:"Centerview Partners", desarrollo:"Asesor financiero de la reestructuración de deuda soberana y PDVSA." },
+        { empresa:"White & Case", desarrollo:"Defensa de CITGO y estrategia vinculada a Bonos PDVSA 2020." },
+        { empresa:"Repsol", desarrollo:"Cardón IV aumenta gas de 580 a 640 MMpcd y recibe crudo venezolano como pago." },
+        { empresa:"United Airlines", desarrollo:"Anuncia ruta Houston–Caracas desde el 11 de agosto." },
+        { empresa:"Qatar Airways", desarrollo:"Anuncia ruta Caracas–Bogotá desde el 22 de julio." },
+        { empresa:"BlackRock", desarrollo:"Larry Fink declara optimismo sobre oportunidades de inversión en Venezuela." }
+      ]
+    },
+    opinionPublica:{
+      protestas:{ total:44, promDiario:7.3, periodo:"8–13 may", variacion:"Conflictividad distribuida y sectorializada; pico de 19 protestas el 8 de mayo.", composicion:"Demandas laborales, vivienda, agua, salud, justicia, derechos de detenidos y presos políticos.", nota:"La conflictividad social deja de ser puramente económica: incorpora fe de vida, justicia y garantías de detenidos, elevando el costo político de una normalización sin avances verificables en derechos." },
+      percepcion:{ fuente:"SITREP semanal / OVCS / Foro Penal", titulo:"Normalización económica con brecha de garantías", nota:"La opinión pública se mueve entre expectativas de recuperación y presión por derechos políticos. La compresión E3–E1 refleja que el ciclo financiero empieza a crear expectativa de apertura electoral.", datos:[{factor:"Protestas",pct:44},{factor:"Estados con protestas",pct:14},{factor:"Presos políticos",pct:457},{factor:"Excarcelaciones verificadas",pct:746}] },
+      excarcelados:{ fp:746, presos:457, militares:187, fuente:"Foro Penal / panel de monitoreo actualizado al período" }
+    },
+    marcoNormativo:{
+      titulo:"TSJ ampliado y reestructuración financiera como marco institucional de la semana",
+      resumen:"La semana combina dos movimientos normativos de alto impacto: la ampliación del TSJ a 32 magistrados y la puesta en marcha de la arquitectura de reestructuración de deuda. El primero define el árbitro institucional de futuras controversias electorales; el segundo ordena la reinserción financiera externa sin respaldo directo del FMI.",
+      cambios:[
+        { titulo:"TSJ 20→32", texto:"La AN sanciona reforma parcial de la Ley Orgánica del TSJ y revierte la reducción de 2022.", color:"#f59e0b" },
+        { titulo:"DSA junio", texto:"El Ejecutivo anuncia marco macroeconómico y análisis de sostenibilidad de deuda para junio.", color:"#38bdf8" },
+        { titulo:"Amnistía bajo revisión", texto:"Rodríguez solicita sanciones a jueces por cobros indebidos en la aplicación de la ley.", color:"#ef4444" },
+        { titulo:"CIJ Esequibo", texto:"Concluyen audiencias orales y la Corte entra en deliberación hacia sentencia definitiva.", color:"#0468B1" }
+      ],
+      comparativaHeaders:["Anterior","Reforma"],
+      comparativa:[{dim:"TSJ",antes:"20 magistrados tras reducción de 2022",despues:"32 magistrados: 7 Sala Constitucional y 5 en cada una de las otras salas"}],
+      lecturaAnalitica:"El patrón institucional es de doble cara: modernización formal y acumulación de control. La ampliación del TSJ puede ser presentada como corrección organizativa, pero en el contexto de un futuro cronograma electoral se convierte en pieza decisiva para judicializar o validar controversias."
+    },
+    escenarios:[
+      { name:"Continuidad Negociada (E3)", prob:"47%", color:"#0468B1", text:"Dominante por reestructuración, TSJ, energía y rol de Rodríguez como interlocutora operativa de Washington." },
+      { name:"Transición Política Pacífica (E1)", prob:"40%", color:"#2d8a30", text:"Sube por MCM–Rubio, retorno ligado a cronograma electoral y compresión de brecha a 7pp." },
+      { name:"Resistencia Coercitiva (E4)", prob:"11%", color:"#ca8a04", text:"Latente por presos políticos, protestas, denuncias de tortura y caso Quero Navas." },
+      { name:"Colapso y Fragmentación (E2)", prob:"2%", color:"#dc2626", text:"Mínimo del período por factores anti-colapso: petróleo, deuda, conectividad y coordinación bilateral." }
+    ],
+    comentarios:[
+      { tag:"Factor 1", color:"#0468B1", title:"La Fase 2 ya tiene arquitectura", text:"La combinación Centerview–White & Case–DSA convierte la normalización financiera en una secuencia operativa. Esa arquitectura sostiene E3, pero también prepara el terreno de E1." },
+      { tag:"Factor 2", color:"#16a34a", title:"La transición entra por el canal financiero", text:"E1 sube no por ruptura opositora sino porque Washington empieza a organizar la transición como consecuencia de la estabilización económica." },
+      { tag:"Factor 3", color:"#dc2626", title:"La brecha de garantías es el punto vulnerable", text:"457 presos políticos, 746 excarcelaciones verificadas pero proceso estancado, denuncias de tortura y caso Quero Navas son el principal límite de credibilidad del proceso." },
+      { tag:"Factor 4", color:"#f59e0b", title:"Conflictividad social sectorializada", text:"Las 44 protestas en 14 entidades muestran presión distribuida; el paro universitario del 19 de mayo será un test de absorción política y coercitiva." }
+    ]
+  }
+];
 
 export const CURATED_NEWS = [
   // S1: 3-15 enero
@@ -1496,5 +1571,26 @@ export const CURATED_FACTCHECK = [
   { title:"Caso Quero Navas: fallecido julio 2025 pero informado como vivo por Defensoría del Pueblo en octubre 2025.", date:"2026-05-06", source:"Foro Penal / Reuters", scenarios:["E4"], dims:["Social","Político"], week:"S17" },
   { title:"CERF/ONU destina USD 2 millones para familias del estado Sucre con más de 20 días sin agua potable.", date:"2026-05-05", source:"ONU / CERF", scenarios:["E4"], dims:["Social","Internacional"], week:"S17" },
   { title:"España prepara waiver ante la UE para permitir entrada de Delcy Rodríguez a Cumbre Iberoamericana de noviembre.", date:"2026-05-07", source:"Reuters / El País", scenarios:["E3"], dims:["Internacional"], week:"S17" }
+,
+  { title:"Venezuela anuncia inicio formal de reestructuración de deuda soberana y PDVSA con Centerview Partners.", date:"2026-05-09", source:"Gobierno VEN / Reuters", scenarios:["E3"], dims:["Económico","Internacional"], week:"S18" },
+  { title:"White & Case asume defensa de CITGO en proceso de subasta de Delaware y disputa por Bonos PDVSA 2020.", date:"2026-05-10", source:"Reuters / Tribunal EE.UU.", scenarios:["E3"], dims:["Económico","Internacional"], week:"S18" },
+  { title:"FMI aclara que no participa en el DSA venezolano y recuerda que no hay consulta Artículo IV desde 2004.", date:"2026-05-12", source:"FMI / Julie Kozack", scenarios:["E3","E2"], dims:["Económico","Internacional"], week:"S18" },
+  { title:"Guillermo Arcay advierte expansión de base monetaria de 18% en dos semanas y dudas sobre deuda reconocida por el BCV.", date:"2026-05-12", source:"Arcay / Análisis económico", scenarios:["E2","E4"], dims:["Económico"], week:"S18" },
+  { title:"AN sanciona reforma parcial de la Ley Orgánica del TSJ y amplía el tribunal de 20 a 32 magistrados.", date:"2026-05-11", source:"Asamblea Nacional", scenarios:["E3","E1"], dims:["Político","Constitucional"], week:"S18" },
+  { title:"MCM revela que coordina con Marco Rubio el protocolo de su regreso a Venezuela.", date:"2026-05-12", source:"CNN / El País", scenarios:["E1"], dims:["Político","Internacional"], week:"S18" },
+  { title:"Fuentes qataríes afirman que MCM no fue incluida en conversaciones Qatar-mediadas sobre escenario pos-Maduro.", date:"2026-05-13", source:"CNN / Qatar", scenarios:["E3","E1"], dims:["Internacional","Político"], week:"S18" },
+  { title:"Foro Penal registra 457 presos políticos y primer aumento desde enero de 2026.", date:"2026-05-04", source:"Foro Penal", scenarios:["E4"], dims:["Político","Social"], week:"S18" },
+  { title:"Panel de seguimiento registra 746 excarcelaciones verificadas desde el 8 de enero de 2026.", date:"2026-05-15", source:"Foro Penal / Monitor", scenarios:["E1","E4"], dims:["Político","Social"], week:"S18" },
+  { title:"OVCS documenta 44 protestas entre el 8 y el 13 de mayo en 14 entidades.", date:"2026-05-13", source:"OVCS", scenarios:["E4","E1"], dims:["Social","Político"], week:"S18" },
+  { title:"FAPUV y APUCV convocan paro universitario para el 19 de mayo por exclusión de bonos y salarios.", date:"2026-05-12", source:"FAPUV / APUCV", scenarios:["E4"], dims:["Social"], week:"S18" },
+  { title:"Tarek El Aissami denuncia torturas, medicación forzada y bloqueo de defensa privada en Fuerte Tiuna.", date:"2026-05-11", source:"Audiencia judicial / Prensa", scenarios:["E4"], dims:["Político","Social"], week:"S18" },
+  { title:"Ministerio Público ordena exhumación de Víctor Hugo Quero Navas tras inconsistencias sobre su muerte bajo custodia.", date:"2026-05-11", source:"Ministerio Público", scenarios:["E4"], dims:["Político","Social"], week:"S18" },
+  { title:"Producción venezolana OPEP alcanza 1,031 M bpd en abril, frente a 1,136 M bpd reportados por comunicación directa.", date:"2026-05-12", source:"OPEP / Ministerio Petróleo", scenarios:["E3"], dims:["Energético","Económico"], week:"S18" },
+  { title:"Cesta Merey sube a USD 90,47 por barril en abril, incremento de USD 4,55 frente a marzo.", date:"2026-05-12", source:"Ministerio Petróleo / OPEP", scenarios:["E3"], dims:["Energético"], week:"S18" },
+  { title:"Repsol anuncia incremento de producción de Cardón IV de 580 a 640 millones de pies cúbicos diarios.", date:"2026-05-12", source:"Repsol", scenarios:["E3"], dims:["Energético","Internacional"], week:"S18" },
+  { title:"NNSA completa retiro de 13,5 kg de uranio enriquecido del reactor RV-1 del IVIC con apoyo OIEA.", date:"2026-05-10", source:"NNSA / OIEA", scenarios:["E3"], dims:["Internacional","Energético"], week:"S18" },
+  { title:"United Airlines anuncia vuelos Houston–Caracas desde el 11 de agosto con Boeing 737 MAX 8.", date:"2026-05-12", source:"United Airlines / DOT", scenarios:["E3"], dims:["Internacional","Económico"], week:"S18" },
+  { title:"Qatar Airways anuncia ruta Caracas–Bogotá desde el 22 de julio, primera aerolínea del Golfo en servir Venezuela.", date:"2026-05-14", source:"Qatar Airways", scenarios:["E3"], dims:["Internacional","Económico"], week:"S18" },
+  { title:"Larry Fink afirma sentirse optimista sobre oportunidades de inversión en Venezuela tras cambios políticos y económicos.", date:"2026-05-14", source:"BlackRock / Prensa", scenarios:["E3"], dims:["Económico","Internacional"], week:"S18" }
 
 ];
