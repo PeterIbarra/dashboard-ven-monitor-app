@@ -323,6 +323,8 @@ export default function MonitorPNUD() {
 
   // Google Translate init
   useEffect(() => {
+    const isLocalPreview = ["127.0.0.1", "localhost"].includes(window.location.hostname) || window.location.protocol === "file:";
+    if (isLocalPreview) return;
     if (window.googleTranslateElementInit) return;
     window.googleTranslateElementInit = function() {
       new window.google.translate.TranslateElement({

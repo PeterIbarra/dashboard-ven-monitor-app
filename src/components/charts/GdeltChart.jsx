@@ -1,13 +1,16 @@
-import { useState, useRef, useCallback } from "react";
+import { useState } from "react";
 import { GDELT_ANNOTATIONS } from "../../data/static.js";
-import { BG, BG2, BORDER, TEXT, MUTED, font } from "../../constants";
+import { BORDER, MUTED, font } from "../../constants";
 
 export function GdeltChart({ data }) {
-  const [hover, setHover] = useState(null);
   const [signals, setSignals] = useState({ instability:true, tone:true, artvolnorm:true });
-  
-  const maxInst = Math.max(...data.map(d=>d.instability||0));
-  const maxArt = Math.max(...data.map(d=>d.artvolnorm||0));
+
+  const num = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+  const maxInst = Math.max(...data.map(d=>num(d.instability) ?? 0));
+  const maxArt = Math.max(...data.map(d=>num(d.artvolnorm) ?? 0));
   const maxLeft = Math.max(maxInst, maxArt, 1);
   const toneMin = -10, toneMax = 2;
   
@@ -19,14 +22,17 @@ export function GdeltChart({ data }) {
   const toYRight = (v) => padT + cH - ((v-toneMin)/(toneMax-toneMin))*cH;
   
   const makePath = (key, yFn) => {
-    return data.map((d,i) => d[key] != null ? `${i===0?"M":"L"}${toX(i)},${yFn(d[key])}` : "").filter(Boolean).join(" ");
+    return data.map((d,i) => {
+      const v = num(d[key]);
+      return v != null ? `${i===0?"M":"L"}${toX(i)},${yFn(v)}` : "";
+    }).filter(Boolean).join(" ");
   };
   
   const makeArea = (key, yFn) => {
-    const indices = data.map((d,i) => d[key]!=null ? i : -1).filter(i=>i>=0);
+    const indices = data.map((d,i) => num(d[key]) != null ? i : -1).filter(i=>i>=0);
     if (!indices.length) return "";
-    let path = `M${toX(indices[0])},${yFn(data[indices[0]][key])}`;
-    for (let j=1; j<indices.length; j++) path += ` L${toX(indices[j])},${yFn(data[indices[j]][key])}`;
+    let path = `M${toX(indices[0])},${yFn(num(data[indices[0]][key]))}`;
+    for (let j=1; j<indices.length; j++) path += ` L${toX(indices[j])},${yFn(num(data[indices[j]][key]))}`;
     path += ` L${toX(indices[indices.length-1])},${padT+cH} L${toX(indices[0])},${padT+cH} Z`;
     return path;
   };
@@ -53,14 +59,7 @@ export function GdeltChart({ data }) {
           </button>
         ))}
       </div>
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}
-        onMouseMove={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const mx = (e.clientX - rect.left) / rect.width * W;
-          const idx = Math.round(((mx - padL) / cW) * (data.length-1));
-          if (idx >= 0 && idx < data.length) setHover(idx);
-        }}
-        onMouseLeave={() => setHover(null)}>
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}>
         {/* Grid */}
         {[0,0.25,0.5,0.75,1].map(f => (
           <line key={f} x1={padL} y1={padT+f*cH} x2={padL+cW} y2={padT+f*cH} stroke="rgba(0,0,0,0.06)" />
@@ -101,28 +100,7 @@ export function GdeltChart({ data }) {
             {new Date(d.date+"T00:00").toLocaleDateString("es",{month:"short",day:"numeric"})}
           </text>;
         })}
-        {/* Hover */}
-        {hover !== null && <>
-          <line x1={toX(hover)} y1={padT} x2={toX(hover)} y2={padT+cH} stroke="rgba(255,255,255,0.25)" />
-          {signals.instability && data[hover].instability!=null && <circle cx={toX(hover)} cy={toYLeft(data[hover].instability)} r={3.5} fill="#ff3b3b" stroke={BG} strokeWidth={2} />}
-          {signals.tone && data[hover].tone!=null && <circle cx={toX(hover)} cy={toYRight(data[hover].tone)} r={3.5} fill="#0e7490" stroke={BG} strokeWidth={2} />}
-          {signals.artvolnorm && data[hover].artvolnorm!=null && <circle cx={toX(hover)} cy={toYLeft(data[hover].artvolnorm)} r={3.5} fill="#c49000" stroke={BG} strokeWidth={2} />}
-        </>}
       </svg>
-      {/* Tooltip */}
-      {hover !== null && data[hover] && (
-        <div style={{ fontSize:13, fontFamily:font, color:TEXT, marginTop:6, padding:"8px 12px", background:BG2, border:`1px solid ${BORDER}`, display:"flex", gap:16, flexWrap:"wrap", alignItems:"center" }}>
-          <span style={{ color:TEXT, fontWeight:600 }}>{new Date(data[hover].date+"T00:00").toLocaleDateString("es",{day:"numeric",month:"short",year:"numeric"})}</span>
-          {signals.instability && <span style={{ color:"#ff3b3b" }}>Conflicto: {data[hover].instability?.toFixed(2)}</span>}
-          {signals.tone && <span style={{ color:"#0e7490" }}>Tono: {data[hover].tone?.toFixed(2)}</span>}
-          {signals.artvolnorm && <span style={{ color:"#c49000" }}>Atención: {data[hover].artvolnorm?.toFixed(2)}</span>}
-          {GDELT_ANNOTATIONS.find(a=>a.date===data[hover].date) && (
-            <span style={{ color:tierColor[GDELT_ANNOTATIONS.find(a=>a.date===data[hover].date).tier], fontWeight:600 }}>
-              ● {GDELT_ANNOTATIONS.find(a=>a.date===data[hover].date).label}
-            </span>
-          )}
-        </div>
-      )}
     </div>
   );
 }

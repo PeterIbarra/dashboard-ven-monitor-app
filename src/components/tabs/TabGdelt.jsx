@@ -133,9 +133,16 @@ export function TabGdelt() {
           </div>
           {GDELT_ANNOTATIONS.map((a,i) => (
             <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 12px",
-              transition:"background 0.15s", cursor:"default", borderBottom:`1px solid ${BORDER}20` }}
-              onMouseEnter={e=>e.currentTarget.style.background=`${BG3}`}
-              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              transition:"background 0.15s, border-color 0.15s", cursor:"default", borderBottom:`1px solid ${BORDER}20`,
+              background:"transparent", color:TEXT }}
+              onMouseEnter={e=>{
+                e.currentTarget.style.background = `${ACCENT}08`;
+                e.currentTarget.style.borderBottomColor = `${ACCENT}22`;
+              }}
+              onMouseLeave={e=>{
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.borderBottomColor = `${BORDER}20`;
+              }}>
               <span style={{ width:10, height:10, borderRadius:"50%", background:tierColor[a.tier], flexShrink:0,
                 boxShadow:`0 0 8px ${tierColor[a.tier]}50`, border:`2px solid ${BG}` }} />
               <span style={{ fontSize:13, fontFamily:font, color:MUTED, minWidth:100 }}>
