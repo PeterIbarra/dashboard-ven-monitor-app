@@ -1,225 +1,225 @@
 export const SCENARIO_SIGNALS = [
   {
-    esc: "E3",
-    signals: [
+    "esc": "E3",
+    "signals": [
       {
-        name: "E3 alcanza 49%",
-        sem: "green",
-        val: "Continuidad Negociada sube +2pp por cohesión táctica sobre Saab y normalización multilateral",
-        isNew: true
+        "name": "Segunda visita SOUTHCOM a Caracas",
+        "sem": "green",
+        "val": "Presencia militar estadounidense normalizada con prenotificación venezolana.",
+        "isNew": true
       },
       {
-        name: "Banco Mundial en Caracas",
-        sem: "green",
-        val: "Primera visita desde 2005; hoja de ruta técnica en estabilización, inversión y empleo",
-        isNew: true
+        "name": "Centerview/Pigasse para deuda USD 150.000M",
+        "sem": "green",
+        "val": "La reestructuración de deuda convierte la normalización financiera en proceso operativo.",
+        "isNew": true
       },
       {
-        name: "Calixto Ortega ante el FMI",
-        sem: "green",
-        val: "Canal formal de representación plena y auditoría técnica de deuda",
-        isNew: true
+        "name": "Claver-Carone como enlace informal",
+        "sem": "yellow",
+        "val": "Sostiene la arquitectura Washington-Caracas pero concentra riesgo reputacional.",
+        "isNew": true
       },
       {
-        name: "BDV-Erebor Bank",
-        sem: "green",
-        val: "Primera corresponsalía bancaria operativa con EE.UU. en el período",
-        isNew: true
+        "name": "Comisiones presidenciales de 90 días",
+        "sem": "green",
+        "val": "Reingeniería estatal bajo Héctor Rodríguez y Anabel Pereira.",
+        "isNew": true
       },
       {
-        name: "ExxonMobil negocia campos",
-        sem: "green",
-        val: "Hasta seis campos venezolanos; señal de retorno energético de alto simbolismo",
-        isNew: true
+        "name": "BDV amplía corresponsalías",
+        "sem": "green",
+        "val": "Abanca Europa, Banesco USA y Erebor consolidan reinserción bancaria."
       },
       {
-        name: "Godoy acreditada ante ONU",
-        sem: "green",
-        val: "Normalización diplomática multilateral posterior al vacío del período Maduro",
-        isNew: true
+        "name": "Venezuela 4° proveedor petrolero de India",
+        "sem": "green",
+        "val": "Agrega amortiguador externo adicional.",
+        "isNew": true
       },
       {
-        name: "Humanitarian Reset incluye Venezuela",
-        sem: "green",
-        val: "EE.UU. incorpora al país en asignación adicional de asistencia ONU",
-        isNew: true
+        "name": "Protección operativa DOJ a Rodríguez",
+        "sem": "yellow",
+        "val": "AP reporta instrucción de evitar nuevas causas contra Delcy; DOJ matiza.",
+        "isNew": true
       },
       {
-        name: "Caso Saab como ruptura administrada",
-        sem: "yellow",
-        val: "El interinato se desvincula selectivamente del antiguo operador sin desmontar continuidad institucional",
-        isNew: true
+        "name": "Manifiesto reconoce plan Washington",
+        "sem": "green",
+        "val": "La oposición opera dentro del marco estratégico externo.",
+        "isNew": true
       },
       {
-        name: "Conoco rechaza contrato PDVSA",
-        sem: "yellow",
-        val: "La reapertura energética enfrenta cuello contractual y fiscal",
-        isNew: true
+        "name": "Aprobación doméstica en mínimo",
+        "sem": "red",
+        "val": "25,2% de aprobación tensiona sostenibilidad interna.",
+        "isNew": true
       },
       {
-        name: "PIB Q1 desacelera",
-        sem: "yellow",
-        val: "Crecimiento de 2,51% muestra que normalización externa aún no resuelve economía real",
-        isNew: true
+        "name": "Decretos de comisiones pendientes",
+        "sem": "yellow",
+        "val": "Sin Gaceta Oficial al cierre, parte de la reforma aún es anuncio."
       },
       {
-        name: "Chris Wright prioriza estabilidad",
-        sem: "yellow",
-        val: "Washington mantiene energía y estabilidad por encima de elecciones inmediatas",
-        isNew: true
+        "name": "Caso Zapatero/Plus Ultra",
+        "sem": "yellow",
+        "val": "Exposición judicial puede dañar canales España-Venezuela.",
+        "isNew": true
       },
       {
-        name: "Reestructuración formal S18",
-        sem: "green",
-        val: "La fase Centerview/White & Case deja de ser novedad y pasa a condición de base",
-        vigpierde: true
+        "name": "Sin calendario electoral vinculante",
+        "sem": "yellow",
+        "val": "La dimensión política sigue rezagada frente al avance financiero."
       }
     ]
   },
   {
-    esc: "E1",
-    signals: [
+    "esc": "E1",
+    "signals": [
       {
-        name: "E1 retrocede a 36%",
-        sem: "yellow",
-        val: "Retorno MCM pendiente, paro absorbido y BCV-Washington sin condicionamiento electoral",
-        isNew: true
+        "name": "Manifiesto de Panamá",
+        "sem": "green",
+        "val": "Primer documento estratégico conjunto en dos años.",
+        "isNew": true
       },
       {
-        name: "Lester Toledo regresa",
-        sem: "green",
-        val: "Primer retorno de dirigente opositor con acusaciones graves en el período",
-        isNew: true
+        "name": "Retornos de Ocariz, Toledo y Marrero",
+        "sem": "green",
+        "val": "Reconstruyen presencia territorial opositora.",
+        "isNew": true
       },
       {
-        name: "Rosales estima 35–45 semanas",
-        sem: "yellow",
-        val: "El debate electoral se vuelve técnico y más largo que la expectativa política inmediata",
-        isNew: true
+        "name": "MCM 55% imagen positiva",
+        "sem": "green",
+        "val": "Principal activo de legitimidad."
       },
       {
-        name: "Foro Penal verifica 38 excarcelaciones",
-        sem: "green",
-        val: "Liberaciones mejoran ambiente, aunque sujetas a medidas restrictivas",
-        isNew: true
+        "name": "Retorno efectivo de MCM pendiente",
+        "sem": "yellow",
+        "val": "Test decisivo de garantías implícitas."
       },
       {
-        name: "Canal MP-Amnistía Internacional",
-        sem: "yellow",
-        val: "Puede mejorar garantías si produce acceso y respuesta a expedientes",
-        isNew: true
+        "name": "Nuevo CNE sin avances",
+        "sem": "yellow",
+        "val": "Condición mínima sigue bloqueada."
       },
       {
-        name: "Guanipa cuestiona relación Dogu-oposición",
-        sem: "yellow",
-        val: "Tensión sobre diseño real de la diplomacia estadounidense con actores opositores",
-        isNew: true
+        "name": "Movilizaciones 30 mayo y 3 junio",
+        "sem": "yellow",
+        "val": "Medirán tracción territorial post-Panamá.",
+        "isNew": true
       },
       {
-        name: "Prioridad de estabilidad sobre elecciones",
-        sem: "yellow",
-        val: "Wright reduce probabilidad de convocatoria inmediata",
-        isNew: true
+        "name": "Debate Toledo/Guaidó",
+        "sem": "yellow",
+        "val": "La rendición de cuentas puede erosionar unidad.",
+        "isNew": true
+      },
+      {
+        "name": "Plan Washington como marco esencial",
+        "sem": "green",
+        "val": "Da estructura externa, pero subordina ritmo opositor.",
+        "vigpierde": true
       }
     ]
   },
   {
-    esc: "E2",
-    signals: [
+    "esc": "E2",
+    "signals": [
       {
-        name: "E2 sube a 4%",
-        sem: "yellow",
-        val: "Deterioro acumulativo de infraestructura, ingreso, señoreaje y PIB desacelerado",
-        isNew: true
+        "name": "PIB Q1 +2,51%",
+        "sem": "yellow",
+        "val": "Desaceleración fuerte frente al +7,19% de Q1 2025.",
+        "isNew": true
       },
       {
-        name: "PIB Q1 mínimo desde 2021",
-        sem: "yellow",
-        val: "2,51% de crecimiento y sector petrolero -2,12% activan alerta macro",
-        isNew: true
+        "name": "PIB petrolero negativo",
+        "sem": "yellow",
+        "val": "Primer retroceso en 11 trimestres.",
+        "isNew": true
       },
       {
-        name: "Canasta USD 730,59",
-        sem: "red",
-        val: "Ingreso integral cubre solo 32,8%; pensión mínima 9,5%",
-        isNew: true
+        "name": "Canasta USD 730,59 vs ingreso USD 240",
+        "sem": "red",
+        "val": "Cobertura de 32,8% sostiene presión social."
       },
       {
-        name: "Inversión negativa",
-        sem: "yellow",
-        val: "Inversión -12,3% y construcción -18,3% muestran fragilidad productiva",
-        isNew: true
+        "name": "Inflación anualizada ~600%",
+        "sem": "red",
+        "val": "Aceleración de precios y brecha cambiaria 30-45%."
       },
       {
-        name: "BM/FMI/Erebor reducen riesgo sistémico",
-        sem: "green",
-        val: "La reapertura financiera contiene escenario de colapso inmediato",
-        isNew: true
+        "name": "Centerview y compra de bonos",
+        "sem": "green",
+        "val": "Mercados apuestan contra colapso inmediato.",
+        "isNew": true
       },
       {
-        name: "Exxon y CITGO sostienen ancla energética",
-        sem: "green",
-        val: "Interés de inversión y utilidad CITGO reducen riesgo externo",
-        isNew: true
+        "name": "Riesgo Congreso EE.UU.",
+        "sem": "yellow",
+        "val": "Investigación sobre Centerview/Claver afectaría canal financiero.",
+        "isNew": true
       },
       {
-        name: "Contrato PDVSA inhibe inversión amplia",
-        sem: "yellow",
-        val: "Rechazo de Conoco indica que la reapertura no será homogénea",
-        isNew: true
+        "name": "Ley eléctrica requiere USD 20.000M",
+        "sem": "yellow",
+        "val": "Sistema deficitario limita producción y bienestar."
+      },
+      {
+        "name": "Petróleo bajo USD 50",
+        "sem": "green",
+        "val": "Riesgo no activado mientras precios se mantienen.",
+        "vigpierde": true
       }
     ]
   },
   {
-    esc: "E4",
-    signals: [
+    "esc": "E4",
+    "signals": [
       {
-        name: "47 protestas en 19 entidades",
-        sem: "red",
-        val: "Mayor densidad de conflictividad del período post-Maduro",
-        isNew: true
+        "name": "Iris Varela guarda la silla de Maduro",
+        "sem": "red",
+        "val": "Narrativa incompatible con transición electoral plena.",
+        "isNew": true
       },
       {
-        name: "Paro universitario nacional",
-        sem: "red",
-        val: "26 protestas en 16 estados el 19 de mayo; 18 vinculadas al sector universitario",
-        isNew: true
+        "name": "Filtración “estamos caídos”",
+        "sem": "yellow",
+        "val": "Percepción interna de vulnerabilidad.",
+        "isNew": true
       },
       {
-        name: "Represión frente al SEBIN",
-        sem: "red",
-        val: "Señal cualitativa importante, pero calibrada y compatible con E3",
-        isNew: true
+        "name": "Detención de trabajadores PDVSA",
+        "sem": "red",
+        "val": "Represión selectiva sobre sector estratégico.",
+        "isNew": true
       },
       {
-        name: "Caso Quero Navas-Carmen Navas",
-        sem: "red",
-        val: "Muerte bajo custodia y fallecimiento de la madre sin respuestas completas elevan presión de DDHH",
-        isNew: true
+        "name": "Brecha de amnistía",
+        "sem": "yellow",
+        "val": "8.740 oficiales frente a 44 verificaciones semanales."
       },
       {
-        name: "Nueva investigación contra Maduro",
-        sem: "yellow",
-        val: "Florida abre línea de lavado de dinero que puede complicar acuerdos de impunidad",
-        isNew: true
+        "name": "Motín Internado Judicial de Barinas",
+        "sem": "yellow",
+        "val": "1.200 reclusos denuncian requisas violentas.",
+        "isNew": true
       },
       {
-        name: "Saab puede ampliar cuerpo probatorio",
-        sem: "yellow",
-        val: "Su proceso en Miami puede activar nuevas revelaciones sobre redes financieras",
-        isNew: true
+        "name": "Represión de movilizaciones 30 mayo/3 junio",
+        "sem": "red",
+        "val": "Activador disruptivo si hay fuerza sistémica."
       },
       {
-        name: "Excarcelaciones con medidas",
-        sem: "yellow",
-        val: "38 liberaciones verificadas no eliminan restricciones ni pendientes",
-        isNew: true
+        "name": "Represalia al retorno de MCM",
+        "sem": "red",
+        "val": "Activador más potente de E4."
       },
       {
-        name: "Costo de represión sistémica sigue alto",
-        sem: "green",
-        val: "BM/FMI/ONU/EE.UU. elevan costo de una escalada coercitiva abierta",
-        vigpierde: true
+        "name": "Fallecimientos de familiares de presos políticos",
+        "sem": "yellow",
+        "val": "Quinto caso de madre fallecida en 2026.",
+        "isNew": true
       }
     ]
   }

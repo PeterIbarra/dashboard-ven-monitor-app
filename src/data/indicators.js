@@ -1,12 +1,12 @@
 export const INDICATORS = [
   {
-    dim: "Energético",
-    icon: "⚡",
-    esc: "E3",
-    name: "Exportaciones de crudo",
-    desc: "Volumen semanal bajo licencias OFAC",
-    umbral: "Sostenimiento >750 kbd. Caída <600 kbd activa alerta.",
-    hist: [
+    "dim": "Energético",
+    "icon": "⚡",
+    "esc": "E3",
+    "name": "Exportaciones de crudo",
+    "desc": "Volumen semanal bajo licencias OFAC",
+    "umbral": "Sostenimiento >750 kbd. Caída <600 kbd activa alerta.",
+    "hist": [
       [
         "green",
         "up",
@@ -101,17 +101,22 @@ export const INDICATORS = [
         "green",
         "up",
         "Producción supera 1,2 M bpd al cierre de abril; meta oficial 1,4 M bpd en 2026"
+      ],
+      [
+        "green",
+        "flat",
+        ">10M barriles a EE.UU.; India 4° proveedor; producción neta ~980K bpd"
       ]
     ]
   },
   {
-    dim: "Energético",
-    icon: "⚡",
-    esc: "E3",
-    name: "Ventas petroleras (ingresos)",
-    desc: "Acuerdos bajo GL49 y GL50/50A",
-    umbral: "Flujo regular a banca PDVSA. Interrupción >2 sem activa E2.",
-    hist: [
+    "dim": "Energético",
+    "icon": "⚡",
+    "esc": "E3",
+    "name": "Ventas petroleras (ingresos)",
+    "desc": "Acuerdos bajo GL49 y GL50/50A",
+    "umbral": "Flujo regular a banca PDVSA. Interrupción >2 sem activa E2.",
+    "hist": [
       [
         "yellow",
         "flat",
@@ -206,17 +211,22 @@ export const INDICATORS = [
         "green",
         "up",
         "CITGO reporta USD 157M de utilidad y EBITDA de USD 368M en Q1 2026"
+      ],
+      [
+        "green",
+        "up",
+        "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
       ]
     ]
   },
   {
-    dim: "Energético",
-    icon: "⚡",
-    esc: "E3",
-    name: "Licencias OFAC activas",
-    desc: "GL49, GL50, GL50A — cobertura operativa",
-    umbral: "Revocación activa E2/E4. FAQ 1238 incluye Cuba condicionado.",
-    hist: [
+    "dim": "Energético",
+    "icon": "⚡",
+    "esc": "E3",
+    "name": "Licencias OFAC activas",
+    "desc": "GL49, GL50, GL50A — cobertura operativa",
+    "umbral": "Revocación activa E2/E4. FAQ 1238 incluye Cuba condicionado.",
+    "hist": [
       [
         "green",
         "flat",
@@ -311,17 +321,22 @@ export const INDICATORS = [
         "green",
         "up",
         "GL-58 y canales financieros sostienen contratación técnica; BM/FMI refuerzan credibilidad"
+      ],
+      [
+        "green",
+        "up",
+        "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
       ]
     ]
   },
   {
-    dim: "Energético",
-    icon: "⚡",
-    esc: "E3",
-    name: "Producción Chevron / Majors",
-    desc: "Operaciones de empresas occidentales en bloques venezolanos",
-    umbral: "Expansión confirma E3. Suspensión reactiva E2.",
-    hist: [
+    "dim": "Energético",
+    "icon": "⚡",
+    "esc": "E3",
+    "name": "Producción Chevron / Majors",
+    "desc": "Operaciones de empresas occidentales en bloques venezolanos",
+    "umbral": "Expansión confirma E3. Suspensión reactiva E2.",
+    "hist": [
       [
         "yellow",
         "flat",
@@ -416,17 +431,22 @@ export const INDICATORS = [
         "green",
         "up",
         "ExxonMobil negocia hasta seis campos; PDVSA vuelve a Houston con delegación técnica"
+      ],
+      [
+        "green",
+        "flat",
+        ">10M barriles a EE.UU.; India 4° proveedor; producción neta ~980K bpd"
       ]
     ]
   },
   {
-    dim: "Energético",
-    icon: "⚡",
-    esc: "E2",
-    name: "Infraestructura de refinación",
-    desc: "Capacidad operativa refinerías nacionales",
-    umbral: "Operación <25% capacidad instalada. Mantenimiento diferido.",
-    hist: [
+    "dim": "Energético",
+    "icon": "⚡",
+    "esc": "E2",
+    "name": "Infraestructura de refinación",
+    "desc": "Capacidad operativa refinerías nacionales",
+    "umbral": "Operación <25% capacidad instalada. Mantenimiento diferido.",
+    "hist": [
       [
         "red",
         "flat",
@@ -526,17 +546,22 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "ConocoPhillips rechaza contrato modelo PDVSA; cuello contractual limita reapertura uniforme"
+      ],
+      [
+        "green",
+        "up",
+        "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
       ]
     ]
   },
   {
-    dim: "Energético",
-    icon: "⚡",
-    esc: "E2",
-    name: "Taladros activos",
-    desc: "Operaciones de perforación nuevas",
-    umbral: "<30 taladros activos. Recuperación <5% anual vs 2014.",
-    hist: [
+    "dim": "Energético",
+    "icon": "⚡",
+    "esc": "E2",
+    "name": "Taladros activos",
+    "desc": "Operaciones de perforación nuevas",
+    "umbral": "<30 taladros activos. Recuperación <5% anual vs 2014.",
+    "hist": [
       [
         "red",
         "flat",
@@ -631,18 +656,23 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Actividad depende de acuerdos con majors; marco fiscal todavía inhibe inversión amplia"
+      ],
+      [
+        "green",
+        "up",
+        "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
       ]
     ]
   },
   {
-    dim: "Energético",
-    icon: "⚡",
-    esc: "E3",
-    name: "Recaudación fiscal",
-    desc: "SENIAT y flujo tributario asociado al repunte energético",
-    umbral: "Caída >20% mensual activa E2. Crecimiento sostenido confirma E3.",
-    addedWeek: 8,
-    hist: [
+    "dim": "Energético",
+    "icon": "⚡",
+    "esc": "E3",
+    "name": "Recaudación fiscal",
+    "desc": "SENIAT y flujo tributario asociado al repunte energético",
+    "umbral": "Caída >20% mensual activa E2. Crecimiento sostenido confirma E3.",
+    "addedWeek": 8,
+    "hist": [
       [
         "green",
         "up",
@@ -712,18 +742,23 @@ export const INDICATORS = [
         "yellow",
         "down",
         "PIB petrolero cae -2,12% en Q1 pese a producción declarada superior a 1,2 M bpd"
+      ],
+      [
+        "green",
+        "up",
+        "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
       ]
     ]
   },
   {
-    dim: "Energético",
-    icon: "⚡",
-    esc: "E3",
-    name: "Apertura sector minero",
-    desc: "Reformas y licencias para inversión extranjera en minería",
-    umbral: "Aprobación reforma + inversiones verificables = E3 consolidado.",
-    addedWeek: 8,
-    hist: [
+    "dim": "Energético",
+    "icon": "⚡",
+    "esc": "E3",
+    "name": "Apertura sector minero",
+    "desc": "Reformas y licencias para inversión extranjera en minería",
+    "umbral": "Aprobación reforma + inversiones verificables = E3 consolidado.",
+    "addedWeek": 8,
+    "hist": [
       [
         "green",
         "up",
@@ -788,18 +823,23 @@ export const INDICATORS = [
         "green",
         "flat",
         "Apertura sectorial se mantiene subordinada a agenda de inversión y estabilización"
+      ],
+      [
+        "green",
+        "up",
+        "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
       ]
     ]
   },
   {
-    dim: "Energético",
-    icon: "⚡",
-    esc: "E3",
-    name: "Diversificación gas natural",
-    desc: "Desarrollo de gas como producto estratégico de exportación",
-    umbral: "Cardón IV operativo + exportaciones GLP = diversificación real.",
-    addedWeek: 10,
-    hist: [
+    "dim": "Energético",
+    "icon": "⚡",
+    "esc": "E3",
+    "name": "Diversificación gas natural",
+    "desc": "Desarrollo de gas como producto estratégico de exportación",
+    "umbral": "Cardón IV operativo + exportaciones GLP = diversificación real.",
+    "addedWeek": 10,
+    "hist": [
       [
         "green",
         "up",
@@ -854,17 +894,22 @@ export const INDICATORS = [
         "green",
         "up",
         "Rodríguez anuncia viaje a India; diversificación energética se amplía más allá de EE.UU."
+      ],
+      [
+        "green",
+        "up",
+        "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
       ]
     ]
   },
   {
-    dim: "Político",
-    icon: "🏛",
-    esc: "E3",
-    name: "Ley de Amnistía",
-    desc: "Operativización y verificación independiente",
-    umbral: "Brecha oficial vs. verificado. >50% sin verificar activa E4.",
-    hist: [
+    "dim": "Político",
+    "icon": "🏛",
+    "esc": "E3",
+    "name": "Ley de Amnistía",
+    "desc": "Operativización y verificación independiente",
+    "umbral": "Brecha oficial vs. verificado. >50% sin verificar activa E4.",
+    "hist": [
       [
         "yellow",
         "flat",
@@ -959,17 +1004,22 @@ export const INDICATORS = [
         "yellow",
         "up",
         "AN anuncia 300 excarcelaciones y FP verifica 38, pero permanecen medidas restrictivas"
+      ],
+      [
+        "yellow",
+        "flat",
+        "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
       ]
     ]
   },
   {
-    dim: "Político",
-    icon: "🏛",
-    esc: "E3",
-    name: "Excarcelaciones verificadas",
-    desc: "Foro Penal: presos políticos activos",
-    umbral: "Ritmo <20/sem o reversión activa E4.",
-    hist: [
+    "dim": "Político",
+    "icon": "🏛",
+    "esc": "E3",
+    "name": "Excarcelaciones verificadas",
+    "desc": "Foro Penal: presos políticos activos",
+    "umbral": "Ritmo <20/sem o reversión activa E4.",
+    "hist": [
       [
         "yellow",
         "flat",
@@ -1064,18 +1114,23 @@ export const INDICATORS = [
         "green",
         "up",
         "Foro Penal verifica 38 excarcelaciones adicionales desde el 18 de mayo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
       ]
     ]
   },
   {
-    dim: "Político",
-    icon: "🏛",
-    esc: "E4",
-    name: "Cautelares vigentes",
-    desc: "Personas bajo medidas restrictivas no resueltas",
-    umbral: ">10.000 cautelares sin resolver activa E4.",
-    addedWeek: 8,
-    hist: [
+    "dim": "Político",
+    "icon": "🏛",
+    "esc": "E4",
+    "name": "Cautelares vigentes",
+    "desc": "Personas bajo medidas restrictivas no resueltas",
+    "umbral": ">10.000 cautelares sin resolver activa E4.",
+    "addedWeek": 8,
+    "hist": [
       [
         "red",
         "flat",
@@ -1140,17 +1195,22 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Medidas restrictivas persisten para liberados; amnistía no equivale a libertad plena"
+      ],
+      [
+        "yellow",
+        "flat",
+        "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
       ]
     ]
   },
   {
-    dim: "Político",
-    icon: "🏛",
-    esc: "E4",
-    name: "Cohesión FANB",
-    desc: "Señales de fractura o lealtad institucional",
-    umbral: "Fractura visible = E4/E2 inmediato.",
-    hist: [
+    "dim": "Político",
+    "icon": "🏛",
+    "esc": "E4",
+    "name": "Cohesión FANB",
+    "desc": "Señales de fractura o lealtad institucional",
+    "umbral": "Fractura visible = E4/E2 inmediato.",
+    "hist": [
       [
         "yellow",
         "flat",
@@ -1245,17 +1305,22 @@ export const INDICATORS = [
         "yellow",
         "down",
         "Cohesión se tensiona por caso Saab, debate AN y presión judicial contra Maduro"
+      ],
+      [
+        "yellow",
+        "flat",
+        "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
       ]
     ]
   },
   {
-    dim: "Político",
-    icon: "🏛",
-    esc: "E3",
-    name: "Reorganización del Ejecutivo",
-    desc: "Capacidad de gestión institucional",
-    umbral: "Reconfiguración técnica → E1. Política → E4.",
-    hist: [
+    "dim": "Político",
+    "icon": "🏛",
+    "esc": "E3",
+    "name": "Reorganización del Ejecutivo",
+    "desc": "Capacidad de gestión institucional",
+    "umbral": "Reconfiguración técnica → E1. Política → E4.",
+    "hist": [
       [
         "yellow",
         "flat",
@@ -1355,17 +1420,22 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Interinato combina ruptura selectiva con Saab y apertura BM/FMI/Erebor"
+      ],
+      [
+        "yellow",
+        "flat",
+        "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
       ]
     ]
   },
   {
-    dim: "Político",
-    icon: "🏛",
-    esc: "E1",
-    name: "Agenda electoral",
-    desc: "Calendario y compromisos electorales concretos",
-    umbral: "Anuncio formal de fecha = E1 gana probabilidad.",
-    hist: [
+    "dim": "Político",
+    "icon": "🏛",
+    "esc": "E1",
+    "name": "Agenda electoral",
+    "desc": "Calendario y compromisos electorales concretos",
+    "umbral": "Anuncio formal de fecha = E1 gana probabilidad.",
+    "hist": [
       [
         "red",
         "flat",
@@ -1460,17 +1530,22 @@ export const INDICATORS = [
         "yellow",
         "down",
         "Rosales estima 35–45 semanas para elecciones; Washington prioriza estabilidad económica"
+      ],
+      [
+        "green",
+        "up",
+        "Manifiesto Panamá, retornos opositores y MCM 55% fortalecen E1"
       ]
     ]
   },
   {
-    dim: "Político",
-    icon: "🏛",
-    esc: "E4",
-    name: "Marcos restrictivos vigentes",
-    desc: "Leyes de odio, terrorismo, delitos de expresión",
-    umbral: "Activación contra oposición = E4. Derogación = E1.",
-    hist: [
+    "dim": "Político",
+    "icon": "🏛",
+    "esc": "E4",
+    "name": "Marcos restrictivos vigentes",
+    "desc": "Leyes de odio, terrorismo, delitos de expresión",
+    "umbral": "Activación contra oposición = E4. Derogación = E1.",
+    "hist": [
       [
         "red",
         "flat",
@@ -1565,18 +1640,23 @@ export const INDICATORS = [
         "red",
         "up",
         "Represión frente al SEBIN introduce umbral sensible en protestas de derechos humanos"
+      ],
+      [
+        "yellow",
+        "flat",
+        "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
       ]
     ]
   },
   {
-    dim: "Político",
-    icon: "🏛",
-    esc: "E1",
-    name: "Liderazgo opositor",
-    desc: "Índice de liderazgo y capacidad de articulación opositora",
-    umbral: "MCM >100 pts consolida E1. Fragmentación debilita.",
-    addedWeek: 8,
-    hist: [
+    "dim": "Político",
+    "icon": "🏛",
+    "esc": "E1",
+    "name": "Liderazgo opositor",
+    "desc": "Índice de liderazgo y capacidad de articulación opositora",
+    "umbral": "MCM >100 pts consolida E1. Fragmentación debilita.",
+    "addedWeek": 8,
+    "hist": [
       [
         "green",
         "up",
@@ -1641,17 +1721,22 @@ export const INDICATORS = [
         "green",
         "up",
         "Lester Toledo regresa tras 10 años; oposición prueba garantías de retorno"
+      ],
+      [
+        "green",
+        "up",
+        "Manifiesto Panamá, retornos opositores y MCM 55% fortalecen E1"
       ]
     ]
   },
   {
-    dim: "Económico",
-    icon: "📊",
-    esc: "E2",
-    name: "Brecha cambiaria",
-    desc: "Diferencial BCV vs. mercado paralelo",
-    umbral: "Brecha >55% activa E2. <30% fortalece E3.",
-    hist: [
+    "dim": "Económico",
+    "icon": "📊",
+    "esc": "E2",
+    "name": "Brecha cambiaria",
+    "desc": "Diferencial BCV vs. mercado paralelo",
+    "umbral": "Brecha >55% activa E2. <30% fortalece E3.",
+    "hist": [
       [
         "green",
         "flat",
@@ -1746,17 +1831,22 @@ export const INDICATORS = [
         "yellow",
         "up",
         "Canasta USD 730,59 e ingreso integral solo cubre 32,8%; presión cambiaria latente"
+      ],
+      [
+        "red",
+        "up",
+        "Inflación anualizada ~600%; canasta USD 730,59 vs ingreso USD 240"
       ]
     ]
   },
   {
-    dim: "Económico",
-    icon: "📊",
-    esc: "E2",
-    name: "Inflación",
-    desc: "Tasa mensual proyectada",
-    umbral: "Retorno a >30% mensual activa E2.",
-    hist: [
+    "dim": "Económico",
+    "icon": "📊",
+    "esc": "E2",
+    "name": "Inflación",
+    "desc": "Tasa mensual proyectada",
+    "umbral": "Retorno a >30% mensual activa E2.",
+    "hist": [
       [
         "yellow",
         "flat",
@@ -1851,17 +1941,22 @@ export const INDICATORS = [
         "yellow",
         "up",
         "Arcay advierte riesgo estacional de expansión monetaria e inflación en segundo semestre"
+      ],
+      [
+        "red",
+        "up",
+        "Inflación anualizada ~600%; canasta USD 730,59 vs ingreso USD 240"
       ]
     ]
   },
   {
-    dim: "Económico",
-    icon: "📊",
-    esc: "E2",
-    name: "Ingresos de la población",
-    desc: "Salario mínimo y poder adquisitivo real",
-    umbral: "47 meses sin ajuste. Ingreso ~USD 256 vs canasta USD 550.",
-    hist: [
+    "dim": "Económico",
+    "icon": "📊",
+    "esc": "E2",
+    "name": "Ingresos de la población",
+    "desc": "Salario mínimo y poder adquisitivo real",
+    "umbral": "47 meses sin ajuste. Ingreso ~USD 256 vs canasta USD 550.",
+    "hist": [
       [
         "red",
         "flat",
@@ -1956,17 +2051,22 @@ export const INDICATORS = [
         "red",
         "up",
         "Ingreso integral USD 240 cubre un tercio de la canasta; pensión mínima solo 9,5%"
+      ],
+      [
+        "red",
+        "up",
+        "Inflación anualizada ~600%; canasta USD 730,59 vs ingreso USD 240"
       ]
     ]
   },
   {
-    dim: "Económico",
-    icon: "📊",
-    esc: "E2",
-    name: "Sistema eléctrico",
-    desc: "Disponibilidad y frecuencia de cortes",
-    umbral: "Cortes >4h/día en zonas urbanas activa presión social.",
-    hist: [
+    "dim": "Económico",
+    "icon": "📊",
+    "esc": "E2",
+    "name": "Sistema eléctrico",
+    "desc": "Disponibilidad y frecuencia de cortes",
+    "umbral": "Cortes >4h/día en zonas urbanas activa presión social.",
+    "hist": [
       [
         "red",
         "flat",
@@ -2061,17 +2161,22 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "IODA registra 103 eventos; Zulia concentra 73 y Táchira/Sucre tienen interrupciones moderadas"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Bonos a 40 ctvs y Centerview contienen colapso, pero bienestar no mejora"
       ]
     ]
   },
   {
-    dim: "Económico",
-    icon: "📊",
-    esc: "E3",
-    name: "Percepción dirección del país",
-    desc: "Encuestas de opinión pública",
-    umbral: ">60% percepción positiva sostiene E3.",
-    hist: [
+    "dim": "Económico",
+    "icon": "📊",
+    "esc": "E3",
+    "name": "Percepción dirección del país",
+    "desc": "Encuestas de opinión pública",
+    "umbral": ">60% percepción positiva sostiene E3.",
+    "hist": [
       [
         "yellow",
         "flat",
@@ -2166,18 +2271,23 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Confianza del consumidor sube a 58, pero hogares siguen presionados por canasta"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Bonos a 40 ctvs y Centerview contienen colapso, pero bienestar no mejora"
       ]
     ]
   },
   {
-    dim: "Económico",
-    icon: "📊",
-    esc: "E3",
-    name: "PIB trimestral",
-    desc: "Crecimiento económico confirmado",
-    umbral: "Crecimiento positivo sostiene E3. Contracción activa E2.",
-    addedWeek: 8,
-    hist: [
+    "dim": "Económico",
+    "icon": "📊",
+    "esc": "E3",
+    "name": "PIB trimestral",
+    "desc": "Crecimiento económico confirmado",
+    "umbral": "Crecimiento positivo sostiene E3. Contracción activa E2.",
+    "addedWeek": 8,
+    "hist": [
       [
         "green",
         "up",
@@ -2247,17 +2357,22 @@ export const INDICATORS = [
         "yellow",
         "down",
         "PIB Q1 crece 2,51%, mínimo desde 2021; construcción -18,3% e inversión negativa"
+      ],
+      [
+        "yellow",
+        "down",
+        "PIB Q1 +2,51% vs +7,19% Q1 2025; inversión -12,3%"
       ]
     ]
   },
   {
-    dim: "Internacional",
-    icon: "🌐",
-    esc: "E3",
-    name: "Cooperación EE.UU.–Venezuela",
-    desc: "Nivel operativo de acuerdos bilaterales",
-    umbral: "Ruptura = E4/E2. Profundización = E1.",
-    hist: [
+    "dim": "Internacional",
+    "icon": "🌐",
+    "esc": "E3",
+    "name": "Cooperación EE.UU.–Venezuela",
+    "desc": "Nivel operativo de acuerdos bilaterales",
+    "umbral": "Ruptura = E4/E2. Profundización = E1.",
+    "hist": [
       [
         "yellow",
         "up",
@@ -2352,17 +2467,22 @@ export const INDICATORS = [
         "green",
         "up",
         "Barrett, TSA, Humanitarian Reset y Exxon refuerzan cooperación práctica con EE.UU."
+      ],
+      [
+        "green",
+        "up",
+        "SOUTHCOM, Tesoro/KPMG, Claver-Carone y protección DOJ sostienen vínculo con Washington"
       ]
     ]
   },
   {
-    dim: "Internacional",
-    icon: "🌐",
-    esc: "E3",
-    name: "Sanciones UE",
-    desc: "Estado de sanciones europeas",
-    umbral: "Levantamiento parcial fortalece E3.",
-    hist: [
+    "dim": "Internacional",
+    "icon": "🌐",
+    "esc": "E3",
+    "name": "Sanciones UE",
+    "desc": "Estado de sanciones europeas",
+    "umbral": "Levantamiento parcial fortalece E3.",
+    "hist": [
       [
         "red",
         "flat",
@@ -2457,17 +2577,22 @@ export const INDICATORS = [
         "green",
         "flat",
         "No hay señales nuevas de tensión UE; normalización multilateral gana peso"
+      ],
+      [
+        "green",
+        "up",
+        "SOUTHCOM, Tesoro/KPMG, Claver-Carone y protección DOJ sostienen vínculo con Washington"
       ]
     ]
   },
   {
-    dim: "Internacional",
-    icon: "🌐",
-    esc: "E3",
-    name: "China y Rusia",
-    desc: "Balanza estratégica en contexto acercamiento EE.UU.",
-    umbral: "Ruptura con China/Rusia por presión EE.UU. fragiliza E3.",
-    hist: [
+    "dim": "Internacional",
+    "icon": "🌐",
+    "esc": "E3",
+    "name": "China y Rusia",
+    "desc": "Balanza estratégica en contexto acercamiento EE.UU.",
+    "umbral": "Ruptura con China/Rusia por presión EE.UU. fragiliza E3.",
+    "hist": [
       [
         "green",
         "flat",
@@ -2562,17 +2687,22 @@ export const INDICATORS = [
         "green",
         "up",
         "India emerge como próximo destino energético; China/Rusia quedan menos visibles"
+      ],
+      [
+        "yellow",
+        "up",
+        "Caso Zapatero/Plus Ultra tensiona España; India agrega amortiguador petrolero"
       ]
     ]
   },
   {
-    dim: "Internacional",
-    icon: "🌐",
-    esc: "E1",
-    name: "FMI y reinserción financiera",
-    desc: "Diálogo con IFIs y acceso a mercados",
-    umbral: "Acuerdo FMI = E1 clave. 'Intensa Fragilidad' sostiene E2.",
-    hist: [
+    "dim": "Internacional",
+    "icon": "🌐",
+    "esc": "E1",
+    "name": "FMI y reinserción financiera",
+    "desc": "Diálogo con IFIs y acceso a mercados",
+    "umbral": "Acuerdo FMI = E1 clave. 'Intensa Fragilidad' sostiene E2.",
+    "hist": [
       [
         "red",
         "flat",
@@ -2667,17 +2797,22 @@ export const INDICATORS = [
         "green",
         "up",
         "BM visita Caracas y Ortega formaliza canal ante FMI; reinserción financiera se acelera"
+      ],
+      [
+        "yellow",
+        "up",
+        "Caso Zapatero/Plus Ultra tensiona España; India agrega amortiguador petrolero"
       ]
     ]
   },
   {
-    dim: "Internacional",
-    icon: "🌐",
-    esc: "E3",
-    name: "Normalización diplomática",
-    desc: "Reapertura embajadas y relaciones bilaterales",
-    umbral: "Reapertura embajada EE.UU. = E1/E3 consolidado.",
-    hist: [
+    "dim": "Internacional",
+    "icon": "🌐",
+    "esc": "E3",
+    "name": "Normalización diplomática",
+    "desc": "Reapertura embajadas y relaciones bilaterales",
+    "umbral": "Reapertura embajada EE.UU. = E1/E3 consolidado.",
+    "hist": [
       [
         "yellow",
         "flat",
@@ -2772,18 +2907,23 @@ export const INDICATORS = [
         "green",
         "up",
         "Godoy se acredita ante ONU y Chile prioriza reactivación consular"
+      ],
+      [
+        "yellow",
+        "up",
+        "Caso Zapatero/Plus Ultra tensiona España; India agrega amortiguador petrolero"
       ]
     ]
   },
   {
-    dim: "Internacional",
-    icon: "🌐",
-    esc: "E1",
-    name: "Presión legislativa EE.UU.",
-    desc: "Proyectos de ley y condicionalidades del Congreso",
-    umbral: "Aprobación legislativa condiciona E3 y empuja E1.",
-    addedWeek: 8,
-    hist: [
+    "dim": "Internacional",
+    "icon": "🌐",
+    "esc": "E1",
+    "name": "Presión legislativa EE.UU.",
+    "desc": "Proyectos de ley y condicionalidades del Congreso",
+    "umbral": "Aprobación legislativa condiciona E3 y empuja E1.",
+    "addedWeek": 8,
+    "hist": [
       [
         "yellow",
         "up",
@@ -2848,18 +2988,23 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "DOJ y actores de EE.UU. presionan judicialmente mientras mercado energético avanza"
+      ],
+      [
+        "green",
+        "up",
+        "SOUTHCOM, Tesoro/KPMG, Claver-Carone y protección DOJ sostienen vínculo con Washington"
       ]
     ]
   },
   {
-    dim: "Internacional",
-    icon: "🌐",
-    esc: "E3",
-    name: "Relación Venezuela-Colombia",
-    desc: "Agenda bilateral y cooperación fronteriza",
-    umbral: "Ruptura bilateral = E2. Integración energética = E3.",
-    addedWeek: 10,
-    hist: [
+    "dim": "Internacional",
+    "icon": "🌐",
+    "esc": "E3",
+    "name": "Relación Venezuela-Colombia",
+    "desc": "Agenda bilateral y cooperación fronteriza",
+    "umbral": "Ruptura bilateral = E2. Integración energética = E3.",
+    "addedWeek": 10,
+    "hist": [
       [
         "green",
         "up",
@@ -2914,18 +3059,23 @@ export const INDICATORS = [
         "green",
         "flat",
         "Relación regional se mantiene estable; Chile reabre vía consular como señal de normalización"
+      ],
+      [
+        "yellow",
+        "up",
+        "Caso Zapatero/Plus Ultra tensiona España; India agrega amortiguador petrolero"
       ]
     ]
   },
   {
-    dim: "Internacional",
-    icon: "🌐",
-    esc: "E3",
-    name: "Proceso judicial Maduro",
-    desc: "Caso narco en Distrito Sur de Nueva York",
-    umbral: "Desestimación = fortalece DR. Condena = consolida separación. Financiamiento = zona gris.",
-    addedWeek: 11,
-    hist: [
+    "dim": "Internacional",
+    "icon": "🌐",
+    "esc": "E3",
+    "name": "Proceso judicial Maduro",
+    "desc": "Caso narco en Distrito Sur de Nueva York",
+    "umbral": "Desestimación = fortalece DR. Condena = consolida separación. Financiamiento = zona gris.",
+    "addedWeek": 11,
+    "hist": [
       [
         "yellow",
         "up",
@@ -2980,17 +3130,22 @@ export const INDICATORS = [
         "red",
         "up",
         "Nueva investigación federal contra Maduro en Florida puede ampliar exposición penal"
+      ],
+      [
+        "yellow",
+        "up",
+        "Caso Zapatero/Plus Ultra tensiona España; India agrega amortiguador petrolero"
       ]
     ]
   },
   {
-    dim: "Social",
-    icon: "✊",
-    esc: "E4",
-    name: "Conflictividad laboral",
-    desc: "Protestas semanales — eje salarial y gremial",
-    umbral: ">50 protestas/sem = presión política de primer orden. >35 = escalada.",
-    hist: [
+    "dim": "Social",
+    "icon": "✊",
+    "esc": "E4",
+    "name": "Conflictividad laboral",
+    "desc": "Protestas semanales — eje salarial y gremial",
+    "umbral": ">50 protestas/sem = presión política de primer orden. >35 = escalada.",
+    "hist": [
       [
         "yellow",
         "flat",
@@ -3085,17 +3240,22 @@ export const INDICATORS = [
         "red",
         "up",
         "47 protestas, paro universitario y UCV elevan presión laboral y sectorial"
+      ],
+      [
+        "yellow",
+        "flat",
+        "43 protestas en 17 entidades; agua, vivienda, justicia y derechos de detenidos"
       ]
     ]
   },
   {
-    dim: "Social",
-    icon: "✊",
-    esc: "E4",
-    name: "Cobertura territorial protestas",
-    desc: "Estados con movilizaciones activas",
-    umbral: ">18 estados = alcance casi nacional. >12 = multi-regional.",
-    hist: [
+    "dim": "Social",
+    "icon": "✊",
+    "esc": "E4",
+    "name": "Cobertura territorial protestas",
+    "desc": "Estados con movilizaciones activas",
+    "umbral": ">18 estados = alcance casi nacional. >12 = multi-regional.",
+    "hist": [
       [
         "yellow",
         "flat",
@@ -3195,18 +3355,23 @@ export const INDICATORS = [
         "red",
         "up",
         "Protestas alcanzan 19 entidades; pico de 26 en 16 estados el 19 de mayo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "43 protestas en 17 entidades; agua, vivienda, justicia y derechos de detenidos"
       ]
     ]
   },
   {
-    dim: "Social",
-    icon: "✊",
-    esc: "E4",
-    name: "Conectividad y electricidad",
-    desc: "Apagones e impacto en conectividad regional",
-    umbral: "Conectividad nacional <80% = alerta. Estado <30% = crítico.",
-    addedWeek: 10,
-    hist: [
+    "dim": "Social",
+    "icon": "✊",
+    "esc": "E4",
+    "name": "Conectividad y electricidad",
+    "desc": "Apagones e impacto en conectividad regional",
+    "umbral": "Conectividad nacional <80% = alerta. Estado <30% = crítico.",
+    "addedWeek": 10,
+    "hist": [
       [
         "yellow",
         "flat",
@@ -3261,18 +3426,23 @@ export const INDICATORS = [
         "yellow",
         "up",
         "103 eventos IODA; Zulia epicentro y posibles interrupciones eléctricas moderadas"
+      ],
+      [
+        "yellow",
+        "up",
+        "ICC -8,1 y deterioro de situación actual elevan presión social"
       ]
     ]
   },
   {
-    dim: "Social",
-    icon: "✊",
-    esc: "E3",
-    name: "Percepción pública",
-    desc: "Encuestas de aprobación y dirección del país",
-    umbral: "Aprobación DR <30% = erosión E3. Percepción democrática >50% = sostiene E1.",
-    addedWeek: 11,
-    hist: [
+    "dim": "Social",
+    "icon": "✊",
+    "esc": "E3",
+    "name": "Percepción pública",
+    "desc": "Encuestas de aprobación y dirección del país",
+    "umbral": "Aprobación DR <30% = erosión E3. Percepción democrática >50% = sostiene E1.",
+    "addedWeek": 11,
+    "hist": [
       [
         "yellow",
         "flat",
@@ -3322,18 +3492,23 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Consumo +3,3% y confianza 58 contrastan con deterioro de poder adquisitivo"
+      ],
+      [
+        "yellow",
+        "up",
+        "ICC -8,1 y deterioro de situación actual elevan presión social"
       ]
     ]
   },
   {
-    dim: "Económico",
-    icon: "📊",
-    esc: "E3",
-    name: "Atracción de inversión",
-    desc: "Señales de FDI y apertura a capital internacional",
-    umbral: "Presencia de majors + incentivos fiscales = E3 consolidado. Retiro = E2.",
-    addedWeek: 11,
-    hist: [
+    "dim": "Económico",
+    "icon": "📊",
+    "esc": "E3",
+    "name": "Atracción de inversión",
+    "desc": "Señales de FDI y apertura a capital internacional",
+    "umbral": "Presencia de majors + incentivos fiscales = E3 consolidado. Retiro = E2.",
+    "addedWeek": 11,
+    "hist": [
       [
         "green",
         "up",
@@ -3388,18 +3563,23 @@ export const INDICATORS = [
         "green",
         "up",
         "Erebor Bank, Yorkville y Exxon muestran apetito de capital pese a riesgos"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Bonos a 40 ctvs y Centerview contienen colapso, pero bienestar no mejora"
       ]
     ]
   },
   {
-    dim: "Económico",
-    icon: "📊",
-    esc: "E2",
-    name: "Sistema eléctrico nacional",
-    desc: "Rehabilitación como precondición para reactivación",
-    umbral: "Sin rehabilitación eléctrica no hay reactivación sostenible. Inversión est. $40.000M.",
-    addedWeek: 11,
-    hist: [
+    "dim": "Económico",
+    "icon": "📊",
+    "esc": "E2",
+    "name": "Sistema eléctrico nacional",
+    "desc": "Rehabilitación como precondición para reactivación",
+    "umbral": "Sin rehabilitación eléctrica no hay reactivación sostenible. Inversión est. $40.000M.",
+    "addedWeek": 11,
+    "hist": [
       [
         "yellow",
         "up",
@@ -3449,18 +3629,23 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Eventos de conectividad persisten, pero sin señal nacional de colapso eléctrico"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Bonos a 40 ctvs y Centerview contienen colapso, pero bienestar no mejora"
       ]
     ]
   },
   {
-    dim: "Político",
-    icon: "🏛",
-    esc: "E1",
-    name: "Continuidad constitucional del interinato",
-    desc: "Reloj jurídico del mandato encargado: plazos, prórroga AN, definición falta temporal vs. absoluta",
-    umbral: "Prórroga formal = E3 estable. Falta absoluta = elecciones 30 días (E1). Indefinición >180 días = crisis (E2).",
-    addedWeek: 12,
-    hist: [
+    "dim": "Político",
+    "icon": "🏛",
+    "esc": "E1",
+    "name": "Continuidad constitucional del interinato",
+    "desc": "Reloj jurídico del mandato encargado: plazos, prórroga AN, definición falta temporal vs. absoluta",
+    "umbral": "Prórroga formal = E3 estable. Falta absoluta = elecciones 30 días (E1). Indefinición >180 días = crisis (E2).",
+    "addedWeek": 12,
+    "hist": [
       [
         "yellow",
         "up",
@@ -3505,6 +3690,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Retornos opositores prueban continuidad constitucional sin cronograma electoral inmediato"
+      ],
+      [
+        "yellow",
+        "flat",
+        "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
       ]
     ]
   }
@@ -3512,226 +3702,226 @@ export const INDICATORS = [
 
 export const SCENARIO_SIGNALS = [
   {
-    esc: "E3",
-    signals: [
+    "esc": "E3",
+    "signals": [
       {
-        name: "E3 alcanza 49%",
-        sem: "green",
-        val: "Continuidad Negociada sube +2pp por cohesión táctica sobre Saab y normalización multilateral",
-        isNew: true
+        "name": "Segunda visita SOUTHCOM a Caracas",
+        "sem": "green",
+        "val": "Presencia militar estadounidense normalizada con prenotificación venezolana.",
+        "isNew": true
       },
       {
-        name: "Banco Mundial en Caracas",
-        sem: "green",
-        val: "Primera visita desde 2005; hoja de ruta técnica en estabilización, inversión y empleo",
-        isNew: true
+        "name": "Centerview/Pigasse para deuda USD 150.000M",
+        "sem": "green",
+        "val": "La reestructuración de deuda convierte la normalización financiera en proceso operativo.",
+        "isNew": true
       },
       {
-        name: "Calixto Ortega ante el FMI",
-        sem: "green",
-        val: "Canal formal de representación plena y auditoría técnica de deuda",
-        isNew: true
+        "name": "Claver-Carone como enlace informal",
+        "sem": "yellow",
+        "val": "Sostiene la arquitectura Washington-Caracas pero concentra riesgo reputacional.",
+        "isNew": true
       },
       {
-        name: "BDV-Erebor Bank",
-        sem: "green",
-        val: "Primera corresponsalía bancaria operativa con EE.UU. en el período",
-        isNew: true
+        "name": "Comisiones presidenciales de 90 días",
+        "sem": "green",
+        "val": "Reingeniería estatal bajo Héctor Rodríguez y Anabel Pereira.",
+        "isNew": true
       },
       {
-        name: "ExxonMobil negocia campos",
-        sem: "green",
-        val: "Hasta seis campos venezolanos; señal de retorno energético de alto simbolismo",
-        isNew: true
+        "name": "BDV amplía corresponsalías",
+        "sem": "green",
+        "val": "Abanca Europa, Banesco USA y Erebor consolidan reinserción bancaria."
       },
       {
-        name: "Godoy acreditada ante ONU",
-        sem: "green",
-        val: "Normalización diplomática multilateral posterior al vacío del período Maduro",
-        isNew: true
+        "name": "Venezuela 4° proveedor petrolero de India",
+        "sem": "green",
+        "val": "Agrega amortiguador externo adicional.",
+        "isNew": true
       },
       {
-        name: "Humanitarian Reset incluye Venezuela",
-        sem: "green",
-        val: "EE.UU. incorpora al país en asignación adicional de asistencia ONU",
-        isNew: true
+        "name": "Protección operativa DOJ a Rodríguez",
+        "sem": "yellow",
+        "val": "AP reporta instrucción de evitar nuevas causas contra Delcy; DOJ matiza.",
+        "isNew": true
       },
       {
-        name: "Caso Saab como ruptura administrada",
-        sem: "yellow",
-        val: "El interinato se desvincula selectivamente del antiguo operador sin desmontar continuidad institucional",
-        isNew: true
+        "name": "Manifiesto reconoce plan Washington",
+        "sem": "green",
+        "val": "La oposición opera dentro del marco estratégico externo.",
+        "isNew": true
       },
       {
-        name: "Conoco rechaza contrato PDVSA",
-        sem: "yellow",
-        val: "La reapertura energética enfrenta cuello contractual y fiscal",
-        isNew: true
+        "name": "Aprobación doméstica en mínimo",
+        "sem": "red",
+        "val": "25,2% de aprobación tensiona sostenibilidad interna.",
+        "isNew": true
       },
       {
-        name: "PIB Q1 desacelera",
-        sem: "yellow",
-        val: "Crecimiento de 2,51% muestra que normalización externa aún no resuelve economía real",
-        isNew: true
+        "name": "Decretos de comisiones pendientes",
+        "sem": "yellow",
+        "val": "Sin Gaceta Oficial al cierre, parte de la reforma aún es anuncio."
       },
       {
-        name: "Chris Wright prioriza estabilidad",
-        sem: "yellow",
-        val: "Washington mantiene energía y estabilidad por encima de elecciones inmediatas",
-        isNew: true
+        "name": "Caso Zapatero/Plus Ultra",
+        "sem": "yellow",
+        "val": "Exposición judicial puede dañar canales España-Venezuela.",
+        "isNew": true
       },
       {
-        name: "Reestructuración formal S18",
-        sem: "green",
-        val: "La fase Centerview/White & Case deja de ser novedad y pasa a condición de base",
-        vigpierde: true
+        "name": "Sin calendario electoral vinculante",
+        "sem": "yellow",
+        "val": "La dimensión política sigue rezagada frente al avance financiero."
       }
     ]
   },
   {
-    esc: "E1",
-    signals: [
+    "esc": "E1",
+    "signals": [
       {
-        name: "E1 retrocede a 36%",
-        sem: "yellow",
-        val: "Retorno MCM pendiente, paro absorbido y BCV-Washington sin condicionamiento electoral",
-        isNew: true
+        "name": "Manifiesto de Panamá",
+        "sem": "green",
+        "val": "Primer documento estratégico conjunto en dos años.",
+        "isNew": true
       },
       {
-        name: "Lester Toledo regresa",
-        sem: "green",
-        val: "Primer retorno de dirigente opositor con acusaciones graves en el período",
-        isNew: true
+        "name": "Retornos de Ocariz, Toledo y Marrero",
+        "sem": "green",
+        "val": "Reconstruyen presencia territorial opositora.",
+        "isNew": true
       },
       {
-        name: "Rosales estima 35–45 semanas",
-        sem: "yellow",
-        val: "El debate electoral se vuelve técnico y más largo que la expectativa política inmediata",
-        isNew: true
+        "name": "MCM 55% imagen positiva",
+        "sem": "green",
+        "val": "Principal activo de legitimidad."
       },
       {
-        name: "Foro Penal verifica 38 excarcelaciones",
-        sem: "green",
-        val: "Liberaciones mejoran ambiente, aunque sujetas a medidas restrictivas",
-        isNew: true
+        "name": "Retorno efectivo de MCM pendiente",
+        "sem": "yellow",
+        "val": "Test decisivo de garantías implícitas."
       },
       {
-        name: "Canal MP-Amnistía Internacional",
-        sem: "yellow",
-        val: "Puede mejorar garantías si produce acceso y respuesta a expedientes",
-        isNew: true
+        "name": "Nuevo CNE sin avances",
+        "sem": "yellow",
+        "val": "Condición mínima sigue bloqueada."
       },
       {
-        name: "Guanipa cuestiona relación Dogu-oposición",
-        sem: "yellow",
-        val: "Tensión sobre diseño real de la diplomacia estadounidense con actores opositores",
-        isNew: true
+        "name": "Movilizaciones 30 mayo y 3 junio",
+        "sem": "yellow",
+        "val": "Medirán tracción territorial post-Panamá.",
+        "isNew": true
       },
       {
-        name: "Prioridad de estabilidad sobre elecciones",
-        sem: "yellow",
-        val: "Wright reduce probabilidad de convocatoria inmediata",
-        isNew: true
+        "name": "Debate Toledo/Guaidó",
+        "sem": "yellow",
+        "val": "La rendición de cuentas puede erosionar unidad.",
+        "isNew": true
+      },
+      {
+        "name": "Plan Washington como marco esencial",
+        "sem": "green",
+        "val": "Da estructura externa, pero subordina ritmo opositor.",
+        "vigpierde": true
       }
     ]
   },
   {
-    esc: "E2",
-    signals: [
+    "esc": "E2",
+    "signals": [
       {
-        name: "E2 sube a 4%",
-        sem: "yellow",
-        val: "Deterioro acumulativo de infraestructura, ingreso, señoreaje y PIB desacelerado",
-        isNew: true
+        "name": "PIB Q1 +2,51%",
+        "sem": "yellow",
+        "val": "Desaceleración fuerte frente al +7,19% de Q1 2025.",
+        "isNew": true
       },
       {
-        name: "PIB Q1 mínimo desde 2021",
-        sem: "yellow",
-        val: "2,51% de crecimiento y sector petrolero -2,12% activan alerta macro",
-        isNew: true
+        "name": "PIB petrolero negativo",
+        "sem": "yellow",
+        "val": "Primer retroceso en 11 trimestres.",
+        "isNew": true
       },
       {
-        name: "Canasta USD 730,59",
-        sem: "red",
-        val: "Ingreso integral cubre solo 32,8%; pensión mínima 9,5%",
-        isNew: true
+        "name": "Canasta USD 730,59 vs ingreso USD 240",
+        "sem": "red",
+        "val": "Cobertura de 32,8% sostiene presión social."
       },
       {
-        name: "Inversión negativa",
-        sem: "yellow",
-        val: "Inversión -12,3% y construcción -18,3% muestran fragilidad productiva",
-        isNew: true
+        "name": "Inflación anualizada ~600%",
+        "sem": "red",
+        "val": "Aceleración de precios y brecha cambiaria 30-45%."
       },
       {
-        name: "BM/FMI/Erebor reducen riesgo sistémico",
-        sem: "green",
-        val: "La reapertura financiera contiene escenario de colapso inmediato",
-        isNew: true
+        "name": "Centerview y compra de bonos",
+        "sem": "green",
+        "val": "Mercados apuestan contra colapso inmediato.",
+        "isNew": true
       },
       {
-        name: "Exxon y CITGO sostienen ancla energética",
-        sem: "green",
-        val: "Interés de inversión y utilidad CITGO reducen riesgo externo",
-        isNew: true
+        "name": "Riesgo Congreso EE.UU.",
+        "sem": "yellow",
+        "val": "Investigación sobre Centerview/Claver afectaría canal financiero.",
+        "isNew": true
       },
       {
-        name: "Contrato PDVSA inhibe inversión amplia",
-        sem: "yellow",
-        val: "Rechazo de Conoco indica que la reapertura no será homogénea",
-        isNew: true
+        "name": "Ley eléctrica requiere USD 20.000M",
+        "sem": "yellow",
+        "val": "Sistema deficitario limita producción y bienestar."
+      },
+      {
+        "name": "Petróleo bajo USD 50",
+        "sem": "green",
+        "val": "Riesgo no activado mientras precios se mantienen.",
+        "vigpierde": true
       }
     ]
   },
   {
-    esc: "E4",
-    signals: [
+    "esc": "E4",
+    "signals": [
       {
-        name: "47 protestas en 19 entidades",
-        sem: "red",
-        val: "Mayor densidad de conflictividad del período post-Maduro",
-        isNew: true
+        "name": "Iris Varela guarda la silla de Maduro",
+        "sem": "red",
+        "val": "Narrativa incompatible con transición electoral plena.",
+        "isNew": true
       },
       {
-        name: "Paro universitario nacional",
-        sem: "red",
-        val: "26 protestas en 16 estados el 19 de mayo; 18 vinculadas al sector universitario",
-        isNew: true
+        "name": "Filtración “estamos caídos”",
+        "sem": "yellow",
+        "val": "Percepción interna de vulnerabilidad.",
+        "isNew": true
       },
       {
-        name: "Represión frente al SEBIN",
-        sem: "red",
-        val: "Señal cualitativa importante, pero calibrada y compatible con E3",
-        isNew: true
+        "name": "Detención de trabajadores PDVSA",
+        "sem": "red",
+        "val": "Represión selectiva sobre sector estratégico.",
+        "isNew": true
       },
       {
-        name: "Caso Quero Navas-Carmen Navas",
-        sem: "red",
-        val: "Muerte bajo custodia y fallecimiento de la madre sin respuestas completas elevan presión de DDHH",
-        isNew: true
+        "name": "Brecha de amnistía",
+        "sem": "yellow",
+        "val": "8.740 oficiales frente a 44 verificaciones semanales."
       },
       {
-        name: "Nueva investigación contra Maduro",
-        sem: "yellow",
-        val: "Florida abre línea de lavado de dinero que puede complicar acuerdos de impunidad",
-        isNew: true
+        "name": "Motín Internado Judicial de Barinas",
+        "sem": "yellow",
+        "val": "1.200 reclusos denuncian requisas violentas.",
+        "isNew": true
       },
       {
-        name: "Saab puede ampliar cuerpo probatorio",
-        sem: "yellow",
-        val: "Su proceso en Miami puede activar nuevas revelaciones sobre redes financieras",
-        isNew: true
+        "name": "Represión de movilizaciones 30 mayo/3 junio",
+        "sem": "red",
+        "val": "Activador disruptivo si hay fuerza sistémica."
       },
       {
-        name: "Excarcelaciones con medidas",
-        sem: "yellow",
-        val: "38 liberaciones verificadas no eliminan restricciones ni pendientes",
-        isNew: true
+        "name": "Represalia al retorno de MCM",
+        "sem": "red",
+        "val": "Activador más potente de E4."
       },
       {
-        name: "Costo de represión sistémica sigue alto",
-        sem: "green",
-        val: "BM/FMI/ONU/EE.UU. elevan costo de una escalada coercitiva abierta",
-        vigpierde: true
+        "name": "Fallecimientos de familiares de presos políticos",
+        "sem": "yellow",
+        "val": "Quinto caso de madre fallecida en 2026.",
+        "isNew": true
       }
     ]
   }

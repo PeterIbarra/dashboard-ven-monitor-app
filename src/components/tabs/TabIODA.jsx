@@ -507,6 +507,78 @@ function InteractiveChart({ states, timePreset, selectedState, onSelectState, pa
   
   const toX = ts => pL + ((ts - viewStart) / viewRange) * cW;
   const toY = pct => pT + cH - (pct / 100) * cH;
+  const clamp01 = v => Math.max(0, Math.min(1, v));
+  const normalizeRange = (start, end) => {
+    const span = end - start;
+    if (span >= 0.98) return null;
+    if (start < 0) return { start: 0, end: span };
+    if (end > 1) return { start: 1 - span, end: 1 };
+    return { start, end };
+  };
+  const getSvgPoint = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) / rect.width * W,
+      y: (e.clientY - rect.top) / rect.height * H,
+      clientX: e.clientX - rect.left,
+      clientY: e.clientY - rect.top,
+    };
+  };
+  const updateHover = (e) => {
+    const pt = getSvgPoint(e);
+    const ts = viewStart + ((pt.x - pL) / cW) * viewRange;
+    if (pt.x < pL || pt.x > pL + cW || ts < viewStart || ts > viewEnd) {
+      setChartHover(null);
+      return;
+    }
+    const values = chartData.map((st, si) => {
+      const closest = st.pctSeries.reduce((best, p) => {
+        if (p.pct === null) return best;
+        const dist = Math.abs(p.ts - ts);
+        return (!best || dist < best.dist) ? { pct: p.pct, dist } : best;
+      }, null);
+      return closest ? { name: st.name, pct: closest.pct, color: palette[si % palette.length] } : null;
+    }).filter(Boolean);
+    values.sort((a,b) => b.pct - a.pct);
+    setChartHover({ x: pt.x, ts, values, clientX: pt.clientX, clientY: pt.clientY });
+  };
+  const handlePointerMove = (e) => {
+    const pt = getSvgPoint(e);
+    if (dragging && dragStart && zoomRange) {
+      const span = dragStart.end - dragStart.start;
+      const dxFrac = ((pt.x - dragStart.x) / cW) * span;
+      setZoomRange(normalizeRange(dragStart.start - dxFrac, dragStart.end - dxFrac));
+    }
+    updateHover(e);
+  };
+  const handlePointerDown = (e) => {
+    const pt = getSvgPoint(e);
+    if (pt.x < pL || pt.x > pL + cW || pt.y < pT || pt.y > pT + cH) return;
+    if (zoomRange) {
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+      setDragging(true);
+      setDragStart({ x: pt.x, start: zoomRange.start, end: zoomRange.end });
+    }
+    updateHover(e);
+  };
+  const stopDragging = (e) => {
+    e?.currentTarget?.releasePointerCapture?.(e.pointerId);
+    setDragging(false);
+    setDragStart(null);
+  };
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const pt = getSvgPoint(e);
+    if (pt.x < pL || pt.x > pL + cW) return;
+    const currentStart = zoomRange ? zoomRange.start : 0;
+    const currentEnd = zoomRange ? zoomRange.end : 1;
+    const currentSpan = currentEnd - currentStart;
+    const anchorFrac = clamp01((pt.x - pL) / cW);
+    const anchor = currentStart + anchorFrac * currentSpan;
+    const scale = e.deltaY > 0 ? 1.25 : 0.8;
+    const nextSpan = Math.max(0.05, Math.min(1, currentSpan * scale));
+    setZoomRange(normalizeRange(anchor - anchorFrac * nextSpan, anchor + (1 - anchorFrac) * nextSpan));
+  };
   
   // Zoom with +/- buttons
   const zoomIn = () => {
@@ -534,25 +606,14 @@ function InteractiveChart({ states, timePreset, selectedState, onSelectState, pa
   
   return (
     <div>
-      <div ref={containerRef} style={{ cursor: "crosshair", touchAction: "none", position: "relative" }}>
+      <div ref={containerRef} style={{ cursor: dragging ? "grabbing" : "crosshair", touchAction: "none", position: "relative", userSelect:"none" }}>
         <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}
-          onMouseMove={e => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const mx = (e.clientX - rect.left) / rect.width * W;
-            const ts = viewStart + ((mx - pL) / cW) * viewRange;
-            if (ts < viewStart || ts > viewEnd) { setChartHover(null); return; }
-            const values = chartData.map((st, si) => {
-              const closest = st.pctSeries.reduce((best, p) => {
-                if (p.pct === null) return best;
-                const dist = Math.abs(p.ts - ts);
-                return (!best || dist < best.dist) ? { pct: p.pct, dist } : best;
-              }, null);
-              return closest ? { name: st.name, pct: closest.pct, color: palette[si % palette.length] } : null;
-            }).filter(Boolean);
-            values.sort((a,b) => b.pct - a.pct);
-            setChartHover({ x: mx, ts, values, clientX: e.clientX - rect.left, clientY: e.clientY - rect.top });
-          }}
-          onMouseLeave={() => setChartHover(null)}>
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={stopDragging}
+          onPointerCancel={stopDragging}
+          onWheel={handleWheel}
+          onMouseLeave={(e) => { stopDragging(e); setChartHover(null); }}>
           {/* Hover crosshair */}
           {chartHover && <line x1={chartHover.x} y1={pT} x2={chartHover.x} y2={pT+cH} stroke="rgba(0,0,0,0.12)" strokeDasharray="2,2" />}
           {/* Grid */}

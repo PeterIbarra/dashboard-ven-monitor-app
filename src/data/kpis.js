@@ -1,70 +1,68 @@
-// Latest KPI cards
-
 export const KPIS_LATEST = {
-  energia: [
+  "energia": [
     {
-      k: "Producción petrolera",
-      v: "1,2 M bpd cierre abr.",
-      c: "#22c55e"
+      "k": "Petróleo EE.UU.",
+      "v": ">10M barriles",
+      "c": "#22c55e"
     },
     {
-      k: "ExxonMobil",
-      v: "Hasta 6 campos en negociación",
-      c: "#22c55e"
+      "k": "Producción neta",
+      "v": "~980K bpd",
+      "c": "#f59e0b"
     },
     {
-      k: "CITGO Q1",
-      v: "USD 157M utilidad",
-      c: "#38bdf8"
+      "k": "India",
+      "v": "4° proveedor",
+      "c": "#38bdf8"
     },
     {
-      k: "Contrato PDVSA",
-      v: "Conoco rechaza modelo",
-      c: "#f59e0b"
+      "k": "Deuda",
+      "v": "Centerview USD 150.000M",
+      "c": "#22c55e"
     }
   ],
-  politico: [
+  "politico": [
     {
-      k: "Caso Saab",
-      v: "Acusación DOJ Miami",
-      c: "#ef4444"
+      "k": "Manifiesto Panamá",
+      "v": "PUD + MCM + EGU",
+      "c": "#22c55e"
     },
     {
-      k: "BM en Caracas",
-      v: "Primera visita desde 2005",
-      c: "#22c55e"
+      "k": "SOUTHCOM",
+      "v": "2ª visita Caracas",
+      "c": "#38bdf8"
     },
     {
-      k: "FMI",
-      v: "Ortega gobernador",
-      c: "#22c55e"
+      "k": "TSJ",
+      "v": "32 magistrados",
+      "c": "#f59e0b"
     },
     {
-      k: "Amnistía",
-      v: "38 FP verificadas",
-      c: "#f59e0b"
+      "k": "Amnistía",
+      "v": "8.740 gob · 44 FP",
+      "c": "#f59e0b"
     }
   ],
-  opinion: [
+  "opinion": [
     {
-      k: "Conflictividad",
-      v: "47 protestas / 19 entidades",
-      c: "#ef4444"
+      "k": "Delcy Rodríguez",
+      "v": "25,2% aprobación",
+      "c": "#ef4444"
     },
     {
-      k: "Paro universitario",
-      v: "26 protestas el 19M",
-      c: "#ef4444"
+      "k": "MCM",
+      "v": "55% imagen positiva",
+      "c": "#22c55e"
     },
     {
-      k: "Canasta alimentaria",
-      v: "USD 730,59",
-      c: "#f59e0b"
+      "k": "ICC",
+      "v": "-8,1",
+      "c": "#ef4444"
     },
     {
-      k: "Ingreso integral",
-      v: "32,8% de la canasta",
-      c: "#ef4444"
+      "k": "Conflictividad",
+      "v": "43 protestas · 17 estados",
+      "c": "#f59e0b"
     }
   ]
 };

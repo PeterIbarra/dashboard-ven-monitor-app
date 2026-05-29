@@ -1,1628 +1,1718 @@
-// Weekly scenario probabilities and readings
-
 export const WEEKS = [
   {
-    label: "3–15 ene",
-    short: "S1",
-    probs: [
+    "label": "3–15 ene",
+    "short": "S1",
+    "probs": [
       {
-        sc: 1,
-        v: 5,
-        t: "flat"
+        "sc": 1,
+        "v": 5,
+        "t": "flat"
       },
       {
-        sc: 2,
-        v: 45,
-        t: "flat"
+        "sc": 2,
+        "v": 45,
+        "t": "flat"
       },
       {
-        sc: 3,
-        v: 40,
-        t: "flat"
+        "sc": 3,
+        "v": 40,
+        "t": "flat"
       },
       {
-        sc: 4,
-        v: 10,
-        t: "flat"
+        "sc": 4,
+        "v": 10,
+        "t": "flat"
       }
     ],
-    xy: {
-      x: 0.43,
-      y: 0.44
+    "xy": {
+      "x": 0.43,
+      "y": 0.44
     },
-    sem: {
-      g: 2,
-      y: 4,
-      r: 7
+    "sem": {
+      "g": 2,
+      "y": 4,
+      "r": 7
     },
-    kpis: {
-      energia: {
-        exportaciones: "Interrumpidas",
-        ingresos: "—",
-        licencias: "En proceso",
-        cambio: "—"
+    "kpis": {
+      "energia": {
+        "exportaciones": "Interrumpidas",
+        "ingresos": "—",
+        "licencias": "En proceso",
+        "cambio": "—"
       },
-      economico: {
-        inflacion: "567% (2025)",
-        ingresos_pob: "< USD 300",
-        electricidad: "Sin datos",
-        pib: "—"
+      "economico": {
+        "inflacion": "567% (2025)",
+        "ingresos_pob": "< USD 300",
+        "electricidad": "Sin datos",
+        "pib": "—"
       },
-      opinion: {
-        direccion: "—",
-        elecciones: "93.5% rechaza trans. chav.",
-        mcm: "—",
-        eeuu: "47%"
+      "opinion": {
+        "direccion": "—",
+        "elecciones": "93.5% rechaza trans. chav.",
+        "mcm": "—",
+        "eeuu": "47%"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "red",
-        t: "<b>Operativo 3 ene:</b> Captura de Maduro. Alta fragilidad institucional."
+        "l": "red",
+        "t": "<b>Operativo 3 ene:</b> Captura de Maduro. Alta fragilidad institucional."
       },
       {
-        l: "red",
-        t: "<b>Exportaciones:</b> Interrupción casi total primeros días."
+        "l": "red",
+        "t": "<b>Exportaciones:</b> Interrupción casi total primeros días."
       },
       {
-        l: "yellow",
-        t: "<b>Excarcelaciones:</b> 101 confirmadas, 14 periodistas."
+        "l": "yellow",
+        "t": "<b>Excarcelaciones:</b> 101 confirmadas, 14 periodistas."
       }
     ],
-    lectura: "El operativo del 3 de enero inaugura el ciclo en condiciones de fragilidad máxima. La captura de Maduro por fuerzas estadounidenses genera un shock institucional sin precedentes: las exportaciones petroleras se interrumpen casi totalmente en los primeros días, la opacidad sobre víctimas del operativo es elevada, y las restricciones a la prensa extranjera configuran un entorno de alta incertidumbre. E2 (Colapso y fragmentación) domina con 45% porque el riesgo de desintegración institucional es real — pero la rápida designación de Delcy Rodríguez como autoridad interina, avalada por el TSJ y reconocida funcionalmente por Washington, impide que el vacío de poder se convierta en crisis terminal. Las 101 excarcelaciones confirmadas, incluidos 14 periodistas, son la primera señal de distensión selectiva. El 47% de aprobación interna a la operación estadounidense y el 79% de opinión favorable hacia Delcy (Hinterlaces) revelan que la ciudadanía procesa el shock con pragmatismo más que con rechazo. E3 (Continuidad negociada) ya está al 40%, emergiendo como alternativa viable si el flujo petrolero se restablece. La clave de esta semana es que el operativo no desencadenó el colapso que muchos anticipaban: la cohesión civil-militar se preservó, la continuidad institucional condicionada fue avalada, y las primeras señales de cooperación energética con EE.UU. aparecen hacia el final del período.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "El operativo del 3 de enero inaugura el ciclo en condiciones de fragilidad máxima. La captura de Maduro por fuerzas estadounidenses genera un shock institucional sin precedentes: las exportaciones petroleras se interrumpen casi totalmente en los primeros días, la opacidad sobre víctimas del operativo es elevada, y las restricciones a la prensa extranjera configuran un entorno de alta incertidumbre. E2 (Colapso y fragmentación) domina con 45% porque el riesgo de desintegración institucional es real — pero la rápida designación de Delcy Rodríguez como autoridad interina, avalada por el TSJ y reconocida funcionalmente por Washington, impide que el vacío de poder se convierta en crisis terminal. Las 101 excarcelaciones confirmadas, incluidos 14 periodistas, son la primera señal de distensión selectiva. El 47% de aprobación interna a la operación estadounidense y el 79% de opinión favorable hacia Delcy (Hinterlaces) revelan que la ciudadanía procesa el shock con pragmatismo más que con rechazo. E3 (Continuidad negociada) ya está al 40%, emergiendo como alternativa viable si el flujo petrolero se restablece. La clave de esta semana es que el operativo no desencadenó el colapso que muchos anticipaban: la cohesión civil-militar se preservó, la continuidad institucional condicionada fue avalada, y las primeras señales de cooperación energética con EE.UU. aparecen hacia el final del período.",
+    "trendSc": 3,
+    "trendDrivers": [
       "Estabilización post-operativo: continuidad institucional bajo tutela EE.UU.",
       "Exportaciones petroleras reactivándose; orden ejecutiva Trump protege ingresos",
       "Excarcelaciones graduales señalan distensión selectiva"
     ]
   },
   {
-    label: "16–22 ene",
-    short: "S2",
-    probs: [
+    "label": "16–22 ene",
+    "short": "S2",
+    "probs": [
       {
-        sc: 1,
-        v: 15,
-        t: "up"
+        "sc": 1,
+        "v": 15,
+        "t": "up"
       },
       {
-        sc: 2,
-        v: 25,
-        t: "down"
+        "sc": 2,
+        "v": 25,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 50,
-        t: "up"
+        "sc": 3,
+        "v": 50,
+        "t": "up"
       },
       {
-        sc: 4,
-        v: 10,
-        t: "flat"
+        "sc": 4,
+        "v": 10,
+        "t": "flat"
       }
     ],
-    xy: {
-      x: 0.25,
-      y: 0.28
+    "xy": {
+      "x": 0.25,
+      "y": 0.28
     },
-    sem: {
-      g: 3,
-      y: 5,
-      r: 5
+    "sem": {
+      "g": 3,
+      "y": 5,
+      "r": 5
     },
-    kpis: {
-      energia: {
-        exportaciones: "En recuperación",
-        ingresos: "Divisas a banca",
-        licencias: "LG-46 en proceso",
-        cambio: "Relativa estabilidad"
+    "kpis": {
+      "energia": {
+        "exportaciones": "En recuperación",
+        "ingresos": "Divisas a banca",
+        "licencias": "LG-46 en proceso",
+        "cambio": "Relativa estabilidad"
       },
-      economico: {
-        inflacion: "Alta (3 dígitos)",
-        ingresos_pob: "< USD 300",
-        electricidad: "Sin datos",
-        pib: "—"
+      "economico": {
+        "inflacion": "Alta (3 dígitos)",
+        "ingresos_pob": "< USD 300",
+        "electricidad": "Sin datos",
+        "pib": "—"
       },
-      opinion: {
-        direccion: "—",
-        elecciones: "—",
-        mcm: "51.6% prefiere MCM",
-        eeuu: "47%"
+      "opinion": {
+        "direccion": "—",
+        "elecciones": "—",
+        "mcm": "51.6% prefiere MCM",
+        "eeuu": "47%"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "yellow",
-        t: "<b>Doble canal EE.UU.:</b> Reconocimiento a Delcy + interlocución MCM."
+        "l": "yellow",
+        "t": "<b>Doble canal EE.UU.:</b> Reconocimiento a Delcy + interlocución MCM."
       },
       {
-        l: "yellow",
-        t: "<b>DDHH:</b> Excarcelaciones + nuevas detenciones simultáneas."
+        "l": "yellow",
+        "t": "<b>DDHH:</b> Excarcelaciones + nuevas detenciones simultáneas."
       },
       {
-        l: "green",
-        t: "<b>Divisas:</b> Flujo hacia banca privada iniciado."
+        "l": "green",
+        "t": "<b>Divisas:</b> Flujo hacia banca privada iniciado."
       }
     ],
-    lectura: "La semana del 16 al 22 de enero marca el punto de inflexión decisivo del ciclo: el tránsito desde la fragilidad máxima hacia la estabilización incipiente. Tres hitos cambian estructuralmente el mapa de riesgos. La visita a Caracas del Director de la CIA John Ratcliffe establece que el vínculo bilateral tiene profundidad de inteligencia, no solo económica. La Licencia General 46 de la OFAC crea por primera vez un marco normativo claro para la cooperación energética bilateral. Y la reapertura del espacio aéreo normaliza el vínculo a nivel cotidiano. E3 sube a 50% dominante porque el acoplamiento energético-financiero ya tiene mecanismos concretos funcionando: USD 300 millones colocados a través de banca privada, BCV publica tipo de cambio oficial por primera vez desde agosto 2024. El doble canal estratégico de Washington — reconocer a Delcy para energía y seguridad, mantener interlocución con MCM sin trasladarle control — es un diseño deliberado, no una contradicción. E2 cae a 25% porque el riesgo de colapso se desvanece al regularizarse las exportaciones. La reestructuración de 28 cargos intermedios de la FANB, manteniendo intacta la cúpula, es señal de control preventivo sin ruptura.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "La semana del 16 al 22 de enero marca el punto de inflexión decisivo del ciclo: el tránsito desde la fragilidad máxima hacia la estabilización incipiente. Tres hitos cambian estructuralmente el mapa de riesgos. La visita a Caracas del Director de la CIA John Ratcliffe establece que el vínculo bilateral tiene profundidad de inteligencia, no solo económica. La Licencia General 46 de la OFAC crea por primera vez un marco normativo claro para la cooperación energética bilateral. Y la reapertura del espacio aéreo normaliza el vínculo a nivel cotidiano. E3 sube a 50% dominante porque el acoplamiento energético-financiero ya tiene mecanismos concretos funcionando: USD 300 millones colocados a través de banca privada, BCV publica tipo de cambio oficial por primera vez desde agosto 2024. El doble canal estratégico de Washington — reconocer a Delcy para energía y seguridad, mantener interlocución con MCM sin trasladarle control — es un diseño deliberado, no una contradicción. E2 cae a 25% porque el riesgo de colapso se desvanece al regularizarse las exportaciones. La reestructuración de 28 cargos intermedios de la FANB, manteniendo intacta la cúpula, es señal de control preventivo sin ruptura.",
+    "trendSc": 3,
+    "trendDrivers": [
       "LG-46 OFAC: marco normativo para cooperación energética bilateral",
       "Doble canal EE.UU.: reconocimiento a Delcy + interlocución con MCM",
       "USD 300M en divisas a banca privada consolidan el esquema financiero"
     ]
   },
   {
-    label: "23–29 ene",
-    short: "S3",
-    probs: [
+    "label": "23–29 ene",
+    "short": "S3",
+    "probs": [
       {
-        sc: 1,
-        v: 20,
-        t: "up"
+        "sc": 1,
+        "v": 20,
+        "t": "up"
       },
       {
-        sc: 2,
-        v: 10,
-        t: "down"
+        "sc": 2,
+        "v": 10,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 60,
-        t: "up"
+        "sc": 3,
+        "v": 60,
+        "t": "up"
       },
       {
-        sc: 4,
-        v: 10,
-        t: "flat"
+        "sc": 4,
+        "v": 10,
+        "t": "flat"
       }
     ],
-    xy: {
-      x: 0.21,
-      y: 0.33
+    "xy": {
+      "x": 0.21,
+      "y": 0.33
     },
-    sem: {
-      g: 5,
-      y: 5,
-      r: 3
+    "sem": {
+      "g": 5,
+      "y": 5,
+      "r": 3
     },
-    kpis: {
-      energia: {
-        exportaciones: "~800 kbd (+60.6%)",
-        ingresos: "Divisas regulares",
-        licencias: "LG-46 emitida",
-        cambio: "Estabilizando"
+    "kpis": {
+      "energia": {
+        "exportaciones": "~800 kbd (+60.6%)",
+        "ingresos": "Divisas regulares",
+        "licencias": "LG-46 emitida",
+        "cambio": "Estabilizando"
       },
-      economico: {
-        inflacion: "Alta (3 dígitos)",
-        ingresos_pob: "< USD 300",
-        electricidad: "Afectaciones",
-        pib: "Proy. al alza"
+      "economico": {
+        "inflacion": "Alta (3 dígitos)",
+        "ingresos_pob": "< USD 300",
+        "electricidad": "Afectaciones",
+        "pib": "Proy. al alza"
       },
-      opinion: {
-        direccion: "—",
-        elecciones: "Reunión Rubio–MCM",
-        mcm: "78% intención voto",
-        eeuu: "—"
+      "opinion": {
+        "direccion": "—",
+        "elecciones": "Reunión Rubio–MCM",
+        "mcm": "78% intención voto",
+        "eeuu": "—"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>LG-46:</b> Licencia OFAC emitida — hito operativo clave."
+        "l": "green",
+        "t": "<b>LG-46:</b> Licencia OFAC emitida — hito operativo clave."
       },
       {
-        l: "green",
-        t: "<b>Reforma Hidrocarburos:</b> Cambio más profundo en 50 años."
+        "l": "green",
+        "t": "<b>Reforma Hidrocarburos:</b> Cambio más profundo en 50 años."
       },
       {
-        l: "yellow",
-        t: "<b>Agenda electoral:</b> Sin fechas. Presión opositora activa."
+        "l": "yellow",
+        "t": "<b>Agenda electoral:</b> Sin fechas. Presión opositora activa."
       }
     ],
-    lectura: "E3 consolida su probabilidad más alta del ciclo — 60% — porque el esquema de estabilización deja de ser promesa y se convierte en mecanismo operativo verificable. La LG-46 está efectiva: Vitol carga ~460.000 barriles de nafta pesada desde Houston reactivando la producción de la Faja del Orinoco. Las exportaciones supervisadas se incrementan sostenidamente. La reforma a la Ley Orgánica de Hidrocarburos — aprobada en segunda discusión — representa el cambio estructural más profundo en el sector petrolero venezolano en 50 años. La reunión Rubio-MCM en Washington institucionaliza el doble canal hacia la transición, y la Ley de Amnistía entra en primera discusión. El 78.3% de intención de voto por MCM configura la base opositora más sólida del ciclo. Sin embargo, Washington es explícito en sus reservas sobre el retorno inmediato de MCM: Rubio compara el proceso con la transición española post-Franco — 'los cambios profundos requieren tiempo'. E2 cae a 10% porque sin interrupción del esquema petrolero-financiero, el riesgo de fragmentación está estructuralmente contenido.",
-    trendSc: 1,
-    trendDrivers: [
+    "lectura": "E3 consolida su probabilidad más alta del ciclo — 60% — porque el esquema de estabilización deja de ser promesa y se convierte en mecanismo operativo verificable. La LG-46 está efectiva: Vitol carga ~460.000 barriles de nafta pesada desde Houston reactivando la producción de la Faja del Orinoco. Las exportaciones supervisadas se incrementan sostenidamente. La reforma a la Ley Orgánica de Hidrocarburos — aprobada en segunda discusión — representa el cambio estructural más profundo en el sector petrolero venezolano en 50 años. La reunión Rubio-MCM en Washington institucionaliza el doble canal hacia la transición, y la Ley de Amnistía entra en primera discusión. El 78.3% de intención de voto por MCM configura la base opositora más sólida del ciclo. Sin embargo, Washington es explícito en sus reservas sobre el retorno inmediato de MCM: Rubio compara el proceso con la transición española post-Franco — 'los cambios profundos requieren tiempo'. E2 cae a 10% porque sin interrupción del esquema petrolero-financiero, el riesgo de fragmentación está estructuralmente contenido.",
+    "trendSc": 1,
+    "trendDrivers": [
       "MCM con 78.3% intención de voto: base opositora más sólida del ciclo",
       "Reunión Rubio-MCM institucionaliza el canal hacia transición",
       "Ley de Amnistía en primera discusión: apertura política avanza"
     ]
   },
   {
-    label: "30e–5f",
-    short: "S4",
-    probs: [
+    "label": "30e–5f",
+    "short": "S4",
+    "probs": [
       {
-        sc: 1,
-        v: 30,
-        t: "up"
+        "sc": 1,
+        "v": 30,
+        "t": "up"
       },
       {
-        sc: 2,
-        v: 5,
-        t: "down"
+        "sc": 2,
+        "v": 5,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 50,
-        t: "down"
+        "sc": 3,
+        "v": 50,
+        "t": "down"
       },
       {
-        sc: 4,
-        v: 15,
-        t: "up"
+        "sc": 4,
+        "v": 15,
+        "t": "up"
       }
     ],
-    xy: {
-      x: 0.19,
-      y: 0.35
+    "xy": {
+      "x": 0.19,
+      "y": 0.35
     },
-    sem: {
-      g: 5,
-      y: 5,
-      r: 3
+    "sem": {
+      "g": 5,
+      "y": 5,
+      "r": 3
     },
-    kpis: {
-      energia: {
-        exportaciones: "~800 kbd",
-        ingresos: "USD >800M acum.",
-        licencias: "LG-46 operativa",
-        cambio: "420–430 VEB/USD"
+    "kpis": {
+      "energia": {
+        "exportaciones": "~800 kbd",
+        "ingresos": "USD >800M acum.",
+        "licencias": "LG-46 operativa",
+        "cambio": "420–430 VEB/USD"
       },
-      economico: {
-        inflacion: "~200% proy.",
-        ingresos_pob: "69.5% < USD 300",
-        electricidad: "Deterioro",
-        pib: "10.4–15.2% proy."
+      "economico": {
+        "inflacion": "~200% proy.",
+        "ingresos_pob": "69.5% < USD 300",
+        "electricidad": "Deterioro",
+        "pib": "10.4–15.2% proy."
       },
-      opinion: {
-        direccion: "—",
-        elecciones: "93.5% rechaza trans.",
-        mcm: "78.3%",
-        eeuu: "—"
+      "opinion": {
+        "direccion": "—",
+        "elecciones": "93.5% rechaza trans.",
+        "mcm": "78.3%",
+        "eeuu": "—"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "yellow",
-        t: "<b>Amnistía 1ª discusión:</b> Arts. 7–13 diferidos."
+        "l": "yellow",
+        "t": "<b>Amnistía 1ª discusión:</b> Arts. 7–13 diferidos."
       },
       {
-        l: "yellow",
-        t: "<b>Excarcelaciones:</b> Patrón con medidas cautelares."
+        "l": "yellow",
+        "t": "<b>Excarcelaciones:</b> Patrón con medidas cautelares."
       },
       {
-        l: "red",
-        t: "<b>FANB:</b> Reafirma lealtad al Proyecto Bolivariano."
+        "l": "red",
+        "t": "<b>FANB:</b> Reafirma lealtad al Proyecto Bolivariano."
       }
     ],
-    lectura: "Primera tensión sistémica del ciclo de estabilización. E3 cede levemente a 50%, E1 sube a 30% y E4 gana terreno hasta 15%. La contradicción central es entre la aceleración de la normalización energético-diplomática — ampliación de licencias OFAC, bonos soberanos al alza, trayectoria hacia 800K bpd — y la resistencia del Ejecutivo a las aperturas políticas que esa misma lógica comienza a demandar. El cierre de El Helicoide como centro policial es presentado como señal de apertura, pero 949 personas detenidas por motivos políticos al 21 de enero contextualizan la señal. La FANB reafirma el 4 de febrero su lealtad al Proyecto Bolivariano. Jorge Rodríguez descarta públicamente elecciones inmediatas. El 93.5% de rechazo a una transición chavista y el 78.3% de intención de voto por MCM representan una demanda que E3 no puede ignorar indefinidamente. 14 jefes de Estado europeos presionan hacia un cronograma electoral. Trump propone reunir a representantes del chavismo y la oposición. E4 sube a 15% por acumulación de señales de control discrecional: aplazamiento del proceso contra Maduro, opacidad en cooperación con autoridades de Álex Saab y Raúl Gorrín.",
-    trendSc: 1,
-    trendDrivers: [
+    "lectura": "Primera tensión sistémica del ciclo de estabilización. E3 cede levemente a 50%, E1 sube a 30% y E4 gana terreno hasta 15%. La contradicción central es entre la aceleración de la normalización energético-diplomática — ampliación de licencias OFAC, bonos soberanos al alza, trayectoria hacia 800K bpd — y la resistencia del Ejecutivo a las aperturas políticas que esa misma lógica comienza a demandar. El cierre de El Helicoide como centro policial es presentado como señal de apertura, pero 949 personas detenidas por motivos políticos al 21 de enero contextualizan la señal. La FANB reafirma el 4 de febrero su lealtad al Proyecto Bolivariano. Jorge Rodríguez descarta públicamente elecciones inmediatas. El 93.5% de rechazo a una transición chavista y el 78.3% de intención de voto por MCM representan una demanda que E3 no puede ignorar indefinidamente. 14 jefes de Estado europeos presionan hacia un cronograma electoral. Trump propone reunir a representantes del chavismo y la oposición. E4 sube a 15% por acumulación de señales de control discrecional: aplazamiento del proceso contra Maduro, opacidad en cooperación con autoridades de Álex Saab y Raúl Gorrín.",
+    "trendSc": 1,
+    "trendDrivers": [
       "93.5% rechaza transición chavista: presión social máxima hacia cambio",
       "MCM con 78.3%: mandato popular claro hacia transición",
       "14 jefes de Estado europeos refuerzan presión hacia elecciones"
     ]
   },
   {
-    label: "6–13 feb",
-    short: "S5",
-    probs: [
+    "label": "6–13 feb",
+    "short": "S5",
+    "probs": [
       {
-        sc: 1,
-        v: 30,
-        t: "flat"
+        "sc": 1,
+        "v": 30,
+        "t": "flat"
       },
       {
-        sc: 2,
-        v: 5,
-        t: "flat"
+        "sc": 2,
+        "v": 5,
+        "t": "flat"
       },
       {
-        sc: 3,
-        v: 45,
-        t: "down"
+        "sc": 3,
+        "v": 45,
+        "t": "down"
       },
       {
-        sc: 4,
-        v: 20,
-        t: "up"
+        "sc": 4,
+        "v": 20,
+        "t": "up"
       }
     ],
-    xy: {
-      x: 0.18,
-      y: 0.4
+    "xy": {
+      "x": 0.18,
+      "y": 0.4
     },
-    sem: {
-      g: 6,
-      y: 6,
-      r: 4
+    "sem": {
+      "g": 6,
+      "y": 6,
+      "r": 4
     },
-    kpis: {
-      energia: {
-        exportaciones: "~800 kbd · EE.UU.",
-        ingresos: "USD >1.000M",
-        licencias: "GL49+GL50/50A",
-        cambio: "420–430 VEB/USD"
+    "kpis": {
+      "energia": {
+        "exportaciones": "~800 kbd · EE.UU.",
+        "ingresos": "USD >1.000M",
+        "licencias": "GL49+GL50/50A",
+        "cambio": "420–430 VEB/USD"
       },
-      economico: {
-        inflacion: "174% proy. 2026",
-        ingresos_pob: "69.5% < USD 300",
-        electricidad: "14.8h sin suministro",
-        pib: "10.4–15.2%"
+      "economico": {
+        "inflacion": "174% proy. 2026",
+        "ingresos_pob": "69.5% < USD 300",
+        "electricidad": "14.8h sin suministro",
+        "pib": "10.4–15.2%"
       },
-      opinion: {
-        direccion: "80% (Hinterlaces)",
-        elecciones: "67% votaría MCM",
-        mcm: "Alta",
-        eeuu: ">90% respalda"
+      "opinion": {
+        "direccion": "80% (Hinterlaces)",
+        "elecciones": "67% votaría MCM",
+        "mcm": "Alta",
+        "eeuu": ">90% respalda"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "yellow",
-        t: "<b>Amnistía 2ª discusión:</b> Diferida arts. 7–13."
+        "l": "yellow",
+        "t": "<b>Amnistía 2ª discusión:</b> Diferida arts. 7–13."
       },
       {
-        l: "red",
-        t: "<b>Excarcelaciones:</b> 897 oficial vs 430 ONG — brecha >50%."
+        "l": "red",
+        "t": "<b>Excarcelaciones:</b> 897 oficial vs 430 ONG — brecha >50%."
       },
       {
-        l: "yellow",
-        t: "<b>Visita Chris Wright:</b> Agenda energética de largo plazo."
+        "l": "yellow",
+        "t": "<b>Visita Chris Wright:</b> Agenda energética de largo plazo."
       }
     ],
-    lectura: "La semana de mayor ambigüedad estructural del ciclo. E3 continúa dominante al 45% pero la distancia sobre E1 se reduce (30%) y E4 sube a 20%, configurando el mapa más distribuido. Tres dinámicas operan simultáneamente sin converger. La visita del secretario de Energía Chris Wright consolida la cooperación de largo plazo: GL49, GL46A, GL48 y GL50 operativas, con BP, Chevron, Eni, Repsol y Shell autorizadas bajo condiciones estrictas. Repsol obtiene autorización para extraer crudo. 50 millones de barriles hacia Houston confirman escala real. Pero la Ley de Amnistía revela sus límites: la segunda discusión es diferida para los artículos 7 al 13 — los más sensibles. El patrón de excarcelaciones con medidas cautelares genera percepción de reversibilidad. La brecha entre 897 liberaciones oficiales y ~430 verificadas por ONG mantiene activa la disputa narrativa. E4 sube por señales específicas de control discrecional: Delcy reafirma en NBC la legitimidad formal de Maduro pese a su detención, mientras ejerce conducción interina — un equilibrio retórico que revela la fragilidad del marco político subyacente.",
-    trendSc: 1,
-    trendDrivers: [
+    "lectura": "La semana de mayor ambigüedad estructural del ciclo. E3 continúa dominante al 45% pero la distancia sobre E1 se reduce (30%) y E4 sube a 20%, configurando el mapa más distribuido. Tres dinámicas operan simultáneamente sin converger. La visita del secretario de Energía Chris Wright consolida la cooperación de largo plazo: GL49, GL46A, GL48 y GL50 operativas, con BP, Chevron, Eni, Repsol y Shell autorizadas bajo condiciones estrictas. Repsol obtiene autorización para extraer crudo. 50 millones de barriles hacia Houston confirman escala real. Pero la Ley de Amnistía revela sus límites: la segunda discusión es diferida para los artículos 7 al 13 — los más sensibles. El patrón de excarcelaciones con medidas cautelares genera percepción de reversibilidad. La brecha entre 897 liberaciones oficiales y ~430 verificadas por ONG mantiene activa la disputa narrativa. E4 sube por señales específicas de control discrecional: Delcy reafirma en NBC la legitimidad formal de Maduro pese a su detención, mientras ejerce conducción interina — un equilibrio retórico que revela la fragilidad del marco político subyacente.",
+    "trendSc": 1,
+    "trendDrivers": [
       "67% votaría por MCM (Financial Times): demanda electoral sostenida",
       "75% percibe país en dirección correcta: base de expectativa",
       "Hoja de ruta EE.UU. de tres fases incluye 'transición' como fase 3"
     ]
   },
   {
-    label: "13–20 feb",
-    short: "S6",
-    probs: [
+    "label": "13–20 feb",
+    "short": "S6",
+    "probs": [
       {
-        sc: 1,
-        v: 35,
-        t: "up"
+        "sc": 1,
+        "v": 35,
+        "t": "up"
       },
       {
-        sc: 2,
-        v: 15,
-        t: "flat"
+        "sc": 2,
+        "v": 15,
+        "t": "flat"
       },
       {
-        sc: 3,
-        v: 40,
-        t: "down"
+        "sc": 3,
+        "v": 40,
+        "t": "down"
       },
       {
-        sc: 4,
-        v: 10,
-        t: "down"
+        "sc": 4,
+        "v": 10,
+        "t": "down"
       }
     ],
-    xy: {
-      x: 0.17,
-      y: 0.46
+    "xy": {
+      "x": 0.17,
+      "y": 0.46
     },
-    sem: {
-      g: 9,
-      y: 8,
-      r: 5
+    "sem": {
+      "g": 9,
+      "y": 8,
+      "r": 5
     },
-    kpis: {
-      energia: {
-        exportaciones: "~800 kbd · ↑60.6%",
-        ingresos: "USD >1.000M · ac. USD 5.000M",
-        licencias: "GL49+GL50/50A plenas",
-        cambio: "420–430 VEB/USD"
+    "kpis": {
+      "energia": {
+        "exportaciones": "~800 kbd · ↑60.6%",
+        "ingresos": "USD >1.000M · ac. USD 5.000M",
+        "licencias": "GL49+GL50/50A plenas",
+        "cambio": "420–430 VEB/USD"
       },
-      economico: {
-        inflacion: "174% (vs 567% 2025)",
-        ingresos_pob: "69.5% < USD 300",
-        electricidad: "14.8h sin suministro",
-        pib: "10.4–15.2%"
+      "economico": {
+        "inflacion": "174% (vs 567% 2025)",
+        "ingresos_pob": "69.5% < USD 300",
+        "electricidad": "14.8h sin suministro",
+        "pib": "10.4–15.2%"
       },
-      opinion: {
-        direccion: "75% dirección correcta",
-        elecciones: "2/3 exige elecciones",
-        mcm: "52% favorabilidad",
-        eeuu: ">90% respalda"
+      "opinion": {
+        "direccion": "75% dirección correcta",
+        "elecciones": "2/3 exige elecciones",
+        "mcm": "52% favorabilidad",
+        "eeuu": ">90% respalda"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>Ley de Amnistía:</b> Promulgada 19 feb."
+        "l": "green",
+        "t": "<b>Ley de Amnistía:</b> Promulgada 19 feb."
       },
       {
-        l: "yellow",
-        t: "<b>FANB:</b> Tensiones. Demandas de oxigenación. Padrino 12 años."
+        "l": "yellow",
+        "t": "<b>FANB:</b> Tensiones. Demandas de oxigenación. Padrino 12 años."
       },
       {
-        l: "yellow",
-        t: "<b>Excarcelaciones:</b> 895 oficial vs 383 verif."
+        "l": "yellow",
+        "t": "<b>Excarcelaciones:</b> 895 oficial vs 383 verif."
       },
       {
-        l: "red",
-        t: "<b>Electoral:</b> Sin fecha. 2/3 exige. EE.UU.: 9–10 meses."
+        "l": "red",
+        "t": "<b>Electoral:</b> Sin fecha. 2/3 exige. EE.UU.: 9–10 meses."
       }
     ],
-    lectura: "La promulgación de la Ley de Amnistía el 19 de febrero es el hito normativo más significativo desde la operación de enero: por primera vez el marco legal reconoce formalmente a los perseguidos políticos de 26 años y establece mecanismos de extinción de acciones penales, civiles y disciplinarias. E1 alcanza su punto más alto del ciclo — 35% — porque la promulgación abre un vector de institucionalización que antes era solo retórico. Dos tercios de la población exige elecciones este año. La encuesta Atlantic Council-Gold Glove muestra que el 75% percibe el país en dirección correcta, pero con una paradoja estructural: la prioridad es la economía sobre la democracia en proporción 8:1. Las tensiones en la FANB — reportaje de El País sobre malestar por continuidad de la cúpula, Padrino López 12 años en el cargo — revelan que la estabilización tiene costos internos que aún no se procesan. España propone ante la UE levantar sanciones a Delcy, Qatar visita Caracas, el FMI señala disposición a iniciar contactos. El sector energético se confirma como ancla: EIA proyecta retorno a 1.1-1.2M bpd hacia mediados de 2026. Pero la brecha entre cifras oficiales de amnistía (895) y verificadas por ONG (383) es la expresión más concreta de que E3 y E4 coexisten: apertura selectiva y control discrecional operan simultáneamente.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "La promulgación de la Ley de Amnistía el 19 de febrero es el hito normativo más significativo desde la operación de enero: por primera vez el marco legal reconoce formalmente a los perseguidos políticos de 26 años y establece mecanismos de extinción de acciones penales, civiles y disciplinarias. E1 alcanza su punto más alto del ciclo — 35% — porque la promulgación abre un vector de institucionalización que antes era solo retórico. Dos tercios de la población exige elecciones este año. La encuesta Atlantic Council-Gold Glove muestra que el 75% percibe el país en dirección correcta, pero con una paradoja estructural: la prioridad es la economía sobre la democracia en proporción 8:1. Las tensiones en la FANB — reportaje de El País sobre malestar por continuidad de la cúpula, Padrino López 12 años en el cargo — revelan que la estabilización tiene costos internos que aún no se procesan. España propone ante la UE levantar sanciones a Delcy, Qatar visita Caracas, el FMI señala disposición a iniciar contactos. El sector energético se confirma como ancla: EIA proyecta retorno a 1.1-1.2M bpd hacia mediados de 2026. Pero la brecha entre cifras oficiales de amnistía (895) y verificadas por ONG (383) es la expresión más concreta de que E3 y E4 coexisten: apertura selectiva y control discrecional operan simultáneamente.",
+    "trendSc": 3,
+    "trendDrivers": [
       "Amnistía promulgada: vector de institucionalización consolidado",
       "Sector energético como ancla: EIA proyecta 1.1-1.2M bpd",
       "Presión por cronograma electoral crece pero sin catalizar ruptura"
     ]
   },
   {
-    label: "20–27 feb",
-    short: "S7",
-    probs: [
+    "label": "20–27 feb",
+    "short": "S7",
+    "probs": [
       {
-        sc: 1,
-        v: 30,
-        t: "down"
+        "sc": 1,
+        "v": 30,
+        "t": "down"
       },
       {
-        sc: 2,
-        v: 10,
-        t: "flat"
+        "sc": 2,
+        "v": 10,
+        "t": "flat"
       },
       {
-        sc: 3,
-        v: 50,
-        t: "up"
+        "sc": 3,
+        "v": 50,
+        "t": "up"
       },
       {
-        sc: 4,
-        v: 10,
-        t: "flat"
+        "sc": 4,
+        "v": 10,
+        "t": "flat"
       }
     ],
-    xy: {
-      x: 0.16,
-      y: 0.48
+    "xy": {
+      "x": 0.16,
+      "y": 0.48
     },
-    sem: {
-      g: 6,
-      y: 7,
-      r: 5
+    "sem": {
+      "g": 6,
+      "y": 7,
+      "r": 5
     },
-    kpis: {
-      energia: {
-        exportaciones: "~800 kbd · VLCC",
-        ingresos: "Proy. USD 6.000M",
-        licencias: "GL49+GL50/50A · FAQ 1238",
-        cambio: "Mdo 631 / BCV 414 Bs/$"
+    "kpis": {
+      "energia": {
+        "exportaciones": "~800 kbd · VLCC",
+        "ingresos": "Proy. USD 6.000M",
+        "licencias": "GL49+GL50/50A · FAQ 1238",
+        "cambio": "Mdo 631 / BCV 414 Bs/$"
       },
-      economico: {
-        inflacion: "3 dígitos · FMI",
-        ingresos_pob: "Canasta 550 vs 270 USD",
-        electricidad: "Sin datos nuevos",
-        pib: "Ancla petrolera"
+      "economico": {
+        "inflacion": "3 dígitos · FMI",
+        "ingresos_pob": "Canasta 550 vs 270 USD",
+        "electricidad": "Sin datos nuevos",
+        "pib": "Ancla petrolera"
       },
-      opinion: {
-        direccion: "51,5% mejor s/ Maduro",
-        elecciones: "Rubio: req. elecciones",
-        mcm: "MCM +28 imagen neta",
-        eeuu: "62,4% valora EE.UU."
+      "opinion": {
+        "direccion": "51,5% mejor s/ Maduro",
+        "elecciones": "Rubio: req. elecciones",
+        "mcm": "MCM +28 imagen neta",
+        "eeuu": "62,4% valora EE.UU."
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>Amnistía operativa:</b> 4.203 solicitudes · Trump: \"nuevo amigo y socio\"."
+        "l": "green",
+        "t": "<b>Amnistía operativa:</b> 4.203 solicitudes · Trump: \"nuevo amigo y socio\"."
       },
       {
-        l: "green",
-        t: "<b>Petróleo:</b> ~800K bpd · Vitol/Trafigura · Eni USD 3B."
+        "l": "green",
+        "t": "<b>Petróleo:</b> ~800K bpd · Vitol/Trafigura · Eni USD 3B."
       },
       {
-        l: "yellow",
-        t: "<b>Brecha cambiaria:</b> 52,6% ↑6,5pp · 47 meses sin ajuste."
+        "l": "yellow",
+        "t": "<b>Brecha cambiaria:</b> 52,6% ↑6,5pp · 47 meses sin ajuste."
       },
       {
-        l: "yellow",
-        t: "<b>Poder Ciudadano:</b> Renuncias Saab/Ruiz · plazo 30 días."
+        "l": "yellow",
+        "t": "<b>Poder Ciudadano:</b> Renuncias Saab/Ruiz · plazo 30 días."
       },
       {
-        l: "red",
-        t: "<b>Electoral:</b> Rubio condiciona · Caso Magalli Meda."
+        "l": "red",
+        "t": "<b>Electoral:</b> Rubio condiciona · Caso Magalli Meda."
       }
     ],
-    lectura: "E3 se consolida en su nivel más alto del ciclo — 50% — a través del hecho simbólico más significativo del período: Donald Trump califica a Venezuela como 'nuevo amigo y socio' en el Estado de la Unión, con Enrique Márquez presente en el hemiciclo. La coexistencia de ambas referencias condensa la lógica del doble canal que ha estructurado toda la relación bilateral desde enero. Las exportaciones se sitúan en ~800.000 bpd, Vitol y Trafigura tienen tres buques fletados para marzo, refinerías indias incrementan compras usando VLCC, y la proyección de ingresos alcanza USD 6.000 millones. La amnistía pasa de aprobada a operativa: 4.203 solicitudes procesadas, 3.231 libertades plenas en el primer corte. El Poder Ciudadano se reconfigura con renuncias de Saab y Ruiz. Colombia activa el canal diplomático con Petro-Delcy para el 14 de marzo.\n\nSin embargo, el mapa no es de consolidación lineal sino de consolidación con tensiones no resueltas. E1 baja a 30% porque no hay compromisos electorales concretos: Rubio afirma que la legitimación electoral es requisito para inversión, pero el Ejecutivo no anuncia calendario. La disputa de cifras sobre amnistía es aguda: Foro Penal registra 568 presos verificados frente a 4.151 oficiales. El caso Magalli Meda — 16 hombres armados en 6 camionetas — revela que la coerción paralela al discurso de reconciliación no ha sido desmantelada. La brecha cambiaria supera el 52.6%, el salario mínimo lleva 47 meses sin cambios, y el FMI clasifica a Venezuela en 'Intensa Fragilidad'. La coexistencia de los cuatro escenarios en tensión — y no la desaparición de los riesgos — es la característica definitoria del momento.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "E3 se consolida en su nivel más alto del ciclo — 50% — a través del hecho simbólico más significativo del período: Donald Trump califica a Venezuela como 'nuevo amigo y socio' en el Estado de la Unión, con Enrique Márquez presente en el hemiciclo. La coexistencia de ambas referencias condensa la lógica del doble canal que ha estructurado toda la relación bilateral desde enero. Las exportaciones se sitúan en ~800.000 bpd, Vitol y Trafigura tienen tres buques fletados para marzo, refinerías indias incrementan compras usando VLCC, y la proyección de ingresos alcanza USD 6.000 millones. La amnistía pasa de aprobada a operativa: 4.203 solicitudes procesadas, 3.231 libertades plenas en el primer corte. El Poder Ciudadano se reconfigura con renuncias de Saab y Ruiz. Colombia activa el canal diplomático con Petro-Delcy para el 14 de marzo.\n\nSin embargo, el mapa no es de consolidación lineal sino de consolidación con tensiones no resueltas. E1 baja a 30% porque no hay compromisos electorales concretos: Rubio afirma que la legitimación electoral es requisito para inversión, pero el Ejecutivo no anuncia calendario. La disputa de cifras sobre amnistía es aguda: Foro Penal registra 568 presos verificados frente a 4.151 oficiales. El caso Magalli Meda — 16 hombres armados en 6 camionetas — revela que la coerción paralela al discurso de reconciliación no ha sido desmantelada. La brecha cambiaria supera el 52.6%, el salario mínimo lleva 47 meses sin cambios, y el FMI clasifica a Venezuela en 'Intensa Fragilidad'. La coexistencia de los cuatro escenarios en tensión — y no la desaparición de los riesgos — es la característica definitoria del momento.",
+    "trendSc": 3,
+    "trendDrivers": [
       "Trump 'nuevo amigo y socio': acoplamiento EE.UU. sin precedentes",
       "~800K bpd + USD 6B consolidan ancla energética",
       "Amnistía operativa refuerza narrativa de reconciliación como pilar"
     ]
   },
   {
-    label: "27f–6m",
-    short: "S8",
-    probs: [
+    "label": "27f–6m",
+    "short": "S8",
+    "probs": [
       {
-        sc: 1,
-        v: 38,
-        t: "up"
+        "sc": 1,
+        "v": 38,
+        "t": "up"
       },
       {
-        sc: 2,
-        v: 12,
-        t: "down"
+        "sc": 2,
+        "v": 12,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 40,
-        t: "flat"
+        "sc": 3,
+        "v": 40,
+        "t": "flat"
       },
       {
-        sc: 4,
-        v: 10,
-        t: "flat"
+        "sc": 4,
+        "v": 10,
+        "t": "flat"
       }
     ],
-    xy: {
-      x: 0.15,
-      y: 0.5
+    "xy": {
+      "x": 0.15,
+      "y": 0.5
     },
-    sem: {
-      g: 8,
-      y: 6,
-      r: 4
+    "sem": {
+      "g": 8,
+      "y": 6,
+      "r": 4
     },
-    kpis: {
-      energia: {
-        exportaciones: "788 kbd feb. (récord 7a)",
-        ingresos: "+78% SENIAT · crudo +10%",
-        licencias: "GL49+GL50/50A+GL129A",
-        cambio: "Alza crudo · proy. USD 100"
+    "kpis": {
+      "energia": {
+        "exportaciones": "788 kbd feb. (récord 7a)",
+        "ingresos": "+78% SENIAT · crudo +10%",
+        "licencias": "GL49+GL50/50A+GL129A",
+        "cambio": "Alza crudo · proy. USD 100"
       },
-      economico: {
-        inflacion: "174% proy. 2026",
-        ingresos_pob: "USD 256 vs canasta 550",
-        electricidad: "14,8h sin suministro",
-        pib: "+7,07% Q4 2025"
+      "economico": {
+        "inflacion": "174% proy. 2026",
+        "ingresos_pob": "USD 256 vs canasta 550",
+        "electricidad": "14,8h sin suministro",
+        "pib": "+7,07% Q4 2025"
       },
-      opinion: {
-        direccion: ">50% dirección correcta",
-        elecciones: "66% exige elecciones",
-        mcm: "106,84/137 pts liderazgo",
-        eeuu: "Relaciones restablecidas"
+      "opinion": {
+        "direccion": ">50% dirección correcta",
+        "elecciones": "66% exige elecciones",
+        "mcm": "106,84/137 pts liderazgo",
+        "eeuu": "Relaciones restablecidas"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>Energía:</b> Exportaciones 788 kbd · récord 7 años Puerto José · SENIAT +78%."
+        "l": "green",
+        "t": "<b>Energía:</b> Exportaciones 788 kbd · récord 7 años Puerto José · SENIAT +78%."
       },
       {
-        l: "green",
-        t: "<b>Diplomacia:</b> Relaciones EE.UU.–VEN restablecidas. Trump: \"escenario perfecto\"."
+        "l": "green",
+        "t": "<b>Diplomacia:</b> Relaciones EE.UU.–VEN restablecidas. Trump: \"escenario perfecto\"."
       },
       {
-        l: "green",
-        t: "<b>Amnistía:</b> 9.060 solicitudes · 5.628 libertades plenas · 31 militares."
+        "l": "green",
+        "t": "<b>Amnistía:</b> 9.060 solicitudes · 5.628 libertades plenas · 31 militares."
       },
       {
-        l: "yellow",
-        t: "<b>E1 a 2pp de E3:</b> MCM retorno inminente · 66% exige elecciones · H.R. 7674."
+        "l": "yellow",
+        "t": "<b>E1 a 2pp de E3:</b> MCM retorno inminente · 66% exige elecciones · H.R. 7674."
       },
       {
-        l: "yellow",
-        t: "<b>Brecha social:</b> Salario USD 256 vs canasta USD 550 · >47 meses sin ajuste."
+        "l": "yellow",
+        "t": "<b>Brecha social:</b> Salario USD 256 vs canasta USD 550 · >47 meses sin ajuste."
       },
       {
-        l: "red",
-        t: "<b>Electoral:</b> Sin fecha. 568 presos. >11.000 cautelares vigentes."
+        "l": "red",
+        "t": "<b>Electoral:</b> Sin fecha. 568 presos. >11.000 cautelares vigentes."
       }
     ],
-    lectura: "E3 se mantiene como escenario dominante al 40%, pero la distancia con E1 (38%) se reduce a apenas 2 puntos porcentuales — la más estrecha desde el inicio del período de análisis. Tres anclas simultáneas sostienen E3: la expansión energética récord (Venezuela duplica exportaciones a 788.000 bpd, acercándose al nivel más alto en el Puerto de José en siete años), el PIB creció 7,07% en Q4 2025 y la recaudación SENIAT se incrementó un 78% en febrero. El marco regulatorio OFAC consolidado (GL49, GL50/50A, GL129A, Monómeros renovada hasta 2028) crea seguridad jurídica para Exxon, Shell, Gold Reserve y Ecopetrol. Washington sigue priorizando la recuperación energética sobre la agenda electoral.\n\nSin embargo, E1 sube a 38% (+3pp) impulsado por el retorno inminente de MCM con agenda de tres prioridades, su liderazgo consolidado (106,84/137 puntos en el Índice MassBehaviorResearch), el respaldo de Ramos Allup, y la exigencia electoral del 66% de la población. El proyecto H.R. 7674 en el Congreso EE.UU. demanda una estrategia de transición en 180 días. La apertura minera (Gold Reserve, Ecopetrol) amplía el marco de reformas. E2 baja a 12% (-3pp) por la solidez del repunte energético y el PIB confirmado. E4 se mantiene latente en 10%. La brecha entre el pragmatismo transaccional de EE.UU. y las expectativas electorales internas es la tensión estructural del período.",
-    trendSc: 1,
-    trendDrivers: [
+    "lectura": "E3 se mantiene como escenario dominante al 40%, pero la distancia con E1 (38%) se reduce a apenas 2 puntos porcentuales — la más estrecha desde el inicio del período de análisis. Tres anclas simultáneas sostienen E3: la expansión energética récord (Venezuela duplica exportaciones a 788.000 bpd, acercándose al nivel más alto en el Puerto de José en siete años), el PIB creció 7,07% en Q4 2025 y la recaudación SENIAT se incrementó un 78% en febrero. El marco regulatorio OFAC consolidado (GL49, GL50/50A, GL129A, Monómeros renovada hasta 2028) crea seguridad jurídica para Exxon, Shell, Gold Reserve y Ecopetrol. Washington sigue priorizando la recuperación energética sobre la agenda electoral.\n\nSin embargo, E1 sube a 38% (+3pp) impulsado por el retorno inminente de MCM con agenda de tres prioridades, su liderazgo consolidado (106,84/137 puntos en el Índice MassBehaviorResearch), el respaldo de Ramos Allup, y la exigencia electoral del 66% de la población. El proyecto H.R. 7674 en el Congreso EE.UU. demanda una estrategia de transición en 180 días. La apertura minera (Gold Reserve, Ecopetrol) amplía el marco de reformas. E2 baja a 12% (-3pp) por la solidez del repunte energético y el PIB confirmado. E4 se mantiene latente en 10%. La brecha entre el pragmatismo transaccional de EE.UU. y las expectativas electorales internas es la tensión estructural del período.",
+    "trendSc": 1,
+    "trendDrivers": [
       "MCM lidera con 106,84/137 pts; retorno inminente con agenda estructurada",
       "66% exige elecciones; H.R. 7674 en Congreso EE.UU.",
       "Apertura minera + Gold Reserve + Ecopetrol: señal de reformas ampliadas"
     ]
   },
   {
-    label: "6–13m",
-    short: "S9",
-    probs: [
+    "label": "6–13m",
+    "short": "S9",
+    "probs": [
       {
-        sc: 1,
-        v: 33,
-        t: "down"
+        "sc": 1,
+        "v": 33,
+        "t": "down"
       },
       {
-        sc: 2,
-        v: 10,
-        t: "down"
+        "sc": 2,
+        "v": 10,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 42,
-        t: "up"
+        "sc": 3,
+        "v": 42,
+        "t": "up"
       },
       {
-        sc: 4,
-        v: 15,
-        t: "up"
+        "sc": 4,
+        "v": 15,
+        "t": "up"
       }
     ],
-    xy: {
-      x: 0.14,
-      y: 0.48
+    "xy": {
+      "x": 0.14,
+      "y": 0.48
     },
-    sem: {
-      g: 9,
-      y: 5,
-      r: 5
+    "sem": {
+      "g": 9,
+      "y": 5,
+      "r": 5
     },
-    kpis: {
-      energia: {
-        exportaciones: "1.021 kbd feb. (+10,5%)",
-        ingresos: "GL-51 oro · USD 100M 1er cargamento",
-        licencias: "GL49+GL50/50A+GL51",
-        cambio: "Merey USD 52,31/bbl (+9,10)"
+    "kpis": {
+      "energia": {
+        "exportaciones": "1.021 kbd feb. (+10,5%)",
+        "ingresos": "GL-51 oro · USD 100M 1er cargamento",
+        "licencias": "GL49+GL50/50A+GL51",
+        "cambio": "Merey USD 52,31/bbl (+9,10)"
       },
-      economico: {
-        inflacion: "617% anualizada (BCV)",
-        ingresos_pob: "USD 300 vs canasta 425–622",
-        electricidad: "Sin datos nuevos",
-        pib: "Proy. dos dígitos 2026"
+      "economico": {
+        "inflacion": "617% anualizada (BCV)",
+        "ingresos_pob": "USD 300 vs canasta 425–622",
+        "electricidad": "Sin datos nuevos",
+        "pib": "Proy. dos dígitos 2026"
       },
-      opinion: {
-        direccion: "Reconocimiento EE.UU. a Rodríguez",
-        elecciones: "Washington señala 2027",
-        mcm: "Trump aconseja no regresar",
-        eeuu: "\"Nuevo socio energético\""
+      "opinion": {
+        "direccion": "Reconocimiento EE.UU. a Rodríguez",
+        "elecciones": "Washington señala 2027",
+        "mcm": "Trump aconseja no regresar",
+        "eeuu": "\"Nuevo socio energético\""
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>Energía:</b> Producción supera 1M bpd por primera vez. Chevron, Shell, Repsol amplían inversiones >EUR 1.000M."
+        "l": "green",
+        "t": "<b>Energía:</b> Producción supera 1M bpd por primera vez. Chevron, Shell, Repsol amplían inversiones >EUR 1.000M."
       },
       {
-        l: "green",
-        t: "<b>Diplomacia:</b> Trump reconoce formalmente a Rodríguez como «único interlocutor legítimo». GL-51 oro operativa."
+        "l": "green",
+        "t": "<b>Diplomacia:</b> Trump reconoce formalmente a Rodríguez como «único interlocutor legítimo». GL-51 oro operativa."
       },
       {
-        l: "green",
-        t: "<b>Minería:</b> Primer cargamento oro USD 100M a EE.UU. Decreto 5.266 absorción Minerven. Ley de Minas primera discusión."
+        "l": "green",
+        "t": "<b>Minería:</b> Primer cargamento oro USD 100M a EE.UU. Decreto 5.266 absorción Minerven. Ley de Minas primera discusión."
       },
       {
-        l: "yellow",
-        t: "<b>Conflictividad laboral:</b> 39 movilizaciones en 23 estados el 12/03. Mayor jornada del año. Superaron piquetes PNB."
+        "l": "yellow",
+        "t": "<b>Conflictividad laboral:</b> 39 movilizaciones en 23 estados el 12/03. Mayor jornada del año. Superaron piquetes PNB."
       },
       {
-        l: "yellow",
-        t: "<b>Inflación:</b> BCV publica 51,9% acumulado ene-feb (617% anualizada). 70% población <USD 300 vs canasta USD 425-622."
+        "l": "yellow",
+        "t": "<b>Inflación:</b> BCV publica 51,9% acumulado ene-feb (617% anualizada). 70% población <USD 300 vs canasta USD 425-622."
       },
       {
-        l: "red",
-        t: "<b>DDHH:</b> 508 presos políticos (Foro Penal). ONU: 87 nuevas detenciones post-3 enero, 14 periodistas."
+        "l": "red",
+        "t": "<b>DDHH:</b> 508 presos políticos (Foro Penal). ONU: 87 nuevas detenciones post-3 enero, 14 periodistas."
       }
     ],
-    lectura: "E3 se consolida como escenario dominante al 42% (+2pp), impulsado por el reconocimiento formal de EE.UU. al gobierno de Rodríguez como «único interlocutor legítimo» — el hecho de mayor impacto estructural de la semana y de todo el período post-3 de enero. La producción petrolera superó por primera vez el millón de barriles diarios (1.021.000 bpd en febrero, +10,5%), la GL-51 habilitó el oro venezolano, y el primer cargamento aurífero de USD 100M fue entregado a EE.UU. Chevron, Shell y Repsol consolidan inversiones sin precedentes.\n\nE1 retrocede a 33% (-5pp): Washington priorizó estabilidad sobre transición acelerada. Trump aconsejó a MCM no regresar y señaló elecciones hacia 2027, reduciendo su margen de acción. E4 sube a 15% (+5pp) por la escalada laboral del 12 de marzo — 39 movilizaciones en 23 estados, la mayor jornada del año — y las tensiones en designaciones del Poder Ciudadano. E2 baja a 10% (-2pp), contenido por la solidez del acuerdo bilateral.\n\nEl equilibrio es funcional pero frágil: depende de que la redistribución del boom energético comience a materializarse antes de que la conflictividad laboral supere el umbral político. La inflación anualizada del 617% (BCV oficial) confirma que la estabilización macroeconómica no se ha consolidado.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "E3 se consolida como escenario dominante al 42% (+2pp), impulsado por el reconocimiento formal de EE.UU. al gobierno de Rodríguez como «único interlocutor legítimo» — el hecho de mayor impacto estructural de la semana y de todo el período post-3 de enero. La producción petrolera superó por primera vez el millón de barriles diarios (1.021.000 bpd en febrero, +10,5%), la GL-51 habilitó el oro venezolano, y el primer cargamento aurífero de USD 100M fue entregado a EE.UU. Chevron, Shell y Repsol consolidan inversiones sin precedentes.\n\nE1 retrocede a 33% (-5pp): Washington priorizó estabilidad sobre transición acelerada. Trump aconsejó a MCM no regresar y señaló elecciones hacia 2027, reduciendo su margen de acción. E4 sube a 15% (+5pp) por la escalada laboral del 12 de marzo — 39 movilizaciones en 23 estados, la mayor jornada del año — y las tensiones en designaciones del Poder Ciudadano. E2 baja a 10% (-2pp), contenido por la solidez del acuerdo bilateral.\n\nEl equilibrio es funcional pero frágil: depende de que la redistribución del boom energético comience a materializarse antes de que la conflictividad laboral supere el umbral político. La inflación anualizada del 617% (BCV oficial) confirma que la estabilización macroeconómica no se ha consolidado.",
+    "trendSc": 3,
+    "trendDrivers": [
       "Reconocimiento formal EE.UU. a Rodríguez: «único interlocutor legítimo»",
       "Producción supera 1M bpd + GL-51 oro + USD 100M primer cargamento",
       "39 movilizaciones laborales en 23 estados: mayor jornada del año"
     ]
   },
   {
-    label: "13–20m",
-    short: "S10",
-    probs: [
+    "label": "13–20m",
+    "short": "S10",
+    "probs": [
       {
-        sc: 1,
-        v: 30,
-        t: "down"
+        "sc": 1,
+        "v": 30,
+        "t": "down"
       },
       {
-        sc: 2,
-        v: 8,
-        t: "down"
+        "sc": 2,
+        "v": 8,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 47,
-        t: "up"
+        "sc": 3,
+        "v": 47,
+        "t": "up"
       },
       {
-        sc: 4,
-        v: 15,
-        t: "flat"
+        "sc": 4,
+        "v": 15,
+        "t": "flat"
       }
     ],
-    xy: {
-      x: 0.13,
-      y: 0.46
+    "xy": {
+      "x": 0.13,
+      "y": 0.46
     },
-    sem: {
-      g: 10,
-      y: 5,
-      r: 4
+    "sem": {
+      "g": 10,
+      "y": 5,
+      "r": 4
     },
-    kpis: {
-      energia: {
-        exportaciones: "Export. a EE.UU. duplicadas",
-        ingresos: "Cardón IV · LG-52 · Repsol +50%",
-        licencias: "GL46B+48A+49A+51+52",
-        cambio: "Ingresos PDVSA −46% 1er bim."
+    "kpis": {
+      "energia": {
+        "exportaciones": "Export. a EE.UU. duplicadas",
+        "ingresos": "Cardón IV · LG-52 · Repsol +50%",
+        "licencias": "GL46B+48A+49A+51+52",
+        "cambio": "Ingresos PDVSA −46% 1er bim."
       },
-      economico: {
-        inflacion: "197% proy. 2026",
-        ingresos_pob: "Bono 150 USD + 300M Fondo",
-        electricidad: "Sin datos nuevos",
-        pib: "+6,9% proy. 2026"
+      "economico": {
+        "inflacion": "197% proy. 2026",
+        "ingresos_pob": "Bono 150 USD + 300M Fondo",
+        "electricidad": "Sin datos nuevos",
+        "pib": "+6,9% proy. 2026"
       },
-      opinion: {
-        direccion: "71% salida «a cualquier costo»",
-        elecciones: "Washington: 2027",
-        mcm: "MCM en CERAWeek Houston",
-        eeuu: "Trump: «fantástica»"
+      "opinion": {
+        "direccion": "71% salida «a cualquier costo»",
+        "elecciones": "Washington: 2027",
+        "mcm": "MCM en CERAWeek Houston",
+        "eeuu": "Trump: «fantástica»"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>Gabinete:</b> 42% modificado · nueva cúpula FANB · Padrino López sale tras 11+ años."
+        "l": "green",
+        "t": "<b>Gabinete:</b> 42% modificado · nueva cúpula FANB · Padrino López sale tras 11+ años."
       },
       {
-        l: "green",
-        t: "<b>Diplomacia:</b> Bandera EE.UU. izada (7 años) · Senado en Miraflores · alerta nivel 3."
+        "l": "green",
+        "t": "<b>Diplomacia:</b> Bandera EE.UU. izada (7 años) · Senado en Miraflores · alerta nivel 3."
       },
       {
-        l: "green",
-        t: "<b>Energía:</b> Cardón IV (gas) · LG-52 · export. duplicadas · Repsol +50%/+200% · Maurel & Prom Maracaibo."
+        "l": "green",
+        "t": "<b>Energía:</b> Cardón IV (gas) · LG-52 · export. duplicadas · Repsol +50%/+200% · Maurel & Prom Maracaibo."
       },
       {
-        l: "yellow",
-        t: "<b>Contención social:</b> Bono 150 USD + 300M Fondo. Protestas 65→46. Efecto temporal."
+        "l": "yellow",
+        "t": "<b>Contención social:</b> Bono 150 USD + 300M Fondo. Protestas 65→46. Efecto temporal."
       },
       {
-        l: "yellow",
-        t: "<b>Amnistía:</b> 7.580 beneficiados · 690 excarcelados (FP) · 515 presos · art.9 exclusiones."
+        "l": "yellow",
+        "t": "<b>Amnistía:</b> 7.580 beneficiados · 690 excarcelados (FP) · 515 presos · art.9 exclusiones."
       },
       {
-        l: "red",
-        t: "<b>Jurídico:</b> Jueza Netburn · PDV Holding/Citgo sin efecto sin OFAC · gasoducto Ricaurte."
+        "l": "red",
+        "t": "<b>Jurídico:</b> Jueza Netburn · PDV Holding/Citgo sin efecto sin OFAC · gasoducto Ricaurte."
       }
     ],
-    lectura: "E3 se consolida como escenario dominante con fuerza inédita — 47% (+5pp) — impulsado por la convergencia de cuatro factores de primer orden. La reconfiguración institucional más amplia desde el 3 de enero: 11 cambios ministeriales y nueva cúpula FANB, con la salida de Padrino López tras más de 11 años en Defensa y su reemplazo por González López, quien centraliza el aparato de seguridad. Con 14 ministros cambiados, Delcy Rodríguez ha modificado el 42% del gabinete heredado de Maduro. La incorporación de opositores (Ríos, Blanco) y técnicos (Sanjuán, Alcalá) amplía la base de gobernabilidad.\n\nLa normalización diplomática entró en fase operativa: el izado de bandera en Caracas (primera vez en 7 años), la delegación del Senado en Miraflores, la reducción de alerta de viaje a nivel 3, y Trump calificando la relación como «fantástica». La expansión energética se diversifica: acuerdo gasífero Cardón IV (PDVSA-Repsol-Eni), LG-52 para transacciones con PDVSA, exportaciones a EE.UU. duplicadas, Repsol proyecta +50% en 2026 y +200% para 2028, Maurel & Prom reactiva taladro en Maracaibo tras 8 años.\n\nE1 retrocede a 30% (-3pp): la incorporación de opositores al Ejecutivo y la ausencia de retorno de MCM difuminan las fronteras entre oficialismo y oposición. E4 se mantiene estable en 15%: las protestas bajan de 65 a 46 por el bono de 150 USD y los 300M al Fondo de Protección Social, pero la brecha salarial estructural persiste. E2 baja a 8% (-2pp), contenido por la solidez creciente del eje bilateral. Sin embargo, la ambigüedad jurídica sobre representación legal (jueza Netburn) y las disputas PDV Holding/Citgo que carecen de efecto sin OFAC evidencian que la normalización política avanza más rápido que la normalización legal y corporativa.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "E3 se consolida como escenario dominante con fuerza inédita — 47% (+5pp) — impulsado por la convergencia de cuatro factores de primer orden. La reconfiguración institucional más amplia desde el 3 de enero: 11 cambios ministeriales y nueva cúpula FANB, con la salida de Padrino López tras más de 11 años en Defensa y su reemplazo por González López, quien centraliza el aparato de seguridad. Con 14 ministros cambiados, Delcy Rodríguez ha modificado el 42% del gabinete heredado de Maduro. La incorporación de opositores (Ríos, Blanco) y técnicos (Sanjuán, Alcalá) amplía la base de gobernabilidad.\n\nLa normalización diplomática entró en fase operativa: el izado de bandera en Caracas (primera vez en 7 años), la delegación del Senado en Miraflores, la reducción de alerta de viaje a nivel 3, y Trump calificando la relación como «fantástica». La expansión energética se diversifica: acuerdo gasífero Cardón IV (PDVSA-Repsol-Eni), LG-52 para transacciones con PDVSA, exportaciones a EE.UU. duplicadas, Repsol proyecta +50% en 2026 y +200% para 2028, Maurel & Prom reactiva taladro en Maracaibo tras 8 años.\n\nE1 retrocede a 30% (-3pp): la incorporación de opositores al Ejecutivo y la ausencia de retorno de MCM difuminan las fronteras entre oficialismo y oposición. E4 se mantiene estable en 15%: las protestas bajan de 65 a 46 por el bono de 150 USD y los 300M al Fondo de Protección Social, pero la brecha salarial estructural persiste. E2 baja a 8% (-2pp), contenido por la solidez creciente del eje bilateral. Sin embargo, la ambigüedad jurídica sobre representación legal (jueza Netburn) y las disputas PDV Holding/Citgo que carecen de efecto sin OFAC evidencian que la normalización política avanza más rápido que la normalización legal y corporativa.",
+    "trendSc": 3,
+    "trendDrivers": [
       "42% gabinete modificado + nueva cúpula FANB: reconfiguración institucional sin precedentes",
       "Bandera EE.UU. + Senado + nivel 3 + «fantástica»: normalización diplomática operativa",
       "Cardón IV + LG-52 + export. duplicadas + Repsol/Maurel & Prom: diversificación energética"
     ]
   },
   {
-    label: "20–29m",
-    short: "S11",
-    probs: [
+    "label": "20–29m",
+    "short": "S11",
+    "probs": [
       {
-        sc: 1,
-        v: 30,
-        t: "flat"
+        "sc": 1,
+        "v": 30,
+        "t": "flat"
       },
       {
-        sc: 2,
-        v: 7,
-        t: "down"
+        "sc": 2,
+        "v": 7,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 43,
-        t: "down"
+        "sc": 3,
+        "v": 43,
+        "t": "down"
       },
       {
-        sc: 4,
-        v: 20,
-        t: "up"
+        "sc": 4,
+        "v": 20,
+        "t": "up"
       }
     ],
-    xy: {
-      x: 0.12,
-      y: 0.43
+    "xy": {
+      "x": 0.12,
+      "y": 0.43
     },
-    sem: {
-      g: 8,
-      y: 6,
-      r: 5
+    "sem": {
+      "g": 8,
+      "y": 6,
+      "r": 5
     },
-    kpis: {
-      energia: {
-        exportaciones: "Repsol x3 meta 2029 (150K b/d)",
-        ingresos: "FII Priority · Signum · incentivos",
-        licencias: "GL-53 + OFAC minero",
-        cambio: "Exp. pet. $18.212M (BCV 2025)"
+    "kpis": {
+      "energia": {
+        "exportaciones": "Repsol x3 meta 2029 (150K b/d)",
+        "ingresos": "FII Priority · Signum · incentivos",
+        "licencias": "GL-53 + OFAC minero",
+        "cambio": "Exp. pet. $18.212M (BCV 2025)"
       },
-      economico: {
-        inflacion: ">600% interanual",
-        ingresos_pob: "97 protestas 4 días · brecha salarial",
-        electricidad: "Siemens/GE evalúan · CAF reactiva",
-        pib: "19 trim. crecimiento consecutivo"
+      "economico": {
+        "inflacion": ">600% interanual",
+        "ingresos_pob": "97 protestas 4 días · brecha salarial",
+        "electricidad": "Siemens/GE evalúan · CAF reactiva",
+        "pib": "19 trim. crecimiento consecutivo"
       },
-      opinion: {
-        direccion: "58% país más democrático (AtlasIntel)",
-        elecciones: "180 días Congreso → plan Rubio",
-        mcm: "MCM CERAWeek: 5M b/d · $150B inv.",
-        eeuu: "Trump: «presidenta electa»"
+      "opinion": {
+        "direccion": "58% país más democrático (AtlasIntel)",
+        "elecciones": "180 días Congreso → plan Rubio",
+        "mcm": "MCM CERAWeek: 5M b/d · $150B inv.",
+        "eeuu": "Trump: «presidenta electa»"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>Ofensiva económica:</b> FII Priority Miami · Signum Caracas · CERAWeek Houston · Repsol x3 · Petropymi-Alep Texas."
+        "l": "green",
+        "t": "<b>Ofensiva económica:</b> FII Priority Miami · Signum Caracas · CERAWeek Houston · Repsol x3 · Petropymi-Alep Texas."
       },
       {
-        l: "green",
-        t: "<b>Normalización bilateral:</b> Misión diplomática Washington · sedes consulares · LG-53 · Trump «presidenta electa» · Comando Sur confirma."
+        "l": "green",
+        "t": "<b>Normalización bilateral:</b> Misión diplomática Washington · sedes consulares · LG-53 · Trump «presidenta electa» · Comando Sur confirma."
       },
       {
-        l: "green",
-        t: "<b>Apertura sectorial:</b> OFAC licencias mineras · Siemens/GE evalúan eléctrico · CAF financiamiento · Cardón IV gas."
+        "l": "green",
+        "t": "<b>Apertura sectorial:</b> OFAC licencias mineras · Siemens/GE evalúan eléctrico · CAF financiamiento · Cardón IV gas."
       },
       {
-        l: "yellow",
-        t: "<b>Conflictividad:</b> 97 protestas 23–26 mar en 22+ estados · pico 41 (25 mar) · eje laboral-salarial dominante."
+        "l": "yellow",
+        "t": "<b>Conflictividad:</b> 97 protestas 23–26 mar en 22+ estados · pico 41 (25 mar) · eje laboral-salarial dominante."
       },
       {
-        l: "yellow",
-        t: "<b>Encuestas contradictorias:</b> Hinterlaces 73% vs AtlasIntel 34,6% aprobación DR · MassBehavior: DR 32/33 (9,12 pts)."
+        "l": "yellow",
+        "t": "<b>Encuestas contradictorias:</b> Hinterlaces 73% vs AtlasIntel 34,6% aprobación DR · MassBehavior: DR 32/33 (9,12 pts)."
       },
       {
-        l: "red",
-        t: "<b>Caso Maduro:</b> Audiencia 26 mar · rechazo desestimación · cargos adicionales · financiamiento defensa sin resolver."
+        "l": "red",
+        "t": "<b>Caso Maduro:</b> Audiencia 26 mar · rechazo desestimación · cargos adicionales · financiamiento defensa sin resolver."
       },
       {
-        l: "red",
-        t: "<b>Amenazas MCM:</b> Colectivos: «detención por traición» · 5.000 combatientes. 515 presos + 179 militares."
+        "l": "red",
+        "t": "<b>Amenazas MCM:</b> Colectivos: «detención por traición» · 5.000 combatientes. 515 presos + 179 militares."
       }
     ],
-    lectura: "E3 se mantiene como escenario dominante pero cede 4pp (47%→43%), erosionado por el escalamiento de la conflictividad social (97 protestas en 4 días, 22+ estados, pico de 41 el 25 de marzo) y el control de EE.UU. sobre los ingresos petroleros (Rubio/Tesoro), que limita el margen fiscal del Ejecutivo. La doble ofensiva económica — Rodríguez en FII Priority Miami con incentivos fiscales directos y MCM en CERAWeek Houston ante petroleras (meta 5M b/d, $150B inversión, nueva ley petrolera) — marca el tránsito de la estabilización a la ofensiva internacional para captar inversión. Signum Global Advisors reunió a decenas de fondos de cobertura en Caracas. Repsol proyecta triplicar producción para 2029. La apertura sectorial se amplía: OFAC emite licencias para minería, Siemens y GE evalúan el sistema eléctrico del Bajo Caroní, la CAF reactiva financiamiento para termoeléctricas y renovables, y se firma el primer acuerdo empresarial Texas-Venezuela (Petropymi-Alep).\n\nLa normalización bilateral alcanza su punto más avanzado: misión diplomática en Washington, recuperación de sedes consulares, LG-53 para misiones diplomáticas, Trump califica a Rodríguez de «presidenta electa», y el Comando Sur confirma cumplimiento de directrices. Sin embargo, ConocoPhillips califica las reformas de «lamentablemente inadecuadas» y Chevron demanda legislación adicional — la brecha entre la oferta del gobierno y las exigencias de las majors sigue abierta.\n\nE4 sube de 15% a 20% (+5pp), impulsado por la reactivación de la conflictividad laboral, las amenazas de colectivos contra MCM (5.000 combatientes movilizables), la persistencia del esquema coercitivo (515 presos, 179 militares denunciados por MCM) y los apagones en el occidente (Táchira al 8,70% de conectividad). E1 se mantiene en 30%: MCM lidera el índice MassBehaviorResearch (123,68 puntos), Guanipa asciende al segundo lugar nacional (119,80), Vente reabre sede y anuncia movilización para el retorno. El Congreso da 180 días a Rubio para un plan de transición. E2 baja a 7% (-1pp), contenido por la solidez bilateral y la ofensiva de inversión. La paradoja central: la líder con mayor capital político (MCM, 123,68) carece de poder institucional, mientras quien detenta la Presidencia (DR, 9,12) ocupa la penúltima posición en apoyo popular.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "E3 se mantiene como escenario dominante pero cede 4pp (47%→43%), erosionado por el escalamiento de la conflictividad social (97 protestas en 4 días, 22+ estados, pico de 41 el 25 de marzo) y el control de EE.UU. sobre los ingresos petroleros (Rubio/Tesoro), que limita el margen fiscal del Ejecutivo. La doble ofensiva económica — Rodríguez en FII Priority Miami con incentivos fiscales directos y MCM en CERAWeek Houston ante petroleras (meta 5M b/d, $150B inversión, nueva ley petrolera) — marca el tránsito de la estabilización a la ofensiva internacional para captar inversión. Signum Global Advisors reunió a decenas de fondos de cobertura en Caracas. Repsol proyecta triplicar producción para 2029. La apertura sectorial se amplía: OFAC emite licencias para minería, Siemens y GE evalúan el sistema eléctrico del Bajo Caroní, la CAF reactiva financiamiento para termoeléctricas y renovables, y se firma el primer acuerdo empresarial Texas-Venezuela (Petropymi-Alep).\n\nLa normalización bilateral alcanza su punto más avanzado: misión diplomática en Washington, recuperación de sedes consulares, LG-53 para misiones diplomáticas, Trump califica a Rodríguez de «presidenta electa», y el Comando Sur confirma cumplimiento de directrices. Sin embargo, ConocoPhillips califica las reformas de «lamentablemente inadecuadas» y Chevron demanda legislación adicional — la brecha entre la oferta del gobierno y las exigencias de las majors sigue abierta.\n\nE4 sube de 15% a 20% (+5pp), impulsado por la reactivación de la conflictividad laboral, las amenazas de colectivos contra MCM (5.000 combatientes movilizables), la persistencia del esquema coercitivo (515 presos, 179 militares denunciados por MCM) y los apagones en el occidente (Táchira al 8,70% de conectividad). E1 se mantiene en 30%: MCM lidera el índice MassBehaviorResearch (123,68 puntos), Guanipa asciende al segundo lugar nacional (119,80), Vente reabre sede y anuncia movilización para el retorno. El Congreso da 180 días a Rubio para un plan de transición. E2 baja a 7% (-1pp), contenido por la solidez bilateral y la ofensiva de inversión. La paradoja central: la líder con mayor capital político (MCM, 123,68) carece de poder institucional, mientras quien detenta la Presidencia (DR, 9,12) ocupa la penúltima posición en apoyo popular.",
+    "trendSc": 3,
+    "trendDrivers": [
       "Ofensiva económica multisectorial: FII Priority + Signum + CERAWeek + Petropymi-Alep + OFAC minero",
       "Normalización bilateral máxima: misión Washington + sedes + LG-53 + «presidenta electa»",
       "97 protestas en 4 días (22+ estados): conflictividad social supera mecanismos de contención"
     ]
   },
   {
-    label: "29m–6a",
-    short: "S12",
-    probs: [
+    "label": "29m–6a",
+    "short": "S12",
+    "probs": [
       {
-        sc: 1,
-        v: 32,
-        t: "up"
+        "sc": 1,
+        "v": 32,
+        "t": "up"
       },
       {
-        sc: 2,
-        v: 6,
-        t: "down"
+        "sc": 2,
+        "v": 6,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 45,
-        t: "up"
+        "sc": 3,
+        "v": 45,
+        "t": "up"
       },
       {
-        sc: 4,
-        v: 17,
-        t: "down"
+        "sc": 4,
+        "v": 17,
+        "t": "down"
       }
     ],
-    xy: {
-      x: 0.11,
-      y: 0.45
+    "xy": {
+      "x": 0.11,
+      "y": 0.45
     },
-    sem: {
-      g: 9,
-      y: 5,
-      r: 5
+    "sem": {
+      "g": 9,
+      "y": 5,
+      "r": 5
     },
-    kpis: {
-      energia: {
-        exportaciones: ">1,09M bpd marzo (máx. 6 meses)",
-        ingresos: "USD 2.398M causados marzo",
-        licencias: "Sanciones DR levantadas · Citgo en disputa",
-        cambio: "Brent 102 · WTI 90,8 · Merey 73,3"
+    "kpis": {
+      "energia": {
+        "exportaciones": ">1,09M bpd marzo (máx. 6 meses)",
+        "ingresos": "USD 2.398M causados marzo",
+        "licencias": "Sanciones DR levantadas · Citgo en disputa",
+        "cambio": "Brent 102 · WTI 90,8 · Merey 73,3"
       },
-      economico: {
-        inflacion: ">600% interanual",
-        ingresos_pob: "Salario <1 USD · 4 años congelado",
-        electricidad: "CAF reactiva plan 7 años",
-        pib: "SENIAT Q1 USD 3.512M (+26,6%)"
+      "economico": {
+        "inflacion": ">600% interanual",
+        "ingresos_pob": "Salario <1 USD · 4 años congelado",
+        "electricidad": "CAF reactiva plan 7 años",
+        "pib": "SENIAT Q1 USD 3.512M (+26,6%)"
       },
-      opinion: {
-        direccion: "Rubio: estabilización «lograda»",
-        elecciones: "90 días cumplidos · debate interinato",
-        mcm: "Machado-Rubio en Dept. Estado",
-        eeuu: "Trump: «empresa conjunta» energética"
+      "opinion": {
+        "direccion": "Rubio: estabilización «lograda»",
+        "elecciones": "90 días cumplidos · debate interinato",
+        "mcm": "Machado-Rubio en Dept. Estado",
+        "eeuu": "Trump: «empresa conjunta» energética"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>Sanciones:</b> OFAC retira a Rodríguez de lista de bloqueados · desbloquea activos · cooperación directa."
+        "l": "green",
+        "t": "<b>Sanciones:</b> OFAC retira a Rodríguez de lista de bloqueados · desbloquea activos · cooperación directa."
       },
       {
-        l: "green",
-        t: "<b>Embajada:</b> Reapertura formal EE.UU. en Caracas · Laura F. Dogu · SOUTHCOM: «hito histórico»."
+        "l": "green",
+        "t": "<b>Embajada:</b> Reapertura formal EE.UU. en Caracas · Laura F. Dogu · SOUTHCOM: «hito histórico»."
       },
       {
-        l: "green",
-        t: "<b>Energía:</b> Exportaciones >1,09M bpd · USD 2.398M ingresos · Shell negocia Loran (~20 Tcf) · vuelos reanudados."
+        "l": "green",
+        "t": "<b>Energía:</b> Exportaciones >1,09M bpd · USD 2.398M ingresos · Shell negocia Loran (~20 Tcf) · vuelos reanudados."
       },
       {
-        l: "yellow",
-        t: "<b>90 días:</b> Vencimiento «ausencia forzosa» · debate falta temporal vs. absoluta · prórroga AN escenario base."
+        "l": "yellow",
+        "t": "<b>90 días:</b> Vencimiento «ausencia forzosa» · debate falta temporal vs. absoluta · prórroga AN escenario base."
       },
       {
-        l: "yellow",
-        t: "<b>Brecha cambiaria:</b> Convergencia USDT-banca ~10% · pero ~30% vs. oficial · mercado segmentado."
+        "l": "yellow",
+        "t": "<b>Brecha cambiaria:</b> Convergencia USDT-banca ~10% · pero ~30% vs. oficial · mercado segmentado."
       },
       {
-        l: "red",
-        t: "<b>Conflictividad:</b> 11 protestas en 4 días · 9 estados · marcha a Miraflores 9 abril · salario <1 USD."
+        "l": "red",
+        "t": "<b>Conflictividad:</b> 11 protestas en 4 días · 9 estados · marcha a Miraflores 9 abril · salario <1 USD."
       },
       {
-        l: "red",
-        t: "<b>Irán:</b> Embajador iraní con colectivos en 23 de Enero · tensión con normalización Washington."
+        "l": "red",
+        "t": "<b>Irán:</b> Embajador iraní con colectivos en 23 de Enero · tensión con normalización Washington."
       }
     ],
-    lectura: "E3 se fortalece a 45% (+2pp) por la convergencia de tres factores decisivos: el levantamiento de sanciones a Delcy Rodríguez por la OFAC, que la valida como interlocutora plena y desbloquea activos estratégicos incluyendo la disputa por Citgo; las declaraciones de Trump calificando la relación como «empresa conjunta» energética, que redefine el vínculo bilateral; y la reapertura formal de la embajada en Caracas, que institucionaliza la normalización. Rubio declara que la estabilización se ha cumplido «en gran medida» y articula la estrategia de tres fases: estabilización → recuperación → elecciones. Las exportaciones superan 1,09M bpd en marzo con ingresos de USD 2.398M, Shell negocia la expansión gasífera de Mariscal Sucre y Loran (~20 Tcf), y se prevé la reanudación de vuelos con 10+ aerolíneas.\\n\\nSin embargo, el vencimiento de los primeros 90 días de la «ausencia forzosa» declarada por el TSJ introduce un factor de presión institucional sin precedente: la figura no existe en la Constitución y deja en suspenso la definición entre falta temporal prorrogable y falta absoluta con convocatoria electoral obligatoria. La prórroga por la AN es el escenario base, pero su gestión será el primer test real de la capacidad institucional para sostener la transición dentro del marco legal.\\n\\nE1 sube a 32% (+2pp), impulsado por la reunión Machado-Rubio en el Departamento de Estado, la reactivación de «comanditos» por Alviarez, y la presión del reloj constitucional hacia una definición electoral. E4 baja a 17% (-3pp) por la ausencia de señales coercitivas directas, aunque la marcha convocada a Miraflores para el 9 de abril, la presencia del embajador iraní con colectivos en el 23 de Enero, y la retoma de la consigna «Chávez vive» por la FANB mantienen el riesgo latente. E2 se contrae a 6% (-1pp), contenido por la solidez bilateral, pero el Q1 cierra con caída acumulada de 14,2% en exportaciones y la detención arbitraria de Ruperti señala inestabilidad en las reglas del juego para el sector privado.\\n\\nLa paradoja central del período: Venezuela pasa de objeto de contención a socio operativo de EE.UU. en materia energética, pero el vacío constitucional, la brecha entre optimismo inversionista y condiciones materiales de la población (salario <1 USD congelado 4 años), y la persistencia de alianzas con Irán tensionan la sostenibilidad del modelo transaccional.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "E3 se fortalece a 45% (+2pp) por la convergencia de tres factores decisivos: el levantamiento de sanciones a Delcy Rodríguez por la OFAC, que la valida como interlocutora plena y desbloquea activos estratégicos incluyendo la disputa por Citgo; las declaraciones de Trump calificando la relación como «empresa conjunta» energética, que redefine el vínculo bilateral; y la reapertura formal de la embajada en Caracas, que institucionaliza la normalización. Rubio declara que la estabilización se ha cumplido «en gran medida» y articula la estrategia de tres fases: estabilización → recuperación → elecciones. Las exportaciones superan 1,09M bpd en marzo con ingresos de USD 2.398M, Shell negocia la expansión gasífera de Mariscal Sucre y Loran (~20 Tcf), y se prevé la reanudación de vuelos con 10+ aerolíneas.\\n\\nSin embargo, el vencimiento de los primeros 90 días de la «ausencia forzosa» declarada por el TSJ introduce un factor de presión institucional sin precedente: la figura no existe en la Constitución y deja en suspenso la definición entre falta temporal prorrogable y falta absoluta con convocatoria electoral obligatoria. La prórroga por la AN es el escenario base, pero su gestión será el primer test real de la capacidad institucional para sostener la transición dentro del marco legal.\\n\\nE1 sube a 32% (+2pp), impulsado por la reunión Machado-Rubio en el Departamento de Estado, la reactivación de «comanditos» por Alviarez, y la presión del reloj constitucional hacia una definición electoral. E4 baja a 17% (-3pp) por la ausencia de señales coercitivas directas, aunque la marcha convocada a Miraflores para el 9 de abril, la presencia del embajador iraní con colectivos en el 23 de Enero, y la retoma de la consigna «Chávez vive» por la FANB mantienen el riesgo latente. E2 se contrae a 6% (-1pp), contenido por la solidez bilateral, pero el Q1 cierra con caída acumulada de 14,2% en exportaciones y la detención arbitraria de Ruperti señala inestabilidad en las reglas del juego para el sector privado.\\n\\nLa paradoja central del período: Venezuela pasa de objeto de contención a socio operativo de EE.UU. en materia energética, pero el vacío constitucional, la brecha entre optimismo inversionista y condiciones materiales de la población (salario <1 USD congelado 4 años), y la persistencia de alianzas con Irán tensionan la sostenibilidad del modelo transaccional.",
+    "trendSc": 3,
+    "trendDrivers": [
       "OFAC levanta sanciones a Rodríguez + Trump «empresa conjunta»: cooperación bilateral operativa",
       "Reapertura embajada Caracas + Rubio «estabilización lograda» + Shell Loran: normalización institucionalizada",
       "90 días constitucionales cumplidos: debate interinato como primer test institucional de la transición"
     ]
   },
   {
-    label: "3–10 abr",
-    short: "S13",
-    probs: [
+    "label": "3–10 abr",
+    "short": "S13",
+    "probs": [
       {
-        sc: 1,
-        v: 32,
-        t: "flat"
+        "sc": 1,
+        "v": 32,
+        "t": "flat"
       },
       {
-        sc: 2,
-        v: 6,
-        t: "flat"
+        "sc": 2,
+        "v": 6,
+        "t": "flat"
       },
       {
-        sc: 3,
-        v: 47,
-        t: "up"
+        "sc": 3,
+        "v": 47,
+        "t": "up"
       },
       {
-        sc: 4,
-        v: 15,
-        t: "down"
+        "sc": 4,
+        "v": 15,
+        "t": "down"
       }
     ],
-    xy: {
-      x: 0.09,
-      y: 0.43
+    "xy": {
+      "x": 0.09,
+      "y": 0.43
     },
-    sem: {
-      g: 9,
-      y: 4,
-      r: 6
+    "sem": {
+      "g": 9,
+      "y": 4,
+      "r": 6
     },
-    kpis: {
-      energia: {
-        exportaciones: "1,09M bpd marzo (récord 6 meses)",
-        ingresos: "USD 2.398M causados",
-        licencias: "Sanciones BCV bajo evaluación EE.UU.",
-        cambio: "Brent ~102 · Q1 -14,2% acum."
+    "kpis": {
+      "energia": {
+        "exportaciones": "1,09M bpd marzo (récord 6 meses)",
+        "ingresos": "USD 2.398M causados",
+        "licencias": "Sanciones BCV bajo evaluación EE.UU.",
+        "cambio": "Brent ~102 · Q1 -14,2% acum."
       },
-      economico: {
-        inflacion: "13,1% mensual · 649,5% anual (BCV)",
-        ingresos_pob: "Salario mínimo <1 USD · 4 años congelado",
-        electricidad: "Refinación PDVSA al 31%",
-        pib: "PIB real 2025 = 35,7% del nivel 2012"
+      "economico": {
+        "inflacion": "13,1% mensual · 649,5% anual (BCV)",
+        "ingresos_pob": "Salario mínimo <1 USD · 4 años congelado",
+        "electricidad": "Refinación PDVSA al 31%",
+        "pib": "PIB real 2025 = 35,7% del nivel 2012"
       },
-      opinion: {
-        direccion: "Aprobación Rodríguez 34,6% (AtlasIntel)",
-        elecciones: "MCM 68,9% intención voto (Meganálisis)",
-        mcm: "Madrid 18 abr · retorno planificado",
-        eeuu: "83,8% rechaza elogios Trump a Rodríguez"
+      "opinion": {
+        "direccion": "Aprobación Rodríguez 34,6% (AtlasIntel)",
+        "elecciones": "MCM 68,9% intención voto (Meganálisis)",
+        "mcm": "Madrid 18 abr · retorno planificado",
+        "eeuu": "83,8% rechaza elogios Trump a Rodríguez"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "red",
-        t: "<b>9 de abril — 72 protestas:</b> Escalada laboral histórica. PNB con gas pimienta, 10 periodistas agredidos, detención PJ."
+        "l": "red",
+        "t": "<b>9 de abril — 72 protestas:</b> Escalada laboral histórica. PNB con gas pimienta, 10 periodistas agredidos, detención PJ."
       },
       {
-        l: "red",
-        t: "<b>Vacío constitucional:</b> 90 días cumplidos. Prórroga formal ante AN necesaria antes de julio o riesgo de crisis de legitimidad."
+        "l": "red",
+        "t": "<b>Vacío constitucional:</b> 90 días cumplidos. Prórroga formal ante AN necesaria antes de julio o riesgo de crisis de legitimidad."
       },
       {
-        l: "yellow",
-        t: "<b>FMI consulta miembros:</b> Primer movimiento en dos décadas. Bonos soberanos cerca de 48 ctvs/USD. Sanciones BCV evaluadas."
+        "l": "yellow",
+        "t": "<b>FMI consulta miembros:</b> Primer movimiento en dos décadas. Bonos soberanos cerca de 48 ctvs/USD. Sanciones BCV evaluadas."
       },
       {
-        l: "yellow",
-        t: "<b>Anuncio salarial 1° mayo:</b> Sin monto ni mecanismo de indexación. Inflación 649,5% anual puede absorber cualquier ajuste."
+        "l": "yellow",
+        "t": "<b>Anuncio salarial 1° mayo:</b> Sin monto ni mecanismo de indexación. Inflación 649,5% anual puede absorber cualquier ajuste."
       },
       {
-        l: "green",
-        t: "<b>Poder Ciudadano renovado:</b> Devoe (Fiscal, 275 votos) + González Lobato (Defensora). Control institucional completo bajo Rodríguez."
+        "l": "green",
+        "t": "<b>Poder Ciudadano renovado:</b> Devoe (Fiscal, 275 votos) + González Lobato (Defensora). Control institucional completo bajo Rodríguez."
       },
       {
-        l: "green",
-        t: "<b>Reinserción financiera:</b> Bonos +, ConocoPhillips y ExxonMobil envían equipos evaluación, Shell Loran primer gas 2027."
+        "l": "green",
+        "t": "<b>Reinserción financiera:</b> Bonos +, ConocoPhillips y ExxonMobil envían equipos evaluación, Shell Loran primer gas 2027."
       }
     ],
-    lectura: "La semana del 3 al 10 de abril consolida E3 como escenario dominante con 47% (+2pp), impulsada por la convergencia de dos avances institucionales de peso: la designación del Fiscal General Larry Devoe (275 votos) y la Defensora del Pueblo Eglée González Lobato, que completan el control del Poder Ciudadano bajo Delcy Rodríguez; y las señales más claras de reinserción financiera del período — la consulta formal del FMI entre sus miembros y la evaluación por Washington del levantamiento de sanciones al BCV, que podría desbloquear hasta un 40% adicional en producción petrolera. Sin embargo, el hecho estructurante de la semana es la jornada del 9 de abril: 72 protestas en 4 días, escalada de 3 a 15 estados, represión con gas pimienta, agresión a 10 periodistas del SNTP y la primera detención política del período (Ort Betancourt Villamizar, PJ). La conflictividad laboral — salario mínimo congelado 4 años en menos de 1 USD, pensiones, contratación colectiva, ONAPRE — no es directamente política pero crea condiciones de presión que pueden acelerar demandas de transición. El anuncio de Rodríguez de un aumento salarial para el 1° de mayo sin montos ni mecanismos de indexación frente a una inflación anualizada del 649,5% (BCV) enfrenta el riesgo de ser absorbido inmediatamente. E1 se mantiene en 32% sostenido por esta presión social y la hoja de ruta opositora del 12 de abril, mientras E4 baja a 15% por ausencia de escalada coercitiva sistémica — aunque el vector iraní-colectivos (embajador Chegini en 23 de Enero) y la movilización del 16 de abril mantienen el riesgo latente. La paradoja del período: el sector energético genera las señales más positivas (ConocoPhillips y ExxonMobil envían equipos de evaluación, Shell Loran con primer gas en 2027, proyección 1,37M bpd para dic 2026) mientras acumula las trabas regulatorias más graves — modelos de contratos sin publicar, refinación al 31%, marcos fiscales calificados de 'lamentablemente inadecuados' por el CEO de ConocoPhillips.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "La semana del 3 al 10 de abril consolida E3 como escenario dominante con 47% (+2pp), impulsada por la convergencia de dos avances institucionales de peso: la designación del Fiscal General Larry Devoe (275 votos) y la Defensora del Pueblo Eglée González Lobato, que completan el control del Poder Ciudadano bajo Delcy Rodríguez; y las señales más claras de reinserción financiera del período — la consulta formal del FMI entre sus miembros y la evaluación por Washington del levantamiento de sanciones al BCV, que podría desbloquear hasta un 40% adicional en producción petrolera. Sin embargo, el hecho estructurante de la semana es la jornada del 9 de abril: 72 protestas en 4 días, escalada de 3 a 15 estados, represión con gas pimienta, agresión a 10 periodistas del SNTP y la primera detención política del período (Ort Betancourt Villamizar, PJ). La conflictividad laboral — salario mínimo congelado 4 años en menos de 1 USD, pensiones, contratación colectiva, ONAPRE — no es directamente política pero crea condiciones de presión que pueden acelerar demandas de transición. El anuncio de Rodríguez de un aumento salarial para el 1° de mayo sin montos ni mecanismos de indexación frente a una inflación anualizada del 649,5% (BCV) enfrenta el riesgo de ser absorbido inmediatamente. E1 se mantiene en 32% sostenido por esta presión social y la hoja de ruta opositora del 12 de abril, mientras E4 baja a 15% por ausencia de escalada coercitiva sistémica — aunque el vector iraní-colectivos (embajador Chegini en 23 de Enero) y la movilización del 16 de abril mantienen el riesgo latente. La paradoja del período: el sector energético genera las señales más positivas (ConocoPhillips y ExxonMobil envían equipos de evaluación, Shell Loran con primer gas en 2027, proyección 1,37M bpd para dic 2026) mientras acumula las trabas regulatorias más graves — modelos de contratos sin publicar, refinación al 31%, marcos fiscales calificados de 'lamentablemente inadecuados' por el CEO de ConocoPhillips.",
+    "trendSc": 3,
+    "trendDrivers": [
       "Poder Ciudadano completo bajo Rodríguez + FMI consulta formal + evaluación sanciones BCV: reinserción financiera avanza",
       "Conflictividad laboral 9-abr (72 protestas, 15 estados) erosiona narrativa estabilización pero no desplaza E3",
       "Hoja de ruta PUD 12-abr + retorno planificado Machado mantiene E1 en 32% como presión de transición activa"
     ]
   },
   {
-    label: "10–17 abr",
-    short: "S14",
-    probs: [
+    "label": "10–17 abr",
+    "short": "S14",
+    "probs": [
       {
-        sc: 1,
-        v: 35,
-        t: "up"
+        "sc": 1,
+        "v": 35,
+        "t": "up"
       },
       {
-        sc: 2,
-        v: 5,
-        t: "down"
+        "sc": 2,
+        "v": 5,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 47,
-        t: "flat"
+        "sc": 3,
+        "v": 47,
+        "t": "flat"
       },
       {
-        sc: 4,
-        v: 13,
-        t: "down"
+        "sc": 4,
+        "v": 13,
+        "t": "down"
       }
     ],
-    xy: {
-      x: 0.08,
-      y: 0.44
+    "xy": {
+      "x": 0.08,
+      "y": 0.44
     },
-    sem: {
-      g: 10,
-      y: 4,
-      r: 5
+    "sem": {
+      "g": 10,
+      "y": 4,
+      "r": 5
     },
-    kpis: {
-      energia: {
-        exportaciones: "1,09M bpd mar (ofic.) · 988 kbd (OPEP sec.)",
-        ingresos: "150M bbl comercializados desde ene · Merey USD 85,92/b",
-        licencias: "GL-56 + GL-57 OFAC emitidas",
-        cambio: "570,75 Bs/USD ofic. · ~636 par · brecha ~30%"
+    "kpis": {
+      "energia": {
+        "exportaciones": "1,09M bpd mar (ofic.) · 988 kbd (OPEP sec.)",
+        "ingresos": "150M bbl comercializados desde ene · Merey USD 85,92/b",
+        "licencias": "GL-56 + GL-57 OFAC emitidas",
+        "cambio": "570,75 Bs/USD ofic. · ~636 par · brecha ~30%"
       },
-      economico: {
-        inflacion: "13,1% mensual (BCV) · 649,5% anual",
-        ingresos_pob: "Salario <1 USD congelado · aumento 1° mayo sin monto",
-        electricidad: "Sin datos nuevos · fallas refinación PDVSA",
-        pib: "PIB 2025 = 35,7% nivel 2012 · BCV publica balanza pagos"
+      "economico": {
+        "inflacion": "13,1% mensual (BCV) · 649,5% anual",
+        "ingresos_pob": "Salario <1 USD congelado · aumento 1° mayo sin monto",
+        "electricidad": "Sin datos nuevos · fallas refinación PDVSA",
+        "pib": "PIB 2025 = 35,7% nivel 2012 · BCV publica balanza pagos"
       },
-      opinion: {
-        direccion: "83,8% rechaza elogios Trump a Rodríguez (Meganálisis)",
-        elecciones: "MCM: 40 semanas mínimas para elecciones libres · retorno inminente",
-        mcm: "MCM en Elíseo con Macron (13 abr) · retorno 'decisión definitiva'",
-        eeuu: "GL-56/57 + Kozak: Fase 1 cumplida → Fase 2"
+      "opinion": {
+        "direccion": "83,8% rechaza elogios Trump a Rodríguez (Meganálisis)",
+        "elecciones": "MCM: 40 semanas mínimas para elecciones libres · retorno inminente",
+        "mcm": "MCM en Elíseo con Macron (13 abr) · retorno 'decisión definitiva'",
+        "eeuu": "GL-56/57 + Kozak: Fase 1 cumplida → Fase 2"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>FMI + BM reanudan relaciones:</b> 16 abr — mayor avance de reinserción multilateral en más de dos décadas. DEG ~USD 5.000M potenciales."
+        "l": "green",
+        "t": "<b>FMI + BM reanudan relaciones:</b> 16 abr — mayor avance de reinserción multilateral en más de dos décadas. DEG ~USD 5.000M potenciales."
       },
       {
-        l: "green",
-        t: "<b>GL-56 y GL-57 OFAC:</b> Apertura financiera condicionada. Conindustria: 'puente hacia normalización financiera'. GL-57 habilita BCV y banca pública."
+        "l": "green",
+        "t": "<b>GL-56 y GL-57 OFAC:</b> Apertura financiera condicionada. Conindustria: 'puente hacia normalización financiera'. GL-57 habilita BCV y banca pública."
       },
       {
-        l: "green",
-        t: "<b>Visita Haustveit + Chevron–PDVSA:</b> Primer Depto. Energía EE.UU. en Caracas. Petroindependencia 49% + bloque Ayacucho 8. 150M bbl desde enero."
+        "l": "green",
+        "t": "<b>Visita Haustveit + Chevron–PDVSA:</b> Primer Depto. Energía EE.UU. en Caracas. Petroindependencia 49% + bloque Ayacucho 8. 150M bbl desde enero."
       },
       {
-        l: "yellow",
-        t: "<b>Fase 1 cumplida (Kozak):</b> EE.UU. avanza a Fase 2 — condiciones electorales explícitas: renovación CNE, auditorías KPMG, retorno libre MCM."
+        "l": "yellow",
+        "t": "<b>Fase 1 cumplida (Kozak):</b> EE.UU. avanza a Fase 2 — condiciones electorales explícitas: renovación CNE, auditorías KPMG, retorno libre MCM."
       },
       {
-        l: "yellow",
-        t: "<b>MCM en Elíseo + retorno inminente:</b> Recibida por Macron (13 abr). Reunión PM Países Bajos (15 abr). Retorno al país como próximo punto de inflexión."
+        "l": "yellow",
+        "t": "<b>MCM en Elíseo + retorno inminente:</b> Recibida por Macron (13 abr). Reunión PM Países Bajos (15 abr). Retorno al país como próximo punto de inflexión."
       },
       {
-        l: "red",
-        t: "<b>81% indicadores transición en rojo:</b> 100 días gestión Rodríguez — solo 1/21 indicadores en verde. Más de 400 presos políticos. Vacío constitucional 180 días sin resolver."
+        "l": "red",
+        "t": "<b>81% indicadores transición en rojo:</b> 100 días gestión Rodríguez — solo 1/21 indicadores en verde. Más de 400 presos políticos. Vacío constitucional 180 días sin resolver."
       }
     ],
-    lectura: "La semana del 10 al 17 de abril marca un punto de inflexión estructural en la reinserción internacional de Venezuela: la reanudación simultánea de relaciones con el FMI y el Banco Mundial, la emisión de las licencias GL-56 y GL-57, la primera visita oficial del Departamento de Energía de EE.UU. a Caracas y la declaración de la Fase 1 cumplida por Kozak configuran el avance más significativo del proceso desde enero. E3 se sostiene en 47% (=0pp) absorbiendo esta acumulación sin precedente como confirmación del escenario de continuidad negociada. E1 sube a 35% (+3pp) impulsado por la proyección internacional de MCM — recibida por Macron en el Elíseo, con reunión en La Haya — y por las condiciones electorales explícitas que fija EE.UU. en la Fase 2 (renovación CNE, auditorías KPMG, retorno libre de MCM). Esta subida no desplaza a E3 porque Washington no prioriza elecciones inmediatas (Chris Wright) y el CNE no muestra movimientos concretos. E4 baja a 13% (−2pp): la movilización del 16 de abril fue absorbida sin represión mayor y la detención de Paparoni fue breve y sin cargos. E2 cede a 5% (−1pp) por la solidez del eje multilateral recién activado. La tensión estructural persiste: apertura económica bajo vigilancia internacional coexiste con sistema político cerrado — 81% de indicadores de transición en rojo, más de 400 presos políticos, debate constitucional de 180 días sin resolver, registro FARA de Rodríguez confirma candidatura 2027 avanzando en paralelo.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "La semana del 10 al 17 de abril marca un punto de inflexión estructural en la reinserción internacional de Venezuela: la reanudación simultánea de relaciones con el FMI y el Banco Mundial, la emisión de las licencias GL-56 y GL-57, la primera visita oficial del Departamento de Energía de EE.UU. a Caracas y la declaración de la Fase 1 cumplida por Kozak configuran el avance más significativo del proceso desde enero. E3 se sostiene en 47% (=0pp) absorbiendo esta acumulación sin precedente como confirmación del escenario de continuidad negociada. E1 sube a 35% (+3pp) impulsado por la proyección internacional de MCM — recibida por Macron en el Elíseo, con reunión en La Haya — y por las condiciones electorales explícitas que fija EE.UU. en la Fase 2 (renovación CNE, auditorías KPMG, retorno libre de MCM). Esta subida no desplaza a E3 porque Washington no prioriza elecciones inmediatas (Chris Wright) y el CNE no muestra movimientos concretos. E4 baja a 13% (−2pp): la movilización del 16 de abril fue absorbida sin represión mayor y la detención de Paparoni fue breve y sin cargos. E2 cede a 5% (−1pp) por la solidez del eje multilateral recién activado. La tensión estructural persiste: apertura económica bajo vigilancia internacional coexiste con sistema político cerrado — 81% de indicadores de transición en rojo, más de 400 presos políticos, debate constitucional de 180 días sin resolver, registro FARA de Rodríguez confirma candidatura 2027 avanzando en paralelo.",
+    "trendSc": 3,
+    "trendDrivers": [
       "FMI + BM reanudan relaciones + GL-56/57 + Haustveit Caracas: mayor acumulación de señales de reinserción internacional del proceso",
       "MCM en Elíseo + condiciones Fase 2 EE.UU. (CNE, KPMG, retorno MCM): E1 sube a 35% como presión de transición activa",
       "81% indicadores transición en rojo + vacío constitucional 180 días + candidatura FARA Rodríguez: sistema político permanece cerrado"
     ]
   },
   {
-    label: "17–24 abr",
-    short: "S15",
-    probs: [
+    "label": "17–24 abr",
+    "short": "S15",
+    "probs": [
       {
-        sc: 1,
-        v: 38,
-        t: "up"
+        "sc": 1,
+        "v": 38,
+        "t": "up"
       },
       {
-        sc: 2,
-        v: 4,
-        t: "down"
+        "sc": 2,
+        "v": 4,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 46,
-        t: "down"
+        "sc": 3,
+        "v": 46,
+        "t": "down"
       },
       {
-        sc: 4,
-        v: 12,
-        t: "down"
+        "sc": 4,
+        "v": 12,
+        "t": "down"
       }
     ],
-    xy: {
-      x: 0.07,
-      y: 0.44
+    "xy": {
+      "x": 0.07,
+      "y": 0.44
     },
-    sem: {
-      g: 9,
-      y: 5,
-      r: 4
+    "sem": {
+      "g": 9,
+      "y": 5,
+      "r": 4
     },
-    kpis: {
-      energia: {
-        exportaciones: "1,1M bpd · meta 1,37M dic 2026",
-        ingresos: "USD 3.000M fondo bajo EE.UU. · KPMG",
-        licencias: "GL-56/57 + GL-55 minería",
-        cambio: "Halliburton evalúa retorno · Brent ~100"
+    "kpis": {
+      "energia": {
+        "exportaciones": "1,1M bpd · meta 1,37M dic 2026",
+        "ingresos": "USD 3.000M fondo bajo EE.UU. · KPMG",
+        "licencias": "GL-56/57 + GL-55 minería",
+        "cambio": "Halliburton evalúa retorno · Brent ~100"
       },
-      economico: {
-        inflacion: "~650% anualizada · FMI: camino «muy difícil»",
-        ingresos_pob: "Salario <1 USD · 1° mayo sin montos ni indexación",
-        electricidad: "Siemens/GE conversan Zulia · CAF activa",
-        pib: "7,4% proy. 2026 (PNUD) · base 35,7% nivel 2012"
+      "economico": {
+        "inflacion": "~650% anualizada · FMI: camino «muy difícil»",
+        "ingresos_pob": "Salario <1 USD · 1° mayo sin montos ni indexación",
+        "electricidad": "Siemens/GE conversan Zulia · CAF activa",
+        "pib": "7,4% proy. 2026 (PNUD) · base 35,7% nivel 2012"
       },
-      opinion: {
-        direccion: "Brecha E3-E1 de 8pp — la más estrecha del ciclo",
-        elecciones: "MCM: 40 sem. · Cabello: «cuando sean» · Petro: cogob.",
-        mcm: "«Hoy comienza el regreso a casa» Puerta del Sol",
-        eeuu: "Barrett Fase 2 + Kozak-Figuera + Rubio negocia BCV"
+      "opinion": {
+        "direccion": "Brecha E3-E1 de 8pp — la más estrecha del ciclo",
+        "elecciones": "MCM: 40 sem. · Cabello: «cuando sean» · Petro: cogob.",
+        "mcm": "«Hoy comienza el regreso a casa» Puerta del Sol",
+        "eeuu": "Barrett Fase 2 + Kozak-Figuera + Rubio negocia BCV"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>FMI + BM + BID:</b> 3 multilaterales reanudan vínculos simultáneamente — mayor consolidación multilateral del período."
+        "l": "green",
+        "t": "<b>FMI + BM + BID:</b> 3 multilaterales reanudan vínculos simultáneamente — mayor consolidación multilateral del período."
       },
       {
-        l: "green",
-        t: "<b>Barrett llega (23 abr):</b> Nuevo encargado EE.UU. confirma Fase 2 — mensaje centrado en resultados concretos."
+        "l": "green",
+        "t": "<b>Barrett llega (23 abr):</b> Nuevo encargado EE.UU. confirma Fase 2 — mensaje centrado en resultados concretos."
       },
       {
-        l: "green",
-        t: "<b>Reconfiguración institucional:</b> Ley de Minas G.O. 7.020 + Comisión Activos Públicos + Comisión TSJ + 100 días gestión."
+        "l": "green",
+        "t": "<b>Reconfiguración institucional:</b> Ley de Minas G.O. 7.020 + Comisión Activos Públicos + Comisión TSJ + 100 días gestión."
       },
       {
-        l: "yellow",
-        t: "<b>Gran Peregrinación 19 abr – 1° mayo:</b> Legitimación interna del interinato. 1° mayo como test de colisión de agendas."
+        "l": "yellow",
+        "t": "<b>Gran Peregrinación 19 abr – 1° mayo:</b> Legitimación interna del interinato. 1° mayo como test de colisión de agendas."
       },
       {
-        l: "yellow",
-        t: "<b>MCM: «hoy comienza el regreso a casa»:</b> Puerta del Sol — retorno inminente como próximo test real del acuerdo bilateral."
+        "l": "yellow",
+        "t": "<b>MCM: «hoy comienza el regreso a casa»:</b> Puerta del Sol — retorno inminente como próximo test real del acuerdo bilateral."
       },
       {
-        l: "red",
-        t: "<b>46 protestas · motín Yare III:</b> Pico 27 (22 abr) paro universitario · 5 fallecidos · 473 presos políticos (Foro Penal)."
+        "l": "red",
+        "t": "<b>46 protestas · motín Yare III:</b> Pico 27 (22 abr) paro universitario · 5 fallecidos · 473 presos políticos (Foro Penal)."
       }
     ],
-    lectura: "E3 cede 1pp a 46% sin perder su posición dominante, en una semana de consolidación institucional y diplomática que profundiza la arquitectura de continuidad negociada. La llegada de John Barrett como encargado de negocios confirma la continuidad estratégica de la Fase 2; los tres organismos multilaterales —FMI, Banco Mundial y BID— reanudan vínculos de forma simultánea con agenda técnica de largo plazo; y la batería de reformas institucionales (Ley de Minas con G.O. 7.020, Comisión de Clasificación de Activos Públicos, Comisión Preliminar del TSJ) consolida la arquitectura del interinato con apertura selectiva al capital privado. La propuesta de cogobernanza de Petro —el actor regional de mayor influencia, en visita a Caracas el 24 de abril— refuerza la lógica de una transición gestionada y prolongada que es la esencia de E3, alejándose de una ruptura electoral inmediata. El balance de los 100 días presenta hitos verificables (amnistía 8.616, PDVSA 1,1M bpd, relaciones FMI-BM), aunque la advertencia de Georgieva —«el camino será muy difícil»— ancla las expectativas en el plano técnico.\\n\\nE1 sube 3pp a 38% —la brecha más estrecha con E3 desde el inicio del período— impulsado por el anuncio de retorno de MCM desde una abarrotada Puerta del Sol («hoy comienza el regreso a casa»), la reunión con el primer ministro de Portugal y la medalla de la Comunidad de Madrid, y la propuesta de acuerdo nacional con rutas simultáneas como nueva arquitectura de articulación transversal que incorpora liberación de presos y retorno de migrantes como condiciones mínimas. La coordinación PUD-EE.UU. vía Figuera-Kozak y el respaldo a la AN de 2015 confirman que Washington mantiene el canal opositor activo. Sin embargo, E1 encuentra su límite en la ausencia de movimientos concretos en el CNE, en el descarte explícito de Cabello de cualquier cronograma y en los reportes —no confirmados— de que desde Washington no se contemplan elecciones en el corto ni mediano plazo. Los reportes extraoficiales sobre la negociación coordinada por Rubio para renovar las autoridades del BCV con auditoría de Deloitte, de confirmarse, representarían un acuerdo entre élites bajo supervisión estadounidense que es más propio de E3 que de E1.\\n\\nE4 baja 1pp a 12% por ausencia de escalada coercitiva sistémica: la detención de Paparoni fue selectiva y sin continuación, el motín de Yare III no generó represión externa, y el freno bilateral sigue activo. Con todo, el patrón de control selectivo —Paparoni, cierre del ciclo de amnistía muy por debajo de las expectativas de las ONG (menos del 30%), 473 presos políticos con 187 militares— confirma que el vector coercitivo opera de forma contenida pero activa. E2 cede a 4% por la solidez del entramado multilateral recién ampliado, aunque la advertencia de Georgieva y la paradoja estructural del salario —cubrir la canasta básica para empleados públicos y pensionados requiere más de USD 21.000M anuales— mantienen las fragilidades intactas. La convergencia del 1° de mayo y el retorno inminente de MCM definen el próximo período como el test más crítico del proceso de estabilización.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "E3 cede 1pp a 46% sin perder su posición dominante, en una semana de consolidación institucional y diplomática que profundiza la arquitectura de continuidad negociada. La llegada de John Barrett como encargado de negocios confirma la continuidad estratégica de la Fase 2; los tres organismos multilaterales —FMI, Banco Mundial y BID— reanudan vínculos de forma simultánea con agenda técnica de largo plazo; y la batería de reformas institucionales (Ley de Minas con G.O. 7.020, Comisión de Clasificación de Activos Públicos, Comisión Preliminar del TSJ) consolida la arquitectura del interinato con apertura selectiva al capital privado. La propuesta de cogobernanza de Petro —el actor regional de mayor influencia, en visita a Caracas el 24 de abril— refuerza la lógica de una transición gestionada y prolongada que es la esencia de E3, alejándose de una ruptura electoral inmediata. El balance de los 100 días presenta hitos verificables (amnistía 8.616, PDVSA 1,1M bpd, relaciones FMI-BM), aunque la advertencia de Georgieva —«el camino será muy difícil»— ancla las expectativas en el plano técnico.\\n\\nE1 sube 3pp a 38% —la brecha más estrecha con E3 desde el inicio del período— impulsado por el anuncio de retorno de MCM desde una abarrotada Puerta del Sol («hoy comienza el regreso a casa»), la reunión con el primer ministro de Portugal y la medalla de la Comunidad de Madrid, y la propuesta de acuerdo nacional con rutas simultáneas como nueva arquitectura de articulación transversal que incorpora liberación de presos y retorno de migrantes como condiciones mínimas. La coordinación PUD-EE.UU. vía Figuera-Kozak y el respaldo a la AN de 2015 confirman que Washington mantiene el canal opositor activo. Sin embargo, E1 encuentra su límite en la ausencia de movimientos concretos en el CNE, en el descarte explícito de Cabello de cualquier cronograma y en los reportes —no confirmados— de que desde Washington no se contemplan elecciones en el corto ni mediano plazo. Los reportes extraoficiales sobre la negociación coordinada por Rubio para renovar las autoridades del BCV con auditoría de Deloitte, de confirmarse, representarían un acuerdo entre élites bajo supervisión estadounidense que es más propio de E3 que de E1.\\n\\nE4 baja 1pp a 12% por ausencia de escalada coercitiva sistémica: la detención de Paparoni fue selectiva y sin continuación, el motín de Yare III no generó represión externa, y el freno bilateral sigue activo. Con todo, el patrón de control selectivo —Paparoni, cierre del ciclo de amnistía muy por debajo de las expectativas de las ONG (menos del 30%), 473 presos políticos con 187 militares— confirma que el vector coercitivo opera de forma contenida pero activa. E2 cede a 4% por la solidez del entramado multilateral recién ampliado, aunque la advertencia de Georgieva y la paradoja estructural del salario —cubrir la canasta básica para empleados públicos y pensionados requiere más de USD 21.000M anuales— mantienen las fragilidades intactas. La convergencia del 1° de mayo y el retorno inminente de MCM definen el próximo período como el test más crítico del proceso de estabilización.",
+    "trendSc": 3,
+    "trendDrivers": [
       "FMI + BM + BID simultáneos + Barrett Fase 2: mayor acumulación multilateral del período",
       "Brecha E3-E1 de 8pp — mínima del ciclo: MCM anuncia regreso desde Puerta del Sol",
       "1° mayo: convergencia Gran Peregrinación + movilización laboral — próximo test decisivo del acuerdo de estabilización"
     ]
   },
   {
-    label: "24 abr–1 may",
-    short: "S16",
-    probs: [
+    "label": "24 abr–1 may",
+    "short": "S16",
+    "probs": [
       {
-        sc: 1,
-        v: 35,
-        t: "down"
+        "sc": 1,
+        "v": 35,
+        "t": "down"
       },
       {
-        sc: 2,
-        v: 4,
-        t: "flat"
+        "sc": 2,
+        "v": 4,
+        "t": "flat"
       },
       {
-        sc: 3,
-        v: 50,
-        t: "up"
+        "sc": 3,
+        "v": 50,
+        "t": "up"
       },
       {
-        sc: 4,
-        v: 11,
-        t: "down"
+        "sc": 4,
+        "v": 11,
+        "t": "down"
       }
     ],
-    xy: {
-      x: 0.05,
-      y: 0.46
+    "xy": {
+      "x": 0.05,
+      "y": 0.46
     },
-    sem: {
-      g: 11,
-      y: 4,
-      r: 3
+    "sem": {
+      "g": 11,
+      "y": 4,
+      "r": 3
     },
-    kpis: {
-      energia: {
-        exportaciones: "499k bpd a EE.UU. · 26,3M bbl acum. (52% 2025)",
-        ingresos: "Shell Monagas · Ení Junín 5 · BP Deltana · Repsol x3",
-        licencias: "MOU Casa Blanca: petróleo, gas, oro, aluminio, carbón",
-        cambio: "BCV ~570 Bs/USD · USDT ~630 · brecha ofic. ~29%"
+    "kpis": {
+      "energia": {
+        "exportaciones": "499k bpd a EE.UU. · 26,3M bbl acum. (52% 2025)",
+        "ingresos": "Shell Monagas · Ení Junín 5 · BP Deltana · Repsol x3",
+        "licencias": "MOU Casa Blanca: petróleo, gas, oro, aluminio, carbón",
+        "cambio": "BCV ~570 Bs/USD · USDT ~630 · brecha ofic. ~29%"
       },
-      economico: {
-        inflacion: "FMI 4% · CEPAL 6,5% · PNUD 7,4% proy. 2026",
-        ingresos_pob: "$240 ingreso mínimo (bonos) · base Bs 130 (~$0,27)",
-        electricidad: "BCV 20 trim. crecimiento · auditorías paralelas EE.UU.-Vzla",
-        pib: "Reservas ~USD 13.600M · 5.000M DEG FMI"
+      "economico": {
+        "inflacion": "FMI 4% · CEPAL 6,5% · PNUD 7,4% proy. 2026",
+        "ingresos_pob": "$240 ingreso mínimo (bonos) · base Bs 130 (~$0,27)",
+        "electricidad": "BCV 20 trim. crecimiento · auditorías paralelas EE.UU.-Vzla",
+        "pib": "Reservas ~USD 13.600M · 5.000M DEG FMI"
       },
-      opinion: {
-        direccion: "AtlasIntel: 31,4% aprueba DR · 47,1% desaprueba",
-        elecciones: "Polymarket: 45% elecciones 2026 · MCM candidatura confirmada",
-        mcm: "Meganálisis: MCM 71,25% intención voto · 84,36% vs. DR",
-        eeuu: "OEA reconoce a Rodríguez como interlocutora operativa"
+      "opinion": {
+        "direccion": "AtlasIntel: 31,4% aprueba DR · 47,1% desaprueba",
+        "elecciones": "Polymarket: 45% elecciones 2026 · MCM candidatura confirmada",
+        "mcm": "Meganálisis: MCM 71,25% intención voto · 84,36% vs. DR",
+        "eeuu": "OEA reconoce a Rodríguez como interlocutora operativa"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>Delegación Casa Blanca:</b> Jarrod Agen + vuelo AA directo Miami-Caracas + MOU petróleo, gas, oro, aluminio y carbón — cooperación energética operativa bilateral."
+        "l": "green",
+        "t": "<b>Delegación Casa Blanca:</b> Jarrod Agen + vuelo AA directo Miami-Caracas + MOU petróleo, gas, oro, aluminio y carbón — cooperación energética operativa bilateral."
       },
       {
-        l: "green",
-        t: "<b>Acuerdos energéticos:</b> Shell instala equipo en Monagas (Carito-Pirital) · Ení firma Junín 5 (35.000M bbl) · BP MOU Plataforma Deltana · Repsol CEO: producción x3 en 3 años."
+        "l": "green",
+        "t": "<b>Acuerdos energéticos:</b> Shell instala equipo en Monagas (Carito-Pirital) · Ení firma Junín 5 (35.000M bbl) · BP MOU Plataforma Deltana · Repsol CEO: producción x3 en 3 años."
       },
       {
-        l: "green",
-        t: "<b>Diplomacia activa:</b> Rodríguez-Petro bilateral USD 1.200M · visita Barbados · invitación Cumbre Iberoamericana Madrid · Zambrano propuesto embajador España."
+        "l": "green",
+        "t": "<b>Diplomacia activa:</b> Rodríguez-Petro bilateral USD 1.200M · visita Barbados · invitación Cumbre Iberoamericana Madrid · Zambrano propuesto embajador España."
       },
       {
-        l: "yellow",
-        t: "<b>$240 sin reforma salarial:</b> Base permanece en Bs 130 (~$0,27) · sin incidencia prestaciones · bloqueo policial marchas laborales en Caracas (30 abr)."
+        "l": "yellow",
+        "t": "<b>$240 sin reforma salarial:</b> Base permanece en Bs 130 (~$0,27) · sin incidencia prestaciones · bloqueo policial marchas laborales en Caracas (30 abr)."
       },
       {
-        l: "yellow",
-        t: "<b>TSJ jubila 8 magistrados:</b> Moreno, Gavidia, Gil y cinco más · 227 sentencias en una semana · proceso postulaciones bajo control AN del interinato."
+        "l": "yellow",
+        "t": "<b>TSJ jubila 8 magistrados:</b> Moreno, Gavidia, Gil y cinco más · 227 sentencias en una semana · proceso postulaciones bajo control AN del interinato."
       },
       {
-        l: "red",
-        t: "<b>Conflictividad laboral:</b> 33 protestas 24–29 abr · 9 estados · convocatorias escalonadas 30 abr – 1° mayo · politización creciente de demandas."
+        "l": "red",
+        "t": "<b>Conflictividad laboral:</b> 33 protestas 24–29 abr · 9 estados · convocatorias escalonadas 30 abr – 1° mayo · politización creciente de demandas."
       },
       {
-        l: "red",
-        t: "<b>Eurocámara 507–31:</b> Sanciones condicionadas a presos políticos, cese represión y elecciones libres — tensión con normalización sin condicionamientos de EE.UU."
+        "l": "red",
+        "t": "<b>Eurocámara 507–31:</b> Sanciones condicionadas a presos políticos, cese represión y elecciones libres — tensión con normalización sin condicionamientos de EE.UU."
       }
     ],
-    lectura: "E3 sube 4pp a 50% —el nivel más alto desde el inicio del período post-Maduro— sobre la base de la semana de mayor densidad de consolidación bilateral y energética del ciclo. La llegada de la delegación de la Casa Blanca encabezada por Jarrod Agen en el primer vuelo directo de American Airlines en siete años, la firma de MOU en petróleo, gas, oro, aluminio y carbón, la instalación de Shell en Monagas, el acuerdo de Ení para Junín 5 (35.000 millones de barriles), el MOU de BP para la Plataforma Deltana y el anuncio del CEO de Repsol de triplicar producción en tres años configuran en una sola semana la masa crítica de compromisos energéticos más significativa del proceso. No es solo densidad: es la transición de la estabilización a la cooperación operativa directa.\n\nEl segundo vector es institucional: la jubilación extraoficial de ocho magistrados del TSJ —incluyendo a Maikel Moreno— precedida de 227 sentencias en una semana y seguida de un proceso de postulaciones bajo control de la AN del interinato completa la reconfiguración del Poder Judicial. El TSJ pasa de ser un bastión del madurismo a convertirse en un instrumento del rodriguismo. Combinado con las auditorías paralelas del BCV y la incorporación de figuras opositoras moderadas en la diplomacia (Zambrano para España, Ochoa Antich para Alemania), el patrón que Americas Quarterly denomina ‘normalización sin transición’ alcanza su expresión más completa: avance económico sin condicionamientos políticos verificables, donde cada acuerdo reduce la presión internacional y amplía el margen de maniobra interno.\n\nE1 cede 3pp a 35% a pesar de señales activas de peso: la confirmación de candidatura de MCM, el registro de 1,5 millones de inscritos en el Registro Electoral en seis semanas y la carta del PUD a Petro con una hoja de ruta de ocho puntos son hechos políticos relevantes. Sin embargo, la dinámica dominante absorbe el espacio político: Cabello descarta explícitamente el calendario electoral, el TSJ pasa bajo control del interinato y el paquete salarial de USD 240 gestiona expectativas sin reforma de fondo. La brecha E3-E1 se amplía de 8 a 15pp, la mayor desde principios del ciclo.\n\nE4 baja 1pp a 11%: el bloqueo policial de marchas en Caracas y el discurso de Cabello son señales coercitivas contenidas que no trascienden a ruptura bilateral. La delegación de la Casa Blanca, Barrett en Miraflores y los MOU energéticos operan como freno estructural. E2 se mantiene en 4%: el compromiso bilateral más robusto del período es el principal factor de contención, aunque la inflación en tres dígitos, el salario base en ~USD 0,27 y el vacío constitucional de los 180 días sin prórroga formal mantienen las fragilidades estructurales intactas.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "E3 sube 4pp a 50% —el nivel más alto desde el inicio del período post-Maduro— sobre la base de la semana de mayor densidad de consolidación bilateral y energética del ciclo. La llegada de la delegación de la Casa Blanca encabezada por Jarrod Agen en el primer vuelo directo de American Airlines en siete años, la firma de MOU en petróleo, gas, oro, aluminio y carbón, la instalación de Shell en Monagas, el acuerdo de Ení para Junín 5 (35.000 millones de barriles), el MOU de BP para la Plataforma Deltana y el anuncio del CEO de Repsol de triplicar producción en tres años configuran en una sola semana la masa crítica de compromisos energéticos más significativa del proceso. No es solo densidad: es la transición de la estabilización a la cooperación operativa directa.\n\nEl segundo vector es institucional: la jubilación extraoficial de ocho magistrados del TSJ —incluyendo a Maikel Moreno— precedida de 227 sentencias en una semana y seguida de un proceso de postulaciones bajo control de la AN del interinato completa la reconfiguración del Poder Judicial. El TSJ pasa de ser un bastión del madurismo a convertirse en un instrumento del rodriguismo. Combinado con las auditorías paralelas del BCV y la incorporación de figuras opositoras moderadas en la diplomacia (Zambrano para España, Ochoa Antich para Alemania), el patrón que Americas Quarterly denomina ‘normalización sin transición’ alcanza su expresión más completa: avance económico sin condicionamientos políticos verificables, donde cada acuerdo reduce la presión internacional y amplía el margen de maniobra interno.\n\nE1 cede 3pp a 35% a pesar de señales activas de peso: la confirmación de candidatura de MCM, el registro de 1,5 millones de inscritos en el Registro Electoral en seis semanas y la carta del PUD a Petro con una hoja de ruta de ocho puntos son hechos políticos relevantes. Sin embargo, la dinámica dominante absorbe el espacio político: Cabello descarta explícitamente el calendario electoral, el TSJ pasa bajo control del interinato y el paquete salarial de USD 240 gestiona expectativas sin reforma de fondo. La brecha E3-E1 se amplía de 8 a 15pp, la mayor desde principios del ciclo.\n\nE4 baja 1pp a 11%: el bloqueo policial de marchas en Caracas y el discurso de Cabello son señales coercitivas contenidas que no trascienden a ruptura bilateral. La delegación de la Casa Blanca, Barrett en Miraflores y los MOU energéticos operan como freno estructural. E2 se mantiene en 4%: el compromiso bilateral más robusto del período es el principal factor de contención, aunque la inflación en tres dígitos, el salario base en ~USD 0,27 y el vacío constitucional de los 180 días sin prórroga formal mantienen las fragilidades estructurales intactas.",
+    "trendSc": 3,
+    "trendDrivers": [
       "Delegación Casa Blanca + vuelo AA + 5 acuerdos energéticos: semana de mayor densidad bilateral y energética del período post-Maduro",
       "Jubilación 8 magistrados TSJ + 227 sentencias + postulaciones bajo AN: reconfiguración judicial como acumulación institucional del interinato",
       "‘Normalización sin transición’ (Americas Quarterly): E3 alcanza 50%, el máximo del ciclo, absorbiendo espacio político sin condicionamientos democráticos"
     ]
   },
   {
-    label: "1–8 may",
-    short: "S17",
-    probs: [
+    "label": "1–8 may",
+    "short": "S17",
+    "probs": [
       {
-        sc: 1,
-        v: 38,
-        t: "up"
+        "sc": 1,
+        "v": 38,
+        "t": "up"
       },
       {
-        sc: 2,
-        v: 3,
-        t: "down"
+        "sc": 2,
+        "v": 3,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 48,
-        t: "down"
+        "sc": 3,
+        "v": 48,
+        "t": "down"
       },
       {
-        sc: 4,
-        v: 11,
-        t: "flat"
+        "sc": 4,
+        "v": 11,
+        "t": "flat"
       }
     ],
-    xy: {
-      x: 0.04,
-      y: 0.44
+    "xy": {
+      "x": 0.04,
+      "y": 0.44
     },
-    sem: {
-      g: 10,
-      y: 5,
-      r: 3
+    "sem": {
+      "g": 10,
+      "y": 5,
+      "r": 3
     },
-    kpis: {
-      energia: {
-        exportaciones: "1,23 mbd abril (máx. desde ene. 2019)",
-        ingresos: "Merey USD 90,4/b · Brent USD 117,3/b · +87% bonos",
-        licencias: "GL-58 OFAC: asesoría reestructuración deuda soberana",
-        cambio: "BCV ~Bs 493,4/USD · intervención Bs ~715/EUR"
+    "kpis": {
+      "energia": {
+        "exportaciones": "1,23 mbd abril (máx. desde ene. 2019)",
+        "ingresos": "Merey USD 90,4/b · Brent USD 117,3/b · +87% bonos",
+        "licencias": "GL-58 OFAC: asesoría reestructuración deuda soberana",
+        "cambio": "BCV ~Bs 493,4/USD · intervención Bs ~715/EUR"
       },
-      economico: {
-        inflacion: "10,6% mensual abril (3er mes ↓)",
-        ingresos_pob: "USD 240 ingreso integral · base Bs 130 (~$0,27)",
-        electricidad: "Pico 15.579 MW (7 may) · máx. en 9 años",
-        pib: "ENCOVI 2025: 68,5% pobreza · 31,7% extrema"
+      "economico": {
+        "inflacion": "10,6% mensual abril (3er mes ↓)",
+        "ingresos_pob": "USD 240 ingreso integral · base Bs 130 (~$0,27)",
+        "electricidad": "Pico 15.579 MW (7 may) · máx. en 9 años",
+        "pib": "ENCOVI 2025: 68,5% pobreza · 31,7% extrema"
       },
-      opinion: {
-        direccion: "Wright: Fase 2 iniciada · elecciones Fase 3",
-        elecciones: "Brecha E3-E1: 10pp — compresión más significativa 2 meses",
-        mcm: "MCM: retorno antes fin 2026 · CNE renovado",
-        eeuu: "GL-58 + 6 actos masivos PUD · 500+ presos políticos"
+      "opinion": {
+        "direccion": "Wright: Fase 2 iniciada · elecciones Fase 3",
+        "elecciones": "Brecha E3-E1: 10pp — compresión más significativa 2 meses",
+        "mcm": "MCM: retorno antes fin 2026 · CNE renovado",
+        "eeuu": "GL-58 + 6 actos masivos PUD · 500+ presos políticos"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>GL-58 OFAC:</b> Asesoría técnica reestructuración deuda soberana y PDVSA · bonos acum. +87% en 2026 · rally +7,1% diario."
+        "l": "green",
+        "t": "<b>GL-58 OFAC:</b> Asesoría técnica reestructuración deuda soberana y PDVSA · bonos acum. +87% en 2026 · rally +7,1% diario."
       },
       {
-        l: "green",
-        t: "<b>Exportaciones récord:</b> 1,23 mbd abril (máx. ene. 2019) · ExxonMobil: de «ininvertible» a «recurso inmenso» · Trump coordina con Chevron y Exxon."
+        "l": "green",
+        "t": "<b>Exportaciones récord:</b> 1,23 mbd abril (máx. ene. 2019) · ExxonMobil: de «ininvertible» a «recurso inmenso» · Trump coordina con Chevron y Exxon."
       },
       {
-        l: "green",
-        t: "<b>FMI/DEG USD 5.000M:</b> Ortega designado Gobernador · destino Gran Misión Vivienda y hospitales."
+        "l": "green",
+        "t": "<b>FMI/DEG USD 5.000M:</b> Ortega designado Gobernador · destino Gran Misión Vivienda y hospitales."
       },
       {
-        l: "yellow",
-        t: "<b>Reforma TSJ 20→32 magistrados:</b> Comité de Postulaciones activado · Caryslia presidenta · reconfiguración judicial más profunda del interinato."
+        "l": "yellow",
+        "t": "<b>Reforma TSJ 20→32 magistrados:</b> Comité de Postulaciones activado · Caryslia presidenta · reconfiguración judicial más profunda del interinato."
       },
       {
-        l: "yellow",
-        t: "<b>42 protestas 1–6 mayo:</b> Pico 35 el 1° mayo · 16 estados · demandas laborales y cambio de gobierno · contenidas con «murciélagos» y PNB."
+        "l": "yellow",
+        "t": "<b>42 protestas 1–6 mayo:</b> Pico 35 el 1° mayo · 16 estados · demandas laborales y cambio de gobierno · contenidas con «murciélagos» y PNB."
       },
       {
-        l: "red",
-        t: "<b>Brecha salarial:</b> Ingreso integral USD 240 vs. base Bs 130 (~USD 0,27) · ENCOVI 2025: 68,5% pobreza · 31,7% extrema."
+        "l": "red",
+        "t": "<b>Brecha salarial:</b> Ingreso integral USD 240 vs. base Bs 130 (~USD 0,27) · ENCOVI 2025: 68,5% pobreza · 31,7% extrema."
       },
       {
-        l: "red",
-        t: "<b>Caso Quero Navas + pico eléctrico:</b> Muerto jul. 2025 pero informado vivo por Defensoría oct. 2025 · 15.579 MW el 7 may — infraestructura bajo presión crítica."
+        "l": "red",
+        "t": "<b>Caso Quero Navas + pico eléctrico:</b> Muerto jul. 2025 pero informado vivo por Defensoría oct. 2025 · 15.579 MW el 7 may — infraestructura bajo presión crítica."
       }
     ],
-    lectura: "E3 desciende 2pp a 48% no porque el escenario pierda consistencia, sino porque la GL-58 y el plan de tres fases de Wright operacionalizan un horizonte temporal que antes era solo retórico. Al declarar la Fase 1 completada y fijar explícitamente las elecciones como Fase 3, Washington delimita el alcance de E3 y convierte a E1 en un endpoint planificado del cronograma bilateral. E3 sigue siendo el eje organizador: la reforma del TSJ bajo control del interinato, el ingreso integral sin reforma salarial, la gestión del BCV y el boom exportador son todos componentes activos del escenario de continuidad negociada. Sin embargo, la brecha E3–E1 se estrecha de 15 a 10pp, la compresión más significativa en dos meses.\n\nEl vector financiero es el de mayor magnitud en el período: la GL-58 habilita servicios legales y de consultoría para una posible reestructuración de deuda soberana y de PDVSA, los bonos venezolanos acumulan ganancias superiores al 87% en 2026, y Calixto Ortega fue designado Gobernador ante el FMI para gestionar ~USD 5.000 millones en DEG. En el plano energético, las exportaciones de abril alcanzaron 1,23 mbd —máximo desde enero de 2019, con crecimiento del 14%— y el giro de ExxonMobil de «ininvertible» en enero a «recurso inmenso que ahora se abre al mundo» en mayo refleja cuán acelerado ha sido el reposicionamiento estratégico de Venezuela en el mapa hemisférico.\n\nE1 sube 3pp a 38% por la convergencia de tres vectores que no se habían dado antes de forma simultánea: la GL-58 instala la arquitectura financiera prerrequisito de cualquier transición política creíble; Wright fija las elecciones como Fase 3 del plan de Trump, convirtiendo a E1 en objetivo de política exterior estadounidense; y la Plataforma Unitaria intensifica su presencia territorial con 6 actos masivos en Táchira, Barinas, Zulia, Yaracuy, Carabobo y Anzoátegui, mientras Magalli Meda confirma el retorno de MCM antes de fin de 2026.\n\nE4 se mantiene en 11% por la ausencia de escalada coercitiva sistémica. El boom energético-financiero reduce el incentivo para una represión masiva, pero el patrón de control selectivo sigue vigente: despliegue de «murciélagos» el 1° de mayo, caso Quero Navas con contradicción institucional grave y demandas de cambio de gobierno incorporadas en el registro del OVCS. E2 baja 1pp a 3%, mínimo del período: la GL-58, los DEG del FMI y las exportaciones récord alejan cualquier escenario de colapso fiscal o cambiario de corto plazo. La tensión central queda definida con precisión: la normalización económica que impulsa Washington avanza más rápido que las reformas democráticas que exige la oposición. Pero por primera vez, el cronograma de Washington incluye esas reformas como destino.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "E3 desciende 2pp a 48% no porque el escenario pierda consistencia, sino porque la GL-58 y el plan de tres fases de Wright operacionalizan un horizonte temporal que antes era solo retórico. Al declarar la Fase 1 completada y fijar explícitamente las elecciones como Fase 3, Washington delimita el alcance de E3 y convierte a E1 en un endpoint planificado del cronograma bilateral. E3 sigue siendo el eje organizador: la reforma del TSJ bajo control del interinato, el ingreso integral sin reforma salarial, la gestión del BCV y el boom exportador son todos componentes activos del escenario de continuidad negociada. Sin embargo, la brecha E3–E1 se estrecha de 15 a 10pp, la compresión más significativa en dos meses.\n\nEl vector financiero es el de mayor magnitud en el período: la GL-58 habilita servicios legales y de consultoría para una posible reestructuración de deuda soberana y de PDVSA, los bonos venezolanos acumulan ganancias superiores al 87% en 2026, y Calixto Ortega fue designado Gobernador ante el FMI para gestionar ~USD 5.000 millones en DEG. En el plano energético, las exportaciones de abril alcanzaron 1,23 mbd —máximo desde enero de 2019, con crecimiento del 14%— y el giro de ExxonMobil de «ininvertible» en enero a «recurso inmenso que ahora se abre al mundo» en mayo refleja cuán acelerado ha sido el reposicionamiento estratégico de Venezuela en el mapa hemisférico.\n\nE1 sube 3pp a 38% por la convergencia de tres vectores que no se habían dado antes de forma simultánea: la GL-58 instala la arquitectura financiera prerrequisito de cualquier transición política creíble; Wright fija las elecciones como Fase 3 del plan de Trump, convirtiendo a E1 en objetivo de política exterior estadounidense; y la Plataforma Unitaria intensifica su presencia territorial con 6 actos masivos en Táchira, Barinas, Zulia, Yaracuy, Carabobo y Anzoátegui, mientras Magalli Meda confirma el retorno de MCM antes de fin de 2026.\n\nE4 se mantiene en 11% por la ausencia de escalada coercitiva sistémica. El boom energético-financiero reduce el incentivo para una represión masiva, pero el patrón de control selectivo sigue vigente: despliegue de «murciélagos» el 1° de mayo, caso Quero Navas con contradicción institucional grave y demandas de cambio de gobierno incorporadas en el registro del OVCS. E2 baja 1pp a 3%, mínimo del período: la GL-58, los DEG del FMI y las exportaciones récord alejan cualquier escenario de colapso fiscal o cambiario de corto plazo. La tensión central queda definida con precisión: la normalización económica que impulsa Washington avanza más rápido que las reformas democráticas que exige la oposición. Pero por primera vez, el cronograma de Washington incluye esas reformas como destino.",
+    "trendSc": 3,
+    "trendDrivers": [
       "GL-58 OFAC + rally bonos +87%: normalización financiera acelera hacia Fase 2 del plan de tres fases de Washington",
       "Exportaciones 1,23 mbd (máx. 2019) + ExxonMobil de «ininvertible» a «recurso inmenso»: reposicionamiento energético hemisférico",
       "Brecha E3–E1 se estrecha a 10pp: Wright fija elecciones como Fase 3 — transición ya en cronograma de Washington"
     ]
   },
   {
-    label: "8–15 may",
-    short: "S18",
-    probs: [
+    "label": "8–15 may",
+    "short": "S18",
+    "probs": [
       {
-        sc: 1,
-        v: 40,
-        t: "up"
+        "sc": 1,
+        "v": 40,
+        "t": "up"
       },
       {
-        sc: 2,
-        v: 2,
-        t: "down"
+        "sc": 2,
+        "v": 2,
+        "t": "down"
       },
       {
-        sc: 3,
-        v: 47,
-        t: "down"
+        "sc": 3,
+        "v": 47,
+        "t": "down"
       },
       {
-        sc: 4,
-        v: 11,
-        t: "flat"
+        "sc": 4,
+        "v": 11,
+        "t": "flat"
       }
     ],
-    xy: {
-      x: 0.03,
-      y: 0.43
+    "xy": {
+      "x": 0.03,
+      "y": 0.43
     },
-    sem: {
-      g: 9,
-      y: 6,
-      r: 3
+    "sem": {
+      "g": 9,
+      "y": 6,
+      "r": 3
     },
-    kpis: {
-      energia: {
-        exportaciones: "1,031 M bpd OPEP abril",
-        ingresos: "Merey USD 90,47/b",
-        licencias: "Reestructuración: Centerview + White & Case",
-        cambio: "Cardón IV 580→640 MMpcd"
+    "kpis": {
+      "energia": {
+        "exportaciones": "1,031 M bpd OPEP abril",
+        "ingresos": "Merey USD 90,47/b",
+        "licencias": "Reestructuración: Centerview + White & Case",
+        "cambio": "Cardón IV 580→640 MMpcd"
       },
-      economico: {
-        inflacion: "Base monetaria +18% en 2 sem.",
-        ingresos_pob: "Salarios universitarios bajo tensión",
-        electricidad: "Sin dato IODA nuevo",
-        pib: "Deuda USD 150–170B"
+      "economico": {
+        "inflacion": "Base monetaria +18% en 2 sem.",
+        "ingresos_pob": "Salarios universitarios bajo tensión",
+        "electricidad": "Sin dato IODA nuevo",
+        "pib": "Deuda USD 150–170B"
       },
-      opinion: {
-        direccion: "E3-E1: brecha 7pp",
-        elecciones: "MCM coordina retorno con Rubio",
-        mcm: "Retorno ligado a cronograma electoral",
-        eeuu: "Qatar revela diseño pos-Maduro sin MCM"
+      "opinion": {
+        "direccion": "E3-E1: brecha 7pp",
+        "elecciones": "MCM coordina retorno con Rubio",
+        "mcm": "Retorno ligado a cronograma electoral",
+        "eeuu": "Qatar revela diseño pos-Maduro sin MCM"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>Reestructuración operacional:</b> Centerview Partners y White & Case convierten la GL-58 en arquitectura concreta de negociación de deuda."
+        "l": "green",
+        "t": "<b>Reestructuración operacional:</b> Centerview Partners y White & Case convierten la GL-58 en arquitectura concreta de negociación de deuda."
       },
       {
-        l: "green",
-        t: "<b>Energía y conectividad:</b> Agen en Caracas, MOU Hunt/HKN/Crossover, United Houston–Caracas y Qatar Airways amplían la normalización externa."
+        "l": "green",
+        "t": "<b>Energía y conectividad:</b> Agen en Caracas, MOU Hunt/HKN/Crossover, United Houston–Caracas y Qatar Airways amplían la normalización externa."
       },
       {
-        l: "green",
-        t: "<b>Petróleo:</b> Producción OPEP de 1,031 M bpd y cesta Merey en USD 90,47/b sostienen el ancla fiscal del interinato."
+        "l": "green",
+        "t": "<b>Petróleo:</b> Producción OPEP de 1,031 M bpd y cesta Merey en USD 90,47/b sostienen el ancla fiscal del interinato."
       },
       {
-        l: "yellow",
-        t: "<b>TSJ 32 magistrados:</b> La reforma sancionada define el árbitro institucional de controversias electorales futuras."
+        "l": "yellow",
+        "t": "<b>TSJ 32 magistrados:</b> La reforma sancionada define el árbitro institucional de controversias electorales futuras."
       },
       {
-        l: "yellow",
-        t: "<b>Conflictividad:</b> 44 protestas en 14 entidades entre 8–13 mayo; demandas laborales, justicia, vivienda, agua y derechos de detenidos."
+        "l": "yellow",
+        "t": "<b>Conflictividad:</b> 44 protestas en 14 entidades entre 8–13 mayo; demandas laborales, justicia, vivienda, agua y derechos de detenidos."
       },
       {
-        l: "red",
-        t: "<b>Presos políticos:</b> Foro Penal registra 457 detenidos y primer aumento desde enero; 746 excarcelaciones verificadas desde el 8 de enero."
+        "l": "red",
+        "t": "<b>Presos políticos:</b> Foro Penal registra 457 detenidos y primer aumento desde enero; 746 excarcelaciones verificadas desde el 8 de enero."
       },
       {
-        l: "red",
-        t: "<b>Garantías procesales:</b> Denuncias de tortura de Tarek El Aissami y caso Quero Navas tensionan la credibilidad de la amnistía."
+        "l": "red",
+        "t": "<b>Garantías procesales:</b> Denuncias de tortura de Tarek El Aissami y caso Quero Navas tensionan la credibilidad de la amnistía."
       }
     ],
-    lectura: "La semana del 8 al 15 de mayo produce el estrechamiento más relevante de la brecha E3–E1 en todo el ciclo reciente: E3 baja a 47% y E1 sube a 40%, dejando apenas 7 puntos entre continuidad negociada y transición política pacífica. La continuidad negociada sigue siendo dominante porque Washington y el interinato operan sobre una arquitectura de normalización ya concreta: Venezuela anuncia formalmente la reestructuración de deuda soberana y de PDVSA, designa a Centerview Partners como asesor financiero, incorpora a White & Case en la defensa de CITGO y prepara un DSA para junio. Esa secuencia confirma que la GL-58 pasó de instrumento potencial a mecanismo operativo. Al mismo tiempo, la reforma del TSJ a 32 magistrados consolida el control del árbitro institucional de futuras controversias electorales y preserva el margen de maniobra de Rodríguez. Sin embargo, cada avance operativo de E3 acorta su propio horizonte: MCM coordina con Rubio el protocolo de su retorno, Alviarez lo vincula a un cronograma electoral, y Rubio declara que la riqueza venezolana empieza a beneficiar a la población. Por eso E1 sube: ya no depende solo de presión opositora, sino de una transición que Washington empieza a organizar como destino de la normalización financiera. E4 se mantiene en 11% porque no hay escalada represiva sistémica, pero la presión coercitiva sigue activa: Foro Penal registra 457 presos políticos, el primer aumento desde enero; las excarcelaciones verificadas desde el 8 de enero llegan a 746, pero el proceso se estanca; el juicio de Tarek El Aissami incorpora denuncias detalladas de tortura; y el caso Quero Navas expone fallas graves de trazabilidad penitenciaria. E2 baja a 2%, mínimo del período, por la acumulación de factores anti-colapso: deuda en reestructuración, petróleo por encima del millón de barriles, United y Qatar Airways, BCV en ruta a Washington y coordinación energética activa. La tensión central queda nítida: la normalización económica avanza más rápido que las garantías políticas, sociales y judiciales que deberían sostenerla.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "La semana del 8 al 15 de mayo produce el estrechamiento más relevante de la brecha E3–E1 en todo el ciclo reciente: E3 baja a 47% y E1 sube a 40%, dejando apenas 7 puntos entre continuidad negociada y transición política pacífica. La continuidad negociada sigue siendo dominante porque Washington y el interinato operan sobre una arquitectura de normalización ya concreta: Venezuela anuncia formalmente la reestructuración de deuda soberana y de PDVSA, designa a Centerview Partners como asesor financiero, incorpora a White & Case en la defensa de CITGO y prepara un DSA para junio. Esa secuencia confirma que la GL-58 pasó de instrumento potencial a mecanismo operativo. Al mismo tiempo, la reforma del TSJ a 32 magistrados consolida el control del árbitro institucional de futuras controversias electorales y preserva el margen de maniobra de Rodríguez. Sin embargo, cada avance operativo de E3 acorta su propio horizonte: MCM coordina con Rubio el protocolo de su retorno, Alviarez lo vincula a un cronograma electoral, y Rubio declara que la riqueza venezolana empieza a beneficiar a la población. Por eso E1 sube: ya no depende solo de presión opositora, sino de una transición que Washington empieza a organizar como destino de la normalización financiera. E4 se mantiene en 11% porque no hay escalada represiva sistémica, pero la presión coercitiva sigue activa: Foro Penal registra 457 presos políticos, el primer aumento desde enero; las excarcelaciones verificadas desde el 8 de enero llegan a 746, pero el proceso se estanca; el juicio de Tarek El Aissami incorpora denuncias detalladas de tortura; y el caso Quero Navas expone fallas graves de trazabilidad penitenciaria. E2 baja a 2%, mínimo del período, por la acumulación de factores anti-colapso: deuda en reestructuración, petróleo por encima del millón de barriles, United y Qatar Airways, BCV en ruta a Washington y coordinación energética activa. La tensión central queda nítida: la normalización económica avanza más rápido que las garantías políticas, sociales y judiciales que deberían sostenerla.",
+    "trendSc": 3,
+    "trendDrivers": [
       "Reestructuración formal de deuda y DSA en junio convierten la GL-58 en arquitectura operativa de continuidad negociada",
       "MCM–Rubio y retorno ligado a cronograma electoral elevan E1 a 40%, la probabilidad más alta del ciclo",
       "457 presos políticos y 44 protestas muestran que la normalización financiera coexiste con presión social y déficit de garantías"
     ]
   },
   {
-    label: "15–22 may",
-    short: "S19",
-    probs: [
+    "label": "15–22 may",
+    "short": "S19",
+    "probs": [
       {
-        sc: 1,
-        v: 36,
-        t: "down"
+        "sc": 1,
+        "v": 36,
+        "t": "down"
       },
       {
-        sc: 2,
-        v: 4,
-        t: "up"
+        "sc": 2,
+        "v": 4,
+        "t": "up"
       },
       {
-        sc: 3,
-        v: 49,
-        t: "up"
+        "sc": 3,
+        "v": 49,
+        "t": "up"
       },
       {
-        sc: 4,
-        v: 11,
-        t: "flat"
+        "sc": 4,
+        "v": 11,
+        "t": "flat"
       }
     ],
-    xy: {
-      x: 0.12,
-      y: 0.45
+    "xy": {
+      "x": 0.12,
+      "y": 0.45
     },
-    sem: {
-      g: 8,
-      y: 6,
-      r: 4
+    "sem": {
+      "g": 8,
+      "y": 6,
+      "r": 4
     },
-    kpis: {
-      energia: {
-        exportaciones: "1,2 M bpd al cierre de abril",
-        ingresos: "CITGO Q1: USD 157M utilidad",
-        licencias: "Exxon negocia hasta 6 campos",
-        cambio: "Conoco rechaza contrato PDVSA"
+    "kpis": {
+      "energia": {
+        "exportaciones": "1,2 M bpd al cierre de abril",
+        "ingresos": "CITGO Q1: USD 157M utilidad",
+        "licencias": "Exxon negocia hasta 6 campos",
+        "cambio": "Conoco rechaza contrato PDVSA"
       },
-      economico: {
-        inflacion: "Canasta USD 730,59",
-        ingresos_pob: "Ingreso USD 240 cubre 32,8%",
-        electricidad: "103 eventos IODA; Zulia epicentro",
-        pib: "PIB Q1 +2,51%; petróleo -2,12%"
+      "economico": {
+        "inflacion": "Canasta USD 730,59",
+        "ingresos_pob": "Ingreso USD 240 cubre 32,8%",
+        "electricidad": "103 eventos IODA; Zulia epicentro",
+        "pib": "PIB Q1 +2,51%; petróleo -2,12%"
       },
-      opinion: {
-        direccion: "E3-E1: brecha 13pp",
-        elecciones: "E1 retrocede: retorno MCM pendiente",
-        mcm: "Retornos opositores y debate de cronograma",
-        eeuu: "Saab + BM/FMI/Erebor consolidan E3"
+      "opinion": {
+        "direccion": "E3-E1: brecha 13pp",
+        "elecciones": "E1 retrocede: retorno MCM pendiente",
+        "mcm": "Retornos opositores y debate de cronograma",
+        "eeuu": "Saab + BM/FMI/Erebor consolidan E3"
       }
     },
-    tensiones: [
+    "tensiones": [
       {
-        l: "green",
-        t: "<b>E3 reforzada:</b> Continuidad Negociada sube a 49% (+2pp) por cohesión táctica sobre Saab y normalización multilateral simultánea."
+        "l": "green",
+        "t": "<b>E3 reforzada:</b> Continuidad Negociada sube a 49% (+2pp) por cohesión táctica sobre Saab y normalización multilateral simultánea."
       },
       {
-        l: "green",
-        t: "<b>Normalización operativa:</b> BM, FMI-Ortega, BDV-Erebor y ExxonMobil consolidan apertura gestionada desde el régimen/interinato."
+        "l": "green",
+        "t": "<b>Normalización operativa:</b> BM, FMI-Ortega, BDV-Erebor y ExxonMobil consolidan apertura gestionada desde el régimen/interinato."
       },
       {
-        l: "green",
-        t: "<b>Contención del paro:</b> El paro universitario más masivo del período fue absorbido sin escalada coercitiva sistémica."
+        "l": "green",
+        "t": "<b>Contención del paro:</b> El paro universitario más masivo del período fue absorbido sin escalada coercitiva sistémica."
       },
       {
-        l: "yellow",
-        t: "<b>E1 retrocede:</b> Baja a 36% porque retorno MCM, condicionamiento electoral y respuesta salarial siguen pendientes o ambiguos."
+        "l": "yellow",
+        "t": "<b>E1 retrocede:</b> Baja a 36% porque retorno MCM, condicionamiento electoral y respuesta salarial siguen pendientes o ambiguos."
       },
       {
-        l: "yellow",
-        t: "<b>E2 sube:</b> Llega a 4% por deterioro acumulativo en infraestructura, ingreso, señoreaje y desaceleración del PIB."
+        "l": "yellow",
+        "t": "<b>E2 sube:</b> Llega a 4% por deterioro acumulativo en infraestructura, ingreso, señoreaje y desaceleración del PIB."
       },
       {
-        l: "red",
-        t: "<b>Conflictividad:</b> 47 protestas en 19 entidades, con pico de 26 el 19 de mayo por el paro universitario nacional."
+        "l": "red",
+        "t": "<b>Conflictividad:</b> 47 protestas en 19 entidades, con pico de 26 el 19 de mayo por el paro universitario nacional."
       },
       {
-        l: "red",
-        t: "<b>Represión calibrada:</b> Heridos frente al SEBIN el 18 de mayo son señal cualitativa relevante, pero compatible con E3."
+        "l": "red",
+        "t": "<b>Represión calibrada:</b> Heridos frente al SEBIN el 18 de mayo son señal cualitativa relevante, pero compatible con E3."
       }
     ],
-    lectura: "La matriz semanal del 15 al 22 de mayo corrige el balance prospectivo hacia una consolidación más clara de E3: Continuidad Negociada sube a 49% (+2pp) y amplía la brecha frente a E1 a 13 puntos. La razón central no es ausencia de tensión, sino capacidad de gestión: el giro coordinado sobre Alex Saab, la visita del Banco Mundial, la formalización de Calixto Ortega ante el FMI, la corresponsalía BDV-Erebor y las negociaciones de ExxonMobil muestran que el régimen/interinato administra la apertura sin concederla. E1 retrocede a 36% (-4pp) porque los tres elementos decisivos de la watchlist previa se resolvieron de forma ambigua: el paro universitario fue absorbido sin respuesta salarial estructural, el retorno de MCM permanece pendiente y el canal financiero en Washington no vino acompañado de condicionamiento electoral verificable. E2 sube a 4% (+2pp), no por fragmentación inmediata, sino por deterioro acumulativo de infraestructura, ingreso real, señoreaje y desaceleración económica: PIB Q1 de 2,51%, canasta alimentaria de USD 730,59 e ingreso integral que cubre solo 32,8%. E4 se mantiene en 11%: la represión del 18 de mayo frente al SEBIN, con heridos, es una señal cualitativa importante y primera represión documentada de una protesta de derechos humanos en el período post-Maduro, pero sigue siendo calibrada y compatible con E3, sin escalada coercitiva sistémica. La semana produce señales máximas en todas las dimensiones —apertura multilateral, acción judicial estadounidense, conflictividad organizada y represión puntual— y aun así E3 sale reforzada. El segundo semestre determinará si el deterioro social alcanza un umbral que la negociación de cúpula ya no pueda absorber.",
-    trendSc: 3,
-    trendDrivers: [
+    "lectura": "La matriz semanal del 15 al 22 de mayo corrige el balance prospectivo hacia una consolidación más clara de E3: Continuidad Negociada sube a 49% (+2pp) y amplía la brecha frente a E1 a 13 puntos. La razón central no es ausencia de tensión, sino capacidad de gestión: el giro coordinado sobre Alex Saab, la visita del Banco Mundial, la formalización de Calixto Ortega ante el FMI, la corresponsalía BDV-Erebor y las negociaciones de ExxonMobil muestran que el régimen/interinato administra la apertura sin concederla. E1 retrocede a 36% (-4pp) porque los tres elementos decisivos de la watchlist previa se resolvieron de forma ambigua: el paro universitario fue absorbido sin respuesta salarial estructural, el retorno de MCM permanece pendiente y el canal financiero en Washington no vino acompañado de condicionamiento electoral verificable. E2 sube a 4% (+2pp), no por fragmentación inmediata, sino por deterioro acumulativo de infraestructura, ingreso real, señoreaje y desaceleración económica: PIB Q1 de 2,51%, canasta alimentaria de USD 730,59 e ingreso integral que cubre solo 32,8%. E4 se mantiene en 11%: la represión del 18 de mayo frente al SEBIN, con heridos, es una señal cualitativa importante y primera represión documentada de una protesta de derechos humanos en el período post-Maduro, pero sigue siendo calibrada y compatible con E3, sin escalada coercitiva sistémica. La semana produce señales máximas en todas las dimensiones —apertura multilateral, acción judicial estadounidense, conflictividad organizada y represión puntual— y aun así E3 sale reforzada. El segundo semestre determinará si el deterioro social alcanza un umbral que la negociación de cúpula ya no pueda absorber.",
+    "trendSc": 3,
+    "trendDrivers": [
       "E3 sube a 49% por cohesión táctica sobre Saab y normalización BM/FMI/Erebor/Exxon",
       "E1 cae a 36% porque retorno MCM, condicionamiento electoral y respuesta salarial siguen pendientes",
       "E2 sube a 4% por deterioro acumulativo de infraestructura, ingreso y señoreaje"
+    ]
+  },
+  {
+    "label": "22–29 may",
+    "short": "S20",
+    "probs": [
+      {
+        "sc": 1,
+        "v": 37,
+        "t": "up"
+      },
+      {
+        "sc": 2,
+        "v": 4,
+        "t": "flat"
+      },
+      {
+        "sc": 3,
+        "v": 47,
+        "t": "down"
+      },
+      {
+        "sc": 4,
+        "v": 12,
+        "t": "up"
+      }
+    ],
+    "xy": {
+      "x": 0.16,
+      "y": 0.43
+    },
+    "sem": {
+      "g": 7,
+      "y": 7,
+      "r": 4
+    },
+    "kpis": {
+      "energia": {
+        "exportaciones": ">10M barriles a EE.UU.; India 4° proveedor",
+        "ingresos": "PDVSA Q1: USD 6.855M facturados",
+        "licencias": "GL-58 permite asesores; Centerview contratado",
+        "cambio": "Producción neta ~980K bpd; meta 1,4M en riesgo"
+      },
+      "economico": {
+        "inflacion": "Inflación anualizada ~600%; ene-abr 90%",
+        "ingresos_pob": "Canasta USD 730,59 vs ingreso USD 240",
+        "electricidad": "Ley eléctrica: USD 20.000M requeridos",
+        "pib": "PIB Q1 +2,51% vs +7,19% en Q1 2025"
+      },
+      "opinion": {
+        "direccion": "E3-E1: brecha 10pp",
+        "elecciones": "Manifiesto Panamá pide CNE y cronograma",
+        "mcm": "MCM 55% positiva; retorno coordinado con Washington",
+        "eeuu": "SOUTHCOM + Centerview + DOJ sostienen E3"
+      }
+    },
+    "tensiones": [
+      {
+        "l": "green",
+        "t": "<b>Andamiaje externo:</b> SOUTHCOM, Centerview, India, Tesoro/KPMG y corresponsalías bancarias sostienen la continuidad negociada."
+      },
+      {
+        "l": "green",
+        "t": "<b>Manifiesto Panamá:</b> La PUD y Alianza Con Venezuela formalizan hoja de ruta y reconocen el Plan de Tres Fases de Washington."
+      },
+      {
+        "l": "green",
+        "t": "<b>Retornos opositores:</b> Ocariz, Toledo y Marrero reconstruyen presencia territorial bajo concesiones calibradas."
+      },
+      {
+        "l": "yellow",
+        "t": "<b>E3 cede:</b> Baja a 47% por divergencia entre normalización externa y legitimidad doméstica en mínimo histórico."
+      },
+      {
+        "l": "yellow",
+        "t": "<b>TSJ y justicia penal:</b> Ampliación a 32 magistrados y consulta del 1 de junio tensionan credibilidad institucional."
+      },
+      {
+        "l": "red",
+        "t": "<b>Sector duro:</b> Iris Varela descarta presidenciales y la filtración “estamos caídos” eleva presión E4."
+      },
+      {
+        "l": "red",
+        "t": "<b>Presión social:</b> 43 protestas en 17 entidades, ICC -8,1 y aprobación de Rodríguez en 25,2%."
+      }
+    ],
+    "lectura": "La semana del 22 al 29 de mayo redefine la calidad de E3 sin desplazar su dominancia. Continuidad Negociada baja de 49% a 47% porque el proceso exhibe su mayor divergencia del ciclo: máximo andamiaje externo y mínimo de legitimidad doméstica. La segunda visita del SOUTHCOM, la contratación de Centerview para gestionar cerca de USD 150.000 millones de deuda, el rol de Claver-Carone como enlace informal, la protección operativa de Washington a Delcy Rodríguez, el flujo petrolero supervisado por Tesoro/KPMG y Venezuela como cuarto proveedor de India hacen que los pilares externos de E3 sigan siendo robustos. Sin embargo, el soporte interno se erosiona: aprobación de Rodríguez en 25,2%, ICC en -8,1, PIB Q1 desacelerado a 2,51%, PIB petrolero negativo y conflictividad de 43 protestas en 17 entidades.\n\nE1 sube a 37% por el Manifiesto de Panamá, el primer documento estratégico conjunto en dos años firmado por Machado y González Urrutia, y por el retorno progresivo de dirigentes como Ocariz, Toledo y Marrero. Pero su avance es limitado: al reconocer el Plan de Tres Fases de Washington como marco esencial, la oposición acepta operar dentro del calendario del árbitro externo. MCM no ha retornado, el CNE no se renueva y las movilizaciones del 30 de mayo y 3 de junio serán la primera prueba territorial real. E4 sube a 12% por señales cualitativas del sector duro: Iris Varela habla de guardar la silla de Maduro, circula la filtración interna “estamos caídos” y se detiene a trabajadores de PDVSA. Aun así, no hay escalada sistémica. E2 permanece en 4%: el deterioro macro y social se acumula, pero los mercados y la arquitectura financiera internacional apuestan contra un colapso inmediato.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 baja a 47% por divergencia entre máximo andamiaje externo y erosión doméstica",
+      "E1 sube a 37% por Manifiesto de Panamá y retornos opositores, pero subordinado al calendario de Washington",
+      "E4 sube a 12% por señales del sector duro sin escalada coercitiva sistémica"
     ]
   }
 ];
