@@ -1,7 +1,32 @@
 const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
+const FIRMS_BASE = "https://firms.modaps.eosdis.nasa.gov/api/area/csv";
 
 module.exports = async function handler(req, res) {
-  const { signal } = req.query;
+  const { signal, source, days, bbox, key } = req.query;
+
+  // ── FIRMS proxy ──
+  if (source === "firms") {
+    const apiKey = key || process.env.FIRMS_API_KEY || "";
+    if (!apiKey) {
+      return res.status(200).json({ needsKey: true, csv: "" });
+    }
+    const d = parseInt(days) || 3;
+    const b = bbox || "-73.4,0.6,-59.8,12.2";
+    const url = `${FIRMS_BASE}/${apiKey}/VIIRS_SNPP_NRT/${b}/${d}`;
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      if (r.status === 401 || r.status === 403) {
+        return res.status(200).json({ needsKey: true, error: "API key inválida o expirada", csv: "" });
+      }
+      if (!r.ok) return res.status(200).json({ error: `FIRMS HTTP ${r.status}`, csv: "" });
+      const csv = await r.text();
+      res.setHeader("Cache-Control", "public, s-maxage=900, stale-while-revalidate=300");
+      return res.status(200).json({ csv, fetchedAt: new Date().toISOString() });
+    } catch (e) {
+      return res.status(200).json({ error: e.message, csv: "" });
+    }
+  }
+
   
   const queries = {
     instability: `${GDELT_BASE}?query=venezuela+(protest+OR+conflict+OR+crisis+OR+violence+OR+unrest)&mode=timelinevol&timespan=120d&format=csv`,
