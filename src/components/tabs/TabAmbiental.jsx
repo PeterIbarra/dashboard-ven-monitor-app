@@ -466,6 +466,12 @@ function RainHistoryPanel({ history, loading }) {
     history.status.includes("Déficit") ? "#ca8a04" :
     history.status.includes("Exceso") ? "#1d4ed8" :
     "#16a34a";
+  const statusExplanation =
+    history.status === "Déficit persistente" ? "Cinco o más de las últimas ocho semanas estuvieron al menos 20% bajo la norma. Indica estrés hídrico acumulado, no solo una semana seca." :
+    history.status === "Exceso persistente" ? "Cinco o más de las últimas ocho semanas estuvieron al menos 20% sobre la norma. Sugiere saturación progresiva de suelos y mayor sensibilidad a inundaciones o deslaves." :
+    history.status === "Déficit reciente" ? "La semana más reciente está al menos 30% bajo la norma, pero todavía no hay persistencia suficiente para clasificarlo como patrón acumulado." :
+    history.status === "Exceso reciente" ? "La semana más reciente está al menos 30% sobre la norma, pero el exceso aún no domina la secuencia de ocho semanas." :
+    "La secuencia reciente alterna semanas secas y húmedas sin desviación sostenida. Conviene mirar el pronóstico antes de activar alerta.";
 
   return (
     <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
@@ -502,6 +508,13 @@ function RainHistoryPanel({ history, loading }) {
         <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>
           {history.below} bajo norma · {history.above} sobre norma
         </div>
+      </div>
+      <div style={{ marginTop:8, paddingTop:8, borderTop:`1px solid ${BORDER}70`,
+        fontSize:11, fontFamily:fontSans, color:MUTED, lineHeight:1.5 }}>
+        <strong style={{ color:statusColor }}>{history.status}:</strong> {statusExplanation}
+      </div>
+      <div style={{ marginTop:6, fontSize:10, fontFamily:font, color:`${MUTED}90`, lineHeight:1.45 }}>
+        Cómo leer la gráfica: cada par de barras compara lluvia observada 2026 (barra izquierda) con la norma NASA POWER 1981-2025 para la misma semana calendario (barra derecha). Azul indica exceso, amarillo déficit y verde rango normal.
       </div>
     </div>
   );
@@ -755,8 +768,6 @@ export function TabAmbiental() {
                     </div>
                   </div>
 
-                  <RainHistoryPanel history={selHistory} loading={historyLoading && !selHistory} />
-
                   {/* Alerta contextual */}
                   {selData.acum7d > UMBRAL_LLUVIA && (
                     <div style={{ background:"#eff6ff", border:"1px solid #93c5fd", padding:"8px 12px",
@@ -818,6 +829,27 @@ export function TabAmbiental() {
               </div>
             </div>
           </div>
+
+          {selected && (
+            <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px 16px" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", gap:12, marginBottom:8, flexWrap:"wrap" }}>
+                <div>
+                  <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+                    Historial pluviométrico · {selected}
+                  </div>
+                  <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, marginTop:2 }}>
+                    Observado 2026 frente a norma NASA POWER 1981-2025 para la misma ventana semanal.
+                  </div>
+                </div>
+                {selHistory?.sentinels?.length > 0 && (
+                  <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}90`, textAlign:"right" }}>
+                    Puntos: {selHistory.sentinels.join(", ")}
+                  </div>
+                )}
+              </div>
+              <RainHistoryPanel history={selHistory} loading={historyLoading && !selHistory} />
+            </div>
+          )}
 
           {/* ── NEXO ANALÍTICO ── */}
           <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px 16px" }}>
