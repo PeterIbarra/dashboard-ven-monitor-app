@@ -169,7 +169,12 @@ function cacheSet(key, value) {
   } catch {}
 }
 
-async function fetchPowerSentinelNorm(sentinel, windowDays) {
+// ── Descarga la serie diaria 1981-2025 completa para un sentinel (una sola vez) ──
+async function fetchPowerSentinelSeries(sentinel) {
+  const cacheKey = `${POWER_CACHE_VERSION}:series:${sentinel.lat}:${sentinel.lon}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
+
   const url =
     `https://power.larc.nasa.gov/api/temporal/daily/point` +
     `?parameters=PRECTOTCORR` +
@@ -177,61 +182,52 @@ async function fetchPowerSentinelNorm(sentinel, windowDays) {
     `&longitude=${sentinel.lon}&latitude=${sentinel.lat}` +
     `&start=${POWER_START_YEAR}0101&end=${POWER_END_YEAR}1231` +
     `&format=JSON&time-standard=UTC`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
-  if (!res.ok) throw new Error(`NASA POWER HTTP ${res.status}`);
+  const res = await fetch(url, { signal: AbortSignal.timeout(25000) });
+  if (!res.ok) {
+    if (res.status === 429) throw new Error("NASA POWER rate limit (429)");
+    throw new Error(`NASA POWER HTTP ${res.status}`);
+  }
   const json = await res.json();
   const series = json?.properties?.parameter?.PRECTOTCORR || {};
+  cacheSet(cacheKey, series);
+  return series;
+}
+
+// ── Calcula norma 7d para una ventana a partir de la serie ya descargada ──
+function calcNormFromSeries(series, windowDays) {
   const maxOffset = Math.max(...windowDays.map(d => d.yearOffset), 0);
   const sums = [];
-  for (let year = POWER_START_YEAR; year <= POWER_END_YEAR - maxOffset; year += 1) {
-    let sum = 0;
-    let valid = true;
+  for (let year = POWER_START_YEAR; year <= POWER_END_YEAR - maxOffset; year++) {
+    let sum = 0, valid = true;
     windowDays.forEach(({ key, yearOffset }) => {
       const value = series[`${year + yearOffset}${key}`];
-      if (value == null || value < 0) {
-        valid = false;
-      } else {
-        sum += value;
-      }
+      if (value == null || value < 0) { valid = false; } else { sum += value; }
     });
     if (valid) sums.push(sum);
   }
   if (!sums.length) return null;
-  return sums.reduce((acc, v) => acc + v, 0) / sums.length;
+  return sums.reduce((a, v) => a + v, 0) / sums.length;
 }
 
-async function fetchPowerSentinelRecent(sentinel, start, end) {
-  const url =
-    `https://power.larc.nasa.gov/api/temporal/daily/point` +
-    `?parameters=PRECTOTCORR` +
-    `&community=AG` +
-    `&longitude=${sentinel.lon}&latitude=${sentinel.lat}` +
-    `&start=${formatPowerDate(start)}&end=${formatPowerDate(end)}` +
-    `&format=JSON&time-standard=UTC`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(16000) });
-  if (!res.ok) throw new Error(`NASA POWER HTTP ${res.status}`);
-  const json = await res.json();
-  return json?.properties?.parameter?.PRECTOTCORR || {};
-}
-
+// ── Calcula norma 7d para el estado actual (lazy, solo al seleccionar) ──
+// Descarga cada sentinel una vez, calcula en memoria. Sin requests redundantes.
 async function fetchPowerClimatology(estado, fechas) {
   const windowDays = calendarWindow(fechas);
   if (!windowDays.length) return null;
   const sentinels = sentinelsForState(estado);
-  const cacheKey = `${POWER_CACHE_VERSION}:${estado.id}:${windowDays.map(d => `${d.yearOffset}${d.key}`).join("-")}`;
+  const cacheKey = `${POWER_CACHE_VERSION}:clim:${estado.id}:${windowDays.map(d => `${d.yearOffset}${d.key}`).join("-")}`;
   const cached = cacheGet(cacheKey);
   if (cached?.norm7d != null) return cached;
 
-  const settled = await Promise.allSettled(
-    sentinels.map(sentinel => fetchPowerSentinelNorm(sentinel, windowDays))
-  );
+  const settled = await Promise.allSettled(sentinels.map(fetchPowerSentinelSeries));
   const norms = settled
-    .filter(r => r.status === "fulfilled" && r.value != null)
-    .map(r => r.value);
+    .filter(r => r.status === "fulfilled" && r.value)
+    .map(r => calcNormFromSeries(r.value, windowDays))
+    .filter(v => v != null);
   if (!norms.length) return null;
 
   const result = {
-    norm7d: norms.reduce((acc, v) => acc + v, 0) / norms.length,
+    norm7d: norms.reduce((a, v) => a + v, 0) / norms.length,
     sentinels: sentinels.map(s => s.name),
     source: `NASA POWER PRECTOTCORR ${POWER_START_YEAR}-${POWER_END_YEAR}`,
   };
@@ -239,6 +235,7 @@ async function fetchPowerClimatology(estado, fechas) {
   return result;
 }
 
+// ── Historial N semanas: descarga series una vez, calcula todas las ventanas en memoria ──
 async function fetchPowerHistory(estado, rangeWeeks = DEFAULT_HISTORY_WEEKS) {
   const windows = buildHistoryWindows(rangeWeeks);
   const sentinels = sentinelsForState(estado);
@@ -246,32 +243,47 @@ async function fetchPowerHistory(estado, rangeWeeks = DEFAULT_HISTORY_WEEKS) {
   const cached = cacheGet(cacheKey);
   if (cached?.weeks?.length) return cached;
 
+  // 1. Descargar serie histórica completa por sentinel (1 request/sentinel, no N×sentinel)
+  const seriesSettled = await Promise.allSettled(sentinels.map(fetchPowerSentinelSeries));
+  const allSeries = seriesSettled
+    .filter(r => r.status === "fulfilled" && r.value)
+    .map(r => r.value);
+
+  // 2. Descargar observado reciente (rango completo de N semanas, 1 request/sentinel)
   const start = windows[0].start;
   const end = windows[windows.length - 1].end;
   const recentSettled = await Promise.allSettled(
-    sentinels.map(sentinel => fetchPowerSentinelRecent(sentinel, start, end))
+    sentinels.map(sentinel => {
+      const url =
+        `https://power.larc.nasa.gov/api/temporal/daily/point` +
+        `?parameters=PRECTOTCORR&community=AG` +
+        `&longitude=${sentinel.lon}&latitude=${sentinel.lat}` +
+        `&start=${formatPowerDate(start)}&end=${formatPowerDate(end)}` +
+        `&format=JSON&time-standard=UTC`;
+      return fetch(url, { signal: AbortSignal.timeout(16000) })
+        .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+        .then(j => j?.properties?.parameter?.PRECTOTCORR || {});
+    })
   );
   const recentSeries = recentSettled
     .filter(r => r.status === "fulfilled")
     .map(r => r.value);
 
-  const weeks = await Promise.all(windows.map(async window => {
-    const observedVals = recentSeries.map(series => {
-      const sum = window.fechas.reduce((acc, iso) => {
+  // 3. Calcular todas las ventanas en memoria (cero requests adicionales)
+  const weeks = windows.map(window => {
+    const observedVals = recentSeries.map(series =>
+      window.fechas.reduce((acc, iso) => {
         const key = iso.replace(/-/g, "");
-        const value = series[key];
-        return value == null || value < 0 ? acc : acc + value;
-      }, 0);
-      return sum;
-    });
-    const normSettled = await Promise.allSettled(
-      sentinels.map(sentinel => fetchPowerSentinelNorm(sentinel, window.windowDays))
+        const v = series[key];
+        return v == null || v < 0 ? acc : acc + v;
+      }, 0)
     );
-    const normVals = normSettled
-      .filter(r => r.status === "fulfilled" && r.value != null)
-      .map(r => r.value);
-    const observed = observedVals.length ? observedVals.reduce((acc, v) => acc + v, 0) / observedVals.length : null;
-    const norm = normVals.length ? normVals.reduce((acc, v) => acc + v, 0) / normVals.length : null;
+    const normVals = allSeries
+      .map(series => calcNormFromSeries(series, window.windowDays))
+      .filter(v => v != null);
+
+    const observed = observedVals.length ? observedVals.reduce((a, v) => a + v, 0) / observedVals.length : null;
+    const norm = normVals.length ? normVals.reduce((a, v) => a + v, 0) / normVals.length : null;
     const anomalyPct = observed != null && norm ? ((observed - norm) / norm) * 100 : null;
     return {
       label: window.label,
@@ -281,7 +293,7 @@ async function fetchPowerHistory(estado, rangeWeeks = DEFAULT_HISTORY_WEEKS) {
       norm,
       anomalyPct,
     };
-  }));
+  });
 
   const below = weeks.filter(w => w.anomalyPct != null && w.anomalyPct < -20).length;
   const above = weeks.filter(w => w.anomalyPct != null && w.anomalyPct > 20).length;
@@ -294,12 +306,8 @@ async function fetchPowerHistory(estado, rangeWeeks = DEFAULT_HISTORY_WEEKS) {
     latest?.anomalyPct > 30 ? "Exceso reciente" :
     "Variabilidad dentro de rango";
   const result = {
-    weeks,
-    rangeWeeks: weeks.length,
-    persistentThreshold,
-    status,
-    below,
-    above,
+    weeks, rangeWeeks: weeks.length, persistentThreshold,
+    status, below, above,
     sentinels: sentinels.map(s => s.name),
     source: `NASA POWER PRECTOTCORR ${POWER_START_YEAR}-${POWER_END_YEAR} / 2026`,
   };
@@ -525,8 +533,546 @@ function RainHistoryPanel({ history, loading }) {
   );
 }
 
+
+// ════════════════════════════════════════════════════════════════
+// SECCIÓN INCENDIOS — NASA FIRMS VIIRS
+// ════════════════════════════════════════════════════════════════
+
+// Bounding box Venezuela para FIRMS
+const VE_BBOX = "-73.4,0.6,-59.8,12.2";
+const FIRMS_DAYS_OPTIONS = [1, 3, 7];
+const FIRMS_DEFAULT_DAYS = 3;
+
+// Polígonos simplificados por estado para point-in-polygon
+// (bounding boxes aproximados — suficiente para agregación estatal)
+const VE_STATE_BOUNDS = {
+  "Amazonas":        { minLat:0.6,  maxLat:6.5,  minLon:-68.0, maxLon:-61.5 },
+  "Anzoátegui":      { minLat:7.8,  maxLat:10.5, minLon:-66.5, maxLon:-62.0 },
+  "Apure":           { minLat:5.5,  maxLat:8.5,  minLon:-72.5, maxLon:-66.0 },
+  "Aragua":          { minLat:9.5,  maxLat:10.8, minLon:-68.3, maxLon:-66.5 },
+  "Barinas":         { minLat:7.0,  maxLat:9.5,  minLon:-71.5, maxLon:-68.5 },
+  "Bolívar":         { minLat:3.6,  maxLat:8.8,  minLon:-64.5, maxLon:-60.0 },
+  "Carabobo":        { minLat:9.8,  maxLat:10.7, minLon:-68.5, maxLon:-67.5 },
+  "Cojedes":         { minLat:8.8,  maxLat:10.0, minLon:-69.0, maxLon:-67.8 },
+  "Delta Amacuro":   { minLat:7.5,  maxLat:10.0, minLon:-62.5, maxLon:-59.8 },
+  "Distrito Capital":{ minLat:10.3, maxLat:10.7, minLon:-67.1, maxLon:-66.6 },
+  "Falcón":          { minLat:10.5, maxLat:12.2, minLon:-71.0, maxLon:-68.5 },
+  "Guárico":         { minLat:7.5,  maxLat:10.0, minLon:-68.5, maxLon:-65.0 },
+  "Lara":            { minLat:9.5,  maxLat:11.0, minLon:-70.5, maxLon:-68.5 },
+  "Mérida":          { minLat:7.8,  maxLat:9.5,  minLon:-72.0, maxLon:-70.5 },
+  "Miranda":         { minLat:9.8,  maxLat:10.8, minLon:-67.3, maxLon:-65.8 },
+  "Monagas":         { minLat:8.5,  maxLat:10.5, minLon:-64.0, maxLon:-62.0 },
+  "Nueva Esparta":   { minLat:10.6, maxLat:11.2, minLon:-64.5, maxLon:-63.5 },
+  "Portuguesa":      { minLat:8.5,  maxLat:10.0, minLon:-70.2, maxLon:-68.5 },
+  "Sucre":           { minLat:10.0, maxLat:11.0, minLon:-64.0, maxLon:-62.2 },
+  "Táchira":         { minLat:6.9,  maxLat:8.5,  minLon:-73.4, maxLon:-71.5 },
+  "Trujillo":        { minLat:9.0,  maxLat:10.5, minLon:-71.0, maxLon:-70.0 },
+  "Vargas":          { minLat:10.4, maxLat:10.8, minLon:-67.4, maxLon:-66.7 },
+  "Yaracuy":         { minLat:10.0, maxLat:10.9, minLon:-69.2, maxLon:-68.2 },
+  "Zulia":           { minLat:7.8,  maxLat:12.2, minLon:-73.4, maxLon:-71.0 },
+};
+
+function pointToState(lat, lon) {
+  for (const [name, b] of Object.entries(VE_STATE_BOUNDS)) {
+    if (lat >= b.minLat && lat <= b.maxLat && lon >= b.minLon && lon <= b.maxLon) return name;
+  }
+  return null;
+}
+
+// ── Fetch FIRMS vía proxy Vercel ──
+async function fetchFirms(days = FIRMS_DEFAULT_DAYS) {
+  const url = `/api/gdelt?source=firms&days=${days}&bbox=${encodeURIComponent(VE_BBOX)}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+  if (!res.ok) throw new Error(`FIRMS proxy HTTP ${res.status}`);
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json.features || [];
+}
+
+// ── Parsear CSV FIRMS y agregar por estado ──
+function parseFirmsCsv(csv) {
+  const lines = csv.trim().split("\n");
+  if (lines.length < 2) return [];
+  const header = lines[0].split(",").map(h => h.trim());
+  const latIdx  = header.indexOf("latitude");
+  const lonIdx  = header.indexOf("longitude");
+  const frpIdx  = header.indexOf("frp");
+  const confIdx = header.indexOf("confidence");
+  const dateIdx = header.indexOf("acq_date");
+  const dnIdx   = header.indexOf("daynight");
+  const points = [];
+  for (let i = 1; i < lines.length; i++) {
+    const parts = lines[i].split(",");
+    const lat  = parseFloat(parts[latIdx]);
+    const lon  = parseFloat(parts[lonIdx]);
+    const frp  = parseFloat(parts[frpIdx]);
+    const conf = parts[confIdx]?.trim();
+    const date = parts[dateIdx]?.trim();
+    const dn   = parts[dnIdx]?.trim();
+    if (isNaN(lat) || isNaN(lon)) continue;
+    points.push({ lat, lon, frp: isNaN(frp) ? 0 : frp, conf, date, dn });
+  }
+  return points;
+}
+
+// ── Agregar puntos por estado ──
+function aggregateByState(points) {
+  const byState = {};
+  for (const p of points) {
+    const state = pointToState(p.lat, p.lon);
+    if (!state) continue;
+    if (!byState[state]) byState[state] = { count: 0, frpTotal: 0, high: 0, points: [] };
+    byState[state].count++;
+    byState[state].frpTotal += p.frp;
+    if (p.conf === "h" || p.conf === "high" || Number(p.conf) > 80) byState[state].high++;
+    byState[state].points.push(p);
+  }
+  return byState;
+}
+
+// ── Color por intensidad FRP ──
+function fireFrpColor(frpTotal, count) {
+  if (count === 0) return "#e5e7eb";
+  const frpAvg = frpTotal / count;
+  if (frpAvg > 100 || count > 50) return "#991b1b";
+  if (frpAvg > 50  || count > 20) return "#dc2626";
+  if (frpAvg > 20  || count > 10) return "#f97316";
+  if (frpAvg > 5   || count > 3)  return "#fbbf24";
+  return "#fef08a";
+}
+
+// ── Componente mapa Leaflet para incendios ──
+function FireLeafletMap({ fireData, rawPoints, selected, onSelect, mob }) {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const layerRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadCSS(LEAFLET_CSS);
+    loadScript(LEAFLET_JS).then(() => {
+      if (cancelled || !mapRef.current || !window.L || mapInstance.current) return;
+      const L = window.L;
+      const map = L.map(mapRef.current, {
+        center: [7.8, -66.5],
+        zoom: mob ? 5 : 6,
+        minZoom: 5,
+        maxZoom: 10,
+        zoomControl: true,
+        scrollWheelZoom: false,
+        attributionControl: false,
+      });
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", {
+        maxZoom: 10,
+      }).addTo(map);
+      mapInstance.current = map;
+      setTimeout(() => map.invalidateSize(), 100);
+    });
+    return () => {
+      cancelled = true;
+      if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
+    };
+  }, [mob]);
+
+  useEffect(() => {
+    if (!mapInstance.current || !window.L) return;
+    const L = window.L;
+    const map = mapInstance.current;
+    if (layerRef.current) map.removeLayer(layerRef.current);
+    const group = L.layerGroup();
+
+    // Puntos individuales VIIRS
+    for (const p of rawPoints) {
+      const radius = Math.max(3, Math.min(10, 3 + (p.frp / 30)));
+      const color = p.frp > 100 ? "#991b1b" : p.frp > 50 ? "#dc2626" : p.frp > 10 ? "#f97316" : "#fbbf24";
+      const marker = L.circleMarker([p.lat, p.lon], {
+        radius,
+        fillColor: color,
+        color: "#000",
+        weight: 0.3,
+        opacity: 0.9,
+        fillOpacity: 0.75,
+      });
+      marker.bindTooltip(
+        `<div style="font-family:monospace;font-size:10px;line-height:1.4">` +
+        `<b>${pointToState(p.lat, p.lon) || "Venezuela"}</b><br/>` +
+        `FRP: <b>${Math.round(p.frp)} MW</b> · ${p.date}<br/>` +
+        `Confianza: ${p.conf} · ${p.dn === "D" ? "Diurno" : "Nocturno"}` +
+        `</div>`,
+        { direction: "top" }
+      );
+      group.addLayer(marker);
+    }
+
+    // Círculos por estado (resumen)
+    const maxCount = Math.max(...Object.values(fireData).map(d => d.count), 1);
+    for (const estado of VE_ESTADOS) {
+      const d = fireData[estado.id];
+      if (!d || d.count === 0) continue;
+      const radius = Math.max(8, Math.min(30, 8 + (d.count / maxCount) * 22));
+      const isSelected = selected === estado.id;
+      const sumMarker = L.circleMarker([estado.lat, estado.lon], {
+        radius: isSelected ? radius + 4 : radius,
+        fillColor: fireFrpColor(d.frpTotal, d.count),
+        color: isSelected ? "#fff" : "#00000050",
+        weight: isSelected ? 2 : 0.5,
+        opacity: 0.9,
+        fillOpacity: isSelected ? 0.4 : 0.25,
+      });
+      sumMarker.bindTooltip(
+        `<div style="font-family:monospace;font-size:11px;line-height:1.45">` +
+        `<b>${estado.id}</b><br/>` +
+        `Focos: <b>${d.count}</b> · Alta confianza: ${d.high}<br/>` +
+        `FRP total: ${Math.round(d.frpTotal)} MW` +
+        `</div>`,
+        { direction: "top" }
+      );
+      sumMarker.on("click", () => onSelect(isSelected ? null : estado.id));
+      group.addLayer(sumMarker);
+    }
+
+    group.addTo(map);
+    layerRef.current = group;
+  }, [fireData, rawPoints, selected, onSelect]);
+
+  return (
+    <div
+      ref={mapRef}
+      style={{
+        width: "100%",
+        height: mob ? 330 : 470,
+        border: `1px solid ${BORDER}`,
+        background: "#1a1a2e",
+        borderRadius: 4,
+      }}
+    />
+  );
+}
+
+// ── Panel de incendios ──
+function TabIncendios({ mob }) {
+  const [fireDays, setFireDays]     = useState(FIRMS_DEFAULT_DAYS);
+  const [fireData, setFireData]     = useState({});
+  const [rawPoints, setRawPoints]   = useState([]);
+  const [fireLoading, setFireLoading] = useState(false);
+  const [fireError, setFireError]   = useState(null);
+  const [fireSel, setFireSel]       = useState(null);
+  const [needsKey, setNeedsKey]     = useState(false);
+  const [firmsKey, setFirmsKey]     = useState(() => {
+    try { return localStorage.getItem("firms_api_key") || ""; } catch { return ""; }
+  });
+  const [keyInput, setKeyInput]     = useState("");
+  const fetchedDays = useRef(null);
+
+  const loadFire = useCallback(async (days, key) => {
+    setFireLoading(true);
+    setFireError(null);
+    try {
+      const url = `/api/gdelt?source=firms&days=${days}&bbox=${encodeURIComponent(VE_BBOX)}&key=${encodeURIComponent(key || "")}`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(18000) });
+      const json = await res.json();
+      if (json.needsKey) { setNeedsKey(true); setFireLoading(false); return; }
+      if (json.error) throw new Error(json.error);
+      const csv = json.csv || "";
+      const points = parseFirmsCsv(csv);
+      setRawPoints(points);
+      setFireData(aggregateByState(points));
+      fetchedDays.current = days;
+    } catch (e) {
+      setFireError(e.message);
+    }
+    setFireLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (firmsKey) loadFire(fireDays, firmsKey);
+    else setNeedsKey(true);
+  }, []);
+
+  useEffect(() => {
+    if (firmsKey && fetchedDays.current !== fireDays) loadFire(fireDays, firmsKey);
+  }, [fireDays, firmsKey, loadFire]);
+
+  const saveKey = () => {
+    const k = keyInput.trim();
+    if (!k) return;
+    try { localStorage.setItem("firms_api_key", k); } catch {}
+    setFirmsKey(k);
+    setNeedsKey(false);
+    loadFire(fireDays, k);
+  };
+
+  const fireRanking = Object.entries(fireData)
+    .map(([id, d]) => ({ id, count: d.count, frp: d.frpTotal, high: d.high }))
+    .sort((a, b) => b.count - a.count)
+    .filter(r => r.count > 0);
+
+  const selFire = fireSel ? fireData[fireSel] : null;
+  const totalFocos = rawPoints.length;
+  const totalFrp   = rawPoints.reduce((s, p) => s + p.frp, 0);
+
+  // ── Pantalla de key ──
+  if (needsKey && !firmsKey) {
+    return (
+      <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:24, maxWidth:520 }}>
+        <div style={{ fontSize:14, fontWeight:600, color:TEXT, marginBottom:8 }}>
+          🔑 Se requiere API key de NASA FIRMS
+        </div>
+        <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.6, marginBottom:16 }}>
+          NASA FIRMS requiere una key gratuita para acceder a datos VIIRS en tiempo real.
+          El registro es inmediato en{" "}
+          <a href="https://firms.modaps.eosdis.nasa.gov/api/" target="_blank" rel="noreferrer"
+            style={{ color:ACCENT }}>firms.modaps.eosdis.nasa.gov/api/</a>.
+          La key se guarda en tu browser y no se envía a ningún servidor externo salvo NASA.
+        </div>
+        <div style={{ display:"flex", gap:8 }}>
+          <input
+            type="text"
+            value={keyInput}
+            onChange={e => setKeyInput(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && saveKey()}
+            placeholder="Pega tu MAP_KEY aquí"
+            style={{ flex:1, fontFamily:font, fontSize:12, padding:"6px 10px",
+              border:`1px solid ${BORDER}`, background:BG3, color:TEXT, outline:"none" }}
+          />
+          <button onClick={saveKey}
+            style={{ fontFamily:font, fontSize:12, padding:"6px 14px",
+              background:ACCENT, color:"#fff", border:"none", cursor:"pointer" }}>
+            Guardar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+
+      {/* Controles */}
+      <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
+        <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+          Período
+        </div>
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+          {FIRMS_DAYS_OPTIONS.map(d => (
+            <button key={d} onClick={() => setFireDays(d)}
+              style={{ fontSize:11, fontFamily:font, padding:"5px 12px", border:"none",
+                background:fireDays===d?ACCENT:"transparent", color:fireDays===d?"#fff":MUTED,
+                cursor:"pointer" }}>
+              {d === 1 ? "24h" : d === 3 ? "3 días" : "7 días"}
+            </button>
+          ))}
+        </div>
+        <button onClick={() => loadFire(fireDays, firmsKey)}
+          style={{ fontSize:11, fontFamily:font, padding:"5px 12px", border:`1px solid ${BORDER}`,
+            background:"transparent", color:MUTED, cursor:"pointer" }}>
+          ↻ Actualizar
+        </button>
+        <button onClick={() => { setFirmsKey(""); setNeedsKey(true); }}
+          style={{ fontSize:10, fontFamily:font, padding:"4px 8px", border:`1px solid ${BORDER}`,
+            background:"transparent", color:`${MUTED}80`, cursor:"pointer" }}>
+          Cambiar key
+        </button>
+
+        {/* KPIs globales */}
+        {!fireLoading && totalFocos > 0 && (
+          <div style={{ marginLeft:"auto", display:"flex", gap:12, flexWrap:"wrap" }}>
+            <div style={{ textAlign:"right" }}>
+              <div style={{ fontSize:18, fontWeight:800, color:"#dc2626", fontFamily:"'Syne',sans-serif" }}>{totalFocos}</div>
+              <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>focos VIIRS</div>
+            </div>
+            <div style={{ textAlign:"right" }}>
+              <div style={{ fontSize:18, fontWeight:800, color:"#f97316", fontFamily:"'Syne',sans-serif" }}>{Math.round(totalFrp)}</div>
+              <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>MW FRP total</div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Loading */}
+      {fireLoading && (
+        <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:20, textAlign:"center" }}>
+          <div style={{ fontSize:13, fontFamily:font, color:MUTED }}>
+            Consultando NASA FIRMS VIIRS…
+          </div>
+          <div style={{ marginTop:8, width:40, height:4, background:ACCENT, margin:"8px auto 0",
+            animation:"pulse 1s infinite alternate", borderRadius:2 }} />
+        </div>
+      )}
+
+      {/* Error */}
+      {fireError && !fireLoading && (
+        <div style={{ background:"#fef2f2", border:"1px solid #fecaca", padding:12,
+          fontSize:12, fontFamily:font, color:"#dc2626" }}>
+          ⚠️ {fireError}
+        </div>
+      )}
+
+      {/* Contenido */}
+      {!fireLoading && !fireError && (
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 280px", gap:12 }}>
+
+          {/* Mapa */}
+          <div style={{ background:"#111827", border:`1px solid ${BORDER}`, padding:8 }}>
+            <div style={{ fontSize:11, fontFamily:font, color:"#9ca3af", letterSpacing:"0.1em",
+              textTransform:"uppercase", marginBottom:6, paddingLeft:4 }}>
+              Focos activos VIIRS · últimos {fireDays === 1 ? "24h" : `${fireDays} días`}
+            </div>
+            <FireLeafletMap
+              fireData={fireData} rawPoints={rawPoints}
+              selected={fireSel} onSelect={setFireSel} mob={mob}
+            />
+            {/* Leyenda */}
+            <div style={{ display:"flex", gap:6, justifyContent:"center", marginTop:6, flexWrap:"wrap" }}>
+              {[
+                { c:"#991b1b", l:"FRP >100MW" },
+                { c:"#dc2626", l:">50MW" },
+                { c:"#f97316", l:">10MW" },
+                { c:"#fbbf24", l:"<10MW" },
+              ].map((l, i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:3 }}>
+                  <div style={{ width:8, height:8, background:l.c, borderRadius:"50%" }} />
+                  <span style={{ fontSize:9, fontFamily:font, color:"#9ca3af" }}>{l.l}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize:9, fontFamily:font, color:"#6b7280", textAlign:"center", marginTop:3 }}>
+              Puntos = focos individuales · Círculos semitransparentes = resumen por estado
+            </div>
+          </div>
+
+          {/* Panel detalle */}
+          <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:16,
+            display:"flex", flexDirection:"column", gap:10 }}>
+
+            {selFire ? (
+              <>
+                <div>
+                  <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif" }}>
+                    {fireSel}
+                  </div>
+                  <div style={{ fontSize:11, fontFamily:font, color:MUTED }}>
+                    Últimos {fireDays === 1 ? "24h" : `${fireDays} días`} · VIIRS SNPP
+                  </div>
+                </div>
+                <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase", letterSpacing:"0.1em" }}>Focos activos</div>
+                  <div style={{ fontSize:26, fontWeight:800, color:"#dc2626", fontFamily:"'Syne',sans-serif" }}>
+                    {selFire.count}
+                  </div>
+                  <div style={{ fontSize:11, fontFamily:font, color:MUTED, marginTop:2 }}>
+                    Alta confianza: {selFire.high} · FRP: {Math.round(selFire.frpTotal)} MW
+                  </div>
+                </div>
+
+                {/* Barra de FRP */}
+                <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:6 }}>
+                    Fire Radiative Power (intensidad)
+                  </div>
+                  <div style={{ height:8, background:BORDER, borderRadius:4 }}>
+                    <div style={{
+                      width:`${Math.min((selFire.frpTotal / Math.max(totalFrp, 1)) * 100, 100)}%`,
+                      height:"100%", background:"#dc2626", borderRadius:4,
+                    }} />
+                  </div>
+                  <div style={{ fontSize:10, fontFamily:font, color:MUTED, marginTop:4 }}>
+                    {((selFire.frpTotal / Math.max(totalFrp, 1)) * 100).toFixed(1)}% del FRP nacional
+                  </div>
+                </div>
+
+                {/* Alerta contextual */}
+                {selFire.count > 20 && (
+                  <div style={{ background:"#fff7ed", border:"1px solid #fed7aa", padding:"8px 12px",
+                    fontSize:12, fontFamily:font, color:"#c2410c" }}>
+                    ⚠️ Alta actividad. Posible impacto en comunidades y calidad del aire.
+                  </div>
+                )}
+                {["Bolívar","Amazonas"].includes(fireSel) && selFire.count > 5 && (
+                  <div style={{ background:"#fefce8", border:"1px solid #fde047", padding:"8px 12px",
+                    fontSize:11, fontFamily:font, color:"#854d0e" }}>
+                    💡 Bolívar/Amazonas: incendios en zonas de minería ilegal y territorios indígenas. Riesgo de conflicto territorial.
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center",
+                justifyContent:"center", flex:1, gap:8, padding:20 }}>
+                <span style={{ fontSize:28, opacity:0.25 }}>🔥</span>
+                <div style={{ fontSize:13, color:MUTED, textAlign:"center", lineHeight:1.5 }}>
+                  Selecciona un estado para ver detalle de focos e intensidad
+                </div>
+                {fireRanking.length > 0 && (
+                  <div style={{ fontSize:11, fontFamily:font, color:`${MUTED}80`, textAlign:"center", marginTop:4 }}>
+                    Más activo: {fireRanking[0]?.id} ({fireRanking[0]?.count} focos)
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Ranking */}
+            {fireRanking.length > 0 && (
+              <div style={{ borderTop:`1px solid ${BORDER}`, paddingTop:8 }}>
+                <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em",
+                  textTransform:"uppercase", marginBottom:6 }}>
+                  Ranking — focos activos
+                </div>
+                {fireRanking.slice(0, 8).map((r, i) => (
+                  <div key={r.id} onClick={() => setFireSel(fireSel === r.id ? null : r.id)}
+                    style={{ display:"flex", alignItems:"center", gap:6, padding:"3px 0",
+                      cursor:"pointer", borderBottom: i < 7 ? `1px solid ${BG3}` : "none" }}>
+                    <span style={{ fontSize:9, fontFamily:font, color:MUTED, width:14, textAlign:"right" }}>{i+1}</span>
+                    <span style={{ fontSize:11, color:fireSel===r.id?ACCENT:TEXT, flex:1,
+                      fontWeight:fireSel===r.id?600:400 }}>{r.id}</span>
+                    <div style={{ width:40, height:5, background:BG3, borderRadius:2 }}>
+                      <div style={{ width:`${Math.min((r.count / (fireRanking[0]?.count || 1)) * 100, 100)}%`,
+                        height:"100%", background:"#dc2626", borderRadius:2 }} />
+                    </div>
+                    <span style={{ fontSize:10, fontFamily:font, color:"#dc2626", width:24, textAlign:"right" }}>
+                      {r.count}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {fireRanking.length === 0 && !fireLoading && (
+              <div style={{ fontSize:12, fontFamily:font, color:MUTED, textAlign:"center", padding:12 }}>
+                Sin focos detectados en el período seleccionado
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Nexo analítico */}
+      <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px 16px" }}>
+        <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em",
+          textTransform:"uppercase", marginBottom:8 }}>Relevancia para el análisis situacional</div>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:8 }}>
+          {[
+            { icon:"⛏️", titulo:"Minería ilegal / Arco Minero", texto:"Incendios en Bolívar y Amazonas frecuentemente asociados a desmontes para minería ilegal. Indicador de expansión del conflicto en zonas indígenas." },
+            { icon:"🌬️", titulo:"Calidad del aire / Salud", texto:"Alta densidad de focos genera humo que afecta comunidades remotas con acceso sanitario precario. Agrava vulnerabilidades en E2." },
+            { icon:"🌧️", titulo:"Nexo lluvia-incendio", texto:"Temporada seca (enero–abril) concentra el pico de incendios. Déficit hídrico sostenido actúa como amplificador. Ver tab Lluvias para correlación." },
+          ].map((item, i) => (
+            <div key={i} style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
+              <div style={{ fontSize:13, marginBottom:4 }}>{item.icon} <span style={{ fontWeight:600, color:TEXT, fontSize:12 }}>{item.titulo}</span></div>
+              <div style={{ fontSize:11, fontFamily:fontSans, color:MUTED, lineHeight:1.5 }}>{item.texto}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}60`, textAlign:"center", paddingBottom:4 }}>
+        Fuente: NASA FIRMS VIIRS SNPP (Near Real-Time) · Sensor VIIRS 375m · Latencia ~3h · Key gratuita requerida
+      </div>
+    </div>
+  );
+}
+
+
 export function TabAmbiental() {
   const mob = useIsMobile();
+  const [seccion, setSeccion] = useState("lluvia");
   const [data, setData]       = useState({});   // { estadoId: { acum7d, acumFcst7d, hist, fcst, fechas } }
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
@@ -560,32 +1106,31 @@ export function TabAmbiental() {
     if (Object.keys(results).length === 0) {
       setError("No se pudo conectar con Open-Meteo. Verificá la conexión.");
     } else {
-      setLoadingLabel("Calculando norma NASA POWER 1981-2025");
-      setProgress(0);
-      let climDone = 0;
-      const CLIM_BATCH = 3;
-      for (let i = 0; i < VE_ESTADOS.length; i += CLIM_BATCH) {
-        const batch = VE_ESTADOS.slice(i, i + CLIM_BATCH).filter(estado => results[estado.id]);
-        const settled = await Promise.allSettled(
-          batch.map(async estado => {
-            const clim = await fetchPowerClimatology(estado, results[estado.id].fechas);
-            return { id: estado.id, clim };
-          })
-        );
-        settled.forEach(r => {
-          if (r.status === "fulfilled" && r.value.clim) {
-            results[r.value.id] = { ...results[r.value.id], climatology: r.value.clim };
-          }
-        });
-        climDone += batch.length;
-        setProgress(Math.round((climDone / VE_ESTADOS.length) * 100));
-      }
       setData(results);
     }
     setLoading(false);
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  // ── Carga lazy de climatología al seleccionar un estado ──
+  useEffect(() => {
+    if (!selected || !data[selected] || data[selected]?.climatology) return;
+    const estado = VE_ESTADOS.find(e => e.id === selected);
+    if (!estado) return;
+    let cancelled = false;
+    fetchPowerClimatology(estado, data[selected].fechas)
+      .then(clim => {
+        if (!cancelled && clim) {
+          setData(prev => ({
+            ...prev,
+            [selected]: { ...prev[selected], climatology: clim },
+          }));
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [selected, data]);
 
   useEffect(() => {
     const historyKey = `${selected}:${historyWeeks}`;
@@ -628,21 +1173,40 @@ export function TabAmbiental() {
     <div>
       {/* ── HEADER ── */}
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14, flexWrap:"wrap" }}>
-        <span style={{ fontSize:16 }}>🌧️</span>
+        <span style={{ fontSize:16 }}>🌿</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Ambiental — Precipitaciones</div>
+          <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Ambiental — Riesgos Naturales</div>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
-            Lluvia 7 días por estado · Open-Meteo + norma NASA POWER 1981-2025
+            {seccion === "lluvia"
+              ? "Lluvia 7 días por estado · Open-Meteo + norma NASA POWER 1981-2025"
+              : "Focos activos VIIRS · NASA FIRMS · Tiempo casi real"}
           </div>
         </div>
-        <button
-          onClick={() => { fetchedRef.current = false; setData({}); setProgress(0); loadData(); }}
-          style={{ fontSize:11, fontFamily:font, padding:"5px 12px", border:`1px solid ${BORDER}`,
-            background:"transparent", color:MUTED, cursor:"pointer", letterSpacing:"0.08em" }}>
-          ↻ Actualizar
-        </button>
+        {/* Toggle sección */}
+        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+          {[{ id:"lluvia", icon:"🌧️", label:"Lluvias" }, { id:"incendios", icon:"🔥", label:"Incendios" }].map(s => (
+            <button key={s.id} onClick={() => setSeccion(s.id)}
+              style={{ fontSize:12, fontFamily:font, padding:"6px 14px", border:"none",
+                background:seccion===s.id?ACCENT:"transparent",
+                color:seccion===s.id?"#fff":MUTED,
+                cursor:"pointer", letterSpacing:"0.08em",
+                display:"flex", alignItems:"center", gap:4 }}>
+              <span style={{ fontSize:13 }}>{s.icon}</span>{s.label}
+            </button>
+          ))}
+        </div>
+        {seccion === "lluvia" && (
+          <button
+            onClick={() => { fetchedRef.current = false; setData({}); setHistory({}); setProgress(0); setLoadingLabel("Consultando Open-Meteo"); loadData(); }}
+            style={{ fontSize:11, fontFamily:font, padding:"5px 12px", border:`1px solid ${BORDER}`,
+              background:"transparent", color:MUTED, cursor:"pointer", letterSpacing:"0.08em" }}>
+            ↻ Actualizar
+          </button>
+        )}
       </div>
 
+      {/* ── SECCIÓN LLUVIAS ── */}
+      {seccion === "lluvia" && (<>
       {/* ── LOADING ── */}
       {loading && (
         <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:24, textAlign:"center" }}>
@@ -897,6 +1461,10 @@ export function TabAmbiental() {
           </div>
         </div>
       )}
+      </>)}
+
+      {/* ── SECCIÓN INCENDIOS ── */}
+      {seccion === "incendios" && <TabIncendios mob={mob} />}
     </div>
   );
 }
