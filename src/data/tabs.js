@@ -10,4 +10,5 @@ export const TABS = [
   { id:"ioda", label:"Conectividad", icon:"🌐" },
   { id:"mercados", label:"Mercados", icon:"📈" },
   { id:"macro", label:"Macro VEN", icon:"💵" },
+  { id:"ambiental", label:"Ambiental", icon:"🌧️" },
 ];
