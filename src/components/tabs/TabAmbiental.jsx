@@ -80,6 +80,7 @@ const NASA_SENTINELS = {
 const POWER_START_YEAR = 1981;
 const POWER_END_YEAR = 2025;
 const POWER_CACHE_VERSION = "power-prectotcorr-1981-2025-v1";
+const HISTORY_WEEKS = 8;
 
 // ── Escala de colores para precipitación ──
 function precipColor(mm) {
@@ -117,6 +118,38 @@ function calendarWindow(fechas, limit = PAST_DAYS) {
       prevKey = key;
       return { key, yearOffset };
     });
+}
+
+function formatPowerDate(date) {
+  return date.toISOString().slice(0, 10).replace(/-/g, "");
+}
+
+function toIsoDate(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function buildHistoryWindows(anchorDate = new Date()) {
+  const windows = [];
+  const anchor = new Date(anchorDate);
+  anchor.setHours(12, 0, 0, 0);
+  for (let i = HISTORY_WEEKS - 1; i >= 0; i -= 1) {
+    const end = new Date(anchor);
+    end.setDate(anchor.getDate() - i * 7);
+    const start = new Date(end);
+    start.setDate(end.getDate() - (PAST_DAYS - 1));
+    const fechas = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      fechas.push(toIsoDate(d));
+    }
+    windows.push({
+      label: `${start.getDate()}/${start.getMonth() + 1}`,
+      start,
+      end,
+      fechas,
+      windowDays: calendarWindow(fechas),
+    });
+  }
+  return windows;
 }
 
 function cacheGet(key) {
@@ -165,6 +198,20 @@ async function fetchPowerSentinelNorm(sentinel, windowDays) {
   return sums.reduce((acc, v) => acc + v, 0) / sums.length;
 }
 
+async function fetchPowerSentinelRecent(sentinel, start, end) {
+  const url =
+    `https://power.larc.nasa.gov/api/temporal/daily/point` +
+    `?parameters=PRECTOTCORR` +
+    `&community=AG` +
+    `&longitude=${sentinel.lon}&latitude=${sentinel.lat}` +
+    `&start=${formatPowerDate(start)}&end=${formatPowerDate(end)}` +
+    `&format=JSON&time-standard=UTC`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(16000) });
+  if (!res.ok) throw new Error(`NASA POWER HTTP ${res.status}`);
+  const json = await res.json();
+  return json?.properties?.parameter?.PRECTOTCORR || {};
+}
+
 async function fetchPowerClimatology(estado, fechas) {
   const windowDays = calendarWindow(fechas);
   if (!windowDays.length) return null;
@@ -185,6 +232,71 @@ async function fetchPowerClimatology(estado, fechas) {
     norm7d: norms.reduce((acc, v) => acc + v, 0) / norms.length,
     sentinels: sentinels.map(s => s.name),
     source: `NASA POWER PRECTOTCORR ${POWER_START_YEAR}-${POWER_END_YEAR}`,
+  };
+  cacheSet(cacheKey, result);
+  return result;
+}
+
+async function fetchPowerHistory(estado) {
+  const windows = buildHistoryWindows();
+  const sentinels = sentinelsForState(estado);
+  const cacheKey = `${POWER_CACHE_VERSION}:history:${estado.id}:${windows.map(w => toIsoDate(w.end)).join("-")}`;
+  const cached = cacheGet(cacheKey);
+  if (cached?.weeks?.length) return cached;
+
+  const start = windows[0].start;
+  const end = windows[windows.length - 1].end;
+  const recentSettled = await Promise.allSettled(
+    sentinels.map(sentinel => fetchPowerSentinelRecent(sentinel, start, end))
+  );
+  const recentSeries = recentSettled
+    .filter(r => r.status === "fulfilled")
+    .map(r => r.value);
+
+  const weeks = await Promise.all(windows.map(async window => {
+    const observedVals = recentSeries.map(series => {
+      const sum = window.fechas.reduce((acc, iso) => {
+        const key = iso.replace(/-/g, "");
+        const value = series[key];
+        return value == null || value < 0 ? acc : acc + value;
+      }, 0);
+      return sum;
+    });
+    const normSettled = await Promise.allSettled(
+      sentinels.map(sentinel => fetchPowerSentinelNorm(sentinel, window.windowDays))
+    );
+    const normVals = normSettled
+      .filter(r => r.status === "fulfilled" && r.value != null)
+      .map(r => r.value);
+    const observed = observedVals.length ? observedVals.reduce((acc, v) => acc + v, 0) / observedVals.length : null;
+    const norm = normVals.length ? normVals.reduce((acc, v) => acc + v, 0) / normVals.length : null;
+    const anomalyPct = observed != null && norm ? ((observed - norm) / norm) * 100 : null;
+    return {
+      label: window.label,
+      start: toIsoDate(window.start),
+      end: toIsoDate(window.end),
+      observed,
+      norm,
+      anomalyPct,
+    };
+  }));
+
+  const below = weeks.filter(w => w.anomalyPct != null && w.anomalyPct < -20).length;
+  const above = weeks.filter(w => w.anomalyPct != null && w.anomalyPct > 20).length;
+  const latest = weeks[weeks.length - 1];
+  const status =
+    below >= 5 ? "Déficit persistente" :
+    above >= 5 ? "Exceso persistente" :
+    latest?.anomalyPct < -30 ? "Déficit reciente" :
+    latest?.anomalyPct > 30 ? "Exceso reciente" :
+    "Variabilidad dentro de rango";
+  const result = {
+    weeks,
+    status,
+    below,
+    above,
+    sentinels: sentinels.map(s => s.name),
+    source: `NASA POWER PRECTOTCORR ${POWER_START_YEAR}-${POWER_END_YEAR} / 2026`,
   };
   cacheSet(cacheKey, result);
   return result;
@@ -323,12 +435,86 @@ function AmbientalLeafletMap({ data, selected, onSelect, mob }) {
   );
 }
 
+function RainHistoryPanel({ history, loading }) {
+  if (loading) {
+    return (
+      <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
+        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+          Historial NASA POWER
+        </div>
+        <div style={{ fontSize:11, fontFamily:font, color:MUTED, marginTop:6 }}>
+          Calculando 8 semanas observado vs norma...
+        </div>
+      </div>
+    );
+  }
+  if (!history?.weeks?.length) {
+    return (
+      <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
+        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+          Historial NASA POWER
+        </div>
+        <div style={{ fontSize:11, fontFamily:font, color:MUTED, marginTop:6 }}>
+          Selecciona un estado para calcular tendencia histórica.
+        </div>
+      </div>
+    );
+  }
+
+  const maxVal = Math.max(...history.weeks.flatMap(w => [w.observed || 0, w.norm || 0]), 1);
+  const statusColor =
+    history.status.includes("Déficit") ? "#ca8a04" :
+    history.status.includes("Exceso") ? "#1d4ed8" :
+    "#16a34a";
+
+  return (
+    <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", gap:8 }}>
+        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+          Historial 8 semanas
+        </div>
+        <div style={{ fontSize:10, fontFamily:font, color:statusColor, fontWeight:700 }}>
+          {history.status}
+        </div>
+      </div>
+      <div style={{ display:"flex", gap:4, alignItems:"flex-end", height:70, marginTop:10 }}>
+        {history.weeks.map((w, i) => {
+          const obsH = Math.max(2, Math.round(((w.observed || 0) / maxVal) * 58));
+          const normH = Math.max(2, Math.round(((w.norm || 0) / maxVal) * 58));
+          const anomalyColor = w.anomalyPct < -20 ? "#ca8a04" : w.anomalyPct > 20 ? "#1d4ed8" : "#16a34a";
+          return (
+            <div key={`${w.start}-${i}`} title={`${w.start} a ${w.end}: obs ${Math.round(w.observed || 0)}mm / norma ${Math.round(w.norm || 0)}mm`}
+              style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
+              <div style={{ height:60, width:"100%", display:"flex", alignItems:"flex-end", justifyContent:"center", gap:1 }}>
+                <div style={{ width:6, height:obsH, background:anomalyColor, borderRadius:"2px 2px 0 0" }} />
+                <div style={{ width:4, height:normH, background:`${MUTED}55`, borderRadius:"2px 2px 0 0" }} />
+              </div>
+              <div style={{ fontSize:7, fontFamily:font, color:MUTED }}>{w.label}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:6, gap:8 }}>
+        <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+          <span style={{ fontSize:9, fontFamily:font, color:MUTED }}><b style={{ color:"#1d4ed8" }}>■</b> Observado</span>
+          <span style={{ fontSize:9, fontFamily:font, color:MUTED }}><b style={{ color:`${MUTED}99` }}>■</b> Norma</span>
+        </div>
+        <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>
+          {history.below} bajo norma · {history.above} sobre norma
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function TabAmbiental() {
   const mob = useIsMobile();
   const [data, setData]       = useState({});   // { estadoId: { acum7d, acumFcst7d, hist, fcst, fechas } }
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
   const [selected, setSelected] = useState(null);
+  const [history, setHistory] = useState({});
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [loadingLabel, setLoadingLabel] = useState("Consultando Open-Meteo");
   const fetchedRef = useRef(false);
@@ -382,7 +568,27 @@ export function TabAmbiental() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  useEffect(() => {
+    if (!selected || history[selected]) return;
+    const estado = VE_ESTADOS.find(e => e.id === selected);
+    if (!estado) return;
+    let cancelled = false;
+    setHistoryLoading(true);
+    fetchPowerHistory(estado)
+      .then(result => {
+        if (!cancelled) setHistory(prev => ({ ...prev, [selected]: result }));
+      })
+      .catch(() => {
+        if (!cancelled) setHistory(prev => ({ ...prev, [selected]: { error: true, weeks: [] } }));
+      })
+      .finally(() => {
+        if (!cancelled) setHistoryLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [selected, history]);
+
   const selData = selected ? data[selected] : null;
+  const selHistory = selected ? history[selected] : null;
 
   // ── Alertas automáticas ──
   const alertas = Object.entries(data).filter(([id, d]) =>
@@ -548,6 +754,8 @@ export function TabAmbiental() {
                       <span>hoy+1</span><span>+7</span>
                     </div>
                   </div>
+
+                  <RainHistoryPanel history={selHistory} loading={historyLoading && !selHistory} />
 
                   {/* Alerta contextual */}
                   {selData.acum7d > UMBRAL_LLUVIA && (
