@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { BG, BG2, BG3, BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "../../constants";
-import { VZ_MAP } from "../../data/static.js";
+import { loadScript, loadCSS } from "../../utils";
+
+const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
 
 // ── Coordenadas de capitales para fetch Open-Meteo (una por estado) ──
 const VE_ESTADOS = [
@@ -36,17 +39,47 @@ const PAST_DAYS = 7;
 // Umbrales de alerta (mm acumulados en 7 días)
 const UMBRAL_SEQUIA = 5;    // menos de 5 mm/7d → sequía
 const UMBRAL_LLUVIA = 100;  // más de 100 mm/7d → riesgo inundación
-// Norma histórica mensual estimada por estado (mm/mes, fuente: climatología IDEAM/NOAA)
-// Se usa para calcular anomalía aproximada. Valores representativos por región.
-const NORMA_MENSUAL = {
-  "Amazonas": 280, "Apure": 180, "Bolívar": 210, "Delta Amacuro": 240,
-  "Anzoátegui": 110, "Monagas": 120, "Sucre": 130, "Nueva Esparta": 70,
-  "Miranda": 100, "Aragua": 95, "Carabobo": 90, "Vargas": 105,
-  "Distrito Capital": 90, "Yaracuy": 100, "Lara": 80, "Falcón": 55,
-  "Zulia": 160, "Mérida": 150, "Táchira": 145, "Barinas": 175,
-  "Portuguesa": 160, "Cojedes": 150, "Guárico": 130, "Trujillo": 120,
+// Puntos sentinela para climatología NASA POWER. Los estados grandes o
+// analíticamente sensibles tienen más de un punto para reducir sesgo territorial.
+const NASA_SENTINELS = {
+  "Amazonas": [
+    { name:"Puerto Ayacucho", lat:5.66, lon:-67.62 },
+    { name:"Alto Orinoco", lat:2.72, lon:-65.86 },
+  ],
+  "Apure": [
+    { name:"San Fernando", lat:7.89, lon:-67.47 },
+    { name:"Elorza", lat:7.06, lon:-69.50 },
+  ],
+  "Bolívar": [
+    { name:"Ciudad Bolívar", lat:8.12, lon:-63.55 },
+    { name:"Guri / Caroní", lat:7.76, lon:-62.98 },
+    { name:"Gran Sabana", lat:5.97, lon:-61.43 },
+  ],
+  "Zulia": [
+    { name:"Maracaibo", lat:10.65, lon:-71.64 },
+    { name:"Sur del Lago", lat:8.95, lon:-71.92 },
+    { name:"Guajira", lat:11.85, lon:-71.32 },
+  ],
+  "Barinas": [
+    { name:"Barinas", lat:8.62, lon:-70.21 },
+    { name:"Llanos agrícolas", lat:8.22, lon:-69.72 },
+  ],
+  "Portuguesa": [
+    { name:"Guanare", lat:9.04, lon:-69.75 },
+    { name:"Acarigua", lat:9.56, lon:-69.20 },
+  ],
+  "Mérida": [
+    { name:"Mérida", lat:8.59, lon:-71.14 },
+    { name:"El Vigía", lat:8.61, lon:-71.65 },
+  ],
+  "Táchira": [
+    { name:"San Cristóbal", lat:7.77, lon:-72.22 },
+    { name:"Sur andino", lat:7.25, lon:-72.45 },
+  ],
 };
-const norma7d = (id) => ((NORMA_MENSUAL[id] || 120) / 30) * PAST_DAYS;
+const POWER_START_YEAR = 1981;
+const POWER_END_YEAR = 2025;
+const POWER_CACHE_VERSION = "power-prectotcorr-1981-2025-v1";
 
 // ── Escala de colores para precipitación ──
 function precipColor(mm) {
@@ -58,14 +91,103 @@ function precipColor(mm) {
   return "#fde68a";               // amarillo — sequía
 }
 
-function anomalyLabel(mm, id) {
-  const norm = norma7d(id);
+function anomalyLabel(mm, norm) {
+  if (!norm) return { txt: "Climatología NASA pendiente", col: MUTED };
   const pct = norm > 0 ? ((mm - norm) / norm) * 100 : 0;
   if (pct > 50)  return { txt: `+${Math.round(pct)}% sobre norma`, col: "#1d4ed8" };
   if (pct > 10)  return { txt: `+${Math.round(pct)}% sobre norma`, col: "#3b82f6" };
   if (pct > -10) return { txt: "Dentro de norma", col: "#6b7280" };
   if (pct > -50) return { txt: `${Math.round(pct)}% bajo norma`, col: "#ca8a04" };
   return { txt: `${Math.round(pct)}% bajo norma`, col: "#dc2626" };
+}
+
+function sentinelsForState(estado) {
+  return NASA_SENTINELS[estado.id] || [{ name: estado.id, lat: estado.lat, lon: estado.lon }];
+}
+
+function calendarWindow(fechas, limit = PAST_DAYS) {
+  let yearOffset = 0;
+  let prevKey = null;
+  return (fechas || [])
+    .slice(0, limit)
+    .map(d => String(d || "").slice(5, 10).replace("-", ""))
+    .filter(Boolean)
+    .map(key => {
+      if (prevKey && key < prevKey) yearOffset += 1;
+      prevKey = key;
+      return { key, yearOffset };
+    });
+}
+
+function cacheGet(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function cacheSet(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {}
+}
+
+async function fetchPowerSentinelNorm(sentinel, windowDays) {
+  const url =
+    `https://power.larc.nasa.gov/api/temporal/daily/point` +
+    `?parameters=PRECTOTCORR` +
+    `&community=AG` +
+    `&longitude=${sentinel.lon}&latitude=${sentinel.lat}` +
+    `&start=${POWER_START_YEAR}0101&end=${POWER_END_YEAR}1231` +
+    `&format=JSON&time-standard=UTC`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
+  if (!res.ok) throw new Error(`NASA POWER HTTP ${res.status}`);
+  const json = await res.json();
+  const series = json?.properties?.parameter?.PRECTOTCORR || {};
+  const maxOffset = Math.max(...windowDays.map(d => d.yearOffset), 0);
+  const sums = [];
+  for (let year = POWER_START_YEAR; year <= POWER_END_YEAR - maxOffset; year += 1) {
+    let sum = 0;
+    let valid = true;
+    windowDays.forEach(({ key, yearOffset }) => {
+      const value = series[`${year + yearOffset}${key}`];
+      if (value == null || value < 0) {
+        valid = false;
+      } else {
+        sum += value;
+      }
+    });
+    if (valid) sums.push(sum);
+  }
+  if (!sums.length) return null;
+  return sums.reduce((acc, v) => acc + v, 0) / sums.length;
+}
+
+async function fetchPowerClimatology(estado, fechas) {
+  const windowDays = calendarWindow(fechas);
+  if (!windowDays.length) return null;
+  const sentinels = sentinelsForState(estado);
+  const cacheKey = `${POWER_CACHE_VERSION}:${estado.id}:${windowDays.map(d => `${d.yearOffset}${d.key}`).join("-")}`;
+  const cached = cacheGet(cacheKey);
+  if (cached?.norm7d != null) return cached;
+
+  const settled = await Promise.allSettled(
+    sentinels.map(sentinel => fetchPowerSentinelNorm(sentinel, windowDays))
+  );
+  const norms = settled
+    .filter(r => r.status === "fulfilled" && r.value != null)
+    .map(r => r.value);
+  if (!norms.length) return null;
+
+  const result = {
+    norm7d: norms.reduce((acc, v) => acc + v, 0) / norms.length,
+    sentinels: sentinels.map(s => s.name),
+    source: `NASA POWER PRECTOTCORR ${POWER_START_YEAR}-${POWER_END_YEAR}`,
+  };
+  cacheSet(cacheKey, result);
+  return result;
 }
 
 // ── Fetch Open-Meteo para un estado ──
@@ -90,6 +212,117 @@ async function fetchPrecip(estado) {
   return { id: estado.id, acum7d, acumFcst7d, hist, fcst, fechas };
 }
 
+function AmbientalLeafletMap({ data, selected, onSelect, mob }) {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const layerRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadCSS(LEAFLET_CSS);
+    loadScript(LEAFLET_JS).then(() => {
+      if (cancelled || !mapRef.current || !window.L || mapInstance.current) return;
+      const L = window.L;
+      const map = L.map(mapRef.current, {
+        center: [7.8, -66.5],
+        zoom: mob ? 5 : 6,
+        minZoom: 5,
+        maxZoom: 9,
+        zoomControl: true,
+        scrollWheelZoom: false,
+        attributionControl: false,
+      });
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", {
+        maxZoom: 10,
+      }).addTo(map);
+      mapInstance.current = map;
+      setTimeout(() => map.invalidateSize(), 100);
+    });
+
+    return () => {
+      cancelled = true;
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+      }
+    };
+  }, [mob]);
+
+  useEffect(() => {
+    if (!mapInstance.current || !window.L) return;
+    const L = window.L;
+    const map = mapInstance.current;
+    if (layerRef.current) map.removeLayer(layerRef.current);
+    const group = L.layerGroup();
+    const maxMm = Math.max(...Object.values(data).map(d => d.acum7d || 0), 1);
+
+    VE_ESTADOS.forEach(estado => {
+      const d = data[estado.id];
+      if (!d) return;
+      const norm = d.climatology?.norm7d;
+      const anomaly = norm ? Math.round(((d.acum7d - norm) / norm) * 100) : null;
+      const radius = Math.max(7, Math.min(28, 7 + (d.acum7d / maxMm) * 24));
+      const isSelected = selected === estado.id;
+      const color = precipColor(d.acum7d);
+      const marker = L.circleMarker([estado.lat, estado.lon], {
+        radius: isSelected ? radius + 4 : radius,
+        fillColor: color,
+        color: isSelected ? TEXT : color,
+        weight: isSelected ? 3 : 1.5,
+        opacity: 0.95,
+        fillOpacity: isSelected ? 0.75 : 0.55,
+      });
+      marker.bindTooltip(
+        `<div style="font-family:${font};font-size:11px;line-height:1.45">` +
+        `<strong>${estado.id}</strong><br/>` +
+        `<span style="font-size:15px;font-weight:700;color:#1d4ed8">${Math.round(d.acum7d)} mm</span> últimos 7d<br/>` +
+        (norm ? `Norma NASA: ${Math.round(norm)} mm<br/>Anomalía: ${anomaly > 0 ? "+" : ""}${anomaly}%` : `Norma NASA: pendiente`) +
+        `</div>`,
+        { direction: "top", offset: [0, -radius] }
+      );
+      marker.on("click", () => onSelect(isSelected ? null : estado.id));
+      group.addLayer(marker);
+    });
+
+    if (selected) {
+      const estado = VE_ESTADOS.find(e => e.id === selected);
+      if (estado) {
+        sentinelsForState(estado).forEach(sentinel => {
+          const sentinelMarker = L.circleMarker([sentinel.lat, sentinel.lon], {
+            radius: 4,
+            fillColor: "#111827",
+            color: "#ffffff",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.85,
+          });
+          sentinelMarker.bindTooltip(
+            `<div style="font-family:${font};font-size:10px"><strong>${sentinel.name}</strong><br/>Punto sentinela NASA POWER</div>`,
+            { direction: "top" }
+          );
+          group.addLayer(sentinelMarker);
+        });
+      }
+    }
+
+    group.addTo(map);
+    layerRef.current = group;
+  }, [data, selected, onSelect]);
+
+  return (
+    <div
+      ref={mapRef}
+      style={{
+        width: "100%",
+        height: mob ? 330 : 470,
+        border: `1px solid ${BORDER}`,
+        background: "#eef1f5",
+        borderRadius: 4,
+      }}
+    />
+  );
+}
+
 export function TabAmbiental() {
   const mob = useIsMobile();
   const [data, setData]       = useState({});   // { estadoId: { acum7d, acumFcst7d, hist, fcst, fechas } }
@@ -97,6 +330,7 @@ export function TabAmbiental() {
   const [error, setError]     = useState(null);
   const [selected, setSelected] = useState(null);
   const [progress, setProgress] = useState(0);
+  const [loadingLabel, setLoadingLabel] = useState("Consultando Open-Meteo");
   const fetchedRef = useRef(false);
 
   const loadData = useCallback(async () => {
@@ -104,6 +338,7 @@ export function TabAmbiental() {
     fetchedRef.current = true;
     setLoading(true);
     setError(null);
+    setLoadingLabel("Consultando Open-Meteo");
     const results = {};
     let done = 0;
     // Fetch en paralelo en lotes de 8 para no saturar Open-Meteo
@@ -120,6 +355,26 @@ export function TabAmbiental() {
     if (Object.keys(results).length === 0) {
       setError("No se pudo conectar con Open-Meteo. Verificá la conexión.");
     } else {
+      setLoadingLabel("Calculando norma NASA POWER 1981-2025");
+      setProgress(0);
+      let climDone = 0;
+      const CLIM_BATCH = 3;
+      for (let i = 0; i < VE_ESTADOS.length; i += CLIM_BATCH) {
+        const batch = VE_ESTADOS.slice(i, i + CLIM_BATCH).filter(estado => results[estado.id]);
+        const settled = await Promise.allSettled(
+          batch.map(async estado => {
+            const clim = await fetchPowerClimatology(estado, results[estado.id].fechas);
+            return { id: estado.id, clim };
+          })
+        );
+        settled.forEach(r => {
+          if (r.status === "fulfilled" && r.value.clim) {
+            results[r.value.id] = { ...results[r.value.id], climatology: r.value.clim };
+          }
+        });
+        climDone += batch.length;
+        setProgress(Math.round((climDone / VE_ESTADOS.length) * 100));
+      }
       setData(results);
     }
     setLoading(false);
@@ -151,7 +406,7 @@ export function TabAmbiental() {
         <div style={{ flex:1 }}>
           <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Ambiental — Precipitaciones</div>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
-            Lluvia acumulada 7 días por estado · Open-Meteo · Actualización automática
+            Lluvia 7 días por estado · Open-Meteo + norma NASA POWER 1981-2025
           </div>
         </div>
         <button
@@ -166,7 +421,7 @@ export function TabAmbiental() {
       {loading && (
         <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:24, textAlign:"center" }}>
           <div style={{ fontSize:13, fontFamily:font, color:MUTED, marginBottom:10 }}>
-            Consultando Open-Meteo — {progress}% ({Math.round(progress * VE_ESTADOS.length / 100)}/{VE_ESTADOS.length} estados)
+            {loadingLabel} — {progress}% ({Math.round(progress * VE_ESTADOS.length / 100)}/{VE_ESTADOS.length} estados)
           </div>
           <div style={{ background:BG3, height:6, borderRadius:3, overflow:"hidden" }}>
             <div style={{ width:`${progress}%`, height:"100%", background:ACCENT, transition:"width 0.3s" }} />
@@ -208,55 +463,13 @@ export function TabAmbiental() {
           {/* ── MAPA + PANEL DETALLE ── */}
           <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 300px", gap:12 }}>
 
-            {/* Mapa coroplético */}
+            {/* Mapa Leaflet */}
             <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:8 }}>
               <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em",
                 textTransform:"uppercase", marginBottom:6, paddingLeft:4 }}>
                 Lluvia acumulada — últimos 7 días (mm)
               </div>
-              <svg viewBox="0 0 600 420" style={{ width:"100%", display:"block" }}>
-                {VZ_MAP.map(state => {
-                  const d = data[state.id];
-                  const mm = d?.acum7d ?? null;
-                  const isSelected = selected === state.id;
-                  return (
-                    <g key={state.id}>
-                      <path
-                        d={state.d}
-                        fill={mm !== null ? precipColor(mm) : "#e5e7eb"}
-                        stroke={isSelected ? TEXT : BORDER}
-                        strokeWidth={isSelected ? 2 : 0.5}
-                        style={{ cursor:"pointer", transition:"all 0.15s" }}
-                        opacity={selected && !isSelected ? 0.55 : 1}
-                        onClick={() => setSelected(isSelected ? null : state.id)}
-                        onMouseEnter={e => { if (!isSelected) e.currentTarget.setAttribute("stroke", TEXT); }}
-                        onMouseLeave={e => { if (!isSelected) e.currentTarget.setAttribute("stroke", BORDER); }}
-                      />
-                    </g>
-                  );
-                })}
-                {/* Etiquetas de mm sobre los estados */}
-                {VZ_MAP.map(state => {
-                  const d = data[state.id];
-                  if (!d) return null;
-                  const nums = (state.d || "").match(/[\d.]+/g);
-                  if (!nums || nums.length < 4) return null;
-                  const nf = nums.map(Number);
-                  const xs = nf.filter((_, i) => i % 2 === 0);
-                  const ys = nf.filter((_, i) => i % 2 === 1);
-                  const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
-                  const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
-                  return (
-                    <text key={`lbl-${state.id}`} x={cx} y={cy}
-                      textAnchor="middle" dominantBaseline="central"
-                      fontSize={d.acum7d > 50 ? 7 : 6}
-                      fill={d.acum7d > 60 ? "white" : "#374151"}
-                      fontFamily="monospace" pointerEvents="none">
-                      {Math.round(d.acum7d)}
-                    </text>
-                  );
-                })}
-              </svg>
+              <AmbientalLeafletMap data={data} selected={selected} onSelect={setSelected} mob={mob} />
               {/* Leyenda */}
               <div style={{ display:"flex", gap:6, justifyContent:"center", marginTop:6, flexWrap:"wrap" }}>
                 {[
@@ -275,7 +488,7 @@ export function TabAmbiental() {
               </div>
               <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}80`,
                 textAlign:"center", marginTop:4 }}>
-                Click en un estado para ver detalles y pronóstico
+                Click en un círculo para ver detalles, pronóstico y puntos sentinela NASA
               </div>
             </div>
 
@@ -290,7 +503,7 @@ export function TabAmbiental() {
                       {selected}
                     </div>
                     <div style={{ fontSize:11, fontFamily:font, color:MUTED }}>
-                      Datos en tiempo real · Open-Meteo
+                      Observado/pronóstico · Open-Meteo | Norma histórica · NASA POWER
                     </div>
                   </div>
 
@@ -303,8 +516,13 @@ export function TabAmbiental() {
                       {Math.round(selData.acum7d)} mm
                     </div>
                     <div style={{ fontSize:11, fontFamily:font, marginTop:4 }}>
-                      {(() => { const a = anomalyLabel(selData.acum7d, selected); return <span style={{ color:a.col }}>{a.txt}</span>; })()}
+                      {(() => { const a = anomalyLabel(selData.acum7d, selData.climatology?.norm7d); return <span style={{ color:a.col }}>{a.txt}</span>; })()}
                     </div>
+                    {selData.climatology?.norm7d != null && (
+                      <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}90`, marginTop:3 }}>
+                        Norma 7d: {Math.round(selData.climatology.norm7d)} mm · {selData.climatology.sentinels.join(", ")}
+                      </div>
+                    )}
                   </div>
 
                   {/* Pronóstico próximos 7d */}
@@ -413,7 +631,7 @@ export function TabAmbiental() {
 
           {/* Fuente */}
           <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}60`, textAlign:"center", paddingBottom:4 }}>
-            Fuente: Open-Meteo API (open-meteo.com) · Modelo meteorológico ERA5/GFS · Datos en UTC-4 · Sin key requerida
+            Fuentes: Open-Meteo API para lluvia reciente/pronóstico · NASA POWER PRECTOTCORR para norma histórica 1981-2025 por puntos sentinela · Sin key requerida
           </div>
         </div>
       )}
