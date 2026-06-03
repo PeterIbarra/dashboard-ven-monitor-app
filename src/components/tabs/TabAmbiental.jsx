@@ -480,11 +480,11 @@ function RainHistoryPanel({ history, loading }) {
     history.status.includes("Exceso") ? "#1d4ed8" :
     "#16a34a";
   const statusExplanation =
-    history.status === "Déficit persistente" ? `${history.persistentThreshold} o más de las últimas ${history.rangeWeeks} semanas estuvieron al menos 20% bajo la norma. Indica estrés hídrico acumulado, no solo una semana seca.` :
-    history.status === "Exceso persistente" ? `${history.persistentThreshold} o más de las últimas ${history.rangeWeeks} semanas estuvieron al menos 20% sobre la norma. Sugiere saturación progresiva de suelos y mayor sensibilidad a inundaciones o deslaves.` :
-    history.status === "Déficit reciente" ? "La semana más reciente está al menos 30% bajo la norma, pero todavía no hay persistencia suficiente para clasificarlo como patrón acumulado." :
-    history.status === "Exceso reciente" ? "La semana más reciente está al menos 30% sobre la norma, pero el exceso aún no domina la secuencia de ocho semanas." :
-    "La secuencia reciente alterna semanas secas y húmedas sin desviación sostenida. Conviene mirar el pronóstico antes de activar alerta.";
+    history.status === "Déficit persistente" ? `En ${history.persistentThreshold} o más de las últimas ${history.rangeWeeks} semanas llovió al menos un 20% menos de lo normal. Esto indica una sequía sostenida, no solo un episodio aislado. Puede afectar reservas de agua, agricultura y en el caso de Bolívar, la producción de electricidad.` :
+    history.status === "Exceso persistente" ? `En ${history.persistentThreshold} o más de las últimas ${history.rangeWeeks} semanas llovió al menos un 20% más de lo normal. El suelo puede estar saturado, lo que aumenta el riesgo de inundaciones o deslaves ante nuevas lluvias.` :
+    history.status === "Déficit reciente" ? "La última semana tuvo al menos un 30% menos de lluvia de lo normal, pero no es suficiente para hablar de sequía prolongada. Vale la pena seguir el pronóstico de los próximos días." :
+    history.status === "Exceso reciente" ? "La última semana tuvo al menos un 30% más de lluvia de lo normal. No hay un patrón sostenido aún, pero conviene vigilar zonas propensas a deslaves." :
+    "Las semanas recientes alternan entre más y menos lluvia, sin una tendencia clara. La situación está dentro del rango habitual.";
 
   return (
     <div style={{ background:BG3, padding:"14px 16px", border:`1px solid ${BORDER}` }}>
@@ -515,19 +515,19 @@ function RainHistoryPanel({ history, loading }) {
       </div>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:10, gap:8 }}>
         <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-          <span style={{ fontSize:11, fontFamily:font, color:MUTED }}><b style={{ color:"#1d4ed8" }}>■</b> Observado coloreado por anomalía</span>
-          <span style={{ fontSize:11, fontFamily:font, color:MUTED }}><b style={{ color:`${MUTED}99` }}>■</b> Norma</span>
+          <span style={{ fontSize:11, fontFamily:fontSans, color:MUTED }}><b style={{ color:"#1d4ed8" }}>■</b> Lluvia observada (color = anomalía)</span>
+          <span style={{ fontSize:11, fontFamily:fontSans, color:MUTED }}><b style={{ color:`${MUTED}99` }}>■</b> Promedio histórico</span>
         </div>
         <div style={{ fontSize:11, fontFamily:font, color:MUTED }}>
           {history.below} bajo norma · {history.above} sobre norma
         </div>
       </div>
       <div style={{ marginTop:8, paddingTop:8, borderTop:`1px solid ${BORDER}70`,
-        fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.55 }}>
+        fontSize:13, fontFamily:fontSans, color:MUTED, lineHeight:1.65 }}>
         <strong style={{ color:statusColor }}>{history.status}:</strong> {statusExplanation}
       </div>
       <div style={{ marginTop:6, fontSize:10, fontFamily:font, color:`${MUTED}90`, lineHeight:1.45 }}>
-        Cómo leer la gráfica: cada par de barras compara lluvia observada 2026 (barra izquierda) con la norma NASA POWER 1981-2025 para la misma semana calendario (barra derecha). Azul indica exceso, amarillo déficit y verde rango normal.
+        Cómo leer esta gráfica: cada par de barras muestra, para una semana, cuánta lluvia cayó (barra de color) comparado con el promedio histórico de esa misma semana entre 1981 y 2025 (barra gris). Azul = más lluvia de lo normal · Amarillo = menos lluvia de lo normal · Verde = dentro del rango esperado.
       </div>
     </div>
   );
@@ -540,8 +540,8 @@ function RainHistoryPanel({ history, loading }) {
 
 // Bounding box Venezuela para FIRMS
 const VE_BBOX = "-73.4,0.6,-59.8,12.2";
-const FIRMS_DAYS_OPTIONS = [1, 3, 7];
-const FIRMS_DEFAULT_DAYS = 3;
+const FIRMS_DAYS_OPTIONS = [1, 2, 7];
+const FIRMS_DEFAULT_DAYS = 2;
 
 // Polígonos simplificados por estado para point-in-polygon
 // (bounding boxes aproximados — suficiente para agregación estatal)
@@ -762,14 +762,15 @@ function TabIncendios({ mob }) {
     try { return localStorage.getItem("firms_api_key") || ""; } catch { return ""; }
   });
   const [keyInput, setKeyInput]     = useState("");
-  const fetchedDays = useRef(null);
 
   const loadFire = useCallback(async (days, key) => {
     setFireLoading(true);
     setFireError(null);
+    setFireData({});
+    setRawPoints([]);
     try {
       const url = `/api/gdelt?source=firms&days=${days}&bbox=${encodeURIComponent(VE_BBOX)}&key=${encodeURIComponent(key || "")}`;
-      const res = await fetch(url, { signal: AbortSignal.timeout(18000) });
+      const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
       const json = await res.json();
       if (json.needsKey) { setNeedsKey(true); setFireLoading(false); return; }
       if (json.error) throw new Error(json.error);
@@ -777,21 +778,22 @@ function TabIncendios({ mob }) {
       const points = parseFirmsCsv(csv);
       setRawPoints(points);
       setFireData(aggregateByState(points));
-      fetchedDays.current = days;
     } catch (e) {
       setFireError(e.message);
     }
     setFireLoading(false);
   }, []);
 
+  // Carga inicial
   useEffect(() => {
     if (firmsKey) loadFire(fireDays, firmsKey);
     else setNeedsKey(true);
-  }, []);
+  }, []); // eslint-disable-line
 
+  // Recargar al cambiar período — siempre, sin condición
   useEffect(() => {
-    if (firmsKey && fetchedDays.current !== fireDays) loadFire(fireDays, firmsKey);
-  }, [fireDays, firmsKey, loadFire]);
+    if (firmsKey && !needsKey) loadFire(fireDays, firmsKey);
+  }, [fireDays]); // eslint-disable-line
 
   const saveKey = () => {
     const k = keyInput.trim();
@@ -818,7 +820,7 @@ function TabIncendios({ mob }) {
         <div style={{ fontSize:14, fontWeight:600, color:TEXT, marginBottom:8 }}>
           🔑 Se requiere API key de NASA FIRMS
         </div>
-        <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.6, marginBottom:16 }}>
+        <div style={{ fontSize:13, fontFamily:fontSans, color:MUTED, lineHeight:1.65, marginBottom:16 }}>
           NASA FIRMS requiere una key gratuita para acceder a datos VIIRS en tiempo real.
           El registro es inmediato en{" "}
           <a href="https://firms.modaps.eosdis.nasa.gov/api/" target="_blank" rel="noreferrer"
@@ -859,7 +861,7 @@ function TabIncendios({ mob }) {
               style={{ fontSize:11, fontFamily:font, padding:"5px 12px", border:"none",
                 background:fireDays===d?ACCENT:"transparent", color:fireDays===d?"#fff":MUTED,
                 cursor:"pointer" }}>
-              {d === 1 ? "24h" : d === 3 ? "3 días" : "7 días"}
+              {d === 1 ? "24 horas" : d === 2 ? "48 horas" : "7 días"}
             </button>
           ))}
         </div>
@@ -916,7 +918,7 @@ function TabIncendios({ mob }) {
           <div style={{ background:"#111827", border:`1px solid ${BORDER}`, padding:8 }}>
             <div style={{ fontSize:11, fontFamily:font, color:"#9ca3af", letterSpacing:"0.1em",
               textTransform:"uppercase", marginBottom:6, paddingLeft:4 }}>
-              Focos activos VIIRS · últimos {fireDays === 1 ? "24h" : `${fireDays} días`}
+              Focos activos VIIRS · últimas {fireDays === 1 ? "24 horas" : fireDays === 2 ? "48 horas" : "7 días"}
             </div>
             <FireLeafletMap
               fireData={fireData} rawPoints={rawPoints}
@@ -952,7 +954,7 @@ function TabIncendios({ mob }) {
                     {fireSel}
                   </div>
                   <div style={{ fontSize:11, fontFamily:font, color:MUTED }}>
-                    Últimos {fireDays === 1 ? "24h" : `${fireDays} días`} · VIIRS SNPP
+                    Últimas {fireDays === 1 ? "24 horas" : fireDays === 2 ? "48 horas" : "7 días"} · Satélite VIIRS
                   </div>
                 </div>
                 <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
@@ -984,14 +986,14 @@ function TabIncendios({ mob }) {
                 {/* Alerta contextual */}
                 {selFire.count > 20 && (
                   <div style={{ background:"#fff7ed", border:"1px solid #fed7aa", padding:"8px 12px",
-                    fontSize:12, fontFamily:font, color:"#c2410c" }}>
-                    ⚠️ Alta actividad. Posible impacto en comunidades y calidad del aire.
+                    fontSize:13, fontFamily:fontSans, color:"#c2410c" }}>
+                    ⚠️ Actividad alta: más de 20 focos detectados. Puede haber humo que afecte comunidades cercanas.
                   </div>
                 )}
                 {["Bolívar","Amazonas"].includes(fireSel) && selFire.count > 5 && (
                   <div style={{ background:"#fefce8", border:"1px solid #fde047", padding:"8px 12px",
-                    fontSize:11, fontFamily:font, color:"#854d0e" }}>
-                    💡 Bolívar/Amazonas: incendios en zonas de minería ilegal y territorios indígenas. Riesgo de conflicto territorial.
+                    fontSize:12, fontFamily:fontSans, color:"#854d0e" }}>
+                    💡 Este estado está en la zona del Arco Minero. Los incendios aquí suelen asociarse a actividad de minería ilegal y pueden generar conflictos con comunidades indígenas.
                   </div>
                 )}
               </>
@@ -999,8 +1001,8 @@ function TabIncendios({ mob }) {
               <div style={{ display:"flex", flexDirection:"column", alignItems:"center",
                 justifyContent:"center", flex:1, gap:8, padding:20 }}>
                 <span style={{ fontSize:28, opacity:0.25 }}>🔥</span>
-                <div style={{ fontSize:13, color:MUTED, textAlign:"center", lineHeight:1.5 }}>
-                  Selecciona un estado para ver detalle de focos e intensidad
+                <div style={{ fontSize:13, fontFamily:fontSans, color:MUTED, textAlign:"center", lineHeight:1.6 }}>
+                  Haz clic en un círculo del mapa para ver el detalle de focos e intensidad por estado
                 </div>
                 {fireRanking.length > 0 && (
                   <div style={{ fontSize:11, fontFamily:font, color:`${MUTED}80`, textAlign:"center", marginTop:4 }}>
@@ -1050,20 +1052,20 @@ function TabIncendios({ mob }) {
           textTransform:"uppercase", marginBottom:8 }}>Relevancia para el análisis situacional</div>
         <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:8 }}>
           {[
-            { icon:"⛏️", titulo:"Minería ilegal / Arco Minero", texto:"Incendios en Bolívar y Amazonas frecuentemente asociados a desmontes para minería ilegal. Indicador de expansión del conflicto en zonas indígenas." },
-            { icon:"🌬️", titulo:"Calidad del aire / Salud", texto:"Alta densidad de focos genera humo que afecta comunidades remotas con acceso sanitario precario. Agrava vulnerabilidades en E2." },
-            { icon:"🌧️", titulo:"Nexo lluvia-incendio", texto:"Temporada seca (enero–abril) concentra el pico de incendios. Déficit hídrico sostenido actúa como amplificador. Ver tab Lluvias para correlación." },
+            { icon:"⛏️", titulo:"Minería ilegal / Arco Minero", texto:"Los incendios en Bolívar y Amazonas suelen ocurrir donde hay minería ilegal. Cuando aumentan, pueden indicar que esa actividad se está expandiendo hacia territorios indígenas." },
+            { icon:"🌬️", titulo:"Calidad del aire / Salud", texto:"Muchos focos seguidos producen humo que afecta la salud de comunidades que ya tienen poco acceso a atención médica. Empeora situaciones de vulnerabilidad que el monitor sigue en el escenario E2." },
+            { icon:"🌧️", titulo:"Nexo lluvia-incendio", texto:"La mayoría de incendios ocurren entre enero y abril, cuando hay menos lluvia. Si el tab de Lluvias muestra déficit en los mismos estados, el riesgo de incendio es mayor." },
           ].map((item, i) => (
             <div key={i} style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
               <div style={{ fontSize:13, marginBottom:4 }}>{item.icon} <span style={{ fontWeight:600, color:TEXT, fontSize:12 }}>{item.titulo}</span></div>
-              <div style={{ fontSize:11, fontFamily:fontSans, color:MUTED, lineHeight:1.5 }}>{item.texto}</div>
+              <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.6 }}>{item.texto}</div>
             </div>
           ))}
         </div>
       </div>
 
       <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}60`, textAlign:"center", paddingBottom:4 }}>
-        Fuente: NASA FIRMS VIIRS SNPP (Near Real-Time) · Sensor VIIRS 375m · Latencia ~3h · Key gratuita requerida
+        Fuente de datos: NASA FIRMS (sistema de alerta de incendios) · Satélite VIIRS 375m · Actualización cada ~3 horas · Requiere clave gratuita de NASA
       </div>
     </div>
   );
@@ -1300,7 +1302,7 @@ export function TabAmbiental() {
                   {/* KPI acumulado */}
                   <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
                     <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em",
-                      textTransform:"uppercase" }}>Lluvia acumulada 7d</div>
+                      textTransform:"uppercase" }}>Lluvia acumulada — últimos 7 días</div>
                     <div style={{ fontSize:26, fontWeight:800, color:precipColor(selData.acum7d) === "#fde68a" ? "#ca8a04" : "#1d4ed8",
                       fontFamily:"'Syne',sans-serif", lineHeight:1.2 }}>
                       {Math.round(selData.acum7d)} mm
@@ -1310,7 +1312,7 @@ export function TabAmbiental() {
                     </div>
                     {selData.climatology?.norm7d != null && (
                       <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}90`, marginTop:3 }}>
-                        Norma 7d: {Math.round(selData.climatology.norm7d)} mm · {selData.climatology.sentinels.join(", ")}
+                        Promedio histórico (NASA, 1981-2025): {Math.round(selData.climatology.norm7d)} mm · Puntos de medición: {selData.climatology.sentinels.join(", ")}
                       </div>
                     )}
                   </div>
@@ -1318,7 +1320,7 @@ export function TabAmbiental() {
                   {/* Pronóstico próximos 7d */}
                   <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
                     <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em",
-                      textTransform:"uppercase", marginBottom:6 }}>Pronóstico próximos 7 días</div>
+                      textTransform:"uppercase", marginBottom:6 }}>Lluvia esperada — próximos 7 días</div>
                     <div style={{ fontSize:22, fontWeight:700, color:ACCENT, fontFamily:"'Syne',sans-serif" }}>
                       {Math.round(selData.acumFcst7d)} mm
                     </div>
@@ -1366,7 +1368,7 @@ export function TabAmbiental() {
                   justifyContent:"center", flex:1, gap:8, padding:24 }}>
                   <span style={{ fontSize:28, opacity:0.25 }}>🗺️</span>
                   <div style={{ fontSize:13, color:MUTED, textAlign:"center", lineHeight:1.5 }}>
-                    Selecciona un estado en el mapa para ver precipitación, anomalía y pronóstico
+                    Haz clic en un estado del mapa para ver cuánta lluvia cayó, si está por encima o por debajo de lo normal, y el pronóstico para los próximos 7 días
                   </div>
                   {ranking.length > 0 && (
                     <div style={{ fontSize:11, fontFamily:font, color:`${MUTED}80`, textAlign:"center", marginTop:4 }}>
@@ -1405,31 +1407,33 @@ export function TabAmbiental() {
             <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px 16px" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", gap:12, marginBottom:8, flexWrap:"wrap" }}>
                 <div>
-                  <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-                    Historial pluviométrico · {selected}
+                  <div style={{ fontSize:13, fontWeight:600, color:TEXT }}>
+                    📅 Historial de lluvias — {selected}
                   </div>
-                  <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, marginTop:2 }}>
-                    Observado 2026 frente a norma NASA POWER 1981-2025 para la misma ventana semanal.
+                  <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, marginTop:3, lineHeight:1.5 }}>
+                    Compara cuánta lluvia cayó cada semana reciente con el promedio de esa misma semana en los últimos 44 años (1981–2025).
+                    Así podés ver si hay una sequía o un exceso de lluvia que se repite, no solo una semana aislada.
                   </div>
                 </div>
                 <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap", justifyContent:mob?"flex-start":"flex-end" }}>
                   {selHistory?.sentinels?.length > 0 && (
-                    <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}90`, textAlign:mob?"left":"right" }}>
-                      Puntos: {selHistory.sentinels.join(", ")}
+                    <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}80`, textAlign:mob?"left":"right" }}>
+                      Estaciones: {selHistory.sentinels.join(", ")}
                     </div>
                   )}
-                  <label style={{ display:"flex", alignItems:"center", gap:6, fontSize:10, fontFamily:font, color:MUTED }}>
-                    Período
+                  <label style={{ display:"flex", alignItems:"center", gap:6, fontSize:11, fontFamily:fontSans, color:MUTED }}>
+                    Ver las últimas
                     <select
                       value={historyWeeks}
                       onChange={e => setHistoryWeeks(Number(e.target.value))}
-                      style={{ fontFamily:font, fontSize:11, background:BG3, border:`1px solid ${BORDER}`,
+                      style={{ fontFamily:fontSans, fontSize:12, background:BG3, border:`1px solid ${BORDER}`,
                         color:ACCENT, padding:"4px 8px", outline:"none", cursor:"pointer" }}
                     >
                       {HISTORY_RANGE_OPTIONS.map(opt => (
                         <option key={opt} value={opt}>{opt} semanas</option>
                       ))}
                     </select>
+                    semanas
                   </label>
                 </div>
               </div>
@@ -1449,7 +1453,7 @@ export function TabAmbiental() {
               ].map((item, i) => (
                 <div key={i} style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
                   <div style={{ fontSize:13, marginBottom:4 }}>{item.icon} <span style={{ fontWeight:600, color:TEXT, fontSize:12 }}>{item.titulo}</span></div>
-                  <div style={{ fontSize:11, fontFamily:fontSans, color:MUTED, lineHeight:1.5 }}>{item.texto}</div>
+                  <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.6 }}>{item.texto}</div>
                 </div>
               ))}
             </div>
