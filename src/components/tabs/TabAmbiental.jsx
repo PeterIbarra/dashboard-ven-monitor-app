@@ -80,7 +80,9 @@ const NASA_SENTINELS = {
 const POWER_START_YEAR = 1981;
 const POWER_END_YEAR = 2025;
 const POWER_CACHE_VERSION = "power-prectotcorr-1981-2025-v1";
-const HISTORY_WEEKS = 8;
+const DEFAULT_SELECTED_STATE = "Bolívar";
+const HISTORY_RANGE_OPTIONS = [8, 12, 16];
+const DEFAULT_HISTORY_WEEKS = 8;
 
 // ── Escala de colores para precipitación ──
 function precipColor(mm) {
@@ -128,11 +130,11 @@ function toIsoDate(date) {
   return date.toISOString().slice(0, 10);
 }
 
-function buildHistoryWindows(anchorDate = new Date()) {
+function buildHistoryWindows(weeks = DEFAULT_HISTORY_WEEKS, anchorDate = new Date()) {
   const windows = [];
   const anchor = new Date(anchorDate);
   anchor.setHours(12, 0, 0, 0);
-  for (let i = HISTORY_WEEKS - 1; i >= 0; i -= 1) {
+  for (let i = weeks - 1; i >= 0; i -= 1) {
     const end = new Date(anchor);
     end.setDate(anchor.getDate() - i * 7);
     const start = new Date(end);
@@ -237,10 +239,10 @@ async function fetchPowerClimatology(estado, fechas) {
   return result;
 }
 
-async function fetchPowerHistory(estado) {
-  const windows = buildHistoryWindows();
+async function fetchPowerHistory(estado, rangeWeeks = DEFAULT_HISTORY_WEEKS) {
+  const windows = buildHistoryWindows(rangeWeeks);
   const sentinels = sentinelsForState(estado);
-  const cacheKey = `${POWER_CACHE_VERSION}:history:${estado.id}:${windows.map(w => toIsoDate(w.end)).join("-")}`;
+  const cacheKey = `${POWER_CACHE_VERSION}:history:${estado.id}:${rangeWeeks}:${windows.map(w => toIsoDate(w.end)).join("-")}`;
   const cached = cacheGet(cacheKey);
   if (cached?.weeks?.length) return cached;
 
@@ -284,14 +286,17 @@ async function fetchPowerHistory(estado) {
   const below = weeks.filter(w => w.anomalyPct != null && w.anomalyPct < -20).length;
   const above = weeks.filter(w => w.anomalyPct != null && w.anomalyPct > 20).length;
   const latest = weeks[weeks.length - 1];
+  const persistentThreshold = Math.ceil(weeks.length * 0.6);
   const status =
-    below >= 5 ? "Déficit persistente" :
-    above >= 5 ? "Exceso persistente" :
+    below >= persistentThreshold ? "Déficit persistente" :
+    above >= persistentThreshold ? "Exceso persistente" :
     latest?.anomalyPct < -30 ? "Déficit reciente" :
     latest?.anomalyPct > 30 ? "Exceso reciente" :
     "Variabilidad dentro de rango";
   const result = {
     weeks,
+    rangeWeeks: weeks.length,
+    persistentThreshold,
     status,
     below,
     above,
@@ -442,8 +447,8 @@ function RainHistoryPanel({ history, loading }) {
         <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
           Historial NASA POWER
         </div>
-        <div style={{ fontSize:11, fontFamily:font, color:MUTED, marginTop:6 }}>
-          Calculando 8 semanas observado vs norma...
+        <div style={{ fontSize:12, fontFamily:font, color:MUTED, marginTop:6 }}>
+          Calculando observado vs norma histórica...
         </div>
       </div>
     );
@@ -467,50 +472,50 @@ function RainHistoryPanel({ history, loading }) {
     history.status.includes("Exceso") ? "#1d4ed8" :
     "#16a34a";
   const statusExplanation =
-    history.status === "Déficit persistente" ? "Cinco o más de las últimas ocho semanas estuvieron al menos 20% bajo la norma. Indica estrés hídrico acumulado, no solo una semana seca." :
-    history.status === "Exceso persistente" ? "Cinco o más de las últimas ocho semanas estuvieron al menos 20% sobre la norma. Sugiere saturación progresiva de suelos y mayor sensibilidad a inundaciones o deslaves." :
+    history.status === "Déficit persistente" ? `${history.persistentThreshold} o más de las últimas ${history.rangeWeeks} semanas estuvieron al menos 20% bajo la norma. Indica estrés hídrico acumulado, no solo una semana seca.` :
+    history.status === "Exceso persistente" ? `${history.persistentThreshold} o más de las últimas ${history.rangeWeeks} semanas estuvieron al menos 20% sobre la norma. Sugiere saturación progresiva de suelos y mayor sensibilidad a inundaciones o deslaves.` :
     history.status === "Déficit reciente" ? "La semana más reciente está al menos 30% bajo la norma, pero todavía no hay persistencia suficiente para clasificarlo como patrón acumulado." :
     history.status === "Exceso reciente" ? "La semana más reciente está al menos 30% sobre la norma, pero el exceso aún no domina la secuencia de ocho semanas." :
     "La secuencia reciente alterna semanas secas y húmedas sin desviación sostenida. Conviene mirar el pronóstico antes de activar alerta.";
 
   return (
-    <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
+    <div style={{ background:BG3, padding:"14px 16px", border:`1px solid ${BORDER}` }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", gap:8 }}>
-        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-          Historial 8 semanas
+        <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
+          Historial {history.rangeWeeks} semanas
         </div>
-        <div style={{ fontSize:10, fontFamily:font, color:statusColor, fontWeight:700 }}>
+        <div style={{ fontSize:12, fontFamily:font, color:statusColor, fontWeight:700 }}>
           {history.status}
         </div>
       </div>
-      <div style={{ display:"flex", gap:4, alignItems:"flex-end", height:70, marginTop:10 }}>
+      <div style={{ display:"flex", gap:6, alignItems:"flex-end", height:160, marginTop:14 }}>
         {history.weeks.map((w, i) => {
-          const obsH = Math.max(2, Math.round(((w.observed || 0) / maxVal) * 58));
-          const normH = Math.max(2, Math.round(((w.norm || 0) / maxVal) * 58));
+          const obsH = Math.max(3, Math.round(((w.observed || 0) / maxVal) * 132));
+          const normH = Math.max(3, Math.round(((w.norm || 0) / maxVal) * 132));
           const anomalyColor = w.anomalyPct < -20 ? "#ca8a04" : w.anomalyPct > 20 ? "#1d4ed8" : "#16a34a";
           return (
             <div key={`${w.start}-${i}`} title={`${w.start} a ${w.end}: obs ${Math.round(w.observed || 0)}mm / norma ${Math.round(w.norm || 0)}mm`}
               style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
-              <div style={{ height:60, width:"100%", display:"flex", alignItems:"flex-end", justifyContent:"center", gap:1 }}>
-                <div style={{ width:6, height:obsH, background:anomalyColor, borderRadius:"2px 2px 0 0" }} />
-                <div style={{ width:4, height:normH, background:`${MUTED}55`, borderRadius:"2px 2px 0 0" }} />
+              <div style={{ height:136, width:"100%", display:"flex", alignItems:"flex-end", justifyContent:"center", gap:2 }}>
+                <div style={{ width:history.rangeWeeks > 12 ? 8 : 12, height:obsH, background:anomalyColor, borderRadius:"3px 3px 0 0" }} />
+                <div style={{ width:history.rangeWeeks > 12 ? 5 : 7, height:normH, background:`${MUTED}55`, borderRadius:"3px 3px 0 0" }} />
               </div>
-              <div style={{ fontSize:7, fontFamily:font, color:MUTED }}>{w.label}</div>
+              <div style={{ fontSize:history.rangeWeeks > 12 ? 8 : 9, fontFamily:font, color:MUTED }}>{w.label}</div>
             </div>
           );
         })}
       </div>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:6, gap:8 }}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:10, gap:8 }}>
         <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-          <span style={{ fontSize:9, fontFamily:font, color:MUTED }}><b style={{ color:"#1d4ed8" }}>■</b> Observado</span>
-          <span style={{ fontSize:9, fontFamily:font, color:MUTED }}><b style={{ color:`${MUTED}99` }}>■</b> Norma</span>
+          <span style={{ fontSize:11, fontFamily:font, color:MUTED }}><b style={{ color:"#1d4ed8" }}>■</b> Observado coloreado por anomalía</span>
+          <span style={{ fontSize:11, fontFamily:font, color:MUTED }}><b style={{ color:`${MUTED}99` }}>■</b> Norma</span>
         </div>
-        <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>
+        <div style={{ fontSize:11, fontFamily:font, color:MUTED }}>
           {history.below} bajo norma · {history.above} sobre norma
         </div>
       </div>
       <div style={{ marginTop:8, paddingTop:8, borderTop:`1px solid ${BORDER}70`,
-        fontSize:11, fontFamily:fontSans, color:MUTED, lineHeight:1.5 }}>
+        fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.55 }}>
         <strong style={{ color:statusColor }}>{history.status}:</strong> {statusExplanation}
       </div>
       <div style={{ marginTop:6, fontSize:10, fontFamily:font, color:`${MUTED}90`, lineHeight:1.45 }}>
@@ -525,7 +530,8 @@ export function TabAmbiental() {
   const [data, setData]       = useState({});   // { estadoId: { acum7d, acumFcst7d, hist, fcst, fechas } }
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(DEFAULT_SELECTED_STATE);
+  const [historyWeeks, setHistoryWeeks] = useState(DEFAULT_HISTORY_WEEKS);
   const [history, setHistory] = useState({});
   const [historyLoading, setHistoryLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -582,26 +588,27 @@ export function TabAmbiental() {
   useEffect(() => { loadData(); }, [loadData]);
 
   useEffect(() => {
-    if (!selected || history[selected]) return;
+    const historyKey = `${selected}:${historyWeeks}`;
+    if (!selected || history[historyKey]) return;
     const estado = VE_ESTADOS.find(e => e.id === selected);
     if (!estado) return;
     let cancelled = false;
     setHistoryLoading(true);
-    fetchPowerHistory(estado)
+    fetchPowerHistory(estado, historyWeeks)
       .then(result => {
-        if (!cancelled) setHistory(prev => ({ ...prev, [selected]: result }));
+        if (!cancelled) setHistory(prev => ({ ...prev, [historyKey]: result }));
       })
       .catch(() => {
-        if (!cancelled) setHistory(prev => ({ ...prev, [selected]: { error: true, weeks: [] } }));
+        if (!cancelled) setHistory(prev => ({ ...prev, [historyKey]: { error: true, weeks: [] } }));
       })
       .finally(() => {
         if (!cancelled) setHistoryLoading(false);
       });
     return () => { cancelled = true; };
-  }, [selected, history]);
+  }, [selected, historyWeeks, history]);
 
   const selData = selected ? data[selected] : null;
-  const selHistory = selected ? history[selected] : null;
+  const selHistory = selected ? history[`${selected}:${historyWeeks}`] : null;
 
   // ── Alertas automáticas ──
   const alertas = Object.entries(data).filter(([id, d]) =>
@@ -841,11 +848,26 @@ export function TabAmbiental() {
                     Observado 2026 frente a norma NASA POWER 1981-2025 para la misma ventana semanal.
                   </div>
                 </div>
-                {selHistory?.sentinels?.length > 0 && (
-                  <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}90`, textAlign:"right" }}>
-                    Puntos: {selHistory.sentinels.join(", ")}
-                  </div>
-                )}
+                <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap", justifyContent:mob?"flex-start":"flex-end" }}>
+                  {selHistory?.sentinels?.length > 0 && (
+                    <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}90`, textAlign:mob?"left":"right" }}>
+                      Puntos: {selHistory.sentinels.join(", ")}
+                    </div>
+                  )}
+                  <label style={{ display:"flex", alignItems:"center", gap:6, fontSize:10, fontFamily:font, color:MUTED }}>
+                    Período
+                    <select
+                      value={historyWeeks}
+                      onChange={e => setHistoryWeeks(Number(e.target.value))}
+                      style={{ fontFamily:font, fontSize:11, background:BG3, border:`1px solid ${BORDER}`,
+                        color:ACCENT, padding:"4px 8px", outline:"none", cursor:"pointer" }}
+                    >
+                      {HISTORY_RANGE_OPTIONS.map(opt => (
+                        <option key={opt} value={opt}>{opt} semanas</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
               </div>
               <RainHistoryPanel history={selHistory} loading={historyLoading && !selHistory} />
             </div>
