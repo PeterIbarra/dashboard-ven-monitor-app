@@ -1,8 +1,38 @@
 const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 const FIRMS_BASE = "https://firms.modaps.eosdis.nasa.gov/api/area/csv";
+const OM_FORECAST_BASE = "https://api.open-meteo.com/v1/forecast";
+const OM_ARCHIVE_BASE  = "https://archive-api.open-meteo.com/v1/archive";
 
 module.exports = async function handler(req, res) {
-  const { signal, source, days, bbox, key } = req.query;
+  const { signal, source, days, bbox, key, lat, lon, past_days, forecast_days, start_date, end_date } = req.query;
+
+  // ── Open-Meteo forecast proxy (?source=omforecast) ──
+  if (source === "omforecast") {
+    const url = `${OM_FORECAST_BASE}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&timezone=America%2FCaracas&past_days=${past_days || 7}&forecast_days=${forecast_days || 7}`;
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      if (!r.ok) return res.status(200).json({ error: `Open-Meteo HTTP ${r.status}` });
+      const data = await r.json();
+      res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=1800");
+      return res.status(200).json(data);
+    } catch (e) {
+      return res.status(200).json({ error: e.message });
+    }
+  }
+
+  // ── Open-Meteo archive proxy (?source=omarchive) ──
+  if (source === "omarchive") {
+    const url = `${OM_ARCHIVE_BASE}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&timezone=America%2FCaracas&start_date=${start_date}&end_date=${end_date}`;
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      if (!r.ok) return res.status(200).json({ error: `Open-Meteo archive HTTP ${r.status}` });
+      const data = await r.json();
+      res.setHeader("Cache-Control", "public, s-maxage=86400, stale-while-revalidate=3600");
+      return res.status(200).json(data);
+    } catch (e) {
+      return res.status(200).json({ error: e.message });
+    }
+  }
 
   // ── FIRMS proxy ──
   if (source === "firms") {
