@@ -316,7 +316,7 @@ async function fetchPowerHistory(estado, rangeWeeks = DEFAULT_HISTORY_WEEKS) {
 }
 
 // ── Fetch Open-Meteo para un estado ──
-async function fetchPrecip(estado) {
+async function fetchPrecip(estado, attempt = 0) {
   const url =
     `https://api.open-meteo.com/v1/forecast` +
     `?latitude=${estado.lat}&longitude=${estado.lon}` +
@@ -324,17 +324,25 @@ async function fetchPrecip(estado) {
     `&timezone=America%2FCaracas` +
     `&past_days=${PAST_DAYS}` +
     `&forecast_days=7`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const json = await res.json();
-  const days = json?.daily?.precipitation_sum ?? [];
-  // Los primeros PAST_DAYS son histórico, los siguientes son pronóstico
-  const hist = days.slice(0, PAST_DAYS);
-  const fcst = days.slice(PAST_DAYS);
-  const acum7d = hist.reduce((s, v) => s + (v ?? 0), 0);
-  const acumFcst7d = fcst.reduce((s, v) => s + (v ?? 0), 0);
-  const fechas = json?.daily?.time ?? [];
-  return { id: estado.id, acum7d, acumFcst7d, hist, fcst, fechas };
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(18000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const days = json?.daily?.precipitation_sum ?? [];
+    const hist = days.slice(0, PAST_DAYS);
+    const fcst = days.slice(PAST_DAYS);
+    const acum7d = hist.reduce((s, v) => s + (v ?? 0), 0);
+    const acumFcst7d = fcst.reduce((s, v) => s + (v ?? 0), 0);
+    const fechas = json?.daily?.time ?? [];
+    return { id: estado.id, acum7d, acumFcst7d, hist, fcst, fechas };
+  } catch(e) {
+    // Un solo retry con pausa de 1.5s
+    if (attempt === 0) {
+      await new Promise(r => setTimeout(r, 1500));
+      return fetchPrecip(estado, 1);
+    }
+    throw e;
+  }
 }
 
 function AmbientalLeafletMap({ data, selected, onSelect, mob }) {
@@ -1539,22 +1547,36 @@ export function TabAmbiental() {
     setError(null);
     setLoadingLabel("Consultando Open-Meteo");
     const results = {};
+    const errors  = [];
     let done = 0;
-    // Fetch en paralelo en lotes de 8 para no saturar Open-Meteo
-    const BATCH = 8;
+    // Lotes de 4 (más conservador) con pausa de 300ms entre lotes
+    const BATCH = 4;
     for (let i = 0; i < VE_ESTADOS.length; i += BATCH) {
       const batch = VE_ESTADOS.slice(i, i + BATCH);
-      const settled = await Promise.allSettled(batch.map(fetchPrecip));
+      const settled = await Promise.allSettled(batch.map(e => fetchPrecip(e)));
       settled.forEach((r, j) => {
-        if (r.status === "fulfilled") results[batch[j].id] = r.value;
+        if (r.status === "fulfilled") {
+          results[batch[j].id] = r.value;
+        } else {
+          errors.push(`${batch[j].id}: ${r.reason?.message ?? "error"}`);
+        }
       });
       done += batch.length;
       setProgress(Math.round((done / VE_ESTADOS.length) * 100));
+      if (i + BATCH < VE_ESTADOS.length) {
+        await new Promise(r => setTimeout(r, 300));
+      }
     }
     if (Object.keys(results).length === 0) {
-      setError("No se pudo conectar con Open-Meteo. Verificá la conexión.");
+      setError(
+        `No se pudo conectar con Open-Meteo. ` +
+        (errors.length ? `Error: ${errors[0]}` : "Verificá la conexión e intentá de nuevo.")
+      );
     } else {
       setData(results);
+      if (errors.length > 0) {
+        console.warn("Open-Meteo: algunos estados fallaron:", errors);
+      }
     }
     setLoading(false);
   }, []);
@@ -1669,9 +1691,16 @@ export function TabAmbiental() {
 
       {/* ── ERROR ── */}
       {error && !loading && (
-        <div style={{ background:"#fef2f2", border:"1px solid #fecaca", padding:16, color:"#dc2626",
-          fontSize:13, fontFamily:font }}>
-          ⚠️ {error}
+        <div style={{ background:"#fef2f2", border:"1px solid #fecaca", padding:16,
+          fontSize:13, fontFamily:fontSans, color:"#dc2626" }}>
+          <div style={{ marginBottom:10 }}>⚠️ {error}</div>
+          <button
+            onClick={() => { fetchedRef.current = false; setData({}); setHistory({}); setProgress(0); setLoadingLabel("Consultando Open-Meteo"); loadData(); }}
+            style={{ fontSize:12, fontFamily:font, padding:"5px 14px",
+              border:"1px solid #fca5a5", background:"#fff", color:"#dc2626",
+              cursor:"pointer" }}>
+            ↻ Reintentar
+          </button>
         </div>
       )}
 
