@@ -500,25 +500,25 @@ function calcMonthlyNormsFromSeries(series) {
 
 // ── RainHistoryPanel — versión interactiva con tabs OM/NASA ──
 function RainHistoryPanel({ estado, history, historyLoading, data }) {
-  const [activeTab, setActiveTab] = React.useState("om");
-  const [omDays, setOmDays]       = React.useState(30);
-  const [omData, setOmData]       = React.useState(null);
-  const [omLoading, setOmLoading] = React.useState(false);
-  const [omError, setOmError]     = React.useState(null);
-  const [nasaFrom, setNasaFrom]   = React.useState(() => `${new Date().getFullYear() - 1}-01-01`);
-  const [nasaTo, setNasaTo]       = React.useState(() => `${new Date().getFullYear() - 1}-12-31`);
-  const [nasaResult, setNasaResult] = React.useState(null);
-  const [nasaLoading, setNasaLoading] = React.useState(false);
-  const [nasaError, setNasaError]   = React.useState(null);
-  const omCanvasRef   = React.useRef(null);
-  const nasaCanvasRef = React.useRef(null);
-  const [omPin, setOmPin]   = React.useState(null);
-  const [nasaPin, setNasaPin] = React.useState(null);
-  const [omHov, setOmHov]   = React.useState(null);
-  const [nasaHov, setNasaHov] = React.useState(null);
+  const [activeTab, setActiveTab] = useState("om");
+  const [omDays, setOmDays]       = useState(30);
+  const [omData, setOmData]       = useState(null);
+  const [omLoading, setOmLoading] = useState(false);
+  const [omError, setOmError]     = useState(null);
+  const [nasaFrom, setNasaFrom]   = useState(() => `${new Date().getFullYear() - 1}-01-01`);
+  const [nasaTo, setNasaTo]       = useState(() => `${new Date().getFullYear() - 1}-12-31`);
+  const [nasaResult, setNasaResult] = useState(null);
+  const [nasaLoading, setNasaLoading] = useState(false);
+  const [nasaError, setNasaError]   = useState(null);
+  const omCanvasRef   = useRef(null);
+  const nasaCanvasRef = useRef(null);
+  const [omPin, setOmPin]   = useState(null);
+  const [nasaPin, setNasaPin] = useState(null);
+  const [omHov, setOmHov]   = useState(null);
+  const [nasaHov, setNasaHov] = useState(null);
 
   // ── Carga OM cuando cambia estado u omDays ──
-  React.useEffect(() => {
+  useEffect(() => {
     if (!estado) return;
     let cancelled = false;
     setOmLoading(true); setOmError(null); setOmData(null); setOmPin(null);
@@ -530,7 +530,7 @@ function RainHistoryPanel({ estado, history, historyLoading, data }) {
   }, [estado?.id, omDays]);
 
   // ── Carga NASA POWER rango fechas ──
-  const loadNasa = React.useCallback(async () => {
+  const loadNasa = useCallback(async () => {
     if (!estado) return;
     setNasaLoading(true); setNasaError(null); setNasaResult(null); setNasaPin(null);
     try {
@@ -571,14 +571,14 @@ function RainHistoryPanel({ estado, history, historyLoading, data }) {
   }, [estado?.id, nasaFrom, nasaTo]);
 
   // ── Render Canvas OM ──
-  React.useEffect(() => {
+  useEffect(() => {
     if (!omCanvasRef.current || !omData?.length) return;
     const canvas = omCanvasRef.current;
     drawOMChart(canvas, omData, omPin, omHov);
   }, [omData, omPin, omHov]);
 
   // ── Render Canvas NASA ──
-  React.useEffect(() => {
+  useEffect(() => {
     if (!nasaCanvasRef.current || !nasaResult?.length) return;
     drawNasaChart(nasaCanvasRef.current, nasaResult, nasaPin, nasaHov);
   }, [nasaResult, nasaPin, nasaHov]);
