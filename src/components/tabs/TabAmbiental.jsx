@@ -325,16 +325,14 @@ async function fetchPowerHistory(estado, rangeWeeks = DEFAULT_HISTORY_WEEKS) {
 // ── Fetch Open-Meteo para un estado ──
 async function fetchPrecip(estado, attempt = 0) {
   const url =
-    `https://api.open-meteo.com/v1/forecast` +
-    `?latitude=${estado.lat}&longitude=${estado.lon}` +
-    `&daily=precipitation_sum` +
-    `&timezone=America%2FCaracas` +
-    `&past_days=${PAST_DAYS}` +
-    `&forecast_days=7`;
+    `/api/gdelt?source=omforecast` +
+    `&lat=${estado.lat}&lon=${estado.lon}` +
+    `&past_days=${PAST_DAYS}&forecast_days=7`;
   try {
     const res = await fetchTimeout(url, 18000);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
+    if (json.error) throw new Error(json.error);
     const days = json?.daily?.precipitation_sum ?? [];
     const hist = days.slice(0, PAST_DAYS);
     const fcst = days.slice(PAST_DAYS);
@@ -343,7 +341,6 @@ async function fetchPrecip(estado, attempt = 0) {
     const fechas = json?.daily?.time ?? [];
     return { id: estado.id, acum7d, acumFcst7d, hist, fcst, fechas };
   } catch(e) {
-    // Un solo retry con pausa de 1.5s
     if (attempt === 0) {
       await new Promise(r => setTimeout(r, 1500));
       return fetchPrecip(estado, 1);
@@ -468,16 +465,16 @@ async function fetchOMHistory(estado, pastDays) {
   const cacheKey = `om_hist:${estado.id}:${pastDays}:${new Date().toISOString().slice(0,10)}`;
   const cached = cacheGet(cacheKey);
   if (cached) return cached;
+  const startDate = toIsoDate(new Date(Date.now() - pastDays * 86400000));
+  const endDate   = toIsoDate(new Date(Date.now() - 86400000));
   const url =
-    `https://archive-api.open-meteo.com/v1/archive` +
-    `?latitude=${estado.lat}&longitude=${estado.lon}` +
-    `&daily=precipitation_sum` +
-    `&timezone=America%2FCaracas` +
-    `&start_date=${toIsoDate(new Date(Date.now() - pastDays * 86400000))}` +
-    `&end_date=${toIsoDate(new Date(Date.now() - 86400000))}`;
-  const res = await fetchTimeout(url, 12000);
+    `/api/gdelt?source=omarchive` +
+    `&lat=${estado.lat}&lon=${estado.lon}` +
+    `&start_date=${startDate}&end_date=${endDate}`;
+  const res = await fetchTimeout(url, 15000);
   if (!res.ok) throw new Error(`Open-Meteo archive HTTP ${res.status}`);
   const json = await res.json();
+  if (json.error) throw new Error(json.error);
   const dates = json?.daily?.time ?? [];
   const vals  = json?.daily?.precipitation_sum ?? [];
   const result = dates.map((d, i) => ({ date: d, mm: vals[i] ?? 0 }));
