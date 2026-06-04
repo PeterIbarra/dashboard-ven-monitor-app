@@ -448,89 +448,535 @@ function AmbientalLeafletMap({ data, selected, onSelect, mob }) {
   );
 }
 
-function RainHistoryPanel({ history, loading }) {
-  if (loading) {
-    return (
-      <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
-        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-          Historial NASA POWER
-        </div>
-        <div style={{ fontSize:12, fontFamily:font, color:MUTED, marginTop:6 }}>
-          Calculando observado vs norma histórica...
-        </div>
-      </div>
-    );
+// ── Fetch Open-Meteo archive para historial reciente (past_days hasta 92) ──
+async function fetchOMHistory(estado, pastDays) {
+  const cacheKey = `om_hist:${estado.id}:${pastDays}:${new Date().toISOString().slice(0,10)}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
+  const url =
+    `https://archive-api.open-meteo.com/v1/archive` +
+    `?latitude=${estado.lat}&longitude=${estado.lon}` +
+    `&daily=precipitation_sum` +
+    `&timezone=America%2FCaracas` +
+    `&start_date=${toIsoDate(new Date(Date.now() - pastDays * 86400000))}` +
+    `&end_date=${toIsoDate(new Date(Date.now() - 86400000))}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
+  if (!res.ok) throw new Error(`Open-Meteo archive HTTP ${res.status}`);
+  const json = await res.json();
+  const dates = json?.daily?.time ?? [];
+  const vals  = json?.daily?.precipitation_sum ?? [];
+  const result = dates.map((d, i) => ({ date: d, mm: vals[i] ?? 0 }));
+  cacheSet(cacheKey, result);
+  return result;
+}
+
+// ── Calcula norma mensual de la serie NASA POWER ya descargada ──
+function calcMonthlyNormsFromSeries(series) {
+  const monthly = {};
+  for (const [key, val] of Object.entries(series)) {
+    if (!key || val == null || val < 0) continue;
+    const m = key.slice(4, 6); // YYYYMMDD → MM
+    if (!monthly[m]) monthly[m] = [];
+    monthly[m].push(val);
   }
-  if (!history?.weeks?.length) {
+  const norms = {};
+  for (const [m, vals] of Object.entries(monthly)) {
+    norms[m] = vals.reduce((a, v) => a + v, 0) / vals.length;
+  }
+  return norms; // { "01": avg_daily_mm, ... }
+}
+
+// ── RainHistoryPanel — versión interactiva con tabs OM/NASA ──
+function RainHistoryPanel({ estado, history, historyLoading, data }) {
+  const [activeTab, setActiveTab] = React.useState("om");
+  const [omDays, setOmDays]       = React.useState(30);
+  const [omData, setOmData]       = React.useState(null);
+  const [omLoading, setOmLoading] = React.useState(false);
+  const [omError, setOmError]     = React.useState(null);
+  const [nasaFrom, setNasaFrom]   = React.useState(() => `${new Date().getFullYear() - 1}-01-01`);
+  const [nasaTo, setNasaTo]       = React.useState(() => `${new Date().getFullYear() - 1}-12-31`);
+  const [nasaResult, setNasaResult] = React.useState(null);
+  const [nasaLoading, setNasaLoading] = React.useState(false);
+  const [nasaError, setNasaError]   = React.useState(null);
+  const omCanvasRef   = React.useRef(null);
+  const nasaCanvasRef = React.useRef(null);
+  const [omPin, setOmPin]   = React.useState(null);
+  const [nasaPin, setNasaPin] = React.useState(null);
+  const [omHov, setOmHov]   = React.useState(null);
+  const [nasaHov, setNasaHov] = React.useState(null);
+
+  // ── Carga OM cuando cambia estado u omDays ──
+  React.useEffect(() => {
+    if (!estado) return;
+    let cancelled = false;
+    setOmLoading(true); setOmError(null); setOmData(null); setOmPin(null);
+    fetchOMHistory(estado, omDays)
+      .then(d => { if (!cancelled) setOmData(d); })
+      .catch(e => { if (!cancelled) setOmError(e.message); })
+      .finally(() => { if (!cancelled) setOmLoading(false); });
+    return () => { cancelled = true; };
+  }, [estado?.id, omDays]);
+
+  // ── Carga NASA POWER rango fechas ──
+  const loadNasa = React.useCallback(async () => {
+    if (!estado) return;
+    setNasaLoading(true); setNasaError(null); setNasaResult(null); setNasaPin(null);
+    try {
+      const sentinels = sentinelsForState(estado);
+      const seriesArr = await Promise.all(sentinels.map(fetchPowerSentinelSeries));
+      // Agrupar por mes en el rango seleccionado
+      const from = new Date(nasaFrom + "T12:00:00");
+      const to   = new Date(nasaTo   + "T12:00:00");
+      const monthlyNorms = seriesArr.map(calcMonthlyNormsFromSeries);
+      const months = [];
+      let cur = new Date(from.getFullYear(), from.getMonth(), 1);
+      while (cur <= to) {
+        const yyyy = cur.getFullYear();
+        const mm   = String(cur.getMonth() + 1).padStart(2, "0");
+        const daysInMonth = new Date(yyyy, cur.getMonth() + 1, 0).getDate();
+        // Observado: suma de días del mes en la serie (usa solo años en rango)
+        let obsSum = 0, obsCount = 0;
+        for (let d = 1; d <= daysInMonth; d++) {
+          const key = `${yyyy}${mm}${String(d).padStart(2,"0")}`;
+          const vals = seriesArr.map(s => s[key]).filter(v => v != null && v >= 0);
+          if (vals.length) { obsSum += vals.reduce((a,v)=>a+v,0)/vals.length; obsCount++; }
+        }
+        // Norma: promedio de todos los años 1981-2025 para ese mes
+        const normDaily = monthlyNorms.map(n => n[mm]).filter(v => v != null);
+        const normAvg   = normDaily.length ? normDaily.reduce((a,v)=>a+v,0)/normDaily.length : null;
+        const norm = normAvg != null ? normAvg * daysInMonth : null;
+        const obs  = obsCount ? obsSum : null;
+        months.push({
+          label: `${["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][cur.getMonth()]}'${String(yyyy).slice(2)}`,
+          obs, norm,
+          anomPct: obs != null && norm ? Math.round((obs - norm) / norm * 100) : null,
+        });
+        cur.setMonth(cur.getMonth() + 1);
+      }
+      setNasaResult(months);
+    } catch(e) { setNasaError(e.message); }
+    setNasaLoading(false);
+  }, [estado?.id, nasaFrom, nasaTo]);
+
+  // ── Render Canvas OM ──
+  React.useEffect(() => {
+    if (!omCanvasRef.current || !omData?.length) return;
+    const canvas = omCanvasRef.current;
+    drawOMChart(canvas, omData, omPin, omHov);
+  }, [omData, omPin, omHov]);
+
+  // ── Render Canvas NASA ──
+  React.useEffect(() => {
+    if (!nasaCanvasRef.current || !nasaResult?.length) return;
+    drawNasaChart(nasaCanvasRef.current, nasaResult, nasaPin, nasaHov);
+  }, [nasaResult, nasaPin, nasaHov]);
+
+  if (!estado) {
     return (
-      <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
-        <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-          Historial NASA POWER
-        </div>
-        <div style={{ fontSize:11, fontFamily:font, color:MUTED, marginTop:6 }}>
-          Selecciona un estado para calcular tendencia histórica.
-        </div>
+      <div style={{ background:BG3, border:`1px solid ${BORDER}`, padding:"10px 14px",
+        fontSize:12, fontFamily:fontSans, color:MUTED }}>
+        Seleccioná un estado en el mapa para ver el historial de lluvias.
       </div>
     );
   }
 
-  const maxVal = Math.max(...history.weeks.flatMap(w => [w.observed || 0, w.norm || 0]), 1);
-  const statusColor =
-    history.status.includes("Déficit") ? "#ca8a04" :
-    history.status.includes("Exceso") ? "#1d4ed8" :
-    "#16a34a";
-  const statusExplanation =
-    history.status === "Déficit persistente" ? `En ${history.persistentThreshold} o más de las últimas ${history.rangeWeeks} semanas llovió al menos un 20% menos de lo normal. Esto indica una sequía sostenida, no solo un episodio aislado. Puede afectar reservas de agua, agricultura y en el caso de Bolívar, la producción de electricidad.` :
-    history.status === "Exceso persistente" ? `En ${history.persistentThreshold} o más de las últimas ${history.rangeWeeks} semanas llovió al menos un 20% más de lo normal. El suelo puede estar saturado, lo que aumenta el riesgo de inundaciones o deslaves ante nuevas lluvias.` :
-    history.status === "Déficit reciente" ? "La última semana tuvo al menos un 30% menos de lluvia de lo normal, pero no es suficiente para hablar de sequía prolongada. Vale la pena seguir el pronóstico de los próximos días." :
-    history.status === "Exceso reciente" ? "La última semana tuvo al menos un 30% más de lluvia de lo normal. No hay un patrón sostenido aún, pero conviene vigilar zonas propensas a deslaves." :
-    "Las semanas recientes alternan entre más y menos lluvia, sin una tendencia clara. La situación está dentro del rango habitual.";
+  const omTotal = omData ? Math.round(omData.reduce((s,d)=>s+(d.mm??0),0)) : null;
+  const omMax   = omData ? Math.round(Math.max(...omData.map(d=>d.mm??0))) : null;
+  const omDry   = omData ? omData.filter(d=>(d.mm??0)<1).length : null;
+  const omAvg   = omData && omData.length ? omTotal/omData.length : null;
+  const pinnedOM = omPin != null && omData ? omData[omPin] : null;
+
+  const nasaTotal = nasaResult ? Math.round(nasaResult.reduce((s,m)=>s+(m.obs??0),0)) : null;
+  const nasaNorm  = nasaResult ? Math.round(nasaResult.reduce((s,m)=>s+(m.norm??0),0)) : null;
+  const nasaAnom  = nasaTotal != null && nasaNorm ? Math.round((nasaTotal-nasaNorm)/nasaNorm*100) : null;
+  const pinnedNasa = nasaPin != null && nasaResult ? nasaResult[nasaPin] : null;
+
+  const MESES_CORTOS = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 
   return (
-    <div style={{ background:BG3, padding:"14px 16px", border:`1px solid ${BORDER}` }}>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", gap:8 }}>
-        <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>
-          Historial {history.rangeWeeks} semanas
-        </div>
-        <div style={{ fontSize:12, fontFamily:font, color:statusColor, fontWeight:700 }}>
-          {history.status}
+    <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px 16px" }}>
+
+      {/* Título */}
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10, flexWrap:"wrap", gap:8 }}>
+        <div>
+          <div style={{ fontSize:13, fontWeight:600, color:TEXT }}>📅 Historial de lluvias — {estado.id}</div>
+          <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, marginTop:2 }}>
+            Consultá lluvia reciente o explorá años anteriores comparados con el promedio histórico.
+          </div>
         </div>
       </div>
-      <div style={{ display:"flex", gap:6, alignItems:"flex-end", height:160, marginTop:14 }}>
-        {history.weeks.map((w, i) => {
-          const obsH = Math.max(3, Math.round(((w.observed || 0) / maxVal) * 132));
-          const normH = Math.max(3, Math.round(((w.norm || 0) / maxVal) * 132));
-          const anomalyColor = w.anomalyPct < -20 ? "#ca8a04" : w.anomalyPct > 20 ? "#1d4ed8" : "#16a34a";
-          return (
-            <div key={`${w.start}-${i}`} title={`${w.start} a ${w.end}: obs ${Math.round(w.observed || 0)}mm / norma ${Math.round(w.norm || 0)}mm`}
-              style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
-              <div style={{ height:136, width:"100%", display:"flex", alignItems:"flex-end", justifyContent:"center", gap:2 }}>
-                <div style={{ width:history.rangeWeeks > 12 ? 8 : 12, height:obsH, background:anomalyColor, borderRadius:"3px 3px 0 0" }} />
-                <div style={{ width:history.rangeWeeks > 12 ? 5 : 7, height:normH, background:`${MUTED}55`, borderRadius:"3px 3px 0 0" }} />
-              </div>
-              <div style={{ fontSize:history.rangeWeeks > 12 ? 8 : 9, fontFamily:font, color:MUTED }}>{w.label}</div>
+
+      {/* Toggle tabs */}
+      <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, width:"fit-content", marginBottom:14 }}>
+        {[
+          { id:"om",   label:"📡 Reciente (Open-Meteo)" },
+          { id:"nasa", label:"🛰 Histórico (NASA POWER)" },
+        ].map(t => (
+          <button key={t.id} onClick={() => setActiveTab(t.id)}
+            style={{ fontSize:12, fontFamily:fontSans, padding:"6px 16px", border:"none",
+              background:activeTab===t.id?ACCENT:"transparent",
+              color:activeTab===t.id?"#fff":MUTED, cursor:"pointer" }}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── TAB OPEN-METEO ── */}
+      {activeTab === "om" && (
+        <div>
+          {/* Controles período */}
+          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12, flexWrap:"wrap" }}>
+            <span style={{ fontSize:12, fontFamily:fontSans, color:MUTED }}>Ver los últimos:</span>
+            <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+              {[[7,"7 días"],[30,"1 mes"],[90,"3 meses"]].map(([d,l]) => (
+                <button key={d} onClick={() => setOmDays(d)}
+                  style={{ fontSize:11, fontFamily:font, padding:"5px 12px", border:"none",
+                    background:omDays===d?ACCENT:"transparent",
+                    color:omDays===d?"#fff":MUTED, cursor:"pointer" }}>
+                  {l}
+                </button>
+              ))}
             </div>
-          );
-        })}
-      </div>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:10, gap:8 }}>
-        <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-          <span style={{ fontSize:11, fontFamily:fontSans, color:MUTED }}><b style={{ color:"#1d4ed8" }}>■</b> Lluvia observada (color = anomalía)</span>
-          <span style={{ fontSize:11, fontFamily:fontSans, color:MUTED }}><b style={{ color:`${MUTED}99` }}>■</b> Promedio histórico</span>
+            <span style={{ fontSize:10, fontFamily:font, color:`${MUTED}80` }}>
+              Open-Meteo archive · sin key · datos a las 24h
+            </span>
+          </div>
+
+          {omLoading && (
+            <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, padding:"10px 0" }}>
+              Consultando Open-Meteo…
+            </div>
+          )}
+          {omError && (
+            <div style={{ fontSize:12, fontFamily:fontSans, color:"#dc2626", padding:"8px 12px",
+              background:"#fef2f2", border:"1px solid #fecaca" }}>
+              ⚠️ {omError}
+            </div>
+          )}
+
+          {omData && !omLoading && (<>
+            {/* KPIs */}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, marginBottom:12 }}>
+              {[
+                { val:`${omTotal} mm`, sub:"Total acumulado", col:ACCENT },
+                { val:`${omMax} mm`,   sub:"Día más lluvioso", col:"#2563eb" },
+                { val:omDry,           sub:"Días sin lluvia",  col:"#ca8a04" },
+              ].map((k,i) => (
+                <div key={i} style={{ background:BG3, padding:"8px 12px", border:`1px solid ${BORDER}` }}>
+                  <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase",
+                    letterSpacing:"0.1em", marginBottom:3 }}>{k.sub}</div>
+                  <div style={{ fontSize:20, fontWeight:700, color:k.col, fontFamily:"'Syne',sans-serif" }}>{k.val}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Canvas */}
+            <div style={{ position:"relative", marginBottom:6 }}>
+              <canvas ref={omCanvasRef} width={600} height={160}
+                style={{ width:"100%", height:160, cursor:"crosshair", display:"block" }}
+                onMouseMove={e => {
+                  const r = e.currentTarget.getBoundingClientRect();
+                  const mx = (e.clientX - r.left) * (600 / r.width);
+                  const pad = {l:32,r:8,b:22,t:8};
+                  const step = (600-pad.l-pad.r) / omData.length;
+                  const idx = Math.floor((mx - pad.l) / step);
+                  setOmHov(idx >= 0 && idx < omData.length ? idx : null);
+                }}
+                onMouseLeave={() => setOmHov(null)}
+                onClick={e => {
+                  const r = e.currentTarget.getBoundingClientRect();
+                  const mx = (e.clientX - r.left) * (600 / r.width);
+                  const pad = {l:32,r:8,b:22,t:8};
+                  const step = (600-pad.l-pad.r) / omData.length;
+                  const idx = Math.floor((mx - pad.l) / step);
+                  if (idx >= 0 && idx < omData.length)
+                    setOmPin(p => p === idx ? null : idx);
+                }}
+              />
+              {/* Tooltip */}
+              {(omHov != null || pinnedOM) && (() => {
+                const d = pinnedOM ?? (omHov != null ? omData[omHov] : null);
+                if (!d) return null;
+                const pad = {l:32,r:8,b:22,t:8};
+                const step = (600-pad.l-pad.r) / omData.length;
+                const idx = pinnedOM ? omPin : omHov;
+                const xPct = ((pad.l + idx * step + step/2) / 600) * 100;
+                return (
+                  <div style={{
+                    position:"absolute", top:4,
+                    left:`${Math.min(Math.max(xPct,15),75)}%`,
+                    background:BG2, border:`1px solid ${BORDER}`,
+                    padding:"6px 10px", fontSize:11, fontFamily:font,
+                    pointerEvents:"none", zIndex:10, whiteSpace:"nowrap",
+                    boxShadow: pinnedOM ? `0 0 0 2px ${ACCENT}` : "none",
+                  }}>
+                    <div style={{ color:TEXT, fontWeight:600 }}>{d.date}</div>
+                    <div style={{ color:ACCENT }}>{Math.round(d.mm ?? 0)} mm</div>
+                    {pinnedOM && <div style={{ fontSize:9, color:MUTED }}>Anclado · clic para soltar</div>}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Leyenda */}
+            <div style={{ display:"flex", gap:12, flexWrap:"wrap", alignItems:"center", fontSize:11 }}>
+              <span style={{ fontFamily:fontSans, color:MUTED }}>
+                <span style={{ display:"inline-block", width:10, height:10, background:"#2563eb", marginRight:4, verticalAlign:"middle" }}/>
+                Lluvia diaria
+              </span>
+              <span style={{ fontFamily:fontSans, color:MUTED }}>
+                <span style={{ display:"inline-block", width:10, height:2, background:"#185FA580", marginRight:4, verticalAlign:"middle" }}/>
+                Media del período ({omAvg?.toFixed(1)} mm/día)
+              </span>
+              <span style={{ fontFamily:font, color:`${MUTED}80`, marginLeft:"auto", fontSize:10 }}>
+                Hover para ver valor · Clic para anclar
+              </span>
+            </div>
+          </>)}
         </div>
-        <div style={{ fontSize:11, fontFamily:font, color:MUTED }}>
-          {history.below} bajo norma · {history.above} sobre norma
+      )}
+
+      {/* ── TAB NASA POWER ── */}
+      {activeTab === "nasa" && (
+        <div>
+          {/* Controles de fecha */}
+          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10, flexWrap:"wrap" }}>
+            <span style={{ fontSize:12, fontFamily:fontSans, color:MUTED }}>Desde:</span>
+            <input type="date" value={nasaFrom} onChange={e => setNasaFrom(e.target.value)}
+              style={{ fontFamily:font, fontSize:11, padding:"4px 8px",
+                border:`1px solid ${BORDER}`, background:BG3, color:TEXT, outline:"none" }} />
+            <span style={{ fontSize:12, fontFamily:fontSans, color:MUTED }}>Hasta:</span>
+            <input type="date" value={nasaTo} onChange={e => setNasaTo(e.target.value)}
+              style={{ fontFamily:font, fontSize:11, padding:"4px 8px",
+                border:`1px solid ${BORDER}`, background:BG3, color:TEXT, outline:"none" }} />
+            <button onClick={loadNasa}
+              style={{ fontFamily:font, fontSize:11, padding:"5px 14px",
+                border:`1px solid ${BORDER}`, background:ACCENT, color:"#fff", cursor:"pointer" }}>
+              Consultar
+            </button>
+          </div>
+          {/* Accesos rápidos */}
+          <div style={{ display:"flex", gap:6, marginBottom:12, flexWrap:"wrap" }}>
+            <span style={{ fontSize:11, fontFamily:fontSans, color:MUTED, alignSelf:"center" }}>Año rápido:</span>
+            {[2025,2024,2023,2022,2020,2015,2010].map(y => (
+              <button key={y} onClick={() => {
+                setNasaFrom(`${y}-01-01`); setNasaTo(`${y}-12-31`);
+                setTimeout(loadNasa, 0);
+              }}
+                style={{ fontFamily:font, fontSize:11, padding:"3px 10px",
+                  border:`1px solid ${BORDER}`, background:"transparent",
+                  color:MUTED, cursor:"pointer" }}>
+                {y}
+              </button>
+            ))}
+          </div>
+
+          {nasaLoading && (
+            <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, padding:"10px 0" }}>
+              Consultando NASA POWER 1981-2025…
+            </div>
+          )}
+          {nasaError && (
+            <div style={{ fontSize:12, fontFamily:fontSans, color:"#dc2626", padding:"8px 12px",
+              background:"#fef2f2", border:"1px solid #fecaca" }}>
+              ⚠️ {nasaError}
+            </div>
+          )}
+
+          {nasaResult && !nasaLoading && (<>
+            {/* KPIs */}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, marginBottom:12 }}>
+              <div style={{ background:BG3, padding:"8px 12px", border:`1px solid ${BORDER}` }}>
+                <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:3 }}>Lluvia total</div>
+                <div style={{ fontSize:20, fontWeight:700, color:ACCENT, fontFamily:"'Syne',sans-serif" }}>{nasaTotal?.toLocaleString()} mm</div>
+              </div>
+              <div style={{ background:BG3, padding:"8px 12px", border:`1px solid ${BORDER}` }}>
+                <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:3 }}>vs. norma histórica</div>
+                <div style={{ fontSize:20, fontWeight:700, fontFamily:"'Syne',sans-serif",
+                  color: nasaAnom < -20 ? "#ca8a04" : nasaAnom > 20 ? "#1d4ed8" : "#16a34a" }}>
+                  {nasaAnom != null ? (nasaAnom >= 0 ? "+" : "") + nasaAnom + "%" : "—"}
+                </div>
+              </div>
+              <div style={{ background:BG3, padding:"8px 12px", border:`1px solid ${BORDER}` }}>
+                <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:3 }}>Diagnóstico</div>
+                <div style={{ fontSize:12, fontWeight:600, fontFamily:fontSans,
+                  color: nasaAnom < -30 ? "#dc2626" : nasaAnom < -10 ? "#ca8a04" : nasaAnom > 30 ? "#1d4ed8" : nasaAnom > 10 ? "#3b82f6" : "#16a34a" }}>
+                  {nasaAnom < -30 ? "Déficit severo" : nasaAnom < -10 ? "Déficit leve" : nasaAnom > 30 ? "Exceso severo" : nasaAnom > 10 ? "Exceso leve" : "Dentro de norma"}
+                </div>
+              </div>
+            </div>
+
+            {/* Canvas NASA */}
+            <div style={{ position:"relative", marginBottom:6 }}>
+              <canvas ref={nasaCanvasRef} width={600} height={160}
+                style={{ width:"100%", height:160, cursor:"crosshair", display:"block" }}
+                onMouseMove={e => {
+                  const r = e.currentTarget.getBoundingClientRect();
+                  const mx = (e.clientX - r.left) * (600 / r.width);
+                  const pad = {l:36,r:8,b:22,t:8};
+                  const gW = (600-pad.l-pad.r) / nasaResult.length;
+                  const idx = Math.floor((mx - pad.l) / gW);
+                  setNasaHov(idx >= 0 && idx < nasaResult.length ? idx : null);
+                }}
+                onMouseLeave={() => setNasaHov(null)}
+                onClick={e => {
+                  const r = e.currentTarget.getBoundingClientRect();
+                  const mx = (e.clientX - r.left) * (600 / r.width);
+                  const pad = {l:36,r:8,b:22,t:8};
+                  const gW = (600-pad.l-pad.r) / nasaResult.length;
+                  const idx = Math.floor((mx - pad.l) / gW);
+                  if (idx >= 0 && idx < nasaResult.length)
+                    setNasaPin(p => p === idx ? null : idx);
+                }}
+              />
+              {/* Tooltip NASA */}
+              {(nasaHov != null || pinnedNasa) && (() => {
+                const m = pinnedNasa ?? (nasaHov != null ? nasaResult[nasaHov] : null);
+                if (!m) return null;
+                const pad = {l:36,r:8,b:22,t:8};
+                const gW = (600-pad.l-pad.r) / nasaResult.length;
+                const idx = pinnedNasa ? nasaPin : nasaHov;
+                const xPct = ((pad.l + idx * gW + gW/2) / 600) * 100;
+                return (
+                  <div style={{
+                    position:"absolute", top:4,
+                    left:`${Math.min(Math.max(xPct,15),70)}%`,
+                    background:BG2, border:`1px solid ${BORDER}`,
+                    padding:"6px 10px", fontSize:11, fontFamily:font,
+                    pointerEvents:"none", zIndex:10, whiteSpace:"nowrap",
+                    boxShadow: pinnedNasa ? `0 0 0 2px ${ACCENT}` : "none",
+                  }}>
+                    <div style={{ color:TEXT, fontWeight:600 }}>{m.label}</div>
+                    <div style={{ color:ACCENT }}>Observado: {Math.round(m.obs ?? 0)} mm</div>
+                    <div style={{ color:`${MUTED}` }}>Norma: {Math.round(m.norm ?? 0)} mm</div>
+                    {m.anomPct != null && (
+                      <div style={{ color: m.anomPct < -20 ? "#ca8a04" : m.anomPct > 20 ? "#1d4ed8" : "#16a34a" }}>
+                        Anomalía: {m.anomPct >= 0 ? "+" : ""}{m.anomPct}%
+                      </div>
+                    )}
+                    {pinnedNasa && <div style={{ fontSize:9, color:MUTED }}>Anclado · clic para soltar</div>}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Leyenda NASA */}
+            <div style={{ display:"flex", gap:12, flexWrap:"wrap", fontSize:11, alignItems:"center" }}>
+              <span style={{ fontFamily:fontSans, color:MUTED }}>
+                <span style={{ display:"inline-block", width:10, height:10, background:"#2563eb", marginRight:4, verticalAlign:"middle" }}/>
+                Observado
+              </span>
+              <span style={{ fontFamily:fontSans, color:MUTED }}>
+                <span style={{ display:"inline-block", width:10, height:10, background:"#88808080", marginRight:4, verticalAlign:"middle" }}/>
+                Norma 1981-2025
+              </span>
+              <span style={{ fontFamily:fontSans, color:"#ca8a04" }}>
+                <span style={{ display:"inline-block", width:10, height:10, background:"#ca8a04", marginRight:4, verticalAlign:"middle" }}/>
+                Déficit &gt;20%
+              </span>
+              <span style={{ fontFamily:fontSans, color:"#1d4ed8" }}>
+                <span style={{ display:"inline-block", width:10, height:10, background:"#1d4ed8", marginRight:4, verticalAlign:"middle" }}/>
+                Exceso &gt;20%
+              </span>
+              <span style={{ fontFamily:font, color:`${MUTED}80`, marginLeft:"auto", fontSize:10 }}>
+                Hover para ver valor · Clic para anclar
+              </span>
+            </div>
+
+            <div style={{ marginTop:10, paddingTop:8, borderTop:`1px solid ${BORDER}70`,
+              fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.55 }}>
+              Los datos de NASA POWER cubren 1981-2025. Para el período seleccionado, la barra de color muestra la lluvia real y la barra gris el promedio histórico de ese mismo mes. Azul = más lluvia de lo normal · Amarillo = menos lluvia · Verde = dentro del rango esperado.
+            </div>
+          </>)}
+
+          {!nasaResult && !nasaLoading && !nasaError && (
+            <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, padding:"12px 0" }}>
+              Seleccioná un rango de fechas y presioná Consultar para ver el historial comparado con la norma 1981-2025.
+            </div>
+          )}
         </div>
-      </div>
-      <div style={{ marginTop:8, paddingTop:8, borderTop:`1px solid ${BORDER}70`,
-        fontSize:13, fontFamily:fontSans, color:MUTED, lineHeight:1.65 }}>
-        <strong style={{ color:statusColor }}>{history.status}:</strong> {statusExplanation}
-      </div>
-      <div style={{ marginTop:6, fontSize:10, fontFamily:font, color:`${MUTED}90`, lineHeight:1.45 }}>
-        Cómo leer esta gráfica: cada par de barras muestra, para una semana, cuánta lluvia cayó (barra de color) comparado con el promedio histórico de esa misma semana entre 1981 y 2025 (barra gris). Azul = más lluvia de lo normal · Amarillo = menos lluvia de lo normal · Verde = dentro del rango esperado.
-      </div>
+      )}
     </div>
   );
+}
+
+// ── Funciones Canvas para RainHistoryPanel ──
+function drawOMChart(canvas, data, pinned, hovered) {
+  const ctx = canvas.getContext("2d");
+  const W = 600, H = 160;
+  const pad = {l:32,r:8,b:22,t:8};
+  const maxVal = Math.max(...data.map(d => d.mm ?? 0), 1);
+  const avg    = data.reduce((s,d)=>s+(d.mm??0),0) / data.length;
+  ctx.clearRect(0,0,W,H);
+  const step = (W-pad.l-pad.r) / data.length;
+  const barW = Math.max(1, Math.floor(step * 0.72));
+  const scY = v => H - pad.b - Math.round((v/maxVal)*(H-pad.t-pad.b));
+  // Grid
+  ctx.strokeStyle="rgba(130,130,130,0.12)"; ctx.lineWidth=0.5;
+  for(let i=1;i<=4;i++){const y=H-pad.b-((H-pad.t-pad.b)/4*i);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();}
+  // Avg line
+  ctx.strokeStyle="#185FA550"; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(pad.l,scY(avg)); ctx.lineTo(W-pad.r,scY(avg)); ctx.stroke();
+  ctx.setLineDash([]);
+  // Bars
+  data.forEach((d, i) => {
+    const x  = pad.l + i*step + (step-barW)/2;
+    const y  = scY(d.mm??0);
+    const bH = Math.max(1, H-pad.b-y);
+    const isHov = i===hovered; const isPin = i===pinned;
+    const mm = d.mm ?? 0;
+    ctx.fillStyle = isPin ? "#185FA5" : isHov ? "#378ADD" : mm > avg*1.3 ? "#2563eb" : mm < avg*0.4 ? "#ca8a04" : "#60a5fa";
+    ctx.globalAlpha = isPin||isHov ? 1 : 0.85;
+    ctx.fillRect(x, y, barW, bH);
+    ctx.globalAlpha = 1;
+    if(isPin){ctx.strokeStyle="#185FA5";ctx.lineWidth=1.5;ctx.strokeRect(x-1,y-1,barW+2,bH+2);}
+  });
+  // Labels x-axis (cada 7 días para 90d, cada día para 7d)
+  const labelEvery = data.length > 60 ? 14 : data.length > 20 ? 7 : data.length > 10 ? 3 : 1;
+  ctx.fillStyle="rgba(110,110,110,0.7)"; ctx.font="9px monospace"; ctx.textAlign="center";
+  data.forEach((d,i)=>{
+    if(i%labelEvery===0){
+      const x=pad.l+i*step+step/2;
+      ctx.fillText(d.date.slice(5), x, H-pad.b+12);
+    }
+  });
+  // Y labels
+  ctx.textAlign="right";
+  ctx.fillText(Math.round(maxVal), pad.l-3, pad.t+9);
+  ctx.fillText("0", pad.l-3, H-pad.b);
+}
+
+function drawNasaChart(canvas, data, pinned, hovered) {
+  const ctx = canvas.getContext("2d");
+  const W = 600, H = 160;
+  const pad = {l:36,r:8,b:22,t:8};
+  const maxVal = Math.max(...data.flatMap(d=>[d.obs??0,d.norm??0]),1);
+  ctx.clearRect(0,0,W,H);
+  const gW = (W-pad.l-pad.r) / data.length;
+  const bW = Math.max(2, Math.floor(gW*0.36));
+  const scY = v => H-pad.b-Math.round((v/maxVal)*(H-pad.t-pad.b));
+  ctx.strokeStyle="rgba(130,130,130,0.12)"; ctx.lineWidth=0.5;
+  for(let i=1;i<=4;i++){const y=H-pad.b-((H-pad.t-pad.b)/4*i);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();}
+  data.forEach((d,i) => {
+    const cx = pad.l + i*gW + gW/2;
+    const isHov=i===hovered; const isPin=i===pinned;
+    const ap = d.anomPct ?? 0;
+    const obsCol = ap < -20 ? "#ca8a04" : ap > 20 ? "#2563eb" : "#60a5fa";
+    // Barra observado
+    const x1=cx-bW-1; const y1=scY(d.obs??0); const h1=Math.max(2,H-pad.b-y1);
+    ctx.fillStyle = isPin||isHov ? obsCol : obsCol+"cc";
+    ctx.fillRect(x1,y1,bW,h1);
+    // Barra norma
+    const x2=cx+1; const y2=scY(d.norm??0); const h2=Math.max(2,H-pad.b-y2);
+    ctx.fillStyle="rgba(140,140,140,0.28)";
+    ctx.fillRect(x2,y2,bW,h2);
+    if(isPin){ctx.strokeStyle=obsCol;ctx.lineWidth=1.5;ctx.strokeRect(x1-1,y1-1,bW*2+4,h1+2);}
+    ctx.fillStyle="rgba(110,110,110,0.7)"; ctx.font="9px monospace"; ctx.textAlign="center";
+    ctx.fillText(d.label, cx, H-pad.b+12);
+  });
+  ctx.textAlign="right"; ctx.fillStyle="rgba(110,110,110,0.7)"; ctx.font="9px monospace";
+  ctx.fillText(Math.round(maxVal)+"mm", pad.l-3, pad.t+9);
+  ctx.fillText("0", pad.l-3, H-pad.b);
 }
 
 
@@ -1404,41 +1850,12 @@ export function TabAmbiental() {
           </div>
 
           {selected && (
-            <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"12px 16px" }}>
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", gap:12, marginBottom:8, flexWrap:"wrap" }}>
-                <div>
-                  <div style={{ fontSize:13, fontWeight:600, color:TEXT }}>
-                    📅 Historial de lluvias — {selected}
-                  </div>
-                  <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, marginTop:3, lineHeight:1.5 }}>
-                    Compara cuánta lluvia cayó cada semana reciente con el promedio de esa misma semana en los últimos 44 años (1981–2025).
-                    Así podés ver si hay una sequía o un exceso de lluvia que se repite, no solo una semana aislada.
-                  </div>
-                </div>
-                <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap", justifyContent:mob?"flex-start":"flex-end" }}>
-                  {selHistory?.sentinels?.length > 0 && (
-                    <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}80`, textAlign:mob?"left":"right" }}>
-                      Estaciones: {selHistory.sentinels.join(", ")}
-                    </div>
-                  )}
-                  <label style={{ display:"flex", alignItems:"center", gap:6, fontSize:11, fontFamily:fontSans, color:MUTED }}>
-                    Ver las últimas
-                    <select
-                      value={historyWeeks}
-                      onChange={e => setHistoryWeeks(Number(e.target.value))}
-                      style={{ fontFamily:fontSans, fontSize:12, background:BG3, border:`1px solid ${BORDER}`,
-                        color:ACCENT, padding:"4px 8px", outline:"none", cursor:"pointer" }}
-                    >
-                      {HISTORY_RANGE_OPTIONS.map(opt => (
-                        <option key={opt} value={opt}>{opt} semanas</option>
-                      ))}
-                    </select>
-                    semanas
-                  </label>
-                </div>
-              </div>
-              <RainHistoryPanel history={selHistory} loading={historyLoading && !selHistory} />
-            </div>
+            <RainHistoryPanel
+              estado={VE_ESTADOS.find(e => e.id === selected) ?? null}
+              history={selHistory}
+              historyLoading={historyLoading}
+              data={data}
+            />
           )}
 
           {/* ── NEXO ANALÍTICO ── */}
