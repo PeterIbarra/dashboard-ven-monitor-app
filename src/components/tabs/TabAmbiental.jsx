@@ -154,6 +154,13 @@ function buildHistoryWindows(weeks = DEFAULT_HISTORY_WEEKS, anchorDate = new Dat
   return windows;
 }
 
+// ── fetch con timeout compatible con todos los browsers (reemplaza AbortSignal.timeout) ──
+function fetchTimeout(url, ms) {
+  const ctrl = new AbortController();
+  const id = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(id));
+}
+
 function cacheGet(key) {
   try {
     const raw = localStorage.getItem(key);
@@ -182,7 +189,7 @@ async function fetchPowerSentinelSeries(sentinel) {
     `&longitude=${sentinel.lon}&latitude=${sentinel.lat}` +
     `&start=${POWER_START_YEAR}0101&end=${POWER_END_YEAR}1231` +
     `&format=JSON&time-standard=UTC`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(25000) });
+  const res = await fetchTimeout(url, 25000);
   if (!res.ok) {
     if (res.status === 429) throw new Error("NASA POWER rate limit (429)");
     throw new Error(`NASA POWER HTTP ${res.status}`);
@@ -260,7 +267,7 @@ async function fetchPowerHistory(estado, rangeWeeks = DEFAULT_HISTORY_WEEKS) {
         `&longitude=${sentinel.lon}&latitude=${sentinel.lat}` +
         `&start=${formatPowerDate(start)}&end=${formatPowerDate(end)}` +
         `&format=JSON&time-standard=UTC`;
-      return fetch(url, { signal: AbortSignal.timeout(16000) })
+      return fetchTimeout(url, 16000)
         .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
         .then(j => j?.properties?.parameter?.PRECTOTCORR || {});
     })
@@ -325,7 +332,7 @@ async function fetchPrecip(estado, attempt = 0) {
     `&past_days=${PAST_DAYS}` +
     `&forecast_days=7`;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(18000) });
+    const res = await fetchTimeout(url, 18000);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     const days = json?.daily?.precipitation_sum ?? [];
@@ -468,7 +475,7 @@ async function fetchOMHistory(estado, pastDays) {
     `&timezone=America%2FCaracas` +
     `&start_date=${toIsoDate(new Date(Date.now() - pastDays * 86400000))}` +
     `&end_date=${toIsoDate(new Date(Date.now() - 86400000))}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
+  const res = await fetchTimeout(url, 12000);
   if (!res.ok) throw new Error(`Open-Meteo archive HTTP ${res.status}`);
   const json = await res.json();
   const dates = json?.daily?.time ?? [];
@@ -1036,7 +1043,7 @@ function pointToState(lat, lon) {
 // ── Fetch FIRMS vía proxy Vercel ──
 async function fetchFirms(days = FIRMS_DEFAULT_DAYS) {
   const url = `/api/gdelt?source=firms&days=${days}&bbox=${encodeURIComponent(VE_BBOX)}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+  const res = await fetchTimeout(url, 15000);
   if (!res.ok) throw new Error(`FIRMS proxy HTTP ${res.status}`);
   const json = await res.json();
   if (json.error) throw new Error(json.error);
@@ -1224,7 +1231,7 @@ function TabIncendios({ mob }) {
     setRawPoints([]);
     try {
       const url = `/api/gdelt?source=firms&days=${days}&bbox=${encodeURIComponent(VE_BBOX)}&key=${encodeURIComponent(key || "")}`;
-      const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
+      const res = await fetchTimeout(url, 20000);
       const json = await res.json();
       if (json.needsKey) { setNeedsKey(true); setFireLoading(false); return; }
       if (json.error) throw new Error(json.error);
