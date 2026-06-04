@@ -498,8 +498,111 @@ function calcMonthlyNormsFromSeries(series) {
   return norms; // { "01": avg_daily_mm, ... }
 }
 
-// ── RainHistoryPanel — versión interactiva con tabs OM/NASA ──
-function RainHistoryPanel({ estado, history, historyLoading, data }) {
+// ── Gráfica de barras semanales interactiva (Canvas) ──
+function WeeklyBarsChart({ weeks }) {
+  const canvasRef = useRef(null);
+  const [hov, setHov]     = useState(null);
+  const [pinned, setPinned] = useState(null);
+  const maxVal = Math.max(...weeks.flatMap(w => [w.observed||0, w.norm||0]), 1);
+
+  useEffect(() => {
+    if (!canvasRef.current || !weeks?.length) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const W = 600, H = 160;
+    const pad = {l:36,r:8,b:22,t:8};
+    ctx.clearRect(0,0,W,H);
+    const gW = (W-pad.l-pad.r) / weeks.length;
+    const bW = Math.max(2, Math.floor(gW*0.38));
+    const scY = v => H-pad.b-Math.round((v/maxVal)*(H-pad.t-pad.b));
+
+    ctx.strokeStyle="rgba(130,130,130,0.12)"; ctx.lineWidth=0.5;
+    for(let i=1;i<=4;i++){
+      const y=H-pad.b-((H-pad.t-pad.b)/4*i);
+      ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+    }
+
+    weeks.forEach((w, i) => {
+      const cx = pad.l + i*gW + gW/2;
+      const isHov=i===hov; const isPin=i===pinned;
+      const ap = w.anomalyPct ?? 0;
+      const obsCol = ap < -20 ? "#ca8a04" : ap > 20 ? "#1d4ed8" : "#16a34a";
+
+      const x1=cx-bW-1; const y1=scY(w.observed||0); const h1=Math.max(2,H-pad.b-y1);
+      ctx.fillStyle = isPin||isHov ? obsCol : obsCol+"cc";
+      ctx.fillRect(x1,y1,bW,h1);
+
+      const x2=cx+1; const y2=scY(w.norm||0); const h2=Math.max(2,H-pad.b-y2);
+      ctx.fillStyle="rgba(140,140,140,0.28)";
+      ctx.fillRect(x2,y2,bW,h2);
+
+      if(isPin){ctx.strokeStyle=obsCol;ctx.lineWidth=1.5;ctx.strokeRect(x1-1,y1-1,bW*2+4,h1+2);}
+
+      ctx.fillStyle="rgba(110,110,110,0.7)"; ctx.font="9px monospace"; ctx.textAlign="center";
+      if(weeks.length <= 12 || i % 2 === 0) ctx.fillText(w.label, cx, H-pad.b+12);
+    });
+
+    ctx.textAlign="right"; ctx.fillStyle="rgba(110,110,110,0.7)"; ctx.font="9px monospace";
+    ctx.fillText(Math.round(maxVal)+"mm", pad.l-3, pad.t+9);
+    ctx.fillText("0", pad.l-3, H-pad.b);
+  }, [weeks, hov, pinned, maxVal]);
+
+  const activeIdx = pinned ?? hov;
+  const activeW   = activeIdx != null ? weeks[activeIdx] : null;
+
+  return (
+    <div style={{ position:"relative", marginBottom:4 }}>
+      <canvas ref={canvasRef} width={600} height={160}
+        style={{ width:"100%", height:160, cursor:"crosshair", display:"block" }}
+        onMouseMove={e => {
+          const r = e.currentTarget.getBoundingClientRect();
+          const mx = (e.clientX - r.left) * (600 / r.width);
+          const pad = {l:36,r:8,b:22,t:8};
+          const gW = (600-pad.l-pad.r) / weeks.length;
+          const idx = Math.floor((mx - pad.l) / gW);
+          setHov(idx >= 0 && idx < weeks.length ? idx : null);
+        }}
+        onMouseLeave={() => setHov(null)}
+        onClick={e => {
+          const r = e.currentTarget.getBoundingClientRect();
+          const mx = (e.clientX - r.left) * (600 / r.width);
+          const pad = {l:36,r:8,b:22,t:8};
+          const gW = (600-pad.l-pad.r) / weeks.length;
+          const idx = Math.floor((mx - pad.l) / gW);
+          if (idx >= 0 && idx < weeks.length) setPinned(p => p === idx ? null : idx);
+        }}
+      />
+      {activeW && (() => {
+        const pad = {l:36,r:8,b:22,t:8};
+        const gW = (600-pad.l-pad.r) / weeks.length;
+        const xPct = ((pad.l + activeIdx * gW + gW/2) / 600) * 100;
+        return (
+          <div style={{
+            position:"absolute", top:4,
+            left:`${Math.min(Math.max(xPct,15),72)}%`,
+            background:BG2, border:`1px solid ${BORDER}`,
+            padding:"6px 10px", fontSize:11, fontFamily:font,
+            pointerEvents:"none", zIndex:10, whiteSpace:"nowrap",
+            boxShadow: pinned != null ? `0 0 0 2px ${ACCENT}` : "none",
+          }}>
+            <div style={{ color:TEXT, fontWeight:600 }}>{activeW.start} → {activeW.end}</div>
+            <div style={{ color:ACCENT }}>Observado: {Math.round(activeW.observed??0)} mm</div>
+            <div style={{ color:MUTED }}>Norma: {Math.round(activeW.norm??0)} mm</div>
+            {activeW.anomalyPct != null && (
+              <div style={{ color: activeW.anomalyPct < -20 ? "#ca8a04" : activeW.anomalyPct > 20 ? "#1d4ed8" : "#16a34a" }}>
+                Anomalía: {activeW.anomalyPct >= 0 ? "+" : ""}{Math.round(activeW.anomalyPct)}%
+              </div>
+            )}
+            {pinned != null && <div style={{ fontSize:9, color:MUTED }}>Anclado · clic para soltar</div>}
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+// ── RainHistoryPanel — versión interactiva con tabs OM/NASA/Tendencia ──
+function RainHistoryPanel({ estado, history, historyLoading, historyWeeks, setHistoryWeeks, data }) {
   const [activeTab, setActiveTab] = useState("om");
   const [omDays, setOmDays]       = useState(30);
   const [omData, setOmData]       = useState(null);
@@ -619,10 +722,11 @@ function RainHistoryPanel({ estado, history, historyLoading, data }) {
       </div>
 
       {/* Toggle tabs */}
-      <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, width:"fit-content", marginBottom:14 }}>
+      <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, width:"fit-content", marginBottom:14, flexWrap:"wrap" }}>
         {[
-          { id:"om",   label:"📡 Reciente (Open-Meteo)" },
-          { id:"nasa", label:"🛰 Histórico (NASA POWER)" },
+          { id:"om",       label:"📡 Reciente (Open-Meteo)" },
+          { id:"tendencia",label:"📊 Tendencia semanal (NASA)" },
+          { id:"nasa",     label:"🛰 Histórico por fecha (NASA)" },
         ].map(t => (
           <button key={t.id} onClick={() => setActiveTab(t.id)}
             style={{ fontSize:12, fontFamily:fontSans, padding:"6px 16px", border:"none",
@@ -745,6 +849,116 @@ function RainHistoryPanel({ estado, history, historyLoading, data }) {
               </span>
             </div>
           </>)}
+        </div>
+      )}
+
+      {/* ── TAB TENDENCIA SEMANAL NASA ── */}
+      {activeTab === "tendencia" && (
+        <div>
+          {/* Selector de semanas */}
+          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12, flexWrap:"wrap" }}>
+            <span style={{ fontSize:12, fontFamily:fontSans, color:MUTED }}>Ver las últimas:</span>
+            <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>
+              {HISTORY_RANGE_OPTIONS.map(opt => (
+                <button key={opt} onClick={() => setHistoryWeeks(opt)}
+                  style={{ fontSize:11, fontFamily:font, padding:"5px 12px", border:"none",
+                    background:historyWeeks===opt?ACCENT:"transparent",
+                    color:historyWeeks===opt?"#fff":MUTED, cursor:"pointer" }}>
+                  {opt} semanas
+                </button>
+              ))}
+            </div>
+            <span style={{ fontSize:10, fontFamily:font, color:`${MUTED}80` }}>
+              NASA POWER PRECTOTCORR · norma 1981-2025
+            </span>
+          </div>
+
+          {historyLoading && !history && (
+            <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, padding:"10px 0" }}>
+              Calculando tendencia semanal vs. norma histórica…
+            </div>
+          )}
+
+          {history?.error && (
+            <div style={{ fontSize:12, fontFamily:fontSans, color:"#dc2626", padding:"8px 12px",
+              background:"#fef2f2", border:"1px solid #fecaca" }}>
+              ⚠️ No se pudo calcular la tendencia. Verificá la conexión.
+            </div>
+          )}
+
+          {history?.weeks?.length > 0 && (() => {
+            const weeks = history.weeks;
+            const maxVal = Math.max(...weeks.flatMap(w => [w.observed||0, w.norm||0]), 1);
+            const statusColor =
+              history.status?.includes("Déficit") ? "#ca8a04" :
+              history.status?.includes("Exceso")  ? "#1d4ed8" : "#16a34a";
+            const statusExplanation =
+              history.status === "Déficit persistente"
+                ? `En ${history.persistentThreshold} o más de las últimas ${history.rangeWeeks} semanas llovió al menos un 20% menos de lo normal. Sequía sostenida — puede afectar reservas de agua, agricultura y en el caso de Bolívar, generación eléctrica.`
+              : history.status === "Exceso persistente"
+                ? `En ${history.persistentThreshold} o más de las últimas ${history.rangeWeeks} semanas llovió al menos un 20% más de lo normal. Suelo posiblemente saturado — mayor riesgo de inundaciones o deslaves.`
+              : history.status === "Déficit reciente"
+                ? "La última semana tuvo al menos un 30% menos de lluvia de lo normal. No es sequía prolongada aún, pero vale seguir el pronóstico."
+              : history.status === "Exceso reciente"
+                ? "La última semana tuvo al menos un 30% más de lluvia de lo normal. No hay patrón sostenido aún, pero conviene vigilar zonas propensas a deslaves."
+              : "Las semanas recientes alternan entre más y menos lluvia sin tendencia clara. Dentro del rango habitual.";
+
+            return (
+              <div>
+                {/* KPIs */}
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline",
+                  gap:8, marginBottom:12, flexWrap:"wrap" }}>
+                  <div style={{ fontSize:13, fontWeight:600, color:statusColor }}>
+                    {history.status}
+                  </div>
+                  <div style={{ fontSize:11, fontFamily:font, color:MUTED }}>
+                    {history.below} semanas bajo norma · {history.above} sobre norma
+                  </div>
+                  {history.sentinels?.length > 0 && (
+                    <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}80` }}>
+                      Estaciones: {history.sentinels.join(", ")}
+                    </div>
+                  )}
+                </div>
+
+                {/* Barras semanales interactivas */}
+                <WeeklyBarsChart weeks={weeks} maxVal={maxVal} />
+
+                {/* Leyenda */}
+                <div style={{ display:"flex", gap:12, flexWrap:"wrap", fontSize:11, marginTop:4, alignItems:"center" }}>
+                  <span style={{ fontFamily:fontSans, color:MUTED }}>
+                    <span style={{ display:"inline-block", width:10, height:10, background:"#1d4ed8", marginRight:4, verticalAlign:"middle" }}/>
+                    Lluvia observada
+                  </span>
+                  <span style={{ fontFamily:fontSans, color:MUTED }}>
+                    <span style={{ display:"inline-block", width:10, height:10, background:"#88808060", marginRight:4, verticalAlign:"middle" }}/>
+                    Norma 1981-2025
+                  </span>
+                  <span style={{ fontFamily:fontSans, color:"#1d4ed8" }}>■ Exceso &gt;20%</span>
+                  <span style={{ fontFamily:fontSans, color:"#ca8a04" }}>■ Déficit &gt;20%</span>
+                  <span style={{ fontFamily:fontSans, color:"#16a34a" }}>■ Normal</span>
+                  <span style={{ fontFamily:font, color:`${MUTED}80`, marginLeft:"auto", fontSize:10 }}>
+                    Hover para detalle · Clic para anclar
+                  </span>
+                </div>
+
+                {/* Diagnóstico */}
+                <div style={{ marginTop:10, paddingTop:8, borderTop:`1px solid ${BORDER}70`,
+                  fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.65 }}>
+                  <strong style={{ color:statusColor }}>{history.status}:</strong> {statusExplanation}
+                </div>
+                <div style={{ marginTop:6, fontSize:10, fontFamily:font, color:`${MUTED}80`, lineHeight:1.45 }}>
+                  Cada par de barras muestra, para una semana, cuánta lluvia cayó (barra de color) comparado con el promedio histórico de esa misma semana entre 1981 y 2025 (barra gris).
+                </div>
+              </div>
+            );
+          })()}
+
+          {!history && !historyLoading && (
+            <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, padding:"10px 0" }}>
+              Seleccioná un estado en el mapa para calcular la tendencia semanal.
+            </div>
+          )}
         </div>
       )}
 
@@ -1887,6 +2101,8 @@ export function TabAmbiental() {
               estado={VE_ESTADOS.find(e => e.id === selected) ?? null}
               history={selHistory}
               historyLoading={historyLoading}
+              historyWeeks={historyWeeks}
+              setHistoryWeeks={setHistoryWeeks}
               data={data}
             />
           )}
