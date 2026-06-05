@@ -512,8 +512,14 @@ function WeeklyBarsChart({ weeks }) {
   useEffect(() => {
     if (!canvasRef.current || !weeks?.length) return;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
     const W = 600, H = 200;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width  = W + "px";
+    canvas.style.height = H + "px";
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
     const pad = {l:44,r:10,b:24,t:12};
     const chartH = H - pad.t - pad.b;
     const chartW = W - pad.l - pad.r;
@@ -809,7 +815,7 @@ function RainHistoryPanel({ estado, history, historyLoading, historyWeeks, setHi
 
             {/* Canvas */}
             <div style={{ position:"relative", marginBottom:6 }}>
-              <canvas ref={omCanvasRef} width={600} height={200}
+              <canvas ref={omCanvasRef}
                 style={{ width:"100%", height:200, cursor:"crosshair", display:"block" }}
                 onMouseMove={e => {
                   const r = e.currentTarget.getBoundingClientRect();
@@ -1055,7 +1061,7 @@ function RainHistoryPanel({ estado, history, historyLoading, historyWeeks, setHi
 
             {/* Canvas NASA */}
             <div style={{ position:"relative", marginBottom:6 }}>
-              <canvas ref={nasaCanvasRef} width={600} height={200}
+              <canvas ref={nasaCanvasRef}
                 style={{ width:"100%", height:200, cursor:"crosshair", display:"block" }}
                 onMouseMove={e => {
                   const r = e.currentTarget.getBoundingClientRect();
@@ -1149,8 +1155,14 @@ function RainHistoryPanel({ estado, history, historyLoading, historyWeeks, setHi
 
 // ── Funciones Canvas para RainHistoryPanel ──
 function drawOMChart(canvas, data, pinned, hovered) {
-  const ctx = canvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
   const W = 600, H = 200;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + "px";
+  canvas.style.height = H + "px";
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
   const pad = {l:38,r:10,b:24,t:12};
   const chartH = H - pad.t - pad.b;
   const chartW = W - pad.l - pad.r;
@@ -1253,8 +1265,14 @@ function drawOMChart(canvas, data, pinned, hovered) {
 }
 
 function drawNasaChart(canvas, data, pinned, hovered) {
-  const ctx = canvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
   const W = 600, H = 200;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + "px";
+  canvas.style.height = H + "px";
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
   const pad = {l:44,r:10,b:24,t:12};
   const chartH = H - pad.t - pad.b;
   const chartW = W - pad.l - pad.r;
