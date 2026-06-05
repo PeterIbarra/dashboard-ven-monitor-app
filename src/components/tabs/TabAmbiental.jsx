@@ -501,95 +501,116 @@ function calcMonthlyNormsFromSeries(series) {
 // ── Gráfica de barras semanales interactiva (Canvas) ──
 function WeeklyBarsChart({ weeks }) {
   const canvasRef = useRef(null);
-  const [hov, setHov]     = useState(null);
+  const [hov, setHov]       = useState(null);
   const [pinned, setPinned] = useState(null);
-  const maxVal = Math.max(...weeks.flatMap(w => [w.observed||0, w.norm||0]), 1);
+
+  const allVals = weeks.flatMap(w => [w.observed||0, w.norm||0]);
+  const maxRaw  = Math.max(...allVals, 1);
+  const tickStep = maxRaw < 50 ? 10 : maxRaw < 150 ? 25 : maxRaw < 400 ? 50 : 100;
+  const axisMax  = Math.ceil(maxRaw / tickStep) * tickStep;
 
   useEffect(() => {
     if (!canvasRef.current || !weeks?.length) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const W = 600, H = 160;
-    const pad = {l:36,r:8,b:22,t:8};
-    ctx.clearRect(0,0,W,H);
-    const gW = (W-pad.l-pad.r) / weeks.length;
-    const bW = Math.max(2, Math.floor(gW*0.38));
-    const scY = v => H-pad.b-Math.round((v/maxVal)*(H-pad.t-pad.b));
+    const W = 600, H = 200;
+    const pad = {l:44,r:10,b:24,t:12};
+    const chartH = H - pad.t - pad.b;
+    const chartW = W - pad.l - pad.r;
+    const scY = v => H - pad.b - Math.round(Math.min(v, axisMax) / axisMax * chartH);
 
-    ctx.strokeStyle="rgba(130,130,130,0.12)"; ctx.lineWidth=0.5;
-    for(let i=1;i<=4;i++){
-      const y=H-pad.b-((H-pad.t-pad.b)/4*i);
-      ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+    ctx.clearRect(0, 0, W, H);
+
+    // Grid con etiquetas Y
+    ctx.font = "9px monospace"; ctx.textAlign = "right"; ctx.fillStyle = "rgba(110,110,110,0.65)";
+    const nTicks = Math.min(6, Math.floor(axisMax / tickStep));
+    for (let i = 1; i <= nTicks; i++) {
+      const v = i * tickStep; if (v > axisMax) break;
+      const y = scY(v);
+      ctx.strokeStyle = "rgba(130,130,130,0.12)"; ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+      ctx.fillText(v + "mm", pad.l - 3, y + 3);
     }
 
+    const gW = chartW / weeks.length;
+    const bW = Math.max(3, Math.floor(gW * 0.38));
+
     weeks.forEach((w, i) => {
-      const cx = pad.l + i*gW + gW/2;
-      const isHov=i===hov; const isPin=i===pinned;
+      const cx = pad.l + i * gW + gW / 2;
+      const isHov = i === hov; const isPin = i === pinned;
       const ap = w.anomalyPct ?? 0;
-      const obsCol = ap < -20 ? "#ca8a04" : ap > 20 ? "#1d4ed8" : "#16a34a";
 
-      const x1=cx-bW-1; const y1=scY(w.observed||0); const h1=Math.max(2,H-pad.b-y1);
-      ctx.fillStyle = isPin||isHov ? obsCol : obsCol+"cc";
-      ctx.fillRect(x1,y1,bW,h1);
+      const obsCol = ap < -30 ? "#dc2626"
+        : ap < -15 ? "#f59e0b"
+        : ap > 30  ? "#1d4ed8"
+        : ap > 15  ? "#3b82f6"
+        : "#16a34a";
 
-      const x2=cx+1; const y2=scY(w.norm||0); const h2=Math.max(2,H-pad.b-y2);
-      ctx.fillStyle="rgba(140,140,140,0.28)";
-      ctx.fillRect(x2,y2,bW,h2);
+      // Barra norma (fondo)
+      const xn = cx - bW + 1; const yn = scY(w.norm || 0); const hn = Math.max(3, H - pad.b - yn);
+      ctx.fillStyle = "rgba(160,160,160,0.22)";
+      ctx.fillRect(xn, yn, bW * 2, hn);
 
-      if(isPin){ctx.strokeStyle=obsCol;ctx.lineWidth=1.5;ctx.strokeRect(x1-1,y1-1,bW*2+4,h1+2);}
+      // Barra observado
+      const xo = cx - Math.floor(bW * 0.7); const yo = scY(w.observed || 0); const ho = Math.max(3, H - pad.b - yo);
+      ctx.globalAlpha = isPin || isHov ? 1 : 0.88;
+      ctx.fillStyle = obsCol;
+      ctx.fillRect(xo, yo, Math.floor(bW * 1.4), ho);
+      ctx.globalAlpha = 1;
 
-      ctx.fillStyle="rgba(110,110,110,0.7)"; ctx.font="9px monospace"; ctx.textAlign="center";
-      if(weeks.length <= 12 || i % 2 === 0) ctx.fillText(w.label, cx, H-pad.b+12);
+      if (isPin) {
+        ctx.strokeStyle = obsCol; ctx.lineWidth = 1.5;
+        ctx.strokeRect(xo - 1, yo - 1, Math.floor(bW * 1.4) + 2, ho + 2);
+      }
+
+      ctx.fillStyle = "rgba(110,110,110,0.7)"; ctx.font = "9px monospace"; ctx.textAlign = "center";
+      if (weeks.length <= 12 || i % 2 === 0) ctx.fillText(w.label, cx, H - pad.b + 13);
     });
 
-    ctx.textAlign="right"; ctx.fillStyle="rgba(110,110,110,0.7)"; ctx.font="9px monospace";
-    ctx.fillText(Math.round(maxVal)+"mm", pad.l-3, pad.t+9);
-    ctx.fillText("0", pad.l-3, H-pad.b);
-  }, [weeks, hov, pinned, maxVal]);
+    ctx.textAlign = "right"; ctx.fillStyle = "rgba(110,110,110,0.7)"; ctx.font = "9px monospace";
+    ctx.fillText(axisMax + "mm", pad.l - 3, pad.t + 9);
+  }, [weeks, hov, pinned, axisMax]);
 
   const activeIdx = pinned ?? hov;
   const activeW   = activeIdx != null ? weeks[activeIdx] : null;
 
   return (
     <div style={{ position:"relative", marginBottom:4 }}>
-      <canvas ref={canvasRef} width={600} height={160}
-        style={{ width:"100%", height:160, cursor:"crosshair", display:"block" }}
+      <canvas ref={canvasRef} width={600} height={200}
+        style={{ width:"100%", height:200, cursor:"crosshair", display:"block" }}
         onMouseMove={e => {
           const r = e.currentTarget.getBoundingClientRect();
           const mx = (e.clientX - r.left) * (600 / r.width);
-          const pad = {l:36,r:8,b:22,t:8};
-          const gW = (600-pad.l-pad.r) / weeks.length;
-          const idx = Math.floor((mx - pad.l) / gW);
+          const gW = (600 - 44 - 10) / weeks.length;
+          const idx = Math.floor((mx - 44) / gW);
           setHov(idx >= 0 && idx < weeks.length ? idx : null);
         }}
         onMouseLeave={() => setHov(null)}
         onClick={e => {
           const r = e.currentTarget.getBoundingClientRect();
           const mx = (e.clientX - r.left) * (600 / r.width);
-          const pad = {l:36,r:8,b:22,t:8};
-          const gW = (600-pad.l-pad.r) / weeks.length;
-          const idx = Math.floor((mx - pad.l) / gW);
+          const gW = (600 - 44 - 10) / weeks.length;
+          const idx = Math.floor((mx - 44) / gW);
           if (idx >= 0 && idx < weeks.length) setPinned(p => p === idx ? null : idx);
         }}
       />
       {activeW && (() => {
-        const pad = {l:36,r:8,b:22,t:8};
-        const gW = (600-pad.l-pad.r) / weeks.length;
-        const xPct = ((pad.l + activeIdx * gW + gW/2) / 600) * 100;
+        const gW = (600 - 44 - 10) / weeks.length;
+        const xPct = ((44 + activeIdx * gW + gW / 2) / 600) * 100;
         return (
           <div style={{
-            position:"absolute", top:4,
-            left:`${Math.min(Math.max(xPct,15),72)}%`,
+            position:"absolute", top:8,
+            left:`${Math.min(Math.max(xPct, 15), 68)}%`,
             background:BG2, border:`1px solid ${BORDER}`,
             padding:"6px 10px", fontSize:11, fontFamily:font,
             pointerEvents:"none", zIndex:10, whiteSpace:"nowrap",
             boxShadow: pinned != null ? `0 0 0 2px ${ACCENT}` : "none",
           }}>
             <div style={{ color:TEXT, fontWeight:600 }}>{activeW.start} → {activeW.end}</div>
-            <div style={{ color:ACCENT }}>Observado: {Math.round(activeW.observed??0)} mm</div>
-            <div style={{ color:MUTED }}>Norma: {Math.round(activeW.norm??0)} mm</div>
+            <div style={{ color:ACCENT }}>Observado: {Math.round(activeW.observed ?? 0)} mm</div>
+            <div style={{ color:MUTED }}>Norma: {Math.round(activeW.norm ?? 0)} mm</div>
             {activeW.anomalyPct != null && (
-              <div style={{ color: activeW.anomalyPct < -20 ? "#ca8a04" : activeW.anomalyPct > 20 ? "#1d4ed8" : "#16a34a" }}>
+              <div style={{ color: activeW.anomalyPct < -15 ? "#f59e0b" : activeW.anomalyPct > 15 ? "#1d4ed8" : "#16a34a" }}>
                 Anomalía: {activeW.anomalyPct >= 0 ? "+" : ""}{Math.round(activeW.anomalyPct)}%
               </div>
             )}
@@ -788,8 +809,8 @@ function RainHistoryPanel({ estado, history, historyLoading, historyWeeks, setHi
 
             {/* Canvas */}
             <div style={{ position:"relative", marginBottom:6 }}>
-              <canvas ref={omCanvasRef} width={600} height={160}
-                style={{ width:"100%", height:160, cursor:"crosshair", display:"block" }}
+              <canvas ref={omCanvasRef} width={600} height={200}
+                style={{ width:"100%", height:200, cursor:"crosshair", display:"block" }}
                 onMouseMove={e => {
                   const r = e.currentTarget.getBoundingClientRect();
                   const mx = (e.clientX - r.left) * (600 / r.width);
@@ -1034,8 +1055,8 @@ function RainHistoryPanel({ estado, history, historyLoading, historyWeeks, setHi
 
             {/* Canvas NASA */}
             <div style={{ position:"relative", marginBottom:6 }}>
-              <canvas ref={nasaCanvasRef} width={600} height={160}
-                style={{ width:"100%", height:160, cursor:"crosshair", display:"block" }}
+              <canvas ref={nasaCanvasRef} width={600} height={200}
+                style={{ width:"100%", height:200, cursor:"crosshair", display:"block" }}
                 onMouseMove={e => {
                   const r = e.currentTarget.getBoundingClientRect();
                   const mx = (e.clientX - r.left) * (600 / r.width);
@@ -1129,80 +1150,174 @@ function RainHistoryPanel({ estado, history, historyLoading, historyWeeks, setHi
 // ── Funciones Canvas para RainHistoryPanel ──
 function drawOMChart(canvas, data, pinned, hovered) {
   const ctx = canvas.getContext("2d");
-  const W = 600, H = 160;
-  const pad = {l:32,r:8,b:22,t:8};
-  const maxVal = Math.max(...data.map(d => d.mm ?? 0), 1);
+  const W = 600, H = 200;
+  const pad = {l:38,r:10,b:24,t:12};
+  const chartH = H - pad.t - pad.b;
+  const chartW = W - pad.l - pad.r;
+
+  // Escala adaptativa: techo = max(percentil 95, avg*2, 5mm)
+  const sorted = [...data.map(d => d.mm ?? 0)].sort((a,b) => a-b);
+  const p95idx = Math.floor(sorted.length * 0.95);
+  const p95    = sorted[p95idx] || sorted[sorted.length-1] || 1;
   const avg    = data.reduce((s,d)=>s+(d.mm??0),0) / data.length;
+  const maxVal = Math.max(p95, avg * 2.5, 5);
+  // Redondear al múltiplo bonito más cercano
+  const tickStep = maxVal < 10 ? 2 : maxVal < 30 ? 5 : maxVal < 80 ? 10 : maxVal < 200 ? 20 : 50;
+  const axisMax  = Math.ceil(maxVal / tickStep) * tickStep;
+  const scY = v => H - pad.b - Math.round(Math.min(v, axisMax) / axisMax * chartH);
+
   ctx.clearRect(0,0,W,H);
-  const step = (W-pad.l-pad.r) / data.length;
-  const barW = Math.max(1, Math.floor(step * 0.72));
-  const scY = v => H - pad.b - Math.round((v/maxVal)*(H-pad.t-pad.b));
-  // Grid
-  ctx.strokeStyle="rgba(130,130,130,0.12)"; ctx.lineWidth=0.5;
-  for(let i=1;i<=4;i++){const y=H-pad.b-((H-pad.t-pad.b)/4*i);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();}
-  // Avg line
-  ctx.strokeStyle="#185FA550"; ctx.lineWidth=1; ctx.setLineDash([4,3]);
-  ctx.beginPath(); ctx.moveTo(pad.l,scY(avg)); ctx.lineTo(W-pad.r,scY(avg)); ctx.stroke();
+
+  // Fondo leve para zona del gráfico
+  ctx.fillStyle = "rgba(240,245,255,0.04)";
+  ctx.fillRect(pad.l, pad.t, chartW, chartH);
+
+  // Grid horizontal con etiquetas Y
+  ctx.font = "9px monospace"; ctx.textAlign = "right"; ctx.fillStyle = "rgba(110,110,110,0.65)";
+  const nTicks = Math.min(6, Math.floor(axisMax / tickStep));
+  for (let i = 1; i <= nTicks; i++) {
+    const v = i * tickStep;
+    if (v > axisMax) break;
+    const y = scY(v);
+    ctx.strokeStyle = v === Math.round(avg / tickStep) * tickStep
+      ? "rgba(130,130,130,0.2)" : "rgba(130,130,130,0.1)";
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.fillText(v + "mm", pad.l - 3, y + 3);
+  }
+
+  // Línea de media punteada
+  const avgY = scY(avg);
+  ctx.strokeStyle = "#185FA560"; ctx.lineWidth = 1.2; ctx.setLineDash([5,3]);
+  ctx.beginPath(); ctx.moveTo(pad.l, avgY); ctx.lineTo(W - pad.r, avgY); ctx.stroke();
   ctx.setLineDash([]);
-  // Bars
+
+  // Barras
+  const step = chartW / data.length;
+  const barW = Math.max(1, Math.floor(step * 0.75));
+
   data.forEach((d, i) => {
-    const x  = pad.l + i*step + (step-barW)/2;
-    const y  = scY(d.mm??0);
-    const bH = Math.max(1, H-pad.b-y);
-    const isHov = i===hovered; const isPin = i===pinned;
     const mm = d.mm ?? 0;
-    ctx.fillStyle = isPin ? "#185FA5" : isHov ? "#378ADD" : mm > avg*1.3 ? "#2563eb" : mm < avg*0.4 ? "#ca8a04" : "#60a5fa";
-    ctx.globalAlpha = isPin||isHov ? 1 : 0.85;
-    ctx.fillRect(x, y, barW, bH);
+    const x  = pad.l + i * step + (step - barW) / 2;
+    const isHov = i === hovered; const isPin = i === pinned;
+
+    // Color por anomalía respecto a media
+    let col;
+    if (mm === 0)          col = "#d1d5db";            // gris — sin lluvia
+    else if (mm >= axisMax) col = "#1e3a8a";           // azul muy oscuro — desbordado
+    else if (mm > avg * 2) col = "#1d4ed8";            // azul fuerte — muy sobre media
+    else if (mm > avg * 1.3) col = "#3b82f6";          // azul medio
+    else if (mm < avg * 0.3) col = "#f59e0b";          // ámbar — muy bajo
+    else if (mm < avg * 0.7) col = "#93c5fd";          // azul claro
+    else                    col = "#60a5fa";            // azul normal
+
+    if (isPin) col = "#1e40af";
+    if (isHov && !isPin) col = col.replace(/[0-9a-f]{2}$/i, "ff");
+
+    // Barra principal
+    const barTop = scY(mm);
+    const barH   = Math.max(mm === 0 ? 2 : 3, H - pad.b - barTop);
+    ctx.globalAlpha = isPin || isHov ? 1 : 0.88;
+    ctx.fillStyle = col;
+    ctx.fillRect(x, barTop, barW, barH);
     ctx.globalAlpha = 1;
-    if(isPin){ctx.strokeStyle="#185FA5";ctx.lineWidth=1.5;ctx.strokeRect(x-1,y-1,barW+2,bH+2);}
-  });
-  // Labels x-axis (cada 7 días para 90d, cada día para 7d)
-  const labelEvery = data.length > 60 ? 14 : data.length > 20 ? 7 : data.length > 10 ? 3 : 1;
-  ctx.fillStyle="rgba(110,110,110,0.7)"; ctx.font="9px monospace"; ctx.textAlign="center";
-  data.forEach((d,i)=>{
-    if(i%labelEvery===0){
-      const x=pad.l+i*step+step/2;
-      ctx.fillText(d.date.slice(5), x, H-pad.b+12);
+
+    // Indicador de desbordamiento (mm > axisMax)
+    if (mm > axisMax) {
+      ctx.fillStyle = "#1e3a8a";
+      ctx.fillText("▲", x + barW/2, pad.t + 8);
+    }
+
+    // Contorno en barras ancladas
+    if (isPin) {
+      ctx.strokeStyle = "#1e40af"; ctx.lineWidth = 1.5;
+      ctx.strokeRect(x - 1, barTop - 1, barW + 2, barH + 2);
     }
   });
-  // Y labels
-  ctx.textAlign="right";
-  ctx.fillText(Math.round(maxVal), pad.l-3, pad.t+9);
-  ctx.fillText("0", pad.l-3, H-pad.b);
+
+  // Etiquetas eje X
+  const labelEvery = data.length > 70 ? 14 : data.length > 35 ? 7 : data.length > 15 ? 3 : 1;
+  ctx.fillStyle = "rgba(110,110,110,0.7)"; ctx.font = "9px monospace"; ctx.textAlign = "center";
+  data.forEach((d, i) => {
+    if (i % labelEvery === 0) {
+      ctx.fillText(d.date.slice(5), pad.l + i * step + step / 2, H - pad.b + 13);
+    }
+  });
+
+  // Etiqueta "MAX" si hay desbordamiento
+  const overflows = data.filter(d => (d.mm ?? 0) > axisMax);
+  if (overflows.length) {
+    ctx.fillStyle = "#1e3a8aaa"; ctx.font = "8px monospace"; ctx.textAlign = "right";
+    ctx.fillText(`▲ > ${axisMax}mm`, W - pad.r, pad.t + 8);
+  }
 }
 
 function drawNasaChart(canvas, data, pinned, hovered) {
   const ctx = canvas.getContext("2d");
-  const W = 600, H = 160;
-  const pad = {l:36,r:8,b:22,t:8};
-  const maxVal = Math.max(...data.flatMap(d=>[d.obs??0,d.norm??0]),1);
-  ctx.clearRect(0,0,W,H);
-  const gW = (W-pad.l-pad.r) / data.length;
-  const bW = Math.max(2, Math.floor(gW*0.36));
-  const scY = v => H-pad.b-Math.round((v/maxVal)*(H-pad.t-pad.b));
-  ctx.strokeStyle="rgba(130,130,130,0.12)"; ctx.lineWidth=0.5;
-  for(let i=1;i<=4;i++){const y=H-pad.b-((H-pad.t-pad.b)/4*i);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();}
-  data.forEach((d,i) => {
-    const cx = pad.l + i*gW + gW/2;
-    const isHov=i===hovered; const isPin=i===pinned;
+  const W = 600, H = 200;
+  const pad = {l:44,r:10,b:24,t:12};
+  const chartH = H - pad.t - pad.b;
+  const chartW = W - pad.l - pad.r;
+
+  const allVals = data.flatMap(d => [d.obs ?? 0, d.norm ?? 0]);
+  const maxRaw  = Math.max(...allVals, 1);
+  const tickStep = maxRaw < 50 ? 10 : maxRaw < 150 ? 25 : maxRaw < 400 ? 50 : 100;
+  const axisMax  = Math.ceil(maxRaw / tickStep) * tickStep;
+  const scY = v => H - pad.b - Math.round(Math.min(v, axisMax) / axisMax * chartH);
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid con etiquetas Y
+  ctx.font = "9px monospace"; ctx.textAlign = "right"; ctx.fillStyle = "rgba(110,110,110,0.65)";
+  const nTicks = Math.min(6, Math.floor(axisMax / tickStep));
+  for (let i = 1; i <= nTicks; i++) {
+    const v = i * tickStep;
+    if (v > axisMax) break;
+    const y = scY(v);
+    ctx.strokeStyle = "rgba(130,130,130,0.12)"; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.fillText(v + "mm", pad.l - 3, y + 3);
+  }
+
+  const gW = chartW / data.length;
+  const bW = Math.max(3, Math.floor(gW * 0.38));
+
+  data.forEach((d, i) => {
+    const cx = pad.l + i * gW + gW / 2;
+    const isHov = i === hovered; const isPin = i === pinned;
     const ap = d.anomPct ?? 0;
-    const obsCol = ap < -20 ? "#ca8a04" : ap > 20 ? "#2563eb" : "#60a5fa";
-    // Barra observado
-    const x1=cx-bW-1; const y1=scY(d.obs??0); const h1=Math.max(2,H-pad.b-y1);
-    ctx.fillStyle = isPin||isHov ? obsCol : obsCol+"cc";
-    ctx.fillRect(x1,y1,bW,h1);
-    // Barra norma
-    const x2=cx+1; const y2=scY(d.norm??0); const h2=Math.max(2,H-pad.b-y2);
-    ctx.fillStyle="rgba(140,140,140,0.28)";
-    ctx.fillRect(x2,y2,bW,h2);
-    if(isPin){ctx.strokeStyle=obsCol;ctx.lineWidth=1.5;ctx.strokeRect(x1-1,y1-1,bW*2+4,h1+2);}
-    ctx.fillStyle="rgba(110,110,110,0.7)"; ctx.font="9px monospace"; ctx.textAlign="center";
-    ctx.fillText(d.label, cx, H-pad.b+12);
+
+    // Color del observado según anomalía
+    const obsCol = ap < -30 ? "#dc2626"   // rojo — déficit severo
+      : ap < -15 ? "#f59e0b"              // ámbar — déficit leve
+      : ap > 30  ? "#1d4ed8"              // azul fuerte — exceso severo
+      : ap > 15  ? "#3b82f6"              // azul medio — exceso leve
+      : "#16a34a";                        // verde — normal
+
+    // Barra norma (fondo, siempre visible)
+    const x2 = cx - bW + 1; const y2 = scY(d.norm ?? 0); const h2 = Math.max(3, H - pad.b - y2);
+    ctx.fillStyle = "rgba(160,160,160,0.22)";
+    ctx.fillRect(x2, y2, bW * 2, h2);
+
+    // Barra observado (encima, más estrecha)
+    const x1 = cx - Math.floor(bW * 0.7); const y1 = scY(d.obs ?? 0); const h1 = Math.max(3, H - pad.b - y1);
+    ctx.globalAlpha = isPin || isHov ? 1 : 0.88;
+    ctx.fillStyle = obsCol;
+    ctx.fillRect(x1, y1, Math.floor(bW * 1.4), h1);
+    ctx.globalAlpha = 1;
+
+    if (isPin) {
+      ctx.strokeStyle = obsCol; ctx.lineWidth = 1.5;
+      ctx.strokeRect(x1 - 1, y1 - 1, Math.floor(bW * 1.4) + 2, h1 + 2);
+    }
+
+    // Etiqueta X
+    ctx.fillStyle = "rgba(110,110,110,0.7)"; ctx.font = "9px monospace"; ctx.textAlign = "center";
+    ctx.fillText(d.label, cx, H - pad.b + 13);
   });
-  ctx.textAlign="right"; ctx.fillStyle="rgba(110,110,110,0.7)"; ctx.font="9px monospace";
-  ctx.fillText(Math.round(maxVal)+"mm", pad.l-3, pad.t+9);
-  ctx.fillText("0", pad.l-3, H-pad.b);
+
+  ctx.textAlign = "right"; ctx.fillStyle = "rgba(110,110,110,0.7)"; ctx.font = "9px monospace";
+  ctx.fillText(axisMax + "mm", pad.l - 3, pad.t + 9);
 }
 
 
