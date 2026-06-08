@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { Card } from "../Card";
 import { Badge } from "../Badge";
@@ -21,6 +21,24 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
   const [aiExplanation, setAiExplanation] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
+  const [fpOpen, setFpOpen] = useState(false);
+  const [fpData, setFpData] = useState(null);
+  const [fpLoading, setFpLoading] = useState(false);
+  const [fpError, setFpError] = useState(null);
+
+  // Fetch Foro Penal data when panel opens
+  useEffect(() => {
+    if (!fpOpen || fpData) return;
+    setFpLoading(true);
+    setFpError(null);
+    fetch("/api/gdelt?source=foropenal")
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) { setFpError(d.error); } else { setFpData(d); }
+      })
+      .catch(e => setFpError(e.message))
+      .finally(() => setFpLoading(false));
+  }, [fpOpen]);
   const wk = WEEKS[week];
   const prevWk = week > 0 ? WEEKS[week-1] : null;
   const dom = wk.probs.reduce((a,b) => a.v > b.v ? a : b);
@@ -682,9 +700,19 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
                 { v:latest.gob.solicitudes?.toLocaleString() || "—", l:"Solicitudes acum.", sub:"Gobierno", c:ACCENT },
                 { v:trkGobLib ? trkGobLib.toLocaleString() : "—", l:"Libertades plenas acum.", sub:"Gobierno", c:"#16a34a", extra: excNuevos ? `+${excNuevos} sem.` : null },
                 { v:trkFpVerif ? trkFpVerif.toLocaleString() : "—", l:"Excarcelaciones verif.", sub:"Foro Penal", c:"#ca8a04", extra: trkFpDelta ? `+${trkFpDelta}` : null },
-                { v:latest.fp.detenidos?.toLocaleString() || "—", l:"Presos políticos", sub:"Foro Penal", c:"#dc2626" },
+                { v:latest.fp.detenidos?.toLocaleString() || "—", l:"Presos políticos", sub:"Foro Penal", c:"#dc2626", clickable:true },
               ].map((item, i) => (
-                <div key={i} style={{ background:BG3, padding:mob?8:12, textAlign:"center" }}>
+                <div
+                  key={i}
+                  onClick={item.clickable ? () => setFpOpen(o => !o) : undefined}
+                  style={{
+                    background: item.clickable ? (fpOpen ? "#dc262615" : BG3) : BG3,
+                    padding:mob?8:12, textAlign:"center",
+                    cursor: item.clickable ? "pointer" : "default",
+                    border: item.clickable ? `1px solid ${fpOpen ? "#dc262640" : "transparent"}` : "1px solid transparent",
+                    transition: "background 0.15s, border 0.15s",
+                  }}
+                >
                   <div style={{ fontFamily:fontSans, fontSize:mob?18:24, fontWeight:700, color:item.c }}>
                     {item.v}
                   </div>
@@ -693,11 +721,186 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
                   )}
                   <div style={{ fontFamily:font, fontSize:mob?7:8, letterSpacing:"0.08em", color:MUTED, textTransform:"uppercase", marginTop:2 }}>{item.l}</div>
                   <div style={{ fontFamily:font, fontSize:mob?7:8, color:item.c, opacity:0.7 }}>{item.sub}</div>
+                  {item.clickable && (
+                    <div style={{ fontSize:8, color:"#dc262670", fontFamily:font, marginTop:2 }}>
+                      {fpOpen ? "▲ cerrar" : "▼ ver desglose"}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
 
-            {/* Nota carry-forward */}
+            {/* ── Panel expandible Foro Penal ── */}
+            {fpOpen && (
+              <div style={{ marginBottom:12, border:`1px solid #dc262630`, background:"#dc262608" }}>
+                {/* Header */}
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"8px 12px", borderBottom:`1px solid #dc262620` }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:10, fontFamily:font, color:"#dc2626", letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:600 }}>
+                      🔍 La Represión en Cifras · Foro Penal
+                    </span>
+                    {fpData?.fechaActualizacion && (
+                      <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>al {fpData.fechaActualizacion}</span>
+                    )}
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    {fpData && (
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFpData(null); setFpLoading(true); setFpError(null);
+                          fetch("/api/gdelt?source=foropenal")
+                            .then(r=>r.json())
+                            .then(d=>{ if(d.error) setFpError(d.error); else setFpData(d); })
+                            .catch(e=>setFpError(e.message))
+                            .finally(()=>setFpLoading(false));
+                        }}
+                        style={{ fontSize:9, fontFamily:font, color:MUTED, cursor:"pointer", padding:"2px 6px", border:`1px solid ${BORDER}`, borderRadius:3 }}
+                      >↻ actualizar</span>
+                    )}
+                    {fpData?.fetchedAt && (
+                      <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>
+                        {new Date(fpData.fetchedAt).toLocaleTimeString("es-VE",{hour:"2-digit",minute:"2-digit"})}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div style={{ padding:"10px 12px" }}>
+                  {fpLoading && (
+                    <div style={{ textAlign:"center", padding:"16px 0", fontSize:11, fontFamily:font, color:MUTED }}>
+                      Consultando foropenal.com…
+                    </div>
+                  )}
+                  {fpError && (
+                    <div style={{ fontSize:10, fontFamily:font, color:"#dc2626", padding:"8px 0" }}>
+                      ⚠ No se pudo obtener datos: {fpError}
+                    </div>
+                  )}
+                  {fpData && !fpLoading && (() => {
+                    const fp = fpData;
+                    const num = (v) => v != null ? v.toLocaleString("es-VE") : "—";
+
+                    const MiniBar = ({ a, b, ca, cb, la, lb }) => {
+                      const total = (a||0) + (b||0);
+                      const pA = total > 0 ? Math.round((a||0)/total*100) : 50;
+                      return (
+                        <div>
+                          <div style={{ height:6, display:"flex", borderRadius:3, overflow:"hidden", marginBottom:3 }}>
+                            <div style={{ width:`${pA}%`, background:ca }} />
+                            <div style={{ width:`${100-pA}%`, background:cb }} />
+                          </div>
+                          <div style={{ display:"flex", justifyContent:"space-between" }}>
+                            <span style={{ fontSize:8, fontFamily:font, color:ca }}>{la}: {num(a)} ({pA}%)</span>
+                            <span style={{ fontSize:8, fontFamily:font, color:cb }}>{lb}: {num(b)} ({100-pA}%)</span>
+                          </div>
+                        </div>
+                      );
+                    };
+
+                    const Section = ({ title, children }) => (
+                      <div style={{ marginBottom:10 }}>
+                        <div style={{ fontSize:8, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:MUTED, marginBottom:5, paddingBottom:3, borderBottom:`1px solid ${BORDER}30` }}>
+                          {title}
+                        </div>
+                        {children}
+                      </div>
+                    );
+
+                    const StatRow = ({ items }) => (
+                      <div style={{ display:"grid", gridTemplateColumns:`repeat(${items.length}, 1fr)`, gap:4, marginBottom:6 }}>
+                        {items.map((it,idx) => (
+                          <div key={idx} style={{ background:BG3, padding:"6px 8px", textAlign:"center" }}>
+                            <div style={{ fontFamily:fontSans, fontSize:mob?14:16, fontWeight:700, color:it.c||TEXT }}>{num(it.v)}</div>
+                            <div style={{ fontSize:7, fontFamily:font, color:MUTED, textTransform:"uppercase", letterSpacing:"0.06em", marginTop:1 }}>{it.l}</div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+
+                    return (
+                      <div>
+                        {/* Headline */}
+                        <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:10 }}>
+                          <span style={{ fontFamily:fontSans, fontSize:mob?32:40, fontWeight:800, color:"#dc2626", lineHeight:1 }}>
+                            {num(fp.presosTotal)}
+                          </span>
+                          <span style={{ fontFamily:font, fontSize:10, color:MUTED }}>presos políticos en Venezuela</span>
+                        </div>
+
+                        <Section title="Composición">
+                          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:4 }}>
+                            <div>
+                              <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginBottom:3 }}>Por género</div>
+                              <MiniBar a={fp.genero?.hombres} b={fp.genero?.mujeres} ca="#3b82f6" cb="#ec4899" la="Hombres" lb="Mujeres" />
+                            </div>
+                            <div>
+                              <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginBottom:3 }}>Civil / Militar</div>
+                              <MiniBar a={fp.tipo?.civiles} b={fp.tipo?.militares} ca="#6366f1" cb="#f59e0b" la="Civiles" lb="Militares" />
+                            </div>
+                          </div>
+                        </Section>
+
+                        <Section title="Situación Judicial">
+                          <StatRow items={[
+                            { v:fp.situacionJudicial?.condenados, l:"Condenados", c:"#dc2626" },
+                            { v:fp.situacionJudicial?.noCondenados, l:"Sin condena", c:"#f59e0b" },
+                            { v:fp.edad?.adultos, l:"Adultos", c:MUTED },
+                            { v:fp.edad?.adolescentes, l:"Adolescentes (14–17)", c:"#dc2626" },
+                          ]} />
+                          <MiniBar a={fp.situacionJudicial?.condenados} b={fp.situacionJudicial?.noCondenados} ca="#dc2626" cb="#f59e0b" la="Condenados" lb="No condenados" />
+                        </Section>
+
+                        <Section title="Movimientos recientes">
+                          <StatRow items={[
+                            { v:fp.movimientosRecientes?.encarcelaciones, l:"Encarcelaciones", c:"#dc2626" },
+                            { v:fp.movimientosRecientes?.excarcelaciones, l:"Excarcelaciones", c:"#16a34a" },
+                            { v:fp.movimientosRecientes?.reportadosRecien, l:"Reportados reciente", c:"#f59e0b" },
+                            { v:fp.movimientosRecientes?.extranjeros, l:"Nac. extranjera", c:MUTED },
+                          ]} />
+                        </Section>
+
+                        <Section title="Arrestos acumulados desde 2014">
+                          <StatRow items={[
+                            { v:fp.arrestosAcumulados?.total, l:"Total detenciones", c:"#dc2626" },
+                            { v:fp.arrestosAcumulados?.asistidosExcarcelados, l:"Asistidos / Excarc.", c:"#16a34a" },
+                            { v:fp.arrestosAcumulados?.cautelaresVigentes, l:"Cautelares vigentes", c:"#f59e0b" },
+                            { v:fp.arrestosAcumulados?.fallecidosCustodia, l:"Fallecidos custodia", c:"#dc2626" },
+                          ]} />
+                          {fp.arrestosAcumulados?.presentadosTribunalesMilitares != null && (
+                            <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginTop:2 }}>
+                              ⚖ {num(fp.arrestosAcumulados.presentadosTribunalesMilitares)} civiles presentados ante tribunales militares
+                            </div>
+                          )}
+                        </Section>
+
+                        <Section title="Ley de Amnistía (desde 20 feb 2026)">
+                          <StatRow items={[
+                            { v:fp.amnistia?.libertadPlenaPrivados, l:"Libertad plena (privados)", c:"#16a34a" },
+                            { v:fp.amnistia?.libertadPlenaCautelar, l:"Libertad plena (cautelar)", c:"#16a34a" },
+                          ]} />
+                        </Section>
+
+                        <Section title="Arrestos 2026">
+                          <StatRow items={[
+                            { v:fp.arrestos2026?.detenciones, l:"Detenciones / encarc.", c:"#dc2626" },
+                            { v:fp.arrestos2026?.liberaciones, l:"Liberaciones / excarc.", c:"#16a34a" },
+                          ]} />
+                        </Section>
+
+                        <div style={{ fontSize:8, fontFamily:font, color:`${MUTED}60`, marginTop:4, display:"flex", justifyContent:"space-between" }}>
+                          <span>Fuente: foropenal.com/represion-en-cifras</span>
+                          <span>Cache: 1 hora · Vercel CDN</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+
+
             {sinDatosNuevos && (
               <div style={{ marginBottom:8, padding:"5px 10px", background:`${MUTED}08`, border:`1px solid ${BORDER}`, borderRadius:4, fontSize:10, fontFamily:font, color:MUTED }}>
                 📋 Sin nuevos datos oficiales esta semana — cifras acumuladas del último reporte disponible
