@@ -2,9 +2,118 @@ const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 const FIRMS_BASE = "https://firms.modaps.eosdis.nasa.gov/api/area/csv";
 const OM_FORECAST_BASE = "https://api.open-meteo.com/v1/forecast";
 const OM_ARCHIVE_BASE  = "https://archive-api.open-meteo.com/v1/archive";
+const FOROPENAL_URL   = "https://foropenal.com/represion-en-cifras";
 
 module.exports = async function handler(req, res) {
   const { signal, source, days, bbox, key, lat, lon, past_days, forecast_days, start_date, end_date } = req.query;
+
+  // ── Foro Penal scraper (?source=foropenal) ──
+  if (source === "foropenal") {
+    try {
+      const r = await fetch(FOROPENAL_URL, {
+        signal: AbortSignal.timeout(15000),
+        headers: { "User-Agent": "PNUD-Monitor/1.0 (monitor@undp.org)" },
+      });
+      if (!r.ok) return res.status(200).json({ error: `Foro Penal HTTP ${r.status}` });
+      const html = await r.text();
+
+      // Helper: extract first integer after a label pattern
+      const extractNum = (pattern) => {
+        const m = html.match(pattern);
+        return m ? parseInt(m[1].replace(/\./g, "").replace(/,/g, ""), 10) : null;
+      };
+
+      // Extract numbers from the page HTML
+      // The page embeds numbers directly in text nodes like "404\npresos políticos"
+      const grabNumber = (label) => {
+        // Match a number (possibly with dots as thousands sep) near the label text
+        const re = new RegExp(
+          "([\\d][\\d\\.]*)[\\s\\S]{0,200}" + label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+          "i"
+        );
+        const m = html.match(re);
+        return m ? parseInt(m[1].replace(/\./g, ""), 10) : null;
+      };
+
+      const grabAfter = (label) => {
+        const re = new RegExp(
+          label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "[\\s\\S]{0,100}?([\\d][\\d\\.]*)",
+          "i"
+        );
+        const m = html.match(re);
+        return m ? parseInt(m[1].replace(/\./g, ""), 10) : null;
+      };
+
+      // Primary numbers visible in page header/hero
+      const totalPresos   = grabNumber("presos pol[ií]ticos en Venezuela al");
+      const hombres       = grabNumber("Hombres");
+      const mujeres       = grabNumber("Mujeres");
+      const civiles       = grabNumber("Civiles");
+      const militares     = grabNumber("Militares");
+      const adultos       = grabNumber("Adultos");
+      const adolescentes  = grabNumber("Adolescentes");
+      const condenados    = grabNumber("Condenados");
+      const noCondenados  = grabNumber("No condenados");
+
+      // Movimientos recientes
+      const encarcelaciones  = grabNumber("Encarcelaciones");
+      const excarcelaciones  = grabNumber("Excarcelaciones");
+      const reportadosRecien = grabNumber("Presos reportados recientemente");
+      const extranjeros      = grabNumber("nacionalidad extranjera");
+
+      // Arrestos acumulados section
+      const arrestosDesde2014 = grabNumber("detenciones pol[ií]ticas en Venezuela");
+      const asistidos         = grabNumber("hoy excarcelados");
+      const cautelares        = grabNumber("medidas restrictivas");
+      const fallecidos        = grabNumber("Fallecidos en custodia");
+      const presentadosTrib   = grabNumber("tribunales militares");
+
+      // Ley de amnistía
+      const amnistiaPrivados  = grabNumber("privados de libertad");
+      const amnistiaCautelar  = grabAfter("Libertad plena");
+
+      // Arrestos 2026
+      const detenciones2026   = grabNumber("Detenciones");
+      const liberaciones2026  = grabNumber("Liberaciones");
+
+      // Extract update date from page text
+      const fechaM = html.match(/al\s+([\d]{1,2}\s+de\s+\w+\s+de\s+[\d]{4})/i);
+      const fechaActualizacion = fechaM ? fechaM[1] : null;
+
+      const data = {
+        fechaActualizacion,
+        presosTotal: totalPresos,
+        genero: { hombres, mujeres },
+        tipo: { civiles, militares },
+        edad: { adultos, adolescentes },
+        situacionJudicial: { condenados, noCondenados },
+        movimientosRecientes: { encarcelaciones, excarcelaciones, reportadosRecien, extranjeros },
+        arrestosAcumulados: {
+          desdeAnio: 2014,
+          total: arrestosDesde2014,
+          asistidosExcarcelados: asistidos,
+          cautelaresVigentes: cautelares,
+          fallecidosCustodia: fallecidos,
+          presentadosTribunalesMilitares: presentadosTrib,
+        },
+        amnistia: {
+          desde: "20 de febrero de 2026",
+          libertadPlenaPrivados: amnistiaPrivados,
+          libertadPlenaCautelar: amnistiaCautelar,
+        },
+        arrestos2026: {
+          detenciones: detenciones2026,
+          liberaciones: liberaciones2026,
+        },
+        fetchedAt: new Date().toISOString(),
+      };
+
+      res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=1800");
+      return res.status(200).json(data);
+    } catch (e) {
+      return res.status(200).json({ error: e.message });
+    }
+  }
 
   // ── Open-Meteo forecast proxy (?source=omforecast) ──
   if (source === "omforecast") {
