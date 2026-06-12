@@ -718,5 +718,41 @@ export const GDELT_ANNOTATIONS = [
     "tier": "CRITICAL",
     "tierEs": "CRÍTICO",
     "label": "Matriz 22–29 mayo ubica E3 en 47%, E1 en 37%, E4 en 12% y E2 en 4%; brecha E3-E1 baja a 10pp."
+  },
+  {
+    "date": "2026-05-29",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Instrucción PDVSA–Tesoro centraliza supervisión de flujos petroleros e ingresos."
+  },
+  {
+    "date": "2026-06-01",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Foro Penal registra 404 presos políticos; El Helicoide continúa operativo."
+  },
+  {
+    "date": "2026-06-02",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Asamblea Nacional aprueba por unanimidad en primera discusión reforma eléctrica de 42 artículos."
+  },
+  {
+    "date": "2026-06-03",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Marcha desde Chacaíto hasta la Embajada de EE.UU. exige presos políticos, calendario electoral y salarios."
+  },
+  {
+    "date": "2026-06-04",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Dan Caine realiza la primera visita de un jefe del Estado Mayor Conjunto de EE.UU. a Caracas."
+  },
+  {
+    "date": "2026-06-05",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 29 mayo–5 junio ubica E3 en 49%, E1 en 34%, E4 en 13% y E2 en 4%; brecha E3-E1 sube a 15pp."
   }
 ];

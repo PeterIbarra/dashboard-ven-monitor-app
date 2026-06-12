@@ -4161,6 +4161,217 @@ export const SITREP_ALL = [
       }
     ]
   }
+  ,
+  {
+    "period": "29 de mayo – 5 de junio de 2026",
+    "periodShort": "29 may–5 jun 2026",
+    "keyPoints": [
+      {
+        "tag": "Seguridad",
+        "color": "#0468B1",
+        "title": "Dan Caine eleva la cooperación bilateral al máximo nivel militar",
+        "text": "La primera visita a Caracas de un jefe del Estado Mayor Conjunto de EE.UU. convierte la cooperación de seguridad en un pilar explícito de la normalización y refuerza la capacidad de gestión de E3."
+      },
+      {
+        "tag": "Energía",
+        "color": "#22c55e",
+        "title": "PDVSA–Tesoro centraliza flujos y supervisión petrolera",
+        "text": "La instrucción del 28 de mayo ordena el manejo de ingresos y exportaciones bajo un esquema centralizado. Venezuela exporta 1,25 millones de bpd e India absorbe 427.000 bpd como segundo comprador."
+      },
+      {
+        "tag": "Finanzas",
+        "color": "#ca8a04",
+        "title": "FMI y asesores legales profundizan la arquitectura externa",
+        "text": "Álvaro Piris y Hogan Lovells amplían el soporte técnico para relación multilateral, deuda y acreedores. La estabilización avanza mediante capacidades externas antes que por reformas políticas internas."
+      },
+      {
+        "tag": "Institucional",
+        "color": "#7c3aed",
+        "title": "Reforma eléctrica abre concesiones y capital privado",
+        "text": "La Asamblea Nacional aprueba por unanimidad en primera discusión un proyecto de 42 artículos, con participación privada o mixta y concesiones de hasta 25 años prorrogables."
+      },
+      {
+        "tag": "Derechos humanos",
+        "color": "#dc2626",
+        "title": "La normalización convive con coerción selectiva",
+        "text": "Foro Penal registra 404 presos políticos al 1 de junio, El Helicoide continúa operativo y persisten detenciones focalizadas y acciones patrimoniales contra opositores."
+      }
+    ],
+    "sintesis": "La semana del 29 de mayo al 5 de junio consolida a E3 en 49% y amplía a 15 puntos su ventaja sobre E1. El patrón dominante ya no es solo fortaleza externa frente a debilidad doméstica, sino institucionalización de la normalización: PDVSA y Tesoro centralizan flujos; Dan Caine eleva la cooperación de seguridad; FMI, Hogan Lovells y asesores financieros construyen capacidad de negociación; y la reforma eléctrica abre capital privado bajo conducción estatal. Al mismo tiempo, la ausencia de retorno de María Corina Machado, nuevo CNE y calendario vinculante reduce E1 a 34%. La protesta continúa, con 42 acciones en 15 entidades, pero es absorbida sin represión sistémica. La coerción permanece selectiva y compatible con E3, elevando E4 a 13%.",
+    "actores": [
+      {
+        "name": "EE.UU.",
+        "items": [
+          "Dan Caine realiza la primera visita de un jefe del Estado Mayor Conjunto de EE.UU. a Caracas.",
+          "Tesoro profundiza la supervisión de flujos petroleros mediante la instrucción operativa con PDVSA.",
+          "La cooperación bilateral combina seguridad, energía y estabilización financiera.",
+          "El horizonte electoral mencionado por Marco Rubio y María Elvira Salazar se desplaza hacia 2027–2028 sin compromiso vinculante.",
+          "La marcha del 3 de junio entrega demandas sobre presos políticos, elecciones y salarios ante la Embajada estadounidense."
+        ]
+      },
+      {
+        "name": "Gobierno Interino (Rodríguez)",
+        "items": [
+          "Centraliza la gestión petrolera y de ingresos bajo coordinación PDVSA–Tesoro.",
+          "Recibe a Dan Caine y profundiza cooperación de seguridad con Washington.",
+          "Promueve reforma eléctrica con participación privada y mixta bajo rectoría estatal.",
+          "Sostiene exportaciones de 1,25 millones de bpd y diversifica ventas hacia India.",
+          "Mantiene control político interno y tolera mecanismos de coerción focalizada."
+        ]
+      },
+      {
+        "name": "Asamblea Nacional / Poder Judicial",
+        "items": [
+          "Aprueba por unanimidad en primera discusión el proyecto de reforma eléctrica de 42 artículos.",
+          "El proyecto contempla concesiones de 25 años prorrogables por 15 y participación privada o mixta.",
+          "No materializa renovación del CNE ni calendario electoral verificable.",
+          "La arquitectura judicial y penitenciaria mantiene abierto El Helicoide.",
+          "Persisten actuaciones selectivas contra trabajadores, abogados y activos de dirigentes opositores."
+        ]
+      },
+      {
+        "name": "Oposición / Sociedad Civil",
+        "items": [
+          "Los retornos de Azuaje, Richard Blanco, Ocariz, Marrero y Toledo reconstruyen presencia territorial.",
+          "María Corina Machado no retorna; su ingreso efectivo sigue siendo el principal indicador prospectivo.",
+          "Edmundo González Urrutia mantiene condiciones democráticas y electorales para una salida legítima.",
+          "La marcha del 3 de junio recorre Chacaíto–Embajada de EE.UU. por presos políticos, calendario y salarios.",
+          "Foro Penal registra 404 presos políticos y documenta 29 excarcelaciones del caso Mibiturven."
+        ]
+      },
+      {
+        "name": "Comunidad Internacional",
+        "items": [
+          "India recibe delegación venezolana del 3 al 7 de junio y se consolida como segundo comprador de crudo.",
+          "Álvaro Piris apoya la relación técnica con el FMI.",
+          "Hogan Lovells se incorpora a la arquitectura legal de deuda y acreedores.",
+          "Reliance, Tata y ONGC aparecen como interlocutores de la diversificación energética y empresarial.",
+          "La normalización externa avanza más rápido que las garantías políticas internas."
+        ]
+      }
+    ],
+    "nacional": {
+      "amnistia": {
+        "solicitudes": null,
+        "libertades": 8740,
+        "privadosLiberados": 29,
+        "cautelares": 8426,
+        "militares": 187,
+        "fpVerificados": 29,
+        "fpDetenidos": 404,
+        "fpNota": "Foro Penal registra 404 presos políticos al 1 de junio. La liberación de 29 personas vinculadas al caso Mibiturven no elimina la brecha de trazabilidad ni la continuidad operativa de El Helicoide."
+      },
+      "rodriguez": [
+        {
+          "title": "Centralización petrolera",
+          "text": "La instrucción PDVSA–Tesoro concentra supervisión de exportaciones e ingresos como núcleo de la estabilización."
+        },
+        {
+          "title": "Cooperación de seguridad",
+          "text": "La visita de Dan Caine normaliza un canal militar de alto nivel sin contraprestación electoral visible."
+        },
+        {
+          "title": "Apertura eléctrica administrada",
+          "text": "La reforma permite capital privado o mixto, pero preserva la conducción estatal y concesiones reguladas."
+        },
+        {
+          "title": "Control selectivo",
+          "text": "El Helicoide, detenciones focalizadas y acciones patrimoniales muestran que la apertura no equivale a desmantelamiento coercitivo."
+        }
+      ],
+      "mcmAgenda": [
+        "Retorno efectivo sin represalia",
+        "Nuevo CNE y calendario vinculante",
+        "Liberación verificable de presos políticos"
+      ]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "1,25M bpd", "label": "Exportaciones petroleras", "color": "#22c55e" },
+        { "value": "427K bpd", "label": "Compras de India", "color": "#38bdf8" },
+        { "value": "269K bpd", "label": "Chevron", "color": "#f59e0b" },
+        { "value": "9,2–12,2%", "label": "Inflación de mayo", "color": "#dc2626" },
+        { "value": "-33%", "label": "Bolsa vs. pico febrero", "color": "#dc2626" }
+      ],
+      "empresas": [
+        { "empresa": "PDVSA / Tesoro", "desarrollo": "Implementan esquema centralizado de supervisión de flujos petroleros e ingresos." },
+        { "empresa": "Chevron", "desarrollo": "Volumen se reduce a 269.000 bpd dentro de una canasta exportadora más diversificada." },
+        { "empresa": "Reliance / ONGC", "desarrollo": "India profundiza diálogo energético y recibe 427.000 bpd de crudo venezolano." },
+        { "empresa": "Hogan Lovells", "desarrollo": "Se incorpora al frente legal vinculado con deuda, acreedores y normalización financiera." },
+        { "empresa": "Tata", "desarrollo": "Figura entre los interlocutores empresariales de la visita venezolana a India." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": {
+        "total": 42,
+        "promDiario": 10.5,
+        "periodo": "29 may–4 jun",
+        "variacion": "Estable frente a S20, con cobertura en 15 entidades y mayor visibilidad política el 3 de junio.",
+        "composicion": "Laborales, seguridad social, vivienda, agua, justicia, salud, educación, participación política y derechos de detenidos.",
+        "nota": "La marcha Chacaíto–Embajada de EE.UU. fue absorbida sin represión sistémica ni concesión institucional inmediata."
+      },
+      "percepcion": {
+        "fuente": "Síntesis de matriz y análisis situacional, 29 may–5 jun",
+        "titulo": "La estabilización externa no corrige la presión cotidiana",
+        "nota": "Inflación, brecha cambiaria, ingreso insuficiente y fallas de servicios mantienen vulnerabilidad social mientras la arquitectura externa gana profundidad.",
+        "datos": [
+          { "factor": "Ingreso/canasta alimentaria", "pct": 32.8 },
+          { "factor": "Brecha cambiaria", "pct": 35 },
+          { "factor": "Corrección Bolsa Caracas", "pct": 33 },
+          { "factor": "Estados con protestas", "pct": 62.5 }
+        ]
+      },
+      "excarcelados": {
+        "fp": 29,
+        "presos": 404,
+        "militares": 187,
+        "fuente": "Foro Penal / balance semanal SITREP"
+      }
+    },
+    "marcoNormativo": {
+      "titulo": "Reforma eléctrica y centralización operativa de ingresos",
+      "resumen": "La semana combina una reforma sectorial de 42 artículos con un mecanismo operativo PDVSA–Tesoro. El primer movimiento abre inversión privada y mixta mediante concesiones; el segundo concentra la supervisión del principal flujo de divisas. Ambos refuerzan una normalización administrada desde el Ejecutivo.",
+      "cambios": [
+        { "titulo": "Primera discusión unánime", "texto": "La Asamblea Nacional aprueba el proyecto eléctrico sin votos en contra.", "color": "#0468B1" },
+        { "titulo": "Concesiones 25+15", "texto": "Operadores privados o mixtos pueden participar mediante concesiones prorrogables.", "color": "#22c55e" },
+        { "titulo": "PDVSA–Tesoro", "texto": "La supervisión de exportaciones e ingresos se concentra bajo un esquema bilateral.", "color": "#f59e0b" },
+        { "titulo": "Déficit electoral", "texto": "No hay nuevo CNE ni calendario verificable que acompañe la apertura económica.", "color": "#dc2626" }
+      ],
+      "lecturaAnalitica": "El paquete refuerza E3 porque convierte la apertura en capacidad institucional y operativa sin transferir todavía control político. Su sostenibilidad dependerá de inversión efectiva, mejora del servicio eléctrico y avances verificables en garantías democráticas."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "49%", "color": "#0468B1", "text": "Sube por centralización petrolera, cooperación militar, arquitectura financiera y reforma eléctrica." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "34%", "color": "#2d8a30", "text": "Retrocede sin retorno de MCM, nuevo CNE ni calendario electoral vinculante." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "13%", "color": "#ca8a04", "text": "Aumenta por coerción selectiva, El Helicoide y tensiones internas, sin escalada sistémica." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "4%", "color": "#dc2626", "text": "Permanece bajo: la fragilidad social crece, pero petróleo y soporte externo contienen la ruptura inmediata." }
+    ],
+    "comentarios": [
+      {
+        "tag": "Cambio estructural",
+        "color": "#0468B1",
+        "title": "E3 pasa de normalización informal a arquitectura institucional",
+        "text": "Seguridad, petróleo, finanzas y electricidad quedan conectados en un esquema de estabilización con conducción estatal y soporte externo."
+      },
+      {
+        "tag": "Transición",
+        "color": "#2d8a30",
+        "title": "La movilización no sustituye los hitos institucionales pendientes",
+        "text": "Los retornos y la marcha del 3 de junio sostienen presencia opositora, pero MCM, CNE y calendario siguen sin materializarse."
+      },
+      {
+        "tag": "Riesgo E4",
+        "color": "#ca8a04",
+        "title": "La coerción selectiva sigue siendo funcional a la apertura",
+        "text": "El sistema contiene actores y protestas sin recurrir a represión masiva, pero conserva instalaciones, detenciones y presión patrimonial."
+      },
+      {
+        "tag": "Watchlist",
+        "color": "#dc2626",
+        "title": "El retorno de María Corina Machado es el indicador decisivo",
+        "text": "Su ingreso efectivo y la respuesta estatal permitirán distinguir entre apertura calibrada, transición real o escalada coercitiva."
+      }
+    ]
+  }
 ];
 
 export const CURATED_NEWS = [
@@ -4721,6 +4932,94 @@ export const CURATED_NEWS = [
       "Político"
     ],
     "week": "S8"
+  },
+  {
+    "title": "Instrucción PDVSA–Tesoro centraliza supervisión de flujos petroleros e ingresos",
+    "date": "2026-05-29",
+    "source": "Matriz semanal / análisis situacional",
+    "scenarios": ["E3"],
+    "dims": ["Energético", "Económico", "Internacional"],
+    "week": "S21"
+  },
+  {
+    "title": "Foro Penal registra 404 presos políticos al 1 de junio",
+    "date": "2026-06-01",
+    "source": "Foro Penal",
+    "scenarios": ["E4", "E1"],
+    "dims": ["Político", "Social"],
+    "week": "S21"
+  },
+  {
+    "title": "El Helicoide continúa operativo pese al proceso de normalización",
+    "date": "2026-06-01",
+    "source": "Análisis situacional / derechos humanos",
+    "scenarios": ["E4"],
+    "dims": ["Político", "Social"],
+    "week": "S21"
+  },
+  {
+    "title": "AN aprueba por unanimidad en primera discusión reforma eléctrica de 42 artículos",
+    "date": "2026-06-02",
+    "source": "Asamblea Nacional",
+    "scenarios": ["E3", "E2"],
+    "dims": ["Energético", "Constitucional", "Económico"],
+    "week": "S21"
+  },
+  {
+    "title": "Marcha Chacaíto–Embajada de EE.UU. exige presos políticos, elecciones y salarios",
+    "date": "2026-06-03",
+    "source": "OVCS / organizaciones convocantes",
+    "scenarios": ["E1", "E4"],
+    "dims": ["Social", "Político"],
+    "week": "S21"
+  },
+  {
+    "title": "Delegación venezolana visita India para ampliar cooperación energética y empresarial",
+    "date": "2026-06-03",
+    "source": "Gobiernos de Venezuela e India",
+    "scenarios": ["E3"],
+    "dims": ["Internacional", "Energético", "Económico"],
+    "week": "S21"
+  },
+  {
+    "title": "India se consolida como segundo comprador de crudo venezolano con 427.000 bpd",
+    "date": "2026-06-04",
+    "source": "Análisis situacional / datos de comercio petrolero",
+    "scenarios": ["E3", "E2"],
+    "dims": ["Energético", "Internacional"],
+    "week": "S21"
+  },
+  {
+    "title": "Dan Caine realiza primera visita de un jefe del Estado Mayor Conjunto de EE.UU. a Caracas",
+    "date": "2026-06-04",
+    "source": "Gobiernos de EE.UU. y Venezuela",
+    "scenarios": ["E3", "E4"],
+    "dims": ["Internacional", "Político"],
+    "week": "S21"
+  },
+  {
+    "title": "Exportaciones petroleras venezolanas alcanzan 1,25 millones de bpd",
+    "date": "2026-06-05",
+    "source": "Análisis situacional / seguimiento energético",
+    "scenarios": ["E3", "E2"],
+    "dims": ["Energético", "Económico"],
+    "week": "S21"
+  },
+  {
+    "title": "Inflación de mayo se estima entre 9,2% y 12,2%",
+    "date": "2026-06-05",
+    "source": "Estimaciones económicas recopiladas en SITREP",
+    "scenarios": ["E2", "E4"],
+    "dims": ["Económico", "Social"],
+    "week": "S21"
+  },
+  {
+    "title": "OVCS registra 42 protestas en 15 entidades entre el 29 de mayo y el 4 de junio",
+    "date": "2026-06-05",
+    "source": "OVCS",
+    "scenarios": ["E4", "E2", "E1"],
+    "dims": ["Social", "Político"],
+    "week": "S21"
   }
 ];
 
@@ -8490,5 +8789,93 @@ export const CURATED_FACTCHECK = [
       "Social"
     ],
     "week": "S20"
+  },
+  {
+    "title": "Instrucción PDVSA–Tesoro centraliza supervisión de flujos petroleros e ingresos",
+    "date": "2026-05-29",
+    "source": "Matriz semanal / análisis situacional",
+    "scenarios": ["E3"],
+    "dims": ["Energético", "Económico", "Internacional"],
+    "week": "S21"
+  },
+  {
+    "title": "Foro Penal registra 404 presos políticos al 1 de junio",
+    "date": "2026-06-01",
+    "source": "Foro Penal",
+    "scenarios": ["E4", "E1"],
+    "dims": ["Político", "Social"],
+    "week": "S21"
+  },
+  {
+    "title": "El Helicoide continúa operativo pese al proceso de normalización",
+    "date": "2026-06-01",
+    "source": "Análisis situacional / derechos humanos",
+    "scenarios": ["E4"],
+    "dims": ["Político", "Social"],
+    "week": "S21"
+  },
+  {
+    "title": "AN aprueba por unanimidad en primera discusión reforma eléctrica de 42 artículos",
+    "date": "2026-06-02",
+    "source": "Asamblea Nacional",
+    "scenarios": ["E3", "E2"],
+    "dims": ["Energético", "Constitucional", "Económico"],
+    "week": "S21"
+  },
+  {
+    "title": "Marcha Chacaíto–Embajada de EE.UU. exige presos políticos, elecciones y salarios",
+    "date": "2026-06-03",
+    "source": "OVCS / organizaciones convocantes",
+    "scenarios": ["E1", "E4"],
+    "dims": ["Social", "Político"],
+    "week": "S21"
+  },
+  {
+    "title": "Delegación venezolana visita India para ampliar cooperación energética y empresarial",
+    "date": "2026-06-03",
+    "source": "Gobiernos de Venezuela e India",
+    "scenarios": ["E3"],
+    "dims": ["Internacional", "Energético", "Económico"],
+    "week": "S21"
+  },
+  {
+    "title": "India se consolida como segundo comprador de crudo venezolano con 427.000 bpd",
+    "date": "2026-06-04",
+    "source": "Análisis situacional / datos de comercio petrolero",
+    "scenarios": ["E3", "E2"],
+    "dims": ["Energético", "Internacional"],
+    "week": "S21"
+  },
+  {
+    "title": "Dan Caine realiza primera visita de un jefe del Estado Mayor Conjunto de EE.UU. a Caracas",
+    "date": "2026-06-04",
+    "source": "Gobiernos de EE.UU. y Venezuela",
+    "scenarios": ["E3", "E4"],
+    "dims": ["Internacional", "Político"],
+    "week": "S21"
+  },
+  {
+    "title": "Exportaciones petroleras venezolanas alcanzan 1,25 millones de bpd",
+    "date": "2026-06-05",
+    "source": "Análisis situacional / seguimiento energético",
+    "scenarios": ["E3", "E2"],
+    "dims": ["Energético", "Económico"],
+    "week": "S21"
+  },
+  {
+    "title": "Inflación de mayo se estima entre 9,2% y 12,2%",
+    "date": "2026-06-05",
+    "source": "Estimaciones económicas recopiladas en SITREP",
+    "scenarios": ["E2", "E4"],
+    "dims": ["Económico", "Social"],
+    "week": "S21"
+  },
+  {
+    "title": "OVCS registra 42 protestas en 15 entidades entre el 29 de mayo y el 4 de junio",
+    "date": "2026-06-05",
+    "source": "OVCS",
+    "scenarios": ["E4", "E2", "E1"],
+    "dims": ["Social", "Político"],
+    "week": "S21"
   }
-];
+].filter(item => item.verdict);

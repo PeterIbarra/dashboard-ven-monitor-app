@@ -1,83 +1,83 @@
 export const WEEK_DRIVERS = {
   "1": {
-    "label": "Alta, en ascenso limitado",
+    "label": "Alta, pero en retroceso operativo",
     "drivers": [
-      "El Manifiesto de Panamá produce el primer documento estratégico conjunto en dos años y alinea a Machado y González Urrutia.",
-      "Exige presos políticos, retorno seguro de exiliados, nuevo CNE y cronograma electoral verificado.",
-      "Los retornos de Ocariz, Toledo y Marrero reconstituyen presencia territorial opositora.",
-      "MCM conserva la imagen positiva más alta del tablero con 55%.",
-      "Las movilizaciones del 30 de mayo y 3 de junio medirán tracción territorial post-Panamá.",
-      "El avance es limitado porque el Manifiesto subordina el calendario opositor al Plan de Tres Fases de Washington.",
-      "Sin retorno efectivo de MCM, nuevo CNE ni cronograma verificable, E1 mejora organizativamente pero no es inminente."
+      "E1 baja a 34% porque la articulación opositora aún no produce un mecanismo institucional de transición.",
+      "La marcha del 3 de junio demostró capacidad de movilización y fue absorbida sin represión sistémica.",
+      "Los retornos de Azuaje, Richard Blanco, Ocariz, Marrero y Toledo reconstruyen presencia territorial.",
+      "González Urrutia mantiene condiciones democráticas y electorales como requisito de legitimidad.",
+      "María Corina Machado no ha retornado al país, principal indicador pendiente de la semana.",
+      "No existe renovación del CNE ni calendario electoral vinculante y verificable.",
+      "El horizonte 2027–2028 mencionado desde Washington prolonga E3 más de lo que acelera E1."
     ],
     "signals": [
       "Retorno efectivo de MCM sin represalia",
-      "Respuesta a movilizaciones 30 mayo y 3 junio",
       "Nuevo CNE o cronograma electoral",
-      "Reacción oficial al Manifiesto de Panamá",
-      "Retornos de Pérez Vivas y Azuaje",
-      "Condicionamiento OFAC a hitos electorales"
+      "Garantías para nuevos retornos opositores",
+      "Liberación verificable de presos políticos",
+      "Condicionamiento externo a hitos electorales",
+      "Conversión de movilización social en acuerdos institucionales"
     ]
   },
   "2": {
-    "label": "Baja, con deterioro acumulativo",
+    "label": "Baja, contenida por amortiguadores externos",
     "drivers": [
-      "E2 se mantiene en 4% porque la arquitectura financiera internacional contrapesa el colapso inmediato.",
-      "Centerview, Vanguard, GMO y bonos al alza muestran apuesta contra ruptura de corto plazo.",
-      "La desaceleración del PIB Q1 a 2,51% confirma pérdida de impulso económico.",
-      "El PIB petrolero negativo y producción neta de ~980.000 bpd advierten límites del ancla energética.",
-      "Canasta de USD 730,59 frente a ingreso de USD 240 sostiene presión social.",
-      "Inflación anualizada cercana a 600% y brecha cambiaria de 30-45% mantienen vulnerabilidad macro.",
-      "E2 no sube porque Washington, India y mercados preservan incentivos de estabilidad."
+      "E2 permanece en 4% porque la arquitectura financiera internacional reduce el riesgo de ruptura inmediata.",
+      "Exportaciones de 1,25 millones de bpd sostienen capacidad de generación de divisas.",
+      "India absorbe 427.000 bpd y funciona como segundo eje de diversificación energética.",
+      "La inflación de mayo, entre 9,2% y 12,2%, mantiene presión severa sobre hogares.",
+      "El ingreso integral cubre apenas 32,8% de la canasta alimentaria.",
+      "La brecha cambiaria ronda 35% y la Bolsa de Caracas corrige 33% desde febrero.",
+      "La fragilidad eléctrica y la desaceleración del PIB se acumulan, pero todavía no convergen en colapso."
     ],
     "signals": [
-      "Investigación en Washington sobre Centerview/Claver-Carone",
-      "Petróleo por debajo de USD 50",
-      "PIB petrolero Q2 confirma caída",
+      "Inflación mensual supera 15%",
       "Brecha cambiaria supera 45%",
-      "Licencias OFAC revertidas",
-      "Deterioro eléctrico afecta pozos"
+      "Caída sostenida de exportaciones petroleras",
+      "Deterioro eléctrico afecta producción",
+      "Interrupción de arquitectura financiera externa",
+      "Escalada simultánea de protestas por salarios y servicios"
     ]
   },
   "3": {
-    "label": "Muy alta, dominante con erosión doméstica",
+    "label": "Muy alta, nuevamente consolidada",
     "drivers": [
-      "E3 sigue dominante en 47% porque el andamiaje externo de la semana es el más robusto del período.",
-      "La segunda visita del SOUTHCOM normaliza presencia de seguridad estadounidense sin crisis política inmediata.",
-      "Centerview convierte la renegociación de deuda en proceso operativo.",
-      "El flujo de petróleo a EE.UU. bajo Tesoro/KPMG e India como cuarto proveedor diversifican soportes externos.",
-      "La protección operativa a Rodríguez por Washington refuerza la lógica funcional bilateral.",
-      "El Manifiesto de Panamá también consolida E3 al aceptar el Plan de Tres Fases como marco externo.",
-      "E3 cede porque aprobación, ICC, PIB y conflictividad muestran erosión doméstica.",
-      "La sostenibilidad depende de traducir normalización financiera en bienestar y garantías políticas."
+      "E3 sube a 49% y amplía a 15 puntos la brecha sobre E1.",
+      "La instrucción PDVSA–Tesoro centraliza supervisión de flujos petroleros e ingresos.",
+      "La primera visita de Dan Caine a Caracas eleva la cooperación de seguridad al máximo nivel militar estadounidense.",
+      "Álvaro Piris y Hogan Lovells profundizan la arquitectura con FMI, acreedores y asesores externos.",
+      "La reforma eléctrica aprobada en primera discusión abre concesiones de 25 años prorrogables y capital privado o mixto.",
+      "Exportaciones de 1,25 millones de bpd e India como segundo comprador fortalecen estabilidad operativa.",
+      "La protesta del 3 de junio fue gestionada sin escalada coercitiva sistémica.",
+      "E3 administra apertura económica y coerción selectiva sin conceder todavía transición electoral."
     ],
     "signals": [
-      "Publicación de decretos de comisiones presidenciales",
-      "Reacción de Washington al caso Zapatero/Plus Ultra",
-      "Avances formales de Centerview con tenedores",
-      "Continuidad de flujo petrolero supervisado",
-      "Distanciamiento de Rodríguez frente a Iris Varela",
-      "Control no represivo de movilizaciones"
+      "Implementación de la instrucción PDVSA–Tesoro",
+      "Segunda discusión y reglamentación de la ley eléctrica",
+      "Avances con FMI y acreedores",
+      "Continuidad de exportaciones sobre 1,2M bpd",
+      "Resultados de la cooperación militar bilateral",
+      "Gestión no represiva de nuevas movilizaciones"
     ]
   },
   "4": {
-    "label": "Latente, en ascenso cualitativo",
+    "label": "Latente, con coerción selectiva persistente",
     "drivers": [
-      "E4 sube a 12% por señales cualitativas del sector duro.",
-      "Iris Varela descarta presidenciales y afirma que Delcy guarda la silla de Maduro.",
-      "La filtración “estamos caídos” sugiere vulnerabilidad interna frente a MCM y apertura.",
-      "La detención de trabajadores de PDVSA demuestra coerción selectiva en sector estratégico.",
-      "La brecha entre datos oficiales de amnistía y verificaciones independientes sostiene control coercitivo.",
-      "El motín de Barinas y denuncias penitenciarias refuerzan presión de derechos humanos.",
-      "E4 no se activa plenamente porque no hay represión sistémica ni ruptura bilateral."
+      "E4 sube a 13% por continuidad y diversificación de mecanismos coercitivos focalizados.",
+      "El Helicoide permanece operativo pese a la narrativa de normalización.",
+      "Foro Penal registra 404 presos políticos al 1 de junio.",
+      "Persisten detenciones de trabajadores de PDVSA y se suma el caso del abogado Moreno.",
+      "La ocupación y uso de la vivienda de Leopoldo López eleva el costo simbólico de la coerción.",
+      "Las declaraciones de Iris Varela mantienen visible la tensión dentro del chavismo.",
+      "E4 no escala más porque la marcha del 3 de junio no fue reprimida sistémicamente y la cooperación con EE.UU. sigue operativa."
     ],
     "signals": [
       "Represalia contra retorno de MCM",
       "Represión sistémica en movilizaciones",
       "Nuevas detenciones de trabajadores petroleros",
       "Fallecimiento en custodia",
-      "Silencio del interinato ante Iris Varela",
-      "Uso del TSJ ampliado contra opositores"
+      "Uso judicial o patrimonial contra opositores",
+      "Ruptura entre sector duro y gobierno interino"
     ]
   }
 };

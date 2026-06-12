@@ -1,67 +1,67 @@
 export const KPIS_LATEST = {
   "energia": [
     {
-      "k": "Petróleo EE.UU.",
-      "v": ">10M barriles",
+      "k": "Exportaciones",
+      "v": "1,25M bpd",
       "c": "#22c55e"
     },
     {
-      "k": "Producción neta",
-      "v": "~980K bpd",
+      "k": "Chevron",
+      "v": "269K bpd",
       "c": "#f59e0b"
     },
     {
       "k": "India",
-      "v": "4° proveedor",
+      "v": "427K bpd · 2° comprador",
       "c": "#38bdf8"
     },
     {
-      "k": "Deuda",
-      "v": "Centerview USD 150.000M",
+      "k": "Reforma eléctrica",
+      "v": "42 artículos · 1ª discusión",
       "c": "#22c55e"
     }
   ],
   "politico": [
     {
-      "k": "Manifiesto Panamá",
-      "v": "PUD + MCM + EGU",
+      "k": "Dan Caine",
+      "v": "1ª visita CJCS a Caracas",
       "c": "#22c55e"
     },
     {
-      "k": "SOUTHCOM",
-      "v": "2ª visita Caracas",
+      "k": "PDVSA–Tesoro",
+      "v": "Flujos centralizados",
       "c": "#38bdf8"
     },
     {
-      "k": "TSJ",
-      "v": "32 magistrados",
+      "k": "Presos políticos",
+      "v": "404 · Foro Penal",
       "c": "#f59e0b"
     },
     {
-      "k": "Amnistía",
-      "v": "8.740 gob · 44 FP",
+      "k": "El Helicoide",
+      "v": "Sigue operativo",
       "c": "#f59e0b"
     }
   ],
   "opinion": [
     {
-      "k": "Delcy Rodríguez",
-      "v": "25,2% aprobación",
-      "c": "#ef4444"
-    },
-    {
-      "k": "MCM",
-      "v": "55% imagen positiva",
-      "c": "#22c55e"
-    },
-    {
-      "k": "ICC",
-      "v": "-8,1",
-      "c": "#ef4444"
-    },
-    {
       "k": "Conflictividad",
-      "v": "43 protestas · 17 estados",
+      "v": "42 protestas · 15 entidades",
+      "c": "#ef4444"
+    },
+    {
+      "k": "Inflación mayo",
+      "v": "9,2–12,2%",
+      "c": "#ef4444"
+    },
+    {
+      "k": "Bolsa Caracas",
+      "v": "-33% desde febrero",
+      "c": "#ef4444"
+    },
+    {
+      "k": "Brecha E3–E1",
+      "v": "15 puntos",
       "c": "#f59e0b"
     }
   ]
@@ -1787,37 +1787,85 @@ export const WEEKS = [
       "E1 sube a 37% por Manifiesto de Panamá y retornos opositores, pero subordinado al calendario de Washington",
       "E4 sube a 12% por señales del sector duro sin escalada coercitiva sistémica"
     ]
+  },
+  {
+    "label": "29 may–5 jun",
+    "short": "S21",
+    "probs": [
+      { "sc": 1, "v": 34, "t": "down" },
+      { "sc": 2, "v": 4, "t": "flat" },
+      { "sc": 3, "v": 49, "t": "up" },
+      { "sc": 4, "v": 13, "t": "up" }
+    ],
+    "xy": { "x": 0.15, "y": 0.46 },
+    "sem": { "g": 8, "y": 6, "r": 4 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "1,25M bpd; India compra 427K bpd",
+        "ingresos": "PDVSA–Tesoro centraliza flujos y supervisión",
+        "licencias": "Hogan Lovells y FMI refuerzan arquitectura financiera",
+        "cambio": "Chevron baja a 269K bpd; diversificación hacia India"
+      },
+      "economico": {
+        "inflacion": "Mayo 9,2–12,2%; anualizada 541–559%",
+        "ingresos_pob": "Ingreso cubre 32,8% de la canasta alimentaria",
+        "electricidad": "Reforma aprobada en 1ª discusión; 42 artículos",
+        "pib": "Desaceleración Q1 y fragilidad acumulativa sin colapso"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha 15pp",
+        "elecciones": "Sin nuevo CNE ni cronograma vinculante",
+        "mcm": "Retorno efectivo sigue siendo indicador decisivo",
+        "eeuu": "Primera visita de Dan Caine consolida cooperación"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>E3 reforzada:</b> Sube a 49% por centralización PDVSA–Tesoro, primera visita del CJCS y avance de la arquitectura financiera." },
+      { "l": "green", "t": "<b>Diversificación energética:</b> Exportaciones de 1,25M bpd e India como segundo comprador amplían los amortiguadores externos." },
+      { "l": "green", "t": "<b>Reforma eléctrica:</b> La aprobación unánime en primera discusión abre capital privado y mixto bajo conducción estatal." },
+      { "l": "yellow", "t": "<b>E1 retrocede:</b> Baja a 34% por ausencia de retorno de MCM, renovación del CNE y calendario electoral verificable." },
+      { "l": "yellow", "t": "<b>Fragilidad macro:</b> Inflación mensual de 9,2–12,2%, brecha cambiaria de 35% y caída bursátil de 33%." },
+      { "l": "red", "t": "<b>Coerción selectiva:</b> El Helicoide continúa operativo y persisten detenciones focalizadas y uso de bienes opositores." },
+      { "l": "red", "t": "<b>Presión social:</b> 42 protestas en 15 entidades sostienen demandas laborales, de servicios, justicia y derechos políticos." }
+    ],
+    "lectura": "La semana del 29 de mayo al 5 de junio consolida nuevamente a E3 como escenario dominante, con 49% (+2pp), y amplía a 15 puntos su brecha frente a E1. Cuatro desarrollos estructurales explican el movimiento: la instrucción PDVSA–Tesoro del 28 de mayo centraliza la supervisión de flujos petroleros; la primera visita a Caracas del jefe del Estado Mayor Conjunto de EE.UU., Dan Caine, eleva la cooperación de seguridad; la incorporación de Álvaro Piris y Hogan Lovells profundiza la arquitectura financiera y multilateral; y la reforma eléctrica, aprobada por unanimidad en primera discusión, abre concesiones y capital privado o mixto bajo conducción estatal. Las exportaciones de 1,25 millones de bpd e India como segundo comprador refuerzan los amortiguadores externos.\n\nE1 baja a 34% (-3pp). El Manifiesto de Panamá y los retornos de dirigentes mantienen capacidad de articulación, pero no se traducen todavía en un mecanismo endógeno de transición: María Corina Machado no ha retornado, el CNE no ha sido renovado y no existe calendario electoral vinculante. La marcha del 3 de junio fue absorbida sin represión sistémica, pero tampoco produjo concesiones institucionales. E4 sube a 13% (+1pp) por coerción selectiva: detenciones de trabajadores de PDVSA y del abogado Moreno, continuidad operativa de El Helicoide y uso de la vivienda de Leopoldo López, junto con tensiones internas del chavismo. E2 permanece en 4%: inflación, ingreso insuficiente, desaceleración y deterioro eléctrico acumulan fragilidad, aunque la arquitectura financiera externa y el nivel exportador contienen un colapso inmediato.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 sube a 49% por PDVSA–Tesoro, visita de Dan Caine, arquitectura financiera y reforma eléctrica",
+      "E1 baja a 34% ante ausencia de retorno de MCM, nuevo CNE y calendario vinculante",
+      "E4 sube a 13% por coerción selectiva compatible todavía con la normalización"
+    ]
   }
 ];
 
 export const TENSIONS = [
   {
     "level": "green",
-    "text": "SOUTHCOM, Centerview, India y protección operativa de Washington sostienen el andamiaje externo de E3."
+    "text": "PDVSA–Tesoro, Dan Caine, Hogan Lovells y FMI consolidan la arquitectura externa de E3."
   },
   {
     "level": "green",
-    "text": "El Manifiesto de Panamá eleva la articulación opositora y ordena una hoja de ruta con MCM y González Urrutia."
+    "text": "Exportaciones de 1,25M bpd e India como segundo comprador amplían la resiliencia energética."
   },
   {
     "level": "yellow",
-    "text": "E3 baja a 47% por caída de legitimidad doméstica: aprobación 25,2%, ICC -8,1 y PIB desacelerado."
+    "text": "E1 baja a 34% sin retorno de MCM, renovación del CNE ni calendario electoral verificable."
   },
   {
     "level": "yellow",
-    "text": "La ampliación del TSJ a 32 magistrados y la consulta penal del 1 de junio tensionan la credibilidad institucional."
+    "text": "Inflación mensual de 9,2–12,2%, brecha cambiaria de 35% y caída bursátil de 33% sostienen fragilidad macro."
   },
   {
     "level": "yellow",
-    "text": "43 protestas en 17 entidades mantienen presión por agua, vivienda, justicia, salud y derechos de detenidos."
+    "text": "42 protestas en 15 entidades mantienen presión laboral, social, de servicios y por derechos políticos."
   },
   {
     "level": "red",
-    "text": "Iris Varela descarta elecciones presidenciales y mantiene vivo el horizonte de retorno de Maduro."
+    "text": "El Helicoide sigue operativo y la cifra de Foro Penal se ubica en 404 presos políticos."
   },
   {
     "level": "red",
-    "text": "Detención de trabajadores de PDVSA y brecha de amnistía muestran que la apertura sigue siendo selectiva."
+    "text": "Detenciones focalizadas y uso de la vivienda de Leopoldo López confirman coerción selectiva."
   }
 ];
 
@@ -1841,7 +1889,8 @@ export const MONITOR_WEEKS = [
   "S17",
   "S18",
   "S19",
-  "S20"
+  "S20",
+  "S21"
 ];
 
 export const ICG_HISTORY = [
@@ -1964,6 +2013,12 @@ export const ICG_HISTORY = [
     "score": 57,
     "sitrep": true,
     "note": "E3 sigue dominante pero cede por primera vez en cuatro semanas: el andamiaje externo se fortalece mientras la aprobación de Rodríguez cae a 25,2% y el ICC a -8,1. Señales del sector duro, caso Zapatero y detenciones selectivas elevan tensión interna sin ruptura sistémica."
+  },
+  {
+    "week": "S21",
+    "score": 59,
+    "sitrep": true,
+    "note": "La centralización PDVSA–Tesoro, la primera visita del CJCS y la reforma eléctrica refuerzan cohesión y capacidad de gestión. Persisten tensiones internas y coerción selectiva, pero sin fractura sistémica."
   }
 ];
 
@@ -2660,6 +2715,31 @@ export const CONF_SEMANAL = [
         "tipo": "Mixto",
         "exigencias": "Vivienda, agua, justicia, laborales, derechos de detenidos, participación política y salud"
       }
+    ]
+  },
+  {
+    "week": "S21",
+    "label": "29 may–4 jun",
+    "protestas": 42,
+    "estados": 15,
+    "reprimidas": 0,
+    "motivos": [
+      "Laborales",
+      "Seguridad social",
+      "Vivienda",
+      "Agua",
+      "Justicia",
+      "Salud",
+      "Educación",
+      "Participación política",
+      "Derechos de detenidos"
+    ],
+    "hecho": "42 protestas entre el 29 de mayo y el 4 de junio en 15 entidades. La marcha del 3 de junio desde Chacaíto hasta la Embajada de EE.UU. concentró demandas por presos políticos, calendario electoral y salarios, sin represión sistémica documentada.",
+    "dias": [
+      { "fecha": "29 Mayo", "protestas": 15, "estados": 12, "tipo": "Mixto", "exigencias": "Laborales, seguridad social, vivienda, agua, justicia, salud, educación y derechos de detenidos" },
+      { "fecha": "2 Junio", "protestas": 8, "estados": 5, "tipo": "Mixto", "exigencias": "Servicios básicos, laborales, vivienda, salud y justicia" },
+      { "fecha": "3 Junio", "protestas": 10, "estados": 7, "tipo": "Político/laboral", "exigencias": "Marcha Chacaíto–Embajada de EE.UU.; presos políticos, calendario electoral y salarios" },
+      { "fecha": "4 Junio", "protestas": 9, "estados": 8, "tipo": "Mixto", "exigencias": "Laborales, educación, agua, vivienda, salud y justicia" }
     ]
   }
 ];

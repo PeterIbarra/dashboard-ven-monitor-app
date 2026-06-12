@@ -314,5 +314,22 @@ export const AMNISTIA_TRACKER = [
       "militares": 187
     },
     "hito": "Gobierno reporta 8.740 beneficiarios por amnistía y 1.594 mecanismos paralelos; Foro Penal verifica 44 excarcelaciones semanales. La brecha de trazabilidad y los casos Barinas, San Miguel, Breijo y PDVSA mantienen presión de derechos humanos."
+  },
+  {
+    "week": "S21",
+    "label": "29 may–5 jun",
+    "gob": {
+      "solicitudes": null,
+      "libertades": 8740,
+      "privadosLiberados": 314,
+      "cautelares": 8426,
+      "militares": 187
+    },
+    "fp": {
+      "verificados": 857,
+      "detenidos": 404,
+      "militares": 187
+    },
+    "hito": "Foro Penal registra 404 presos políticos al 1 de junio. La excarcelación de 29 personas vinculadas al caso Mibiturven reduce un grupo específico, pero El Helicoide continúa operativo y persisten detenciones selectivas, sin trazabilidad integral de los beneficios oficiales."
   }
 ];
