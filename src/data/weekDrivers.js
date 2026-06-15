@@ -1,83 +1,83 @@
 export const WEEK_DRIVERS = {
   "1": {
-    "label": "Alta, pero en retroceso operativo",
+    "label": "Alta, con presión creciente pero sin vía institucional",
     "drivers": [
-      "E1 baja a 34% porque la articulación opositora aún no produce un mecanismo institucional de transición.",
-      "La marcha del 3 de junio demostró capacidad de movilización y fue absorbida sin represión sistémica.",
-      "Los retornos de Azuaje, Richard Blanco, Ocariz, Marrero y Toledo reconstruyen presencia territorial.",
-      "González Urrutia mantiene condiciones democráticas y electorales como requisito de legitimidad.",
-      "María Corina Machado no ha retornado al país, principal indicador pendiente de la semana.",
-      "No existe renovación del CNE ni calendario electoral vinculante y verificable.",
-      "El horizonte 2027–2028 mencionado desde Washington prolonga E3 más de lo que acelera E1."
+      "E1 baja a 33% porque la presión electoral no se traduce en decisiones institucionales.",
+      "Marco Rubio exige un nuevo CNE lo antes posible y sindicatos reclaman cronograma presidencial.",
+      "Las vigilias frente a la Embajada de EE.UU. sostienen la demanda por presos políticos y justicia.",
+      "Roberto Marrero recibe amnistía y se suma al retorno acumulado de dirigentes.",
+      "El Manifiesto de Panamá mantiene una arquitectura opositora de demanda externa.",
+      "Diosdado Cabello descarta categóricamente negociar con María Corina Machado.",
+      "Sin renovación del CNE, retorno de MCM ni calendario vinculante, la tensión política aumenta pero E1 retrocede."
     ],
     "signals": [
-      "Retorno efectivo de MCM sin represalia",
-      "Nuevo CNE o cronograma electoral",
-      "Garantías para nuevos retornos opositores",
-      "Liberación verificable de presos políticos",
-      "Condicionamiento externo a hitos electorales",
-      "Conversión de movilización social en acuerdos institucionales"
+      "Renovación o recomposición del CNE",
+      "Publicación de cronograma electoral",
+      "Retorno efectivo de MCM",
+      "Respuesta oficial al Manifiesto de Panamá",
+      "Condicionamiento electoral de la delegación estadounidense",
+      "Liberación verificable de presos políticos"
     ]
   },
   "2": {
-    "label": "Baja, contenida por amortiguadores externos",
+    "label": "Baja, con riesgo social de mediano plazo",
     "drivers": [
-      "E2 permanece en 4% porque la arquitectura financiera internacional reduce el riesgo de ruptura inmediata.",
-      "Exportaciones de 1,25 millones de bpd sostienen capacidad de generación de divisas.",
-      "India absorbe 427.000 bpd y funciona como segundo eje de diversificación energética.",
-      "La inflación de mayo, entre 9,2% y 12,2%, mantiene presión severa sobre hogares.",
-      "El ingreso integral cubre apenas 32,8% de la canasta alimentaria.",
-      "La brecha cambiaria ronda 35% y la Bolsa de Caracas corrige 33% desde febrero.",
-      "La fragilidad eléctrica y la desaceleración del PIB se acumulan, pero todavía no convergen en colapso."
+      "E2 permanece en 4%, su mínimo histórico, por el andamiaje financiero y exportador.",
+      "La inflación mensual baja a 6,3%, mínimo en 19 meses, aunque la interanual alcanza 525%.",
+      "Los bonos soberanos y de PDVSA acumulan una revalorización cercana a 60% en el año.",
+      "El flujo de divisas estimado en USD 1.500 millones mensuales y la reconexión bancaria reducen riesgo inmediato.",
+      "El operativo FANB en el Arco Minero muestra capacidad estatal de recuperar control territorial.",
+      "El 68% de los hogares declara ingresos iguales o inferiores al mínimo y se registran 75 protestas.",
+      "El riesgo de colapso se desplaza al mediano plazo si no aparece inversión ejecutable o si la reestructuración de deuda se desordena."
     ],
     "signals": [
-      "Inflación mensual supera 15%",
-      "Brecha cambiaria supera 45%",
-      "Caída sostenida de exportaciones petroleras",
-      "Deterioro eléctrico afecta producción",
-      "Interrupción de arquitectura financiera externa",
-      "Escalada simultánea de protestas por salarios y servicios"
+      "Análisis de sostenibilidad de deuda con el FMI",
+      "Embargos o litigios agresivos de bonistas",
+      "Caída de exportaciones o del flujo de divisas",
+      "Crisis humanitaria o desplazamientos en el Arco Minero",
+      "Inflación mensual vuelve a acelerarse",
+      "Conflictividad supera el máximo de 75 protestas"
     ]
   },
   "3": {
-    "label": "Muy alta, nuevamente consolidada",
+    "label": "Muy alta, dominante sobre el umbral del 50%",
     "drivers": [
-      "E3 sube a 49% y amplía a 15 puntos la brecha sobre E1.",
-      "La instrucción PDVSA–Tesoro centraliza supervisión de flujos petroleros e ingresos.",
-      "La primera visita de Dan Caine a Caracas eleva la cooperación de seguridad al máximo nivel militar estadounidense.",
-      "Álvaro Piris y Hogan Lovells profundizan la arquitectura con FMI, acreedores y asesores externos.",
-      "La reforma eléctrica aprobada en primera discusión abre concesiones de 25 años prorrogables y capital privado o mixto.",
-      "Exportaciones de 1,25 millones de bpd e India como segundo comprador fortalecen estabilidad operativa.",
-      "La protesta del 3 de junio fue gestionada sin escalada coercitiva sistémica.",
-      "E3 administra apertura económica y coerción selectiva sin conceder todavía transición electoral."
+      "E3 alcanza 50% por primera vez y amplía a 16 puntos la brecha sobre E1.",
+      "OFAC amplía siete licencias generales y admite arbitraje en Reino Unido, Francia y Singapur.",
+      "La eliminación de la cláusula de interés público responde a objeciones del capital privado.",
+      "La gira India–Türkiye abre oportunidades con Reliance, Tata, Essar y una meta comercial de USD 3.000 millones.",
+      "PDVSA y SLB firman un memorando tecnológico con sistemas digitales e inteligencia artificial.",
+      "IMPSA reporta 90% de acuerdo técnico-financiero para Tocoma y Macagua, con 672 MW potenciales.",
+      "La FANB despliega capacidad territorial en el Arco Minero para habilitar la apertura extractiva.",
+      "E3 sube solo 1pp porque la arquitectura todavía no se convierte en capital comprometido."
     ],
     "signals": [
-      "Implementación de la instrucción PDVSA–Tesoro",
-      "Segunda discusión y reglamentación de la ley eléctrica",
-      "Avances con FMI y acreedores",
-      "Continuidad de exportaciones sobre 1,2M bpd",
-      "Resultados de la cooperación militar bilateral",
-      "Gestión no represiva de nuevas movilizaciones"
+      "Resultado de la delegación técnica estadounidense",
+      "Compromiso formal de Exxon, ConocoPhillips o Chevron",
+      "Acuerdo PDVSA–Reliance por hasta 400.000 bpd",
+      "Resolución de dividendos de ONGC Videsh",
+      "Firma definitiva del contrato IMPSA",
+      "Reglamento y contratos modelo de hidrocarburos"
     ]
   },
   "4": {
-    "label": "Latente, con coerción selectiva persistente",
+    "label": "Latente, calibrada al servicio de la apertura",
     "drivers": [
-      "E4 sube a 13% por continuidad y diversificación de mecanismos coercitivos focalizados.",
-      "El Helicoide permanece operativo pese a la narrativa de normalización.",
-      "Foro Penal registra 404 presos políticos al 1 de junio.",
-      "Persisten detenciones de trabajadores de PDVSA y se suma el caso del abogado Moreno.",
-      "La ocupación y uso de la vivienda de Leopoldo López eleva el costo simbólico de la coerción.",
-      "Las declaraciones de Iris Varela mantienen visible la tensión dentro del chavismo.",
-      "E4 no escala más porque la marcha del 3 de junio no fue reprimida sistémicamente y la cooperación con EE.UU. sigue operativa."
+      "E4 se mantiene en 13% porque la coerción sigue siendo selectiva y funcional a la normalización.",
+      "El operativo militar en Las Claritas y Km 88 busca desplazar estructuras armadas del Arco Minero.",
+      "Provea y SOS Orinoco advierten riesgos de ejecuciones, detenciones, desplazamientos y afectación indígena.",
+      "El caso PDVSA Cripto mantiene denuncias de audiencias telemáticas, tratos crueles y restricciones a la defensa.",
+      "El Plan de 100 Días de la FANB consolida el esquema de mando renovado en marzo.",
+      "Cabello cierra públicamente la posibilidad de negociación con Machado.",
+      "CorteIDH ordena cerrar El Helicoide en 18 meses, elevando el costo internacional de la coerción."
     ],
     "signals": [
-      "Represalia contra retorno de MCM",
-      "Represión sistémica en movilizaciones",
-      "Nuevas detenciones de trabajadores petroleros",
-      "Fallecimiento en custodia",
-      "Uso judicial o patrimonial contra opositores",
-      "Ruptura entre sector duro y gobierno interino"
+      "Balance oficial del operativo en Las Claritas",
+      "Desplazamientos o abusos verificados en comunidades",
+      "Respuesta estatal al fallo sobre El Helicoide",
+      "Represión de vigilias o protestas ante el CNE",
+      "Escalada procesal en el caso PDVSA Cripto",
+      "Ruptura visible dentro del mando político-militar"
     ]
   }
 };

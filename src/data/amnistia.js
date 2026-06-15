@@ -331,5 +331,22 @@ export const AMNISTIA_TRACKER = [
       "militares": 187
     },
     "hito": "Foro Penal registra 404 presos políticos al 1 de junio. La excarcelación de 29 personas vinculadas al caso Mibiturven reduce un grupo específico, pero El Helicoide continúa operativo y persisten detenciones selectivas, sin trazabilidad integral de los beneficios oficiales."
+  },
+  {
+    "week": "S22",
+    "label": "5–12 jun",
+    "gob": {
+      "solicitudes": null,
+      "libertades": 8740,
+      "privadosLiberados": 314,
+      "cautelares": 8426,
+      "militares": 187
+    },
+    "fp": {
+      "verificados": 857,
+      "detenidos": 404,
+      "militares": 187
+    },
+    "hito": "Foro Penal mantiene 404 presos políticos, al menos 35 mujeres. Roberto Marrero recibe amnistía tras su retorno, mientras familiares sostienen vigilias ante la Embajada de EE.UU. y protestan por condiciones de reclusión. La CorteIDH ordena cerrar El Helicoide en 18 meses."
   }
 ];

@@ -4371,6 +4371,204 @@ export const SITREP_ALL = [
         "text": "Su ingreso efectivo y la respuesta estatal permitirán distinguir entre apertura calibrada, transición real o escalada coercitiva."
       }
     ]
+  },
+  {
+    "period": "5 – 12 de junio de 2026",
+    "periodShort": "5–12 jun 2026",
+    "keyPoints": [
+      {
+        "tag": "Marco contractual",
+        "color": "#0468B1",
+        "title": "OFAC amplía siete licencias y las jurisdicciones de arbitraje",
+        "text": "Las versiones GL-46C, 47A, 48B, 50B, 51B, 52A y 54A admiten arbitraje en Reino Unido, Francia y Singapur, además de EE.UU., y responden a demandas de seguridad jurídica del capital privado."
+      },
+      {
+        "tag": "Diplomacia",
+        "color": "#22c55e",
+        "title": "India y Türkiye consolidan ejes alternativos de apertura",
+        "text": "La gira incorpora conversaciones con Reliance, Tata, Essar y ONGC Videsh, junto con una meta de comercio bilateral con Türkiye de USD 3.000 millones."
+      },
+      {
+        "tag": "Territorio",
+        "color": "#ca8a04",
+        "title": "La FANB despliega control territorial en el Arco Minero",
+        "text": "El operativo en Las Claritas y Km 88 busca desplazar estructuras armadas y habilitar la apertura extractiva, con riesgos humanitarios, ambientales e indígenas aún sin balance oficial."
+      },
+      {
+        "tag": "Política",
+        "color": "#7c3aed",
+        "title": "La presión por un nuevo CNE encuentra cierre oficial",
+        "text": "Rubio y la Coalición Sindical Nacional exigen renovación electoral y cronograma, mientras Cabello descarta negociar con María Corina Machado."
+      },
+      {
+        "tag": "Derechos humanos",
+        "color": "#dc2626",
+        "title": "CorteIDH ordena cerrar El Helicoide en 18 meses",
+        "text": "La orden internacional coincide con 404 presos políticos, vigilias de familiares y denuncias sobre condiciones de detención; la respuesta estatal será un indicador estructural."
+      }
+    ],
+    "sintesis": "La semana del 5 al 12 de junio consolida a E3 en 50%, primer cruce de ese umbral y una brecha máxima de 16 puntos sobre E1. La apertura gana densidad jurídica con siete licencias de OFAC y arbitraje ampliado; densidad diplomática con la gira India–Türkiye; densidad técnica con PDVSA–SLB e IMPSA; y densidad territorial con el operativo FANB en el Arco Minero. Sin embargo, la arquitectura aún no se convierte en inversión comprometida. La dimensión política avanza a otra velocidad: la presión por un nuevo CNE y cronograma aumenta, pero Cabello cierra la negociación con Machado. La inflación mensual baja a 6,3% y los bonos suben 60% en el año, mientras 75 protestas en 19 entidades marcan el máximo reciente. La normalización económica continúa sin transición política y bajo escrutinio internacional por El Helicoide.",
+    "actores": [
+      {
+        "name": "EE.UU.",
+        "items": [
+          "OFAC actualiza siete licencias generales y amplía las jurisdicciones de arbitraje.",
+          "Una delegación técnica viajará a Caracas para promover nuevos ajustes petroleros y contractuales.",
+          "Marco Rubio exige la renovación del CNE lo antes posible.",
+          "Pete Hegseth anticipa anuncios de cooperación antidrogas con Venezuela.",
+          "La Embajada atribuye las exportaciones de 1,25 millones de bpd al plan de tres fases."
+        ]
+      },
+      {
+        "name": "Gobierno Interino (Rodríguez)",
+        "items": [
+          "Completa una gira por India y Türkiye con agenda energética, minera, tecnológica y comercial.",
+          "PDVSA firma con SLB un memorando de largo plazo para digitalización e inteligencia artificial.",
+          "Avanza con IMPSA en Tocoma y Macagua, con hasta 672 MW potenciales.",
+          "Da seguimiento al Plan de 100 Días de la FANB y al nuevo mando militar.",
+          "Impulsa la revisión del contrato modelo petrolero y elimina la cláusula de interés público."
+        ]
+      },
+      {
+        "name": "AN / Poder Judicial / MP",
+        "items": [
+          "El caso PDVSA Cripto acumula denuncias de irregularidades procesales y restricciones a la defensa.",
+          "CorteIDH ordena cerrar El Helicoide en 18 meses y exige traslados con garantías.",
+          "Cabello informa 58.714 personas privadas de libertad y 12.425 con más de dos años sin sentencia.",
+          "No se materializa una renovación del CNE ni un cronograma electoral.",
+          "La reacción al fallo de la CorteIDH permanece pendiente al cierre."
+        ]
+      },
+      {
+        "name": "Oposición / Sociedad Civil",
+        "items": [
+          "Roberto Marrero recibe amnistía y defiende acuerdos para crear condiciones electorales.",
+          "Cabello descarta públicamente una negociación con María Corina Machado.",
+          "Sindicatos protestan ante el CNE para exigir nuevos rectores y cronograma presidencial.",
+          "Familiares realizan vigilias los días 8 y 9 de junio frente a la Embajada de EE.UU.",
+          "Provea y SOS Orinoco alertan sobre riesgos humanitarios del operativo minero."
+        ]
+      },
+      {
+        "name": "Comunidad Internacional",
+        "items": [
+          "India condiciona nuevos acuerdos energéticos al pago de más de USD 500 millones a ONGC Videsh.",
+          "Reliance evalúa un acuerdo de suministro de hasta 400.000 bpd.",
+          "Türkiye plantea elevar el comercio bilateral desde USD 448 millones a USD 3.000 millones.",
+          "El FMI mantiene cooperación técnica, pero no participa en la reestructuración de deuda.",
+          "PIIE advierte sobre riesgos de que bonistas se adelanten sin un marco de sostenibilidad."
+        ]
+      }
+    ],
+    "nacional": {
+      "amnistia": {
+        "solicitudes": null,
+        "libertades": 8740,
+        "privadosLiberados": 314,
+        "cautelares": 8426,
+        "militares": 187,
+        "fpVerificados": null,
+        "fpDetenidos": 404,
+        "fpNota": "Foro Penal mantiene 404 presos políticos, al menos 35 mujeres. Roberto Marrero recibe amnistía, pero persisten vigilias, denuncias sobre condiciones de reclusión y una orden internacional de cierre de El Helicoide."
+      },
+      "rodriguez": [
+        { "title": "Diplomacia energética asiática", "text": "India y Türkiye amplían el portafolio de socios y reducen la dependencia exclusiva de Washington." },
+        { "title": "Arquitectura contractual", "text": "Las licencias y la eliminación de cláusulas objetadas acercan el marco a las exigencias privadas." },
+        { "title": "Capacidad territorial", "text": "El operativo minero muestra control estatal, pero abre riesgos humanitarios y reputacionales." },
+        { "title": "Normalización sin transición", "text": "El Ejecutivo acumula acuerdos económicos mientras el CNE y el calendario siguen inmóviles." }
+      ],
+      "mcmAgenda": [
+        "Renovación inmediata del CNE",
+        "Cronograma electoral verificable",
+        "Retorno y negociación con garantías"
+      ]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "6,3%", "label": "Inflación mensual mayo", "color": "#22c55e" },
+        { "value": "525%", "label": "Inflación interanual", "color": "#dc2626" },
+        { "value": "+60%", "label": "Bonos en el año", "color": "#22c55e" },
+        { "value": "USD 1.500M", "label": "Flujo mensual de divisas", "color": "#38bdf8" },
+        { "value": "68%", "label": "Hogares bajo umbral mínimo", "color": "#dc2626" }
+      ],
+      "empresas": [
+        { "empresa": "Reliance Industries", "desarrollo": "Evalúa un acuerdo de suministro con PDVSA de hasta 400.000 bpd." },
+        { "empresa": "SLB", "desarrollo": "Firma MOU con PDVSA para datos, modelaje predictivo e inteligencia artificial." },
+        { "empresa": "IMPSA", "desarrollo": "Alcanza cerca de 90% de acuerdo técnico-financiero para Tocoma y Macagua." },
+        { "empresa": "Shell / BP", "desarrollo": "Aceleran proyectos gasíferos vinculados con Trinidad y Tobago." },
+        { "empresa": "Tata / Essar", "desarrollo": "Exploran energías renovables, transporte e inversiones en el sistema eléctrico." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": {
+        "total": 75,
+        "promDiario": 15,
+        "periodo": "4–10 jun",
+        "variacion": "Aumento de 79% frente a las 42 protestas del período previo y máximo del ciclo reciente.",
+        "composicion": "Laborales, seguridad social, vivienda, agua, justicia, salud, educación, participación política, derechos de detenidos y propiedad.",
+        "nota": "Las vigilias ante la Embajada de EE.UU. y la protesta sindical frente al CNE elevaron el peso político de la conflictividad."
+      },
+      "percepcion": {
+        "fuente": "Pulso Nacional / Poder y Estrategia, mayo 2026",
+        "titulo": "Amplio respaldo a capital privado con deterioro del servicio",
+        "nota": "La población apoya cambios estructurales en electricidad, pero la evaluación del servicio y los ingresos confirma una base social frágil.",
+        "datos": [
+          { "factor": "Apoyo a capital privado eléctrico", "pct": 81 },
+          { "factor": "Evaluación negativa del servicio", "pct": 66 },
+          { "factor": "Ingresos iguales o menores al mínimo", "pct": 68 },
+          { "factor": "Privatización eléctrica total", "pct": 43 }
+        ]
+      },
+      "excarcelados": {
+        "fp": null,
+        "presos": 404,
+        "militares": 187,
+        "fuente": "Foro Penal / análisis situacional"
+      }
+    },
+    "marcoNormativo": {
+      "titulo": "Licencias OFAC, arbitraje ampliado y ajuste del contrato petrolero",
+      "resumen": "La semana produce las correcciones contractuales más directas del ciclo. OFAC amplía licencias y jurisdicciones de arbitraje, mientras el contrato modelo elimina la cláusula de interés público. El objetivo es reducir incertidumbre jurídica antes de la visita de la delegación técnica estadounidense.",
+      "cambios": [
+        { "titulo": "Siete licencias", "texto": "GL-46C, 47A, 48B, 50B, 51B, 52A y 54A amplían el marco autorizado.", "color": "#0468B1" },
+        { "titulo": "Arbitraje internacional", "texto": "Se admiten Reino Unido, Francia y Singapur además de Estados Unidos.", "color": "#22c55e" },
+        { "titulo": "Contrato modelo", "texto": "Se elimina la cláusula de interés público objetada por inversionistas.", "color": "#f59e0b" },
+        { "titulo": "Capital pendiente", "texto": "Los cambios aún no generan compromisos ejecutables de las grandes compañías.", "color": "#dc2626" }
+      ],
+      "lecturaAnalitica": "La maduración jurídica refuerza E3 porque reduce barreras de entrada sin alterar el control político. La prueba decisiva será si la delegación estadounidense y las compañías convierten estas correcciones en inversión, producción y contratos firmes."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "50%", "color": "#0468B1", "text": "Alcanza su máximo por avances contractuales, diplomacia asiática y control territorial." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "33%", "color": "#2d8a30", "text": "Retrocede: aumenta la presión por CNE, pero no hay negociación ni calendario." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "13%", "color": "#ca8a04", "text": "Permanece estable con coerción selectiva en PDVSA, prisiones y Arco Minero." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "4%", "color": "#dc2626", "text": "Sigue en mínimo por moderación inflacionaria, bonos y flujo de divisas." }
+    ],
+    "comentarios": [
+      {
+        "tag": "Umbral",
+        "color": "#0468B1",
+        "title": "E3 alcanza 50%, pero todavía sin capital comprometido",
+        "text": "La semana mejora reglas, socios y capacidades; la prueba material será la firma de contratos e inversiones."
+      },
+      {
+        "tag": "Brecha política",
+        "color": "#2d8a30",
+        "title": "El eje electoral queda rezagado frente a la apertura económica",
+        "text": "La presión por CNE y cronograma crece justo cuando el oficialismo endurece el cierre a Machado."
+      },
+      {
+        "tag": "Paradoja social",
+        "color": "#ca8a04",
+        "title": "Mejores señales macro, máxima conflictividad reciente",
+        "text": "Inflación mensual y bonos mejoran, pero 75 protestas e ingresos bajos revelan que el alivio no llega a los hogares."
+      },
+      {
+        "tag": "Riesgo principal",
+        "color": "#dc2626",
+        "title": "Arco Minero y El Helicoide ponen a prueba la narrativa de normalización",
+        "text": "El manejo de derechos humanos determinará si el control territorial y penitenciario erosiona el soporte internacional."
+      }
+    ]
   }
 ];
 
@@ -5020,6 +5218,86 @@ export const CURATED_NEWS = [
     "scenarios": ["E4", "E2", "E1"],
     "dims": ["Social", "Político"],
     "week": "S21"
+  },
+  {
+    "title": "Rodríguez completa gira por India con Reliance, Tata, Essar y ONGC Videsh",
+    "date": "2026-06-06",
+    "source": "Gobiernos de Venezuela e India",
+    "scenarios": ["E3"],
+    "dims": ["Internacional", "Energético", "Económico"],
+    "week": "S22"
+  },
+  {
+    "title": "PDVSA y SLB firman memorando tecnológico con inteligencia artificial",
+    "date": "2026-06-07",
+    "source": "PDVSA / SLB",
+    "scenarios": ["E3"],
+    "dims": ["Energético", "Económico"],
+    "week": "S22"
+  },
+  {
+    "title": "FANB despliega operativo en Las Claritas y Km 88 del Arco Minero",
+    "date": "2026-06-08",
+    "source": "Reuters / Provea / SOS Orinoco",
+    "scenarios": ["E3", "E4", "E2"],
+    "dims": ["Político", "Social", "Económico"],
+    "week": "S22"
+  },
+  {
+    "title": "Familiares realizan vigilias frente a la Embajada de EE.UU. por presos políticos",
+    "date": "2026-06-09",
+    "source": "OVCS / familiares",
+    "scenarios": ["E1", "E4"],
+    "dims": ["Social", "Político"],
+    "week": "S22"
+  },
+  {
+    "title": "OFAC amplía siete licencias y jurisdicciones de arbitraje contractual",
+    "date": "2026-06-10",
+    "source": "OFAC / Tesoro de EE.UU.",
+    "scenarios": ["E3"],
+    "dims": ["Energético", "Económico", "Internacional"],
+    "week": "S22"
+  },
+  {
+    "title": "BCV reporta inflación de mayo de 6,3%, mínimo en 19 meses",
+    "date": "2026-06-10",
+    "source": "BCV",
+    "scenarios": ["E3", "E2"],
+    "dims": ["Económico", "Social"],
+    "week": "S22"
+  },
+  {
+    "title": "Sindicatos exigen renovación del CNE y cronograma presidencial",
+    "date": "2026-06-10",
+    "source": "Coalición Sindical Nacional",
+    "scenarios": ["E1", "E4"],
+    "dims": ["Político", "Social"],
+    "week": "S22"
+  },
+  {
+    "title": "CorteIDH ordena el cierre de El Helicoide en 18 meses",
+    "date": "2026-06-11",
+    "source": "Corte Interamericana de Derechos Humanos",
+    "scenarios": ["E4", "E1"],
+    "dims": ["Político", "Internacional", "Social"],
+    "week": "S22"
+  },
+  {
+    "title": "Bonos venezolanos acumulan revalorización cercana a 60% en 2026",
+    "date": "2026-06-11",
+    "source": "Jefferies / análisis situacional",
+    "scenarios": ["E3", "E2"],
+    "dims": ["Económico", "Internacional"],
+    "week": "S22"
+  },
+  {
+    "title": "OVCS registra 75 protestas en 19 entidades, máximo del ciclo reciente",
+    "date": "2026-06-12",
+    "source": "OVCS",
+    "scenarios": ["E4", "E2", "E1"],
+    "dims": ["Social", "Político"],
+    "week": "S22"
   }
 ];
 

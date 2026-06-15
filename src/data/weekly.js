@@ -1,35 +1,35 @@
 export const KPIS_LATEST = {
   "energia": [
     {
-      "k": "Exportaciones",
-      "v": "1,25M bpd",
+      "k": "OFAC",
+      "v": "7 licencias ampliadas",
       "c": "#22c55e"
     },
     {
-      "k": "Chevron",
-      "v": "269K bpd",
+      "k": "Reliance",
+      "v": "Hasta 400K bpd",
       "c": "#f59e0b"
     },
     {
-      "k": "India",
-      "v": "427K bpd · 2° comprador",
+      "k": "PDVSA–SLB",
+      "v": "MOU tecnológico + IA",
       "c": "#38bdf8"
     },
     {
-      "k": "Reforma eléctrica",
-      "v": "42 artículos · 1ª discusión",
+      "k": "IMPSA",
+      "v": "672 MW potenciales",
       "c": "#22c55e"
     }
   ],
   "politico": [
     {
-      "k": "Dan Caine",
-      "v": "1ª visita CJCS a Caracas",
+      "k": "CNE",
+      "v": "Presión Rubio + sindicatos",
       "c": "#22c55e"
     },
     {
-      "k": "PDVSA–Tesoro",
-      "v": "Flujos centralizados",
+      "k": "Arco Minero",
+      "v": "Operativo FANB",
       "c": "#38bdf8"
     },
     {
@@ -38,30 +38,30 @@ export const KPIS_LATEST = {
       "c": "#f59e0b"
     },
     {
-      "k": "El Helicoide",
-      "v": "Sigue operativo",
+      "k": "CorteIDH",
+      "v": "Cierre Helicoide · 18 meses",
       "c": "#f59e0b"
     }
   ],
   "opinion": [
     {
       "k": "Conflictividad",
-      "v": "42 protestas · 15 entidades",
+      "v": "75 protestas · 19 entidades",
       "c": "#ef4444"
     },
     {
       "k": "Inflación mayo",
-      "v": "9,2–12,2%",
-      "c": "#ef4444"
+      "v": "6,3% · mínimo 19 meses",
+      "c": "#22c55e"
     },
     {
-      "k": "Bolsa Caracas",
-      "v": "-33% desde febrero",
-      "c": "#ef4444"
+      "k": "Bonos",
+      "v": "+60% en el año",
+      "c": "#22c55e"
     },
     {
       "k": "Brecha E3–E1",
-      "v": "15 puntos",
+      "v": "16 puntos",
       "c": "#f59e0b"
     }
   ]
@@ -1835,37 +1835,85 @@ export const WEEKS = [
       "E1 baja a 34% ante ausencia de retorno de MCM, nuevo CNE y calendario vinculante",
       "E4 sube a 13% por coerción selectiva compatible todavía con la normalización"
     ]
+  },
+  {
+    "label": "5–12 jun",
+    "short": "S22",
+    "probs": [
+      { "sc": 1, "v": 33, "t": "down" },
+      { "sc": 2, "v": 4, "t": "flat" },
+      { "sc": 3, "v": 50, "t": "up" },
+      { "sc": 4, "v": 13, "t": "flat" }
+    ],
+    "xy": { "x": 0.14, "y": 0.48 },
+    "sem": { "g": 8, "y": 7, "r": 4 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "1,25M bpd; Reliance evalúa hasta 400K bpd",
+        "ingresos": "Flujo de divisas estimado en ~USD 1.500M/mes",
+        "licencias": "OFAC amplía 7 licencias y arbitraje UK/Francia/Singapur",
+        "cambio": "PDVSA–SLB firma MOU tecnológico; IMPSA proyecta 672 MW"
+      },
+      "economico": {
+        "inflacion": "Mayo 6,3%; mínimo en 19 meses; interanual 525%",
+        "ingresos_pob": "68% de hogares en o bajo el ingreso mínimo",
+        "electricidad": "81% apoya capital privado; 66% evalúa mal el servicio",
+        "pib": "Bonos +60% anual; inversión ejecutable aún pendiente"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha 16pp",
+        "elecciones": "Rubio y sindicatos exigen nuevo CNE y cronograma",
+        "mcm": "Cabello descarta negociación directa con Machado",
+        "eeuu": "Delegación técnica evaluará marco petrolero"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>E3 cruza 50%:</b> OFAC amplía siete licencias y mejora las jurisdicciones de arbitraje para contratos petroleros y mineros." },
+      { "l": "green", "t": "<b>Diversificación asiática:</b> India y Türkiye amplían la agenda con Reliance, Tata, Essar y una meta comercial de USD 3.000M." },
+      { "l": "green", "t": "<b>Capacidad operativa:</b> PDVSA–SLB, IMPSA y el despliegue FANB en el Arco Minero refuerzan gestión sectorial y territorial." },
+      { "l": "yellow", "t": "<b>E1 retrocede:</b> La presión por nuevo CNE aumenta, pero Cabello cierra la negociación con Machado y no hay calendario." },
+      { "l": "yellow", "t": "<b>Divergencia social:</b> Inflación mensual de 6,3% y bonos al alza coexisten con 75 protestas, máximo del ciclo reciente." },
+      { "l": "red", "t": "<b>Derechos humanos:</b> CorteIDH ordena cerrar El Helicoide en 18 meses; la reacción estatal será un indicador estructural." },
+      { "l": "red", "t": "<b>Riesgo territorial:</b> El operativo en Las Claritas puede habilitar inversión minera, pero mantiene riesgos humanitarios y ambientales." }
+    ],
+    "lectura": "La semana del 5 al 12 de junio lleva a E3 al 50% (+1pp), primer cruce de ese umbral y máxima brecha histórica frente a E1, con 16 puntos. El movimiento responde a la mayor densidad jurídico-contractual e institucional del ciclo: OFAC amplía siete licencias generales y admite arbitraje en Reino Unido, Francia y Singapur; se elimina la cláusula de interés público del contrato modelo petrolero; PDVSA y SLB firman un memorando tecnológico; IMPSA avanza en Tocoma y Macagua; y la gira India–Türkiye abre perspectivas con Reliance, Tata, Essar y una meta comercial bilateral de USD 3.000 millones. El operativo de la FANB en el Arco Minero añade capacidad territorial al servicio de la apertura extractiva. Sin embargo, estos avances todavía son arquitectura y señalización, no capital comprometido.\n\nE1 baja a 33% (-1pp) pese a la presión de Marco Rubio, sindicatos y familiares de presos políticos por un nuevo CNE, cronograma y libertades. El cierre categórico de Diosdado Cabello a negociar con María Corina Machado, la ausencia de renovación electoral y la falta de compromisos vinculantes mantienen estancado el vector político. E4 permanece en 13%: el caso PDVSA Cripto, el Plan de 100 Días de la FANB y el operativo en Las Claritas muestran coerción selectiva, mientras la CorteIDH ordena cerrar El Helicoide en 18 meses. E2 sigue en 4% porque inflación mensual de 6,3%, bonos +60%, flujo de divisas y reconexión financiera contienen un colapso inmediato, aunque 75 protestas, inflación interanual de 525% y 68% de hogares con ingresos bajos acumulan riesgo social.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 alcanza 50% por licencias OFAC, arbitraje ampliado, gira India–Türkiye y control territorial",
+      "E1 baja a 33% porque la presión por nuevo CNE no produce calendario ni negociación política",
+      "E4 queda en 13%: coerción selectiva y Arco Minero sin escalada sistémica contra la oposición"
+    ]
   }
 ];
 
 export const TENSIONS = [
   {
     "level": "green",
-    "text": "PDVSA–Tesoro, Dan Caine, Hogan Lovells y FMI consolidan la arquitectura externa de E3."
+    "text": "OFAC amplía siete licencias y admite arbitraje en Reino Unido, Francia y Singapur."
   },
   {
     "level": "green",
-    "text": "Exportaciones de 1,25M bpd e India como segundo comprador amplían la resiliencia energética."
+    "text": "La gira India–Türkiye y los avances con Reliance, SLB e IMPSA profundizan la apertura sectorial."
   },
   {
     "level": "yellow",
-    "text": "E1 baja a 34% sin retorno de MCM, renovación del CNE ni calendario electoral verificable."
+    "text": "Rubio y sindicatos elevan la presión por un nuevo CNE, pero Cabello cierra la negociación con Machado."
   },
   {
     "level": "yellow",
-    "text": "Inflación mensual de 9,2–12,2%, brecha cambiaria de 35% y caída bursátil de 33% sostienen fragilidad macro."
+    "text": "Inflación de 6,3% y bonos +60% contrastan con ingresos bajos e inflación interanual de 525%."
   },
   {
     "level": "yellow",
-    "text": "42 protestas en 15 entidades mantienen presión laboral, social, de servicios y por derechos políticos."
+    "text": "75 protestas en 19 entidades marcan el máximo reciente de conflictividad social."
   },
   {
     "level": "red",
-    "text": "El Helicoide sigue operativo y la cifra de Foro Penal se ubica en 404 presos políticos."
+    "text": "CorteIDH ordena el cierre de El Helicoide en 18 meses; persisten 404 presos políticos."
   },
   {
     "level": "red",
-    "text": "Detenciones focalizadas y uso de la vivienda de Leopoldo López confirman coerción selectiva."
+    "text": "El operativo FANB en el Arco Minero combina control territorial con riesgos humanitarios y ambientales."
   }
 ];
 
@@ -1890,7 +1938,8 @@ export const MONITOR_WEEKS = [
   "S18",
   "S19",
   "S20",
-  "S21"
+  "S21",
+  "S22"
 ];
 
 export const ICG_HISTORY = [
@@ -2019,6 +2068,12 @@ export const ICG_HISTORY = [
     "score": 59,
     "sitrep": true,
     "note": "La centralización PDVSA–Tesoro, la primera visita del CJCS y la reforma eléctrica refuerzan cohesión y capacidad de gestión. Persisten tensiones internas y coerción selectiva, pero sin fractura sistémica."
+  },
+  {
+    "week": "S22",
+    "score": 61,
+    "sitrep": true,
+    "note": "OFAC, la gira India–Türkiye, el seguimiento al Plan de 100 Días y el operativo en el Arco Minero elevan capacidad institucional y territorial. La tensión electoral y de derechos humanos crece sin fractura del mando."
   }
 ];
 
@@ -2740,6 +2795,33 @@ export const CONF_SEMANAL = [
       { "fecha": "2 Junio", "protestas": 8, "estados": 5, "tipo": "Mixto", "exigencias": "Servicios básicos, laborales, vivienda, salud y justicia" },
       { "fecha": "3 Junio", "protestas": 10, "estados": 7, "tipo": "Político/laboral", "exigencias": "Marcha Chacaíto–Embajada de EE.UU.; presos políticos, calendario electoral y salarios" },
       { "fecha": "4 Junio", "protestas": 9, "estados": 8, "tipo": "Mixto", "exigencias": "Laborales, educación, agua, vivienda, salud y justicia" }
+    ]
+  },
+  {
+    "week": "S22",
+    "label": "4–10 jun",
+    "protestas": 75,
+    "estados": 19,
+    "reprimidas": 0,
+    "motivos": [
+      "Laborales",
+      "Seguridad social",
+      "Vivienda",
+      "Agua",
+      "Justicia",
+      "Salud",
+      "Educación",
+      "Participación política",
+      "Derechos de detenidos",
+      "Propiedad"
+    ],
+    "hecho": "75 protestas entre el 4 y el 10 de junio en 19 entidades, máximo del ciclo reciente. Las vigilias de familiares de presos políticos frente a la Embajada de EE.UU. y la concentración sindical ante el CNE elevaron el peso político de la conflictividad.",
+    "dias": [
+      { "fecha": "4 Junio", "protestas": 9, "estados": 8, "tipo": "Mixto", "exigencias": "Laborales, seguridad social, vivienda, justicia, salud, educación, participación política y derechos de detenidos" },
+      { "fecha": "5 Junio", "protestas": 15, "estados": 8, "tipo": "Mixto", "exigencias": "Vivienda, agua, justicia, participación política, seguridad social y laborales" },
+      { "fecha": "8 Junio", "protestas": 19, "estados": 13, "tipo": "Mixto", "exigencias": "Vivienda, agua, justicia, derechos de detenidos, participación política, laborales, educación y propiedad" },
+      { "fecha": "9 Junio", "protestas": 12, "estados": 9, "tipo": "Derechos humanos", "exigencias": "Justicia, derechos de detenidos, participación política, laborales, educación y vivienda" },
+      { "fecha": "10 Junio", "protestas": 20, "estados": 13, "tipo": "Laboral/político", "exigencias": "Justicia, derechos de detenidos, participación política, laborales, educación y defensa de derechos" }
     ]
   }
 ];

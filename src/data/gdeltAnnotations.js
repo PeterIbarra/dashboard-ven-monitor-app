@@ -754,5 +754,53 @@ export const GDELT_ANNOTATIONS = [
     "tier": "CRITICAL",
     "tierEs": "CRÍTICO",
     "label": "Matriz 29 mayo–5 junio ubica E3 en 49%, E1 en 34%, E4 en 13% y E2 en 4%; brecha E3-E1 sube a 15pp."
+  },
+  {
+    "date": "2026-06-06",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Rodríguez culmina agenda en India con Reliance, Tata, Essar y negociación sobre dividendos de ONGC Videsh."
+  },
+  {
+    "date": "2026-06-08",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "FANB despliega operativo en Las Claritas y Km 88 para recuperar control territorial del Arco Minero."
+  },
+  {
+    "date": "2026-06-09",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Familiares de presos políticos completan dos días de vigilia frente a la Embajada de EE.UU."
+  },
+  {
+    "date": "2026-06-10",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "OFAC amplía siete licencias y admite arbitraje contractual en Reino Unido, Francia y Singapur."
+  },
+  {
+    "date": "2026-06-10",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "BCV reporta inflación de mayo de 6,3%, mínimo en 19 meses, con tasa interanual de 525%."
+  },
+  {
+    "date": "2026-06-11",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "CorteIDH ordena el cierre de El Helicoide en un plazo de 18 meses."
+  },
+  {
+    "date": "2026-06-12",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "OVCS registra 75 protestas en 19 entidades entre el 4 y el 10 de junio, máximo del ciclo reciente."
+  },
+  {
+    "date": "2026-06-12",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 5–12 junio ubica E3 en 50%, E1 en 33%, E4 en 13% y E2 en 4%; brecha E3-E1 alcanza 16pp."
   }
 ];
