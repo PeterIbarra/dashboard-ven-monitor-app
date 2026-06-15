@@ -153,9 +153,10 @@ module.exports = async function handler(req, res) {
     const b = bbox || "-73.4,0.6,-59.8,12.2";
     const url = `${FIRMS_BASE}/${apiKey}/VIIRS_SNPP_NRT/${b}/${d}`;
     try {
-      const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      const timeoutMs = d >= 7 ? 30000 : 18000;
+      const r = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
       if (r.status === 401 || r.status === 403) {
-        return res.status(200).json({ needsKey: true, error: "API key inválida o expirada", csv: "" });
+        return res.status(200).json({ needsKey: true, error: "Credencial inválida o expirada", csv: "" });
       }
       if (!r.ok) return res.status(200).json({ error: `FIRMS HTTP ${r.status}`, csv: "" });
       const csv = await r.text();
