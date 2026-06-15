@@ -1347,6 +1347,8 @@ function drawNasaChart(canvas, data, pinned, hovered) {
 const VE_BBOX = "-73.4,0.6,-59.8,12.2";
 const FIRMS_DAYS_OPTIONS = [1, 2, 7];
 const FIRMS_DEFAULT_DAYS = 2;
+const FIRMS_CACHE_VERSION = "firms-viirs-history-v2";
+const FIRMS_HISTORY_LIMIT = 60;
 
 // Polígonos simplificados por estado para point-in-polygon
 // (bounding boxes aproximados — suficiente para agregación estatal)
@@ -1418,6 +1420,83 @@ function parseFirmsCsv(csv) {
     points.push({ lat, lon, frp: isNaN(frp) ? 0 : frp, conf, date, dn });
   }
   return points;
+}
+
+function firePointKey(p) {
+  return `${p.date || ""}|${p.lat.toFixed(3)}|${p.lon.toFixed(3)}|${Math.round(p.frp || 0)}`;
+}
+
+function dedupeFirePoints(points) {
+  const seen = new Set();
+  const out = [];
+  for (const p of points || []) {
+    const key = firePointKey(p);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(p);
+  }
+  return out;
+}
+
+function getFireHistory() {
+  return cacheGet(FIRMS_CACHE_VERSION) || [];
+}
+
+function saveFireSnapshot(days, points, fetchedAt = new Date().toISOString(), source = "live") {
+  const snapshot = {
+    days,
+    fetchedAt,
+    source,
+    points: dedupeFirePoints(points || []),
+  };
+  const history = getFireHistory()
+    .filter(s => !(s.days === days && s.fetchedAt?.slice(0, 13) === fetchedAt.slice(0, 13)));
+  history.unshift(snapshot);
+  cacheSet(FIRMS_CACHE_VERSION, history.slice(0, FIRMS_HISTORY_LIMIT));
+  cacheSet(`${FIRMS_CACHE_VERSION}:latest:${days}`, snapshot);
+  return snapshot;
+}
+
+function loadFireSnapshot(days) {
+  return cacheGet(`${FIRMS_CACHE_VERSION}:latest:${days}`);
+}
+
+function buildSevenDayFallback() {
+  const now = Date.now();
+  const cutoff = now - 7 * 24 * 60 * 60 * 1000;
+  const recent = getFireHistory()
+    .filter(s => {
+      const ts = Date.parse(s.fetchedAt || "");
+      return Number.isFinite(ts) && ts >= cutoff && (s.days === 1 || s.days === 2 || s.days === 7);
+    });
+  const points = dedupeFirePoints(recent.flatMap(s => s.points || []));
+  if (!points.length) return null;
+  return saveFireSnapshot(7, points, new Date().toISOString(), "historial local");
+}
+
+function formatFirePeriod(days) {
+  return days === 1 ? "24 horas" : days === 2 ? "48 horas" : "7 días";
+}
+
+function summarizeFireContext({ fireDays, rawPoints, fireRanking, totalFrp }) {
+  const highConfidence = rawPoints.filter(p => p.conf === "h" || p.conf === "high" || Number(p.conf) > 80).length;
+  const night = rawPoints.filter(p => p.dn === "N").length;
+  const states = fireRanking.length;
+  const top = fireRanking[0];
+  const avgFrp = rawPoints.length ? totalFrp / rawPoints.length : 0;
+  if (!rawPoints.length) {
+    return {
+      title: "Sin focos activos detectados",
+      text: `NASA FIRMS no registra puntos VIIRS en Venezuela para las últimas ${formatFirePeriod(fireDays)}. La lectura debe tomarse como ausencia de señal satelital, no como descarte absoluto de quemas pequeñas o bajo nubosidad.`,
+      tone: "#22c55e",
+    };
+  }
+  const pressure = rawPoints.length > 50 || avgFrp > 30 ? "alta" : rawPoints.length > 15 ? "moderada" : "focalizada";
+  return {
+    title: `Actividad ${pressure} en ${states} ${states === 1 ? "estado" : "estados"}`,
+    text: `${top ? `${top.id} concentra ${top.count} focos y ${Math.round(top.frp)} MW de FRP. ` : ""}${highConfidence} focos son de alta confianza y ${night} fueron detectados de noche. Para análisis situacional, los clusters sostenidos pesan más que puntos aislados: sugieren quema recurrente, presión agrícola/minera o incendios con posibilidad de humo y afectación comunitaria.`,
+    tone: pressure === "alta" ? "#dc2626" : pressure === "moderada" ? "#f97316" : "#f59e0b",
+  };
 }
 
 // ── Agregar puntos por estado ──
@@ -1563,51 +1642,69 @@ function TabIncendios({ mob }) {
   const [fireError, setFireError]   = useState(null);
   const [fireSel, setFireSel]       = useState(null);
   const [needsKey, setNeedsKey]     = useState(false);
-  const [firmsKey, setFirmsKey]     = useState(() => {
-    try { return localStorage.getItem("firms_api_key") || ""; } catch { return ""; }
-  });
-  const [keyInput, setKeyInput]     = useState("");
+  const [fireSource, setFireSource] = useState("live");
+  const [fireHistoryMeta, setFireHistoryMeta] = useState(() => getFireHistory());
 
-  const loadFire = useCallback(async (days, key) => {
-    setFireLoading(true);
-    setFireError(null);
-    setFireData({});
-    setRawPoints([]);
-    try {
-      const url = `/api/gdelt?source=firms&days=${days}&bbox=${encodeURIComponent(VE_BBOX)}&key=${encodeURIComponent(key || "")}`;
-      const res = await fetchTimeout(url, 20000);
-      const json = await res.json();
-      if (json.needsKey) { setNeedsKey(true); setFireLoading(false); return; }
-      if (json.error) throw new Error(json.error);
-      const csv = json.csv || "";
-      const points = parseFirmsCsv(csv);
-      setRawPoints(points);
-      setFireData(aggregateByState(points));
-    } catch (e) {
-      setFireError(e.message);
-    }
-    setFireLoading(false);
+  const applyFirePoints = useCallback((points, source = "live") => {
+    const clean = dedupeFirePoints(points || []);
+    setRawPoints(clean);
+    setFireData(aggregateByState(clean));
+    setFireSource(source);
+    setFireHistoryMeta(getFireHistory());
   }, []);
 
-  // Carga inicial
-  useEffect(() => {
-    if (firmsKey) loadFire(fireDays, firmsKey);
-    else setNeedsKey(true);
-  }, []); // eslint-disable-line
-
-  // Recargar al cambiar período — siempre, sin condición
-  useEffect(() => {
-    if (firmsKey && !needsKey) loadFire(fireDays, firmsKey);
-  }, [fireDays]); // eslint-disable-line
-
-  const saveKey = () => {
-    const k = keyInput.trim();
-    if (!k) return;
-    try { localStorage.setItem("firms_api_key", k); } catch {}
-    setFirmsKey(k);
+  const loadFire = useCallback(async (days, { force = false } = {}) => {
+    setFireLoading(true);
+    setFireError(null);
     setNeedsKey(false);
-    loadFire(fireDays, k);
-  };
+
+    const cached = !force ? loadFireSnapshot(days) : null;
+    if (cached?.points?.length) {
+      applyFirePoints(cached.points, cached.source === "historial local" ? "historial local" : "cache local");
+    }
+
+    try {
+      const url = `/api/gdelt?source=firms&days=${days}&bbox=${encodeURIComponent(VE_BBOX)}`;
+      const res = await fetchTimeout(url, days === 7 ? 35000 : 22000);
+      const json = await res.json();
+      if (json.needsKey) {
+        setNeedsKey(true);
+        const fallback = days === 7 ? buildSevenDayFallback() : loadFireSnapshot(days);
+        if (fallback?.points?.length) applyFirePoints(fallback.points, "historial local");
+        else setFireError("NASA FIRMS requiere completar la configuración segura del servidor. La credencial no se solicita desde el dashboard.");
+        setFireLoading(false);
+        return;
+      }
+      if (json.error) throw new Error(json.error);
+      const csv = json.csv || "";
+      let points = parseFirmsCsv(csv);
+      if (days === 7 && !points.length) {
+        const fallback = buildSevenDayFallback();
+        if (fallback?.points?.length) {
+          applyFirePoints(fallback.points, "historial local");
+          setFireError("FIRMS no devolvió puntos para 7 días. Mostrando histórico local acumulado.");
+          setFireLoading(false);
+          return;
+        }
+      }
+      const snapshot = saveFireSnapshot(days, points, json.fetchedAt || new Date().toISOString(), "live");
+      applyFirePoints(snapshot.points, "live");
+    } catch (e) {
+      const fallback = days === 7 ? buildSevenDayFallback() : loadFireSnapshot(days);
+      if (fallback?.points?.length) {
+        applyFirePoints(fallback.points, "historial local");
+        setFireError(`No se pudo refrescar FIRMS (${e.message}). Mostrando histórico local guardado.`);
+      } else {
+        setFireError(e.message);
+      }
+    }
+    setFireLoading(false);
+  }, [applyFirePoints]);
+
+  // Cargar y recargar al cambiar período.
+  useEffect(() => {
+    loadFire(fireDays);
+  }, [fireDays]); // eslint-disable-line
 
   const fireRanking = Object.entries(fireData)
     .map(([id, d]) => ({ id, count: d.count, frp: d.frpTotal, high: d.high }))
@@ -1617,37 +1714,25 @@ function TabIncendios({ mob }) {
   const selFire = fireSel ? fireData[fireSel] : null;
   const totalFocos = rawPoints.length;
   const totalFrp   = rawPoints.reduce((s, p) => s + p.frp, 0);
+  const fireContext = summarizeFireContext({ fireDays, rawPoints, fireRanking, totalFrp });
+  const savedSevenDay = fireHistoryMeta.find(s => s.days === 7);
+  const savedSnapshots = fireHistoryMeta.length;
+  const latestSaved = fireHistoryMeta[0]?.fetchedAt;
 
-  // ── Pantalla de key ──
-  if (needsKey && !firmsKey) {
+  if (needsKey && !rawPoints.length) {
     return (
-      <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:24, maxWidth:520 }}>
+      <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:24 }}>
         <div style={{ fontSize:14, fontWeight:600, color:TEXT, marginBottom:8 }}>
-          🔑 Se requiere API key de NASA FIRMS
+          Configuración pendiente de NASA FIRMS
         </div>
         <div style={{ fontSize:13, fontFamily:fontSans, color:MUTED, lineHeight:1.65, marginBottom:16 }}>
-          NASA FIRMS requiere una key gratuita para acceder a datos VIIRS en tiempo real.
-          El registro es inmediato en{" "}
-          <a href="https://firms.modaps.eosdis.nasa.gov/api/" target="_blank" rel="noreferrer"
-            style={{ color:ACCENT }}>firms.modaps.eosdis.nasa.gov/api/</a>.
-          La key se guarda en tu browser y no se envía a ningún servidor externo salvo NASA.
+          El dashboard ya no solicita ni muestra credenciales en la interfaz. Para activar datos VIIRS en tiempo casi real, la credencial debe estar configurada en el entorno del servidor. Si existen snapshots previos, el módulo seguirá mostrando el histórico local disponible.
         </div>
-        <div style={{ display:"flex", gap:8 }}>
-          <input
-            type="text"
-            value={keyInput}
-            onChange={e => setKeyInput(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && saveKey()}
-            placeholder="Pega tu MAP_KEY aquí"
-            style={{ flex:1, fontFamily:font, fontSize:12, padding:"6px 10px",
-              border:`1px solid ${BORDER}`, background:BG3, color:TEXT, outline:"none" }}
-          />
-          <button onClick={saveKey}
+        <button onClick={() => loadFire(fireDays, { force:true })}
             style={{ fontFamily:font, fontSize:12, padding:"6px 14px",
               background:ACCENT, color:"#fff", border:"none", cursor:"pointer" }}>
-            Guardar
-          </button>
-        </div>
+          Reintentar conexión
+        </button>
       </div>
     );
   }
@@ -1670,15 +1755,10 @@ function TabIncendios({ mob }) {
             </button>
           ))}
         </div>
-        <button onClick={() => loadFire(fireDays, firmsKey)}
+        <button onClick={() => loadFire(fireDays, { force:true })}
           style={{ fontSize:11, fontFamily:font, padding:"5px 12px", border:`1px solid ${BORDER}`,
             background:"transparent", color:MUTED, cursor:"pointer" }}>
           ↻ Actualizar
-        </button>
-        <button onClick={() => { setFirmsKey(""); setNeedsKey(true); }}
-          style={{ fontSize:10, fontFamily:font, padding:"4px 8px", border:`1px solid ${BORDER}`,
-            background:"transparent", color:`${MUTED}80`, cursor:"pointer" }}>
-          Cambiar key
         </button>
 
         {/* KPIs globales */}
@@ -1691,6 +1771,14 @@ function TabIncendios({ mob }) {
             <div style={{ textAlign:"right" }}>
               <div style={{ fontSize:18, fontWeight:800, color:"#f97316", fontFamily:"'Syne',sans-serif" }}>{Math.round(totalFrp)}</div>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>MW FRP total</div>
+            </div>
+            <div style={{ textAlign:"right" }}>
+              <div style={{ fontSize:18, fontWeight:800, color:fireSource === "live" ? "#22c55e" : "#f59e0b", fontFamily:"'Syne',sans-serif" }}>
+                {fireSource === "live" ? "LIVE" : "HIST"}
+              </div>
+              <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>
+                {fireSource === "live" ? "NASA FIRMS" : "cache local"}
+              </div>
             </div>
           </div>
         )}
@@ -1709,14 +1797,68 @@ function TabIncendios({ mob }) {
 
       {/* Error */}
       {fireError && !fireLoading && (
-        <div style={{ background:"#fef2f2", border:"1px solid #fecaca", padding:12,
-          fontSize:12, fontFamily:font, color:"#dc2626" }}>
+        <div style={{ background:rawPoints.length ? "#fffbeb" : "#fef2f2", border:rawPoints.length ? "1px solid #fcd34d" : "1px solid #fecaca", padding:12,
+          fontSize:12, fontFamily:font, color:rawPoints.length ? "#92400e" : "#dc2626" }}>
           ⚠️ {fireError}
         </div>
       )}
 
+      {!fireLoading && (
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1.4fr 1fr", gap:8 }}>
+          <div style={{ background:BG2, border:`1px solid ${BORDER}`, borderLeft:`3px solid ${fireContext.tone}`, padding:"10px 12px" }}>
+            <div style={{ fontSize:11, fontFamily:font, color:fireContext.tone, letterSpacing:"0.1em",
+              textTransform:"uppercase", marginBottom:4 }}>Lectura rápida</div>
+            <div style={{ fontSize:13, fontWeight:700, color:TEXT, marginBottom:4 }}>{fireContext.title}</div>
+            <div style={{ fontSize:12, fontFamily:fontSans, color:MUTED, lineHeight:1.6 }}>{fireContext.text}</div>
+          </div>
+          <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"10px 12px" }}>
+            <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em",
+              textTransform:"uppercase", marginBottom:6 }}>Histórico local</div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+              <div>
+                <div style={{ fontSize:20, fontWeight:800, color:TEXT, fontFamily:"'Syne',sans-serif" }}>{savedSnapshots}</div>
+                <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>snapshots guardados</div>
+              </div>
+              <div>
+                <div style={{ fontSize:20, fontWeight:800, color:savedSevenDay ? "#22c55e" : "#f59e0b", fontFamily:"'Syne',sans-serif" }}>
+                  {savedSevenDay ? "7d" : "—"}
+                </div>
+                <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>ventana acumulada</div>
+              </div>
+            </div>
+            <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}80`, marginTop:8, lineHeight:1.5 }}>
+              {latestSaved ? `Última actualización guardada: ${new Date(latestSaved).toLocaleString("es-VE")}.` : "Aún no hay histórico local guardado."}
+              {" "}El histórico vive en este navegador y se usa como respaldo para 7 días.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!fireLoading && (
+        <div style={{ background:BG2, border:`1px solid ${BORDER}`, padding:"10px 12px" }}>
+          <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em",
+            textTransform:"uppercase", marginBottom:8 }}>Cómo interpretar las incidencias</div>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"repeat(4,1fr)", gap:8 }}>
+            {[
+              { k:"FRP", v:"Intensidad térmica", t:"Más MW no siempre significa mayor superficie, pero sí mayor energía emitida por el foco." },
+              { k:"Confianza", v:"Calidad de detección", t:"Los focos de alta confianza pesan más para seguimiento operativo; los de baja confianza son señales exploratorias." },
+              { k:"Noche", v:"Persistencia", t:"Detecciones nocturnas suelen indicar fuego activo más sostenido o visible fuera del ciclo agrícola diurno." },
+              { k:"Límite", v:"No es daño total", t:"VIIRS detecta calor, no hectáreas quemadas; humo, nubosidad y quemas pequeñas pueden subestimar el evento." },
+            ].map((item) => (
+              <div key={item.k} style={{ background:BG3, border:`1px solid ${BORDER}`, padding:"8px 10px" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", gap:8 }}>
+                  <span style={{ fontSize:10, fontFamily:font, color:"#dc2626", letterSpacing:"0.1em" }}>{item.k}</span>
+                  <span style={{ fontSize:11, fontWeight:700, color:TEXT, textAlign:"right" }}>{item.v}</span>
+                </div>
+                <div style={{ fontSize:11, fontFamily:fontSans, color:MUTED, lineHeight:1.45, marginTop:5 }}>{item.t}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Contenido */}
-      {!fireLoading && !fireError && (
+      {!fireLoading && (!fireError || rawPoints.length > 0) && (
         <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 280px", gap:12 }}>
 
           {/* Mapa */}
@@ -1870,7 +2012,7 @@ function TabIncendios({ mob }) {
       </div>
 
       <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}60`, textAlign:"center", paddingBottom:4 }}>
-        Fuente de datos: NASA FIRMS (sistema de alerta de incendios) · Satélite VIIRS 375m · Actualización cada ~3 horas · Requiere clave gratuita de NASA
+        Fuente de datos: NASA FIRMS (sistema de alerta de incendios) · Satélite VIIRS 375m · Actualización cada ~3 horas · Respaldo histórico local en este navegador
       </div>
     </div>
   );
