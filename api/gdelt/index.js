@@ -402,30 +402,35 @@ const MISSING_PERSONS_API = "https://desaparecidos-terremoto-api.theempire.tech/
 // object the API itself returns. The `items` array — and anything inside it — is
 // never read, never stored, and never forwarded past this function.
 async function fetchMissingPersonsCount(debug) {
-  try {
-    const res = await fetch(MISSING_PERSONS_API, {
-      headers: { accept: "application/json", "user-agent": "Mozilla/5.0 (compatible; MonitorVenezuelaBot/1.0)" },
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!res.ok) return { missingCounts: null, _debugMissing: { status: res.status, ok: false } };
-    const json = await res.json();
-    const counts = json && json.counts ? {
-      total: json.counts.total ?? null,
-      sinContacto: json.counts.sinContacto ?? null,
-      localizado: json.counts.localizado ?? null,
-    } : null;
-    // `json` (which includes `items`) goes out of scope here and is not returned.
-    return { missingCounts: counts, _debugMissing: debug ? { status: res.status, ok: res.ok } : undefined };
-  } catch (e) {
-    return {
-      missingCounts: null,
-      _debugMissing: debug ? {
+  const attempts = [];
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const res = await fetch(MISSING_PERSONS_API, {
+        headers: { accept: "application/json", "user-agent": "Mozilla/5.0 (compatible; MonitorVenezuelaBot/1.0)" },
+        signal: AbortSignal.timeout(3500),
+      });
+      if (!res.ok) {
+        attempts.push({ attempt, status: res.status, ok: false });
+        continue;
+      }
+      const json = await res.json();
+      const counts = json && json.counts ? {
+        total: json.counts.total ?? null,
+        sinContacto: json.counts.sinContacto ?? null,
+        localizado: json.counts.localizado ?? null,
+      } : null;
+      // `json` (which includes `items`) goes out of scope here and is not returned.
+      return { missingCounts: counts, _debugMissing: debug ? { status: res.status, ok: res.ok, attempts: attempt } : undefined };
+    } catch (e) {
+      attempts.push({
+        attempt,
         error: e.message,
         cause: e.cause ? String(e.cause.code || e.cause.message || e.cause) : null,
-        name: e.name,
-      } : undefined,
-    };
+      });
+      if (attempt < 2) await new Promise(r => setTimeout(r, 250));
+    }
   }
+  return { missingCounts: null, _debugMissing: debug ? { attempts } : undefined };
 }
 
 async function fetchSismoExtras(debug) {
