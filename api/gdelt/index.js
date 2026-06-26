@@ -29,6 +29,12 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(data);
   }
 
+  if (source === "usgs") {
+    const data = await fetchUsgsQuakes(req.query);
+    res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=60");
+    return res.status(200).json(data);
+  }
+
   // ── Foro Penal scraper (?source=foropenal) ──
   if (source === "foropenal") {
     try {
@@ -599,4 +605,35 @@ async function fetchSismoBuildingDetail(buildingId, debug) {
   }
 
   return result;
+}
+
+const USGS_BASE = "https://earthquake.usgs.gov/fdsnws/event/1/query";
+// Bounding box covering all of Venezuela with margin (same box used client-side for isVenezuelaPoint)
+const VE_BBOX = { minlatitude: "0", maxlatitude: "13", minlongitude: "-74", maxlongitude: "-58" };
+
+async function fetchUsgsQuakes(query) {
+  const { starttime, endtime, minmagnitude } = query;
+  const params = new URLSearchParams({
+    format: "geojson",
+    starttime: starttime || "2026-06-24",
+    endtime: endtime || new Date().toISOString().slice(0, 19),
+    ...VE_BBOX,
+    minmagnitude: minmagnitude || "0",
+    orderby: "time",
+    limit: "5000",
+  });
+  const url = `${USGS_BASE}?${params.toString()}`;
+  try {
+    const res = await fetch(url, {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!res.ok) {
+      return { features: [], error: `USGS HTTP ${res.status}`, fetchedAt: new Date().toISOString() };
+    }
+    const json = await res.json();
+    return { features: Array.isArray(json.features) ? json.features : [], fetchedAt: new Date().toISOString() };
+  } catch (e) {
+    return { features: [], error: e.message, fetchedAt: new Date().toISOString() };
+  }
 }
