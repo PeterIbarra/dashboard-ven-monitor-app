@@ -35,6 +35,12 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(data);
   }
 
+  if (source === "emsc") {
+    const data = await fetchEmscQuakes(req.query);
+    res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=60");
+    return res.status(200).json(data);
+  }
+
   // ── Foro Penal scraper (?source=foropenal) ──
   if (source === "foropenal") {
     try {
@@ -630,6 +636,40 @@ async function fetchUsgsQuakes(query) {
     });
     if (!res.ok) {
       return { features: [], error: `USGS HTTP ${res.status}`, fetchedAt: new Date().toISOString() };
+    }
+    const json = await res.json();
+    return { features: Array.isArray(json.features) ? json.features : [], fetchedAt: new Date().toISOString() };
+  } catch (e) {
+    return { features: [], error: e.message, fetchedAt: new Date().toISOString() };
+  }
+}
+
+// EMSC (European-Mediterranean Seismological Centre) aggregates ~65 national/regional seismic
+// networks worldwide and is typically far more complete than USGS for events below M4.5 outside
+// the US — this is the gap most third-party earthquake apps fill by using EMSC instead of/alongside USGS.
+const EMSC_BASE = "https://www.seismicportal.eu/fdsnws/event/1/query";
+
+async function fetchEmscQuakes(query) {
+  const { starttime, endtime, minmagnitude } = query;
+  const params = new URLSearchParams({
+    format: "json",
+    start: (starttime || "2026-06-24").slice(0, 19),
+    end: (endtime || new Date().toISOString().slice(0, 19)).slice(0, 19),
+    minlat: VE_BBOX.minlatitude,
+    maxlat: VE_BBOX.maxlatitude,
+    minlon: VE_BBOX.minlongitude,
+    maxlon: VE_BBOX.maxlongitude,
+    minmag: minmagnitude || "0",
+    limit: "2000",
+  });
+  const url = `${EMSC_BASE}?${params.toString()}`;
+  try {
+    const res = await fetch(url, {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!res.ok) {
+      return { features: [], error: `EMSC HTTP ${res.status}`, fetchedAt: new Date().toISOString() };
     }
     const json = await res.json();
     return { features: Array.isArray(json.features) ? json.features : [], fetchedAt: new Date().toISOString() };
