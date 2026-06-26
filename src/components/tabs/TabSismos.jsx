@@ -491,7 +491,7 @@ function QuakeRegistry({ mob }) {
   const [range, setRange] = useState("mainshock");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
-  const [minMagId, setMinMagId] = useState("2.5");
+  const [minMagId, setMinMagId] = useState("0");
   const minMag = parseFloat(minMagId) || 0;
 
   const [quakes, setQuakes] = useState([]);
@@ -517,21 +517,16 @@ function QuakeRegistry({ mob }) {
     setError(null);
     try {
       const params = new URLSearchParams({
-        format: "geojson",
+        source: "usgs",
         starttime: fromIso.slice(0, 19),
         endtime: toIso.slice(0, 19),
-        minlatitude: "0",
-        maxlatitude: "13",
-        minlongitude: "-74",
-        maxlongitude: "-58",
         minmagnitude: String(minMag),
-        orderby: "time",
-        limit: "1000",
       });
-      const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?${params.toString()}`;
+      const url = `/api/gdelt?${params.toString()}`;
       const res = await fetchTimeout(url, 15000);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
+      if (json.error) throw new Error(json.error);
       const parsed = (Array.isArray(json.features) ? json.features : [])
         .map(f => ({
           id: f.id,
@@ -655,12 +650,6 @@ function QuakeRegistry({ mob }) {
         </div>
       )}
 
-      {loading && (
-        <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 24, textAlign: "center", color: MUTED, fontFamily: font }}>
-          Conectando con USGS...
-        </div>
-      )}
-
       {error && !loading && (
         <div style={{ background: "#fef2f2", border: "1px solid #fecaca", padding: 16, color: "#dc2626", fontFamily: fontSans }}>
           {error}{" "}
@@ -670,118 +659,114 @@ function QuakeRegistry({ mob }) {
         </div>
       )}
 
-      {!loading && !error && (
-        <>
-          <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10 }}>
-            <Kpi label="Sismos registrados" value={quakes.length} />
-            <Kpi label="Magnitud maxima" value={maxMag ? `M${maxMag.toFixed(1)}` : "-"} tone="#7f1d1d" />
-            <Kpi label="Replicas M4.5+" value={aftershocksM45} tone="#dc2626" />
-            <Kpi label="Mas reciente" value={mostRecent ? quakeTimeAgo(mostRecent.time) : "-"} tone={ACCENT} />
+      <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10 }}>
+        <Kpi label="Sismos registrados" value={loading ? "..." : quakes.length} />
+        <Kpi label="Magnitud maxima" value={loading ? "..." : (maxMag ? `M${maxMag.toFixed(1)}` : "-")} tone="#7f1d1d" />
+        <Kpi label="Replicas M4.5+" value={loading ? "..." : aftershocksM45} tone="#dc2626" />
+        <Kpi label="Mas reciente" value={loading ? "..." : (mostRecent ? quakeTimeAgo(mostRecent.time) : "-")} tone={ACCENT} />
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 340px", gap: 12 }}>
+        <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
+          <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
+            Epicentros - USGS (fuente oficial){loading ? " - cargando..." : ""}
           </div>
+          <div
+            ref={mapRef}
+            style={{ width: "100%", height: mob ? 320 : 480, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }}
+          />
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
+            {[["M2.5-3.9", "#f59e0b"], ["M4-4.9", "#f97316"], ["M5-5.9", "#dc2626"], ["M6+", "#7f1d1d"]].map(([label, color]) => (
+              <div key={label} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+                <span style={{ width: 10, height: 10, borderRadius: 10, background: color, display: "inline-block" }} />
+                {label}
+              </div>
+            ))}
+          </div>
+        </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 340px", gap: 12 }}>
-            <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
-              <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
-                Epicentros - USGS (fuente oficial)
+        <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
+          <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+            Detalle seleccionado
+          </div>
+          {selectedQuake ? (
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: magColor(selectedQuake.mag || 0) }}>
+                M{selectedQuake.mag != null ? selectedQuake.mag.toFixed(1) : "?"}
               </div>
-              <div
-                ref={mapRef}
-                style={{ width: "100%", height: mob ? 320 : 480, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }}
-              />
-              <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
-                {[["M2.5-3.9", "#f59e0b"], ["M4-4.9", "#f97316"], ["M5-5.9", "#dc2626"], ["M6+", "#7f1d1d"]].map(([label, color]) => (
-                  <div key={label} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
-                    <span style={{ width: 10, height: 10, borderRadius: 10, background: color, display: "inline-block" }} />
-                    {label}
-                  </div>
-                ))}
+              <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT, marginTop: 4, lineHeight: 1.5 }}>
+                {selectedQuake.place}
               </div>
-            </div>
-
-            <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
-              <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
-                Detalle seleccionado
+              <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 8 }}>
+                {formatQuakeTime(selectedQuake.time)}
               </div>
-              {selectedQuake ? (
-                <div>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: magColor(selectedQuake.mag || 0) }}>
-                    M{selectedQuake.mag != null ? selectedQuake.mag.toFixed(1) : "?"}
-                  </div>
-                  <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT, marginTop: 4, lineHeight: 1.5 }}>
-                    {selectedQuake.place}
-                  </div>
-                  <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 8 }}>
-                    {formatQuakeTime(selectedQuake.time)}
-                  </div>
-                  <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 4 }}>
-                    Profundidad: {selectedQuake.depth != null ? `${selectedQuake.depth.toFixed(1)} km` : "Sin dato"}
-                  </div>
-                  <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 4 }}>
-                    {formatCoord(selectedQuake.lat)}, {formatCoord(selectedQuake.lng)}
-                  </div>
-                  {selectedQuake.url && (
-                    <a href={selectedQuake.url} target="_blank" rel="noreferrer" style={{ display: "inline-block", marginTop: 10, fontSize: 11, fontFamily: font, color: ACCENT }}>
-                      Ver ficha en USGS ↗
-                    </a>
-                  )}
-                </div>
-              ) : (
-                <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.5 }}>
-                  Haz clic en un punto del mapa o una fila de la tabla para ver el detalle.
-                </div>
+              <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 4 }}>
+                Profundidad: {selectedQuake.depth != null ? `${selectedQuake.depth.toFixed(1)} km` : "Sin dato"}
+              </div>
+              <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 4 }}>
+                {formatCoord(selectedQuake.lat)}, {formatCoord(selectedQuake.lng)}
+              </div>
+              {selectedQuake.url && (
+                <a href={selectedQuake.url} target="_blank" rel="noreferrer" style={{ display: "inline-block", marginTop: 10, fontSize: 11, fontFamily: font, color: ACCENT }}>
+                  Ver ficha en USGS ↗
+                </a>
               )}
             </div>
-          </div>
-
-          <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
-            <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
-              Listado ({sorted.length})
+          ) : (
+            <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.5 }}>
+              {loading ? "Cargando catalogo sismico..." : "Haz clic en un punto del mapa o una fila de la tabla para ver el detalle."}
             </div>
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: font }}>
-                <thead>
-                  <tr style={{ borderBottom: `2px solid ${BORDER}` }}>
-                    <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Fecha</th>
-                    <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Magnitud</th>
-                    <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Profundidad</th>
-                    <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Lugar</th>
-                    <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Coordenadas</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sorted.slice(0, 300).map(q => (
-                    <tr
-                      key={q.id}
-                      onClick={() => setSelectedId(q.id)}
-                      style={{ borderBottom: `1px solid ${BORDER}30`, cursor: "pointer", background: selectedId === q.id ? `${ACCENT}08` : "transparent" }}
-                    >
-                      <td style={{ padding: "6px 8px", color: TEXT }}>{formatQuakeTime(q.time)}</td>
-                      <td style={{ padding: "6px 8px", color: magColor(q.mag || 0), fontWeight: 700 }}>
-                        M{q.mag != null ? q.mag.toFixed(1) : "?"}
-                      </td>
-                      <td style={{ padding: "6px 8px", color: MUTED }}>{q.depth != null ? `${q.depth.toFixed(1)} km` : "-"}</td>
-                      <td style={{ padding: "6px 8px", color: TEXT }}>{q.place}</td>
-                      <td style={{ padding: "6px 8px", color: `${MUTED}cc` }}>{formatCoord(q.lat)}, {formatCoord(q.lng)}</td>
-                    </tr>
-                  ))}
-                  {sorted.length === 0 && (
-                    <tr><td colSpan={5} style={{ padding: 16, textAlign: "center", color: MUTED }}>No se registraron sismos para este filtro.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-            {sorted.length > 300 && (
-              <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}90`, marginTop: 8 }}>
-                Mostrando los 300 mas recientes de {sorted.length} registros.
-              </div>
-            )}
-          </div>
+          )}
+        </div>
+      </div>
 
-          <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
-            Fuente: USGS Earthquake Catalog (fdsnws/event) - datos oficiales, actualizacion en tiempo real
+      <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
+        <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+          Listado ({sorted.length})
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: font }}>
+            <thead>
+              <tr style={{ borderBottom: `2px solid ${BORDER}` }}>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Fecha</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Magnitud</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Profundidad</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Lugar</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Coordenadas</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.slice(0, 300).map(q => (
+                <tr
+                  key={q.id}
+                  onClick={() => setSelectedId(q.id)}
+                  style={{ borderBottom: `1px solid ${BORDER}30`, cursor: "pointer", background: selectedId === q.id ? `${ACCENT}08` : "transparent" }}
+                >
+                  <td style={{ padding: "6px 8px", color: TEXT }}>{formatQuakeTime(q.time)}</td>
+                  <td style={{ padding: "6px 8px", color: magColor(q.mag || 0), fontWeight: 700 }}>
+                    M{q.mag != null ? q.mag.toFixed(1) : "?"}
+                  </td>
+                  <td style={{ padding: "6px 8px", color: MUTED }}>{q.depth != null ? `${q.depth.toFixed(1)} km` : "-"}</td>
+                  <td style={{ padding: "6px 8px", color: TEXT }}>{q.place}</td>
+                  <td style={{ padding: "6px 8px", color: `${MUTED}cc` }}>{formatCoord(q.lat)}, {formatCoord(q.lng)}</td>
+                </tr>
+              ))}
+              {sorted.length === 0 && (
+                <tr><td colSpan={5} style={{ padding: 16, textAlign: "center", color: MUTED }}>{loading ? "Cargando..." : "No se registraron sismos para este filtro."}</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        {sorted.length > 300 && (
+          <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}90`, marginTop: 8 }}>
+            Mostrando los 300 mas recientes de {sorted.length} registros.
           </div>
-        </>
-      )}
+        )}
+      </div>
+
+      <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
+        Fuente: USGS Earthquake Catalog (fdsnws/event) - datos oficiales, actualizacion en tiempo real
+      </div>
     </div>
   );
 }
