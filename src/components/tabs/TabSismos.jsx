@@ -598,13 +598,18 @@ export function TabSismos() {
 
     const row = (cells) => `<tr>${cells.map(c => `<td style="padding:4px 6px;border-bottom:1px solid #e5e7eb;vertical-align:top;">${c}</td>`).join("")}</tr>`;
     const emptyRow = (cols) => `<tr><td colspan="${cols}" style="padding:8px;color:#9ca3af;">Sin registros en este periodo.</td></tr>`;
+    const coordsOf = (item) => {
+      const p = getLatLng(item);
+      return p ? `${formatCoord(p.lat)}, ${formatCoord(p.lng)}` : "-";
+    };
 
     const reportRows = reportReports.slice(0, 200).map(r => row([
       formatDate(itemDate(r)),
       r.place || "Sin ubicacion",
       SEVERITY[r._severity]?.label || "-",
-      String(r.note || "").slice(0, 140),
-    ])).join("") || emptyRow(4);
+      String(r.note || "").slice(0, 120),
+      coordsOf(r),
+    ])).join("") || emptyRow(5);
 
     const buildingRows = reportBuildings.slice(0, 200).map(b => row([
       formatDate(itemDate(b)),
@@ -612,21 +617,24 @@ export function TabSismos() {
       DAMAGE[b._damage]?.label || "-",
       b.address || b.zone || b.city || "-",
       b.is_technically_evaluated ? "Si" : "No",
-    ])).join("") || emptyRow(5);
+      coordsOf(b),
+    ])).join("") || emptyRow(6);
 
     const acopioRows = reportAcopios.slice(0, 200).map(a => row([
       formatDate(itemDate(a)),
       a.name || "Centro de acopio",
-      String(a.needs || "").slice(0, 140),
+      String(a.needs || "").slice(0, 120),
       a.contact || "-",
-    ])).join("") || emptyRow(4);
+      coordsOf(a),
+    ])).join("") || emptyRow(5);
 
     const socialRows = reportBuildingDamageSocial.slice(0, 200).map(s => row([
       formatDate(itemDate(s)),
       s.place || "-",
       s.damage_type || "-",
       s.confirmations ?? 0,
-    ])).join("") || emptyRow(4);
+      coordsOf(s),
+    ])).join("") || emptyRow(5);
 
     const kpis = [
       ["Reportes", reportReports.length],
@@ -672,25 +680,25 @@ export function TabSismos() {
 
       <div style="font-size:14px;font-weight:700;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;color:#111827;">Reportes ciudadanos (${reportReports.length})</div>
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
-        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Lugar</th><th style="padding:4px 6px;">Severidad</th><th style="padding:4px 6px;">Nota</th></tr></thead>
+        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Lugar</th><th style="padding:4px 6px;">Severidad</th><th style="padding:4px 6px;">Nota</th><th style="padding:4px 6px;">Coordenadas</th></tr></thead>
         <tbody>${reportRows}</tbody>
       </table>
 
       <div style="font-size:14px;font-weight:700;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;color:#111827;">Edificios afectados (${reportBuildings.length})</div>
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
-        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Nombre</th><th style="padding:4px 6px;">Dano</th><th style="padding:4px 6px;">Direccion</th><th style="padding:4px 6px;">Evaluado</th></tr></thead>
+        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Nombre</th><th style="padding:4px 6px;">Dano</th><th style="padding:4px 6px;">Direccion</th><th style="padding:4px 6px;">Evaluado</th><th style="padding:4px 6px;">Coordenadas</th></tr></thead>
         <tbody>${buildingRows}</tbody>
       </table>
 
       <div style="font-size:14px;font-weight:700;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;color:#111827;">Acopios (${reportAcopios.length})</div>
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
-        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Nombre</th><th style="padding:4px 6px;">Necesidades</th><th style="padding:4px 6px;">Contacto</th></tr></thead>
+        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Nombre</th><th style="padding:4px 6px;">Necesidades</th><th style="padding:4px 6px;">Contacto</th><th style="padding:4px 6px;">Coordenadas</th></tr></thead>
         <tbody>${acopioRows}</tbody>
       </table>
 
       <div style="font-size:14px;font-weight:700;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;color:#111827;">Dano social — corroboracion en redes (${reportBuildingDamageSocial.length})</div>
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
-        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Lugar</th><th style="padding:4px 6px;">Tipo</th><th style="padding:4px 6px;">Confirmaciones</th></tr></thead>
+        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Lugar</th><th style="padding:4px 6px;">Tipo</th><th style="padding:4px 6px;">Confirmaciones</th><th style="padding:4px 6px;">Coordenadas</th></tr></thead>
         <tbody>${socialRows}</tbody>
       </table>
 
