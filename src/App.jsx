@@ -36,6 +36,7 @@ import { TabIODA } from "./components/tabs/TabIODA";
 import { TabMercados } from "./components/tabs/TabMercados";
 import { TabMacro } from "./components/tabs/TabMacro";
 import { TabAmbiental } from "./components/tabs/TabAmbiental";
+import { TabSismos } from "./components/tabs/TabSismos";
 import { NewsTicker } from "./components/NewsTicker";
 import { MethodologyFooter } from "./components/MethodologyFooter";
 import { AuthGate, UserButton } from "./components/AuthGate";
@@ -512,6 +513,7 @@ export default function MonitorPNUD() {
         {tab === "mercados" && <TabMercados />}
         {tab === "macro" && <TabMacro />}
         {tab === "ambiental" && <TabAmbiental />}
+        {tab === "sismos" && <TabSismos />}
       </div>
 
       {/* FOOTER + METHODOLOGY */}
