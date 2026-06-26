@@ -42,6 +42,51 @@ const REPORT_RANGES = [
 
 const REFRESH_INTERVAL_MS = 120000;
 
+const MAINSHOCK_ISO = "2026-06-24T00:00:00Z";
+
+const QUAKE_RANGES = [
+  { id: "mainshock", label: "Desde el sismo" },
+  { id: "7d", label: "7 dias" },
+  { id: "30d", label: "30 dias" },
+  { id: "custom", label: "Fecha/hora" },
+];
+
+const QUAKE_MAG_OPTIONS = [
+  { id: "0", label: "Todos" },
+  { id: "2.5", label: "M2.5+" },
+  { id: "4", label: "M4+" },
+  { id: "5", label: "M5+" },
+];
+
+function magColor(mag) {
+  if (mag >= 6) return "#7f1d1d";
+  if (mag >= 5) return "#dc2626";
+  if (mag >= 4) return "#f97316";
+  if (mag >= 2.5) return "#f59e0b";
+  return "#9ca3af";
+}
+
+function formatQuakeTime(value) {
+  if (!value) return "Sin fecha";
+  try {
+    return new Intl.DateTimeFormat("es-VE", {
+      day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
+function quakeTimeAgo(value) {
+  if (!value) return "-";
+  const diffMs = Date.now() - new Date(value).getTime();
+  if (!Number.isFinite(diffMs)) return "-";
+  const h = diffMs / 3600000;
+  if (h < 1) return `hace ${Math.max(1, Math.round(h * 60))}min`;
+  if (h < 48) return `hace ${Math.round(h)}h`;
+  return `hace ${Math.round(h / 24)}d`;
+}
+
 function fetchTimeout(url, ms) {
   const ctrl = new AbortController();
   const id = setTimeout(() => ctrl.abort(), ms);
@@ -437,6 +482,310 @@ function ToggleGroup({ value, onChange, options }) {
   );
 }
 
+function QuakeRegistry({ mob }) {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const layerRef = useRef(null);
+  const [mapReady, setMapReady] = useState(false);
+
+  const [range, setRange] = useState("mainshock");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+  const [minMagId, setMinMagId] = useState("2.5");
+  const minMag = parseFloat(minMagId) || 0;
+
+  const [quakes, setQuakes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const { fromIso, toIso } = useMemo(() => {
+    const now = new Date();
+    if (range === "custom") {
+      return {
+        fromIso: customFrom ? new Date(customFrom).toISOString() : MAINSHOCK_ISO,
+        toIso: customTo ? new Date(customTo).toISOString() : now.toISOString(),
+      };
+    }
+    if (range === "mainshock") return { fromIso: MAINSHOCK_ISO, toIso: now.toISOString() };
+    const days = range === "7d" ? 7 : 30;
+    return { fromIso: new Date(now.getTime() - days * 24 * 3600 * 1000).toISOString(), toIso: now.toISOString() };
+  }, [range, customFrom, customTo]);
+
+  async function loadQuakes() {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({
+        format: "geojson",
+        starttime: fromIso.slice(0, 19),
+        endtime: toIso.slice(0, 19),
+        minlatitude: "0",
+        maxlatitude: "13",
+        minlongitude: "-74",
+        maxlongitude: "-58",
+        minmagnitude: String(minMag),
+        orderby: "time",
+        limit: "1000",
+      });
+      const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?${params.toString()}`;
+      const res = await fetchTimeout(url, 15000);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const parsed = (Array.isArray(json.features) ? json.features : [])
+        .map(f => ({
+          id: f.id,
+          mag: typeof f.properties?.mag === "number" ? f.properties.mag : null,
+          place: f.properties?.place || "Sin lugar registrado",
+          time: f.properties?.time ? new Date(f.properties.time).toISOString() : null,
+          url: f.properties?.url || null,
+          lat: f.geometry?.coordinates?.[1],
+          lng: f.geometry?.coordinates?.[0],
+          depth: typeof f.geometry?.coordinates?.[2] === "number" ? f.geometry.coordinates[2] : null,
+        }))
+        .filter(q => Number.isFinite(q.lat) && Number.isFinite(q.lng));
+      setQuakes(parsed);
+    } catch (e) {
+      setError("No se pudo conectar con USGS en este momento.");
+      setQuakes([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { loadQuakes(); }, [fromIso, toIso, minMag]);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadCSS(LEAFLET_CSS);
+    loadScript(LEAFLET_JS).then(() => {
+      if (cancelled || !mapRef.current || !window.L || mapInstance.current) return;
+      const L = window.L;
+      const map = L.map(mapRef.current, {
+        center: [10.6, -67.0],
+        zoom: mob ? 6 : 7,
+        minZoom: 4,
+        maxZoom: 12,
+        zoomControl: true,
+        scrollWheelZoom: true,
+        attributionControl: false,
+      });
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 18 }).addTo(map);
+      mapInstance.current = map;
+      setMapReady(true);
+      setTimeout(() => map.invalidateSize(), 120);
+    });
+    return () => {
+      cancelled = true;
+      setMapReady(false);
+      if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
+    };
+  }, [mob]);
+
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current || !window.L) return;
+    const L = window.L;
+    const map = mapInstance.current;
+    if (layerRef.current) map.removeLayer(layerRef.current);
+    const group = L.layerGroup();
+    const bounds = [];
+    quakes.forEach(q => {
+      const color = magColor(q.mag || 0);
+      const selected = selectedId === q.id;
+      bounds.push([q.lat, q.lng]);
+      const marker = L.circleMarker([q.lat, q.lng], {
+        radius: selected ? Math.max(7, (q.mag || 1) * 2.6) : Math.max(4, (q.mag || 1) * 1.9),
+        fillColor: color,
+        color: selected ? "#111827" : "#ffffff",
+        weight: selected ? 2.5 : 1,
+        opacity: 0.92,
+        fillOpacity: 0.62,
+      });
+      marker.bindPopup(
+        `<div style="font-family:monospace;font-size:11px;max-width:240px;line-height:1.45">` +
+        `<strong>M${q.mag != null ? q.mag.toFixed(1) : "?"}</strong> - ${q.place}<br/>` +
+        `${formatQuakeTime(q.time)}<br/>` +
+        `Profundidad: ${q.depth != null ? q.depth.toFixed(1) + " km" : "Sin dato"}` +
+        `</div>`
+      );
+      marker.on("click", () => setSelectedId(q.id));
+      group.addLayer(marker);
+    });
+    group.addTo(map);
+    layerRef.current = group;
+    if (bounds.length > 1) map.fitBounds(bounds, { padding: [24, 24], maxZoom: 10 });
+  }, [quakes, selectedId, mapReady]);
+
+  const sorted = useMemo(
+    () => [...quakes].sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0)),
+    [quakes]
+  );
+  const maxMag = quakes.reduce((m, q) => Math.max(m, q.mag || 0), 0);
+  const aftershocksM45 = quakes.filter(q => (q.mag || 0) >= 4.5).length;
+  const mostRecent = sorted[0];
+  const selectedQuake = quakes.find(q => q.id === selectedId) || null;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
+        <ToggleGroup value={range} onChange={setRange} options={QUAKE_RANGES} />
+        <ToggleGroup value={minMagId} onChange={setMinMagId} options={QUAKE_MAG_OPTIONS} />
+      </div>
+
+      {range === "custom" && (
+        <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 1fr", gap: 8, background: BG2, border: `1px solid ${BORDER}`, padding: 10 }}>
+          <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 10, fontFamily: font, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            Desde
+            <input
+              type="datetime-local"
+              value={customFrom}
+              onChange={e => setCustomFrom(e.target.value)}
+              style={{ border: `1px solid ${BORDER}`, padding: "7px 9px", fontFamily: fontSans, fontSize: 12, color: TEXT, background: "#ffffff" }}
+            />
+          </label>
+          <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 10, fontFamily: font, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            Hasta
+            <input
+              type="datetime-local"
+              value={customTo}
+              onChange={e => setCustomTo(e.target.value)}
+              style={{ border: `1px solid ${BORDER}`, padding: "7px 9px", fontFamily: fontSans, fontSize: 12, color: TEXT, background: "#ffffff" }}
+            />
+          </label>
+        </div>
+      )}
+
+      {loading && (
+        <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 24, textAlign: "center", color: MUTED, fontFamily: font }}>
+          Conectando con USGS...
+        </div>
+      )}
+
+      {error && !loading && (
+        <div style={{ background: "#fef2f2", border: "1px solid #fecaca", padding: 16, color: "#dc2626", fontFamily: fontSans }}>
+          {error}{" "}
+          <a href="https://earthquake.usgs.gov/earthquakes/map/?extent=0,-74&extent=13,-58" target="_blank" rel="noreferrer" style={{ color: ACCENT }}>
+            Ver directamente en USGS ↗
+          </a>
+        </div>
+      )}
+
+      {!loading && !error && (
+        <>
+          <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10 }}>
+            <Kpi label="Sismos registrados" value={quakes.length} />
+            <Kpi label="Magnitud maxima" value={maxMag ? `M${maxMag.toFixed(1)}` : "-"} tone="#7f1d1d" />
+            <Kpi label="Replicas M4.5+" value={aftershocksM45} tone="#dc2626" />
+            <Kpi label="Mas reciente" value={mostRecent ? quakeTimeAgo(mostRecent.time) : "-"} tone={ACCENT} />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 340px", gap: 12 }}>
+            <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
+              <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
+                Epicentros - USGS (fuente oficial)
+              </div>
+              <div
+                ref={mapRef}
+                style={{ width: "100%", height: mob ? 320 : 480, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }}
+              />
+              <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
+                {[["M2.5-3.9", "#f59e0b"], ["M4-4.9", "#f97316"], ["M5-5.9", "#dc2626"], ["M6+", "#7f1d1d"]].map(([label, color]) => (
+                  <div key={label} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+                    <span style={{ width: 10, height: 10, borderRadius: 10, background: color, display: "inline-block" }} />
+                    {label}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
+              <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+                Detalle seleccionado
+              </div>
+              {selectedQuake ? (
+                <div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: magColor(selectedQuake.mag || 0) }}>
+                    M{selectedQuake.mag != null ? selectedQuake.mag.toFixed(1) : "?"}
+                  </div>
+                  <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT, marginTop: 4, lineHeight: 1.5 }}>
+                    {selectedQuake.place}
+                  </div>
+                  <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 8 }}>
+                    {formatQuakeTime(selectedQuake.time)}
+                  </div>
+                  <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 4 }}>
+                    Profundidad: {selectedQuake.depth != null ? `${selectedQuake.depth.toFixed(1)} km` : "Sin dato"}
+                  </div>
+                  <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 4 }}>
+                    {formatCoord(selectedQuake.lat)}, {formatCoord(selectedQuake.lng)}
+                  </div>
+                  {selectedQuake.url && (
+                    <a href={selectedQuake.url} target="_blank" rel="noreferrer" style={{ display: "inline-block", marginTop: 10, fontSize: 11, fontFamily: font, color: ACCENT }}>
+                      Ver ficha en USGS ↗
+                    </a>
+                  )}
+                </div>
+              ) : (
+                <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.5 }}>
+                  Haz clic en un punto del mapa o una fila de la tabla para ver el detalle.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
+            <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+              Listado ({sorted.length})
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: font }}>
+                <thead>
+                  <tr style={{ borderBottom: `2px solid ${BORDER}` }}>
+                    <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Fecha</th>
+                    <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Magnitud</th>
+                    <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Profundidad</th>
+                    <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Lugar</th>
+                    <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Coordenadas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sorted.slice(0, 300).map(q => (
+                    <tr
+                      key={q.id}
+                      onClick={() => setSelectedId(q.id)}
+                      style={{ borderBottom: `1px solid ${BORDER}30`, cursor: "pointer", background: selectedId === q.id ? `${ACCENT}08` : "transparent" }}
+                    >
+                      <td style={{ padding: "6px 8px", color: TEXT }}>{formatQuakeTime(q.time)}</td>
+                      <td style={{ padding: "6px 8px", color: magColor(q.mag || 0), fontWeight: 700 }}>
+                        M{q.mag != null ? q.mag.toFixed(1) : "?"}
+                      </td>
+                      <td style={{ padding: "6px 8px", color: MUTED }}>{q.depth != null ? `${q.depth.toFixed(1)} km` : "-"}</td>
+                      <td style={{ padding: "6px 8px", color: TEXT }}>{q.place}</td>
+                      <td style={{ padding: "6px 8px", color: `${MUTED}cc` }}>{formatCoord(q.lat)}, {formatCoord(q.lng)}</td>
+                    </tr>
+                  ))}
+                  {sorted.length === 0 && (
+                    <tr><td colSpan={5} style={{ padding: 16, textAlign: "center", color: MUTED }}>No se registraron sismos para este filtro.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            {sorted.length > 300 && (
+              <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}90`, marginTop: 8 }}>
+                Mostrando los 300 mas recientes de {sorted.length} registros.
+              </div>
+            )}
+          </div>
+
+          <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
+            Fuente: USGS Earthquake Catalog (fdsnws/event) - datos oficiales, actualizacion en tiempo real
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function TabSismos() {
   const mob = useIsMobile();
   const [data, setData] = useState({
@@ -466,6 +815,7 @@ export function TabSismos() {
   const [reportFrom, setReportFrom] = useState("");
   const [reportTo, setReportTo] = useState("");
   const [reportGenerating, setReportGenerating] = useState(false);
+  const [subView, setSubView] = useState("principal");
   const [nextRefreshAt, setNextRefreshAt] = useState(null);
   const [now, setNow] = useState(Date.now());
 
@@ -956,6 +1306,20 @@ export function TabSismos() {
         </div>
       </div>
 
+      <div style={{ marginBottom: 12 }}>
+        <ToggleGroup
+          value={subView}
+          onChange={setSubView}
+          options={[
+            { id: "principal", label: "Vista principal" },
+            { id: "registro", label: "Registro de sismos (USGS)" },
+          ]}
+        />
+      </div>
+
+      {subView === "registro" && <QuakeRegistry mob={mob} />}
+
+      {subView === "principal" && (<>
       {loading && (
         <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 24, textAlign: "center", color: MUTED, fontFamily: font }}>
           Cargando datos consolidados de sismos...
@@ -1341,6 +1705,7 @@ export function TabSismos() {
           </div>
         </div>
       )}
+      </>)}
     </div>
   );
 }
