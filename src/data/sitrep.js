@@ -4569,6 +4569,136 @@ export const SITREP_ALL = [
         "text": "El manejo de derechos humanos determinará si el control territorial y penitenciario erosiona el soporte internacional."
       }
     ]
+  },
+  {
+    "period": "12 – 19 de junio de 2026",
+    "periodShort": "12–19 jun 2026",
+    "keyPoints": [
+      {
+        "tag": "Transición",
+        "color": "#22c55e",
+        "title": "Mesa técnica AN–Figuera instala canal político formal",
+        "text": "El retorno de Dinorah Figuera y la instalación de una mesa técnica con la Asamblea Nacional abren el primer canal verificable de diálogo político del ciclo, con respaldo explícito del Departamento de Estado."
+      },
+      {
+        "tag": "Seguridad",
+        "color": "#0468B1",
+        "title": "Operación SOUTHCOM–FANB contra el Tren de Aragua",
+        "text": "La neutralización de Héctor Guerrero Flores en Bolívar profundiza la cooperación bilateral en seguridad y proyecta a Venezuela como socio operativo de Washington."
+      },
+      {
+        "tag": "Energía",
+        "color": "#f59e0b",
+        "title": "IMPSA, GE Vernova y PDVSA–Repsol elevan densidad contractual",
+        "text": "Los acuerdos eléctricos e hidrocarburíferos refuerzan la apertura sectorial, aunque todavía sin montos de inversión ni cronogramas plenamente verificables."
+      },
+      {
+        "tag": "Social",
+        "color": "#dc2626",
+        "title": "27 protestas en 13 estados",
+        "text": "La conflictividad laboral, de seguridad social y servicios evidencia desacople persistente entre apertura de élites y condiciones materiales."
+      }
+    ],
+    "sintesis": "El período 12–19 de junio marca el avance institucional más relevante desde enero: la mesa técnica AN–Figuera transfiere probabilidad hacia E1 y reduce la brecha E3–E1 de 16 a 10 puntos. E3 sigue dominante en 47% por la convergencia de apertura energética, cooperación de seguridad y normalización financiera, pero cede terreno relativo ante el primer canal político verificable del ciclo. E1 sube a 37% por el respaldo de EE.UU. a una agenda de transición democrática, aunque sin cronograma electoral, CNE renovado ni incorporación plena de MCM. E4 baja a 12% por ausencia de represalia ante retornos opositores; E2 queda en 4% por amortiguadores financieros, pese a fragilidad eléctrica y social.",
+    "actores": [
+      {
+        "name": "EE.UU.",
+        "items": [
+          "Departamento de Estado respalda públicamente el diálogo político iniciado con Figuera.",
+          "SOUTHCOM coordina con FANB la operación contra el Tren de Aragua.",
+          "La cooperación de seguridad se suma al eje energético y financiero de la relación bilateral."
+        ]
+      },
+      {
+        "name": "Gobierno Interino",
+        "items": [
+          "Conduce la mesa técnica con la AN de 2015 sin perder control del proceso.",
+          "Avanza acuerdos IMPSA, GE Vernova y PDVSA–Repsol.",
+          "Mantiene revisión de expedientes judiciales pendientes y control selectivo."
+        ]
+      },
+      {
+        "name": "Oposición",
+        "items": [
+          "Dinorah Figuera retorna y se instala como interlocutora institucional.",
+          "La posición de Plataforma Unitaria y MCM queda como variable decisiva.",
+          "El retorno de MCM sigue siendo la prueba principal de garantías reales."
+        ]
+      },
+      {
+        "name": "Sociedad / Servicios",
+        "items": [
+          "OVCS registra 27 protestas en 13 estados.",
+          "IODA identifica 12 eventos eléctricos en 6 estados, con Guárico en 50%.",
+          "Persisten demandas laborales, seguridad social y servicios básicos."
+        ]
+      }
+    ]
+  },
+  {
+    "period": "19 – 26 de junio de 2026",
+    "periodShort": "19–26 jun 2026",
+    "keyPoints": [
+      {
+        "tag": "Emergencia",
+        "color": "#dc2626",
+        "title": "Doblete sísmico Mw 7.2/7.5 reordena prioridades",
+        "text": "El sismo del 24 de junio activa respuesta humanitaria, reconstrucción, monitoreo de réplicas, electricidad y telecomunicaciones como ejes inmediatos."
+      },
+      {
+        "tag": "Continuidad",
+        "color": "#0468B1",
+        "title": "E3 sube a 49% por necesidad operativa del Estado",
+        "text": "La emergencia refuerza la centralidad del gobierno encargado para coordinar ayuda, gestionar servicios y ejecutar reconstrucción con cooperación internacional."
+      },
+      {
+        "tag": "Transición",
+        "color": "#22c55e",
+        "title": "E1 sube a 39% por canal AN2015–Figuera y OEA",
+        "text": "La comisión negociadora y la disposición de la OEA a apoyar una transición electoral sostienen el canal político pese a la emergencia."
+      },
+      {
+        "tag": "Fiscal",
+        "color": "#f59e0b",
+        "title": "Sismo y deuda externa se cruzan en julio",
+        "text": "El costo estimado del sismo (1%–7% del PIB) coincide con la presentación del plan de Centerview sobre deuda externa reportada en USD 240.000M."
+      }
+    ],
+    "sintesis": "La semana del 19 al 26 de junio confirma que la emergencia humanitaria y el proceso político-financiero no compiten sino que se sobreponen. E3 sube a 49% porque el doblete sísmico prolonga la necesidad operativa del gobierno encargado y canaliza la ayuda internacional a través de la arquitectura institucional existente. E1 sube a 39% porque la comisión AN2015–Figuera y la OEA siguen activos. E4 baja a 9% por ausencia de securitización de la emergencia y tono oficial de reconciliación. E2 baja a 3% porque el shock fue absorbido sin fractura inmediata, aunque el costo fiscal, la deuda externa de USD 240.000M y las réplicas serán variables críticas de julio.",
+    "actores": [
+      {
+        "name": "Gobierno Interino",
+        "items": [
+          "Activa respuesta institucional frente al sismo y coordina ayuda externa.",
+          "Presenta tono de reconciliación nacional y cooperación internacional.",
+          "Mantiene centralidad operativa en reconstrucción, servicios y gestión de réplicas."
+        ]
+      },
+      {
+        "name": "Internacional",
+        "items": [
+          "Más de 25 países y organismos multilaterales movilizan asistencia.",
+          "FMI y BID activan instrumentos de apoyo; fondo inicial de USD 200M.",
+          "OEA se declara lista para apoyar una transición electoral."
+        ]
+      },
+      {
+        "name": "Oposición",
+        "items": [
+          "Canal AN2015–Figuera continúa pese a la emergencia.",
+          "Figuera deslinda su rol negociador del liderazgo electoral de MCM.",
+          "La posición coordinada de Plataforma Unitaria y MCM sigue pendiente."
+        ]
+      },
+      {
+        "name": "Economía / Servicios",
+        "items": [
+          "PDVSA acumula USD 9.400M facturados entre enero y mayo.",
+          "BCV flexibiliza mercado cambiario; brecha paralela alcanza 36%.",
+          "USGS estima 24% de probabilidad de M6 adicional y 3% de M7+."
+        ]
+      }
+    ]
   }
 ];
 
