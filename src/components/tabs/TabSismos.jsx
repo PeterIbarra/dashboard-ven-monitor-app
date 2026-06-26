@@ -87,6 +87,55 @@ function quakeTimeAgo(value) {
   return `hace ${Math.round(h / 24)}d`;
 }
 
+function normalizeUsgsFeature(f) {
+  return {
+    id: `usgs_${f.id}`,
+    mag: typeof f.properties?.mag === "number" ? f.properties.mag : null,
+    place: f.properties?.place || "Sin lugar registrado",
+    time: f.properties?.time ? new Date(f.properties.time).toISOString() : null,
+    url: f.properties?.url || null,
+    lat: f.geometry?.coordinates?.[1],
+    lng: f.geometry?.coordinates?.[0],
+    depth: typeof f.geometry?.coordinates?.[2] === "number" ? f.geometry.coordinates[2] : null,
+    source: "USGS",
+  };
+}
+
+function normalizeEmscFeature(f) {
+  const depthRaw = f.geometry?.coordinates?.[2];
+  return {
+    id: `emsc_${f.id}`,
+    mag: typeof f.properties?.mag === "number" ? f.properties.mag : null,
+    place: f.properties?.flynn_region || "Sin lugar registrado",
+    time: f.properties?.time ? new Date(f.properties.time).toISOString() : null,
+    url: f.id ? `https://www.seismicportal.eu/eventdetails.html?unid=${f.id}` : null,
+    lat: f.geometry?.coordinates?.[1],
+    lng: f.geometry?.coordinates?.[0],
+    depth: typeof depthRaw === "number" ? Math.abs(depthRaw) : null,
+    source: "EMSC",
+  };
+}
+
+// USGS and EMSC both catalog major events independently — merge and drop EMSC entries
+// that clearly correspond to a USGS event already in the list (same rough time/place/magnitude),
+// so the same physical earthquake doesn't show up twice with two different IDs.
+function mergeQuakeSources(usgsList, emscList) {
+  const merged = [...usgsList];
+  emscList.forEach(e => {
+    const isDuplicate = usgsList.some(u => {
+      if (!u.time || !e.time) return false;
+      const dtSec = Math.abs(new Date(u.time).getTime() - new Date(e.time).getTime()) / 1000;
+      if (dtSec > 90) return false;
+      if (Math.abs((u.lat ?? 999) - (e.lat ?? 0)) > 0.6) return false;
+      if (Math.abs((u.lng ?? 999) - (e.lng ?? 0)) > 0.6) return false;
+      if (u.mag != null && e.mag != null && Math.abs(u.mag - e.mag) > 0.8) return false;
+      return true;
+    });
+    if (!isDuplicate) merged.push(e);
+  });
+  return merged;
+}
+
 function fetchTimeout(url, ms) {
   const ctrl = new AbortController();
   const id = setTimeout(() => ctrl.abort(), ms);
@@ -517,31 +566,31 @@ function QuakeRegistry({ mob }) {
     setError(null);
     try {
       const params = new URLSearchParams({
-        source: "usgs",
         starttime: fromIso.slice(0, 19),
         endtime: toIso.slice(0, 19),
         minmagnitude: String(minMag),
       });
-      const url = `/api/gdelt?${params.toString()}`;
-      const res = await fetchTimeout(url, 15000);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      if (json.error) throw new Error(json.error);
-      const parsed = (Array.isArray(json.features) ? json.features : [])
-        .map(f => ({
-          id: f.id,
-          mag: typeof f.properties?.mag === "number" ? f.properties.mag : null,
-          place: f.properties?.place || "Sin lugar registrado",
-          time: f.properties?.time ? new Date(f.properties.time).toISOString() : null,
-          url: f.properties?.url || null,
-          lat: f.geometry?.coordinates?.[1],
-          lng: f.geometry?.coordinates?.[0],
-          depth: typeof f.geometry?.coordinates?.[2] === "number" ? f.geometry.coordinates[2] : null,
-        }))
+      const [usgsRes, emscRes] = await Promise.all([
+        fetchTimeout(`/api/gdelt?source=usgs&${params.toString()}`, 15000).catch(() => null),
+        fetchTimeout(`/api/gdelt?source=emsc&${params.toString()}`, 15000).catch(() => null),
+      ]);
+      const usgsJson = usgsRes && usgsRes.ok ? await usgsRes.json() : { features: [], error: "sin respuesta" };
+      const emscJson = emscRes && emscRes.ok ? await emscRes.json() : { features: [], error: "sin respuesta" };
+
+      const usgsParsed = (Array.isArray(usgsJson.features) ? usgsJson.features : [])
+        .map(normalizeUsgsFeature)
         .filter(q => Number.isFinite(q.lat) && Number.isFinite(q.lng));
-      setQuakes(parsed);
+      const emscParsed = (Array.isArray(emscJson.features) ? emscJson.features : [])
+        .map(normalizeEmscFeature)
+        .filter(q => Number.isFinite(q.lat) && Number.isFinite(q.lng));
+
+      if (usgsParsed.length === 0 && emscParsed.length === 0 && usgsJson.error && emscJson.error) {
+        throw new Error("No se pudo conectar con USGS ni con EMSC en este momento.");
+      }
+
+      setQuakes(mergeQuakeSources(usgsParsed, emscParsed));
     } catch (e) {
-      setError("No se pudo conectar con USGS en este momento.");
+      setError(e.message || "No se pudo conectar con las fuentes sismicas en este momento.");
       setQuakes([]);
     } finally {
       setLoading(false);
@@ -600,7 +649,8 @@ function QuakeRegistry({ mob }) {
         `<div style="font-family:monospace;font-size:11px;max-width:240px;line-height:1.45">` +
         `<strong>M${q.mag != null ? q.mag.toFixed(1) : "?"}</strong> - ${q.place}<br/>` +
         `${formatQuakeTime(q.time)}<br/>` +
-        `Profundidad: ${q.depth != null ? q.depth.toFixed(1) + " km" : "Sin dato"}` +
+        `Profundidad: ${q.depth != null ? q.depth.toFixed(1) + " km" : "Sin dato"}<br/>` +
+        `<span style="color:#6b7280">Fuente: ${q.source}</span>` +
         `</div>`
       );
       marker.on("click", () => setSelectedId(q.id));
@@ -697,6 +747,9 @@ function QuakeRegistry({ mob }) {
               <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT, marginTop: 4, lineHeight: 1.5 }}>
                 {selectedQuake.place}
               </div>
+              <div style={{ display: "inline-block", marginTop: 6, fontSize: 9, fontFamily: font, color: selectedQuake.source === "EMSC" ? "#0d9488" : "#2563eb", border: `1px solid ${selectedQuake.source === "EMSC" ? "#0d9488" : "#2563eb"}40`, padding: "2px 6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                {selectedQuake.source}
+              </div>
               <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 8 }}>
                 {formatQuakeTime(selectedQuake.time)}
               </div>
@@ -708,7 +761,7 @@ function QuakeRegistry({ mob }) {
               </div>
               {selectedQuake.url && (
                 <a href={selectedQuake.url} target="_blank" rel="noreferrer" style={{ display: "inline-block", marginTop: 10, fontSize: 11, fontFamily: font, color: ACCENT }}>
-                  Ver ficha en USGS ↗
+                  Ver ficha en {selectedQuake.source} ↗
                 </a>
               )}
             </div>
@@ -733,6 +786,7 @@ function QuakeRegistry({ mob }) {
                 <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Profundidad</th>
                 <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Lugar</th>
                 <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Coordenadas</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Fuente</th>
               </tr>
             </thead>
             <tbody>
@@ -749,10 +803,15 @@ function QuakeRegistry({ mob }) {
                   <td style={{ padding: "6px 8px", color: MUTED }}>{q.depth != null ? `${q.depth.toFixed(1)} km` : "-"}</td>
                   <td style={{ padding: "6px 8px", color: TEXT }}>{q.place}</td>
                   <td style={{ padding: "6px 8px", color: `${MUTED}cc` }}>{formatCoord(q.lat)}, {formatCoord(q.lng)}</td>
+                  <td style={{ padding: "6px 8px" }}>
+                    <span style={{ fontSize: 9, fontFamily: font, color: q.source === "EMSC" ? "#0d9488" : "#2563eb", border: `1px solid ${q.source === "EMSC" ? "#0d9488" : "#2563eb"}40`, padding: "1px 5px" }}>
+                      {q.source}
+                    </span>
+                  </td>
                 </tr>
               ))}
               {sorted.length === 0 && (
-                <tr><td colSpan={5} style={{ padding: 16, textAlign: "center", color: MUTED }}>{loading ? "Cargando..." : "No se registraron sismos para este filtro."}</td></tr>
+                <tr><td colSpan={6} style={{ padding: 16, textAlign: "center", color: MUTED }}>{loading ? "Cargando..." : "No se registraron sismos para este filtro."}</td></tr>
               )}
             </tbody>
           </table>
@@ -765,7 +824,7 @@ function QuakeRegistry({ mob }) {
       </div>
 
       <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
-        Fuente: USGS Earthquake Catalog (fdsnws/event) - datos oficiales, actualizacion en tiempo real
+        Fuente: USGS + EMSC (European-Mediterranean Seismological Centre) - catalogos oficiales fusionados, duplicados removidos
       </div>
     </div>
   );
