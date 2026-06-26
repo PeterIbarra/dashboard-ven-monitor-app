@@ -403,7 +403,10 @@ const MISSING_PERSONS_API = "https://desaparecidos-terremoto-api.theempire.tech/
 // never read, never stored, and never forwarded past this function.
 async function fetchMissingPersonsCount(debug) {
   try {
-    const res = await fetch(MISSING_PERSONS_API, { signal: AbortSignal.timeout(8000) });
+    const res = await fetch(MISSING_PERSONS_API, {
+      headers: { accept: "application/json", "user-agent": "Mozilla/5.0 (compatible; MonitorVenezuelaBot/1.0)" },
+      signal: AbortSignal.timeout(8000),
+    });
     if (!res.ok) return { missingCounts: null, _debugMissing: { status: res.status, ok: false } };
     const json = await res.json();
     const counts = json && json.counts ? {
@@ -414,7 +417,14 @@ async function fetchMissingPersonsCount(debug) {
     // `json` (which includes `items`) goes out of scope here and is not returned.
     return { missingCounts: counts, _debugMissing: debug ? { status: res.status, ok: res.ok } : undefined };
   } catch (e) {
-    return { missingCounts: null, _debugMissing: debug ? { error: e.message } : undefined };
+    return {
+      missingCounts: null,
+      _debugMissing: debug ? {
+        error: e.message,
+        cause: e.cause ? String(e.cause.code || e.cause.message || e.cause) : null,
+        name: e.name,
+      } : undefined,
+    };
   }
 }
 
