@@ -438,6 +438,7 @@ export function TabSismos() {
     buildingDamageSocial: [],
     casualtiesLatest: null,
     casualtiesHistory: [],
+    missingCounts: null,
     counts: { reports: 0, acopios: 0, buildings: 0, damage: {} },
   });
   const [loading, setLoading] = useState(true);
@@ -470,6 +471,7 @@ export function TabSismos() {
         buildingDamageSocial: Array.isArray(json.buildingDamageSocial) ? json.buildingDamageSocial : [],
         casualtiesLatest: json.casualtiesLatest || null,
         casualtiesHistory: Array.isArray(json.casualtiesHistory) ? json.casualtiesHistory : [],
+        missingCounts: json.missingCounts || null,
         counts: json.counts || { reports: 0, acopios: 0, buildings: 0, damage: {} },
         fetchedAt: json.fetchedAt,
       });
@@ -712,6 +714,26 @@ export function TabSismos() {
                   {c.source_name || "Fuente"}: {c.deaths ?? "—"}m / {c.injured ?? "—"}h / {c.missing ?? "—"}d
                 </span>
               ))}
+            </div>
+          )}
+
+          {data.missingCounts && (
+            <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: "10px 14px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 }}>
+                Registro comunitario de desaparecidos (sin verificar)
+              </span>
+              <span style={{ fontSize: 13, fontFamily: fontSans, color: TEXT, fontWeight: 800 }}>
+                {data.missingCounts.total ?? "—"} <span style={{ fontSize: 10, fontWeight: 400, color: MUTED }}>reportados</span>
+              </span>
+              <span style={{ fontSize: 13, fontFamily: fontSans, color: TEXT, fontWeight: 800 }}>
+                {data.missingCounts.sinContacto ?? "—"} <span style={{ fontSize: 10, fontWeight: 400, color: MUTED }}>sin contacto</span>
+              </span>
+              <span style={{ fontSize: 13, fontFamily: fontSans, color: "#16a34a", fontWeight: 800 }}>
+                {data.missingCounts.localizado ?? "—"} <span style={{ fontSize: 10, fontWeight: 400, color: MUTED }}>localizados</span>
+              </span>
+              <span style={{ fontSize: 10, fontFamily: font, color: `${MUTED}cc`, marginLeft: "auto" }}>
+                desaparecidosterremotovenezuela.com - solo conteo agregado, sin datos individuales
+              </span>
             </div>
           )}
 
