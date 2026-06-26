@@ -394,6 +394,30 @@ function sismoBuildingsHeaders() {
   };
 }
 
+const MISSING_PERSONS_API = "https://desaparecidos-terremoto-api.theempire.tech/api/personas?page=1&pageSize=1";
+
+// IMPORTANT: this endpoint returns full individual records (name, phone, address,
+// physical description, photo) with no auth required. We deliberately request the
+// smallest possible page (pageSize=1) and extract ONLY the pre-computed `counts`
+// object the API itself returns. The `items` array — and anything inside it — is
+// never read, never stored, and never forwarded past this function.
+async function fetchMissingPersonsCount(debug) {
+  try {
+    const res = await fetch(MISSING_PERSONS_API, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return { missingCounts: null, _debugMissing: { status: res.status, ok: false } };
+    const json = await res.json();
+    const counts = json && json.counts ? {
+      total: json.counts.total ?? null,
+      sinContacto: json.counts.sinContacto ?? null,
+      localizado: json.counts.localizado ?? null,
+    } : null;
+    // `json` (which includes `items`) goes out of scope here and is not returned.
+    return { missingCounts: counts, _debugMissing: debug ? { status: res.status, ok: res.ok } : undefined };
+  } catch (e) {
+    return { missingCounts: null, _debugMissing: debug ? { error: e.message } : undefined };
+  }
+}
+
 async function fetchSismoExtras(debug) {
   const headers = {
     apikey: SISMO_API_KEY,
@@ -405,9 +429,10 @@ async function fetchSismoExtras(debug) {
   const casualtiesUrl = `${SISMO_SUPABASE_URL}/rest/v1/casualty_stats?select=id,deaths,injured,missing,source_name,source_url,auto_extracted,scraped_at&order=scraped_at.desc&limit=30`;
   const buildingDamageUrl = `${SISMO_SUPABASE_URL}/rest/v1/building_damage?select=id,external_id,external_source,lat,lng,place,damage_type,affected,needs,photo_url,confirmations,reported_at&order=reported_at.desc&limit=3000`;
 
-  const [casRes, bdRes] = await Promise.all([
+  const [casRes, bdRes, missingResult] = await Promise.all([
     fetch(casualtiesUrl, { headers, signal: AbortSignal.timeout(10000) }),
     fetch(buildingDamageUrl, { headers, signal: AbortSignal.timeout(10000) }),
+    fetchMissingPersonsCount(debug),
   ]);
 
   const casualtyHistory = casRes.ok ? await casRes.json() : [];
@@ -425,6 +450,7 @@ async function fetchSismoExtras(debug) {
     casualtiesLatest,
     casualtiesHistory: sortedCasualties.slice(0, 12),
     buildingDamageSocial,
+    missingCounts: missingResult.missingCounts,
   };
 
   if (debug) {
@@ -433,6 +459,7 @@ async function fetchSismoExtras(debug) {
       buildingDamageStatus: bdRes.status,
       casualtiesOk: casRes.ok,
       buildingDamageOk: bdRes.ok,
+      missingPersons: missingResult._debugMissing,
     };
   }
 
@@ -504,6 +531,7 @@ async function fetchSismosConsolidado(debug) {
     buildingDamageSocial: extras.buildingDamageSocial,
     casualtiesLatest: extras.casualtiesLatest,
     casualtiesHistory: extras.casualtiesHistory,
+    missingCounts: extras.missingCounts,
     counts,
     fetchedAt: new Date().toISOString(),
     source: "consolidated-earthquake-public-data",
