@@ -33,6 +33,13 @@ const PERIODS = [
   { id: "custom", label: "Fecha/hora" },
 ];
 
+const REPORT_RANGES = [
+  { id: "24h", label: "24h" },
+  { id: "48h", label: "48h" },
+  { id: "7d", label: "7 dias" },
+  { id: "custom", label: "Fecha/hora" },
+];
+
 const REFRESH_INTERVAL_MS = 120000;
 
 function fetchTimeout(url, ms) {
@@ -107,6 +114,7 @@ function isInPeriod(value, period, customStart, customEnd) {
   }
   const ranges = {
     "24h": 24 * 60 * 60 * 1000,
+    "48h": 48 * 60 * 60 * 1000,
     "7d": 7 * 24 * 60 * 60 * 1000,
     "30d": 30 * 24 * 60 * 60 * 1000,
   };
@@ -453,6 +461,11 @@ export function TabSismos() {
   const [buildingDetails, setBuildingDetails] = useState({});
   const [detailLoading, setDetailLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportRange, setReportRange] = useState("24h");
+  const [reportFrom, setReportFrom] = useState("");
+  const [reportTo, setReportTo] = useState("");
+  const [reportGenerating, setReportGenerating] = useState(false);
   const [nextRefreshAt, setNextRefreshAt] = useState(null);
   const [now, setNow] = useState(Date.now());
 
@@ -544,10 +557,186 @@ export function TabSismos() {
     [data.buildingDamageSocial, period, customStart, customEnd]
   );
 
+  // ── Conjuntos para el reporte exportable: su propio rango, independiente del filtro de pantalla ──
+  const reportReports = useMemo(
+    () => reportsWithSeverity.filter(item => isInPeriod(itemDate(item), reportRange, reportFrom, reportTo)),
+    [reportsWithSeverity, reportRange, reportFrom, reportTo]
+  );
+  const reportBuildings = useMemo(
+    () => buildingsWithDamage.filter(item => isInPeriod(itemDate(item), reportRange, reportFrom, reportTo)),
+    [buildingsWithDamage, reportRange, reportFrom, reportTo]
+  );
+  const reportAcopios = useMemo(
+    () => data.acopios.filter(item => isInPeriod(itemDate(item), reportRange, reportFrom, reportTo)),
+    [data.acopios, reportRange, reportFrom, reportTo]
+  );
+  const reportBuildingDamageSocial = useMemo(
+    () => data.buildingDamageSocial.filter(item => isInPeriod(itemDate(item), reportRange, reportFrom, reportTo)),
+    [data.buildingDamageSocial, reportRange, reportFrom, reportTo]
+  );
+
   const damageCounts = useMemo(() => filteredBuildings.reduce((acc, building) => {
     acc[building._damage] = (acc[building._damage] || 0) + 1;
     return acc;
   }, { parcial: 0, severo: 0, total: 0 }), [filteredBuildings]);
+
+  function reportRangeLabel() {
+    if (reportRange === "24h") return "Ultimas 24 horas";
+    if (reportRange === "48h") return "Ultimas 48 horas";
+    if (reportRange === "7d") return "Ultimos 7 dias";
+    const from = reportFrom ? formatDate(reportFrom) : "?";
+    const to = reportTo ? formatDate(reportTo) : "ahora";
+    return `${from} - ${to}`;
+  }
+
+  function buildReportHtml() {
+    const rangeLabel = reportRangeLabel();
+    const reportDamage = reportBuildings.reduce((acc, b) => {
+      acc[b._damage] = (acc[b._damage] || 0) + 1;
+      return acc;
+    }, { parcial: 0, severo: 0, total: 0 });
+
+    const row = (cells) => `<tr>${cells.map(c => `<td style="padding:4px 6px;border-bottom:1px solid #e5e7eb;vertical-align:top;">${c}</td>`).join("")}</tr>`;
+    const emptyRow = (cols) => `<tr><td colspan="${cols}" style="padding:8px;color:#9ca3af;">Sin registros en este periodo.</td></tr>`;
+
+    const reportRows = reportReports.slice(0, 200).map(r => row([
+      formatDate(itemDate(r)),
+      r.place || "Sin ubicacion",
+      SEVERITY[r._severity]?.label || "-",
+      String(r.note || "").slice(0, 140),
+    ])).join("") || emptyRow(4);
+
+    const buildingRows = reportBuildings.slice(0, 200).map(b => row([
+      formatDate(itemDate(b)),
+      b.name || "Sin nombre",
+      DAMAGE[b._damage]?.label || "-",
+      b.address || b.zone || b.city || "-",
+      b.is_technically_evaluated ? "Si" : "No",
+    ])).join("") || emptyRow(5);
+
+    const acopioRows = reportAcopios.slice(0, 200).map(a => row([
+      formatDate(itemDate(a)),
+      a.name || "Centro de acopio",
+      String(a.needs || "").slice(0, 140),
+      a.contact || "-",
+    ])).join("") || emptyRow(4);
+
+    const socialRows = reportBuildingDamageSocial.slice(0, 200).map(s => row([
+      formatDate(itemDate(s)),
+      s.place || "-",
+      s.damage_type || "-",
+      s.confirmations ?? 0,
+    ])).join("") || emptyRow(4);
+
+    const kpis = [
+      ["Reportes", reportReports.length],
+      ["Edificios", reportBuildings.length],
+      ["Acopios", reportAcopios.length],
+      ["Dano total", reportDamage.total],
+      ["Dano severo", reportDamage.severo],
+      ["Dano social (redes)", reportBuildingDamageSocial.length],
+    ].map(([label, value]) => `
+      <div style="border:1px solid #e5e7eb;padding:8px 12px;min-width:108px;">
+        <div style="font-size:9px;text-transform:uppercase;color:#6b7280;">${label}</div>
+        <div style="font-size:20px;font-weight:800;color:#111827;">${value}</div>
+      </div>`).join("");
+
+    const casualtiesBlock = data.casualtiesLatest ? `
+      <div style="background:#fef2f2;border:1px solid #fecaca;padding:10px 14px;margin-bottom:14px;">
+        <div style="font-size:10px;text-transform:uppercase;color:#991b1b;font-weight:700;">Cifras confirmadas (ultima lectura disponible, no acotada al periodo)</div>
+        <div style="font-size:13px;margin-top:4px;color:#111827;">
+          ${data.casualtiesLatest.deaths ?? "-"} muertos · ${data.casualtiesLatest.injured ?? "-"} heridos · ${data.casualtiesLatest.missing ?? "-"} desaparecidos (cifra oficial)
+        </div>
+        <div style="font-size:10px;color:#6b7280;margin-top:2px;">Fuente: ${data.casualtiesLatest.source_name || "sin especificar"}</div>
+      </div>` : "";
+
+    const missingBlock = data.missingCounts ? `
+      <div style="background:#f3f4f6;border:1px solid #d1d5db;padding:10px 14px;margin-bottom:14px;">
+        <div style="font-size:10px;text-transform:uppercase;color:#374151;font-weight:700;">Registro comunitario de desaparecidos — sin verificar, solo conteo agregado</div>
+        <div style="font-size:13px;margin-top:4px;color:#111827;">
+          ${data.missingCounts.total ?? "-"} reportados · ${data.missingCounts.sinContacto ?? "-"} sin contacto · ${data.missingCounts.localizado ?? "-"} localizados
+        </div>
+      </div>` : "";
+
+    return `<div style="font-family:Arial,sans-serif;color:#1f2937;width:760px;">
+      <div style="border-bottom:3px solid #7f1d1d;padding-bottom:12px;margin-bottom:18px;">
+        <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#6b7280;">PNUD Venezuela · Monitor de Contexto Situacional</div>
+        <div style="font-size:20px;font-weight:800;margin-top:4px;color:#111827;">Reporte de Sismos — Impacto y Respuesta</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:4px;">Periodo: ${rangeLabel} · Generado: ${formatDate(new Date().toISOString())}</div>
+      </div>
+
+      ${casualtiesBlock}
+      ${missingBlock}
+
+      <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">${kpis}</div>
+
+      <div style="font-size:14px;font-weight:700;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;color:#111827;">Reportes ciudadanos (${reportReports.length})</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Lugar</th><th style="padding:4px 6px;">Severidad</th><th style="padding:4px 6px;">Nota</th></tr></thead>
+        <tbody>${reportRows}</tbody>
+      </table>
+
+      <div style="font-size:14px;font-weight:700;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;color:#111827;">Edificios afectados (${reportBuildings.length})</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Nombre</th><th style="padding:4px 6px;">Dano</th><th style="padding:4px 6px;">Direccion</th><th style="padding:4px 6px;">Evaluado</th></tr></thead>
+        <tbody>${buildingRows}</tbody>
+      </table>
+
+      <div style="font-size:14px;font-weight:700;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;color:#111827;">Acopios (${reportAcopios.length})</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Nombre</th><th style="padding:4px 6px;">Necesidades</th><th style="padding:4px 6px;">Contacto</th></tr></thead>
+        <tbody>${acopioRows}</tbody>
+      </table>
+
+      <div style="font-size:14px;font-weight:700;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;color:#111827;">Dano social — corroboracion en redes (${reportBuildingDamageSocial.length})</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Lugar</th><th style="padding:4px 6px;">Tipo</th><th style="padding:4px 6px;">Confirmaciones</th></tr></thead>
+        <tbody>${socialRows}</tbody>
+      </table>
+
+      <div style="text-align:center;font-size:9px;color:#9ca3af;padding:20px 0;text-transform:uppercase;letter-spacing:0.1em;border-top:1px solid #e5e7eb;margin-top:22px;">
+        PNUD Venezuela · Monitor de Contexto Situacional · Uso interno · Listas limitadas a 200 registros por seccion
+      </div>
+    </div>`;
+  }
+
+  async function handleGenerateReport() {
+    setReportGenerating(true);
+    try {
+      await Promise.all([
+        loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"),
+        loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"),
+      ]);
+      const html = buildReportHtml();
+      const container = document.createElement("div");
+      container.innerHTML = html;
+      container.style.cssText = "position:fixed;top:0;left:0;width:800px;background:#ffffff;z-index:99999;padding:32px;";
+      document.body.appendChild(container);
+      await new Promise(r => setTimeout(r, 400));
+      const canvas = await window.html2canvas(container, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+      document.body.removeChild(container);
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
+      const pdf = new window.jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pdfW = pdf.internal.pageSize.getWidth();
+      const pdfH = pdf.internal.pageSize.getHeight();
+      const ratio = pdfW / canvas.width;
+      const scaledH = canvas.height * ratio;
+      let yOffset = 0;
+      while (yOffset < scaledH) {
+        if (yOffset > 0) pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, -yOffset, pdfW, scaledH);
+        yOffset += pdfH;
+      }
+      const rangeSlug = reportRange === "custom" ? "personalizado" : reportRange;
+      pdf.save(`Reporte_Sismos_${rangeSlug}_${new Date().toISOString().slice(0, 10)}.pdf`);
+      setReportOpen(false);
+    } catch (e) {
+      console.error("Error generando reporte de sismos:", e);
+      alert("No se pudo generar el reporte. Intenta de nuevo.");
+    } finally {
+      setReportGenerating(false);
+    }
+  }
 
   const latestItems = useMemo(() => {
     const includeReports = layerMode === "all" || layerMode === "reports";
@@ -661,6 +850,102 @@ export function TabSismos() {
         >
           Actualizar
         </button>
+        <div style={{ position: "relative" }}>
+          <button
+            onClick={() => setReportOpen(o => !o)}
+            style={{
+              fontSize: 11,
+              fontFamily: font,
+              padding: "6px 12px",
+              border: `1px solid ${BORDER}`,
+              background: reportOpen ? BG3 : "transparent",
+              color: TEXT,
+              cursor: "pointer",
+              letterSpacing: "0.08em",
+            }}
+          >
+            📄 Generar reporte
+          </button>
+          {reportOpen && (
+            <div
+              style={{
+                position: "absolute",
+                right: 0,
+                top: "calc(100% + 6px)",
+                zIndex: 30,
+                background: "#ffffff",
+                border: `1px solid ${BORDER}`,
+                padding: 12,
+                width: 270,
+                boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+              }}
+            >
+              <div style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+                Periodo del reporte
+              </div>
+              <div style={{ display: "flex", gap: 0, border: `1px solid ${BORDER}`, marginBottom: 10 }}>
+                {REPORT_RANGES.map(r => (
+                  <button
+                    key={r.id}
+                    onClick={() => setReportRange(r.id)}
+                    style={{
+                      flex: 1,
+                      fontSize: 10,
+                      fontFamily: font,
+                      padding: "6px 4px",
+                      border: "none",
+                      background: reportRange === r.id ? ACCENT : "transparent",
+                      color: reportRange === r.id ? "#ffffff" : MUTED,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+              {reportRange === "custom" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }}>
+                  <label style={{ fontSize: 10, fontFamily: font, color: MUTED, display: "block" }}>
+                    Desde
+                    <input
+                      type="datetime-local"
+                      value={reportFrom}
+                      onChange={e => setReportFrom(e.target.value)}
+                      style={{ width: "100%", marginTop: 3, border: `1px solid ${BORDER}`, padding: "6px 8px", fontFamily: fontSans, fontSize: 12, color: TEXT, boxSizing: "border-box" }}
+                    />
+                  </label>
+                  <label style={{ fontSize: 10, fontFamily: font, color: MUTED, display: "block" }}>
+                    Hasta
+                    <input
+                      type="datetime-local"
+                      value={reportTo}
+                      onChange={e => setReportTo(e.target.value)}
+                      style={{ width: "100%", marginTop: 3, border: `1px solid ${BORDER}`, padding: "6px 8px", fontFamily: fontSans, fontSize: 12, color: TEXT, boxSizing: "border-box" }}
+                    />
+                  </label>
+                </div>
+              )}
+              <button
+                onClick={handleGenerateReport}
+                disabled={reportGenerating || (reportRange === "custom" && !reportFrom)}
+                style={{
+                  width: "100%",
+                  fontSize: 11,
+                  fontFamily: font,
+                  padding: "8px 10px",
+                  border: "none",
+                  background: reportGenerating ? `${ACCENT}80` : ACCENT,
+                  color: "#ffffff",
+                  cursor: reportGenerating || (reportRange === "custom" && !reportFrom) ? "default" : "pointer",
+                  letterSpacing: "0.08em",
+                  opacity: reportRange === "custom" && !reportFrom ? 0.6 : 1,
+                }}
+              >
+                {reportGenerating ? "Generando PDF..." : "Generar PDF"}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {loading && (
