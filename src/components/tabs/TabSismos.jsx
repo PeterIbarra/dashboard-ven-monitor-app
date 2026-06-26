@@ -18,20 +18,11 @@ const DAMAGE = {
   total: { label: "Total", color: "#7f1d1d", weight: 1 },
 };
 
-const PRIORITY = {
-  critico: { label: "Critico", color: "#dc2626" },
-  urgente: { label: "Urgente", color: "#f97316" },
-  importante: { label: "Importante", color: "#f59e0b" },
-};
-
-const NEEDS_CATEGORIES = ["rescate", "voluntarios", "materiales", "herramientas", "alimentos", "electricidad", "medicamentos", "otro"];
-
 const LAYERS = [
   { id: "all", label: "Todo" },
   { id: "reports", label: "Reportes" },
   { id: "buildings", label: "Edificios" },
   { id: "acopios", label: "Acopios" },
-  { id: "needs", label: "Necesidades" },
 ];
 
 const PERIODS = [
@@ -64,14 +55,6 @@ function normalizeDamage(value) {
   if (key.includes("total") || key.includes("colap")) return "total";
   if (key.includes("sever")) return "severo";
   return "parcial";
-}
-
-function normalizePriority(value) {
-  const key = String(value || "").toLowerCase();
-  if (PRIORITY[key]) return key;
-  if (key.includes("crit")) return "critico";
-  if (key.includes("urg")) return "urgente";
-  return "importante";
 }
 
 function formatDate(value) {
@@ -159,7 +142,7 @@ function heatGradient(value) {
   return `radial-gradient(circle, ${core} 0%, ${core} 18%, #00f5a0 32%, #00a8ff 48%, rgba(59,80,255,0.72) 64%, rgba(59,80,255,0) 78%)`;
 }
 
-function SismoMap({ reports, acopios, reliefCenters = [], buildings, buildingDamageSocial = [], needs = [], selectedId, selectedPoint, onSelect, mob, layerMode, mapMode }) {
+function SismoMap({ reports, acopios, buildings, buildingDamageSocial = [], selectedId, selectedPoint, onSelect, mob, layerMode, mapMode }) {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const layerRef = useRef(null);
@@ -212,7 +195,6 @@ function SismoMap({ reports, acopios, reliefCenters = [], buildings, buildingDam
     const includeReports = layerMode === "all" || layerMode === "reports";
     const includeAcopios = layerMode === "all" || layerMode === "acopios";
     const includeBuildings = layerMode === "all" || layerMode === "buildings";
-    const includeNeeds = layerMode === "all" || layerMode === "needs";
 
     if (includeReports) {
       reports.forEach(report => {
@@ -339,66 +321,6 @@ function SismoMap({ reports, acopios, reliefCenters = [], buildings, buildingDam
         marker.on("click", () => onSelect({ type: "acopio", item: acopio }));
         group.addLayer(marker);
       });
-
-      reliefCenters.forEach(center => {
-        const lat = Number(center.lat);
-        const lng = Number(center.lng);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng) || !isVenezuelaPoint(lat, lng)) return;
-        bounds.push([lat, lng]);
-        heatPoints.push({ lat, lng, weight: 0.5, color: "#0d9488" });
-        if (mapMode === "heat") return;
-        const selected = selectedId === `reliefCenter:${center.id}`;
-        const marker = L.circleMarker([lat, lng], {
-          radius: selected ? 13 : 10,
-          fillColor: "#0d9488",
-          color: selected ? TEXT : "#ffffff",
-          weight: selected ? 3 : 2,
-          opacity: 1,
-          fillOpacity: 0.85,
-        });
-        marker.bindPopup(
-          `<div style="font-family:monospace;font-size:11px;max-width:260px;line-height:1.45">` +
-          `<strong>${center.name || "Centro de acopio verificado"}</strong><br/>` +
-          `<span style="color:#0d9488;font-weight:700">Acopio verificado</span><br/>` +
-          (center.address ? `<div>${center.address}${center.state ? ` - ${center.state}` : ""}</div>` : "") +
-          (center.accepted_items ? `<div>Recibe: ${String(center.accepted_items).slice(0, 160)}</div>` : "") +
-          `</div>`
-        );
-        marker.on("click", () => onSelect({ type: "reliefCenter", item: center }));
-        group.addLayer(marker);
-      });
-    }
-
-    if (includeNeeds) {
-      needs.forEach(need => {
-        const lat = Number(need.lat);
-        const lng = Number(need.lng);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng) || !isVenezuelaPoint(lat, lng)) return;
-        const priority = normalizePriority(need.priority);
-        const meta = PRIORITY[priority];
-        const selected = selectedId === `need:${need.id}`;
-        bounds.push([lat, lng]);
-        heatPoints.push({ lat, lng, weight: priority === "critico" ? 0.9 : priority === "urgente" ? 0.65 : 0.4, color: meta.color });
-        if (mapMode === "heat") return;
-
-        const marker = L.circleMarker([lat, lng], {
-          radius: selected ? 11 : priority === "critico" ? 8 : 6,
-          fillColor: meta.color,
-          color: selected ? TEXT : "#ffffff",
-          weight: selected ? 3 : 1,
-          opacity: 0.95,
-          fillOpacity: 0.75,
-        });
-        marker.bindPopup(
-          `<div style="font-family:monospace;font-size:11px;max-width:260px;line-height:1.45">` +
-          `<strong>${need.title || "Necesidad reportada"}</strong><br/>` +
-          `<span style="color:${meta.color};font-weight:700">${need.category || "otro"} - ${meta.label}</span><br/>` +
-          (need.items_needed ? `<div>${String(need.items_needed).slice(0, 160)}</div>` : "") +
-          `</div>`
-        );
-        marker.on("click", () => onSelect({ type: "need", item: need }));
-        group.addLayer(marker);
-      });
     }
 
     if (mapMode === "heat") {
@@ -446,7 +368,7 @@ function SismoMap({ reports, acopios, reliefCenters = [], buildings, buildingDam
       map.fitBounds(bounds, { padding: [24, 24], maxZoom: mob ? 11 : 12 });
       viewportKeyRef.current = viewportKey;
     }
-  }, [reports, acopios, reliefCenters, buildings, buildingDamageSocial, needs, selectedId, selectedPoint, onSelect, mob, layerMode, mapMode, mapReady]);
+  }, [reports, acopios, buildings, buildingDamageSocial, selectedId, selectedPoint, onSelect, mob, layerMode, mapMode, mapReady]);
 
   useEffect(() => {
     if (!mapReady || !mapInstance.current || !selectedId || !selectedPoint) return;
@@ -512,13 +434,10 @@ export function TabSismos() {
   const [data, setData] = useState({
     reports: [],
     acopios: [],
-    reliefCenters: [],
     buildings: [],
     buildingDamageSocial: [],
-    needs: [],
     casualtiesLatest: null,
     casualtiesHistory: [],
-    missingAgg: { total: 0, byStatus: {}, topLocations: [] },
     counts: { reports: 0, acopios: 0, buildings: 0, damage: {} },
   });
   const [loading, setLoading] = useState(true);
@@ -533,7 +452,6 @@ export function TabSismos() {
   const [buildingDetails, setBuildingDetails] = useState({});
   const [detailLoading, setDetailLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [needsCategory, setNeedsCategory] = useState("");
   const [nextRefreshAt, setNextRefreshAt] = useState(null);
   const [now, setNow] = useState(Date.now());
 
@@ -548,13 +466,10 @@ export function TabSismos() {
       setData({
         reports: Array.isArray(json.reports) ? json.reports : [],
         acopios: Array.isArray(json.acopios) ? json.acopios : [],
-        reliefCenters: Array.isArray(json.reliefCenters) ? json.reliefCenters : [],
         buildings: Array.isArray(json.buildings) ? json.buildings : [],
         buildingDamageSocial: Array.isArray(json.buildingDamageSocial) ? json.buildingDamageSocial : [],
-        needs: Array.isArray(json.needs) ? json.needs : [],
         casualtiesLatest: json.casualtiesLatest || null,
         casualtiesHistory: Array.isArray(json.casualtiesHistory) ? json.casualtiesHistory : [],
-        missingAgg: json.missingAgg || { total: 0, byStatus: {}, topLocations: [] },
         counts: json.counts || { reports: 0, acopios: 0, buildings: 0, damage: {} },
         fetchedAt: json.fetchedAt,
       });
@@ -622,27 +537,9 @@ export function TabSismos() {
     [data.acopios, period, customStart, customEnd]
   );
 
-  const filteredReliefCenters = useMemo(
-    () => data.reliefCenters.filter(item => isInPeriod(itemDate(item), period, customStart, customEnd)),
-    [data.reliefCenters, period, customStart, customEnd]
-  );
-
   const filteredBuildingDamageSocial = useMemo(
     () => data.buildingDamageSocial.filter(item => isInPeriod(itemDate(item), period, customStart, customEnd)),
     [data.buildingDamageSocial, period, customStart, customEnd]
-  );
-
-  const needsWithPriority = useMemo(
-    () => data.needs.map(n => ({ ...n, _priority: normalizePriority(n.priority) })),
-    [data.needs]
-  );
-
-  const filteredNeeds = useMemo(
-    () => needsWithPriority.filter(item =>
-      isInPeriod(itemDate(item), period, customStart, customEnd) &&
-      (!needsCategory || item.category === needsCategory)
-    ),
-    [needsWithPriority, period, customStart, customEnd, needsCategory]
   );
 
   const damageCounts = useMemo(() => filteredBuildings.reduce((acc, building) => {
@@ -654,16 +551,13 @@ export function TabSismos() {
     const includeReports = layerMode === "all" || layerMode === "reports";
     const includeAcopios = layerMode === "all" || layerMode === "acopios";
     const includeBuildings = layerMode === "all" || layerMode === "buildings";
-    const includeNeeds = layerMode === "all" || layerMode === "needs";
     return [
       ...(includeReports ? filteredReports.map(item => ({ type: "report", item, date: itemDate(item), label: "Reporte" })) : []),
       ...(includeAcopios ? filteredAcopios.map(item => ({ type: "acopio", item, date: itemDate(item), label: "Acopio" })) : []),
-      ...(includeAcopios ? filteredReliefCenters.map(item => ({ type: "reliefCenter", item, date: itemDate(item), label: "Acopio verificado" })) : []),
       ...(includeBuildings ? filteredBuildings.map(item => ({ type: "building", item, date: itemDate(item), label: "Edificio" })) : []),
       ...(includeBuildings ? filteredBuildingDamageSocial.map(item => ({ type: "buildingSocial", item, date: itemDate(item), label: "Dano (social)" })) : []),
-      ...(includeNeeds ? filteredNeeds.map(item => ({ type: "need", item, date: itemDate(item), label: "Necesidad" })) : []),
     ].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-  }, [filteredReports, filteredAcopios, filteredReliefCenters, filteredBuildings, filteredBuildingDamageSocial, filteredNeeds, layerMode]);
+  }, [filteredReports, filteredAcopios, filteredBuildings, filteredBuildingDamageSocial, layerMode]);
 
   const visibleActivityItems = useMemo(
     () => latestItems.slice(0, activityLimit),
@@ -682,17 +576,14 @@ export function TabSismos() {
       selected.type === "report" ? filteredReports :
       selected.type === "building" ? filteredBuildings :
       selected.type === "buildingSocial" ? filteredBuildingDamageSocial :
-      selected.type === "reliefCenter" ? filteredReliefCenters :
-      selected.type === "need" ? filteredNeeds :
       filteredAcopios;
     const visible = source.some(item => item.id === selected.item.id);
     if (!visible && period !== "all") setSelected(null);
-  }, [filteredReports, filteredBuildings, filteredAcopios, filteredReliefCenters, filteredBuildingDamageSocial, filteredNeeds, period, selected]);
+  }, [filteredReports, filteredBuildings, filteredAcopios, filteredBuildingDamageSocial, period, selected]);
 
   const selectedItem = selected?.item;
   const selectedSeverity = selected?.type === "report" ? SEVERITY[normalizeSeverity(selectedItem?.severity)] : null;
   const selectedDamage = selected?.type === "building" ? DAMAGE[normalizeDamage(selectedItem?.damage_level)] : null;
-  const selectedPriority = selected?.type === "need" ? PRIORITY[normalizePriority(selectedItem?.priority)] : null;
   const selectedPoint = getLatLng(selectedItem);
   const selectedMapsUrl = googleMapsUrl(selectedItem);
   const detail = selected?.type === "building" ? buildingDetails[selected.item.id] : null;
@@ -824,48 +715,18 @@ export function TabSismos() {
             </div>
           )}
 
-          <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr 1fr" : "repeat(6, 1fr)", gap: 10 }}>
             <Kpi label="Reportes" value={filteredReports.length} />
             <Kpi label="Edificios" value={filteredBuildings.length} tone="#7f1d1d" />
-            <Kpi label="Acopios" value={filteredAcopios.length + filteredReliefCenters.length} tone="#16a34a" />
-            <Kpi label="Necesidades" value={filteredNeeds.length} tone={PRIORITY.urgente.color} />
+            <Kpi label="Acopios" value={filteredAcopios.length} tone="#16a34a" />
             <Kpi label="Daño total" value={damageCounts.total} tone={DAMAGE.total.color} />
             <Kpi label="Daño severo" value={damageCounts.severo} tone={DAMAGE.severo.color} />
             <Kpi label="Evaluados" value={filteredBuildings.filter(item => item.is_technically_evaluated).length} tone={ACCENT} />
-            <Kpi label="Desaparecidos" value={data.missingAgg?.total || 0} tone="#7f1d1d" />
           </div>
-
-          {data.missingAgg && data.missingAgg.total > 0 && (
-            <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 12, display: "flex", flexDirection: "column", gap: 6 }}>
-              <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                Personas reportadas desaparecidas (redes sociales) - agregado, sin datos individuales
-              </div>
-              <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 12, fontFamily: fontSans, color: TEXT }}>
-                {Object.entries(data.missingAgg.byStatus).map(([status, count]) => (
-                  <span key={status}><strong>{count}</strong> {status.replace(/-/g, " ")}</span>
-                ))}
-              </div>
-              {data.missingAgg.topLocations?.length > 0 && (
-                <div style={{ fontSize: 11, fontFamily: font, color: MUTED, lineHeight: 1.6 }}>
-                  Zonas con mas reportes: {data.missingAgg.topLocations.slice(0, 6).map(l => `${l.location} (${l.count})`).join(" - ")}
-                </div>
-              )}
-            </div>
-          )}
 
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
             <ToggleGroup value={layerMode} onChange={setLayerMode} options={LAYERS} />
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              {layerMode === "needs" && (
-                <select
-                  value={needsCategory}
-                  onChange={e => setNeedsCategory(e.target.value)}
-                  style={{ fontSize: 11, fontFamily: font, padding: "7px 10px", border: `1px solid ${BORDER}`, background: "#ffffff", color: TEXT }}
-                >
-                  <option value="">Todas las categorias</option>
-                  {NEEDS_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              )}
               <ToggleGroup value={period} onChange={setPeriod} options={PERIODS} />
               <ToggleGroup
                 value={mapMode}
@@ -915,10 +776,8 @@ export function TabSismos() {
               <SismoMap
                 reports={filteredReports}
                 acopios={filteredAcopios}
-                reliefCenters={filteredReliefCenters}
                 buildings={filteredBuildings}
                 buildingDamageSocial={filteredBuildingDamageSocial}
-                needs={filteredNeeds}
                 selectedId={selectedId}
                 selectedPoint={selectedPoint}
                 onSelect={setSelected}
@@ -938,16 +797,8 @@ export function TabSismos() {
                   Acopio
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
-                  <span style={{ width: 10, height: 10, borderRadius: 10, background: "#0d9488", display: "inline-block" }} />
-                  Acopio verificado
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
                   <span style={{ width: 10, height: 10, borderRadius: 10, background: "#ea580c", display: "inline-block" }} />
                   Dano (redes)
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
-                  <span style={{ width: 10, height: 10, borderRadius: 10, background: PRIORITY.critico.color, display: "inline-block" }} />
-                  Necesidad critica
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
                   <span style={{ width: 10, height: 10, borderRadius: 10, background: SEVERITY.high.color, display: "inline-block" }} />
@@ -964,17 +815,13 @@ export function TabSismos() {
                 {selectedItem ? (
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 700, color: TEXT, marginBottom: 4 }}>
-                      {selectedItem.place || selectedItem.name || selectedItem.title ||
-                        (selected.type === "acopio" || selected.type === "reliefCenter" ? "Centro de acopio" :
-                         selected.type === "need" ? "Necesidad reportada" : "Reporte ciudadano")}
+                      {selectedItem.place || selectedItem.name || (selected.type === "acopio" ? "Centro de acopio" : "Reporte ciudadano")}
                     </div>
-                    <div style={{ fontSize: 11, fontFamily: font, color: selectedSeverity?.color || selectedDamage?.color || selectedPriority?.color || (selected.type === "reliefCenter" ? "#0d9488" : selected.type === "buildingSocial" ? "#ea580c" : "#16a34a"), marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontFamily: font, color: selectedSeverity?.color || selectedDamage?.color || (selected.type === "buildingSocial" ? "#ea580c" : "#16a34a"), marginBottom: 8 }}>
                       {selected.type === "acopio" && "Acopio / apoyo"}
-                      {selected.type === "reliefCenter" && "Centro de acopio verificado"}
                       {selected.type === "report" && `Reporte ${selectedSeverity?.label}`}
                       {selected.type === "building" && `Edificio afectado - daño ${selectedDamage?.label}`}
                       {selected.type === "buildingSocial" && "Dano de edificio (corroboracion social)"}
-                      {selected.type === "need" && `Necesidad - ${selectedItem.category || "otro"} - ${selectedPriority?.label || ""}`}
                     </div>
 
                     {selected.type === "building" && (
@@ -1023,40 +870,6 @@ export function TabSismos() {
                       </div>
                     )}
 
-                    {selected.type === "need" && (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                        {selectedItem.description && (
-                          <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.55 }}>{selectedItem.description}</div>
-                        )}
-                        {selectedItem.items_needed && (
-                          <div style={{ background: BG3, border: `1px solid ${BORDER}`, padding: 10, fontSize: 12, fontFamily: fontSans, color: TEXT, lineHeight: 1.5 }}>
-                            <strong>Articulos / apoyo requerido:</strong> {selectedItem.items_needed}
-                          </div>
-                        )}
-                        {selectedItem.location_name && (
-                          <div style={{ fontSize: 11, fontFamily: font, color: MUTED }}>{selectedItem.location_name}</div>
-                        )}
-                        {selectedItem.contact_info && (
-                          <div style={{ fontSize: 11, fontFamily: font, color: TEXT }}>Contacto: {selectedItem.contact_info}</div>
-                        )}
-                      </div>
-                    )}
-
-                    {selected.type === "reliefCenter" && (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                        {(selectedItem.address || selectedItem.state) && (
-                          <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.55 }}>
-                            {selectedItem.address}{selectedItem.state ? ` - ${selectedItem.state}` : ""}
-                          </div>
-                        )}
-                        {selectedItem.accepted_items && (
-                          <div style={{ background: BG3, border: `1px solid ${BORDER}`, padding: 10, fontSize: 12, fontFamily: fontSans, color: TEXT, lineHeight: 1.5 }}>
-                            <strong>Recibe:</strong> {selectedItem.accepted_items}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
                     {selected.type === "buildingSocial" && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.55 }}>
@@ -1073,7 +886,7 @@ export function TabSismos() {
                       </div>
                     )}
 
-                    {!["building", "need", "reliefCenter", "buildingSocial"].includes(selected.type) && (
+                    {!["building", "buildingSocial"].includes(selected.type) && (
                       <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.55 }}>
                         {selectedItem.note || selectedItem.needs || "Sin nota descriptiva."}
                       </div>
@@ -1132,11 +945,7 @@ export function TabSismos() {
                         ? { label: "Dano social", color: "#ea580c" }
                         : type === "acopio"
                           ? { label: "Acopio", color: "#16a34a" }
-                          : type === "reliefCenter"
-                            ? { label: "Acopio verificado", color: "#0d9488" }
-                            : type === "need"
-                              ? PRIORITY[normalizePriority(item.priority)]
-                              : SEVERITY[normalizeSeverity(item.severity)];
+                          : SEVERITY[normalizeSeverity(item.severity)];
                     const point = getLatLng(item);
                     const mapsUrl = googleMapsUrl(item);
                     return (
@@ -1160,7 +969,7 @@ export function TabSismos() {
                         >
                           <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
                             <span style={{ fontSize: 12, fontWeight: 700, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                              {item.place || item.name || item.title || "Sin ubicacion"}
+                              {item.place || item.name || "Sin ubicacion"}
                             </span>
                             <span style={{ fontSize: 10, fontFamily: font, color: meta.color }}>{label}</span>
                           </div>
