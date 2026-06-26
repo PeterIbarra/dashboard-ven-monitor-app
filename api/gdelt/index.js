@@ -394,8 +394,6 @@ function sismoBuildingsHeaders() {
   };
 }
 
-const NEEDS_PRIORITIES = ["critico", "urgente", "importante"];
-
 async function fetchSismoExtras(debug) {
   const headers = {
     apikey: SISMO_API_KEY,
@@ -405,25 +403,14 @@ async function fetchSismoExtras(debug) {
   };
 
   const casualtiesUrl = `${SISMO_SUPABASE_URL}/rest/v1/casualty_stats?select=id,deaths,injured,missing,source_name,source_url,auto_extracted,scraped_at&order=scraped_at.desc&limit=30`;
-  const needsUrl = `${SISMO_SUPABASE_URL}/rest/v1/needs_requests?select=id,title,description,category,priority,lat,lng,location_name,contact_info,items_needed,source_url,created_at,expires_at,is_active&order=created_at.desc&limit=2000`;
-  const reliefUrl = `${SISMO_SUPABASE_URL}/rest/v1/relief_centers?select=id,name,address,state,lat,lng,source_name,source_url,accepted_items,active,scraped_at&order=scraped_at.desc&limit=2000`;
-  // missing_persons: only fields needed for aggregate counts — names/photos/contact are
-  // never requested here, so they never leave the Supabase project.
-  const missingUrl = `${SISMO_SUPABASE_URL}/rest/v1/missing_persons?select=id,status,last_seen_location,submitted_at,is_duplicate&order=submitted_at.desc&limit=5000`;
   const buildingDamageUrl = `${SISMO_SUPABASE_URL}/rest/v1/building_damage?select=id,external_id,external_source,lat,lng,place,damage_type,affected,needs,photo_url,confirmations,reported_at&order=reported_at.desc&limit=3000`;
 
-  const [casRes, needsRes, reliefRes, missingRes, bdRes] = await Promise.all([
+  const [casRes, bdRes] = await Promise.all([
     fetch(casualtiesUrl, { headers, signal: AbortSignal.timeout(10000) }),
-    fetch(needsUrl, { headers, signal: AbortSignal.timeout(10000) }),
-    fetch(reliefUrl, { headers, signal: AbortSignal.timeout(10000) }),
-    fetch(missingUrl, { headers, signal: AbortSignal.timeout(10000) }),
     fetch(buildingDamageUrl, { headers, signal: AbortSignal.timeout(10000) }),
   ]);
 
   const casualtyHistory = casRes.ok ? await casRes.json() : [];
-  const needsRaw = needsRes.ok ? await needsRes.json() : [];
-  const reliefCenters = reliefRes.ok ? await reliefRes.json() : [];
-  const missingRaw = missingRes.ok ? await missingRes.json() : [];
   const buildingDamageSocial = bdRes.ok ? await bdRes.json() : [];
 
   // Prefer manually-curated rows (auto_extracted=false) over scraped ones, most recent first —
@@ -434,57 +421,17 @@ async function fetchSismoExtras(debug) {
   });
   const casualtiesLatest = sortedCasualties[0] || null;
 
-  const nowMs = Date.now();
-  const needs = needsRaw.filter(n => {
-    if (n.is_active === false) return false;
-    if (n.expires_at && new Date(n.expires_at).getTime() < nowMs) return false;
-    return true;
-  });
-
-  // Missing persons: aggregate counts only. Raw rows (and any PII they may carry,
-  // even though we didn't select it) are discarded before the function returns.
-  const missingFiltered = missingRaw.filter(m => !m.is_duplicate);
-  const missingByStatus = missingFiltered.reduce((acc, m) => {
-    const key = String(m.status || "sin-contacto").toLowerCase();
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {});
-  const missingByLocation = missingFiltered.reduce((acc, m) => {
-    const key = (m.last_seen_location || "Sin ubicacion especificada").trim();
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {});
-  const topMissingLocations = Object.entries(missingByLocation)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 12)
-    .map(([location, count]) => ({ location, count }));
-
-  const missingAgg = {
-    total: missingFiltered.length,
-    byStatus: missingByStatus,
-    topLocations: topMissingLocations,
-  };
-
   const result = {
     casualtiesLatest,
     casualtiesHistory: sortedCasualties.slice(0, 12),
-    needs,
-    reliefCenters,
-    missingAgg,
     buildingDamageSocial,
   };
 
   if (debug) {
     result._debugExtra = {
       casualtiesStatus: casRes.status,
-      needsStatus: needsRes.status,
-      reliefStatus: reliefRes.status,
-      missingStatus: missingRes.status,
       buildingDamageStatus: bdRes.status,
       casualtiesOk: casRes.ok,
-      needsOk: needsRes.ok,
-      reliefOk: reliefRes.ok,
-      missingOk: missingRes.ok,
       buildingDamageOk: bdRes.ok,
     };
   }
@@ -547,22 +494,16 @@ async function fetchSismosConsolidado(debug) {
     }, {}),
     technicallyEvaluated: buildings.filter(b => b.is_technically_evaluated).length,
     missingPersons: buildings.filter(b => b.has_missing_persons).length,
-    needs: extras.needs.length,
-    reliefCenters: extras.reliefCenters.length,
     buildingDamageSocial: extras.buildingDamageSocial.length,
-    missingReportedTotal: extras.missingAgg.total,
   };
 
   const result = {
     reports: base.reports,
     acopios: base.acopios,
     buildings,
-    needs: extras.needs,
-    reliefCenters: extras.reliefCenters,
     buildingDamageSocial: extras.buildingDamageSocial,
     casualtiesLatest: extras.casualtiesLatest,
     casualtiesHistory: extras.casualtiesHistory,
-    missingAgg: extras.missingAgg,
     counts,
     fetchedAt: new Date().toISOString(),
     source: "consolidated-earthquake-public-data",
