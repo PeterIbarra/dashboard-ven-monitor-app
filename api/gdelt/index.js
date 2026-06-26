@@ -3,9 +3,31 @@ const FIRMS_BASE = "https://firms.modaps.eosdis.nasa.gov/api/area/csv";
 const OM_FORECAST_BASE = "https://api.open-meteo.com/v1/forecast";
 const OM_ARCHIVE_BASE  = "https://archive-api.open-meteo.com/v1/archive";
 const FOROPENAL_URL   = "https://foropenal.com/represion-en-cifras";
+const SISMO_SUPABASE_URL = "https://buricxvfkunajzehyruu.supabase.co";
+const SISMO_API_KEY = "sb_publishable_WYdU76C5OLEfuUlY6n9UEg_GoUoVY_k";
+const SISMO_BUILDINGS_SUPABASE_URL = "https://jckifxsdlnsvbztxydes.supabase.co";
+const SISMO_BUILDINGS_API_KEY = "sb_publishable_i7iEDrCVZcSt0k3RGFrY4g_WrtZBB4w";
 
 module.exports = async function handler(req, res) {
-  const { signal, source, days, bbox, key, lat, lon, past_days, forecast_days, start_date, end_date } = req.query;
+  const { signal, source, days, bbox, key, lat, lon, past_days, forecast_days, start_date, end_date, building_id } = req.query;
+
+  if (source === "sismovenezuela") {
+    const data = await fetchSismoVenezuela(req.query.debug === "1");
+    res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=60");
+    return res.status(200).json(data);
+  }
+
+  if (source === "sismos") {
+    const data = await fetchSismosConsolidado(req.query.debug === "1");
+    res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=60");
+    return res.status(200).json(data);
+  }
+
+  if (source === "sismoedificiodetalle") {
+    const data = await fetchSismoBuildingDetail(building_id, req.query.debug === "1");
+    res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=60");
+    return res.status(200).json(data);
+  }
 
   // ── Foro Penal scraper (?source=foropenal) ──
   if (source === "foropenal") {
@@ -322,4 +344,165 @@ function parseCsv(csvText) {
     if (date && !isNaN(value)) map.set(date, value);
   }
   return map;
+}
+
+async function fetchSismoVenezuela(debug) {
+  const headers = {
+    apikey: SISMO_API_KEY,
+    authorization: `Bearer ${SISMO_API_KEY}`,
+    "accept-profile": "public",
+    accept: "application/json",
+  };
+
+  const reportsUrl = `${SISMO_SUPABASE_URL}/rest/v1/reports?select=id,lat,lng,severity,place,photo_url,note,created_at&order=created_at.desc&limit=5000`;
+  const acopiosUrl = `${SISMO_SUPABASE_URL}/rest/v1/acopios?select=id,lat,lng,name,needs,contact,created_at&order=created_at.desc&limit=2000`;
+
+  const [reportsRes, acopiosRes] = await Promise.all([
+    fetch(reportsUrl, { headers, signal: AbortSignal.timeout(10000) }),
+    fetch(acopiosUrl, { headers, signal: AbortSignal.timeout(10000) }),
+  ]);
+
+  const reports = reportsRes.ok ? await reportsRes.json() : [];
+  const acopios = acopiosRes.ok ? await acopiosRes.json() : [];
+
+  const result = {
+    reports,
+    acopios,
+    counts: { reports: reports.length, acopios: acopios.length },
+    fetchedAt: new Date().toISOString(),
+    source: "sismovenezuela.org (Supabase)",
+  };
+
+  if (debug) {
+    result._debug = {
+      reportsStatus: reportsRes.status,
+      acopiosStatus: acopiosRes.status,
+      reportsOk: reportsRes.ok,
+      acopiosOk: acopiosRes.ok,
+    };
+  }
+
+  return result;
+}
+
+function sismoBuildingsHeaders() {
+  return {
+    apikey: SISMO_BUILDINGS_API_KEY,
+    authorization: `Bearer ${SISMO_BUILDINGS_API_KEY}`,
+    "accept-profile": "public",
+    accept: "application/json",
+  };
+}
+
+async function fetchSismoBuildings(debug) {
+  const select = [
+    "id",
+    "name",
+    "address",
+    "city",
+    "zone",
+    "lat",
+    "lng",
+    "damage_level",
+    "status",
+    "main_photo_url",
+    "media_urls",
+    "general_source",
+    "notes",
+    "casualties_notes",
+    "trapped_names",
+    "has_missing_persons",
+    "is_technically_evaluated",
+    "last_updated_at",
+  ].join(",");
+  const url = `${SISMO_BUILDINGS_SUPABASE_URL}/rest/v1/buildings?select=${encodeURIComponent(select)}&order=last_updated_at.desc&limit=2000`;
+  const res = await fetch(url, { headers: sismoBuildingsHeaders(), signal: AbortSignal.timeout(10000) });
+  const buildings = res.ok ? await res.json() : [];
+  const result = { buildings };
+
+  if (debug) {
+    result._debug = {
+      buildingsStatus: res.status,
+      buildingsOk: res.ok,
+    };
+  }
+
+  return result;
+}
+
+async function fetchSismosConsolidado(debug) {
+  const [base, buildingsResult] = await Promise.all([
+    fetchSismoVenezuela(debug),
+    fetchSismoBuildings(debug),
+  ]);
+
+  const buildings = buildingsResult.buildings || [];
+  const counts = {
+    reports: base.reports.length,
+    acopios: base.acopios.length,
+    buildings: buildings.length,
+    damage: buildings.reduce((acc, b) => {
+      const key = String(b.damage_level || "sin_dato").toLowerCase();
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {}),
+    technicallyEvaluated: buildings.filter(b => b.is_technically_evaluated).length,
+    missingPersons: buildings.filter(b => b.has_missing_persons).length,
+  };
+
+  const result = {
+    reports: base.reports,
+    acopios: base.acopios,
+    buildings,
+    counts,
+    fetchedAt: new Date().toISOString(),
+    source: "consolidated-earthquake-public-data",
+  };
+
+  if (debug) {
+    result._debug = {
+      ...base._debug,
+      ...buildingsResult._debug,
+    };
+  }
+
+  return result;
+}
+
+async function fetchSismoBuildingDetail(buildingId, debug) {
+  if (!buildingId) {
+    return { evaluations: [], timeline: [], error: "building_id requerido" };
+  }
+
+  const safeId = encodeURIComponent(String(buildingId));
+  const headers = sismoBuildingsHeaders();
+  const evalSelect = "id,building_id,evaluator_id,structural_damage_score,habitability,technical_report,required_actions,created_at";
+  const timelineSelect = "id,building_id,status,damage_level,previous_status,previous_damage_level,update_notes,created_at";
+  const evalUrl = `${SISMO_BUILDINGS_SUPABASE_URL}/rest/v1/structural_evaluations?select=${encodeURIComponent(evalSelect)}&building_id=eq.${safeId}&order=created_at.desc`;
+  const timelineUrl = `${SISMO_BUILDINGS_SUPABASE_URL}/rest/v1/building_status_timeline?select=${encodeURIComponent(timelineSelect)}&building_id=eq.${safeId}&order=created_at.desc&limit=100`;
+
+  const [evaluationsRes, timelineRes] = await Promise.all([
+    fetch(evalUrl, { headers, signal: AbortSignal.timeout(10000) }),
+    fetch(timelineUrl, { headers, signal: AbortSignal.timeout(10000) }),
+  ]);
+
+  const evaluations = evaluationsRes.ok ? await evaluationsRes.json() : [];
+  const timeline = timelineRes.ok ? await timelineRes.json() : [];
+  const result = {
+    evaluations,
+    timeline,
+    counts: { evaluations: evaluations.length, timeline: timeline.length },
+    fetchedAt: new Date().toISOString(),
+  };
+
+  if (debug) {
+    result._debug = {
+      evaluationsStatus: evaluationsRes.status,
+      timelineStatus: timelineRes.status,
+      evaluationsOk: evaluationsRes.ok,
+      timelineOk: timelineRes.ok,
+    };
+  }
+
+  return result;
 }
