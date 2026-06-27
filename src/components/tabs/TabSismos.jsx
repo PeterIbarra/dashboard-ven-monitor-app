@@ -1329,6 +1329,181 @@ function MicrosoftAI4GDamage({ mob }) {
   );
 }
 
+function pointInBounds(lat, lng, bounds) {
+  if (!Array.isArray(bounds) || bounds.length !== 2) return false;
+  const [a, b] = bounds;
+  if (!Array.isArray(a) || !Array.isArray(b)) return false;
+  const minLat = Math.min(a[0], b[0]);
+  const maxLat = Math.max(a[0], b[0]);
+  const minLng = Math.min(a[1], b[1]);
+  const maxLng = Math.max(a[1], b[1]);
+  return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
+}
+
+// Weighted composite: official satellite grading counts most, technical building evaluations
+// next, raw citizen report volume least (unverified). If a zone lacks one input entirely,
+// its weight is redistributed among whatever inputs ARE available, rather than penalizing
+// the zone for a data gap that isn't about actual severity.
+function compositeSeverityScore(parts) {
+  const available = parts.filter(p => p.value != null);
+  if (available.length === 0) return null;
+  const totalWeight = available.reduce((s, p) => s + p.weight, 0);
+  return available.reduce((s, p) => s + p.value * p.weight, 0) / totalWeight;
+}
+
+function SeverityByZone({ buildings, reports, mob }) {
+  const [aois, setAois] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetchTimeout("/api/gdelt?source=cdi", 20000);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        if (cancelled) return;
+        setAois(Array.isArray(json.aois) ? json.aois.filter(a => a.status === "official-vector") : []);
+      } catch (e) {
+        if (!cancelled) setError(e.message || "No se pudo cargar Copernicus.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  const zones = useMemo(() => {
+    return aois.map(aoi => {
+      const zoneBuildings = buildings.filter(b => {
+        const p = getLatLng(b);
+        return p && pointInBounds(p.lat, p.lng, aoi.bounds);
+      });
+      const zoneReports = reports.filter(r => {
+        const p = getLatLng(r);
+        return p && pointInBounds(p.lat, p.lng, aoi.bounds);
+      });
+      const techSevereTotal = zoneBuildings.filter(b => {
+        const d = normalizeDamage(b.damage_level);
+        return d === "severo" || d === "total";
+      }).length;
+
+      const m = aoi.metrics || {};
+      const copernicusFeatures = m.features || 0;
+      const copernicusSeverity = copernicusFeatures > 0
+        ? ((m.destroyed || 0) + (m.damagedConfirmed || 0)) / copernicusFeatures
+        : null;
+      const technicalSeverity = zoneBuildings.length > 0 ? techSevereTotal / zoneBuildings.length : null;
+
+      return {
+        id: aoi.id,
+        nameEs: aoi.nameEs,
+        copernicusSeverity,
+        copernicusFeatures,
+        technicalSeverity,
+        techEvaluated: zoneBuildings.length,
+        reportCount: zoneReports.length,
+      };
+    });
+  }, [aois, buildings, reports]);
+
+  const maxReports = Math.max(1, ...zones.map(z => z.reportCount));
+
+  const scored = useMemo(() => {
+    return zones.map(z => {
+      const reportNorm = z.reportCount / maxReports;
+      const score = compositeSeverityScore([
+        { value: z.copernicusSeverity, weight: 0.5 },
+        { value: z.technicalSeverity, weight: 0.3 },
+        { value: reportNorm, weight: 0.2 },
+      ]);
+      return { ...z, score };
+    }).sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
+  }, [zones, maxReports]);
+
+  function scoreColor(score) {
+    if (score == null) return "#9ca3af";
+    if (score >= 0.6) return "#7f1d1d";
+    if (score >= 0.35) return "#dc2626";
+    if (score >= 0.15) return "#f97316";
+    return "#16a34a";
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ fontSize: 11, fontFamily: font, color: MUTED, lineHeight: 1.6, background: BG2, border: `1px solid ${BORDER}`, padding: 10 }}>
+        Score compuesto por zona (solo las 6 zonas con vector oficial de Copernicus — datos vivos, comparables entre si). Combina <strong>daño satelital oficial</strong> (peso 50%), <strong>edificios con evaluacion tecnica</strong> (peso 30%) y <strong>volumen de reportes ciudadanos</strong> (peso 20%, normalizado contra la zona con mas reportes). Si a una zona le falta un insumo, su peso se redistribuye entre los insumos disponibles — no se penaliza por vacio de datos.
+        Catia La Mar (Microsoft AI4G) queda fuera de este ranking porque es un snapshot estatico del 25 jun, no comparable con zonas que se actualizan en vivo — esa fuente se mantiene en su propia sub-tab.
+      </div>
+
+      {loading && (
+        <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 24, textAlign: "center", color: MUTED, fontFamily: font }}>
+          Calculando severidad por zona...
+        </div>
+      )}
+
+      {error && !loading && (
+        <div style={{ background: "#fef2f2", border: "1px solid #fecaca", padding: 16, color: "#dc2626", fontFamily: fontSans }}>
+          {error}
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: font }}>
+              <thead>
+                <tr style={{ borderBottom: `2px solid ${BORDER}` }}>
+                  <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Zona</th>
+                  <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Score compuesto</th>
+                  <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Dano satelital oficial</th>
+                  <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Edificios eval. tecnica</th>
+                  <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Reportes ciudadanos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scored.map(z => (
+                  <tr key={z.id} style={{ borderBottom: `1px solid ${BORDER}30` }}>
+                    <td style={{ padding: "8px", color: TEXT, fontWeight: 600 }}>{z.nameEs}</td>
+                    <td style={{ padding: "8px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 70, height: 8, background: `${BORDER}`, borderRadius: 4, overflow: "hidden" }}>
+                          <div style={{ width: `${Math.round((z.score ?? 0) * 100)}%`, height: "100%", background: scoreColor(z.score) }} />
+                        </div>
+                        <span style={{ color: scoreColor(z.score), fontWeight: 700 }}>
+                          {z.score != null ? `${Math.round(z.score * 100)}%` : "sin dato"}
+                        </span>
+                      </div>
+                    </td>
+                    <td style={{ padding: "8px", color: MUTED }}>
+                      {z.copernicusSeverity != null ? `${Math.round(z.copernicusSeverity * 100)}% (${z.copernicusFeatures} estructuras)` : "sin dato"}
+                    </td>
+                    <td style={{ padding: "8px", color: MUTED }}>
+                      {z.technicalSeverity != null ? `${Math.round(z.technicalSeverity * 100)}% (${z.techEvaluated} edificios)` : "sin dato"}
+                    </td>
+                    <td style={{ padding: "8px", color: MUTED }}>{z.reportCount}</td>
+                  </tr>
+                ))}
+                {scored.length === 0 && (
+                  <tr><td colSpan={5} style={{ padding: 16, textAlign: "center", color: MUTED }}>Sin zonas con vector oficial disponibles.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
+        Score relativo entre zonas, no una medida absoluta de gravedad humana — uso orientativo para priorizar revision, no para decisiones automatizadas.
+      </div>
+    </div>
+  );
+}
+
 export function TabSismos() {
   const mob = useIsMobile();
   const [data, setData] = useState({
@@ -1858,6 +2033,7 @@ export function TabSismos() {
             { id: "principal", label: "Vista principal" },
             { id: "registro", label: "Registro de sismos (USGS+EMSC)" },
             { id: "satelital", label: "Dano satelital (Copernicus)" },
+            { id: "severidad", label: "Severidad por zona" },
           ]}
         />
       </div>
@@ -1876,6 +2052,7 @@ export function TabSismos() {
           {damageProvider === "copernicus" ? <CopernicusDamage mob={mob} /> : <MicrosoftAI4GDamage mob={mob} />}
         </div>
       )}
+      {subView === "severidad" && <SeverityByZone buildings={data.buildings} reports={data.reports} mob={mob} />}
 
       {subView === "principal" && (<>
       {loading && (
