@@ -142,6 +142,55 @@ function fetchTimeout(url, ms) {
   return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(id));
 }
 
+const CDI_DAMAGE_COLORS = {
+  destroyed: "#7f1d1d",
+  damagedConfirmed: "#dc2626",
+  possibleDamage: "#f59e0b",
+  unclassified: "#9ca3af",
+};
+
+const CDI_DAMAGE_LABELS = {
+  destroyed: "Destruido",
+  damagedConfirmed: "Dano confirmado",
+  possibleDamage: "Posible dano",
+  unclassified: "Sin clasificar",
+};
+
+// Copernicus EMS "Grading" vectors use varying property names/labels depending on the
+// activation; we try several common patterns and fall back to "unclassified" rather than
+// guessing wrong. Verify against `_debug.sampleFeatureProperties` from the proxy after deploy.
+function classifyCdiFeature(props) {
+  const raw = String(
+    props?.damage_grade ?? props?.damageClass ?? props?.damage_class ?? props?.grading ??
+    props?.class_dama ?? props?.gridcode ?? props?.class ?? props?.status ?? ""
+  ).toLowerCase();
+  if (raw.includes("destr") || raw.includes("collapse")) return "destroyed";
+  if (raw.includes("confirm") || raw.includes("damaged") || raw.includes("high")) return "damagedConfirmed";
+  if (raw.includes("possib") || raw.includes("moderate") || raw.includes("low")) return "possibleDamage";
+  return "unclassified";
+}
+
+// Microsoft AI for Good (Catia La Mar) uses a continuous damage_pct, not discrete categories —
+// color scale matches the legend published with the dataset's own reference figure.
+const MSAI4G_BUCKETS = [
+  { id: "none", label: "0% (sin dano)", color: "#fef3c7" },
+  { id: "b1", label: "0-20%", color: "#fde68a" },
+  { id: "b2", label: "20-40%", color: "#fbbf24" },
+  { id: "b3", label: "40-60%", color: "#f97316" },
+  { id: "b4", label: "60-80%", color: "#ef4444" },
+  { id: "b5", label: "80-100%", color: "#7f1d1d" },
+];
+
+function msai4gColor(d10, unknown) {
+  if (unknown) return "#9ca3af";
+  if (d10 <= 0) return "#fef3c7";
+  if (d10 < 0.2) return "#fde68a";
+  if (d10 < 0.4) return "#fbbf24";
+  if (d10 < 0.6) return "#f97316";
+  if (d10 < 0.8) return "#ef4444";
+  return "#7f1d1d";
+}
+
 function normalizeSeverity(value) {
   const key = String(value || "").toLowerCase();
   if (SEVERITY[key]) return key;
@@ -830,6 +879,456 @@ function QuakeRegistry({ mob }) {
   );
 }
 
+function CopernicusDamage({ mob }) {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const damageLayerRef = useRef(null);
+  const selectedLayerRef = useRef(null);
+  const tileLayerRef = useRef(null);
+  const [mapReady, setMapReady] = useState(false);
+
+  const [data, setData] = useState({ aois: [], watchlist: [], updatedAt: null });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedAoiId, setSelectedAoiId] = useState(null);
+  const [showImagery, setShowImagery] = useState(true);
+  const [selectedFeature, setSelectedFeature] = useState(null);
+
+  async function loadData() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetchTimeout("/api/gdelt?source=cdi", 20000);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      if (json.error && (!json.aois || json.aois.length === 0)) throw new Error(json.error);
+      const aois = Array.isArray(json.aois) ? json.aois : [];
+      setData({ aois, watchlist: json.watchlist || [], updatedAt: json.updatedAt });
+      if (aois.length > 0) {
+        setSelectedAoiId(prev => prev && aois.some(a => a.id === prev) ? prev : (
+          aois.find(a => a.status === "official-vector" && (a.features || []).length > 0)?.id || aois[0].id
+        ));
+      }
+    } catch (e) {
+      setError(e.message || "No se pudo conectar con Crisis Damage Intelligence.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { loadData(); }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadCSS(LEAFLET_CSS);
+    loadScript(LEAFLET_JS).then(() => {
+      if (cancelled || !mapRef.current || !window.L || mapInstance.current) return;
+      const L = window.L;
+      const map = L.map(mapRef.current, {
+        center: [10.5, -67.0],
+        zoom: mob ? 11 : 13,
+        minZoom: 4,
+        maxZoom: 19,
+        zoomControl: true,
+        attributionControl: false,
+      });
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 19 }).addTo(map);
+      mapInstance.current = map;
+      setMapReady(true);
+      setTimeout(() => map.invalidateSize(), 120);
+    });
+    return () => {
+      cancelled = true;
+      setMapReady(false);
+      if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
+    };
+  }, [mob]);
+
+  const selectedAoi = data.aois.find(a => a.id === selectedAoiId) || null;
+
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current || !window.L || !selectedAoi) return;
+    const L = window.L;
+    const map = mapInstance.current;
+
+    if (tileLayerRef.current) { map.removeLayer(tileLayerRef.current); tileLayerRef.current = null; }
+    if (damageLayerRef.current) { map.removeLayer(damageLayerRef.current); damageLayerRef.current = null; }
+    selectedLayerRef.current = null;
+
+    if (showImagery && selectedAoi.afterTilesUrlTemplate) {
+      const tileLayer = L.tileLayer(selectedAoi.afterTilesUrlTemplate, {
+        minZoom: selectedAoi.tileMinZoom || 12,
+        maxZoom: selectedAoi.tileMaxZoom || 18,
+        maxNativeZoom: selectedAoi.tileMaxZoom || 18,
+        opacity: 0.95,
+      });
+      tileLayer.addTo(map);
+      tileLayerRef.current = tileLayer;
+    }
+
+    const features = selectedAoi.features || [];
+    if (features.length > 0) {
+      const geoLayer = L.geoJSON({ type: "FeatureCollection", features }, {
+        style: feature => {
+          const cls = classifyCdiFeature(feature.properties);
+          return {
+            color: "#ffffff",
+            weight: 1,
+            fillColor: CDI_DAMAGE_COLORS[cls],
+            fillOpacity: 0.6,
+          };
+        },
+        pointToLayer: (feature, latlng) => {
+          const cls = classifyCdiFeature(feature.properties);
+          return L.circleMarker(latlng, {
+            radius: 6,
+            color: "#ffffff",
+            weight: 1,
+            fillColor: CDI_DAMAGE_COLORS[cls],
+            fillOpacity: 0.75,
+          });
+        },
+        onEachFeature: (feature, layer) => {
+          const cls = classifyCdiFeature(feature.properties);
+          layer.bindPopup(
+            `<div style="font-family:monospace;font-size:11px;max-width:220px;line-height:1.4">` +
+            `<strong>${CDI_DAMAGE_LABELS[cls]}</strong><br/>` +
+            `AOI: ${selectedAoi.nameEs}` +
+            `</div>`
+          );
+          layer.on("click", () => {
+            if (selectedLayerRef.current && selectedLayerRef.current !== layer) {
+              selectedLayerRef.current.setStyle({ color: "#ffffff", weight: 1 });
+            }
+            layer.setStyle({ color: "#111827", weight: 2.5 });
+            selectedLayerRef.current = layer;
+            setSelectedFeature({ ...feature, __aoi: selectedAoi.id });
+          });
+        },
+      });
+      geoLayer.addTo(map);
+      damageLayerRef.current = geoLayer;
+      try {
+        const b = geoLayer.getBounds();
+        if (b.isValid()) map.fitBounds(b, { padding: [24, 24], maxZoom: selectedAoi.tileMaxZoom || 18 });
+      } catch {
+        if (Array.isArray(selectedAoi.bounds) && selectedAoi.bounds.length === 2) {
+          map.fitBounds(selectedAoi.bounds, { padding: [24, 24] });
+        }
+      }
+    } else if (Array.isArray(selectedAoi.bounds) && selectedAoi.bounds.length === 2) {
+      map.fitBounds(selectedAoi.bounds, { padding: [24, 24] });
+    }
+  }, [selectedAoi, showImagery, mapReady]);
+
+  const aoiOptions = data.aois.map(a => ({ id: a.id, label: a.nameEs.replace(/^AOI\d+\s*/, "") }));
+  const damageCounts = selectedAoi?.metrics || {};
+  const totalDestroyed = data.aois.reduce((sum, a) => sum + (a.metrics?.destroyed || 0), 0);
+  const totalConfirmed = data.aois.reduce((sum, a) => sum + (a.metrics?.damagedConfirmed || 0), 0);
+  const totalFeatures = data.aois.reduce((sum, a) => sum + (a.metrics?.features || 0), 0);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ fontSize: 11, fontFamily: font, color: MUTED, lineHeight: 1.6, background: BG2, border: `1px solid ${BORDER}`, padding: 10 }}>
+        Datos de <strong>Crisis Damage Intelligence</strong>, construidos sobre la activacion oficial <strong>Copernicus EMSR884</strong> (servicio europeo de mapeo de emergencias) con revision adicional por IA (VLM). Cobertura por zonas (AOI), no nacional completa.
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10 }}>
+        <Kpi label="Zonas con datos" value={loading ? "..." : data.aois.length} />
+        <Kpi label="Estructuras evaluadas" value={loading ? "..." : totalFeatures} />
+        <Kpi label="Destruidas (total)" value={loading ? "..." : totalDestroyed} tone={CDI_DAMAGE_COLORS.destroyed} />
+        <Kpi label="Dano confirmado (total)" value={loading ? "..." : totalConfirmed} tone={CDI_DAMAGE_COLORS.damagedConfirmed} />
+      </div>
+
+      {error && !loading && (
+        <div style={{ background: "#fef2f2", border: "1px solid #fecaca", padding: 16, color: "#dc2626", fontFamily: fontSans }}>
+          {error}{" "}
+          <a href="https://crisis-damage-intelligence.vercel.app/" target="_blank" rel="noreferrer" style={{ color: ACCENT }}>
+            Ver plataforma directamente ↗
+          </a>
+        </div>
+      )}
+
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
+        <ToggleGroup value={selectedAoiId} onChange={id => { setSelectedAoiId(id); setSelectedFeature(null); }} options={aoiOptions} />
+        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontFamily: font, color: MUTED, cursor: "pointer" }}>
+          <input type="checkbox" checked={showImagery} onChange={e => setShowImagery(e.target.checked)} />
+          Mostrar imagen satelital
+        </label>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 320px", gap: 12 }}>
+        <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
+          <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
+            {selectedAoi ? selectedAoi.nameEs : "Cargando zona..."}{loading ? " - cargando..." : ""}
+          </div>
+          <div ref={mapRef} style={{ width: "100%", height: mob ? 320 : 480, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
+            {Object.entries(CDI_DAMAGE_LABELS).map(([key, label]) => (
+              <div key={key} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+                <span style={{ width: 10, height: 10, borderRadius: 10, background: CDI_DAMAGE_COLORS[key], display: "inline-block" }} />
+                {label}
+              </div>
+            ))}
+          </div>
+          {selectedAoi?.sensor && (
+            <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}90`, textAlign: "center", marginTop: 6 }}>
+              Imagen: {selectedAoi.sensor} - adquirida {formatQuakeTime(selectedAoi.acquisitionUtc)} (post-evento)
+            </div>
+          )}
+        </div>
+
+        <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
+          <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+            {selectedFeature ? "Estructura seleccionada" : `Resumen - ${selectedAoi?.nameEs || ""}`}
+          </div>
+          {selectedFeature ? (
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: CDI_DAMAGE_COLORS[classifyCdiFeature(selectedFeature.properties)] }}>
+                {CDI_DAMAGE_LABELS[classifyCdiFeature(selectedFeature.properties)]}
+              </div>
+              <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 8 }}>
+                Zona: {selectedAoi?.nameEs}
+              </div>
+              <button
+                onClick={() => setSelectedFeature(null)}
+                style={{ marginTop: 10, fontSize: 10, fontFamily: font, color: MUTED, background: "transparent", border: `1px solid ${BORDER}`, padding: "5px 10px", cursor: "pointer" }}
+              >
+                Volver al resumen
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ fontSize: 12, fontFamily: fontSans, color: TEXT }}>Estructuras evaluadas: <strong>{damageCounts.features ?? 0}</strong></div>
+              <div style={{ fontSize: 12, fontFamily: fontSans, color: CDI_DAMAGE_COLORS.destroyed }}>Destruidas: <strong>{damageCounts.destroyed ?? 0}</strong></div>
+              <div style={{ fontSize: 12, fontFamily: fontSans, color: CDI_DAMAGE_COLORS.damagedConfirmed }}>Dano confirmado: <strong>{damageCounts.damagedConfirmed ?? 0}</strong></div>
+              <div style={{ fontSize: 12, fontFamily: fontSans, color: CDI_DAMAGE_COLORS.possibleDamage }}>Posible dano: <strong>{damageCounts.possibleDamage ?? 0}</strong></div>
+              <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 4 }}>Revisadas por IA (VLM): {damageCounts.vlmReviewed ?? 0}</div>
+              {selectedAoi?.status === "imagery-only" && (
+                <div style={{ fontSize: 10, fontFamily: font, color: "#b45309", marginTop: 4 }}>
+                  Solo imagen disponible - Copernicus aun no publico vector oficial de dano para esta zona.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
+        <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+          Comparativo por zona
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, fontFamily: font }}>
+            <thead>
+              <tr style={{ borderBottom: `2px solid ${BORDER}` }}>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Zona</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Estado</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Estructuras</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Destruidas</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Dano confirmado</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Posible dano</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.aois.map(a => (
+                <tr
+                  key={a.id}
+                  onClick={() => { setSelectedAoiId(a.id); setSelectedFeature(null); }}
+                  style={{ borderBottom: `1px solid ${BORDER}30`, cursor: "pointer", background: selectedAoiId === a.id ? `${ACCENT}08` : "transparent" }}
+                >
+                  <td style={{ padding: "6px 8px", color: TEXT }}>{a.nameEs}</td>
+                  <td style={{ padding: "6px 8px", color: a.status === "official-vector" ? "#16a34a" : "#b45309", fontSize: 10 }}>
+                    {a.status === "official-vector" ? "Vector oficial" : "Solo imagen"}
+                  </td>
+                  <td style={{ padding: "6px 8px", color: TEXT }}>{a.metrics?.features ?? 0}</td>
+                  <td style={{ padding: "6px 8px", color: CDI_DAMAGE_COLORS.destroyed, fontWeight: 700 }}>{a.metrics?.destroyed ?? 0}</td>
+                  <td style={{ padding: "6px 8px", color: CDI_DAMAGE_COLORS.damagedConfirmed }}>{a.metrics?.damagedConfirmed ?? 0}</td>
+                  <td style={{ padding: "6px 8px", color: CDI_DAMAGE_COLORS.possibleDamage }}>{a.metrics?.possibleDamage ?? 0}</td>
+                </tr>
+              ))}
+              {data.aois.length === 0 && (
+                <tr><td colSpan={6} style={{ padding: 16, textAlign: "center", color: MUTED }}>{loading ? "Cargando..." : "Sin datos disponibles."}</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        {data.watchlist.length > 0 && (
+          <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}90`, marginTop: 10 }}>
+            En espera de Copernicus: {data.watchlist.map(w => w.name?.es || w.id).join(", ")}
+          </div>
+        )}
+      </div>
+
+      <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
+        Fuente: Crisis Damage Intelligence sobre Copernicus EMSR884 - vectores oficiales + revision IA (VLM) - sin cobertura nacional completa
+      </div>
+    </div>
+  );
+}
+
+function MicrosoftAI4GDamage({ mob }) {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const layerRef = useRef(null);
+  const [mapReady, setMapReady] = useState(false);
+
+  const [points, setPoints] = useState([]);
+  const [areaMask, setAreaMask] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showAll, setShowAll] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const dataRes = await fetchTimeout("/data/catia-la-mar-damage.json", 20000);
+        if (!dataRes.ok) throw new Error(`HTTP ${dataRes.status}`);
+        const json = await dataRes.json();
+        if (cancelled) return;
+        setPoints(Array.isArray(json.points) ? json.points : []);
+        try {
+          const areaRes = await fetchTimeout("/data/catia-la-mar-area.geojson", 10000);
+          if (areaRes.ok && !cancelled) setAreaMask(await areaRes.json());
+        } catch {
+          // area outline is decorative only — safe to skip if unavailable
+        }
+      } catch (e) {
+        if (!cancelled) setError(e.message || "No se pudo cargar el dataset estatico.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadCSS(LEAFLET_CSS);
+    loadScript(LEAFLET_JS).then(() => {
+      if (cancelled || !mapRef.current || !window.L || mapInstance.current) return;
+      const L = window.L;
+      const map = L.map(mapRef.current, {
+        center: [10.6, -67.04],
+        zoom: mob ? 12 : 14,
+        minZoom: 10,
+        maxZoom: 18,
+        preferCanvas: true,
+        zoomControl: true,
+        attributionControl: false,
+      });
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 19 }).addTo(map);
+      mapInstance.current = map;
+      setMapReady(true);
+      setTimeout(() => map.invalidateSize(), 120);
+    });
+    return () => {
+      cancelled = true;
+      setMapReady(false);
+      if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
+    };
+  }, [mob]);
+
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current || !window.L) return;
+    const L = window.L;
+    const map = mapInstance.current;
+    if (layerRef.current) { map.removeLayer(layerRef.current); layerRef.current = null; }
+
+    const group = L.layerGroup();
+    const visible = showAll ? points : points.filter(p => p[2] > 0 || p[3] === 1);
+    visible.forEach(([lat, lng, d10, unknown]) => {
+      const marker = L.circleMarker([lat, lng], {
+        radius: 2.5,
+        stroke: false,
+        fillColor: msai4gColor(d10, unknown),
+        fillOpacity: 0.85,
+      });
+      marker.bindPopup(
+        `<div style="font-family:monospace;font-size:11px">${unknown ? "Sin dato (cubierto por nubes)" : `Dano estimado: ${Math.round(d10 * 100)}%`}</div>`
+      );
+      group.addLayer(marker);
+    });
+
+    let areaLayer = null;
+    if (areaMask) {
+      areaLayer = L.geoJSON(areaMask, { style: { color: "#2563eb", weight: 2, fill: false, dashArray: "6 4" } });
+      areaLayer.addTo(group);
+    }
+
+    group.addTo(map);
+    layerRef.current = group;
+
+    if (areaLayer) {
+      try {
+        const b = areaLayer.getBounds();
+        if (b.isValid()) map.fitBounds(b, { padding: [16, 16] });
+      } catch {
+        // fall back to default center/zoom set at map init
+      }
+    }
+  }, [points, areaMask, showAll, mapReady]);
+
+  const total = points.length;
+  const anyDamage = points.filter(p => p[2] > 0).length;
+  const highConfidence = points.filter(p => p[2] >= 0.8).length;
+  const cloudCovered = points.filter(p => p[3] === 1).length;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ fontSize: 11, fontFamily: font, color: MUTED, lineHeight: 1.6, background: BG2, border: `1px solid ${BORDER}`, padding: 10 }}>
+        Modelo de IA (<strong>Microsoft AI for Good Lab</strong>) sobre imagen satelital del 25 jun 2026, cruzado con huellas de edificios de Overture Maps.{" "}
+        <strong>Snapshot estatico - no se actualiza.</strong> El propio proveedor advierte problemas de ortorectificacion en la imagen y recomienda usar el umbral de 80%+ como señal de alta confianza, en vez de "algun dano detectado" sin mas.
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10 }}>
+        <Kpi label="Edificios analizados" value={loading ? "..." : total} />
+        <Kpi label="Con algun dano" value={loading ? "..." : anyDamage} tone="#f97316" />
+        <Kpi label="Dano alta confianza (80%+)" value={loading ? "..." : highConfidence} tone="#7f1d1d" />
+        <Kpi label="Cubiertos por nubes" value={loading ? "..." : cloudCovered} tone="#6b7280" />
+      </div>
+
+      {error && !loading && (
+        <div style={{ background: "#fef2f2", border: "1px solid #fecaca", padding: 16, color: "#dc2626", fontFamily: fontSans }}>
+          {error}
+        </div>
+      )}
+
+      <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontFamily: font, color: MUTED, cursor: "pointer" }}>
+        <input type="checkbox" checked={showAll} onChange={e => setShowAll(e.target.checked)} />
+        Mostrar todos los edificios analizados (incluye sin dano detectado) - {total} en total
+      </label>
+
+      <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
+        <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
+          Catia La Mar - dano por edificio{loading ? " - cargando..." : ""}
+        </div>
+        <div ref={mapRef} style={{ width: "100%", height: mob ? 360 : 520, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
+          {MSAI4G_BUCKETS.map(b => (
+            <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+              <span style={{ width: 10, height: 10, borderRadius: 2, background: b.color, display: "inline-block", border: "1px solid #d1d5db" }} />
+              {b.label}
+            </div>
+          ))}
+          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+            <span style={{ width: 10, height: 10, borderRadius: 2, background: "#9ca3af", display: "inline-block" }} />
+            N/A (nubes)
+          </div>
+        </div>
+      </div>
+
+      <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
+        Fuente: Microsoft AI for Good Lab via HDX - "Venezuela Earthquakes: Building Damage Assessment in Catia La Mar" - CC BY - dato estatico (25 jun 2026), sin actualizacion
+      </div>
+    </div>
+  );
+}
+
 export function TabSismos() {
   const mob = useIsMobile();
   const [data, setData] = useState({
@@ -860,6 +1359,7 @@ export function TabSismos() {
   const [reportTo, setReportTo] = useState("");
   const [reportGenerating, setReportGenerating] = useState(false);
   const [subView, setSubView] = useState("principal");
+  const [damageProvider, setDamageProvider] = useState("copernicus");
   const [nextRefreshAt, setNextRefreshAt] = useState(null);
   const [now, setNow] = useState(Date.now());
 
@@ -1356,12 +1856,26 @@ export function TabSismos() {
           onChange={setSubView}
           options={[
             { id: "principal", label: "Vista principal" },
-            { id: "registro", label: "Registro de sismos (USGS)" },
+            { id: "registro", label: "Registro de sismos (USGS+EMSC)" },
+            { id: "satelital", label: "Dano satelital (Copernicus)" },
           ]}
         />
       </div>
 
       {subView === "registro" && <QuakeRegistry mob={mob} />}
+      {subView === "satelital" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <ToggleGroup
+            value={damageProvider}
+            onChange={setDamageProvider}
+            options={[
+              { id: "copernicus", label: "Copernicus EMSR884 (multi-zona)" },
+              { id: "msai4g", label: "Microsoft AI for Good - Catia La Mar" },
+            ]}
+          />
+          {damageProvider === "copernicus" ? <CopernicusDamage mob={mob} /> : <MicrosoftAI4GDamage mob={mob} />}
+        </div>
+      )}
 
       {subView === "principal" && (<>
       {loading && (

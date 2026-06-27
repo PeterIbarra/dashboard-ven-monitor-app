@@ -1,67 +1,67 @@
 export const KPIS_LATEST = {
   "energia": [
     {
-      "k": "PDVSA",
-      "v": "USD 9.400M ene–may",
+      "k": "OFAC",
+      "v": "7 licencias ampliadas",
       "c": "#22c55e"
     },
     {
-      "k": "Exportaciones",
-      "v": "+25% interanual",
+      "k": "Reliance",
+      "v": "Hasta 400K bpd",
       "c": "#f59e0b"
     },
     {
-      "k": "FMI/BID",
-      "v": "Asistencia activada",
+      "k": "PDVSA–SLB",
+      "v": "MOU tecnológico + IA",
       "c": "#38bdf8"
     },
     {
-      "k": "Fondo sismo",
-      "v": "USD 200M inicial",
+      "k": "IMPSA",
+      "v": "672 MW potenciales",
       "c": "#22c55e"
     }
   ],
   "politico": [
     {
-      "k": "E3 dominante",
-      "v": "49%",
+      "k": "CNE",
+      "v": "Presión Rubio + sindicatos",
       "c": "#22c55e"
     },
     {
-      "k": "E1",
-      "v": "39% · OEA lista",
+      "k": "Arco Minero",
+      "v": "Operativo FANB",
       "c": "#38bdf8"
     },
     {
-      "k": "AN2015",
-      "v": "Comisión negociadora",
+      "k": "Presos políticos",
+      "v": "404 · Foro Penal",
       "c": "#f59e0b"
     },
     {
-      "k": "Cooperación",
-      "v": "+25 países",
+      "k": "CorteIDH",
+      "v": "Cierre Helicoide · 18 meses",
       "c": "#f59e0b"
     }
   ],
   "opinion": [
     {
-      "k": "Sismo",
-      "v": "Mw 7.2/7.5",
+      "k": "Conflictividad",
+      "v": "75 protestas · 19 entidades",
       "c": "#ef4444"
     },
     {
-      "k": "Costo estimado",
-      "v": "1%–7% PIB",
+      "k": "Inflación mayo",
+      "v": "6,3% · mínimo 19 meses",
       "c": "#22c55e"
     },
     {
-      "k": "Deuda externa",
-      "v": "USD 240.000M",
+      "k": "Bonos",
+      "v": "+60% en el año",
       "c": "#22c55e"
     },
     {
       "k": "Brecha E3–E1",
-      "v": "10 puntos",
+      "v": "16 puntos",
       "c": "#f59e0b"
     }
   ]
@@ -1883,133 +1883,37 @@ export const WEEKS = [
       "E1 baja a 33% porque la presión por nuevo CNE no produce calendario ni negociación política",
       "E4 queda en 13%: coerción selectiva y Arco Minero sin escalada sistémica contra la oposición"
     ]
-  },
-  {
-    "label": "12–19 jun",
-    "short": "S23",
-    "probs": [
-      { "sc": 1, "v": 37, "t": "up" },
-      { "sc": 2, "v": 4, "t": "flat" },
-      { "sc": 3, "v": 47, "t": "down" },
-      { "sc": 4, "v": 12, "t": "down" }
-    ],
-    "xy": { "x": 0.18, "y": 0.44 },
-    "sem": { "g": 8, "y": 7, "r": 4 },
-    "kpis": {
-      "energia": {
-        "exportaciones": "~1,25M bpd; PDVSA–Repsol +20.000 bpd",
-        "ingresos": "Bonos al alza; Vanguard aumenta tenencias",
-        "licencias": "IMPSA 672 MW/2.640 MW; GE Vernova 1 GW/5 GW",
-        "cambio": "Operación SOUTHCOM–FANB contra Tren de Aragua"
-      },
-      "economico": {
-        "inflacion": "Mayo 6,3%; mínimo en más de un año",
-        "ingresos_pob": "27 protestas en 13 estados",
-        "electricidad": "IODA: 12 eventos en 6 estados; Guárico 50%",
-        "pib": "Bonos ~USD 110.300M; disputa Centerview–Lazard"
-      },
-      "opinion": {
-        "direccion": "E3–E1: brecha baja de 16pp a 10pp",
-        "elecciones": "Mesa técnica AN–Figuera instalada el 18 jun",
-        "mcm": "Retorno de MCM queda como prueba crítica",
-        "eeuu": "Departamento de Estado respalda agenda de transición"
-      }
-    },
-    "tensiones": [
-      { "l": "green", "t": "<b>Canal político formal:</b> La mesa técnica AN–Figuera instala el primer canal verificable de diálogo sobre transición democrática." },
-      { "l": "green", "t": "<b>Apertura operativa:</b> IMPSA, GE Vernova y PDVSA–Repsol elevan la densidad contractual del ciclo, aunque sin capex plenamente verificable." },
-      { "l": "green", "t": "<b>Seguridad bilateral:</b> La operación SOUTHCOM–FANB contra el Tren de Aragua profundiza la coordinación operativa con Washington." },
-      { "l": "yellow", "t": "<b>E3 cede terreno relativo:</b> La continuidad negociada sigue dominante, pero transfiere probabilidad hacia E1 por el canal político abierto." },
-      { "l": "yellow", "t": "<b>Fricción financiera:</b> La disputa Centerview–Lazard introduce ruido en la arquitectura de reestructuración de deuda." },
-      { "l": "red", "t": "<b>Servicios y conflictividad:</b> 27 protestas en 13 estados e IODA registra 12 eventos eléctricos en 6 estados." },
-      { "l": "red", "t": "<b>Prueba de garantías:</b> Una represalia ante el retorno de MCM reactivaría de inmediato el escenario coercitivo." }
-    ],
-    "lectura": "La semana del 12 al 19 de junio registra el avance institucional más significativo del proceso desde enero: el retorno de Dinorah Figuera y la instalación de una mesa técnica con la Asamblea Nacional de mayoría gubernamental, respaldada por la AN de 2015 y por el Departamento de Estado de EE.UU. E3 baja a 47% (-3pp) pero conserva el liderazgo porque la arquitectura de continuidad negociada sigue apoyada en cooperación de seguridad, apertura energética y normalización financiera. La novedad es que, por primera vez, parte de esa probabilidad se transfiere hacia E1: la mesa técnica activa un canal político formal con agenda electoral concreta, aunque todavía sin cronograma vinculante, CNE renovado ni incorporación verificada de los actores opositores de mayor capital político.\n\nE1 sube a 37% (+4pp), el movimiento más relevante de la semana, por el respaldo explícito de Washington a un proceso de transición democrática y por retornos opositores sin represalia documentada. E4 baja a 12% (-1pp) porque no hubo respuesta coercitiva frente a Figuera o Pérez Vivas, aunque persisten instrumentos selectivos como la revisión de más de 12.000 expedientes judiciales y la amenaza latente ante un eventual retorno de MCM. E2 permanece en 4%: inflación mensual de 6,3%, bonos al alza y expectativas de reestructuración contienen el colapso inmediato, mientras 27 protestas, fragilidad eléctrica y disputa de asesores financieros mantienen riesgo de mediano plazo.",
-    "trendSc": 1,
-    "trendDrivers": [
-      "E1 sube a 37% por mesa técnica AN–Figuera y respaldo del Departamento de Estado",
-      "E3 baja a 47% pero sigue dominante por energía, seguridad bilateral y normalización financiera",
-      "La brecha E3–E1 se comprime de 16pp a 10pp, la contracción más rápida del ciclo"
-    ]
-  },
-  {
-    "label": "19–26 jun",
-    "short": "S24",
-    "probs": [
-      { "sc": 1, "v": 39, "t": "up" },
-      { "sc": 2, "v": 3, "t": "down" },
-      { "sc": 3, "v": 49, "t": "up" },
-      { "sc": 4, "v": 9, "t": "down" }
-    ],
-    "xy": { "x": 0.20, "y": 0.47 },
-    "sem": { "g": 8, "y": 6, "r": 5 },
-    "kpis": {
-      "energia": {
-        "exportaciones": "PDVSA: USD 9.400M ene–may; +54% interanual",
-        "ingresos": "Exportaciones petroleras +25%; precio prom. USD 71,25/b",
-        "licencias": "FMI/BID activan asistencia; fondo inicial USD 200M",
-        "cambio": "BCV flexibiliza mercado cambiario; brecha 36%"
-      },
-      "economico": {
-        "inflacion": "Costo sismo: 1%–7% del PIB (USGS)",
-        "ingresos_pob": "Deuda externa reportada: USD 240.000M",
-        "electricidad": "Afectación eléctrica en eje oriental y zona epicentral",
-        "pib": "PIB Q1 +2,1%; consumo real +28% ene–may"
-      },
-      "opinion": {
-        "direccion": "E3–E1: brecha estable en 10pp",
-        "elecciones": "OEA lista para apoyar transición electoral",
-        "mcm": "Figuera deslinda comisión negociadora del liderazgo de MCM",
-        "eeuu": "Más de 25 países movilizan ayuda humanitaria"
-      }
-    },
-    "tensiones": [
-      { "l": "green", "t": "<b>E3 se refuerza:</b> El doblete sísmico prolonga la necesidad operativa del gobierno encargado para gestionar ayuda, réplicas y reconstrucción." },
-      { "l": "green", "t": "<b>Cooperación internacional:</b> Más de 25 países y organismos movilizan asistencia; FMI/BID canalizan apoyo por vías institucionales." },
-      { "l": "green", "t": "<b>E1 avanza en paralelo:</b> El canal AN2015–Figuera y la disposición de la OEA sostienen la transición pacífica en 39%." },
-      { "l": "yellow", "t": "<b>Shock fiscal:</b> El costo estimado del sismo (1%–7% del PIB) se cruza con la negociación de deuda externa de USD 240.000M." },
-      { "l": "yellow", "t": "<b>Cifras a consolidar:</b> El balance oficial de víctimas y daños difiere de las proyecciones probabilísticas del USGS." },
-      { "l": "red", "t": "<b>Réplicas y servicios:</b> USGS estima 24% de probabilidad de M6 adicional y 3% de M7+; electricidad y telecomunicaciones siguen bajo monitoreo." },
-      { "l": "red", "t": "<b>Riesgo social posterior:</b> Una respuesta insuficiente en servicios básicos podría desplazar presión hacia E2 en julio." }
-    ],
-    "lectura": "La semana del 19 al 26 de junio interrumpe la tendencia de contracción de la brecha E3–E1: ambos escenarios avanzan en paralelo y la distancia queda estable en 10pp. E3 sube a 49% (+2pp) porque la emergencia sísmica del 24 de junio no compite con la continuidad negociada sino que se le sobrepone. La magnitud del doblete Mw 7.2/7.5 exige continuidad operativa del gobierno encargado para gestionar réplicas, reconstrucción, distribución de ayuda y coordinación internacional. La asistencia de más de 25 países, el fondo inicial de USD 200M y la activación de instrumentos del FMI y el BID refuerzan los canales institucionales existentes en vez de sustituirlos.\n\nE1 sube a 39% (+2pp) porque el canal AN2015–Figuera sigue en curso pese a la emergencia: la comisión negociadora, el deslinde institucional de Figuera frente a MCM y la disposición de la OEA a apoyar una transición electoral sostienen la probabilidad de una salida pacífica. E4 baja a 9% (-3pp) por ausencia de securitización de la emergencia, tono oficial de reconciliación y falta de señales de tensión en la FANB. E2 baja a 3% (-1pp) porque el sistema absorbió el shock sin fractura institucional inmediata, aunque el costo de reconstrucción estimado entre 1% y 7% del PIB, la deuda externa de USD 240.000M y la evolución de réplicas sísmicas serán variables críticas de julio.",
-    "trendSc": 3,
-    "trendDrivers": [
-      "E3 sube a 49% porque el sismo refuerza la centralidad operativa del gobierno encargado y la coordinación internacional",
-      "E1 sube a 39% porque el canal AN2015–Figuera y la OEA siguen activos pese a la emergencia",
-      "E4 cae a 9% y E2 a 3% por ausencia de cierre coercitivo o fractura institucional inmediata"
-    ]
   }
 ];
 
 export const TENSIONS = [
   {
     "level": "green",
-    "text": "El doblete sísmico refuerza la centralidad operativa del gobierno encargado y la coordinación internacional."
+    "text": "OFAC amplía siete licencias y admite arbitraje en Reino Unido, Francia y Singapur."
   },
   {
     "level": "green",
-    "text": "Más de 25 países y organismos movilizan ayuda; FMI/BID canalizan apoyo por vías institucionales."
+    "text": "La gira India–Türkiye y los avances con Reliance, SLB e IMPSA profundizan la apertura sectorial."
   },
   {
     "level": "yellow",
-    "text": "El canal AN2015–Figuera y la OEA sostienen E1 en 39%, pero falta confirmación formal de hitos."
+    "text": "Rubio y sindicatos elevan la presión por un nuevo CNE, pero Cabello cierra la negociación con Machado."
   },
   {
     "level": "yellow",
-    "text": "El shock fiscal del sismo (1%–7% del PIB) se cruza con la negociación de deuda externa de USD 240.000M."
+    "text": "Inflación de 6,3% y bonos +60% contrastan con ingresos bajos e inflación interanual de 525%."
   },
   {
     "level": "yellow",
-    "text": "Las cifras de víctimas, daños e infraestructura afectada siguen en consolidación frente a proyecciones USGS."
+    "text": "75 protestas en 19 entidades marcan el máximo reciente de conflictividad social."
   },
   {
     "level": "red",
-    "text": "USGS estima 24% de probabilidad de un M6 adicional y 3% de M7+; servicios básicos bajo presión."
+    "text": "CorteIDH ordena el cierre de El Helicoide en 18 meses; persisten 404 presos políticos."
   },
   {
     "level": "red",
-    "text": "Una respuesta insuficiente en reconstrucción, electricidad o telecomunicaciones podría desplazar presión hacia E2."
+    "text": "El operativo FANB en el Arco Minero combina control territorial con riesgos humanitarios y ambientales."
   }
 ];
 
@@ -2035,9 +1939,7 @@ export const MONITOR_WEEKS = [
   "S19",
   "S20",
   "S21",
-  "S22",
-  "S23",
-  "S24"
+  "S22"
 ];
 
 export const ICG_HISTORY = [
@@ -2172,18 +2074,6 @@ export const ICG_HISTORY = [
     "score": 61,
     "sitrep": true,
     "note": "OFAC, la gira India–Türkiye, el seguimiento al Plan de 100 Días y el operativo en el Arco Minero elevan capacidad institucional y territorial. La tensión electoral y de derechos humanos crece sin fractura del mando."
-  },
-  {
-    "week": "S23",
-    "score": 64,
-    "sitrep": true,
-    "note": "La mesa técnica AN–Figuera abre un canal político formal y la operación SOUTHCOM–FANB refuerza coordinación de seguridad. La cohesión mejora, aunque el retorno de MCM y la disputa Centerview–Lazard quedan como pruebas sensibles."
-  },
-  {
-    "week": "S24",
-    "score": 67,
-    "sitrep": true,
-    "note": "El doblete sísmico activa respuesta institucional y cooperación internacional sin fractura civil-militar visible. La cohesión sube por gestión coordinada, con riesgo fiscal y de servicios en observación."
   }
 ];
 
@@ -2932,44 +2822,6 @@ export const CONF_SEMANAL = [
       { "fecha": "8 Junio", "protestas": 19, "estados": 13, "tipo": "Mixto", "exigencias": "Vivienda, agua, justicia, derechos de detenidos, participación política, laborales, educación y propiedad" },
       { "fecha": "9 Junio", "protestas": 12, "estados": 9, "tipo": "Derechos humanos", "exigencias": "Justicia, derechos de detenidos, participación política, laborales, educación y vivienda" },
       { "fecha": "10 Junio", "protestas": 20, "estados": 13, "tipo": "Laboral/político", "exigencias": "Justicia, derechos de detenidos, participación política, laborales, educación y defensa de derechos" }
-    ]
-  },
-  {
-    "week": "S23",
-    "label": "12–17 jun",
-    "protestas": 27,
-    "estados": 13,
-    "reprimidas": 0,
-    "motivos": [
-      "Laborales",
-      "Seguridad social",
-      "Servicios básicos",
-      "Electricidad",
-      "Justicia",
-      "Participación política"
-    ],
-    "hecho": "27 protestas en 13 estados durante el período 12–17 de junio. La conflictividad social se mantiene desacoplada de la apertura de élites: demandas laborales, seguridad social y servicios coinciden con el inicio de la mesa técnica AN–Figuera.",
-    "dias": [
-      { "fecha": "12–17 Junio", "protestas": 27, "estados": 13, "tipo": "Mixto", "exigencias": "Laborales, seguridad social, servicios básicos, electricidad, justicia y participación política" }
-    ]
-  },
-  {
-    "week": "S24",
-    "label": "19–26 jun",
-    "protestas": 0,
-    "estados": 0,
-    "reprimidas": 0,
-    "motivos": [
-      "Emergencia sísmica",
-      "Servicios básicos",
-      "Reconstrucción",
-      "Ayuda humanitaria",
-      "Electricidad",
-      "Telecomunicaciones"
-    ],
-    "hecho": "La agenda social del período queda dominada por el doblete sísmico del 24 de junio: víctimas, daños, electricidad, telecomunicaciones, réplicas y acceso a ayuda humanitaria pasan a ser los principales vectores de seguimiento.",
-    "dias": [
-      { "fecha": "24 Junio", "protestas": 0, "estados": 0, "tipo": "Emergencia", "exigencias": "Atención a víctimas, reconstrucción, servicios básicos, electricidad, telecomunicaciones y coordinación de ayuda" }
     ]
   }
 ];

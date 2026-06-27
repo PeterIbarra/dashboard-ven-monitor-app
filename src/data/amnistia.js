@@ -348,39 +348,5 @@ export const AMNISTIA_TRACKER = [
       "militares": 187
     },
     "hito": "Foro Penal mantiene 404 presos políticos, al menos 35 mujeres. Roberto Marrero recibe amnistía tras su retorno, mientras familiares sostienen vigilias ante la Embajada de EE.UU. y protestan por condiciones de reclusión. La CorteIDH ordena cerrar El Helicoide en 18 meses."
-  },
-  {
-    "week": "S23",
-    "label": "12–19 jun",
-    "gob": {
-      "solicitudes": null,
-      "libertades": 8740,
-      "privadosLiberados": 314,
-      "cautelares": 8426,
-      "militares": 187
-    },
-    "fp": {
-      "verificados": 857,
-      "detenidos": 404,
-      "militares": 187
-    },
-    "hito": "Sin nuevo balance verificable de excarcelaciones. La revisión de más de 12.000 expedientes pendientes de juicio mantiene el tema judicial en seguimiento, mientras el retorno de dirigentes opositores sin represalia reduce presión inmediata sobre E4."
-  },
-  {
-    "week": "S24",
-    "label": "19–26 jun",
-    "gob": {
-      "solicitudes": null,
-      "libertades": 8740,
-      "privadosLiberados": 314,
-      "cautelares": 8426,
-      "militares": 187
-    },
-    "fp": {
-      "verificados": 857,
-      "detenidos": 404,
-      "militares": 187
-    },
-    "hito": "Sin nuevo balance verificable de presos políticos en la semana del sismo. La agenda pública se desplaza hacia emergencia, reconstrucción y coordinación humanitaria, sin señales documentadas de securitización de la respuesta."
   }
 ];
