@@ -41,6 +41,12 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(data);
   }
 
+  if (source === "cdi") {
+    const data = await fetchCrisisDamageIntelligence(req.query.debug === "1");
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=120");
+    return res.status(200).json(data);
+  }
+
   // ── Foro Penal scraper (?source=foropenal) ──
   if (source === "foropenal") {
     try {
@@ -675,5 +681,91 @@ async function fetchEmscQuakes(query) {
     return { features: Array.isArray(json.features) ? json.features : [], fetchedAt: new Date().toISOString() };
   } catch (e) {
     return { features: [], error: e.message, fetchedAt: new Date().toISOString() };
+  }
+}
+
+// Crisis Damage Intelligence: third-party platform built on top of the official Copernicus
+// EMSR884 rapid-mapping activation for this earthquake, enriched with VLM (AI) review.
+// catalog.json lists one entry per AOI (area of interest); each AOI links to its own
+// damage.geojson (building-level damage vector) and a satellite tile pyramid for the
+// post-event image. We fetch the catalog + every AOI's damage geojson server-side (small
+// vector payloads); the satellite tiles themselves are NOT proxied here — they're loaded
+// directly by the browser as a Leaflet tile layer, same as the basemap tiles, to avoid
+// pulling tens of MB of imagery through this serverless function.
+const CDI_BASE = "https://crisis-damage-intelligence.vercel.app";
+
+async function fetchCrisisDamageIntelligence(debug) {
+  try {
+    const catalogRes = await fetch(`${CDI_BASE}/data/catalog.json`, {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!catalogRes.ok) {
+      return { aois: [], error: `catalog HTTP ${catalogRes.status}`, fetchedAt: new Date().toISOString() };
+    }
+    const catalog = await catalogRes.json();
+    const aoiList = Array.isArray(catalog.aois) ? catalog.aois : [];
+
+    const damageResults = await Promise.all(
+      aoiList.map(async aoi => {
+        const damageUrl = aoi.layers?.damage;
+        if (!damageUrl) return { id: aoi.id, features: [] };
+        try {
+          const url = damageUrl.startsWith("http") ? damageUrl : `${CDI_BASE}${damageUrl}`;
+          const res = await fetch(url, {
+            headers: { accept: "application/json" },
+            signal: AbortSignal.timeout(10000),
+          });
+          if (!res.ok) return { id: aoi.id, features: [], error: `HTTP ${res.status}` };
+          const geo = await res.json();
+          return { id: aoi.id, features: Array.isArray(geo.features) ? geo.features : [] };
+        } catch (e) {
+          return { id: aoi.id, features: [], error: e.message };
+        }
+      })
+    );
+    const damageById = {};
+    damageResults.forEach(d => { damageById[d.id] = d; });
+
+    const aois = aoiList.map(aoi => ({
+      id: aoi.id,
+      country: aoi.country,
+      event: aoi.event,
+      nameEs: aoi.name?.es || aoi.id,
+      status: aoi.status,
+      source: aoi.source,
+      bounds: aoi.bounds,
+      center: aoi.center,
+      metrics: aoi.metrics || {},
+      afterTilesUrlTemplate: aoi.imagery?.after?.tilePyramid?.urlTemplate
+        ? `${CDI_BASE}${aoi.imagery.after.tilePyramid.urlTemplate}`
+        : null,
+      tileMinZoom: aoi.imagery?.after?.tilePyramid?.minZoom ?? 12,
+      tileMaxZoom: aoi.imagery?.after?.tilePyramid?.maxZoom ?? 18,
+      sensor: aoi.imagery?.after?.sensor || null,
+      acquisitionUtc: aoi.imagery?.after?.acquisitionUtc || null,
+      features: damageById[aoi.id]?.features || [],
+    }));
+
+    const result = {
+      updatedAt: catalog.updatedAt,
+      aois,
+      watchlist: catalog.watchlist || [],
+      fetchedAt: new Date().toISOString(),
+    };
+
+    if (debug) {
+      const sampleAoi = aois.find(a => a.features.length > 0);
+      result._debug = {
+        aoiCount: aois.length,
+        damageErrors: damageResults.filter(d => d.error).map(d => ({ id: d.id, error: d.error })),
+        sampleFeatureProperties: sampleAoi ? sampleAoi.features[0]?.properties || null : null,
+        sampleFeatureGeometryType: sampleAoi ? sampleAoi.features[0]?.geometry?.type || null : null,
+      };
+    }
+
+    return result;
+  } catch (e) {
+    return { aois: [], error: e.message, fetchedAt: new Date().toISOString() };
   }
 }
