@@ -4569,6 +4569,311 @@ export const SITREP_ALL = [
         "text": "El manejo de derechos humanos determinará si el control territorial y penitenciario erosiona el soporte internacional."
       }
     ]
+  },
+  {
+    "period": "12 – 19 de junio de 2026",
+    "periodShort": "12–19 jun 2026",
+    "keyPoints": [
+      {
+        "tag": "Transición",
+        "color": "#22c55e",
+        "title": "Mesa técnica AN–Figuera instala canal político formal",
+        "text": "El retorno de Dinorah Figuera y la instalación de una mesa técnica con la Asamblea Nacional abren el primer canal verificable de diálogo político del ciclo, con respaldo explícito del Departamento de Estado."
+      },
+      {
+        "tag": "Seguridad",
+        "color": "#0468B1",
+        "title": "Operación SOUTHCOM–FANB contra el Tren de Aragua",
+        "text": "La neutralización de Héctor Guerrero Flores en Bolívar profundiza la cooperación bilateral en seguridad y proyecta a Venezuela como socio operativo de Washington."
+      },
+      {
+        "tag": "Energía",
+        "color": "#f59e0b",
+        "title": "IMPSA, GE Vernova y PDVSA–Repsol elevan densidad contractual",
+        "text": "Los acuerdos eléctricos e hidrocarburíferos refuerzan la apertura sectorial, aunque todavía sin montos de inversión ni cronogramas plenamente verificables."
+      },
+      {
+        "tag": "Social",
+        "color": "#dc2626",
+        "title": "27 protestas en 13 estados",
+        "text": "La conflictividad laboral, de seguridad social y servicios evidencia desacople persistente entre apertura de élites y condiciones materiales."
+      }
+    ],
+    "sintesis": "El período 12–19 de junio marca el avance institucional más relevante desde enero: la mesa técnica AN–Figuera transfiere probabilidad hacia E1 y reduce la brecha E3–E1 de 16 a 10 puntos. E3 sigue dominante en 47% por la convergencia de apertura energética, cooperación de seguridad y normalización financiera, pero cede terreno relativo ante el primer canal político verificable del ciclo. E1 sube a 37% por el respaldo de EE.UU. a una agenda de transición democrática, aunque sin cronograma electoral, CNE renovado ni incorporación plena de MCM. E4 baja a 12% por ausencia de represalia ante retornos opositores; E2 queda en 4% por amortiguadores financieros, pese a fragilidad eléctrica y social.",
+    "actores": [
+      {
+        "name": "EE.UU.",
+        "items": [
+          "Departamento de Estado respalda públicamente el diálogo político iniciado con Figuera.",
+          "SOUTHCOM coordina con FANB la operación contra el Tren de Aragua.",
+          "La cooperación de seguridad se suma al eje energético y financiero de la relación bilateral."
+        ]
+      },
+      {
+        "name": "Gobierno Interino",
+        "items": [
+          "Conduce la mesa técnica con la AN de 2015 sin perder control del proceso.",
+          "Avanza acuerdos IMPSA, GE Vernova y PDVSA–Repsol.",
+          "Mantiene revisión de expedientes judiciales pendientes y control selectivo."
+        ]
+      },
+      {
+        "name": "Oposición",
+        "items": [
+          "Dinorah Figuera retorna y se instala como interlocutora institucional.",
+          "La posición de Plataforma Unitaria y MCM queda como variable decisiva.",
+          "El retorno de MCM sigue siendo la prueba principal de garantías reales."
+        ]
+      },
+      {
+        "name": "Sociedad / Servicios",
+        "items": [
+          "OVCS registra 27 protestas en 13 estados.",
+          "IODA identifica 12 eventos eléctricos en 6 estados, con Guárico en 50%.",
+          "Persisten demandas laborales, seguridad social y servicios básicos."
+        ]
+      }
+    ],
+    "nacional": {
+      "amnistia": {
+        "solicitudes": null,
+        "libertadesPlenas": null,
+        "privadosLiberados": null,
+        "cautelares": null,
+        "militares": 187,
+        "fpVerificados": 857,
+        "fpDetenidos": 404,
+        "fpNota": "Foro Penal mantiene 404 presos políticos. No se reporta nuevo balance verificable de excarcelaciones; el foco judicial se desplaza hacia la revisión de más de 12.000 expedientes pendientes de juicio."
+      },
+      "rodriguez": [
+        { "title": "Mesa técnica con AN2015", "text": "La apertura del canal Rodríguez–Figuera introduce una vía política formal, pero bajo control institucional del Ejecutivo y sin calendario vinculante." },
+        { "title": "Revisión judicial masiva", "text": "Cabello informa revisión de expedientes de más de 12.000 personas pendientes de juicio; cerca de 70% depende de Defensa Pública." },
+        { "title": "Cooperación de seguridad", "text": "La operación conjunta SOUTHCOM–FANB contra el Tren de Aragua refuerza el eje de seguridad bilateral." },
+        { "title": "Infraestructura energética", "text": "Los acuerdos con IMPSA, GE Vernova y Repsol elevan la densidad contractual de la recuperación eléctrica e hidrocarburífera." }
+      ],
+      "mcmAgenda": [
+        "Definir posición pública frente a la mesa AN–Figuera.",
+        "Evaluar retorno efectivo y condiciones reales de garantía.",
+        "Presionar por CNE renovado, partidos restituidos y cronograma verificable."
+      ]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "6,3%", "label": "Inflación mayo BCV", "color": "#22c55e" },
+        { "value": "USD 851M", "label": "Gasto semanal proyectado", "color": "#f59e0b" },
+        { "value": "USD 580M", "label": "Intervención BCV programada", "color": "#38bdf8" },
+        { "value": "12", "label": "Eventos eléctricos IODA", "color": "#dc2626" }
+      ],
+      "empresas": [
+        { "empresa": "IMPSA", "desarrollo": "Acuerdo para recuperación de capacidad hidroeléctrica, con 672 MW inmediatos y hasta 2.640 MW potenciales." },
+        { "empresa": "GE Vernova", "desarrollo": "Agenda de rehabilitación termoeléctrica con alcance anunciado de 1 GW inicial y hasta 5 GW." },
+        { "empresa": "PDVSA–Repsol", "desarrollo": "Profundiza recuperación operativa en Petroquiriquire, con meta adicional de 20.000 bpd." },
+        { "empresa": "Centerview / Lazard", "desarrollo": "La disputa por asesoría financiera introduce ruido sobre la credibilidad del proceso de reestructuración." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": {
+        "total": 27,
+        "promDiario": 5,
+        "periodo": "12–17 jun",
+        "variacion": "Descenso frente al máximo previo",
+        "composicion": "Laborales, seguridad social, servicios básicos, electricidad, justicia y participación política.",
+        "nota": "Aunque el volumen baja frente a las 75 protestas de la semana anterior, la conflictividad sigue mostrando desconexión entre apertura de élites y demandas materiales."
+      },
+      "percepcion": {
+        "fuente": "SITREP / monitoreo IODA / Síntesis Financiera",
+        "titulo": "Normalización con fragilidad cotidiana",
+        "nota": "La moderación inflacionaria mejora el relato macro, pero electricidad, salarios y gasto público mantienen presión social.",
+        "datos": [
+          { "factor": "Estados con protestas", "pct": 54 },
+          { "factor": "Estados con eventos eléctricos", "pct": 25 },
+          { "factor": "Guárico electricidad estimada", "pct": 50 },
+          { "factor": "Defensa Pública en casos pendientes", "pct": 70 }
+        ]
+      },
+      "excarcelados": {
+        "fp": 857,
+        "presos": 404,
+        "militares": 187,
+        "fuente": "Foro Penal / SITREP"
+      }
+    },
+    "marcoNormativo": {
+      "titulo": "Mesa técnica, licencias OFAC y arquitectura de recuperación",
+      "resumen": "El período combina apertura política formal, ajustes de sanciones y acuerdos sectoriales. El canal AN–Figuera crea una ruta de diálogo, mientras las licencias de aviación, telecomunicaciones y deuda mantienen la normalización económica dentro de marcos específicos y no de levantamiento general.",
+      "cambios": [
+        { "titulo": "Mesa AN–Figuera", "texto": "Primer canal político formal respaldado por el Departamento de Estado.", "color": "#22c55e" },
+        { "titulo": "OFAC GL-59 / 24A / 5X", "texto": "Ajustes puntuales en aviación, telecomunicaciones, paquetería y PDVSA 2020.", "color": "#0468B1" },
+        { "titulo": "Revisión judicial", "texto": "Más de 12.000 expedientes pendientes de juicio entran en revisión oficial.", "color": "#f59e0b" },
+        { "titulo": "Sin CNE renovado", "texto": "La ruta política sigue sin mecanismo electoral operativo verificable.", "color": "#dc2626" }
+      ],
+      "lecturaAnalitica": "El marco normativo amplía la gobernabilidad de E3, pero el respaldo explícito de EE.UU. a una agenda de transición transfiere probabilidad a E1. La sostenibilidad del movimiento depende de hitos verificables: segunda reunión, CNE, garantías y posición de MCM/PUD."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "47%", "color": "#0468B1", "text": "Sigue dominante por seguridad bilateral, acuerdos energéticos y normalización financiera, pero cede ante el nuevo canal político." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "37%", "color": "#2d8a30", "text": "Sube por mesa técnica, respaldo del Departamento de Estado y retornos opositores sin represalia documentada." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "12%", "color": "#ca8a04", "text": "Baja levemente por ausencia de represalia, aunque persisten herramientas coercitivas selectivas." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "4%", "color": "#dc2626", "text": "Permanece bajo por amortiguadores financieros, pese a fragilidad eléctrica y vulnerabilidad cambiaria." }
+    ],
+    "comentarios": [
+      { "tag": "Movimiento clave", "color": "#22c55e", "title": "La brecha E3–E1 se comprime a 10 puntos", "text": "La transición deja de ser solo presión externa y entra en una arquitectura de negociación formal." },
+      { "tag": "Límite", "color": "#f59e0b", "title": "La mesa es un inicio, no un resultado", "text": "Sin CNE, cronograma ni incorporación plena de MCM/PUD, el canal puede operar como válvula de presión." },
+      { "tag": "Riesgo social", "color": "#dc2626", "title": "Servicios y salarios siguen fuera de la normalización", "text": "La baja inflación mensual no resuelve electricidad, ingresos ni conflictividad laboral." },
+      { "tag": "Watchlist", "color": "#0468B1", "title": "Próxima señal: hitos verificables", "text": "La segunda reunión, composición de la mesa y reacción de la Plataforma Unitaria definirán si E1 sigue subiendo." }
+    ]
+  },
+  {
+    "period": "19 – 26 de junio de 2026",
+    "periodShort": "19–26 jun 2026",
+    "keyPoints": [
+      {
+        "tag": "Emergencia",
+        "color": "#dc2626",
+        "title": "Doblete sísmico Mw 7.2/7.5 reordena prioridades",
+        "text": "El sismo del 24 de junio activa respuesta humanitaria, reconstrucción, monitoreo de réplicas, electricidad y telecomunicaciones como ejes inmediatos."
+      },
+      {
+        "tag": "Continuidad",
+        "color": "#0468B1",
+        "title": "E3 sube a 49% por necesidad operativa del Estado",
+        "text": "La emergencia refuerza la centralidad del gobierno encargado para coordinar ayuda, gestionar servicios y ejecutar reconstrucción con cooperación internacional."
+      },
+      {
+        "tag": "Transición",
+        "color": "#22c55e",
+        "title": "E1 sube a 39% por canal AN2015–Figuera y OEA",
+        "text": "La comisión negociadora y la disposición de la OEA a apoyar una transición electoral sostienen el canal político pese a la emergencia."
+      },
+      {
+        "tag": "Fiscal",
+        "color": "#f59e0b",
+        "title": "Sismo y deuda externa se cruzan en julio",
+        "text": "El costo estimado del sismo (1%–7% del PIB) coincide con la presentación del plan de Centerview sobre deuda externa reportada en USD 240.000M."
+      }
+    ],
+    "sintesis": "La semana del 19 al 26 de junio confirma que la emergencia humanitaria y el proceso político-financiero no compiten sino que se sobreponen. E3 sube a 49% porque el doblete sísmico prolonga la necesidad operativa del gobierno encargado y canaliza la ayuda internacional a través de la arquitectura institucional existente. E1 sube a 39% porque la comisión AN2015–Figuera y la OEA siguen activos. E4 baja a 9% por ausencia de securitización de la emergencia y tono oficial de reconciliación. E2 baja a 3% porque el shock fue absorbido sin fractura inmediata, aunque el costo fiscal, la deuda externa de USD 240.000M y las réplicas serán variables críticas de julio.",
+    "actores": [
+      {
+        "name": "Gobierno Interino",
+        "items": [
+          "Activa respuesta institucional frente al sismo y coordina ayuda externa.",
+          "Presenta tono de reconciliación nacional y cooperación internacional.",
+          "Mantiene centralidad operativa en reconstrucción, servicios y gestión de réplicas."
+        ]
+      },
+      {
+        "name": "Internacional",
+        "items": [
+          "Más de 25 países y organismos multilaterales movilizan asistencia.",
+          "FMI y BID activan instrumentos de apoyo; fondo inicial de USD 200M.",
+          "OEA se declara lista para apoyar una transición electoral."
+        ]
+      },
+      {
+        "name": "Oposición",
+        "items": [
+          "Canal AN2015–Figuera continúa pese a la emergencia.",
+          "Figuera deslinda su rol negociador del liderazgo electoral de MCM.",
+          "La posición coordinada de Plataforma Unitaria y MCM sigue pendiente."
+        ]
+      },
+      {
+        "name": "Economía / Servicios",
+        "items": [
+          "PDVSA acumula USD 9.400M facturados entre enero y mayo.",
+          "BCV flexibiliza mercado cambiario; brecha paralela alcanza 36%.",
+          "USGS estima 24% de probabilidad de M6 adicional y 3% de M7+."
+        ]
+      }
+    ],
+    "nacional": {
+      "amnistia": {
+        "solicitudes": null,
+        "libertadesPlenas": null,
+        "privadosLiberados": null,
+        "cautelares": null,
+        "militares": 187,
+        "fpVerificados": 857,
+        "fpDetenidos": 404,
+        "fpNota": "No se reporta nuevo balance verificable de presos políticos durante la semana del sismo. La agenda pública se desplaza hacia emergencia, reconstrucción y coordinación humanitaria, sin señales documentadas de securitización de la respuesta."
+      },
+      "rodriguez": [
+        { "title": "Estado Mayor y respuesta sísmica", "text": "La emergencia activa una lógica de coordinación centralizada para réplicas, búsqueda, atención hospitalaria, servicios y distribución de ayuda." },
+        { "title": "Programa de Paz y Convivencia Democrática", "text": "El tono oficial se desplaza hacia reconciliación y cooperación, reduciendo el peso inmediato de E4." },
+        { "title": "Desplazamiento narrativo", "text": "El discurso oficial profundiza el reemplazo simbólico de Maduro por el 3 de enero como punto de activación institucional." },
+        { "title": "Comisión negociadora en paralelo", "text": "La emergencia no cancela el canal AN2015–Figuera; lo deja coexistiendo con la agenda humanitaria." }
+      ],
+      "mcmAgenda": [
+        "Definir posición frente al deslinde institucional de Figuera.",
+        "Evitar que la emergencia congele la agenda de garantías electorales.",
+        "Articular presión por reconstrucción transparente y transición electoral."
+      ]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "1%–7%", "label": "Pérdida PIB estimada por sismo", "color": "#dc2626" },
+        { "value": "USD 240.000M", "label": "Deuda externa reportada", "color": "#f59e0b" },
+        { "value": "USD 9.400M", "label": "PDVSA facturado ene–may", "color": "#22c55e" },
+        { "value": "36%", "label": "Brecha cambiaria junio", "color": "#ca8a04" }
+      ],
+      "empresas": [
+        { "empresa": "Centerview Partners", "desarrollo": "Preparará el plan de deuda externa para inicios de julio, con marco macroeconómico de una economía cercana a USD 100.000M." },
+        { "empresa": "FMI", "desarrollo": "Activa instrumentos de asistencia rápida y recursos iniciales para recuperación post-sismo." },
+        { "empresa": "BID", "desarrollo": "Reanuda relaciones formales, aunque aclara que ello no implica acceso inmediato a nuevos préstamos." },
+        { "empresa": "PDVSA", "desarrollo": "Acumula USD 9.400M en ingresos facturados entre enero y mayo, +54% interanual." },
+        { "empresa": "BCV", "desarrollo": "Flexibiliza el mercado cambiario mientras la brecha paralela alcanza 36% en junio." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": {
+        "total": 0,
+        "promDiario": 0,
+        "periodo": "19–26 jun",
+        "variacion": "Agenda social desplazada por emergencia",
+        "composicion": "Atención a víctimas, reconstrucción, electricidad, telecomunicaciones, servicios básicos y ayuda humanitaria.",
+        "nota": "La ausencia de un conteo de protestas no implica ausencia de presión social: el foco se desplaza a respuesta humanitaria, servicios, réplicas y transparencia de la reconstrucción."
+      },
+      "percepcion": {
+        "fuente": "SITREP / USGS / balance oficial / monitoreo ciudadano",
+        "titulo": "Brecha de información sobre víctimas y daños",
+        "nota": "El balance oficial, las proyecciones probabilísticas del USGS y los reportes ciudadanos todavía no convergen; la consolidación de cifras será clave para evaluar magnitud humanitaria y costo fiscal.",
+        "datos": [
+          { "factor": "Probabilidad USGS 10k–100k fallecidos", "pct": 42 },
+          { "factor": "Probabilidad USGS 1k–10k fallecidos", "pct": 33 },
+          { "factor": "Probabilidad USGS >100k fallecidos", "pct": 17 },
+          { "factor": "Población expuesta MMI VII+", "pct": 11 }
+        ]
+      },
+      "excarcelados": {
+        "fp": 857,
+        "presos": 404,
+        "militares": 187,
+        "fuente": "Foro Penal / último dato verificado"
+      }
+    },
+    "marcoNormativo": {
+      "titulo": "Emergencia, asistencia multilateral y negociación de deuda",
+      "resumen": "El doblete sísmico introduce una capa humanitaria sobre el proceso político-financiero. La respuesta se canaliza mediante el gobierno encargado y organismos multilaterales, mientras el calendario de deuda externa previsto para julio adquiere una nueva variable: el costo de reconstrucción.",
+      "cambios": [
+        { "titulo": "Fondo USD 200M", "texto": "Recursos iniciales con apoyo multilateral para respuesta y recuperación post-sismo.", "color": "#22c55e" },
+        { "titulo": "BID reanuda relación", "texto": "La reanudación formal no equivale aún a nuevos programas de préstamo.", "color": "#0468B1" },
+        { "titulo": "Deuda USD 240.000M", "texto": "Centerview prepara presentación a acreedores para inicios de julio.", "color": "#f59e0b" },
+        { "titulo": "Riesgo fiscal", "texto": "El costo del sismo (1%–7% del PIB) puede tensionar el marco macro y la negociación.", "color": "#dc2626" }
+      ],
+      "lecturaAnalitica": "La emergencia refuerza E3 porque requiere continuidad operativa y coordinación externa, pero también crea un nuevo punto de estrés: si la reconstrucción supera la capacidad fiscal o se percibe opaca, puede reabrir presión hacia E2 y erosionar legitimidad."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "49%", "color": "#0468B1", "text": "Sube porque la emergencia prolonga la centralidad operativa del gobierno encargado y canaliza ayuda por vías institucionales." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "39%", "color": "#2d8a30", "text": "Avanza porque el canal AN2015–Figuera y la disposición de la OEA continúan pese al sismo." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "9%", "color": "#ca8a04", "text": "Baja por ausencia de cierre cívico, securitización de la ayuda o tensiones reportadas en la FANB." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "3%", "color": "#dc2626", "text": "Cede porque no hay fractura institucional inmediata, aunque costo fiscal, servicios y réplicas siguen en watchlist." }
+    ],
+    "comentarios": [
+      { "tag": "Emergencia", "color": "#dc2626", "title": "El sismo reordena la agenda, no cancela la política", "text": "La respuesta humanitaria se sobrepone al proceso de transición y normalización, reforzando la necesidad de coordinación estatal." },
+      { "tag": "E3/E1", "color": "#0468B1", "title": "Ambos escenarios avanzan en paralelo", "text": "E3 gana por capacidad operativa; E1 gana porque el canal Figuera–AN2015 y la OEA permanecen activos." },
+      { "tag": "Riesgo fiscal", "color": "#f59e0b", "title": "Reconstrucción y deuda convergen en julio", "text": "La presentación de Centerview llega justo cuando el sismo introduce necesidades extraordinarias de financiamiento." },
+      { "tag": "Watchlist", "color": "#ca8a04", "title": "Réplicas, servicios y transparencia", "text": "Electricidad, telecomunicaciones, cifras de víctimas y ejecución de ayuda definirán si la estabilidad se sostiene." }
+    ]
   }
 ];
 
