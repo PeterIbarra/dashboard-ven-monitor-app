@@ -47,6 +47,12 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(data);
   }
 
+  if (source === "lhasa-identify") {
+    const data = await fetchLhasaIdentify(req.query.lat, req.query.lng);
+    res.setHeader("Cache-Control", "no-store");
+    return res.status(200).json(data);
+  }
+
   // ── Foro Penal scraper (?source=foropenal) ──
   if (source === "foropenal") {
     try {
@@ -767,5 +773,43 @@ async function fetchCrisisDamageIntelligence(debug) {
     return result;
   } catch (e) {
     return { aois: [], error: e.message, fetchedAt: new Date().toISOString() };
+  }
+}
+
+const LHASA_BASE_SERVER = "https://maps.disasters.nasa.gov/ags03/rest/services/NRT/landslide_nowcast/ImageServer";
+
+// Proxied server-side: the LHASA image overlay itself loads fine client-side as a plain <img>
+// (no CORS needed for that), but the /identify operation is a real fetch() that NASA's server
+// may not whitelist for arbitrary browser origins. Routing it through here sidesteps that.
+async function fetchLhasaIdentify(lat, lng) {
+  const latNum = parseFloat(lat);
+  const lngNum = parseFloat(lng);
+  if (!Number.isFinite(latNum) || !Number.isFinite(lngNum)) {
+    return { value: null, error: "lat/lng invalidos" };
+  }
+  try {
+    const geometry = JSON.stringify({ x: lngNum, y: latNum, spatialReference: { wkid: 4326 } });
+    const params = new URLSearchParams({
+      geometry,
+      geometryType: "esriGeometryPoint",
+      returnGeometry: "false",
+      renderingRule: JSON.stringify({ rasterFunction: "Landslide_Nowcast_Index" }),
+      f: "json",
+    });
+    const res = await fetch(`${LHASA_BASE_SERVER}/identify?${params.toString()}`, {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      return { value: null, error: `HTTP ${res.status} ${text.slice(0, 140)}` };
+    }
+    const json = await res.json();
+    if (json.error) {
+      return { value: null, error: json.error.message || JSON.stringify(json.error).slice(0, 140) };
+    }
+    return json;
+  } catch (e) {
+    return { value: null, error: e.message };
   }
 }
