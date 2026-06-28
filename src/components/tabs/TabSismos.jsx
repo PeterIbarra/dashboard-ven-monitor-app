@@ -1329,6 +1329,85 @@ function MicrosoftAI4GDamage({ mob }) {
   );
 }
 
+// ── Datos de referencia estáticos por estado ──────────────────────────────
+// GEM: perdida anual promedio historica (USD), leida de seismic_risk_profile_Venezuela.png
+// RAPIDA/PNUD (Buro de Crisis): edificios expuestos >=MMI VI y dano economico estimado de ESTE
+// sismo (jun 2026), leidos de la app oficial en geosmart.undp.org. Ninguna de las dos fuentes
+// tiene API publica — son snapshots estaticos transcritos, no se actualizan solos.
+const STATE_REFERENCE_DATA = {
+  "Distrito Capital":      { gemAnnualLoss: 3300000, rapidaDamage: 5390.5, rapidaDamageLI: 3773.4, rapidaDamageLS: 7007.7, rapidaPctGDP: 7, rapidaBuildingsExposed: 389860 },
+  "Miranda":               { gemAnnualLoss: 6100000, rapidaDamage:  677.7, rapidaDamageLI:  474.4, rapidaDamageLS:  881.1, rapidaPctGDP: 5, rapidaBuildingsExposed: 372391 },
+  "Carabobo":              { gemAnnualLoss: 3700000, rapidaDamage:  284.2, rapidaDamageLI:  199.0, rapidaDamageLS:  369.5, rapidaPctGDP: 5, rapidaBuildingsExposed: 297575 },
+  "La Guaira":             { gemAnnualLoss:  651700, rapidaDamage:  179.3, rapidaDamageLI:  125.5, rapidaDamageLS:  233.1, rapidaPctGDP: 7, rapidaBuildingsExposed:  44489 },
+  "Aragua":                { gemAnnualLoss: 1800000, rapidaDamage:   91.9, rapidaDamageLI:   64.3, rapidaDamageLS:  119.4, rapidaPctGDP: 3, rapidaBuildingsExposed: 265225 },
+  "Yaracuy":               { gemAnnualLoss:  709000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed: 187392 },
+  "Falcón":                { gemAnnualLoss:  602300, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:  51756 },
+  "Cojedes":               { gemAnnualLoss:  159000, rapidaDamage:    3.5, rapidaDamageLI:    2.4, rapidaDamageLS:    4.5, rapidaPctGDP: 2, rapidaBuildingsExposed:  51296 },
+  "Lara":                  { gemAnnualLoss: 5100000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:  25470 },
+  "Portuguesa":            { gemAnnualLoss: 1200000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:   8226 },
+  "Guárico":               { gemAnnualLoss:  163500, rapidaDamage:    0.8, rapidaDamageLI:    0.6, rapidaDamageLS:    1.1, rapidaPctGDP: 1, rapidaBuildingsExposed:      1 },
+  "Anzoátegui":            { gemAnnualLoss: 1400000, rapidaDamage:    2.3, rapidaDamageLI:    1.6, rapidaDamageLS:    3.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Barinas":               { gemAnnualLoss:  812400, rapidaDamage:    0.2, rapidaDamageLI:    0.1, rapidaDamageLS:    0.2, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Apure":                 { gemAnnualLoss:   27600, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Dependencias Federales":{ gemAnnualLoss:     150, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 1, rapidaBuildingsExposed:      0 },
+  "Nueva Esparta":         { gemAnnualLoss: 1200000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Sucre":                 { gemAnnualLoss: 5100000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Zulia":                 { gemAnnualLoss: 3200000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Táchira":               { gemAnnualLoss: 3300000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Trujillo":              { gemAnnualLoss: 2000000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Mérida":                { gemAnnualLoss: 5000000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Monagas":               { gemAnnualLoss:  743000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Bolívar":               { gemAnnualLoss:  330000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Amazonas":              { gemAnnualLoss:   92800, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+  "Delta Amacuro":         { gemAnnualLoss:   44000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
+};
+
+// Catia La Mar (Microsoft AI4G) solo cubre un sector de La Guaira, no el estado completo —
+// se muestra como detalle adicional unicamente en el panel de ese estado, no como columna nacional.
+const CATIA_LA_MAR_SUMMARY = { total: 30761, conDano: 9134, altaConfianza: 1989, estado: "La Guaira" };
+
+function rayCastInRing(x, y, ring) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    const intersect = (yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function pointInGeometry(lat, lng, geometry) {
+  if (!geometry) return false;
+  const polygons = geometry.type === "MultiPolygon" ? geometry.coordinates : [geometry.coordinates];
+  for (const poly of polygons) {
+    if (poly[0] && rayCastInRing(lng, lat, poly[0])) return true;
+  }
+  return false;
+}
+
+function findStateForPoint(lat, lng, statesGeo) {
+  if (!statesGeo || !Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  for (const feature of statesGeo.features) {
+    if (pointInGeometry(lat, lng, feature.geometry)) return feature.properties.name;
+  }
+  return null;
+}
+
+const METRIC_DEFS = {
+  vivo: { label: "Severidad en vivo", colorSteps: ["#fee2e2", "#fca5a5", "#f87171", "#ef4444", "#b91c1c"] },
+  expuestos: { label: "Edificios expuestos (RAPIDA)", colorSteps: ["#dbeafe", "#93c5fd", "#60a5fa", "#3b82f6", "#1d4ed8"] },
+  economico: { label: "Dano economico (RAPIDA)", colorSteps: ["#ffedd5", "#fdba74", "#fb923c", "#f97316", "#c2410c"] },
+  base: { label: "Riesgo de base (GEM)", colorSteps: ["#ede9fe", "#c4b5fd", "#a78bfa", "#8b5cf6", "#6d28d9"] },
+};
+
+function stepColor(value, maxValue, steps) {
+  if (!value || value <= 0 || !maxValue || maxValue <= 0) return "#f3f4f6";
+  const ratio = Math.sqrt(value / maxValue);
+  const idx = Math.min(steps.length - 1, Math.floor(ratio * steps.length));
+  return steps[idx];
+}
+
 function pointInBounds(lat, lng, bounds) {
   if (!Array.isArray(bounds) || bounds.length !== 2) return false;
   const [a, b] = bounds;
@@ -1462,6 +1541,12 @@ function SeverityByZone({ buildings, reports, mob }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <NationalSeverityMap buildings={buildings} reports={reports} mob={mob} />
+
+      <div style={{ borderTop: `2px solid ${BORDER}`, marginTop: 8, paddingTop: 16, fontSize: 12, fontFamily: font, color: TEXT, fontWeight: 700 }}>
+        Detalle adicional: 6 zonas con verificacion satelital Copernicus
+      </div>
+
       <div style={{ fontSize: 11, fontFamily: font, color: MUTED, lineHeight: 1.6, background: BG2, border: `1px solid ${BORDER}`, padding: 10 }}>
         Score compuesto por zona (solo las 6 zonas con vector oficial de Copernicus — datos vivos, comparables entre si). Combina <strong>daño satelital oficial</strong> (peso 50%), <strong>edificios con evaluacion tecnica</strong> (peso 30%) y <strong>volumen de reportes ciudadanos</strong> (peso 20%, normalizado contra la zona con mas reportes). Si a una zona le falta un insumo, su peso se redistribuye entre los insumos disponibles — no se penaliza por vacio de datos.
         Catia La Mar (Microsoft AI4G) queda fuera de este ranking porque es un snapshot estatico del 25 jun, no comparable con zonas que se actualizan en vivo — esa fuente se mantiene en su propia sub-tab.
@@ -1471,6 +1556,7 @@ function SeverityByZone({ buildings, reports, mob }) {
         <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 24, textAlign: "center", color: MUTED, fontFamily: font }}>
           Calculando severidad por zona...
         </div>
+
       )}
 
       {error && !loading && (
@@ -1806,6 +1892,331 @@ function LandslideRisk({ buildings, mob }) {
       <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
         Fuente: NASA GPM/LHASA Landslide Nowcast (NRT) - edificios: sismovenezuela.org / evaluacion tecnica oficial - Catia La Mar: Microsoft AI for Good Lab via HDX
       </div>
+    </div>
+  );
+}
+
+function NationalSeverityMap({ buildings, reports, mob }) {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const statesLayerRef = useRef(null);
+  const [mapReady, setMapReady] = useState(false);
+
+  const [statesGeo, setStatesGeo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [metric, setMetric] = useState("vivo");
+  const [selectedStateName, setSelectedStateName] = useState(null);
+  const [sortKey, setSortKey] = useState("vivo");
+  const [sortDir, setSortDir] = useState("desc");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchTimeout("/data/venezuela-states.geojson", 15000)
+      .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
+      .then(json => { if (!cancelled) setStatesGeo(json); })
+      .catch(e => { if (!cancelled) setError(e.message || "No se pudo cargar el mapa de estados."); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Agregacion de nuestros datos en vivo por estado real (point-in-polygon contra el GeoJSON)
+  const liveByState = useMemo(() => {
+    const acc = {};
+    if (!statesGeo) return acc;
+    statesGeo.features.forEach(f => { acc[f.properties.name] = { reports: 0, buildingsSevere: 0, buildingsTotal: 0 }; });
+    reports.forEach(r => {
+      const p = getLatLng(r);
+      if (!p) return;
+      const name = findStateForPoint(p.lat, p.lng, statesGeo);
+      if (name && acc[name]) acc[name].reports += 1;
+    });
+    buildings.forEach(b => {
+      const p = getLatLng(b);
+      if (!p) return;
+      const name = findStateForPoint(p.lat, p.lng, statesGeo);
+      if (!name || !acc[name]) return;
+      acc[name].buildingsTotal += 1;
+      const d = normalizeDamage(b.damage_level);
+      if (d === "severo" || d === "total") acc[name].buildingsSevere += 1;
+    });
+    return acc;
+  }, [statesGeo, reports, buildings]);
+
+  // Tabla combinada: las 25 filas, cada fuente en su propia columna, sin fusionar en un score
+  const rows = useMemo(() => {
+    if (!statesGeo) return [];
+    return statesGeo.features.map(f => {
+      const name = f.properties.name;
+      const ref = STATE_REFERENCE_DATA[name] || { gemAnnualLoss: 0, rapidaDamage: 0, rapidaDamageLI: 0, rapidaDamageLS: 0, rapidaPctGDP: 0, rapidaBuildingsExposed: 0 };
+      const live = liveByState[name] || { reports: 0, buildingsSevere: 0, buildingsTotal: 0 };
+      const vivoValue = live.reports + live.buildingsSevere * 2;
+      return { name, ...ref, ...live, vivoValue };
+    });
+  }, [statesGeo, liveByState]);
+
+  const maxValues = useMemo(() => ({
+    vivo: Math.max(1, ...rows.map(r => r.vivoValue)),
+    expuestos: Math.max(1, ...rows.map(r => r.rapidaBuildingsExposed)),
+    economico: Math.max(1, ...rows.map(r => r.rapidaDamage)),
+    base: Math.max(1, ...rows.map(r => r.gemAnnualLoss)),
+  }), [rows]);
+
+  const valueForMetric = (row, m) => (
+    m === "vivo" ? row.vivoValue :
+    m === "expuestos" ? row.rapidaBuildingsExposed :
+    m === "economico" ? row.rapidaDamage :
+    row.gemAnnualLoss
+  );
+
+  const sortedRows = useMemo(() => {
+    const copy = [...rows];
+    copy.sort((a, b) => {
+      const av = sortKey === "name" ? a.name : valueForMetric(a, sortKey) ?? valueForMetric(a, "vivo");
+      const bv = sortKey === "name" ? b.name : valueForMetric(b, sortKey) ?? valueForMetric(b, "vivo");
+      if (sortKey === "name") return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+      return sortDir === "asc" ? av - bv : bv - av;
+    });
+    return copy;
+  }, [rows, sortKey, sortDir]);
+
+  function toggleSort(key) {
+    if (sortKey === key) setSortDir(d => (d === "desc" ? "asc" : "desc"));
+    else { setSortKey(key); setSortDir("desc"); }
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+    loadCSS(LEAFLET_CSS);
+    loadScript(LEAFLET_JS).then(() => {
+      if (cancelled || !mapRef.current || !window.L || mapInstance.current) return;
+      const L = window.L;
+      const map = L.map(mapRef.current, {
+        center: [8.0, -66.0],
+        zoom: mob ? 5 : 6,
+        minZoom: 4,
+        maxZoom: 10,
+        zoomControl: true,
+        attributionControl: false,
+      });
+      mapInstance.current = map;
+      setMapReady(true);
+      setTimeout(() => map.invalidateSize(), 150);
+    });
+    return () => {
+      cancelled = true;
+      setMapReady(false);
+      if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
+    };
+  }, [mob]);
+
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current || !window.L || !statesGeo) return;
+    const L = window.L;
+    const map = mapInstance.current;
+    if (statesLayerRef.current) { map.removeLayer(statesLayerRef.current); statesLayerRef.current = null; }
+
+    const def = METRIC_DEFS[metric];
+    const maxV = maxValues[metric];
+
+    const layer = L.geoJSON(statesGeo, {
+      style: feature => {
+        const row = rows.find(r => r.name === feature.properties.name);
+        const value = row ? valueForMetric(row, metric) : 0;
+        const selected = selectedStateName === feature.properties.name;
+        return {
+          fillColor: stepColor(value, maxV, def.colorSteps),
+          fillOpacity: 0.85,
+          color: selected ? "#111827" : "#ffffff",
+          weight: selected ? 2.5 : 1,
+        };
+      },
+      onEachFeature: (feature, lyr) => {
+        lyr.on("click", () => setSelectedStateName(feature.properties.name));
+        lyr.bindTooltip(feature.properties.name, { sticky: true });
+      },
+    });
+    layer.addTo(map);
+    statesLayerRef.current = layer;
+    try {
+      const b = layer.getBounds();
+      if (b.isValid() && !selectedStateName) map.fitBounds(b, { padding: [12, 12] });
+    } catch {
+      // ignore — keeps default center/zoom if bounds computation fails
+    }
+  }, [statesGeo, metric, rows, maxValues, selectedStateName, mapReady]);
+
+  const selectedRow = rows.find(r => r.name === selectedStateName) || null;
+
+  function divergenceInfo(row) {
+    const liveNorm = row.vivoValue / maxValues.vivo;
+    const expectedNorm = row.rapidaBuildingsExposed / maxValues.expuestos;
+    if (expectedNorm <= 0) {
+      return liveNorm > 0 ? { label: "Evidencia sin expectativa previa de RAPIDA", ratio: null } : { label: "Sin evidencia ni expectativa", ratio: null };
+    }
+    const ratio = liveNorm / expectedNorm;
+    let label;
+    if (ratio > 1.3) label = "Mas evidencia en terreno de la esperada";
+    else if (ratio < 0.7) label = "Menos evidencia en terreno de la esperada (aun)";
+    else label = "Consistente con lo esperado por RAPIDA";
+    return { label, ratio };
+  }
+
+  function yearsRatioInfo(row) {
+    if (!row.gemAnnualLoss || row.rapidaDamage <= 0) return null;
+    const years = (row.rapidaDamage * 1000000) / row.gemAnnualLoss;
+    return years;
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ fontSize: 11, fontFamily: font, color: MUTED, lineHeight: 1.6, background: BG2, border: `1px solid ${BORDER}`, padding: 10 }}>
+        Cuatro fuentes, cada una midiendo algo distinto — <strong>no se fusionan en un solo score</strong> porque responden preguntas diferentes: <strong>Severidad en vivo</strong> es evidencia directa nuestra (reportes + edificios con dano confirmado, se actualiza solo); <strong>Edificios expuestos</strong> y <strong>Dano economico</strong> son del Buro de Crisis de PNUD (RAPIDA), estimaciones especificas de este sismo (modelo de exposicion sismica y modelo economico CLIMADA, respectivamente) — snapshot del 26 jun, no se actualiza; <strong>Riesgo de base</strong> es GEM, probabilidad de largo plazo (100.000 anos simulados), no relacionada a este evento especifico.
+      </div>
+
+      {loading && (
+        <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 24, textAlign: "center", color: MUTED, fontFamily: font }}>
+          Cargando limites estatales...
+        </div>
+      )}
+      {error && !loading && (
+        <div style={{ background: "#fef2f2", border: "1px solid #fecaca", padding: 16, color: "#dc2626", fontFamily: fontSans }}>{error}</div>
+      )}
+
+      {!loading && !error && (
+        <>
+          <ToggleGroup
+            value={metric}
+            onChange={setMetric}
+            options={Object.entries(METRIC_DEFS).map(([id, d]) => ({ id, label: d.label }))}
+          />
+
+          <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 340px", gap: 12 }}>
+            <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
+              <div ref={mapRef} style={{ width: "100%", height: mob ? 400 : 560, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
+            </div>
+
+            <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
+              <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+                {selectedRow ? selectedRow.name : "Selecciona un estado"}
+              </div>
+              {selectedRow ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div>
+                    <div style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Severidad en vivo</div>
+                    <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT }}>
+                      {selectedRow.reports} reportes - {selectedRow.buildingsSevere} edificios severo/total ({selectedRow.buildingsTotal} evaluados)
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Edificios expuestos (RAPIDA)</div>
+                    <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT }}>{selectedRow.rapidaBuildingsExposed.toLocaleString()} edificios a intensidad ≥VI MMI</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Dano economico (RAPIDA)</div>
+                    <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT }}>
+                      ${selectedRow.rapidaDamage.toLocaleString()}M (rango ${selectedRow.rapidaDamageLI.toLocaleString()}M-${selectedRow.rapidaDamageLS.toLocaleString()}M) - {selectedRow.rapidaPctGDP}% del PIB estatal
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Riesgo de base (GEM)</div>
+                    <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT }}>${selectedRow.gemAnnualLoss.toLocaleString()} perdida anual promedio historica</div>
+                  </div>
+
+                  {(() => {
+                    const years = yearsRatioInfo(selectedRow);
+                    if (years == null) return null;
+                    const extreme = years > 100;
+                    return (
+                      <div style={{ background: "#fffbeb", border: "1px solid #fde68a", padding: 8 }}>
+                        <div style={{ fontSize: 10, fontFamily: font, color: "#92400e", textTransform: "uppercase" }}>Equivalencia (RAPIDA / GEM)</div>
+                        <div style={{ fontSize: 13, fontFamily: fontSans, color: "#92400e", fontWeight: 700 }}>
+                          ~{years < 1 ? years.toFixed(2) : Math.round(years).toLocaleString()} anos de perdida anual promedio en un solo evento
+                        </div>
+                        {extreme && (
+                          <div style={{ fontSize: 10, fontFamily: font, color: "#92400e", marginTop: 4 }}>
+                            Ratio muy alto — refleja que la perdida anual promedio reparte el riesgo entre muchos escenarios posibles a lo largo del tiempo, mientras este sismo concentro el golpe en este estado. No es un error de calculo.
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {(() => {
+                    const div = divergenceInfo(selectedRow);
+                    return (
+                      <div>
+                        <div style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Evidencia en terreno vs. esperado por RAPIDA</div>
+                        <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT }}>
+                          {div.label}{div.ratio != null ? ` (${div.ratio.toFixed(1)}x)` : ""}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {selectedRow.name === "La Guaira" && (
+                    <div style={{ background: "#f0fdfa", border: "1px solid #99f6e4", padding: 8 }}>
+                      <div style={{ fontSize: 10, fontFamily: font, color: "#0f766e", textTransform: "uppercase" }}>Catia La Mar — Microsoft AI4G (detalle, no todo el estado)</div>
+                      <div style={{ fontSize: 12, fontFamily: fontSans, color: "#0f766e", marginTop: 2 }}>
+                        {CATIA_LA_MAR_SUMMARY.total.toLocaleString()} edificios analizados - {CATIA_LA_MAR_SUMMARY.conDano.toLocaleString()} con dano detectado - {CATIA_LA_MAR_SUMMARY.altaConfianza.toLocaleString()} de alta confianza (≥80%)
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.5 }}>
+                  Haz clic en un estado del mapa o una fila de la tabla para ver el detalle completo.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11, fontFamily: font }}>
+                <thead>
+                  <tr style={{ borderBottom: `2px solid ${BORDER}` }}>
+                    {[
+                      ["name", "Estado"],
+                      ["vivo", "Severidad en vivo"],
+                      ["expuestos", "Edificios expuestos"],
+                      ["economico", "Dano economico (USD M)"],
+                      ["base", "Riesgo de base (USD)"],
+                    ].map(([key, label]) => (
+                      <th
+                        key={key}
+                        onClick={() => toggleSort(key)}
+                        style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600, cursor: "pointer" }}
+                      >
+                        {label}{sortKey === key ? (sortDir === "desc" ? " ▼" : " ▲") : ""}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedRows.map(r => (
+                    <tr
+                      key={r.name}
+                      onClick={() => setSelectedStateName(r.name)}
+                      style={{ borderBottom: `1px solid ${BORDER}30`, cursor: "pointer", background: selectedStateName === r.name ? `${ACCENT}08` : "transparent" }}
+                    >
+                      <td style={{ padding: "6px 8px", color: TEXT, fontWeight: 600 }}>{r.name}</td>
+                      <td style={{ padding: "6px 8px", color: TEXT }}>{r.reports} rep. / {r.buildingsSevere} edif.</td>
+                      <td style={{ padding: "6px 8px", color: TEXT }}>{r.rapidaBuildingsExposed.toLocaleString()}</td>
+                      <td style={{ padding: "6px 8px", color: TEXT }}>${r.rapidaDamage.toLocaleString()}M</td>
+                      <td style={{ padding: "6px 8px", color: TEXT }}>${r.gemAnnualLoss.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
+            Fuentes: GEM Foundation (riesgo de base, estatico) - RAPIDA/Buro de Crisis PNUD via geosmart.undp.org (estimaciones de este sismo, estatico, snapshot 26 jun 2026) - datos en vivo: sismovenezuela.org y evaluacion tecnica oficial
+          </div>
+        </>
+      )}
     </div>
   );
 }
