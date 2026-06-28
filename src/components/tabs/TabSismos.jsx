@@ -1355,7 +1355,7 @@ function SeverityByZone({ buildings, reports, mob }) {
   const [aois, setAois] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [gemExpanded, setGemExpanded] = useState(false);
+  const [gemExpanded, setGemExpanded] = useState(true);
   const gemMapRef = useRef(null);
   const gemMapInstance = useRef(null);
 
@@ -1655,10 +1655,15 @@ function LandslideRisk({ buildings, mob }) {
         setIdentifyLoading(true);
         setIdentifyResult(null);
         try {
-          const geometry = JSON.stringify({ x: e.latlng.lng, y: e.latlng.lat, spatialReference: { wkid: 4326 } });
-          const params = new URLSearchParams({ geometry, geometryType: "esriGeometryPoint", returnGeometry: "false", f: "json" });
-          const res = await fetchTimeout(`${LHASA_BASE}/identify?${params.toString()}`, 10000);
+          const params = new URLSearchParams({
+            source: "lhasa-identify",
+            lat: String(e.latlng.lat),
+            lng: String(e.latlng.lng),
+          });
+          const res = await fetchTimeout(`/api/gdelt?${params.toString()}`, 12000);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const json = await res.json();
+          if (json.error) throw new Error(json.error);
           const raw = json?.value;
           const val = raw != null && raw !== "NoData" ? parseInt(raw, 10) : null;
           setIdentifyResult({
@@ -1667,8 +1672,14 @@ function LandslideRisk({ buildings, mob }) {
             label: val === 2 ? "Alto" : val === 1 ? "Moderado" : val === 0 ? "Sin senal" : "Sin dato",
             value: val,
           });
-        } catch {
-          setIdentifyResult({ lat: e.latlng.lat, lng: e.latlng.lng, label: "No se pudo consultar", value: null });
+        } catch (err) {
+          setIdentifyResult({
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+            label: "No se pudo consultar",
+            value: null,
+            errorDetail: err && err.message ? err.message : String(err),
+          });
         } finally {
           setIdentifyLoading(false);
         }
@@ -1780,6 +1791,11 @@ function LandslideRisk({ buildings, mob }) {
             <strong style={{ color: identifyResult.value === 2 ? "#dc2626" : identifyResult.value === 1 ? "#b45309" : MUTED }}>
               {identifyResult.label}
             </strong>
+            {identifyResult.errorDetail && (
+              <div style={{ fontSize: 11, fontFamily: font, color: "#dc2626", marginTop: 6, wordBreak: "break-word" }}>
+                Detalle: {identifyResult.errorDetail}
+              </div>
+            )}
           </div>
         )}
         {!identifyLoading && !identifyResult && (
