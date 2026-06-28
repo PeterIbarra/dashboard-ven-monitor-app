@@ -1355,6 +1355,33 @@ function SeverityByZone({ buildings, reports, mob }) {
   const [aois, setAois] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [gemExpanded, setGemExpanded] = useState(false);
+  const gemMapRef = useRef(null);
+  const gemMapInstance = useRef(null);
+
+  useEffect(() => {
+    if (!gemExpanded || gemMapInstance.current || !gemMapRef.current) return;
+    let cancelled = false;
+    loadCSS(LEAFLET_CSS);
+    loadScript(LEAFLET_JS).then(() => {
+      if (cancelled || !gemMapRef.current || !window.L || gemMapInstance.current) return;
+      const L = window.L;
+      const map = L.map(gemMapRef.current, {
+        center: [10.4, -67.0],
+        zoom: mob ? 6 : 7,
+        minZoom: 4,
+        maxZoom: 11,
+        zoomControl: true,
+        attributionControl: false,
+      });
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 19 }).addTo(map);
+      const bounds = [[-2, -76], [14, -56]];
+      L.imageOverlay("/data/gem-pga-venezuela.png", bounds, { opacity: 0.75, interactive: false }).addTo(map);
+      gemMapInstance.current = map;
+      setTimeout(() => map.invalidateSize(), 150);
+    });
+    return () => { cancelled = true; };
+  }, [gemExpanded, mob]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1497,8 +1524,271 @@ function SeverityByZone({ buildings, reports, mob }) {
         </div>
       )}
 
+      <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
+        <div
+          onClick={() => setGemExpanded(e => !e)}
+          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}
+        >
+          <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            Contexto: perfil de riesgo sismico de base — Venezuela (GEM Foundation)
+          </div>
+          <span style={{ fontSize: 11, fontFamily: font, color: ACCENT }}>{gemExpanded ? "Ocultar ▲" : "Ver perfil ▼"}</span>
+        </div>
+        <div style={{ fontSize: 11, fontFamily: fontSans, color: MUTED, marginTop: 6, lineHeight: 1.5 }}>
+          Amenaza, exposicion y perdida anual promedio estimada por estado — modelo de base (no relacionado a este sismo especifico), simulando 100.000 anos de actividad sismica. Incluye el terremoto de 1812 en La Guaira (M7.7, ~26.000 fallecidos), el peor antecedente historico de la region.
+        </div>
+        {gemExpanded && (
+          <div style={{ marginTop: 10 }}>
+            <div style={{ fontSize: 10, fontFamily: font, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>
+              Mapa interactivo — aceleracion maxima del suelo (PGA, 475 anos, roca de referencia)
+            </div>
+            <div ref={gemMapRef} style={{ width: "100%", height: mob ? 280 : 360, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
+            <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
+              {[
+                ["<0.05g", "#8fb3ff"],
+                ["0.05-0.13g", "#abcf63"],
+                ["0.13-0.35g", "#fffa14"],
+                ["0.35-0.90g", "#ffa30a"],
+                ["0.90g+", "#ff4c00"],
+              ].map(([label, color]) => (
+                <div key={label} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+                  <span style={{ width: 10, height: 10, background: color, display: "inline-block", border: "1px solid #d1d5db" }} />
+                  {label}
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}90`, marginTop: 6 }}>
+              Capa estatica (GEM v2023.1, resolucion ~5.5km) — no se actualiza. Fuente: GEM Foundation, Global Seismic Hazard Map — licencia CC BY-NC-SA 4.0.
+            </div>
+
+            <div style={{ fontSize: 10, fontFamily: font, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 16, marginBottom: 6 }}>
+              Perfil de riesgo de Venezuela (vista rapida)
+            </div>
+            <a href="/data/gem-venezuela-risk-profile.png" target="_blank" rel="noreferrer">
+              <img
+                src="/data/gem-venezuela-risk-profile.png"
+                alt="Perfil de riesgo sismico de Venezuela - GEM Foundation"
+                style={{ width: "100%", border: `1px solid ${BORDER}`, display: "block" }}
+              />
+            </a>
+            <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}90`, marginTop: 6 }}>
+              Clic en la imagen para verla a tamano completo. Fuente: GEM Foundation, Global Seismic Risk Model (v2026.0.0) — licencia CC BY-NC-SA 4.0. No debe usarse para diseno de estructuras sismorresistentes ni decisiones criticas individuales.
+            </div>
+          </div>
+        )}
+      </div>
+
       <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
         Score relativo entre zonas, no una medida absoluta de gravedad humana — uso orientativo para priorizar revision, no para decisiones automatizadas.
+      </div>
+    </div>
+  );
+}
+
+const LHASA_BASE = "https://maps.disasters.nasa.gov/ags03/rest/services/NRT/landslide_nowcast/ImageServer";
+
+function buildLhasaImageUrl(bounds, width, height) {
+  const params = new URLSearchParams({
+    bbox: `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`,
+    bboxSR: "4326",
+    imageSR: "4326",
+    size: `${Math.max(1, Math.round(width))},${Math.max(1, Math.round(height))}`,
+    format: "png32",
+    transparent: "true",
+    renderingRule: JSON.stringify({ rasterFunction: "Landslide_Nowcast_Index" }),
+    f: "image",
+  });
+  return `${LHASA_BASE}/exportImage?${params.toString()}`;
+}
+
+function LandslideRisk({ buildings, mob }) {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const lhasaLayerRef = useRef(null);
+  const buildingsLayerRef = useRef(null);
+  const msai4gLayerRef = useRef(null);
+  const [mapReady, setMapReady] = useState(false);
+
+  const [showBuildings, setShowBuildings] = useState(true);
+  const [showMsai4g, setShowMsai4g] = useState(true);
+  const [msai4gPoints, setMsai4gPoints] = useState([]);
+  const [identifyResult, setIdentifyResult] = useState(null);
+  const [identifyLoading, setIdentifyLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchTimeout("/data/catia-la-mar-damage.json", 15000)
+      .then(res => (res.ok ? res.json() : { points: [] }))
+      .then(json => { if (!cancelled) setMsai4gPoints(Array.isArray(json.points) ? json.points : []); })
+      .catch(() => { if (!cancelled) setMsai4gPoints([]); });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadCSS(LEAFLET_CSS);
+    loadScript(LEAFLET_JS).then(() => {
+      if (cancelled || !mapRef.current || !window.L || mapInstance.current) return;
+      const L = window.L;
+      const map = L.map(mapRef.current, {
+        center: [10.4, -67.0],
+        zoom: mob ? 7 : 8,
+        minZoom: 5,
+        maxZoom: 16,
+        zoomControl: true,
+        attributionControl: false,
+      });
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 19 }).addTo(map);
+
+      function refreshLhasa() {
+        const bounds = map.getBounds();
+        const size = map.getSize();
+        const url = buildLhasaImageUrl(bounds, size.x, size.y);
+        if (lhasaLayerRef.current) map.removeLayer(lhasaLayerRef.current);
+        const overlay = L.imageOverlay(url, bounds, { opacity: 0.7, interactive: false, zIndex: 5 });
+        overlay.addTo(map);
+        lhasaLayerRef.current = overlay;
+      }
+
+      map.on("moveend", refreshLhasa);
+      map.on("click", async e => {
+        setIdentifyLoading(true);
+        setIdentifyResult(null);
+        try {
+          const geometry = JSON.stringify({ x: e.latlng.lng, y: e.latlng.lat, spatialReference: { wkid: 4326 } });
+          const params = new URLSearchParams({ geometry, geometryType: "esriGeometryPoint", returnGeometry: "false", f: "json" });
+          const res = await fetchTimeout(`${LHASA_BASE}/identify?${params.toString()}`, 10000);
+          const json = await res.json();
+          const raw = json?.value;
+          const val = raw != null && raw !== "NoData" ? parseInt(raw, 10) : null;
+          setIdentifyResult({
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+            label: val === 2 ? "Alto" : val === 1 ? "Moderado" : val === 0 ? "Sin senal" : "Sin dato",
+            value: val,
+          });
+        } catch {
+          setIdentifyResult({ lat: e.latlng.lat, lng: e.latlng.lng, label: "No se pudo consultar", value: null });
+        } finally {
+          setIdentifyLoading(false);
+        }
+      });
+
+      mapInstance.current = map;
+      setMapReady(true);
+      setTimeout(() => { map.invalidateSize(); refreshLhasa(); }, 150);
+    });
+    return () => {
+      cancelled = true;
+      setMapReady(false);
+      if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
+    };
+  }, [mob]);
+
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current || !window.L) return;
+    const L = window.L;
+    const map = mapInstance.current;
+    if (buildingsLayerRef.current) { map.removeLayer(buildingsLayerRef.current); buildingsLayerRef.current = null; }
+    if (!showBuildings) return;
+    const group = L.layerGroup();
+    buildings.forEach(b => {
+      const p = getLatLng(b);
+      if (!p) return;
+      const d = normalizeDamage(b.damage_level);
+      group.addLayer(L.circleMarker([p.lat, p.lng], {
+        radius: 4,
+        stroke: false,
+        fillColor: DAMAGE[d]?.color || "#9ca3af",
+        fillOpacity: 0.85,
+      }).bindPopup(`<div style="font-family:monospace;font-size:11px">Edificio - dano ${DAMAGE[d]?.label || "sin clasificar"}</div>`));
+    });
+    group.addTo(map);
+    buildingsLayerRef.current = group;
+  }, [buildings, showBuildings, mapReady]);
+
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current || !window.L) return;
+    const L = window.L;
+    const map = mapInstance.current;
+    if (msai4gLayerRef.current) { map.removeLayer(msai4gLayerRef.current); msai4gLayerRef.current = null; }
+    if (!showMsai4g) return;
+    const group = L.layerGroup();
+    msai4gPoints.forEach(([lat, lng, d10, unknown]) => {
+      if (!(d10 > 0 || unknown === 1)) return;
+      group.addLayer(L.circleMarker([lat, lng], {
+        radius: 2.2,
+        stroke: false,
+        fillColor: msai4gColor(d10, unknown),
+        fillOpacity: 0.85,
+      }));
+    });
+    group.addTo(map);
+    msai4gLayerRef.current = group;
+  }, [msai4gPoints, showMsai4g, mapReady]);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ fontSize: 11, fontFamily: font, color: "#92400e", lineHeight: 1.6, background: "#fffbeb", border: "1px solid #fde68a", padding: 10 }}>
+        <strong>Esto mide probabilidad de que la lluvia reciente active un deslizamiento, no confirma que uno haya ocurrido.</strong> Modelo NASA LHASA: combina lluvia satelital (GPM/IMERG, ultimos 7 dias) con susceptibilidad estatica del terreno (pendiente, geologia, fallas, perdida de cobertura forestal). Resolucion ~1km — no resuelve fallas locales a menor escala. Capa global, actualizacion con latencia de ~3h por el proveedor.
+      </div>
+
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontFamily: font, color: MUTED, cursor: "pointer" }}>
+          <input type="checkbox" checked={showBuildings} onChange={e => setShowBuildings(e.target.checked)} />
+          Edificios con evaluacion tecnica oficial
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontFamily: font, color: MUTED, cursor: "pointer" }}>
+          <input type="checkbox" checked={showMsai4g} onChange={e => setShowMsai4g(e.target.checked)} />
+          Dano detectado - Microsoft AI4G (Catia La Mar)
+        </label>
+      </div>
+
+      <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
+        <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
+          Riesgo de deslizamiento (NASA LHASA) + dano registrado - clic en el mapa para consultar un punto
+        </div>
+        <div ref={mapRef} style={{ width: "100%", height: mob ? 360 : 520, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
+        <div style={{ display: "flex", gap: 14, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+            <span style={{ width: 10, height: 10, borderRadius: 2, background: "#facc15", display: "inline-block" }} />
+            Deslizamiento moderado
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+            <span style={{ width: 10, height: 10, borderRadius: 2, background: "#dc2626", display: "inline-block" }} />
+            Deslizamiento alto
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+            <span style={{ width: 10, height: 10, borderRadius: 10, background: DAMAGE.total.color, display: "inline-block" }} />
+            Edificio dano severo/total
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+            <span style={{ width: 10, height: 10, borderRadius: 10, background: "#7f1d1d", display: "inline-block" }} />
+            Catia La Mar - dano 80%+
+          </div>
+        </div>
+      </div>
+
+      <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 12 }}>
+        <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
+          Punto consultado
+        </div>
+        {identifyLoading && <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED }}>Consultando...</div>}
+        {!identifyLoading && identifyResult && (
+          <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT }}>
+            {formatCoord(identifyResult.lat)}, {formatCoord(identifyResult.lng)} — riesgo de deslizamiento:{" "}
+            <strong style={{ color: identifyResult.value === 2 ? "#dc2626" : identifyResult.value === 1 ? "#b45309" : MUTED }}>
+              {identifyResult.label}
+            </strong>
+          </div>
+        )}
+        {!identifyLoading && !identifyResult && (
+          <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED }}>Haz clic en cualquier punto del mapa.</div>
+        )}
+      </div>
+
+      <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
+        Fuente: NASA GPM/LHASA Landslide Nowcast (NRT) - edificios: sismovenezuela.org / evaluacion tecnica oficial - Catia La Mar: Microsoft AI for Good Lab via HDX
       </div>
     </div>
   );
@@ -2034,11 +2324,13 @@ export function TabSismos() {
             { id: "registro", label: "Registro de sismos (USGS+EMSC)" },
             { id: "satelital", label: "Dano satelital (Copernicus)" },
             { id: "severidad", label: "Severidad por zona" },
+            { id: "deslizamientos", label: "Riesgo de deslizamientos (NASA)" },
           ]}
         />
       </div>
 
       {subView === "registro" && <QuakeRegistry mob={mob} />}
+      {subView === "deslizamientos" && <LandslideRisk buildings={data.buildings} mob={mob} />}
       {subView === "satelital" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <ToggleGroup
