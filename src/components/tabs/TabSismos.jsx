@@ -2227,8 +2227,36 @@ function NationalSeverityMap({ buildings, reports, mob }) {
                     style={{ width: "100%", height: mob ? 400 : 560, minHeight: mob ? 400 : 560, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }}
                   />
                   {!layerReady && (
-                    <div style={{ position: "absolute", inset: 1, display: "grid", placeItems: "center", background: "rgba(238,241,245,.72)", color: MUTED, fontFamily: fontSans, fontSize: 12 }}>
-                      Dibujando mapa nacional...
+                    <div style={{ position: "absolute", inset: 1, background: "#eef1f5", borderRadius: 4 }}>
+                      <svg
+                        viewBox={`0 0 ${mapW} ${mapH}`}
+                        role="img"
+                        aria-label={`Mapa nacional: ${metricDef.label}`}
+                        style={{ width: "100%", height: "100%", display: "block" }}
+                      >
+                        <rect x="0" y="0" width={mapW} height={mapH} fill="#eef1f5" />
+                        {statesGeo.features.map(feature => {
+                          const name = feature.properties.name;
+                          const row = rows.find(r => r.name === name);
+                          const value = row ? valueForMetric(row, metric) : 0;
+                          const selected = selectedStateName === name;
+                          return (
+                            <path
+                              key={name}
+                              d={geometryToSvgPath(feature.geometry, mapBounds, mapW, mapH)}
+                              fill={stepColor(value, maxValues[metric], metricDef.colorSteps)}
+                              fillOpacity={0.9}
+                              stroke={selected ? "#111827" : "#ffffff"}
+                              strokeWidth={selected ? 2.2 : 0.8}
+                              vectorEffect="non-scaling-stroke"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => setSelectedStateName(name)}
+                            >
+                              <title>{`${name}: ${value.toLocaleString()}`}</title>
+                            </path>
+                          );
+                        })}
+                      </svg>
                     </div>
                   )}
                 </div>
