@@ -6,6 +6,27 @@ import { loadCSS, loadScript } from "../../utils";
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
 
+function ensureLeafletBaseStyles() {
+  if (typeof document === "undefined" || document.getElementById("leaflet-base-inline")) return;
+  const style = document.createElement("style");
+  style.id = "leaflet-base-inline";
+  style.textContent = `
+    .leaflet-container{overflow:hidden;position:relative;outline:0}
+    .leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}
+    .leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}
+    .leaflet-map-pane,.leaflet-tile-pane,.leaflet-overlay-pane,.leaflet-shadow-pane,.leaflet-marker-pane,.leaflet-tooltip-pane,.leaflet-popup-pane{position:absolute;left:0;top:0}
+    .leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}
+    .leaflet-control-container .leaflet-top,.leaflet-control-container .leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}
+    .leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}
+    .leaflet-control{position:relative;z-index:1000;pointer-events:auto;float:left;clear:both}
+    .leaflet-control-zoom a{display:block;width:26px;height:26px;line-height:26px;text-align:center;text-decoration:none;background:#fff;color:#111827;border-bottom:1px solid #d1d5db}
+    .leaflet-control-zoom{box-shadow:0 1px 4px rgba(0,0,0,.2);border-radius:4px;overflow:hidden;margin:10px}
+    .leaflet-interactive{cursor:pointer}
+    .leaflet-tooltip{position:absolute;padding:4px 7px;background:#fff;border:1px solid #d1d5db;color:#111827;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.15);font-size:11px}
+  `;
+  document.head.appendChild(style);
+}
+
 const SEVERITY = {
   low: { label: "Leve", color: "#f59e0b", weight: 0.4 },
   medium: { label: "Media", color: "#f97316", weight: 0.7 },
@@ -151,8 +172,8 @@ const CDI_DAMAGE_COLORS = {
 
 const CDI_DAMAGE_LABELS = {
   destroyed: "Destruido",
-  damagedConfirmed: "Dano confirmado",
-  possibleDamage: "Posible dano",
+  damagedConfirmed: "Daño confirmado",
+  possibleDamage: "Posible daño",
   unclassified: "Sin clasificar",
 };
 
@@ -173,7 +194,7 @@ function classifyCdiFeature(props) {
 // Microsoft AI for Good (Catia La Mar) uses a continuous damage_pct, not discrete categories —
 // color scale matches the legend published with the dataset's own reference figure.
 const MSAI4G_BUCKETS = [
-  { id: "none", label: "0% (sin dano)", color: "#fef3c7" },
+  { id: "none", label: "0% (sin daño)", color: "#fef3c7" },
   { id: "b1", label: "0-20%", color: "#fde68a" },
   { id: "b2", label: "20-40%", color: "#fbbf24" },
   { id: "b3", label: "40-60%", color: "#f97316" },
@@ -433,7 +454,7 @@ function SismoMap({ reports, acopios, buildings, buildingDamageSocial = [], sele
         });
         marker.bindPopup(
           `<div style="font-family:monospace;font-size:11px;max-width:280px;line-height:1.45">` +
-          `<strong>${item.place || "Dano reportado (redes)"}</strong><br/>` +
+          `<strong>${item.place || "Daño reportado (redes)"}</strong><br/>` +
           `<span style="color:#ea580c;font-weight:700">${item.damage_type || "Corroboracion social"} - ${item.confirmations || 0} confirmaciones</span><br/>` +
           `${formatDate(item.reported_at)}<br/>` +
           (item.needs ? `<div style="margin-top:5px;color:#4b5563">${String(item.needs).slice(0, 180)}</div>` : "") +
@@ -816,7 +837,7 @@ function QuakeRegistry({ mob }) {
             </div>
           ) : (
             <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.5 }}>
-              {loading ? "Cargando catalogo sismico..." : "Haz clic en un punto del mapa o una fila de la tabla para ver el detalle."}
+              {loading ? "Cargando catálogo sísmico..." : "Haz clic en un punto del mapa o una fila de la tabla para ver el detalle."}
             </div>
           )}
         </div>
@@ -867,7 +888,7 @@ function QuakeRegistry({ mob }) {
         </div>
         {sorted.length > 300 && (
           <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}90`, marginTop: 8 }}>
-            Mostrando los 300 mas recientes de {sorted.length} registros.
+            Mostrando los 300 más recientes de {sorted.length} registros.
           </div>
         )}
       </div>
@@ -1030,14 +1051,14 @@ function CopernicusDamage({ mob }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <div style={{ fontSize: 11, fontFamily: font, color: MUTED, lineHeight: 1.6, background: BG2, border: `1px solid ${BORDER}`, padding: 10 }}>
-        Datos de <strong>Crisis Damage Intelligence</strong>, construidos sobre la activacion oficial <strong>Copernicus EMSR884</strong> (servicio europeo de mapeo de emergencias) con revision adicional por IA (VLM). Cobertura por zonas (AOI), no nacional completa.
+        Datos de <strong>Crisis Damage Intelligence</strong>, construidos sobre la activación oficial <strong>Copernicus EMSR884</strong> (servicio europeo de mapeo de emergencias) con revisión adicional por IA (VLM). Cobertura por zonas (AOI), no nacional completa.
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10 }}>
         <Kpi label="Zonas con datos" value={loading ? "..." : data.aois.length} />
         <Kpi label="Estructuras evaluadas" value={loading ? "..." : totalFeatures} />
         <Kpi label="Destruidas (total)" value={loading ? "..." : totalDestroyed} tone={CDI_DAMAGE_COLORS.destroyed} />
-        <Kpi label="Dano confirmado (total)" value={loading ? "..." : totalConfirmed} tone={CDI_DAMAGE_COLORS.damagedConfirmed} />
+        <Kpi label="Daño confirmado (total)" value={loading ? "..." : totalConfirmed} tone={CDI_DAMAGE_COLORS.damagedConfirmed} />
       </div>
 
       {error && !loading && (
@@ -1101,12 +1122,12 @@ function CopernicusDamage({ mob }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <div style={{ fontSize: 12, fontFamily: fontSans, color: TEXT }}>Estructuras evaluadas: <strong>{damageCounts.features ?? 0}</strong></div>
               <div style={{ fontSize: 12, fontFamily: fontSans, color: CDI_DAMAGE_COLORS.destroyed }}>Destruidas: <strong>{damageCounts.destroyed ?? 0}</strong></div>
-              <div style={{ fontSize: 12, fontFamily: fontSans, color: CDI_DAMAGE_COLORS.damagedConfirmed }}>Dano confirmado: <strong>{damageCounts.damagedConfirmed ?? 0}</strong></div>
-              <div style={{ fontSize: 12, fontFamily: fontSans, color: CDI_DAMAGE_COLORS.possibleDamage }}>Posible dano: <strong>{damageCounts.possibleDamage ?? 0}</strong></div>
+              <div style={{ fontSize: 12, fontFamily: fontSans, color: CDI_DAMAGE_COLORS.damagedConfirmed }}>Daño confirmado: <strong>{damageCounts.damagedConfirmed ?? 0}</strong></div>
+              <div style={{ fontSize: 12, fontFamily: fontSans, color: CDI_DAMAGE_COLORS.possibleDamage }}>Posible daño: <strong>{damageCounts.possibleDamage ?? 0}</strong></div>
               <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 4 }}>Revisadas por IA (VLM): {damageCounts.vlmReviewed ?? 0}</div>
               {selectedAoi?.status === "imagery-only" && (
                 <div style={{ fontSize: 10, fontFamily: font, color: "#b45309", marginTop: 4 }}>
-                  Solo imagen disponible - Copernicus aun no publico vector oficial de dano para esta zona.
+                  Solo imagen disponible - Copernicus aún no publicó vector oficial de daño para esta zona.
                 </div>
               )}
             </div>
@@ -1126,8 +1147,8 @@ function CopernicusDamage({ mob }) {
                 <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Estado</th>
                 <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Estructuras</th>
                 <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Destruidas</th>
-                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Dano confirmado</th>
-                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Posible dano</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Daño confirmado</th>
+                <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Posible daño</th>
               </tr>
             </thead>
             <tbody>
@@ -1197,7 +1218,7 @@ function MicrosoftAI4GDamage({ mob }) {
           // area outline is decorative only — safe to skip if unavailable
         }
       } catch (e) {
-        if (!cancelled) setError(e.message || "No se pudo cargar el dataset estatico.");
+        if (!cancelled) setError(e.message || "No se pudo cargar el dataset estático.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -1249,7 +1270,7 @@ function MicrosoftAI4GDamage({ mob }) {
         fillOpacity: 0.85,
       });
       marker.bindPopup(
-        `<div style="font-family:monospace;font-size:11px">${unknown ? "Sin dato (cubierto por nubes)" : `Dano estimado: ${Math.round(d10 * 100)}%`}</div>`
+        `<div style="font-family:monospace;font-size:11px">${unknown ? "Sin dato (cubierto por nubes)" : `Daño estimado: ${Math.round(d10 * 100)}%`}</div>`
       );
       group.addLayer(marker);
     });
@@ -1282,13 +1303,13 @@ function MicrosoftAI4GDamage({ mob }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <div style={{ fontSize: 11, fontFamily: font, color: MUTED, lineHeight: 1.6, background: BG2, border: `1px solid ${BORDER}`, padding: 10 }}>
         Modelo de IA (<strong>Microsoft AI for Good Lab</strong>) sobre imagen satelital del 25 jun 2026, cruzado con huellas de edificios de Overture Maps.{" "}
-        <strong>Snapshot estatico - no se actualiza.</strong> El propio proveedor advierte problemas de ortorectificacion en la imagen y recomienda usar el umbral de 80%+ como señal de alta confianza, en vez de "algun dano detectado" sin mas.
+        <strong>Snapshot estático - no se actualiza.</strong> El propio proveedor advierte problemas de ortorrectificación en la imagen y recomienda usar el umbral de 80%+ como señal de alta confianza, en vez de "algún daño detectado" sin más.
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10 }}>
         <Kpi label="Edificios analizados" value={loading ? "..." : total} />
-        <Kpi label="Con algun dano" value={loading ? "..." : anyDamage} tone="#f97316" />
-        <Kpi label="Dano alta confianza (80%+)" value={loading ? "..." : highConfidence} tone="#7f1d1d" />
+        <Kpi label="Con algún daño" value={loading ? "..." : anyDamage} tone="#f97316" />
+        <Kpi label="Daño alta confianza (80%+)" value={loading ? "..." : highConfidence} tone="#7f1d1d" />
         <Kpi label="Cubiertos por nubes" value={loading ? "..." : cloudCovered} tone="#6b7280" />
       </div>
 
@@ -1300,12 +1321,12 @@ function MicrosoftAI4GDamage({ mob }) {
 
       <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontFamily: font, color: MUTED, cursor: "pointer" }}>
         <input type="checkbox" checked={showAll} onChange={e => setShowAll(e.target.checked)} />
-        Mostrar todos los edificios analizados (incluye sin dano detectado) - {total} en total
+        Mostrar todos los edificios analizados (incluye sin daño detectado) - {total} en total
       </label>
 
       <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
         <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
-          Catia La Mar - dano por edificio{loading ? " - cargando..." : ""}
+          Catia La Mar - daño por edificio{loading ? " - cargando..." : ""}
         </div>
         <div ref={mapRef} style={{ width: "100%", height: mob ? 360 : 520, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
         <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
@@ -1323,17 +1344,17 @@ function MicrosoftAI4GDamage({ mob }) {
       </div>
 
       <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
-        Fuente: Microsoft AI for Good Lab via HDX - "Venezuela Earthquakes: Building Damage Assessment in Catia La Mar" - CC BY - dato estatico (25 jun 2026), sin actualizacion
+        Fuente: Microsoft AI for Good Lab via HDX - "Venezuela Earthquakes: Building Damage Assessment in Catia La Mar" - CC BY - dato estático (25 jun 2026), sin actualización
       </div>
     </div>
   );
 }
 
 // ── Datos de referencia estáticos por estado ──────────────────────────────
-// GEM: perdida anual promedio historica (USD), leida de seismic_risk_profile_Venezuela.png
-// RAPIDA/PNUD (Buro de Crisis): edificios expuestos >=MMI VI y dano economico estimado de ESTE
-// sismo (jun 2026), leidos de la app oficial en geosmart.undp.org. Ninguna de las dos fuentes
-// tiene API publica — son snapshots estaticos transcritos, no se actualizan solos.
+// GEM: pérdida anual promedio histórica (USD), leída de seismic_risk_profile_Venezuela.png
+// RAPIDA/PNUD (Buró de Crisis): edificios expuestos >=MMI VI y daño económico estimado de ESTE
+// sismo (jun 2026), leídos de la app oficial en geosmart.undp.org. Ninguna de las dos fuentes
+// tiene API pública — son snapshots estáticos transcritos, no se actualizan solos.
 const STATE_REFERENCE_DATA = {
   "Distrito Capital":      { gemAnnualLoss: 3300000, rapidaDamage: 5390.5, rapidaDamageLI: 3773.4, rapidaDamageLS: 7007.7, rapidaPctGDP: 7, rapidaBuildingsExposed: 389860 },
   "Miranda":               { gemAnnualLoss: 6100000, rapidaDamage:  677.7, rapidaDamageLI:  474.4, rapidaDamageLS:  881.1, rapidaPctGDP: 5, rapidaBuildingsExposed: 372391 },
@@ -1377,7 +1398,7 @@ function stateReferenceForName(name) {
 }
 
 // Catia La Mar (Microsoft AI4G) solo cubre un sector de La Guaira, no el estado completo —
-// se muestra como detalle adicional unicamente en el panel de ese estado, no como columna nacional.
+// se muestra como detalle adicional únicamente en el panel de ese estado, no como columna nacional.
 const CATIA_LA_MAR_SUMMARY = { total: 30761, conDano: 9134, altaConfianza: 1989, estado: "La Guaira" };
 
 function rayCastInRing(x, y, ring) {
@@ -1411,7 +1432,7 @@ function findStateForPoint(lat, lng, statesGeo) {
 const METRIC_DEFS = {
   vivo: { label: "Severidad en vivo", colorSteps: ["#fee2e2", "#fca5a5", "#f87171", "#ef4444", "#b91c1c"] },
   expuestos: { label: "Edificios expuestos (RAPIDA)", colorSteps: ["#dbeafe", "#93c5fd", "#60a5fa", "#3b82f6", "#1d4ed8"] },
-  economico: { label: "Dano economico (RAPIDA)", colorSteps: ["#ffedd5", "#fdba74", "#fb923c", "#f97316", "#c2410c"] },
+  economico: { label: "Daño económico (RAPIDA)", colorSteps: ["#ffedd5", "#fdba74", "#fb923c", "#f97316", "#c2410c"] },
   base: { label: "Riesgo de base (GEM)", colorSteps: ["#ede9fe", "#c4b5fd", "#a78bfa", "#8b5cf6", "#6d28d9"] },
 };
 
@@ -1442,6 +1463,41 @@ function compositeSeverityScore(parts) {
   if (available.length === 0) return null;
   const totalWeight = available.reduce((s, p) => s + p.weight, 0);
   return available.reduce((s, p) => s + p.value * p.weight, 0) / totalWeight;
+}
+
+function collectGeometryBounds(geo) {
+  const bounds = { minLng: Infinity, minLat: Infinity, maxLng: -Infinity, maxLat: -Infinity };
+  const walk = value => {
+    if (!Array.isArray(value)) return;
+    if (Number.isFinite(value[0]) && Number.isFinite(value[1])) {
+      bounds.minLng = Math.min(bounds.minLng, value[0]);
+      bounds.maxLng = Math.max(bounds.maxLng, value[0]);
+      bounds.minLat = Math.min(bounds.minLat, value[1]);
+      bounds.maxLat = Math.max(bounds.maxLat, value[1]);
+      return;
+    }
+    value.forEach(walk);
+  };
+  geo?.features?.forEach(feature => walk(feature.geometry?.coordinates));
+  return Number.isFinite(bounds.minLng) ? bounds : null;
+}
+
+function geometryToSvgPath(geometry, bounds, width, height, pad = 18) {
+  if (!geometry || !bounds) return "";
+  const xScale = (width - pad * 2) / Math.max(0.0001, bounds.maxLng - bounds.minLng);
+  const yScale = (height - pad * 2) / Math.max(0.0001, bounds.maxLat - bounds.minLat);
+  const scale = Math.min(xScale, yScale);
+  const usedW = (bounds.maxLng - bounds.minLng) * scale;
+  const usedH = (bounds.maxLat - bounds.minLat) * scale;
+  const xOffset = (width - usedW) / 2;
+  const yOffset = (height - usedH) / 2;
+  const project = ([lng, lat]) => [xOffset + (lng - bounds.minLng) * scale, yOffset + (bounds.maxLat - lat) * scale];
+  const ringToPath = ring => ring.map((coord, i) => {
+    const [x, y] = project(coord);
+    return `${i === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`;
+  }).join(" ") + " Z";
+  const polygons = geometry.type === "MultiPolygon" ? geometry.coordinates : [geometry.coordinates];
+  return polygons.flatMap(poly => (poly || []).map(ringToPath)).join(" ");
 }
 
 function SeverityByZone({ buildings, reports, mob }) {
@@ -1562,8 +1618,8 @@ function SeverityByZone({ buildings, reports, mob }) {
       </div>
 
       <div style={{ fontSize: 11, fontFamily: font, color: MUTED, lineHeight: 1.6, background: BG2, border: `1px solid ${BORDER}`, padding: 10 }}>
-        Score compuesto por zona (solo las 6 zonas con vector oficial de Copernicus — datos vivos, comparables entre si). Combina <strong>daño satelital oficial</strong> (peso 50%), <strong>edificios con evaluacion tecnica</strong> (peso 30%) y <strong>volumen de reportes ciudadanos</strong> (peso 20%, normalizado contra la zona con mas reportes). Si a una zona le falta un insumo, su peso se redistribuye entre los insumos disponibles — no se penaliza por vacio de datos.
-        Catia La Mar (Microsoft AI4G) queda fuera de este ranking porque es un snapshot estatico del 25 jun, no comparable con zonas que se actualizan en vivo — esa fuente se mantiene en su propia sub-tab.
+        Score compuesto por zona (solo las 6 zonas con vector oficial de Copernicus — datos vivos, comparables entre sí). Combina <strong>daño satelital oficial</strong> (peso 50%), <strong>edificios con evaluación técnica</strong> (peso 30%) y <strong>volumen de reportes ciudadanos</strong> (peso 20%, normalizado contra la zona con más reportes). Si a una zona le falta un insumo, su peso se redistribuye entre los insumos disponibles — no se penaliza por vacío de datos.
+        Catia La Mar (Microsoft AI4G) queda fuera de este ranking porque es un snapshot estático del 25 jun, no comparable con zonas que se actualizan en vivo — esa fuente se mantiene en su propia sub-tab.
       </div>
 
       {loading && (
@@ -1587,8 +1643,8 @@ function SeverityByZone({ buildings, reports, mob }) {
                 <tr style={{ borderBottom: `2px solid ${BORDER}` }}>
                   <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Zona</th>
                   <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Score compuesto</th>
-                  <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Dano satelital oficial</th>
-                  <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Edificios eval. tecnica</th>
+                  <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Daño satelital oficial</th>
+                  <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Edificios eval. técnica</th>
                   <th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, fontWeight: 600 }}>Reportes ciudadanos</th>
                 </tr>
               </thead>
@@ -1630,17 +1686,17 @@ function SeverityByZone({ buildings, reports, mob }) {
           style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}
         >
           <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-            Contexto: perfil de riesgo sismico de base — Venezuela (GEM Foundation)
+            Contexto: perfil de riesgo sísmico de base — Venezuela (GEM Foundation)
           </div>
           <span style={{ fontSize: 11, fontFamily: font, color: ACCENT }}>{gemExpanded ? "Ocultar ▲" : "Ver perfil ▼"}</span>
         </div>
         <div style={{ fontSize: 11, fontFamily: fontSans, color: MUTED, marginTop: 6, lineHeight: 1.5 }}>
-          Amenaza, exposicion y perdida anual promedio estimada por estado — modelo de base (no relacionado a este sismo especifico), simulando 100.000 anos de actividad sismica. Incluye el terremoto de 1812 en La Guaira (M7.7, ~26.000 fallecidos), el peor antecedente historico de la region.
+          Amenaza, exposición y pérdida anual promedio estimada por estado — modelo de base (no relacionado a este sismo específico), simulando 100.000 años de actividad sísmica. Incluye el terremoto de 1812 en La Guaira (M7.7, ~26.000 fallecidos), el peor antecedente histórico de la región.
         </div>
         {gemExpanded && (
           <div style={{ marginTop: 10 }}>
             <div style={{ fontSize: 10, fontFamily: font, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>
-              Mapa interactivo — aceleracion maxima del suelo (PGA, 475 anos, roca de referencia)
+              Mapa interactivo — aceleración máxima del suelo (PGA, 475 años, roca de referencia)
             </div>
             <div ref={gemMapRef} style={{ width: "100%", height: mob ? 280 : 360, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
             <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
@@ -1658,7 +1714,7 @@ function SeverityByZone({ buildings, reports, mob }) {
               ))}
             </div>
             <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}90`, marginTop: 6 }}>
-              Capa estatica (GEM v2023.1, resolucion ~5.5km) — no se actualiza. Fuente: GEM Foundation, Global Seismic Hazard Map — licencia CC BY-NC-SA 4.0.
+              Capa estática (GEM v2023.1, resolución ~5.5km) — no se actualiza. Fuente: GEM Foundation, Global Seismic Hazard Map — licencia CC BY-NC-SA 4.0.
             </div>
 
             <div style={{ fontSize: 10, fontFamily: font, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 16, marginBottom: 6 }}>
@@ -1667,7 +1723,7 @@ function SeverityByZone({ buildings, reports, mob }) {
             <a href="/data/gem-venezuela-risk-profile.png" target="_blank" rel="noreferrer">
               <img
                 src="/data/gem-venezuela-risk-profile.png"
-                alt="Perfil de riesgo sismico de Venezuela - GEM Foundation"
+                alt="Perfil de riesgo sísmico de Venezuela - GEM Foundation"
                 style={{ width: "100%", border: `1px solid ${BORDER}`, display: "block" }}
               />
             </a>
@@ -1812,7 +1868,7 @@ function LandslideRisk({ buildings, mob }) {
         stroke: false,
         fillColor: DAMAGE[d]?.color || "#9ca3af",
         fillOpacity: 0.85,
-      }).bindPopup(`<div style="font-family:monospace;font-size:11px">Edificio - dano ${DAMAGE[d]?.label || "sin clasificar"}</div>`));
+      }).bindPopup(`<div style="font-family:monospace;font-size:11px">Edificio - daño ${DAMAGE[d]?.label || "sin clasificar"}</div>`));
     });
     group.addTo(map);
     buildingsLayerRef.current = group;
@@ -1841,23 +1897,23 @@ function LandslideRisk({ buildings, mob }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <div style={{ fontSize: 11, fontFamily: font, color: "#92400e", lineHeight: 1.6, background: "#fffbeb", border: "1px solid #fde68a", padding: 10 }}>
-        <strong>Esto mide probabilidad de que la lluvia reciente active un deslizamiento, no confirma que uno haya ocurrido.</strong> Modelo NASA LHASA: combina lluvia satelital (GPM/IMERG, ultimos 7 dias) con susceptibilidad estatica del terreno (pendiente, geologia, fallas, perdida de cobertura forestal). Resolucion ~1km — no resuelve fallas locales a menor escala. Capa global, actualizacion con latencia de ~3h por el proveedor.
+        <strong>Esto mide probabilidad de que la lluvia reciente active un deslizamiento, no confirma que uno haya ocurrido.</strong> Modelo NASA LHASA: combina lluvia satelital (GPM/IMERG, últimos 7 días) con susceptibilidad estática del terreno (pendiente, geología, fallas, pérdida de cobertura forestal). Resolución ~1km — no resuelve fallas locales a menor escala. Capa global, actualización con latencia de ~3h por el proveedor.
       </div>
 
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
         <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontFamily: font, color: MUTED, cursor: "pointer" }}>
           <input type="checkbox" checked={showBuildings} onChange={e => setShowBuildings(e.target.checked)} />
-          Edificios con evaluacion tecnica oficial
+          Edificios con evaluación técnica oficial
         </label>
         <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontFamily: font, color: MUTED, cursor: "pointer" }}>
           <input type="checkbox" checked={showMsai4g} onChange={e => setShowMsai4g(e.target.checked)} />
-          Dano detectado - Microsoft AI4G (Catia La Mar)
+          Daño detectado - Microsoft AI4G (Catia La Mar)
         </label>
       </div>
 
       <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
         <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
-          Riesgo de deslizamiento (NASA LHASA) + dano registrado - clic en el mapa para consultar un punto
+          Riesgo de deslizamiento (NASA LHASA) + daño registrado - clic en el mapa para consultar un punto
         </div>
         <div ref={mapRef} style={{ width: "100%", height: mob ? 360 : 520, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
         <div style={{ display: "flex", gap: 14, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
@@ -1871,11 +1927,11 @@ function LandslideRisk({ buildings, mob }) {
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
             <span style={{ width: 10, height: 10, borderRadius: 10, background: DAMAGE.total.color, display: "inline-block" }} />
-            Edificio dano severo/total
+            Edificio daño severo/total
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
             <span style={{ width: 10, height: 10, borderRadius: 10, background: "#7f1d1d", display: "inline-block" }} />
-            Catia La Mar - dano 80%+
+            Catia La Mar - daño 80%+
           </div>
         </div>
       </div>
@@ -1904,7 +1960,7 @@ function LandslideRisk({ buildings, mob }) {
       </div>
 
       <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
-        Fuente: NASA GPM/LHASA Landslide Nowcast (NRT) - edificios: sismovenezuela.org / evaluacion tecnica oficial - Catia La Mar: Microsoft AI for Good Lab via HDX
+        Fuente: NASA GPM/LHASA Landslide Nowcast (NRT) - edificios: sismovenezuela.org / evaluación técnica oficial - Catia La Mar: Microsoft AI for Good Lab via HDX
       </div>
     </div>
   );
@@ -1915,6 +1971,8 @@ function NationalSeverityMap({ buildings, reports, mob }) {
   const mapInstance = useRef(null);
   const statesLayerRef = useRef(null);
   const [mapReady, setMapReady] = useState(false);
+  const [layerReady, setLayerReady] = useState(false);
+  const [mapError, setMapError] = useState(false);
 
   const [statesGeo, setStatesGeo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -2002,6 +2060,9 @@ function NationalSeverityMap({ buildings, reports, mob }) {
   useEffect(() => {
     let cancelled = false;
     setMapReady(false);
+    setLayerReady(false);
+    setMapError(false);
+    ensureLeafletBaseStyles();
     loadCSS(LEAFLET_CSS);
     loadScript(LEAFLET_JS).then(() => {
       if (cancelled || !mapRef.current || !window.L || mapInstance.current) return;
@@ -2020,13 +2081,16 @@ function NationalSeverityMap({ buildings, reports, mob }) {
       }).addTo(map);
       mapInstance.current = map;
       setMapReady(true);
-      setTimeout(() => map.invalidateSize(), 120);
+      [120, 450, 900].forEach(ms => setTimeout(() => {
+        if (!cancelled) map.invalidateSize();
+      }, ms));
     }).catch(() => {
-      if (!cancelled) setError("No se pudo cargar Leaflet para el mapa nacional.");
+      if (!cancelled) setMapError(true);
     });
     return () => {
       cancelled = true;
       setMapReady(false);
+      setLayerReady(false);
       if (statesLayerRef.current) { statesLayerRef.current.remove(); statesLayerRef.current = null; }
       if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
     };
@@ -2034,6 +2098,7 @@ function NationalSeverityMap({ buildings, reports, mob }) {
 
   useEffect(() => {
     if (!mapReady || !mapInstance.current || !window.L || !statesGeo) return;
+    setLayerReady(false);
     const L = window.L;
     const map = mapInstance.current;
     if (statesLayerRef.current) { map.removeLayer(statesLayerRef.current); statesLayerRef.current = null; }
@@ -2061,15 +2126,23 @@ function NationalSeverityMap({ buildings, reports, mob }) {
     layer.addTo(map);
     statesLayerRef.current = layer;
     try {
+      map.invalidateSize();
       const b = layer.getBounds();
       if (b.isValid() && !selectedStateName) map.fitBounds(b, { padding: [12, 12] });
     } catch {
       // ignore — keeps default center/zoom if bounds computation fails
     }
+    setTimeout(() => {
+      map.invalidateSize();
+      setLayerReady(true);
+    }, 80);
   }, [statesGeo, metric, rows, maxValues, selectedStateName, mapReady]);
 
   const selectedRow = rows.find(r => r.name === selectedStateName) || null;
   const metricDef = METRIC_DEFS[metric];
+  const mapBounds = useMemo(() => collectGeometryBounds(statesGeo), [statesGeo]);
+  const mapW = 900;
+  const mapH = mob ? 420 : 560;
 
   function divergenceInfo(row) {
     const liveNorm = row.vivoValue / maxValues.vivo;
@@ -2094,7 +2167,7 @@ function NationalSeverityMap({ buildings, reports, mob }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <div style={{ fontSize: 11, fontFamily: font, color: MUTED, lineHeight: 1.6, background: BG2, border: `1px solid ${BORDER}`, padding: 10 }}>
-        Cuatro fuentes, cada una midiendo algo distinto — <strong>no se fusionan en un solo score</strong> porque responden preguntas diferentes: <strong>Severidad en vivo</strong> es evidencia directa nuestra (reportes + edificios con dano confirmado, se actualiza solo); <strong>Edificios expuestos</strong> y <strong>Dano economico</strong> son del Buro de Crisis de PNUD (RAPIDA), estimaciones especificas de este sismo (modelo de exposicion sismica y modelo economico CLIMADA, respectivamente) — snapshot del 26 jun, no se actualiza; <strong>Riesgo de base</strong> es GEM, probabilidad de largo plazo (100.000 anos simulados), no relacionada a este evento especifico.
+        Cuatro fuentes, cada una midiendo algo distinto — <strong>no se fusionan en un solo score</strong> porque responden preguntas diferentes: <strong>Severidad en vivo</strong> es evidencia directa nuestra (reportes + edificios con daño confirmado, se actualiza solo); <strong>Edificios expuestos</strong> y <strong>Daño económico</strong> son del Buró de Crisis de PNUD (RAPIDA), estimaciones específicas de este sismo (modelo de exposición sísmica y modelo económico CLIMADA, respectivamente) — snapshot del 26 jun, no se actualiza; <strong>Riesgo de base</strong> es GEM, probabilidad de largo plazo (100.000 años simulados), no relacionada a este evento específico.
       </div>
 
       {loading && (
@@ -2116,11 +2189,50 @@ function NationalSeverityMap({ buildings, reports, mob }) {
 
           <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 340px", gap: 12 }}>
             <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
-              <div
-                ref={mapRef}
-                aria-label={`Mapa nacional: ${metricDef.label}`}
-                style={{ width: "100%", height: mob ? 400 : 560, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }}
-              />
+              {mapError ? (
+                <svg
+                  viewBox={`0 0 ${mapW} ${mapH}`}
+                  role="img"
+                  aria-label={`Mapa nacional: ${metricDef.label}`}
+                  style={{ width: "100%", height: mob ? 400 : 560, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4, display: "block" }}
+                >
+                  <rect x="0" y="0" width={mapW} height={mapH} fill="#eef1f5" />
+                  {statesGeo.features.map(feature => {
+                    const name = feature.properties.name;
+                    const row = rows.find(r => r.name === name);
+                    const value = row ? valueForMetric(row, metric) : 0;
+                    const selected = selectedStateName === name;
+                    return (
+                      <path
+                        key={name}
+                        d={geometryToSvgPath(feature.geometry, mapBounds, mapW, mapH)}
+                        fill={stepColor(value, maxValues[metric], metricDef.colorSteps)}
+                        fillOpacity={0.9}
+                        stroke={selected ? "#111827" : "#ffffff"}
+                        strokeWidth={selected ? 2.2 : 0.8}
+                        vectorEffect="non-scaling-stroke"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setSelectedStateName(name)}
+                      >
+                        <title>{`${name}: ${value.toLocaleString()}`}</title>
+                      </path>
+                    );
+                  })}
+                </svg>
+              ) : (
+                <div style={{ position: "relative" }}>
+                  <div
+                    ref={mapRef}
+                    aria-label={`Mapa nacional: ${metricDef.label}`}
+                    style={{ width: "100%", height: mob ? 400 : 560, minHeight: mob ? 400 : 560, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }}
+                  />
+                  {!layerReady && (
+                    <div style={{ position: "absolute", inset: 1, display: "grid", placeItems: "center", background: "rgba(238,241,245,.72)", color: MUTED, fontFamily: fontSans, fontSize: 12 }}>
+                      Dibujando mapa nacional...
+                    </div>
+                  )}
+                </div>
+              )}
               <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
                 {[
                   ["Sin dato", "#f3f4f6"],
@@ -2154,14 +2266,14 @@ function NationalSeverityMap({ buildings, reports, mob }) {
                     <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT }}>{selectedRow.rapidaBuildingsExposed.toLocaleString()} edificios a intensidad ≥VI MMI</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Dano economico (RAPIDA)</div>
+                    <div style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Daño económico (RAPIDA)</div>
                     <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT }}>
                       ${selectedRow.rapidaDamage.toLocaleString()}M (rango ${selectedRow.rapidaDamageLI.toLocaleString()}M-${selectedRow.rapidaDamageLS.toLocaleString()}M) - {selectedRow.rapidaPctGDP}% del PIB estatal
                     </div>
                   </div>
                   <div>
                     <div style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Riesgo de base (GEM)</div>
-                    <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT }}>${selectedRow.gemAnnualLoss.toLocaleString()} perdida anual promedio historica</div>
+                    <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT }}>${selectedRow.gemAnnualLoss.toLocaleString()} pérdida anual promedio histórica</div>
                   </div>
 
                   {(() => {
@@ -2172,11 +2284,11 @@ function NationalSeverityMap({ buildings, reports, mob }) {
                       <div style={{ background: "#fffbeb", border: "1px solid #fde68a", padding: 8 }}>
                         <div style={{ fontSize: 10, fontFamily: font, color: "#92400e", textTransform: "uppercase" }}>Equivalencia (RAPIDA / GEM)</div>
                         <div style={{ fontSize: 13, fontFamily: fontSans, color: "#92400e", fontWeight: 700 }}>
-                          ~{years < 1 ? years.toFixed(2) : Math.round(years).toLocaleString()} anos de perdida anual promedio en un solo evento
+                          ~{years < 1 ? years.toFixed(2) : Math.round(years).toLocaleString()} años de pérdida anual promedio en un solo evento
                         </div>
                         {extreme && (
                           <div style={{ fontSize: 10, fontFamily: font, color: "#92400e", marginTop: 4 }}>
-                            Ratio muy alto — refleja que la perdida anual promedio reparte el riesgo entre muchos escenarios posibles a lo largo del tiempo, mientras este sismo concentro el golpe en este estado. No es un error de calculo.
+                            Ratio muy alto — refleja que la pérdida anual promedio reparte el riesgo entre muchos escenarios posibles a lo largo del tiempo, mientras este sismo concentró el golpe en este estado. No es un error de cálculo.
                           </div>
                         )}
                       </div>
@@ -2199,7 +2311,7 @@ function NationalSeverityMap({ buildings, reports, mob }) {
                     <div style={{ background: "#f0fdfa", border: "1px solid #99f6e4", padding: 8 }}>
                       <div style={{ fontSize: 10, fontFamily: font, color: "#0f766e", textTransform: "uppercase" }}>Catia La Mar — Microsoft AI4G (detalle, no todo el estado)</div>
                       <div style={{ fontSize: 12, fontFamily: fontSans, color: "#0f766e", marginTop: 2 }}>
-                        {CATIA_LA_MAR_SUMMARY.total.toLocaleString()} edificios analizados - {CATIA_LA_MAR_SUMMARY.conDano.toLocaleString()} con dano detectado - {CATIA_LA_MAR_SUMMARY.altaConfianza.toLocaleString()} de alta confianza (≥80%)
+                        {CATIA_LA_MAR_SUMMARY.total.toLocaleString()} edificios analizados - {CATIA_LA_MAR_SUMMARY.conDano.toLocaleString()} con daño detectado - {CATIA_LA_MAR_SUMMARY.altaConfianza.toLocaleString()} de alta confianza (≥80%)
                       </div>
                     </div>
                   )}
@@ -2221,7 +2333,7 @@ function NationalSeverityMap({ buildings, reports, mob }) {
                       ["name", "Estado"],
                       ["vivo", "Severidad en vivo"],
                       ["expuestos", "Edificios expuestos"],
-                      ["economico", "Dano economico (USD M)"],
+                      ["economico", "Daño económico (USD M)"],
                       ["base", "Riesgo de base (USD)"],
                     ].map(([key, label]) => (
                       <th
@@ -2254,7 +2366,7 @@ function NationalSeverityMap({ buildings, reports, mob }) {
           </div>
 
           <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
-            Fuentes: GEM Foundation (riesgo de base, estatico) - RAPIDA/Buro de Crisis PNUD via geosmart.undp.org (estimaciones de este sismo, estatico, snapshot 26 jun 2026) - datos en vivo: sismovenezuela.org y evaluacion tecnica oficial
+            Fuentes: GEM Foundation (riesgo de base, estático) - RAPIDA/Buró de Crisis PNUD via geosmart.undp.org (estimaciones de este sismo, estático, snapshot 26 jun 2026) - datos en vivo: sismovenezuela.org y evaluación técnica oficial
           </div>
         </>
       )}
@@ -2408,8 +2520,8 @@ export function TabSismos() {
   }, { parcial: 0, severo: 0, total: 0 }), [filteredBuildings]);
 
   function reportRangeLabel() {
-    if (reportRange === "24h") return "Ultimas 24 horas";
-    if (reportRange === "48h") return "Ultimas 48 horas";
+    if (reportRange === "24h") return "Últimas 24 horas";
+    if (reportRange === "48h") return "Últimas 48 horas";
     if (reportRange === "7d") return "Ultimos 7 dias";
     const from = reportFrom ? formatDate(reportFrom) : "?";
     const to = reportTo ? formatDate(reportTo) : "ahora";
@@ -2467,9 +2579,9 @@ export function TabSismos() {
       ["Reportes", reportReports.length],
       ["Edificios", reportBuildings.length],
       ["Acopios", reportAcopios.length],
-      ["Dano total", reportDamage.total],
-      ["Dano severo", reportDamage.severo],
-      ["Dano social (redes)", reportBuildingDamageSocial.length],
+      ["Daño total", reportDamage.total],
+      ["Daño severo", reportDamage.severo],
+      ["Daño social (redes)", reportBuildingDamageSocial.length],
     ].map(([label, value]) => `
       <div style="border:1px solid #e5e7eb;padding:8px 12px;min-width:108px;">
         <div style="font-size:9px;text-transform:uppercase;color:#6b7280;">${label}</div>
@@ -2513,7 +2625,7 @@ export function TabSismos() {
 
       <div style="font-size:14px;font-weight:700;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;color:#111827;">Edificios afectados (${reportBuildings.length})</div>
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
-        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Nombre</th><th style="padding:4px 6px;">Dano</th><th style="padding:4px 6px;">Direccion</th><th style="padding:4px 6px;">Evaluado</th><th style="padding:4px 6px;">Coordenadas</th></tr></thead>
+        <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Nombre</th><th style="padding:4px 6px;">Daño</th><th style="padding:4px 6px;">Dirección</th><th style="padding:4px 6px;">Evaluado</th><th style="padding:4px 6px;">Coordenadas</th></tr></thead>
         <tbody>${buildingRows}</tbody>
       </table>
 
@@ -2523,7 +2635,7 @@ export function TabSismos() {
         <tbody>${acopioRows}</tbody>
       </table>
 
-      <div style="font-size:14px;font-weight:700;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;color:#111827;">Dano social — corroboracion en redes (${reportBuildingDamageSocial.length})</div>
+      <div style="font-size:14px;font-weight:700;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;color:#111827;">Daño social — corroboración en redes (${reportBuildingDamageSocial.length})</div>
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <thead><tr style="text-align:left;color:#6b7280;"><th style="padding:4px 6px;">Fecha</th><th style="padding:4px 6px;">Lugar</th><th style="padding:4px 6px;">Tipo</th><th style="padding:4px 6px;">Confirmaciones</th><th style="padding:4px 6px;">Coordenadas</th></tr></thead>
         <tbody>${socialRows}</tbody>
@@ -2581,7 +2693,7 @@ export function TabSismos() {
       ...(includeReports ? filteredReports.map(item => ({ type: "report", item, date: itemDate(item), label: "Reporte" })) : []),
       ...(includeAcopios ? filteredAcopios.map(item => ({ type: "acopio", item, date: itemDate(item), label: "Acopio" })) : []),
       ...(includeBuildings ? filteredBuildings.map(item => ({ type: "building", item, date: itemDate(item), label: "Edificio" })) : []),
-      ...(includeBuildings ? filteredBuildingDamageSocial.map(item => ({ type: "buildingSocial", item, date: itemDate(item), label: "Dano (social)" })) : []),
+      ...(includeBuildings ? filteredBuildingDamageSocial.map(item => ({ type: "buildingSocial", item, date: itemDate(item), label: "Daño (social)" })) : []),
     ].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
   }, [filteredReports, filteredAcopios, filteredBuildings, filteredBuildingDamageSocial, layerMode]);
 
@@ -2790,7 +2902,7 @@ export function TabSismos() {
           options={[
             { id: "principal", label: "Vista principal" },
             { id: "registro", label: "Registro de sismos (USGS+EMSC)" },
-            { id: "satelital", label: "Dano satelital (Copernicus)" },
+            { id: "satelital", label: "Daño satelital (Copernicus)" },
             { id: "severidad", label: "Severidad por zona" },
             { id: "deslizamientos", label: "Riesgo de deslizamientos (NASA)" },
           ]}
@@ -2945,7 +3057,7 @@ export function TabSismos() {
           <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 350px", gap: 12 }}>
             <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
               <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
-                Mapa consolidado - {mapMode === "heat" ? "concentracion de dano y reportes" : "capas georreferenciadas"}
+                Mapa consolidado - {mapMode === "heat" ? "concentración de daño y reportes" : "capas georreferenciadas"}
               </div>
               <SismoMap
                 reports={filteredReports}
@@ -2972,7 +3084,7 @@ export function TabSismos() {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
                   <span style={{ width: 10, height: 10, borderRadius: 10, background: "#ea580c", display: "inline-block" }} />
-                  Dano (redes)
+                  Daño (redes)
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
                   <span style={{ width: 10, height: 10, borderRadius: 10, background: SEVERITY.high.color, display: "inline-block" }} />
@@ -2995,7 +3107,7 @@ export function TabSismos() {
                       {selected.type === "acopio" && "Acopio / apoyo"}
                       {selected.type === "report" && `Reporte ${selectedSeverity?.label}`}
                       {selected.type === "building" && `Edificio afectado - daño ${selectedDamage?.label}`}
-                      {selected.type === "buildingSocial" && "Dano de edificio (corroboracion social)"}
+                      {selected.type === "buildingSocial" && "Daño de edificio (corroboración social)"}
                     </div>
 
                     {selected.type === "building" && (
@@ -3014,7 +3126,7 @@ export function TabSismos() {
                             <div style={{ fontSize: 18, fontWeight: 800, color: TEXT }}>{mediaCount(selectedItem)}</div>
                           </div>
                           <div style={{ background: BG3, border: `1px solid ${BORDER}`, padding: 8 }}>
-                            <div style={{ fontSize: 9, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Evaluacion</div>
+                            <div style={{ fontSize: 9, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Evaluación</div>
                             <div style={{ fontSize: 18, fontWeight: 800, color: selectedItem.is_technically_evaluated ? "#16a34a" : MUTED }}>
                               {selectedItem.is_technically_evaluated ? "Si" : "No"}
                             </div>
@@ -3023,7 +3135,7 @@ export function TabSismos() {
                         {detailLoading && <div style={{ fontSize: 11, fontFamily: font, color: MUTED }}>Cargando detalle tecnico...</div>}
                         {detail?.evaluations?.length > 0 && (
                           <div style={{ background: BG3, border: `1px solid ${BORDER}`, padding: 10 }}>
-                            <div style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase", marginBottom: 4 }}>Evaluacion tecnica</div>
+                            <div style={{ fontSize: 10, fontFamily: font, color: MUTED, textTransform: "uppercase", marginBottom: 4 }}>Evaluación técnica</div>
                             <div style={{ fontSize: 12, fontFamily: fontSans, color: TEXT, lineHeight: 1.5 }}>
                               Habitabilidad: <strong>{detail.evaluations[0].habitability || "Sin dato"}</strong><br />
                               Puntaje: <strong>{detail.evaluations[0].structural_damage_score ?? "Sin dato"}</strong>
@@ -3047,7 +3159,7 @@ export function TabSismos() {
                     {selected.type === "buildingSocial" && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.55 }}>
-                          {selectedItem.damage_type || "Dano reportado en redes"}{selectedItem.affected ? ` - ${selectedItem.affected} afectados` : ""}
+                          {selectedItem.damage_type || "Daño reportado en redes"}{selectedItem.affected ? ` - ${selectedItem.affected} afectados` : ""}
                         </div>
                         <div style={{ fontSize: 11, fontFamily: font, color: "#ea580c" }}>
                           {selectedItem.confirmations || 0} confirmaciones (redes sociales)
@@ -3102,7 +3214,7 @@ export function TabSismos() {
                   </div>
                 ) : (
                   <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.5 }}>
-                    Haz clic en un punto del mapa para ver reporte, edificio afectado, fotos, acopio o evaluacion tecnica disponible.
+                    Haz clic en un punto del mapa para ver reporte, edificio afectado, fotos, acopio o evaluación técnica disponible.
                   </div>
                 )}
               </div>
@@ -3116,7 +3228,7 @@ export function TabSismos() {
                     const meta = type === "building"
                       ? DAMAGE[normalizeDamage(item.damage_level)]
                       : type === "buildingSocial"
-                        ? { label: "Dano social", color: "#ea580c" }
+                        ? { label: "Daño social", color: "#ea580c" }
                         : type === "acopio"
                           ? { label: "Acopio", color: "#16a34a" }
                           : SEVERITY[normalizeSeverity(item.severity)];
@@ -3176,7 +3288,7 @@ export function TabSismos() {
                       onClick={() => setActivityLimit(value => value + 25)}
                       style={{ fontSize: 11, fontFamily: font, padding: "8px 10px", border: `1px solid ${BORDER}`, background: BG3, color: TEXT, cursor: "pointer", letterSpacing: "0.08em" }}
                     >
-                      Ver mas ({latestItems.length - visibleActivityItems.length})
+                      Ver más ({latestItems.length - visibleActivityItems.length})
                     </button>
                   )}
                   {visibleActivityItems.length > 14 && (
@@ -3196,7 +3308,7 @@ export function TabSismos() {
           </div>
 
           <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
-            Datos publicos consolidados - sismovenezuela.org · actualizado {timeAgoFrom(lastUpdated, now)} · proxima actualizacion automatica en {countdownTo(nextRefreshAt, now)}
+            Datos públicos consolidados - sismovenezuela.org · actualizado {timeAgoFrom(lastUpdated, now)} · próxima actualización automática en {countdownTo(nextRefreshAt, now)}
           </div>
         </div>
       )}
