@@ -1362,6 +1362,20 @@ const STATE_REFERENCE_DATA = {
   "Delta Amacuro":         { gemAnnualLoss:   44000, rapidaDamage:    0.0, rapidaDamageLI:    0.0, rapidaDamageLS:    0.0, rapidaPctGDP: 0, rapidaBuildingsExposed:      0 },
 };
 
+const EMPTY_STATE_REFERENCE = { gemAnnualLoss: 0, rapidaDamage: 0, rapidaDamageLI: 0, rapidaDamageLS: 0, rapidaPctGDP: 0, rapidaBuildingsExposed: 0 };
+
+function toUtf8Mojibake(value) {
+  try {
+    return Array.from(new TextEncoder().encode(value), b => String.fromCharCode(b)).join("");
+  } catch {
+    return value;
+  }
+}
+
+function stateReferenceForName(name) {
+  return STATE_REFERENCE_DATA[name] || STATE_REFERENCE_DATA[toUtf8Mojibake(name)] || EMPTY_STATE_REFERENCE;
+}
+
 // Catia La Mar (Microsoft AI4G) solo cubre un sector de La Guaira, no el estado completo —
 // se muestra como detalle adicional unicamente en el panel de ese estado, no como columna nacional.
 const CATIA_LA_MAR_SUMMARY = { total: 30761, conDano: 9134, altaConfianza: 1989, estado: "La Guaira" };
@@ -1948,7 +1962,7 @@ function NationalSeverityMap({ buildings, reports, mob }) {
     if (!statesGeo) return [];
     return statesGeo.features.map(f => {
       const name = f.properties.name;
-      const ref = STATE_REFERENCE_DATA[name] || { gemAnnualLoss: 0, rapidaDamage: 0, rapidaDamageLI: 0, rapidaDamageLS: 0, rapidaPctGDP: 0, rapidaBuildingsExposed: 0 };
+      const ref = stateReferenceForName(name);
       const live = liveByState[name] || { reports: 0, buildingsSevere: 0, buildingsTotal: 0 };
       const vivoValue = live.reports + live.buildingsSevere * 2;
       return { name, ...ref, ...live, vivoValue };
@@ -1987,25 +2001,33 @@ function NationalSeverityMap({ buildings, reports, mob }) {
 
   useEffect(() => {
     let cancelled = false;
+    setMapReady(false);
     loadCSS(LEAFLET_CSS);
     loadScript(LEAFLET_JS).then(() => {
       if (cancelled || !mapRef.current || !window.L || mapInstance.current) return;
       const L = window.L;
       const map = L.map(mapRef.current, {
-        center: [8.0, -66.0],
+        center: [7.8, -66.4],
         zoom: mob ? 5 : 6,
         minZoom: 4,
         maxZoom: 10,
         zoomControl: true,
         attributionControl: false,
+        scrollWheelZoom: true,
       });
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+        maxZoom: 19,
+      }).addTo(map);
       mapInstance.current = map;
       setMapReady(true);
-      setTimeout(() => map.invalidateSize(), 150);
+      setTimeout(() => map.invalidateSize(), 120);
+    }).catch(() => {
+      if (!cancelled) setError("No se pudo cargar Leaflet para el mapa nacional.");
     });
     return () => {
       cancelled = true;
       setMapReady(false);
+      if (statesLayerRef.current) { statesLayerRef.current.remove(); statesLayerRef.current = null; }
       if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
     };
   }, [mob]);
@@ -2047,6 +2069,7 @@ function NationalSeverityMap({ buildings, reports, mob }) {
   }, [statesGeo, metric, rows, maxValues, selectedStateName, mapReady]);
 
   const selectedRow = rows.find(r => r.name === selectedStateName) || null;
+  const metricDef = METRIC_DEFS[metric];
 
   function divergenceInfo(row) {
     const liveNorm = row.vivoValue / maxValues.vivo;
@@ -2093,7 +2116,25 @@ function NationalSeverityMap({ buildings, reports, mob }) {
 
           <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 340px", gap: 12 }}>
             <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
-              <div ref={mapRef} style={{ width: "100%", height: mob ? 400 : 560, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
+              <div
+                ref={mapRef}
+                aria-label={`Mapa nacional: ${metricDef.label}`}
+                style={{ width: "100%", height: mob ? 400 : 560, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }}
+              />
+              <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
+                {[
+                  ["Sin dato", "#f3f4f6"],
+                  ["Bajo", metricDef.colorSteps[1]],
+                  ["Medio", metricDef.colorSteps[2]],
+                  ["Alto", metricDef.colorSteps[3]],
+                  ["Muy alto", metricDef.colorSteps[4]],
+                ].map(([label, color]) => (
+                  <div key={label} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+                    <span style={{ width: 10, height: 10, background: color, border: "1px solid #d1d5db", display: "inline-block" }} />
+                    {label}
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
