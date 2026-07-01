@@ -53,6 +53,18 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(data);
   }
 
+  if (source === "escombros") {
+    const data = await fetchEscombros(req.query.debug === "1");
+    res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=60");
+    return res.status(200).json(data);
+  }
+
+  if (source === "vantor-tiles") {
+    const data = await fetchVantorTilesInfo(req.query.debug === "1");
+    res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=600");
+    return res.status(200).json(data);
+  }
+
   // ── Foro Penal scraper (?source=foropenal) ──
   if (source === "foropenal") {
     try {
@@ -813,3 +825,123 @@ async function fetchLhasaIdentify(lat, lng) {
     return { value: null, error: e.message };
   }
 }
+
+// ── DRP Venezuela - Escombros en Vías (La Guaira) ─────────────────────────
+// FeatureServer público del Hub de Esri/DRP para el terremoto de Venezuela 2026.
+// hasStaticData: false → datos operativos en vivo, actualizados por los equipos en campo.
+const DRP_ORG = "w0z3NDBGLWwOLx2y";
+const ESCOMBROS_BASE = `https://services8.arcgis.com/${DRP_ORG}/ArcGIS/rest/services/EscombrosEnVias/FeatureServer/0`;
+const ESCOMBROS_PUNTOS_BASE = `https://services8.arcgis.com/${DRP_ORG}/ArcGIS/rest/services/Escombros_La_Guaira/FeatureServer/3`;
+
+async function fetchEscombros(debug) {
+  const headers = { accept: "application/json" };
+
+  // Conteo por tipo de vía (para KPIs)
+  const statsParams = new URLSearchParams({
+    where: "1=1",
+    outStatistics: JSON.stringify([
+      { statisticType: "count", onStatisticField: "OBJECTID", outStatisticFieldName: "total" },
+    ]),
+    groupByFieldsForStatistics: "TipoVia",
+    f: "json",
+  });
+
+  // Geometrías completas (para el mapa)
+  const geoParams = new URLSearchParams({
+    where: "1=1",
+    outFields: "OBJECTID,TipoVia,Shape__Area",
+    geometryPrecision: "5",
+    outSR: "4326",
+    f: "geojson",
+  });
+
+  try {
+    const [statsRes, geoRes] = await Promise.all([
+      fetch(`${ESCOMBROS_BASE}/query?${statsParams}`, { headers, signal: AbortSignal.timeout(10000) }),
+      fetch(`${ESCOMBROS_BASE}/query?${geoParams}`, { headers, signal: AbortSignal.timeout(10000) }),
+    ]);
+
+    const statsJson = statsRes.ok ? await statsRes.json() : null;
+    const geoJson = geoRes.ok ? await geoRes.json() : null;
+
+    const counts = { principal: 0, secundaria: 0, otro: 0, total: 0 };
+    if (statsJson && Array.isArray(statsJson.features)) {
+      statsJson.features.forEach(f => {
+        const tipo = String(f.attributes?.TipoVia || "").toLowerCase();
+        const n = f.attributes?.total || 0;
+        if (tipo.includes("principal")) counts.principal += n;
+        else if (tipo.includes("secundaria")) counts.secundaria += n;
+        else counts.otro += n;
+        counts.total += n;
+      });
+    }
+
+    const result = {
+      counts,
+      features: geoJson?.features || [],
+      fetchedAt: new Date().toISOString(),
+      source: "DRP Venezuela - EscombrosEnVias (FeatureServer)",
+    };
+
+    if (debug) {
+      result._debug = { statsStatus: statsRes.status, geoStatus: geoRes.status };
+    }
+
+    return result;
+  } catch (e) {
+    return { counts: { principal: 0, secundaria: 0, otro: 0, total: 0 }, features: [], error: e.message };
+  }
+}
+
+// ── Vantor (Maxar) - Tiles antes/después ──────────────────────────────────
+// Tile services preprocesados del programa Vantor Open Data, publicados como
+// MapServer de ArcGIS. No requieren autenticación. Las URLs reales de los tiles
+// las devolvemos aquí para que el frontend las use directo en Leaflet como
+// L.tileLayer (no proxy de imágenes — el browser las carga directo, igual que el basemap).
+const VANTOR_ANTES = `https://tiles.arcgis.com/tiles/${DRP_ORG}/arcgis/rest/services/Vantor_Antes_WTL1/MapServer`;
+const VANTOR_DESPUES = `https://tiles.arcgis.com/tiles/${DRP_ORG}/arcgis/rest/services/Vantor_Images_WTL1/MapServer`;
+
+async function fetchVantorTilesInfo(debug) {
+  const headers = { accept: "application/json" };
+  try {
+    const [antesRes, despuesRes] = await Promise.all([
+      fetch(`${VANTOR_ANTES}?f=json`, { headers, signal: AbortSignal.timeout(10000) }),
+      fetch(`${VANTOR_DESPUES}?f=json`, { headers, signal: AbortSignal.timeout(10000) }),
+    ]);
+
+    const antesJson = antesRes.ok ? await antesRes.json() : null;
+    const despuesJson = despuesRes.ok ? await despuesRes.json() : null;
+
+    // Extraer bounding box y rango de zoom de cada servicio
+    function parseTileInfo(json, baseUrl) {
+      if (!json) return null;
+      const ext = json.initialExtent || json.fullExtent;
+      const minScale = json.minScale || json.tileInfo?.lods?.[json.tileInfo.lods.length - 1]?.scale;
+      const maxScale = json.maxScale || json.tileInfo?.lods?.[0]?.scale;
+      return {
+        url: baseUrl,
+        tileUrl: `${baseUrl}/tile/{z}/{y}/{x}`,
+        name: json.mapName || json.serviceDescription || baseUrl.split("/").slice(-2, -1)[0],
+        extent: ext ? [ext.ymin, ext.xmin, ext.ymax, ext.xmax] : null,
+        minZoom: json.tileInfo?.lods?.length ? Math.min(...json.tileInfo.lods.map(l => l.level)) : 10,
+        maxZoom: json.tileInfo?.lods?.length ? Math.max(...json.tileInfo.lods.map(l => l.level)) : 20,
+      };
+    }
+
+    const result = {
+      antes: parseTileInfo(antesJson, VANTOR_ANTES),
+      despues: parseTileInfo(despuesJson, VANTOR_DESPUES),
+      fetchedAt: new Date().toISOString(),
+      source: "Vantor/Maxar Open Data via DRP Venezuela ArcGIS",
+    };
+
+    if (debug) {
+      result._debug = { antesStatus: antesRes.status, despuesStatus: despuesRes.status };
+    }
+
+    return result;
+  } catch (e) {
+    return { antes: null, despues: null, error: e.message };
+  }
+}
+
