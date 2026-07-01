@@ -501,12 +501,13 @@ function SismoMap({ reports, acopios, buildings, buildingDamageSocial = [], esco
           style: feature => {
             const tipo = String(feature.properties?.TipoVia || "").toLowerCase();
             const isPrincipal = tipo.includes("principal");
+            // Colores exactos del drawingInfo del FeatureServer de DRP Venezuela
             return {
-              color: isPrincipal ? "#dc2626" : "#f97316",
-              weight: isPrincipal ? 3 : 2,
-              fillColor: isPrincipal ? "#dc2626" : "#f97316",
-              fillOpacity: 0.35,
-              opacity: 0.9,
+              color: isPrincipal ? "#ff0000" : "#ffaa00",
+              weight: isPrincipal ? 2.5 : 1.5,
+              fillColor: isPrincipal ? "#ff0000" : "#ffaa00",
+              fillOpacity: 0.5,
+              opacity: 1,
             };
           },
           onEachFeature: (feature, layer) => {
@@ -2254,6 +2255,117 @@ function NationalSeverityMap({ buildings, reports, mob }) {
   );
 }
 
+function EscombrosMap({ features, counts, vantorDespues, mob }) {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const escLayerRef = useRef(null);
+  const [mapReady, setMapReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadCSS(LEAFLET_CSS);
+    loadScript(LEAFLET_JS).then(() => {
+      if (cancelled || !mapRef.current || !window.L || mapInstance.current) return;
+      const L = window.L;
+      const map = L.map(mapRef.current, {
+        center: [10.595, -67.025],
+        zoom: mob ? 13 : 14,
+        minZoom: 10,
+        maxZoom: 19,
+        zoomControl: true,
+        attributionControl: false,
+      });
+      // Imagen satelital post-evento de Vantor como basemap — igual al dashboard de Esri
+      if (vantorDespues) {
+        L.tileLayer(`${vantorDespues.url}/tile/{z}/{y}/{x}`, {
+          maxZoom: vantorDespues.maxZoom || 20,
+          maxNativeZoom: vantorDespues.maxZoom || 20,
+          opacity: 1,
+        }).addTo(map);
+      } else {
+        // Fallback: satelital de ESRI si no hay Vantor todavía
+        L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+          maxZoom: 19,
+        }).addTo(map);
+      }
+      mapInstance.current = map;
+      setMapReady(true);
+      setTimeout(() => map.invalidateSize(), 150);
+    });
+    return () => {
+      cancelled = true;
+      setMapReady(false);
+      if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
+    };
+  }, [mob, vantorDespues]);
+
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current || !window.L || !features.length) return;
+    const L = window.L;
+    const map = mapInstance.current;
+    if (escLayerRef.current) { map.removeLayer(escLayerRef.current); escLayerRef.current = null; }
+    const layer = L.geoJSON(
+      { type: "FeatureCollection", features },
+      {
+        style: f => {
+          const isPrincipal = String(f.properties?.TipoVia || "").toLowerCase().includes("principal");
+          return {
+            color: isPrincipal ? "#ff0000" : "#ffaa00",
+            weight: isPrincipal ? 2 : 1.5,
+            fillColor: isPrincipal ? "#ff0000" : "#ffaa00",
+            fillOpacity: 0.5,
+            opacity: 1,
+          };
+        },
+        onEachFeature: (f, lyr) => {
+          const tipo = f.properties?.TipoVia || "Sin clasificar";
+          lyr.bindPopup(`<div style="font-family:monospace;font-size:11px"><strong>Escombro en vía ${tipo}</strong></div>`);
+        },
+      }
+    );
+    layer.addTo(map);
+    escLayerRef.current = layer;
+    try {
+      const b = layer.getBounds();
+      if (b.isValid()) map.fitBounds(b, { padding: [20, 20] });
+    } catch {
+      // mantiene el center/zoom inicial
+    }
+  }, [features, mapReady]);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+        <Kpi label="Total bloqueadas" value={counts.total || "—"} tone="#b45309" />
+        <Kpi label="Vías principales" value={counts.principal || "—"} tone="#ff0000" />
+        <Kpi label="Vías secundarias" value={counts.secundaria || "—"} tone="#ffaa00" />
+      </div>
+
+      <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
+        <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
+          Escombros en vías — La Guaira (imagen satelital Vantor post-evento)
+          {counts.total === 0 && " - cargando datos..."}
+        </div>
+        <div ref={mapRef} style={{ width: "100%", height: mob ? 400 : 560, border: `1px solid ${BORDER}`, background: "#1a1a2e", borderRadius: 4 }} />
+        <div style={{ display: "flex", gap: 14, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+            <span style={{ width: 12, height: 12, background: "#ff0000", borderRadius: 2, display: "inline-block", opacity: 0.8 }} />
+            Escombro en vía principal
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
+            <span style={{ width: 12, height: 12, background: "#ffaa00", borderRadius: 2, display: "inline-block", opacity: 0.8 }} />
+            Escombro en vía secundaria
+          </div>
+        </div>
+      </div>
+
+      <div style={{ fontSize: 10, fontFamily: font, color: `${MUTED}70`, textAlign: "center" }}>
+        Fuente: DRP Venezuela / Esri (disastersesriven.hub.arcgis.com) — datos operativos en vivo, actualizados por equipos en campo. Imagen satelital: Vantor/Maxar Open Data (post-evento 24 jun 2026, estática).
+      </div>
+    </div>
+  );
+}
+
 function VantorSwipe({ antes, despues, mob }) {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
@@ -2264,8 +2376,8 @@ function VantorSwipe({ antes, despues, mob }) {
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
+  // Inicialización del mapa — se monta siempre, independientemente de si ya llegaron los tiles
   useEffect(() => {
-    if (!antes && !despues) return;
     let cancelled = false;
     loadCSS(LEAFLET_CSS);
     loadScript(LEAFLET_JS).then(() => {
@@ -2279,27 +2391,8 @@ function VantorSwipe({ antes, despues, mob }) {
         zoomControl: true,
         attributionControl: false,
       });
-
-      if (despues) {
-        const dl = L.tileLayer(
-          `${despues.url}/tile/{z}/{y}/{x}`,
-          { maxZoom: despues.maxZoom || 20, maxNativeZoom: despues.maxZoom || 20, opacity: 1 }
-        );
-        dl.addTo(map);
-        despuesLayerRef.current = dl;
-      } else {
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 19 }).addTo(map);
-      }
-
-      if (antes) {
-        const al = L.tileLayer(
-          `${antes.url}/tile/{z}/{y}/{x}`,
-          { maxZoom: antes.maxZoom || 20, maxNativeZoom: antes.maxZoom || 20, opacity: 1 }
-        );
-        al.addTo(map);
-        antesLayerRef.current = al;
-      }
-
+      // Basemap de respaldo (visible hasta que carguen los tiles de Vantor)
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png", { maxZoom: 19 }).addTo(map);
       mapInstance.current = map;
       setMapReady(true);
       setTimeout(() => map.invalidateSize(), 150);
@@ -2309,7 +2402,34 @@ function VantorSwipe({ antes, despues, mob }) {
       setMapReady(false);
       if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; }
     };
-  }, [antes, despues, mob]);
+  }, [mob]);
+
+  // Tiles de Vantor — se agregan cuando llegan (pueden llegar después del mapa)
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current || !window.L) return;
+    const L = window.L;
+    const map = mapInstance.current;
+
+    if (despuesLayerRef.current) { map.removeLayer(despuesLayerRef.current); despuesLayerRef.current = null; }
+    if (antesLayerRef.current) { map.removeLayer(antesLayerRef.current); antesLayerRef.current = null; }
+
+    if (despues) {
+      const dl = L.tileLayer(
+        `${despues.url}/tile/{z}/{y}/{x}`,
+        { maxZoom: despues.maxZoom || 20, maxNativeZoom: despues.maxZoom || 20, opacity: 1 }
+      );
+      dl.addTo(map);
+      despuesLayerRef.current = dl;
+    }
+    if (antes) {
+      const al = L.tileLayer(
+        `${antes.url}/tile/{z}/{y}/{x}`,
+        { maxZoom: antes.maxZoom || 20, maxNativeZoom: antes.maxZoom || 20, opacity: 1 }
+      );
+      al.addTo(map);
+      antesLayerRef.current = al;
+    }
+  }, [antes, despues, mapReady]);
 
   // Clip del layer "antes" usando CSS clip-path según posición del swipe
   useEffect(() => {
@@ -2956,12 +3076,14 @@ export function TabSismos() {
             { id: "satelital", label: "Dano satelital (Copernicus)" },
             { id: "severidad", label: "Severidad por zona" },
             { id: "deslizamientos", label: "Riesgo de deslizamientos (NASA)" },
+            { id: "escombros", label: "Escombros en vías (La Guaira)" },
           ]}
         />
       </div>
 
       {subView === "registro" && <QuakeRegistry mob={mob} />}
       {subView === "deslizamientos" && <LandslideRisk buildings={data.buildings} mob={mob} />}
+      {subView === "escombros" && <EscombrosMap features={escombros.features} counts={escombros.counts} vantorDespues={vantorTiles.despues} mob={mob} />}
       {subView === "satelital" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <ToggleGroup
