@@ -829,67 +829,66 @@ async function fetchLhasaIdentify(lat, lng) {
 // ── DRP Venezuela - Escombros en Vías (La Guaira) ─────────────────────────
 // FeatureServer público del Hub de Esri/DRP para el terremoto de Venezuela 2026.
 // hasStaticData: false → datos operativos en vivo, actualizados por los equipos en campo.
-const DRP_ORG = "w0z3NDBGLWwOLx2y";
-const ESCOMBROS_BASE = `https://services8.arcgis.com/${DRP_ORG}/ArcGIS/rest/services/EscombrosEnVias/FeatureServer/0`;
-const ESCOMBROS_PUNTOS_BASE = `https://services8.arcgis.com/${DRP_ORG}/ArcGIS/rest/services/Escombros_La_Guaira/FeatureServer/3`;
+const DRP_ORG = "F4wmVgGRtJMzSu8M";
+const ESCOMBROS_BASE = `https://services8.arcgis.com/${DRP_ORG}/arcgis/rest/services/EscombrosEnVias/FeatureServer/0`;
+const ESCOMBROS_PUNTOS_BASE = `https://services8.arcgis.com/${DRP_ORG}/arcgis/rest/services/Escombros_La_Guaira/FeatureServer/3`;
 
 async function fetchEscombros(debug) {
   const headers = { accept: "application/json" };
 
-  // Conteo por tipo de vía (para KPIs)
-  const statsParams = new URLSearchParams({
-    where: "1=1",
+  // Conteos separados por tipo de vía — igual al dashboard de Esri original
+  const countQuery = (tipo) => new URLSearchParams({
+    where: `lower(TipoVia)='${tipo}'`,
     outStatistics: JSON.stringify([
-      { statisticType: "count", onStatisticField: "OBJECTID", outStatisticFieldName: "total" },
+      { statisticType: "count", onStatisticField: "OBJECTID", outStatisticFieldName: "COUNT_OBJECTID" },
     ]),
-    groupByFieldsForStatistics: "TipoVia",
+    returnGeometry: "false",
     f: "json",
   });
 
-  // Geometrías completas (para el mapa)
+  // Geometrías completas en WGS84 para Leaflet (el servicio usa Web Mercator 102100)
   const geoParams = new URLSearchParams({
     where: "1=1",
-    outFields: "OBJECTID,TipoVia,Shape__Area",
-    geometryPrecision: "5",
+    outFields: "OBJECTID,TipoVia",
     outSR: "4326",
+    geometryPrecision: "5",
+    resultRecordCount: "5000",
     f: "geojson",
   });
 
   try {
-    const [statsRes, geoRes] = await Promise.all([
-      fetch(`${ESCOMBROS_BASE}/query?${statsParams}`, { headers, signal: AbortSignal.timeout(10000) }),
-      fetch(`${ESCOMBROS_BASE}/query?${geoParams}`, { headers, signal: AbortSignal.timeout(10000) }),
+    const [principalRes, secundariaRes, geoRes] = await Promise.all([
+      fetch(`${ESCOMBROS_BASE}/query?${countQuery("principal")}`, { headers, signal: AbortSignal.timeout(10000) }),
+      fetch(`${ESCOMBROS_BASE}/query?${countQuery("secundaria")}`, { headers, signal: AbortSignal.timeout(10000) }),
+      fetch(`${ESCOMBROS_BASE}/query?${geoParams}`, { headers, signal: AbortSignal.timeout(12000) }),
     ]);
 
-    const statsJson = statsRes.ok ? await statsRes.json() : null;
+    const principalJson = principalRes.ok ? await principalRes.json() : null;
+    const secundariaJson = secundariaRes.ok ? await secundariaRes.json() : null;
     const geoJson = geoRes.ok ? await geoRes.json() : null;
 
-    const counts = { principal: 0, secundaria: 0, otro: 0, total: 0 };
-    if (statsJson && Array.isArray(statsJson.features)) {
-      statsJson.features.forEach(f => {
-        const tipo = String(f.attributes?.TipoVia || "").toLowerCase();
-        const n = f.attributes?.total || 0;
-        if (tipo.includes("principal")) counts.principal += n;
-        else if (tipo.includes("secundaria")) counts.secundaria += n;
-        else counts.otro += n;
-        counts.total += n;
-      });
-    }
+    const principal = principalJson?.features?.[0]?.attributes?.COUNT_OBJECTID || 0;
+    const secundaria = secundariaJson?.features?.[0]?.attributes?.COUNT_OBJECTID || 0;
 
     const result = {
-      counts,
+      counts: { principal, secundaria, total: principal + secundaria },
       features: geoJson?.features || [],
       fetchedAt: new Date().toISOString(),
-      source: "DRP Venezuela - EscombrosEnVias (FeatureServer)",
+      source: "DRP Venezuela / Esri — EscombrosEnVias (FeatureServer, datos en vivo)",
     };
 
     if (debug) {
-      result._debug = { statsStatus: statsRes.status, geoStatus: geoRes.status };
+      result._debug = {
+        principalStatus: principalRes.status,
+        secundariaStatus: secundariaRes.status,
+        geoStatus: geoRes.status,
+        featuresCount: result.features.length,
+      };
     }
 
     return result;
   } catch (e) {
-    return { counts: { principal: 0, secundaria: 0, otro: 0, total: 0 }, features: [], error: e.message };
+    return { counts: { principal: 0, secundaria: 0, total: 0 }, features: [], error: e.message };
   }
 }
 
