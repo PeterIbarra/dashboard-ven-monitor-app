@@ -4874,6 +4874,221 @@ export const SITREP_ALL = [
       { "tag": "Riesgo fiscal", "color": "#f59e0b", "title": "Reconstrucción y deuda convergen en julio", "text": "La presentación de Centerview llega justo cuando el sismo introduce necesidades extraordinarias de financiamiento." },
       { "tag": "Watchlist", "color": "#ca8a04", "title": "Réplicas, servicios y transparencia", "text": "Electricidad, telecomunicaciones, cifras de víctimas y ejecución de ayuda definirán si la estabilidad se sostiene." }
     ]
+  },
+  {
+    "period": "26 de junio – 03 de julio de 2026",
+    "periodShort": "26 jun–03 jul 2026",
+    "keyPoints": [
+      { "tag": "Emergencia", "color": "#dc2626", "title": "La respuesta sísmica entra en recuperación temprana", "text": "El balance oficial alcanza 2.295 fallecidos, 12.400 heridos, 855 edificaciones afectadas y 11.546 personas sin vivienda atendidas en 46 campamentos." },
+      { "tag": "Continuidad", "color": "#0468B1", "title": "E3 conserva el liderazgo en 44%", "text": "La cohesión PSUV/FANB y la coordinación con cerca de 2.000 efectivos de SOUTHCOM sostienen la continuidad, aunque pierde 2pp por presión fiscal y de legitimidad." },
+      { "tag": "Política", "color": "#22c55e", "title": "El retorno bloqueado de Machado debilita E1", "text": "Dos intentos de regreso fueron frenados y no hubo avances verificables de la comisión AN2015–Gobierno; E1 baja a 36%." },
+      { "tag": "Fiscal", "color": "#f59e0b", "title": "Reconstrucción y deuda forman un trilema fiscal", "text": "El USGS estima pérdidas de 4%–20% del PIB, frente a un fondo de USD 200M, deuda externa de USD 240.000M y menor flujo petrolero." }
+    ],
+    "sintesis": "El período confirma que la emergencia sísmica dejó de ser un shock transitorio y pasó a ordenar la dinámica nacional. E3 continúa dominante en 44% (−2pp), pero su sostenibilidad fiscal y de legitimidad se erosiona. E1 baja a 36% (−2pp) por el bloqueo activo de dos intentos de retorno de María Corina Machado y la ausencia de avances verificables en la negociación institucional. E4 sube a 12% (+2pp) por la securitización del acceso a ayuda e información. E2 sube a 8% (+2pp) ante pérdidas equivalentes a 4%–20% del PIB, una deuda externa de USD 240.000M y la caída del flujo petrolero. El vencimiento del segundo plazo constitucional del interinato entre el 3 y el 5 de julio es la variable decisiva para el ciclo siguiente.",
+    "actores": [
+      { "name": "Gobierno encargado", "items": ["Despliega aproximadamente 19.000 funcionarios y un Estado Mayor con cuatro vicepresidencias sectoriales.", "Constituye una Comisión Presidencial de Habitabilidad y aplica semáforo de ocupación de edificaciones.", "Enfrenta una evaluación ciudadana superior al 86% en las categorías deficiente o muy deficiente."] },
+      { "name": "Estados Unidos / internacional", "items": ["SOUTHCOM despliega cerca de 2.000 efectivos en apoyo a la respuesta.", "Estados Unidos eleva su asistencia anunciada a USD 200M; CERF aporta USD 15M y la UE EUR 5M.", "147 países y 31 organismos internacionales expresan solidaridad con Venezuela."] },
+      { "name": "Oposición", "items": ["María Corina Machado realiza dos intentos de retorno sin respaldo operativo estadounidense.", "El Grupo IDEA cuestiona públicamente el bloqueo al regreso.", "La comisión AN2015–Gobierno permanece abierta, pero sin avances verificables durante el período."] },
+      { "name": "Economía y energía", "items": ["Exportaciones petroleras de junio: aproximadamente 1,20M b/d.", "Flujo de caja petrolero: USD 1.110M, una caída de USD 260M frente a mayo.", "La deuda externa revelada de USD 240.000M se cruza con pérdidas sísmicas de 4%–20% del PIB."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesPlenas": null, "privadosLiberados": null, "cautelares": null, "militares": 187, "fpVerificados": 857, "fpDetenidos": 404, "fpNota": "El documento fuente no reporta un nuevo balance verificable de presos políticos; el monitoreo se concentra en acceso humanitario, prensa y legitimidad de la respuesta." },
+      "rodriguez": [
+        { "title": "Estado Mayor de coordinación", "text": "Cuatro vicepresidencias sectoriales coordinan seguridad, servicios, asuntos sociales y economía." },
+        { "title": "Recuperación temprana", "text": "La respuesta transita de búsqueda y rescate hacia necesidades básicas, alojamiento y reconstrucción resiliente." },
+        { "title": "Vencimiento constitucional", "text": "El segundo plazo del interinato vence entre el 3 y el 5 de julio sin mecanismo formal resuelto al cierre." },
+        { "title": "Legitimidad bajo presión", "text": "Más de 86% de la consulta de Mass Behavior Research califica la gestión como deficiente o muy deficiente." }
+      ],
+      "mcmAgenda": ["Definir una ruta de retorno coordinada con Washington.", "Preservar cohesión opositora ante el veto externo.", "Exigir transparencia, pluralidad y acceso independiente a la respuesta humanitaria."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "4%–20%", "label": "Pérdidas del PIB estimadas por USGS", "color": "#dc2626" },
+        { "value": "USD 240.000M", "label": "Deuda externa revelada", "color": "#f59e0b" },
+        { "value": "USD 1.110M", "label": "Flujo petrolero de junio", "color": "#ca8a04" },
+        { "value": "20%", "label": "Brecha cambiaria al cierre", "color": "#f59e0b" }
+      ],
+      "empresas": [
+        { "empresa": "PDVSA", "desarrollo": "Exportaciones de 1,20M b/d y flujo de caja de USD 1.110M en junio; afectaciones eléctricas condicionan El Palito y Morón." },
+        { "empresa": "Centerview Partners", "desarrollo": "El análisis de sostenibilidad de deuda se retrasa por la emergencia y queda como señal crítica para acreedores." },
+        { "empresa": "CAF", "desarrollo": "Crea un Fondo de Recuperación y Reconstrucción con capital inicial de USD 1M." },
+        { "empresa": "IFRC", "desarrollo": "Lanza un llamamiento de emergencia por CHF 50M." },
+        { "empresa": "BCV", "desarrollo": "El dólar oficial sube de Bs. 639,70 a Bs. 652,97; la presión fiscal de reconstrucción amplía riesgos monetarios." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 0, "promDiario": 0, "periodo": "26 jun–3 jul", "variacion": "Sin conteo verificable en el documento fuente", "composicion": "Ayuda, vivienda, servicios, transparencia y libertad de información.", "nota": "La ausencia de conteo no equivale a ausencia de presión: la desaprobación ciudadana supera el 86%." },
+      "percepcion": { "fuente": "Mass Behavior Research Venezuela / análisis situacional", "titulo": "Respuesta amplia, legitimidad percibida baja", "nota": "La escala de la cooperación internacional coexiste con una evaluación mayoritariamente negativa de la gestión gubernamental.", "datos": [{ "factor": "Gestión deficiente o muy deficiente", "pct": 86 }, { "factor": "Electricidad restablecida en La Guaira", "pct": 75 }, { "factor": "Agua restablecida en La Guaira", "pct": 68 }, { "factor": "Acceso vial restablecido", "pct": 90 }] },
+      "excarcelados": { "fp": 857, "presos": 404, "militares": 187, "fuente": "Foro Penal / último dato verificado" }
+    },
+    "marcoNormativo": {
+      "titulo": "Emergencia, recuperación temprana y vencimiento del interinato",
+      "resumen": "La transición hacia recuperación temprana coincide con el vencimiento del segundo plazo constitucional del interinato, sin que exista al corte un mecanismo formal de extensión o sustitución.",
+      "cambios": [
+        { "titulo": "Habitabilidad", "texto": "Comisión presidencial aplica un sistema de semáforo para evaluar edificaciones.", "color": "#22c55e" },
+        { "titulo": "Recuperación temprana", "texto": "Se prevé activar el clúster liderado por el PNUD y avanzar hacia una eventual PDNA.", "color": "#0468B1" },
+        { "titulo": "Interinato 3–5 jul", "texto": "La resolución jurídica de su vencimiento queda pendiente al cierre.", "color": "#f59e0b" },
+        { "titulo": "Acceso humanitario", "texto": "Controles sobre voluntariado, ayuda y prensa elevan riesgo de securitización.", "color": "#dc2626" }
+      ],
+      "lecturaAnalitica": "La continuidad institucional conserva capacidad operativa, pero enfrenta simultáneamente una prueba constitucional, un shock fiscal y una crisis de legitimidad. La forma jurídica de resolver el interinato y el financiamiento de la reconstrucción determinarán la trayectoria inmediata."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "44%", "color": "#0468B1", "text": "Sigue dominante por cohesión de élite y cooperación operativa, pero cede ante presión fiscal y de legitimidad." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "36%", "color": "#2d8a30", "text": "Baja por el bloqueo al retorno de Machado y la falta de avances negociadores verificables." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "12%", "color": "#ca8a04", "text": "Sube por controles de acceso a ayuda, restricciones a prensa y disputa sobre la información." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "8%", "color": "#dc2626", "text": "Sube por el trilema fiscal, aunque sin fractura civil-militar o territorial." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Vencimiento del interinato entre el 3 y el 5 de julio", "text": "El mecanismo jurídico de resolución y su reconocimiento externo definirán la arquitectura del ciclo siguiente." },
+      { "tag": "Humanitario", "color": "#0468B1", "title": "La respuesta entra en recuperación temprana", "text": "Alojamiento, servicios, habitabilidad y reconstrucción resiliente sustituyen progresivamente a búsqueda y rescate." },
+      { "tag": "Riesgo fiscal", "color": "#f59e0b", "title": "El fondo disponible es pequeño frente al daño", "text": "USD 200M de reconstrucción contrastan con pérdidas estimadas en 4%–20% del PIB." },
+      { "tag": "Legitimidad", "color": "#ca8a04", "title": "No hubo efecto de cohesión ciudadana", "text": "Más de 86% evalúa negativamente la gestión, pese a la magnitud de la cooperación internacional." }
+    ]
+  },
+  {
+    "period": "03 de julio – 09 de julio de 2026",
+    "periodShort": "03–09 jul 2026",
+    "keyPoints": [
+      { "tag": "Constitucional", "color": "#dc2626", "title": "Los 180 días vencen sin resolución formal", "text": "TSJ, Asamblea Nacional y Ministerio Público guardan silencio tras el vencimiento del artículo 234; el gobierno encargado continúa de facto." },
+      { "tag": "Continuidad", "color": "#0468B1", "title": "E3 sube a 46% y amplía su ventaja", "text": "La disciplina de élite, el reacomodo económico y el respaldo operativo externo elevan la continuidad negociada 2pp." },
+      { "tag": "Oposición", "color": "#22c55e", "title": "El bloqueo a Machado reduce E1 a 33%", "text": "Dos intentos de retorno fueron frenados por Washington; la negación pública posterior de Trump no modifica la conducta observada." },
+      { "tag": "Fiscal", "color": "#f59e0b", "title": "El EMBI sube 836 puntos básicos", "text": "El riesgo país alcanza 7.098 puntos mientras los daños estimados divergen entre USD 6.700M y USD 37.000M." }
+    ],
+    "sintesis": "El período 3–9 de julio combina continuidad institucional de facto, disciplina de élite y respaldo operativo externo con una erosión persistente de legitimidad y un deterioro fiscal medible. E3 sube a 46% (+2pp) porque el enroque del equipo económico ocurre sin fractura, el silencio de los poderes públicos sostiene al gobierno encargado tras los 180 días y múltiples actores internacionales continúan financiando la respuesta. E1 baja a 33% (−3pp) por el bloqueo reiterado al retorno de María Corina Machado. E4 sube a 13% (+1pp) al trasladarse el control hacia el presupuesto de reconstrucción. E2 permanece en 8% porque el aumento del EMBI y la incertidumbre sobre daños no producen todavía fractura civil-militar o territorial.",
+    "actores": [
+      { "name": "Gobierno encargado", "items": ["Continúa en funciones después de cumplirse 180 días sin pronunciamiento formal de los poderes públicos.", "Firma el Reglamento de Hidrocarburos tras revisar 1.389 resoluciones.", "Reorganiza SENIAT, Pequiven, Banco de Venezuela y CIIP sin disidencia pública."] },
+      { "name": "Estados Unidos", "items": ["Mantiene cooperación humanitaria y operativa; la asistencia supera USD 386M.", "El jefe de SOUTHCOM se reúne con Delcy Rodríguez y Diosdado Cabello.", "Reportes de WSJ y Axios documentan el bloqueo a Machado, aunque Trump lo niega posteriormente."] },
+      { "name": "Oposición y sociedad civil", "items": ["Sindicatos y organizaciones civiles solicitan junta de gobierno y elecciones.", "La AN2015 agradece el respaldo estadounidense y mantiene abierto su canal institucional.", "Machado conserva 53% de imagen positiva y declara mantener respeto hacia la Administración Trump."] },
+      { "name": "Comunidad internacional", "items": ["El plan humanitario ONU recibe USD 274M más USD 32M del sector privado.", "Israel extiende su misión; China y Uruguay envían nuevos cargamentos.", "El FMI conversa sobre tramo de reserva y DEG, separado de la reestructuración de deuda."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesPlenas": null, "privadosLiberados": null, "cautelares": null, "militares": 187, "fpVerificados": 857, "fpDetenidos": 404, "fpNota": "Los documentos no incorporan un nuevo balance verificable de presos políticos; se conserva el último dato disponible." },
+      "rodriguez": [
+        { "title": "Continuidad tras 180 días", "text": "El Ejecutivo permanece en funciones bajo la categoría de ausencia forzosa, sin nueva decisión formal del TSJ." },
+        { "title": "Reglamento petrolero", "text": "Se desarrolla el modelo de Estado regulador y empresa operadora, con mayor espacio privado y control ministerial." },
+        { "title": "Venezuela Renace", "text": "Jacqueline Faría dirige la misión presidencial que centraliza recuperación, subsidios y créditos." },
+        { "title": "Reacomodo económico", "text": "El intercambio SENIAT–Pequiven y los cambios en BDV y CIIP redistribuyen funciones dentro del mismo bloque." }
+      ],
+      "mcmAgenda": ["Resolver la contradicción entre reportes de bloqueo y negación de Trump.", "Construir respaldo explícito para un eventual retorno.", "Convertir la demanda electoral doméstica en avance institucional verificable."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "7.098", "label": "EMBI Venezuela · +836pb", "color": "#dc2626" },
+        { "value": "USD 150–240MM", "label": "Deuda externa estimada", "color": "#f59e0b" },
+        { "value": "USD 6.700–37.000M", "label": "Rango de daños estimados", "color": "#ca8a04" },
+        { "value": "USD 1.869M", "label": "Flujo de efectivo esperado en julio", "color": "#22c55e" }
+      ],
+      "empresas": [
+        { "empresa": "Citgo", "desarrollo": "El crudo venezolano vuelve a ser su principal fuente; tres cargamentos y 1,4M de barriles en abril." },
+        { "empresa": "Vitol", "desarrollo": "Abre oficina en Caracas y amplía su presencia regional; el contrato con Trafigura supera 100M de barriles." },
+        { "empresa": "FMI", "desarrollo": "Dialoga sobre tramo de reserva y DEG, pero no participa formalmente en la reestructuración ni produce un DSA." },
+        { "empresa": "UNDRR / PNUD", "desarrollo": "Las estimaciones de daños difieren más de cinco veces: USD 37.000M frente a USD 6.700M." },
+        { "empresa": "JPMorgan", "desarrollo": "El EMBI pasa de 6.262 a 7.098 puntos en ocho jornadas bursátiles." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 15, "promDiario": 5, "periodo": "3–9 jul", "variacion": "15 protestas en tres jornadas", "composicion": "Justicia, trabajo, participación política, salud, vivienda y derechos de NNA.", "nota": "Distrito Capital, Lara y Anzoátegui presentan focos reiterados; las demandas sociales convergen con la exigencia electoral." },
+      "percepcion": { "fuente": "AtlasIntel / análisis situacional", "titulo": "Legitimidad en deterioro y demanda electoral activa", "nota": "La desaprobación general alcanza 63,3% y 65% desaprueba la respuesta al terremoto.", "datos": [{ "factor": "Desaprobación de Delcy Rodríguez", "pct": 63.3 }, { "factor": "Desaprobación de respuesta sísmica", "pct": 65 }, { "factor": "Confianza en EE.UU. para reconstrucción", "pct": 75 }, { "factor": "Elecciones como prioridad", "pct": 46 }] },
+      "excarcelados": { "fp": 857, "presos": 404, "militares": 187, "fuente": "Foro Penal / último dato verificado" }
+    },
+    "marcoNormativo": {
+      "titulo": "Artículo 234, Reglamento de Hidrocarburos y reconstrucción centralizada",
+      "resumen": "El período combina una controversia constitucional no resuelta con una ampliación regulada de la apertura energética y la centralización presidencial de la reconstrucción.",
+      "cambios": [
+        { "titulo": "180 días cumplidos", "texto": "No existe pronunciamiento adicional del TSJ, AN o MP sobre la continuidad del interinato.", "color": "#dc2626" },
+        { "titulo": "Reglamento petrolero", "texto": "Actualiza ocho décadas de resoluciones y amplía participación privada bajo control ministerial.", "color": "#22c55e" },
+        { "titulo": "Venezuela Renace", "texto": "La Presidencia centraliza recuperación y asignación de recursos sin PDNA formal.", "color": "#f59e0b" },
+        { "titulo": "Starlink piloto", "texto": "Conatel autoriza temporalmente una prueba de internet satelital tras la emergencia.", "color": "#0468B1" }
+      ],
+      "lecturaAnalitica": "La continuidad combina disciplina interna, tolerancia externa y apertura económica regulada, pero descansa en una ambigüedad constitucional y una legitimidad social decreciente. La resolución del artículo 234 y la credibilidad técnica de la reconstrucción serán pruebas críticas."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "46%", "color": "#0468B1", "text": "Sube por cohesión de élite, silencio institucional coordinado y respaldo operativo externo." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "33%", "color": "#2d8a30", "text": "Baja por el bloqueo reiterado al retorno de Machado y la falta de avances institucionales." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "13%", "color": "#ca8a04", "text": "Sube por la concentración discrecional del presupuesto de reconstrucción." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "8%", "color": "#dc2626", "text": "Permanece estable: aumenta el estrés fiscal, pero no hay fractura civil-militar o territorial." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Pronunciamiento o silencio continuado sobre el artículo 234", "text": "Una ruptura del silencio institucional sería la señal de cambio de escenario más importante del próximo ciclo." },
+      { "tag": "Washington", "color": "#0468B1", "title": "La conducta operativa favorece continuidad", "text": "El bloqueo a Machado y la interlocución con Cabello pesan más que las declaraciones públicas contradictorias." },
+      { "tag": "Fiscal", "color": "#f59e0b", "title": "Daños y deuda carecen de ancla técnica única", "text": "La divergencia de estimaciones y la ausencia de DSA aumentan incertidumbre para acreedores." },
+      { "tag": "Social", "color": "#ca8a04", "title": "La emergencia no desplaza la demanda electoral", "text": "46% prioriza elecciones y las protestas conectan demandas materiales con la controversia constitucional." }
+    ]
+  },
+  {
+    "period": "10 de julio – 17 de julio de 2026",
+    "periodShort": "10–17 jul 2026",
+    "keyPoints": [
+      { "tag": "Político", "color": "#0468B1", "title": "La hoja de ruta electoral comenzará el 1° de agosto", "text": "La AN2015 y el gobierno encargado anuncian una agenda para conformar un nuevo CNE y reformar las leyes electorales, respaldada formalmente por Washington." },
+      { "tag": "Oposición", "color": "#ca8a04", "title": "La PUD termina la semana sin posición común", "text": "La reunión convocada por Machado y González Urrutia concluyó sin acuerdos sobre representación, mecanismo decisorio o participación en la agenda AN2015–Ejecutivo." },
+      { "tag": "Institucional", "color": "#5b6b7f", "title": "El Ejecutivo ejecuta su mayor reestructuración ministerial", "text": "Félix Plasencia asume la nueva cartera fusionada de Relaciones y Comercio Exterior; Yván Gil pasa a Ciencia y Tecnología y las fundaciones sociales quedan bajo Presidencia." },
+      { "tag": "Washington", "color": "#7c3aed", "title": "Cabello se consolida como interlocutor operativo", "text": "NYT y Financial Times documentan su coordinación con el Comando Sur y la tutela estadounidense sobre decisiones del gobierno, pese a la recompensa vigente de USD 25 millones." },
+      { "tag": "Económico", "color": "#f59e0b", "title": "La inflación de junio alcanza 13,8%", "text": "El acumulado semestral llega a 129,82%, mientras el financiamiento de reconstrucción permanece sin precisar y el TPS entra en revisión." },
+      { "tag": "Energía", "color": "#22c55e", "title": "La producción petrolera presenta una brecha de 117.000 b/d", "text": "La OPEP registra 1,070M b/d por fuentes secundarias y 1,187M b/d por comunicación directa; el Ejecutivo fija una meta de 1,5M b/d." },
+      { "tag": "Emergencia", "color": "#dc2626", "title": "4.930 fallecidos y 21.210 personas en campamentos", "text": "El balance del 16 de julio registra 107 campamentos, 128.324 familias atendidas, 856 edificios afectados y 1.308 réplicas." },
+      { "tag": "Escenarios", "color": "#0468B1", "title": "E3 sube a 48% bajo continuidad tutelada", "text": "La disciplina del gabinete, la tutela operativa de Washington y los acuerdos energéticos refuerzan la continuidad negociada en 2pp." },
+      { "tag": "Escenarios", "color": "#dc2626", "title": "E1 cae 6pp hasta 27%", "text": "Movimiento Disruptivo Justificado: Washington reconoce que la amnistía no garantiza el retorno seguro de Machado y respalda un canal institucional que no la incorpora." }
+    ],
+    "sintesis": "El período 10–17 de julio profundiza la continuidad tutelada del gobierno encargado. E3 sube a 48% (+2pp) por la evidencia periodística sobre tutela operativa de Washington, la disciplina de élite durante la reestructuración ministerial y la densificación de compromisos energéticos. E1 cae a 27% (−6pp), Movimiento Disruptivo Justificado, porque Washington reconoce que la ley de amnistía no protege el regreso de María Corina Machado y respalda una hoja de ruta AN2015–Ejecutivo que no incorpora a la coalición opositora de mayor legitimidad. E4 sube a 16% (+3pp) por la consolidación de Cabello y la centralización de recursos sociales. E2 sube a 9% (+1pp) por inflación, riesgo sobre TPS/remesas y financiamiento de reconstrucción incierto.",
+    "actores": [
+      { "name": "Gobierno encargado", "items": ["Fusiona Relaciones Exteriores y Comercio Exterior bajo Félix Plasencia.", "Traslada a Yván Gil a Ciencia y Tecnología y centraliza fundaciones sociales en Presidencia.", "Fija meta petrolera de 1,5M b/d y confirma 30 acuerdos internacionales en negociación."] },
+      { "name": "Estados Unidos", "items": ["Respalda la agenda AN2015–Ejecutivo hacia un nuevo CNE y reformas electorales.", "Reconoce que la amnistía no ofrece garantías suficientes para Machado.", "Mantiene interlocución operativa con Diosdado Cabello pese a la recompensa de USD 25M."] },
+      { "name": "Oposición", "items": ["La PUD concluye una reunión de tres horas sin posición común.", "Machado y González Urrutia permanecen fuera de la hoja de ruta institucional anunciada.", "La desclasificación del informe CIA–Smartmatic agrega disputa sobre garantías del nuevo CNE."] },
+      { "name": "Comunidad internacional", "items": ["Corea del Sur eleva su apoyo acumulado a USD 8,5M; USD 3M se canalizan vía PNUD.", "Rusia entrega 35 toneladas adicionales y Estados Unidos realiza un sexto puente aéreo.", "Shell evalúa Patao y Mejillones y proyecta perforar Dragón desde 2027."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesPlenas": 9000, "privadosLiberados": null, "cautelares": null, "militares": 187, "fpVerificados": 857, "fpDetenidos": 404, "fpNota": "El Ejecutivo reporta cerca de 9.000 beneficiarios, incluidos 900 liberados en enero y más de 500 por convivencia democrática; se conserva el último balance verificable del Foro Penal para comparación." },
+      "rodriguez": [
+        { "title": "Reestructuración ministerial", "text": "Fusiona Cancillería y Comercio Exterior; Plasencia asume la cartera y Gil pasa a Ciencia y Tecnología." },
+        { "title": "Hoja de ruta energética", "text": "Meta de 1,5M b/d, 30 acuerdos petroleros y retorno de auditoría externa en PDVSA." },
+        { "title": "Sistema eléctrico", "text": "GE prevé recuperar 4.000 MW e IMSA sumar más de 2.400 MW en Tocoma y Bajo Caroní." },
+        { "title": "Diálogo condicionado", "text": "Mantiene el diálogo con Machado condicionado al levantamiento total de sanciones." }
+      ],
+      "mcmAgenda": ["Obtener garantías legales verificables de retorno.", "Articular una posición común de la PUD frente a la hoja de ruta AN2015.", "Definir participación en el nuevo CNE y las reformas electorales."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "13,8%", "label": "Inflación de junio", "color": "#dc2626" },
+        { "value": "129,82%", "label": "Inflación acumulada semestral", "color": "#dc2626" },
+        { "value": "1,070–1,187M", "label": "Producción OPEP · b/d", "color": "#22c55e" },
+        { "value": "USD 71,13", "label": "Merey junio · −14,1%", "color": "#f59e0b" }
+      ],
+      "empresas": [
+        { "empresa": "PDVSA", "desarrollo": "Retoma auditoría externa y sostiene una meta oficial de producción de 1,5M b/d." },
+        { "empresa": "Chevron / Repsol", "desarrollo": "Forman parte de 30 acuerdos internacionales en negociación bajo la nueva Ley de Hidrocarburos." },
+        { "empresa": "General Electric", "desarrollo": "Acuerdo para recuperar 1.000 MW en 24 meses y 4.000 MW en cuatro años." },
+        { "empresa": "IMSA", "desarrollo": "Tocoma y Macagua aportarían más de 2.400 MW adicionales." },
+        { "empresa": "Shell", "desarrollo": "Evalúa Patao y Mejillones y proyecta la primera producción del campo Dragón para 2029." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 0, "promDiario": 0, "periodo": "10–17 jul", "variacion": "Sin conteo verificable en el documento fuente", "composicion": "Inflación, reconstrucción, garantías electorales y protección migratoria.", "nota": "No se interpreta la ausencia de conteo como ausencia de presión social." },
+      "percepcion": { "fuente": "Análisis situacional / último dato disponible", "titulo": "Legitimidad sin actualización semanal", "nota": "Se conserva como referencia la desaprobación de 63,3% reportada en el corte anterior; no existe una nueva medición esta semana.", "datos": [{ "factor": "Desaprobación previa del gobierno", "pct": 63.3 }, { "factor": "Abastecimiento interno reportado", "pct": 96 }, { "factor": "Inflación junio", "pct": 13.8 }, { "factor": "Ocupación de campamentos", "pct": 84 }] },
+      "excarcelados": { "fp": 857, "presos": 404, "militares": 187, "fuente": "Foro Penal / último dato verificado" }
+    },
+    "marcoNormativo": {
+      "titulo": "Hoja de ruta electoral, reforma inmobiliaria y centralización social",
+      "resumen": "La agenda AN2015–Ejecutivo avanza hacia un nuevo CNE desde el 1° de agosto, mientras la AN inicia una reforma inmobiliaria y la Presidencia absorbe instrumentos de gestión social.",
+      "cambios": [
+        { "titulo": "Nuevo CNE", "texto": "La hoja de ruta prevé reforma electoral, auditorías, observación y responsabilidad de rectores.", "color": "#22c55e" },
+        { "titulo": "Amnistía insuficiente", "texto": "Washington reconoce que el marco vigente no garantiza el regreso seguro de Machado.", "color": "#dc2626" },
+        { "titulo": "Reforma inmobiliaria", "texto": "Flexibiliza precios, plazos y financiamiento, y amplía facultades de supervisión estatal.", "color": "#f59e0b" },
+        { "titulo": "Fundaciones sociales", "texto": "Barrio Nuevo Barrio Tricolor y Venezuela Bella pasan al Despacho de la Presidencia.", "color": "#0468B1" }
+      ],
+      "lecturaAnalitica": "El proceso institucional gana densidad formal, pero excluye a los actores opositores de mayor legitimidad y centraliza simultáneamente recursos coercitivos y sociales. Esa combinación favorece continuidad negociada y eleva el riesgo coercitivo."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "48%", "color": "#0468B1", "text": "Sube por tutela operativa externa, disciplina de gabinete y centralización de la renta energética." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "27%", "color": "#2d8a30", "text": "Cae 6pp por falta de garantías para Machado y exclusión del canal AN2015–Ejecutivo." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "16%", "color": "#ca8a04", "text": "Sube por consolidación de Cabello y control presidencial de instrumentos sociales." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "9%", "color": "#dc2626", "text": "Sube por inflación, riesgo sobre remesas y reconstrucción sin financiamiento precisado." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Hoja de ruta hacia el 1° de agosto", "text": "La incorporación o exclusión de Machado y la PUD determinará si el canal es apertura o continuidad tutelada." },
+      { "tag": "Disruptivo", "color": "#ca8a04", "title": "La transición cae por debajo de 30%", "text": "El reconocimiento oficial de falta de garantías produce el mayor ajuste semanal de E1 en el ciclo." },
+      { "tag": "Energía", "color": "#22c55e", "title": "La resiliencia productiva contiene E2", "text": "La meta petrolera y los acuerdos eléctricos sostienen capacidad de financiamiento de la coalición." },
+      { "tag": "Riesgo", "color": "#f59e0b", "title": "Inflación, TPS y reconstrucción convergen", "text": "La presión sobre precios y remesas aumenta antes de que exista un costo total financiado de reconstrucción." }
+    ]
   }
 ];
 

@@ -382,5 +382,56 @@ export const AMNISTIA_TRACKER = [
       "militares": 187
     },
     "hito": "Sin nuevo balance verificable de presos políticos en la semana del sismo. La agenda pública se desplaza hacia emergencia, reconstrucción y coordinación humanitaria, sin señales documentadas de securitización de la respuesta."
+  },
+  {
+    "week": "S25",
+    "label": "26 jun–3 jul",
+    "gob": {
+      "solicitudes": null,
+      "libertades": 8740,
+      "privadosLiberados": 314,
+      "cautelares": 8426,
+      "militares": 187
+    },
+    "fp": {
+      "verificados": 857,
+      "detenidos": 404,
+      "militares": 187
+    },
+    "hito": "El documento fuente no reporta un nuevo balance verificable de presos políticos. El foco de derechos y garantías se desplaza al acceso humanitario, las restricciones a periodistas y el control de voluntarios en las zonas afectadas."
+  },
+  {
+    "week": "S26",
+    "label": "3–9 jul",
+    "gob": {
+      "solicitudes": null,
+      "libertades": 8740,
+      "privadosLiberados": 314,
+      "cautelares": 8426,
+      "militares": 187
+    },
+    "fp": {
+      "verificados": 857,
+      "detenidos": 404,
+      "militares": 187
+    },
+    "hito": "Los documentos del período no incorporan un nuevo balance verificable de presos políticos o excarcelaciones. Se conserva el último dato disponible y se prioriza el monitoreo de garantías políticas, protestas y controversia constitucional."
+  },
+  {
+    "week": "S27",
+    "label": "10–17 jul",
+    "gob": {
+      "solicitudes": null,
+      "libertades": 9000,
+      "privadosLiberados": 1400,
+      "cautelares": 8426,
+      "militares": 187
+    },
+    "fp": {
+      "verificados": 857,
+      "detenidos": 404,
+      "militares": 187
+    },
+    "hito": "El Ejecutivo reporta cerca de 9.000 beneficiarios de la Ley de Amnistía, con 900 liberaciones en enero y más de 500 adicionales mediante programas de convivencia democrática. El subsecretario Weiland advierte que el texto vigente no ofrece garantías suficientes para el regreso de María Corina Machado."
   }
 ];

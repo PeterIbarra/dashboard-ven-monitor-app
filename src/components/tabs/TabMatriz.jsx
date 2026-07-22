@@ -109,7 +109,7 @@ export function TabMatriz({ week, setWeek }) {
           <div style={{ marginTop:12, display:"flex", flexDirection:"column", gap:6 }}>
             {wk.probs.map(p => {
               const sc = SCENARIOS.find(s=>s.id===p.sc);
-              const delta = prevWk ? p.v - (prevWk.probs.find(pp=>pp.sc===p.sc)?.v||0) : null;
+              const delta = p.reportedDelta ?? (prevWk ? p.v - (prevWk.probs.find(pp=>pp.sc===p.sc)?.v||0) : null);
               return (
                 <div key={p.sc} style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", padding:"3px 0" }} onClick={()=>setSel(p.sc)}>
                   <span style={{ fontSize:13, fontFamily:font, color:sc.color, width:22, fontWeight:sel===p.sc?700:400 }}>E{sc.id}</span>

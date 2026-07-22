@@ -1,67 +1,67 @@
 export const KPIS_LATEST = {
   "energia": [
     {
-      "k": "PDVSA",
-      "v": "USD 9.400M ene–may",
+      "k": "Producción OPEP",
+      "v": "1,07–1,187M b/d",
       "c": "#22c55e"
     },
     {
-      "k": "Exportaciones",
-      "v": "+25% interanual",
+      "k": "Meta oficial",
+      "v": "1,5M b/d · 30 acuerdos",
+      "c": "#22c55e"
+    },
+    {
+      "k": "Merey junio",
+      "v": "USD 71,13 · −14,1%",
       "c": "#f59e0b"
     },
     {
-      "k": "FMI/BID",
-      "v": "Asistencia activada",
-      "c": "#38bdf8"
-    },
-    {
-      "k": "Fondo sismo",
-      "v": "USD 200M inicial",
+      "k": "Electricidad",
+      "v": "+6.400 MW acordados",
       "c": "#22c55e"
     }
   ],
   "politico": [
     {
       "k": "E3 dominante",
-      "v": "49%",
-      "c": "#22c55e"
-    },
-    {
-      "k": "E1",
-      "v": "39% · OEA lista",
+      "v": "48% · +2pp",
       "c": "#38bdf8"
     },
     {
-      "k": "AN2015",
-      "v": "Comisión negociadora",
-      "c": "#f59e0b"
+      "k": "E1",
+      "v": "27% · −6pp",
+      "c": "#22c55e"
     },
     {
-      "k": "Cooperación",
-      "v": "+25 países",
-      "c": "#f59e0b"
+      "k": "E4",
+      "v": "16% · +3pp",
+      "c": "#ca8a04"
+    },
+    {
+      "k": "Hoja de ruta",
+      "v": "AN2015 · 1° agosto",
+      "c": "#ef4444"
     }
   ],
   "opinion": [
     {
-      "k": "Sismo",
-      "v": "Mw 7.2/7.5",
+      "k": "Balance oficial",
+      "v": "4.930 fallecidos",
       "c": "#ef4444"
     },
     {
-      "k": "Costo estimado",
-      "v": "1%–7% PIB",
-      "c": "#22c55e"
+      "k": "Campamentos",
+      "v": "21.210 personas · 107",
+      "c": "#f59e0b"
     },
     {
-      "k": "Deuda externa",
-      "v": "USD 240.000M",
-      "c": "#22c55e"
+      "k": "Inflación junio",
+      "v": "13,8% · 129,82% acum.",
+      "c": "#ef4444"
     },
     {
       "k": "Brecha E3–E1",
-      "v": "10 puntos",
+      "v": "21 puntos",
       "c": "#f59e0b"
     }
   ]
@@ -1979,37 +1979,182 @@ export const WEEKS = [
       "E1 sube a 39% porque el canal AN2015–Figuera y la OEA siguen activos pese a la emergencia",
       "E4 cae a 9% y E2 a 3% por ausencia de cierre coercitivo o fractura institucional inmediata"
     ]
+  },
+  {
+    "label": "26 jun–3 jul",
+    "short": "S25",
+    "probs": [
+      { "sc": 1, "v": 36, "t": "down", "reportedDelta": -2 },
+      { "sc": 2, "v": 8, "t": "up", "reportedDelta": 2 },
+      { "sc": 3, "v": 44, "t": "down", "reportedDelta": -2 },
+      { "sc": 4, "v": 12, "t": "up", "reportedDelta": 2 }
+    ],
+    "xy": { "x": 0.24, "y": 0.44 },
+    "sem": { "g": 5, "y": 8, "r": 7 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "1,20M b/d en junio; −0,04–0,05M b/d vs. mayo",
+        "ingresos": "Flujo petrolero USD 1.110M; −USD 260M vs. mayo",
+        "licencias": "Cesta venezolana USD 69,8/barril",
+        "cambio": "El Palito y Complejo Morón condicionados por suministro eléctrico"
+      },
+      "economico": {
+        "inflacion": "Junio: 11,4%–13,8% mensual; 125,0%–129,9% acumulada",
+        "ingresos_pob": "SENIAT: USD 866M en junio; −7,5% vs. mayo",
+        "electricidad": "La Guaira: 75% electricidad, 68% agua y 90% vialidad",
+        "pib": "Pérdidas del sismo: 4%–20% del PIB (USGS)"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha estable en 8pp",
+        "elecciones": "Vencimiento del segundo plazo del interinato: 3–5 jul",
+        "mcm": "Dos intentos de retorno bloqueados; fricción abierta con Washington",
+        "eeuu": "86% califica la gestión como deficiente o muy deficiente"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Cohesión de élite:</b> No se documentan fracturas en PSUV/FANB durante la respuesta a la emergencia." },
+      { "l": "green", "t": "<b>Cooperación internacional:</b> 147 países y 31 organismos expresan solidaridad; SOUTHCOM despliega cerca de 2.000 efectivos." },
+      { "l": "yellow", "t": "<b>Continuidad bajo presión:</b> E3 conserva el liderazgo en 44%, pero cede por erosión fiscal y de legitimidad." },
+      { "l": "yellow", "t": "<b>Interinato:</b> El segundo plazo constitucional vence entre el 3 y el 5 de julio sin mecanismo formal resuelto al corte." },
+      { "l": "red", "t": "<b>Securitización humanitaria:</b> Registro de voluntarios, restricciones a periodistas y retención denunciada de ayuda elevan E4." },
+      { "l": "red", "t": "<b>Trilema fiscal:</b> Reconstrucción, deuda de USD 240.000M y menor flujo petrolero elevan E2 a 8%." },
+      { "l": "red", "t": "<b>Daño humanitario:</b> 2.295 fallecidos, 12.400 heridos y 11.546 personas sin vivienda atendidas en campamentos." }
+    ],
+    "lectura": "La semana del 26 de junio al 3 de julio confirma que la emergencia sísmica se convirtió en un factor estructural superpuesto a la agenda política y económica. E3 continúa dominante en 44% (−2pp): la cohesión del PSUV/FANB y la coordinación operativa con Estados Unidos se mantienen, pero el costo de reconstrucción, la caída del flujo petrolero y la desaprobación ciudadana erosionan la sostenibilidad de la continuidad negociada.\n\nE1 baja a 36% (−2pp) porque dos intentos de retorno de María Corina Machado fueron bloqueados y la comisión AN2015–Gobierno no registró avances verificables. E4 sube a 12% (+2pp) por señales de securitización del acceso a la ayuda y a la información. E2 sube a 8% (+2pp) porque el USGS amplió las pérdidas estimadas a 4%–20% del PIB, mientras el fondo de reconstrucción de USD 200M y el flujo petrolero de junio resultan insuficientes frente al nuevo estrés fiscal. No se declara movimiento disruptivo: todos los ajustes permanecen dentro del techo de ±5pp.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 conserva el liderazgo en 44%, sostenido por cohesión de élite y continuidad operativa",
+      "E1 baja a 36% tras el bloqueo de dos intentos de retorno de MCM y la falta de avances negociadores",
+      "E4 y E2 suben a 12% y 8% por securitización humanitaria y ampliación del riesgo fiscal"
+    ]
+  },
+  {
+    "label": "3–9 jul",
+    "short": "S26",
+    "probs": [
+      { "sc": 1, "v": 33, "t": "down" },
+      { "sc": 2, "v": 8, "t": "flat" },
+      { "sc": 3, "v": 46, "t": "up" },
+      { "sc": 4, "v": 13, "t": "up" }
+    ],
+    "xy": { "x": 0.23, "y": 0.46 },
+    "sem": { "g": 6, "y": 8, "r": 7 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "64% vía traders; Citgo retoma crudo venezolano",
+        "ingresos": "Flujo de efectivo esperado en julio: ~USD 1.869M",
+        "licencias": "Reglamento de Hidrocarburos tras revisar 1.389 resoluciones",
+        "cambio": "Producción 1,18M bpd en mayo; meta 1,37M bpd"
+      },
+      "economico": {
+        "inflacion": "Sin dato semanal nuevo; vigilar transmisión fiscal-cambiaria",
+        "ingresos_pob": "Deuda USD 150.000–240.000M sin DSA del FMI",
+        "electricidad": "Starlink autorizado para prueba piloto de conectividad",
+        "pib": "Daños: USD 6.700M PNUD vs. USD 37.000M UNDRR"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha se amplía a 13pp",
+        "elecciones": "46% prioriza elecciones vs. 33% reconstrucción",
+        "mcm": "Imagen positiva 53%; dos intentos de retorno bloqueados",
+        "eeuu": "75% confía en EE.UU. para la reconstrucción"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Cohesión de élite:</b> El enroque SENIAT–Pequiven–Banco de Venezuela–CIIP ocurre sin renuncias ni disidencias." },
+      { "l": "green", "t": "<b>Apertura energética:</b> El nuevo Reglamento de Hidrocarburos amplía participación privada bajo regulación centralizada." },
+      { "l": "green", "t": "<b>Respaldo externo:</b> Washington, Israel, China, UE y organismos multilaterales sostienen la capacidad operativa del gobierno encargado." },
+      { "l": "yellow", "t": "<b>Vacío formal:</b> El silencio de TSJ, AN y MP tras cumplirse 180 días opera como continuidad tácita, no como solución constitucional." },
+      { "l": "yellow", "t": "<b>Legitimidad:</b> La desaprobación de Delcy Rodríguez llega a 63,3% y la de la respuesta sísmica a 65%." },
+      { "l": "red", "t": "<b>Riesgo fiscal:</b> El EMBI sube 836pb hasta 7.098 puntos en ocho jornadas." },
+      { "l": "red", "t": "<b>Reconstrucción discrecional:</b> Venezuela Renace concentra presupuesto sin una PDNA formal ni arbitraje técnico validado." }
+    ],
+    "lectura": "La semana del 3 al 9 de julio consolida la continuidad negociada como escenario dominante. E3 sube a 46% (+2pp) porque el reacomodo del equipo económico ocurre sin fracturas, el silencio institucional tras el vencimiento de los 180 días sostiene de facto al gobierno encargado y una coalición amplia de actores externos continúa financiando y reconociendo su capacidad operativa.\n\nE1 baja a 33% (−3pp) porque dos intentos documentados de regreso de María Corina Machado fueron bloqueados por Washington y el canal AN2015–Ejecutivo no produjo avances verificables. E4 sube a 13% (+1pp) al trasladarse la securitización desde el acceso físico hacia el control presupuestario de la reconstrucción mediante la Gran Misión Venezuela Renace. E2 permanece en 8%: el EMBI sube 836 puntos básicos y los daños oscilan entre USD 6.700M y USD 37.000M, pero no se observa fractura civil-militar ni pérdida de control territorial. La brecha E3–E1 se amplía a 13pp.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 sube a 46% por cohesión de élite, silencio institucional coordinado y respaldo operativo externo",
+      "E1 baja a 33% por el bloqueo reiterado al retorno de MCM y la falta de avances negociadores",
+      "E4 sube a 13% por control discrecional de la reconstrucción; E2 permanece en 8%"
+    ]
+  },
+  {
+    "label": "10–17 jul",
+    "short": "S27",
+    "probs": [
+      { "sc": 1, "v": 27, "t": "down" },
+      { "sc": 2, "v": 9, "t": "up" },
+      { "sc": 3, "v": 48, "t": "up" },
+      { "sc": 4, "v": 16, "t": "up" }
+    ],
+    "xy": { "x": 0.27, "y": 0.48 },
+    "sem": { "g": 6, "y": 8, "r": 8 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "OPEP: 1,070M b/d fuentes secundarias; 1,187M b/d comunicación directa",
+        "ingresos": "Merey USD 71,13/barril en junio; −14,1% vs. mayo",
+        "licencias": "Meta 1,5M b/d; 30 acuerdos con Chevron, Repsol y otros",
+        "cambio": "GE +4.000 MW; IMSA/Tocoma–Macagua +2.400 MW"
+      },
+      "economico": {
+        "inflacion": "Junio 13,8%; acumulado semestral 129,82%",
+        "ingresos_pob": "TPS de ~600.000 venezolanos bajo revisión en Corte Suprema de EE.UU.",
+        "electricidad": "Acuerdos para recuperar o añadir más de 6.400 MW",
+        "pib": "Financiamiento total de reconstrucción aún sin precisar"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha se amplía a 21pp",
+        "elecciones": "Hoja de ruta AN2015–Ejecutivo inicia 1° agosto",
+        "mcm": "Amnistía sin garantías suficientes; PUD sin posición común",
+        "eeuu": "Tutela operativa documentada por NYT y Financial Times"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Continuidad tutelada:</b> NYT y FT documentan control operativo de Washington sobre personal, comunicación y política exterior." },
+      { "l": "green", "t": "<b>Disciplina de élite:</b> La mayor reestructuración de gabinete se ejecuta sin renuncias, fugas ni disidencia pública." },
+      { "l": "green", "t": "<b>Ancla petrolera:</b> Meta de 1,5M b/d, 30 acuerdos y nuevos compromisos eléctricos sostienen capacidad rentista." },
+      { "l": "yellow", "t": "<b>Canal paralelo:</b> La hoja de ruta AN2015–Ejecutivo avanza hacia un nuevo CNE sin Machado ni González Urrutia." },
+      { "l": "yellow", "t": "<b>Brecha productiva:</b> OPEP registra 1,070M b/d por fuentes secundarias frente a 1,187M b/d por comunicación directa." },
+      { "l": "red", "t": "<b>Movimiento disruptivo:</b> E1 cae 6pp porque Washington reconoce que la amnistía no garantiza un retorno seguro de Machado." },
+      { "l": "red", "t": "<b>Presión sociofiscal:</b> Inflación de 13,8%, financiamiento de reconstrucción incierto y amenaza al TPS/remesas elevan E2." },
+      { "l": "red", "t": "<b>Control centralizado:</b> Cabello consolida el aparato coercitivo y la Presidencia absorbe fundaciones sociales de reconstrucción." }
+    ],
+    "lectura": "El corte del 10 al 17 de julio profundiza el patrón de continuidad tutelada. E3 sube a 48% (+2pp) porque NYT y Financial Times documentan el control operativo de Washington sobre decisiones del gobierno encargado, mientras la mayor reestructuración del gabinete se ejecuta sin fracturas y la apertura energética sostiene la capacidad rentista.\n\nE1 cae a 27% (−6pp), Movimiento Disruptivo Justificado, porque la propia administración estadounidense reconoce ante el Congreso que la ley de amnistía no ofrece garantías suficientes para el regreso de María Corina Machado, mientras respalda un canal AN2015–Ejecutivo que excluye a la coalición opositora de mayor legitimidad electoral. E4 sube a 16% (+3pp) por la consolidación de Cabello y la centralización de fundaciones sociales bajo la Presidencia. E2 sube a 9% (+1pp) ante inflación de 13,8%, amenaza al TPS/remesas y financiamiento de reconstrucción incierto, sin fractura civil-militar ni pérdida territorial.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 sube a 48% por tutela operativa de Washington, disciplina de gabinete y ancla energética",
+      "E1 cae a 27% en Movimiento Disruptivo Justificado por falta de garantías para MCM y exclusión del canal institucional",
+      "E4 sube a 16% y E2 a 9% por centralización coercitiva, inflación y riesgo sobre remesas"
+    ]
   }
 ];
 
 export const TENSIONS = [
   {
     "level": "green",
-    "text": "El doblete sísmico refuerza la centralidad operativa del gobierno encargado y la coordinación internacional."
+    "text": "La mayor reestructuración del gabinete se ejecuta por decreto sin renuncias, fugas ni disidencias."
   },
   {
     "level": "green",
-    "text": "Más de 25 países y organismos movilizan ayuda; FMI/BID canalizan apoyo por vías institucionales."
+    "text": "La meta de 1,5M b/d, 30 acuerdos petroleros y más de 6.400 MW comprometidos sostienen la continuidad."
   },
   {
     "level": "yellow",
-    "text": "El canal AN2015–Figuera y la OEA sostienen E1 en 39%, pero falta confirmación formal de hitos."
+    "text": "La hoja de ruta AN2015–Ejecutivo avanza hacia un nuevo CNE con respaldo de Washington, sin la PUD unificada."
   },
   {
     "level": "yellow",
-    "text": "El shock fiscal del sismo (1%–7% del PIB) se cruza con la negociación de deuda externa de USD 240.000M."
+    "text": "Washington reconoce que la ley de amnistía no garantiza el retorno seguro de Machado; E1 cae 6pp."
   },
   {
     "level": "yellow",
-    "text": "Las cifras de víctimas, daños e infraestructura afectada siguen en consolidación frente a proyecciones USGS."
+    "text": "Cabello consolida control de seguridad y la Presidencia centraliza fundaciones sociales de reconstrucción."
   },
   {
     "level": "red",
-    "text": "USGS estima 24% de probabilidad de un M6 adicional y 3% de M7+; servicios básicos bajo presión."
+    "text": "La inflación de junio alcanza 13,8% y 129,82% acumulado en el primer semestre."
   },
   {
     "level": "red",
-    "text": "Una respuesta insuficiente en reconstrucción, electricidad o telecomunicaciones podría desplazar presión hacia E2."
+    "text": "La revisión del TPS amenaza las remesas de cerca de 600.000 venezolanos mientras el financiamiento de reconstrucción sigue impreciso."
   }
 ];
 
@@ -2037,7 +2182,10 @@ export const MONITOR_WEEKS = [
   "S21",
   "S22",
   "S23",
-  "S24"
+  "S24",
+  "S25",
+  "S26",
+  "S27"
 ];
 
 export const ICG_HISTORY = [
@@ -2184,6 +2332,24 @@ export const ICG_HISTORY = [
     "score": 67,
     "sitrep": true,
     "note": "El doblete sísmico activa respuesta institucional y cooperación internacional sin fractura civil-militar visible. La cohesión sube por gestión coordinada, con riesgo fiscal y de servicios en observación."
+  },
+  {
+    "week": "S25",
+    "score": 65,
+    "sitrep": true,
+    "note": "La cohesión PSUV/FANB se mantiene durante la emergencia, pero el 86% de desaprobación, la presión fiscal y la securitización de la ayuda erosionan la legitimidad operativa."
+  },
+  {
+    "week": "S26",
+    "score": 68,
+    "sitrep": true,
+    "note": "El enroque económico y el silencio institucional tras los 180 días confirman disciplina de élite. La cohesión mejora pese a la erosión de legitimidad y al aumento del riesgo fiscal."
+  },
+  {
+    "week": "S27",
+    "score": 71,
+    "sitrep": true,
+    "note": "La reestructuración del gabinete sin disidencias, la tutela operativa de Washington y la consolidación de Cabello refuerzan cohesión de élite, aunque amplían la distancia con la oposición de mayor legitimidad electoral."
   }
 ];
 
@@ -2970,6 +3136,50 @@ export const CONF_SEMANAL = [
     "hecho": "La agenda social del período queda dominada por el doblete sísmico del 24 de junio: víctimas, daños, electricidad, telecomunicaciones, réplicas y acceso a ayuda humanitaria pasan a ser los principales vectores de seguimiento.",
     "dias": [
       { "fecha": "24 Junio", "protestas": 0, "estados": 0, "tipo": "Emergencia", "exigencias": "Atención a víctimas, reconstrucción, servicios básicos, electricidad, telecomunicaciones y coordinación de ayuda" }
+    ]
+  },
+  {
+    "week": "S25",
+    "label": "26 jun–3 jul",
+    "protestas": 0,
+    "estados": 0,
+    "reprimidas": 0,
+    "motivos": [
+      "Ayuda humanitaria",
+      "Vivienda",
+      "Servicios básicos",
+      "Transparencia",
+      "Libertad de información"
+    ],
+    "hecho": "Sin conteo semanal verificable de protestas en el documento fuente. La presión social se expresa en una desaprobación superior al 86% de la gestión de la emergencia y en disputas por el acceso a la ayuda y a la información.",
+    "dias": [
+      { "fecha": "26 Junio–3 Julio", "protestas": 0, "estados": 0, "tipo": "Emergencia/legitimidad", "exigencias": "Ayuda humanitaria, vivienda, servicios, transparencia y acceso de prensa" }
+    ]
+  },
+  {
+    "week": "S26",
+    "label": "3–9 jul",
+    "protestas": 15,
+    "estados": 10,
+    "reprimidas": 0,
+    "motivos": ["Justicia", "Derechos laborales", "Participación política", "Salud", "Vivienda", "Derechos de niños y adolescentes"],
+    "hecho": "El OVCS registra 15 protestas en tres jornadas y 10 entidades. Las demandas sociales se conectan con la controversia constitucional y la exigencia de elecciones.",
+    "dias": [
+      { "fecha": "3 Julio", "protestas": 5, "estados": 5, "tipo": "Político/social", "exigencias": "Justicia, participación política, derechos laborales y vivienda" },
+      { "fecha": "6 Julio", "protestas": 5, "estados": 4, "tipo": "Social", "exigencias": "Justicia, derechos laborales y salud" },
+      { "fecha": "8 Julio", "protestas": 5, "estados": 4, "tipo": "Político/social", "exigencias": "Justicia, trabajo, participación política, salud y derechos de NNA" }
+    ]
+  },
+  {
+    "week": "S27",
+    "label": "10–17 jul",
+    "protestas": 0,
+    "estados": 0,
+    "reprimidas": 0,
+    "motivos": ["Sin conteo verificable", "Reconstrucción", "Inflación", "Garantías electorales", "TPS y remesas"],
+    "hecho": "El documento fuente no incorpora un conteo de protestas para el período. El monitoreo social se concentra en inflación, campamentos, garantías electorales y la amenaza sobre TPS y remesas.",
+    "dias": [
+      { "fecha": "10–17 Julio", "protestas": 0, "estados": 0, "tipo": "Sin conteo verificable", "exigencias": "Reconstrucción, precios, garantías electorales y protección migratoria" }
     ]
   }
 ];

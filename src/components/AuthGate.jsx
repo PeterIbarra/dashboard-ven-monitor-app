@@ -882,6 +882,10 @@ function ErrorBox({ msg }) {
 // Gate principal
 // ─────────────────────────────────────────
 export function AuthGate({ children }) {
+  // La revisión local no debe depender de una sesión o código de Clerk.
+  // Vite elimina esta rama del build de producción porque DEV=false.
+  if (import.meta.env.DEV) return children;
+
   return (
     <>
       <SignedOut><LoginScreen /></SignedOut>

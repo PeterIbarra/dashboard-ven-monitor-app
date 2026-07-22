@@ -203,7 +203,7 @@ export function TabDashboard({ week, liveData = {}, setTab }) {
         {wk.probs.map(p => {
           const sc = SCENARIOS.find(s=>s.id===p.sc);
           const isDom = p.sc === dom.sc;
-          const delta = prevWk ? p.v - (prevWk.probs.find(pp=>pp.sc===p.sc)?.v||0) : null;
+          const delta = p.reportedDelta ?? (prevWk ? p.v - (prevWk.probs.find(pp=>pp.sc===p.sc)?.v||0) : null);
           return (
             <div key={p.sc} style={{ background:isDom?BG3:BG2, padding:"14px 16px", borderTop:`3px solid ${sc.color}` }}>
               <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:4, display:"flex", alignItems:"center", gap:6 }}>

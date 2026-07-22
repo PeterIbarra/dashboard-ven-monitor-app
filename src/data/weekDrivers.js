@@ -1,83 +1,74 @@
 export const WEEK_DRIVERS = {
   "1": {
-    "label": "Alta, con presión creciente pero sin vía institucional",
+    "label": "Transición pacífica — 27% · −6pp · movimiento disruptivo",
     "drivers": [
-      "E1 baja a 33% porque la presión electoral no se traduce en decisiones institucionales.",
-      "Marco Rubio exige un nuevo CNE lo antes posible y sindicatos reclaman cronograma presidencial.",
-      "Las vigilias frente a la Embajada de EE.UU. sostienen la demanda por presos políticos y justicia.",
-      "Roberto Marrero recibe amnistía y se suma al retorno acumulado de dirigentes.",
-      "El Manifiesto de Panamá mantiene una arquitectura opositora de demanda externa.",
-      "Diosdado Cabello descarta categóricamente negociar con María Corina Machado.",
-      "Sin renovación del CNE, retorno de MCM ni calendario vinculante, la tensión política aumenta pero E1 retrocede."
+      "El subsecretario Weiland reconoce ante el Congreso que la amnistía vigente no garantiza el regreso seguro de Machado.",
+      "La PUD cierra una reunión de tres horas sin posición común sobre representación ni sobre el rol de Machado.",
+      "El canal AN2015–Ejecutivo avanza hacia un nuevo CNE sin Machado ni Edmundo González Urrutia.",
+      "Washington respalda formalmente esa vía institucional paralela a partir del 1° de agosto.",
+      "La desclasificación del informe CIA–Smartmatic introduce una nueva disputa sobre garantías electorales.",
+      "E1 cae 6pp en Movimiento Disruptivo Justificado: el actor de mayor legitimidad queda fuera del canal institucional con respaldo externo."
     ],
     "signals": [
-      "Renovación o recomposición del CNE",
-      "Publicación de cronograma electoral",
-      "Retorno efectivo de MCM",
-      "Respuesta oficial al Manifiesto de Panamá",
-      "Condicionamiento electoral de la delegación estadounidense",
-      "Liberación verificable de presos políticos"
+      "Posición común de la Plataforma Unitaria",
+      "Reforma de la amnistía con garantías verificables",
+      "Tercer intento de retorno de Machado",
+      "Composición y observación del nuevo CNE",
+      "Participación de Machado y González Urrutia en la hoja de ruta"
     ]
   },
   "2": {
-    "label": "Baja, con riesgo social de mediano plazo",
+    "label": "Colapso y fragmentación — 9% · +1pp",
     "drivers": [
-      "E2 permanece en 4%, su mínimo histórico, por el andamiaje financiero y exportador.",
-      "La inflación mensual baja a 6,3%, mínimo en 19 meses, aunque la interanual alcanza 525%.",
-      "Los bonos soberanos y de PDVSA acumulan una revalorización cercana a 60% en el año.",
-      "El flujo de divisas estimado en USD 1.500 millones mensuales y la reconexión bancaria reducen riesgo inmediato.",
-      "El operativo FANB en el Arco Minero muestra capacidad estatal de recuperar control territorial.",
-      "El 68% de los hogares declara ingresos iguales o inferiores al mínimo y se registran 75 protestas.",
-      "El riesgo de colapso se desplaza al mediano plazo si no aparece inversión ejecutable o si la reestructuración de deuda se desordena."
+      "La inflación de junio alcanza 13,8%, más del doble de mayo, y 129,82% acumulado semestral.",
+      "La Administración Trump solicita revocar el TPS de cerca de 600.000 venezolanos.",
+      "La amenaza sobre TPS introduce presión sobre remesas de la diáspora.",
+      "El financiamiento total del plan de reconstrucción continúa sin precisar.",
+      "Los acuerdos con Chevron, Repsol, GE e IMSA sostienen la coalición rentista en el corto plazo.",
+      "E2 sube solo 1pp porque no hay fractura FANB/PSUV ni pérdida territorial."
     ],
     "signals": [
-      "Análisis de sostenibilidad de deuda con el FMI",
-      "Embargos o litigios agresivos de bonistas",
-      "Caída de exportaciones o del flujo de divisas",
-      "Crisis humanitaria o desplazamientos en el Arco Minero",
-      "Inflación mensual vuelve a acelerarse",
-      "Conflictividad supera el máximo de 75 protestas"
+      "Tipo de cambio paralelo y brecha cambiaria",
+      "Decisión de la Corte Suprema sobre TPS",
+      "Efecto verificable sobre remesas",
+      "Financiamiento del plan de reconstrucción",
+      "Fractura de cadena de mando o pérdida territorial"
     ]
   },
   "3": {
-    "label": "Muy alta, dominante sobre el umbral del 50%",
+    "label": "Continuidad negociada — 48% · +2pp",
     "drivers": [
-      "E3 alcanza 50% por primera vez y amplía a 16 puntos la brecha sobre E1.",
-      "OFAC amplía siete licencias generales y admite arbitraje en Reino Unido, Francia y Singapur.",
-      "La eliminación de la cláusula de interés público responde a objeciones del capital privado.",
-      "La gira India–Türkiye abre oportunidades con Reliance, Tata, Essar y una meta comercial de USD 3.000 millones.",
-      "PDVSA y SLB firman un memorando tecnológico con sistemas digitales e inteligencia artificial.",
-      "IMPSA reporta 90% de acuerdo técnico-financiero para Tocoma y Macagua, con 672 MW potenciales.",
-      "La FANB despliega capacidad territorial en el Arco Minero para habilitar la apertura extractiva.",
-      "E3 sube solo 1pp porque la arquitectura todavía no se convierte en capital comprometido."
+      "NYT y Financial Times documentan tutela de Washington sobre personal, comunicación y política exterior.",
+      "Cabello se consolida como interlocutor operativo del Comando Sur pese a la recompensa de USD 25M.",
+      "La mayor reestructuración del gabinete se ejecuta sin renuncias, fugas ni disidencia.",
+      "La hoja de ruta AN2015–Ejecutivo avanza con respaldo formal del Departamento de Estado.",
+      "La meta de 1,5M b/d y 30 acuerdos energéticos centralizan renta bajo el Ejecutivo.",
+      "E3 sube 2pp, limitado por legitimidad deteriorada y ausencia de una PDNA formal."
     ],
     "signals": [
-      "Resultado de la delegación técnica estadounidense",
-      "Compromiso formal de Exxon, ConocoPhillips o Chevron",
-      "Acuerdo PDVSA–Reliance por hasta 400.000 bpd",
-      "Resolución de dividendos de ONGC Videsh",
-      "Firma definitiva del contrato IMPSA",
-      "Reglamento y contratos modelo de hidrocarburos"
+      "Desarrollo de la hoja de ruta hacia el 1° de agosto",
+      "Incorporación o exclusión de la PUD y Machado",
+      "Rol operativo de Cabello y recompensa estadounidense",
+      "Publicación de una PDNA formal",
+      "Formalización de la reforma inmobiliaria"
     ]
   },
   "4": {
-    "label": "Latente, calibrada al servicio de la apertura",
+    "label": "Resistencia coercitiva — 16% · +3pp",
     "drivers": [
-      "E4 se mantiene en 13% porque la coerción sigue siendo selectiva y funcional a la normalización.",
-      "El operativo militar en Las Claritas y Km 88 busca desplazar estructuras armadas del Arco Minero.",
-      "Provea y SOS Orinoco advierten riesgos de ejecuciones, detenciones, desplazamientos y afectación indígena.",
-      "El caso PDVSA Cripto mantiene denuncias de audiencias telemáticas, tratos crueles y restricciones a la defensa.",
-      "El Plan de 100 Días de la FANB consolida el esquema de mando renovado en marzo.",
-      "Cabello cierra públicamente la posibilidad de negociación con Machado.",
-      "CorteIDH ordena cerrar El Helicoide en 18 meses, elevando el costo internacional de la coerción."
+      "Cabello consolida control sobre fuerzas de seguridad, estructuras militares y colectivos.",
+      "Washington reconoce a Cabello como interlocutor operativo sin retirar la recompensa vigente.",
+      "Barrio Nuevo Barrio Tricolor y Venezuela Bella pasan al Despacho de la Presidencia.",
+      "La reforma inmobiliaria amplía inspección, sanción, registro y control del Ministerio de Vivienda.",
+      "El control coercitivo y el aparato social de reconstrucción quedan bajo una cadena de mando más centralizada.",
+      "E4 sube 3pp, sin Movimiento Disruptivo porque no hay represión masiva o quiebre territorial."
     ],
     "signals": [
-      "Balance oficial del operativo en Las Claritas",
-      "Desplazamientos o abusos verificados en comunidades",
-      "Respuesta estatal al fallo sobre El Helicoide",
-      "Represión de vigilias o protestas ante el CNE",
-      "Escalada procesal en el caso PDVSA Cripto",
-      "Ruptura visible dentro del mando político-militar"
+      "Criterios de asignación de recursos de fundaciones sociales",
+      "Represalias ante la indefinición de la PUD",
+      "Respuesta ante un tercer intento de retorno de Machado",
+      "Política de recompensa sobre Cabello",
+      "Escalada coercitiva sistémica"
     ]
   }
 };
