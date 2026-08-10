@@ -9,6 +9,7 @@ import { BilateralChart } from "../charts/BilateralChart";
 import { NewsAlerts } from "../NewsAlerts";
 import { CohesionMiniWidget } from "../CohesionMiniWidget";
 import { RedesMiniWidget } from "../RedesMiniWidget";
+import { OpinionPulseWidget } from "../OpinionPulseWidget";
 import { WEEKS, KPIS_LATEST, TENSIONS, CONF_SEMANAL } from "../../data/weekly.js";
 import { INDICATORS, SCENARIO_SIGNALS } from "../../data/indicators.js";
 import { SCENARIOS, CONF_MESES } from "../../data/static.js";
@@ -16,7 +17,7 @@ import { AMNISTIA_TRACKER } from "../../data/amnistia.js";
 import { REDES_TOTALS } from "../../data/redes.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SC, SEM, font, fontSans } from "../../constants";
 
-export function TabDashboard({ week, liveData = {}, setTab }) {
+export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection }) {
   const mob = useIsMobile();
   const [aiExplanation, setAiExplanation] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -553,7 +554,14 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
         );
       })()}
 
-      {/* ── ROW 1c: Conflictividad Bilateral EE.UU.–Venezuela ── */}
+      {/* ── ROW 1c: Pulso de Opinión Pública ── */}
+      <OpinionPulseWidget onNavigate={(section) => {
+        setOpinionSection(section);
+        setTab("opinion");
+        window.scrollTo({ top:0, behavior:"smooth" });
+      }} />
+
+      {/* ── ROW 1d: Conflictividad Bilateral EE.UU.–Venezuela ── */}
       {liveData?.bilateral?.latest && (() => {
         const bil = liveData.bilateral;
         const lat = bil.latest;

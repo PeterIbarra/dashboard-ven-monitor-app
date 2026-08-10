@@ -30,6 +30,7 @@ import { TabSitrep } from "./components/tabs/TabSitrep";
 import { TabMatriz } from "./components/tabs/TabMatriz";
 import { TabMonitor } from "./components/tabs/TabMonitor";
 import { TabClimaSocial } from "./components/tabs/TabClimaSocial";
+import { TabOpinionPublica } from "./components/tabs/TabOpinionPublica";
 import { TabGdelt } from "./components/tabs/TabGdelt";
 import { TabConflictividad } from "./components/tabs/TabConflictividad";
 import { TabIODA } from "./components/tabs/TabIODA";
@@ -108,6 +109,7 @@ const PNUD_LOGO = "data:image/svg+xml," + encodeURIComponent(PNUD_LOGO_SVG);
 
 export default function MonitorPNUD() {
   const [tab, setTab] = useState("dashboard");
+  const [opinionSection, setOpinionSection] = useState("panorama");
   const [week, setWeek] = useState(WEEKS.length - 1);
   const mob = useIsMobile();
 
@@ -502,11 +504,12 @@ export default function MonitorPNUD() {
 
       {/* CONTENT */}
       <div style={{ maxWidth:1340, margin:"0 auto", padding:mob?"12px 10px 40px":"24px 24px 60px" }}>
-        {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} setTab={setTab} />}
+        {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} setTab={setTab} setOpinionSection={setOpinionSection} />}
         {tab === "sitrep" && <TabSitrep week={week} liveData={liveData} />}
         {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
         {tab === "clima" && <TabClimaSocial liveData={liveData} />}
+        {tab === "opinion" && <TabOpinionPublica section={opinionSection} setSection={setOpinionSection} />}
         {tab === "gdelt" && <TabGdelt />}
         {tab === "conflictividad" && <TabConflictividad />}
         {tab === "ioda" && <TabIODA />}
