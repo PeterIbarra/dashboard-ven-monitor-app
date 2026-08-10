@@ -110,6 +110,7 @@ const PNUD_LOGO = "data:image/svg+xml," + encodeURIComponent(PNUD_LOGO_SVG);
 export default function MonitorPNUD() {
   const [tab, setTab] = useState("dashboard");
   const [opinionSection, setOpinionSection] = useState("panorama");
+  const [sismosSection, setSismosSection] = useState("principal");
   const [week, setWeek] = useState(WEEKS.length - 1);
   const mob = useIsMobile();
 
@@ -504,7 +505,7 @@ export default function MonitorPNUD() {
 
       {/* CONTENT */}
       <div style={{ maxWidth:1340, margin:"0 auto", padding:mob?"12px 10px 40px":"24px 24px 60px" }}>
-        {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} setTab={setTab} setOpinionSection={setOpinionSection} />}
+        {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} setTab={setTab} setOpinionSection={setOpinionSection} setSismosSection={setSismosSection} />}
         {tab === "sitrep" && <TabSitrep week={week} liveData={liveData} />}
         {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
@@ -516,7 +517,7 @@ export default function MonitorPNUD() {
         {tab === "mercados" && <TabMercados />}
         {tab === "macro" && <TabMacro />}
         {tab === "ambiental" && <TabAmbiental />}
-        {tab === "sismos" && <TabSismos />}
+        {tab === "sismos" && <TabSismos subView={sismosSection} setSubView={setSismosSection} />}
       </div>
 
       {/* FOOTER + METHODOLOGY */}

@@ -14,8 +14,8 @@ export function OpinionPulseWidget({ onNavigate }) {
     <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr" }}>
       <div style={{ padding:"13px 14px", borderRight:mob?"none":`1px solid ${BORDER}`, borderBottom:mob?`1px solid ${BORDER}`:"none" }}>
         <div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase", marginBottom:8 }}>Brecha de liderazgos</div>
-        <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, marginBottom:4 }}><span>Machado</span><b style={{ color:"#2d8a30" }}>+58 pp</b></div>
-        <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, marginBottom:8 }}><span>D. Rodríguez</span><b style={{ color:"#dc2626" }}>−52 pp</b></div>
+        <div style={{ display:"flex", justifyContent:"space-between", gap:8, fontSize:11, marginBottom:4 }}><span>María Corina Machado</span><b style={{ color:"#2d8a30", whiteSpace:"nowrap" }}>+58 pp</b></div>
+        <div style={{ display:"flex", justifyContent:"space-between", gap:8, fontSize:11, marginBottom:8 }}><span>Delcy Rodríguez</span><b style={{ color:"#dc2626", whiteSpace:"nowrap" }}>−52 pp</b></div>
         <div style={{ background:"#f5f3ff", border:"1px solid #7c3aed22", padding:"6px 8px", marginBottom:9 }}><span style={{ fontSize:9, color:MUTED }}>Brecha neta</span><div style={{ fontSize:22, fontWeight:900, color:"#7c3aed", lineHeight:1.05 }}>110 puntos</div></div>
         <ActionButton onClick={()=>onNavigate("liderazgo")} color="#7c3aed">Ver liderazgos</ActionButton>
       </div>

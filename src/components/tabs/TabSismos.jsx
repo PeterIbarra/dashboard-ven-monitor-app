@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "../../constants";
 import { loadCSS, loadScript } from "../../utils";
+import { EarthquakeEvolution } from "../EarthquakeEvolution";
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -2518,7 +2519,7 @@ function VantorSwipe({ antes, despues, mob }) {
   );
 }
 
-export function TabSismos() {
+export function TabSismos({ subView, setSubView }) {
   const mob = useIsMobile();
   const [data, setData] = useState({
     reports: [],
@@ -2549,7 +2550,6 @@ export function TabSismos() {
   const [reportGenerating, setReportGenerating] = useState(false);
   const [escombros, setEscombros] = useState({ counts: { principal: 0, secundaria: 0, otro: 0, total: 0 }, features: [] });
   const [vantorTiles, setVantorTiles] = useState({ antes: null, despues: null });
-  const [subView, setSubView] = useState("principal");
   const [damageProvider, setDamageProvider] = useState("copernicus");
   const [nextRefreshAt, setNextRefreshAt] = useState(null);
   const [now, setNow] = useState(Date.now());
@@ -3072,6 +3072,7 @@ export function TabSismos() {
           onChange={setSubView}
           options={[
             { id: "principal", label: "Vista principal" },
+            { id: "evolucion", label: "Evolución histórica" },
             { id: "registro", label: "Registro de sismos (USGS+EMSC)" },
             { id: "satelital", label: "Dano satelital (Copernicus)" },
             { id: "severidad", label: "Severidad por zona" },
@@ -3082,6 +3083,7 @@ export function TabSismos() {
       </div>
 
       {subView === "registro" && <QuakeRegistry mob={mob} />}
+      {subView === "evolucion" && <EarthquakeEvolution mob={mob} />}
       {subView === "deslizamientos" && <LandslideRisk buildings={data.buildings} mob={mob} />}
       {subView === "escombros" && <EscombrosMap features={escombros.features} counts={escombros.counts} vantorDespues={vantorTiles.despues} mob={mob} />}
       {subView === "satelital" && (
