@@ -328,10 +328,9 @@ export default function MonitorPNUD() {
 
   // Google Translate init
   useEffect(() => {
-    const isLocalPreview = ["127.0.0.1", "localhost"].includes(window.location.hostname) || window.location.protocol === "file:";
-    if (isLocalPreview) return;
-    if (window.googleTranslateElementInit) return;
-    window.googleTranslateElementInit = function() {
+    const initializeTranslate = () => {
+      const container = document.getElementById("google_translate_element");
+      if (!container || container.childElementCount > 0 || !window.google?.translate?.TranslateElement) return;
       new window.google.translate.TranslateElement({
         pageLanguage: 'es',
         includedLanguages: 'es,en,fr,pt',
@@ -339,7 +338,9 @@ export default function MonitorPNUD() {
         autoDisplay: false,
       }, 'google_translate_element');
     };
-    loadScript('//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit');
+    window.googleTranslateElementInit = initializeTranslate;
+    if (window.google?.translate?.TranslateElement) initializeTranslate();
+    else loadScript('https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit');
   }, []);
 
   return (
@@ -474,7 +475,7 @@ export default function MonitorPNUD() {
           </div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:mob?6:10, flexWrap:"wrap" }}>
-          {!mob && <div id="google_translate_element" />}
+          <div id="google_translate_element" title="Traducir dashboard" style={{ minWidth:mob?94:120, minHeight:28 }} />
           <select value={week} onChange={e => setWeek(+e.target.value)}
             style={{ fontFamily:font, fontSize:mob?11:13, background:BG2, border:`1px solid ${BORDER}`, color:ACCENT,
               padding:mob?"4px 22px 4px 6px":"5px 28px 5px 10px", cursor:"pointer", outline:"none",
