@@ -1,67 +1,67 @@
 export const KPIS_LATEST = {
   "energia": [
     {
-      "k": "Producción OPEP",
-      "v": "1,07–1,187M b/d",
+      "k": "Producción actual",
+      "v": "1,2M b/d",
       "c": "#22c55e"
     },
     {
-      "k": "Meta oficial",
-      "v": "1,5M b/d · 30 acuerdos",
+      "k": "Exportaciones",
+      "v": "2° mes consecutivo de caída",
       "c": "#22c55e"
     },
     {
-      "k": "Merey junio",
-      "v": "USD 71,13 · −14,1%",
+      "k": "PetroPiar",
+      "v": "907 km² · antes 460",
       "c": "#f59e0b"
     },
     {
-      "k": "Electricidad",
-      "v": "+6.400 MW acordados",
+      "k": "ONGC Videsh",
+      "v": "Licencia · deuda USD 536M",
       "c": "#22c55e"
     }
   ],
   "politico": [
     {
       "k": "E3 dominante",
-      "v": "48% · +2pp",
+      "v": "52% · −4pp",
       "c": "#38bdf8"
     },
     {
       "k": "E1",
-      "v": "27% · −6pp",
+      "v": "12% · −2pp",
       "c": "#22c55e"
     },
     {
       "k": "E4",
-      "v": "16% · +3pp",
+      "v": "23% · +3pp",
       "c": "#ca8a04"
     },
     {
-      "k": "Hoja de ruta",
-      "v": "AN2015 · 1° agosto",
+      "k": "E2",
+      "v": "13% · +3pp",
       "c": "#ef4444"
     }
   ],
   "opinion": [
     {
       "k": "Balance oficial",
-      "v": "4.930 fallecidos",
+      "v": "6.125 fallecidos",
       "c": "#ef4444"
     },
     {
-      "k": "Campamentos",
-      "v": "21.210 personas · 107",
+      "k": "Viviendas afectadas",
+      "v": "41.624 de 43.679",
       "c": "#f59e0b"
     },
     {
-      "k": "Inflación junio",
-      "v": "13,8% · 129,82% acum.",
+      "k": "Rechazo Rodríguez",
+      "v": "71% · +10pp",
       "c": "#ef4444"
     },
     {
       "k": "Brecha E3–E1",
-      "v": "21 puntos",
+      "v": "40 puntos",
       "c": "#f59e0b"
     }
   ]
@@ -2124,37 +2124,183 @@ export const WEEKS = [
       "E1 cae a 27% en Movimiento Disruptivo Justificado por falta de garantías para MCM y exclusión del canal institucional",
       "E4 sube a 16% y E2 a 9% por centralización coercitiva, inflación y riesgo sobre remesas"
     ]
+  },
+  {
+    "label": "17–24 jul",
+    "short": "S28",
+    "probs": [
+      { "sc": 1, "v": 22, "t": "down" },
+      { "sc": 2, "v": 9, "t": "flat" },
+      { "sc": 3, "v": 52, "t": "up" },
+      { "sc": 4, "v": 17, "t": "up" }
+    ],
+    "xy": { "x": 0.22, "y": 0.52 },
+    "sem": { "g": 8, "y": 7, "r": 7 },
+    "kpis": {
+      "energia": {
+        "exportaciones": ">1,2M b/d; facturación PDVSA USD 11.200M (+52% interanual)",
+        "ingresos": "Merey USD 71,23/barril; +19,3% interanual",
+        "licencias": "Plazo contractual del 28 de julio; unas dos docenas de empresas",
+        "cambio": "INSA–GE: 7.400 MW en cuatro años; GE Vernova evalúa rehabilitar 11 GW"
+      },
+      "economico": {
+        "inflacion": "129,82% acumulado en el primer semestre",
+        "ingresos_pob": "USD 346M de reservas propias liberadas por el FMI",
+        "electricidad": "Capacidad instalada por debajo de 40% de operatividad",
+        "pib": "Daños estimados por Banco Mundial: USD 19.600M"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha se amplía a 30pp",
+        "elecciones": "Hoja de ruta AN2015–Ejecutivo inicia el 1° de agosto",
+        "mcm": "Rubio y Figuera reconocen su rol; mecanismo aún sin definir",
+        "eeuu": "USD 13.000M de fondos petroleros bajo custodia y sin balance verificable"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Tutela consolidada:</b> La inmunidad de Delcy Rodríguez confirma que Washington trata a la cúpula operativa como Estado." },
+      { "l": "green", "t": "<b>Ancla rentista:</b> PDVSA factura USD 11.200M y sostiene exportaciones superiores a 1,2M b/d." },
+      { "l": "green", "t": "<b>Apertura energética:</b> Acuerdos INSA–GE, Repsol y Fluxus profundizan el reordenamiento contractual." },
+      { "l": "yellow", "t": "<b>Inclusión nominal:</b> Machado recibe reconocimiento explícito, pero sin cronograma, delegación ni garantías concretas." },
+      { "l": "yellow", "t": "<b>Transparencia fiscal:</b> No existe balance público verificable de los USD 13.000M bajo custodia estadounidense." },
+      { "l": "red", "t": "<b>Presión humanitaria:</b> La Guaira alcanza 100% de ocupación de campamentos y aún no existe una PDNA formal." },
+      { "l": "red", "t": "<b>Presencia coercitiva:</b> Southern Spear despliega la Fuerza de Combate Litoral-24 frente a La Guaira." }
+    ],
+    "lectura": "El corte del 17 al 24 de julio consolida la continuidad negociada como escenario dominante. E3 sube a 52% (+4pp) porque la inmunidad soberana reconocida a Delcy Rodríguez, la facturación de PDVSA (+52% interanual) y los nuevos acuerdos energéticos refuerzan la arquitectura de tutela negociada.\n\nE1 baja a 22% (−5pp) porque el reconocimiento de Rubio y Figuera hacia María Corina Machado constituye un nuevo episodio de incorporación discursiva sin mecanismo concreto de participación. E4 sube a 17% (+1pp) por el despliegue de Southern Spear frente a La Guaira. E2 permanece en 9%: la crisis habitacional, la ausencia de PDNA y la erosión del ingreso elevan presión, pero no hay evidencia de fractura civil-militar o pérdida territorial.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 sube a 52% por inmunidad soberana, expansión petrolera y acuerdos energéticos",
+      "E1 baja a 22% porque el reconocimiento a Machado aún no se traduce en participación verificable",
+      "E4 sube a 17% por Southern Spear; E2 se mantiene en 9% sin fractura sistémica"
+    ]
+  },
+  {
+    "label": "24 jul–3 ago",
+    "short": "S29",
+    "probs": [
+      { "sc": 1, "v": 14, "t": "down" },
+      { "sc": 2, "v": 10, "t": "up" },
+      { "sc": 3, "v": 56, "t": "up" },
+      { "sc": 4, "v": 20, "t": "up" }
+    ],
+    "xy": { "x": 0.14, "y": 0.56 },
+    "sem": { "g": 7, "y": 8, "r": 9 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "Producción de junio: 1,07M b/d; Chevron: 280.000 b/d (+15% trimestral)",
+        "ingresos": "Pagos tributarios y regalías canalizados al Tesoro de EE.UU. con tasa de 20–35%",
+        "licencias": "Halliburton reactiva operaciones y Hunt Oil firma memorando de evaluación",
+        "cambio": "Termocarabobo recupera 300 MW; meta de 4.800 MW termoeléctricos antes de fin de 2026"
+      },
+      "economico": {
+        "inflacion": "Liquidez monetaria +159% desde diciembre; +9,17% en la última semana",
+        "ingresos_pob": "Tipo oficial: Bs 742,23/USD; brecha cambiaria de 14–15%",
+        "electricidad": "Plan de ahorro energético e hídrico y recuperación parcial de Termocarabobo",
+        "pib": "Deuda externa estimada en 290% del PIB; bonos +60% en 2026"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha se amplía a 42pp",
+        "elecciones": "Mesa AN2015–Ejecutivo aplazada a la semana del 3–9 de agosto",
+        "mcm": "Fuera de la delegación; condiciona respaldo a resultados verificables",
+        "eeuu": "34% percibe sumisión; 26% relación ganar–ganar; 25% tutela democrática"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Control militar:</b> La reestructuración de componentes y REDI se ejecuta sin fricción pública." },
+      { "l": "green", "t": "<b>Tutela fiscal:</b> Los pagos petroleros internacionales se centralizan directamente en el Tesoro estadounidense." },
+      { "l": "green", "t": "<b>Arquitectura institucional:</b> El retiro de la CPI recibe respaldo explícito de Washington." },
+      { "l": "yellow", "t": "<b>Mesa restringida:</b> La delegación AN2015 se limita a PJ y VP, sin Machado ni otros partidos de la PUD." },
+      { "l": "yellow", "t": "<b>Escrutinio externo:</b> La GAO abre una investigación formal sobre más de USD 13.000M bajo custodia estadounidense." },
+      { "l": "red", "t": "<b>Presión social:</b> Se registran 62 protestas, con un pico de 38 el 28 de julio." },
+      { "l": "red", "t": "<b>Brecha humanitaria:</b> Solo 39% de la respuesta está financiada para 1,3 millones de personas." },
+      { "l": "red", "t": "<b>Legitimidad:</b> La aceptación de Rodríguez cae de 69,9% en enero a 40,2% en julio." }
+    ],
+    "lectura": "El corte del 24 de julio al 3 de agosto consolida la continuidad negociada en su mayor nivel del ciclo. E3 sube a 56% (+4pp) por el retiro del Estatuto de Roma con respaldo estadounidense, la reestructuración militar integral sin fisuras y la centralización de pagos petroleros en el Tesoro de EE.UU.\n\nE1 cae a 14% (−8pp), Movimiento Disruptivo Justificado, porque la delegación AN2015 queda restringida a Primero Justicia y Voluntad Popular, sin Machado ni el resto del bloque unitario, y la mesa se aplaza sin explicación. E4 sube a 20% (+3pp) por la consolidación del aparato coercitivo. E2 llega a 10% (+1pp) ante 62 protestas, deterioro de gestión y una respuesta humanitaria financiada solo en 39%, sin fractura civil-militar observable.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 sube a 56% por control militar, retiro de la CPI y centralización tributaria petrolera",
+      "E1 cae a 14% en Movimiento Disruptivo por una mesa restringida y aplazada",
+      "E4 sube a 20% y E2 a 10% por consolidación coercitiva, protestas y brecha humanitaria"
+    ]
+  },
+  {
+    "label": "3–7 ago",
+    "short": "S30",
+    "probs": [
+      { "sc": 1, "v": 12, "t": "down" },
+      { "sc": 2, "v": 13, "t": "up" },
+      { "sc": 3, "v": 52, "t": "down" },
+      { "sc": 4, "v": 23, "t": "up" }
+    ],
+    "xy": { "x": 0.12, "y": 0.52 },
+    "sem": { "g": 5, "y": 8, "r": 11 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "Segundo mes consecutivo de caída; producción nacional actual de 1,2M b/d",
+        "ingresos": "PetroPiar amplía su área de 460 a 907 km²",
+        "licencias": "ONGC Videsh obtiene licencia; deuda pendiente cercana a USD 536M",
+        "cambio": "Plan de contingencia eléctrica ante el fenómeno Súper Niño"
+      },
+      "economico": {
+        "inflacion": "Dólar oficial acumula +150,4% en 2026",
+        "ingresos_pob": "Tipo oficial de referencia: Bs 746,63/USD",
+        "electricidad": "Demanda podría crecer 1.745 MW entre agosto y octubre",
+        "pib": "Deuda externa estimada en USD 170.000M"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha permanece amplia en 40pp",
+        "elecciones": "Mesa instalada el 6 de agosto; sesión permanente hasta el día 12",
+        "mcm": "72% de imagen positiva; permanece fuera de la delegación",
+        "eeuu": "Resolución bipartidista exige supervisión y elecciones verificables"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Mesa instalada:</b> AN2015 y Gobierno Nacional abren sesión permanente hasta el 12 de agosto." },
+      { "l": "green", "t": "<b>Control coercitivo:</b> La nueva cúpula militar se sostiene sin fricción y la GNB ratifica lealtad." },
+      { "l": "yellow", "t": "<b>Sin resultados:</b> La mesa todavía no produce cronograma electoral, reforma del CNE o reinstitucionalización del TSJ." },
+      { "l": "yellow", "t": "<b>Exclusión persistente:</b> La delegación sigue limitada a PJ y VP, sin Machado ni buena parte de la PUD." },
+      { "l": "yellow", "t": "<b>Arquitectura estadounidense:</b> El Senado presiona y el eventual relevo Claver-Carone–Orr no está confirmado." },
+      { "l": "red", "t": "<b>Balance incompleto:</b> El corte oficial omite heridos, damnificados, campamentos y una discrepancia crítica sobre desaparecidos." },
+      { "l": "red", "t": "<b>Desconfianza:</b> 94,1% no confía en la información oficial y 91,6% evalúa negativamente la respuesta." },
+      { "l": "red", "t": "<b>Conflictividad:</b> 25 protestas en 12 entidades muestran una tendencia ascendente durante el corto período." }
+    ],
+    "lectura": "El corte del 3 al 7 de agosto confirma la continuidad negociada, pero reduce su probabilidad a 52% (−4pp). La instalación formal de la mesa AN2015–Gobierno Nacional consolida el procedimiento, aunque no produce todavía cronograma electoral, reforma del CNE o reinstitucionalización del TSJ, mientras el deterioro de legitimidad y el balance humanitario incompleto debilitan la base social del arreglo.\n\nE1 baja a 12% (−2pp) porque la delegación sigue restringida a PJ y VP y persisten diferencias opositoras. E4 sube a 23% (+3pp) por la continuidad de la nueva cúpula militar y la centralización de recursos. E2 sube a 13% (+3pp) ante 25 protestas, desconfianza institucional y discrepancias humanitarias. Ningún ajuste supera el techo metodológico ordinario.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 baja a 52%: la mesa se instala, pero todavía no entrega resultados sustantivos",
+      "E1 baja a 12% por exclusión persistente y divisiones dentro de la oposición",
+      "E4 sube a 23% y E2 a 13% por control coercitivo, desconfianza y retracción del balance humanitario"
+    ]
   }
 ];
 
 export const TENSIONS = [
   {
     "level": "green",
-    "text": "La mayor reestructuración del gabinete se ejecuta por decreto sin renuncias, fugas ni disidencias."
+    "text": "La mesa AN2015–Gobierno Nacional se instala formalmente con sesión permanente hasta el 12 de agosto."
   },
   {
     "level": "green",
-    "text": "La meta de 1,5M b/d, 30 acuerdos petroleros y más de 6.400 MW comprometidos sostienen la continuidad."
+    "text": "La nueva cúpula militar se mantiene sin fisuras y la Guardia Nacional ratifica lealtad a Rodríguez."
   },
   {
     "level": "yellow",
-    "text": "La hoja de ruta AN2015–Ejecutivo avanza hacia un nuevo CNE con respaldo de Washington, sin la PUD unificada."
+    "text": "La mesa aún no produce cronograma electoral, reforma del CNE o reinstitucionalización del TSJ."
   },
   {
     "level": "yellow",
-    "text": "Washington reconoce que la ley de amnistía no garantiza el retorno seguro de Machado; E1 cae 6pp."
+    "text": "La delegación permanece limitada a PJ y VP, con diferencias reconocidas por AD y La Causa R."
   },
   {
     "level": "yellow",
-    "text": "Cabello consolida control de seguridad y la Presidencia centraliza fundaciones sociales de reconstrucción."
+    "text": "El balance humanitario omite variables y mantiene una discrepancia sin explicar sobre desaparecidos."
   },
   {
     "level": "red",
-    "text": "La inflación de junio alcanza 13,8% y 129,82% acumulado en el primer semestre."
+    "text": "El rechazo a Rodríguez alcanza 71% y la imagen positiva de Machado llega a 72%."
   },
   {
     "level": "red",
-    "text": "La revisión del TPS amenaza las remesas de cerca de 600.000 venezolanos mientras el financiamiento de reconstrucción sigue impreciso."
+    "text": "El 94,1% desconfía de la información oficial y 91,6% califica negativamente la respuesta gubernamental."
   }
 ];
 
@@ -2185,7 +2331,10 @@ export const MONITOR_WEEKS = [
   "S24",
   "S25",
   "S26",
-  "S27"
+  "S27",
+  "S28",
+  "S29",
+  "S30"
 ];
 
 export const ICG_HISTORY = [
@@ -2350,6 +2499,24 @@ export const ICG_HISTORY = [
     "score": 71,
     "sitrep": true,
     "note": "La reestructuración del gabinete sin disidencias, la tutela operativa de Washington y la consolidación de Cabello refuerzan cohesión de élite, aunque amplían la distancia con la oposición de mayor legitimidad electoral."
+  },
+  {
+    "week": "S28",
+    "score": 74,
+    "sitrep": true,
+    "note": "La inmunidad de Rodríguez, la expansión de PDVSA y los acuerdos energéticos refuerzan cohesión y capacidad estatal; persisten presión humanitaria, opacidad fiscal y exclusión funcional de la oposición."
+  },
+  {
+    "week": "S29",
+    "score": 78,
+    "sitrep": true,
+    "note": "La reestructuración integral de la FANB sin fricción, la centralización petrolera y el retiro de la CPI elevan cohesión y control institucional, aunque aparecen disensos políticos y fuerte erosión de legitimidad."
+  },
+  {
+    "week": "S30",
+    "score": 76,
+    "sitrep": true,
+    "note": "La cúpula militar mantiene cohesión y la mesa formaliza el canal político, pero la fuerte desconfianza pública, las omisiones humanitarias y la ausencia de resultados verificables reducen la fortaleza del arreglo."
   }
 ];
 
@@ -3003,7 +3170,7 @@ export const CONF_SEMANAL = [
     "week": "S20",
     "label": "22–27 may",
     "protestas": 43,
-    "estados": 17,
+    "estados": 15,
     "reprimidas": 0,
     "motivos": [
       "Vivienda",
@@ -3180,6 +3347,51 @@ export const CONF_SEMANAL = [
     "hecho": "El documento fuente no incorpora un conteo de protestas para el período. El monitoreo social se concentra en inflación, campamentos, garantías electorales y la amenaza sobre TPS y remesas.",
     "dias": [
       { "fecha": "10–17 Julio", "protestas": 0, "estados": 0, "tipo": "Sin conteo verificable", "exigencias": "Reconstrucción, precios, garantías electorales y protección migratoria" }
+    ]
+  },
+  {
+    "week": "S28",
+    "label": "17–24 jul",
+    "protestas": 28,
+    "estados": 17,
+    "reprimidas": 0,
+    "motivos": ["Vivienda", "Derechos laborales", "Servicios", "Justicia", "Participación política", "Seguridad ciudadana"],
+    "hecho": "Entre el 20 y el 23 de julio se registraron 28 protestas. Las demandas territoriales, laborales y habitacionales coexistieron con acciones por presos políticos y participación institucional.",
+    "dias": [
+      { "fecha": "20 Julio", "protestas": 6, "estados": 5, "tipo": "Mixto", "exigencias": "Vivienda, derechos laborales, participación política y justicia" },
+      { "fecha": "21 Julio", "protestas": 8, "estados": 5, "tipo": "Mixto", "exigencias": "Derechos laborales, vivienda, justicia y libertad para detenidos" },
+      { "fecha": "22 Julio", "protestas": 10, "estados": 9, "tipo": "Mixto", "exigencias": "Trabajo, vivienda, justicia, participación política y seguridad ciudadana" },
+      { "fecha": "23 Julio", "protestas": 4, "estados": 4, "tipo": "Mixto", "exigencias": "Trabajo, vivienda, justicia, seguridad y ambiente sano" }
+    ]
+  },
+  {
+    "week": "S29",
+    "label": "24 jul–3 ago",
+    "protestas": 62,
+    "estados": 20,
+    "reprimidas": 0,
+    "motivos": ["Participación política", "Justicia", "Derechos laborales", "Vivienda", "Seguridad social", "Agua", "Salud"],
+    "hecho": "El OVCS registra 62 protestas entre el 24 y el 31 de julio. El 28 de julio concentra 38 movilizaciones en 20 estados y Bolívar mantiene actividad durante cuatro días consecutivos.",
+    "dias": [
+      { "fecha": "24 Julio", "protestas": 2, "estados": 2, "tipo": "Laboral/político", "exigencias": "Derechos laborales y participación política" },
+      { "fecha": "28 Julio", "protestas": 38, "estados": 20, "tipo": "Político/social", "exigencias": "Participación política, justicia, manifestación pacífica y salud" },
+      { "fecha": "29 Julio", "protestas": 4, "estados": 3, "tipo": "Mixto", "exigencias": "Trabajo, participación política y vivienda" },
+      { "fecha": "30 Julio", "protestas": 6, "estados": 6, "tipo": "Social", "exigencias": "Seguridad social, vivienda y manifestación pacífica" },
+      { "fecha": "31 Julio", "protestas": 12, "estados": 8, "tipo": "Mixto", "exigencias": "Justicia, seguridad social, trabajo, vivienda y agua" }
+    ]
+  },
+  {
+    "week": "S30",
+    "label": "3–7 ago",
+    "protestas": 25,
+    "estados": 12,
+    "reprimidas": 0,
+    "motivos": ["Vivienda", "Agua", "Derechos laborales", "Seguridad social", "Participación política", "Libertad de expresión", "Justicia"],
+    "hecho": "Se registran 25 protestas entre el 4 y el 6 de agosto en 12 entidades. Aragua, Distrito Capital, Falcón, Lara, La Guaira, Carabobo y Zulia presentan recurrencia territorial.",
+    "dias": [
+      { "fecha": "4 Agosto", "protestas": 6, "estados": 4, "tipo": "Mixto", "exigencias": "Vivienda, agua, trabajo, seguridad social y participación política" },
+      { "fecha": "5 Agosto", "protestas": 8, "estados": 7, "tipo": "Mixto", "exigencias": "Vivienda, trabajo, participación, expresión, detenidos, justicia y agua" },
+      { "fecha": "6 Agosto", "protestas": 11, "estados": 8, "tipo": "Mixto", "exigencias": "Vivienda, trabajo, participación, expresión, detenidos, justicia y agua" }
     ]
   }
 ];

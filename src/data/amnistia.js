@@ -433,5 +433,46 @@ export const AMNISTIA_TRACKER = [
       "militares": 187
     },
     "hito": "El Ejecutivo reporta cerca de 9.000 beneficiarios de la Ley de Amnistía, con 900 liberaciones en enero y más de 500 adicionales mediante programas de convivencia democrática. El subsecretario Weiland advierte que el texto vigente no ofrece garantías suficientes para el regreso de María Corina Machado."
+  },
+  {
+    "week": "S28",
+    "label": "17–24 jul",
+    "gob": {
+      "solicitudes": null,
+      "libertades": 9000,
+      "privadosLiberados": 1400,
+      "cautelares": 8426,
+      "militares": 187
+    },
+    "fp": {
+      "verificados": 857,
+      "detenidos": 404,
+      "militares": 187
+    },
+    "hito": "Los documentos de S28 no incorporan un nuevo balance verificable de amnistía o presos políticos. Rubio y Figuera reconocen el papel de María Corina Machado, pero siguen pendientes garantías legales de retorno y un mecanismo concreto de participación."
+  },
+  {
+    "week": "S29",
+    "label": "24 jul–3 ago",
+    "gob": {
+      "solicitudes": null,
+      "libertades": 9000,
+      "privadosLiberados": 1400,
+      "cautelares": 8426,
+      "militares": 187
+    },
+    "fp": {
+      "verificados": 857,
+      "detenidos": 404,
+      "militares": 187
+    },
+    "hito": "Sin nuevo balance verificable de amnistía o presos políticos. Machado, Primero Justicia y otros actores condicionan la legitimidad de la mesa a la liberación de detenidos, el desmontaje del aparato represivo y garantías políticas comprobables."
+  },
+  {
+    "week": "S30",
+    "label": "3–7 ago",
+    "gob": { "solicitudes": null, "libertades": 9000, "privadosLiberados": 1400, "cautelares": 8426, "militares": 187 },
+    "fp": { "verificados": 857, "detenidos": 404, "militares": 187 },
+    "hito": "Sin nuevo balance verificable. La PUD respalda el esquema de diálogo, pero exige liberación de presos políticos, fin de la persecución y garantías electorales como condiciones de legitimidad y resultados."
   }
 ];

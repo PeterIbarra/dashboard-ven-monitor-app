@@ -5089,6 +5089,233 @@ export const SITREP_ALL = [
       { "tag": "Energía", "color": "#22c55e", "title": "La resiliencia productiva contiene E2", "text": "La meta petrolera y los acuerdos eléctricos sostienen capacidad de financiamiento de la coalición." },
       { "tag": "Riesgo", "color": "#f59e0b", "title": "Inflación, TPS y reconstrucción convergen", "text": "La presión sobre precios y remesas aumenta antes de que exista un costo total financiado de reconstrucción." }
     ]
+  },
+  {
+    "period": "17 de julio – 24 de julio de 2026",
+    "periodShort": "17–24 jul 2026",
+    "keyPoints": [
+      { "tag": "Financiamiento", "color": "#0468B1", "title": "Convergen cuatro canales para la reconstrucción", "text": "Venezuela accede a USD 346M de reservas propias en el FMI; OFAC flexibiliza la GL60 y BID–Banco Mundial abren una vía multilateral todavía sin monto ni cronograma." },
+      { "tag": "Transparencia", "color": "#dc2626", "title": "USD 13.000M permanecen bajo custodia de EE.UU.", "text": "El fondo petrolero administrado por Washington carece de un balance público verificable y genera cuestionamientos bipartidistas en el Congreso estadounidense." },
+      { "tag": "Energía", "color": "#22c55e", "title": "PDVSA acelera su expansión contractual", "text": "La facturación semestral alcanza USD 11.200M (+52%), las exportaciones superan 1,2M b/d y el plazo del 28 de julio moviliza a unas dos docenas de empresas." },
+      { "tag": "Electricidad", "color": "#22c55e", "title": "Los acuerdos INSA–GE proyectan 7.400 MW", "text": "La agenda incluye Tocoma, Macagua y 4.000 MW de GE en cuatro años, mientras GE Vernova evalúa rehabilitar 11 GW instalados." },
+      { "tag": "Emergencia", "color": "#dc2626", "title": "El balance oficial sube a 5.398 fallecidos", "text": "Hay 16.740 heridos y 23.843 personas en 107 campamentos; La Guaira alcanza 100% de ocupación un mes después del sismo." },
+      { "tag": "Social", "color": "#ca8a04", "title": "Se registran 28 protestas en cuatro días", "text": "Las demandas por vivienda, trabajo y servicios coexisten con exigencias de justicia, participación política y libertad para detenidos." },
+      { "tag": "Político", "color": "#7c3aed", "title": "Rubio y Figuera reconocen el papel de Machado", "text": "La incorporación discursiva responde a presión opositora, pero sigue sin cronograma, delegación, garantías de retorno o mecanismo concreto de participación." },
+      { "tag": "Escenarios", "color": "#0468B1", "title": "E3 se consolida en 52%", "text": "La inmunidad de Rodríguez, la expansión de PDVSA y los acuerdos energéticos elevan 4pp la continuidad negociada." },
+      { "tag": "Escenarios", "color": "#2d8a30", "title": "E1 retrocede a 22%; E4 sube a 17%", "text": "La transición cae 5pp por inclusión nominal sin transferencia efectiva; Southern Spear eleva 1pp el riesgo coercitivo y E2 permanece en 9%." }
+    ],
+    "sintesis": "El corte del 17 al 24 de julio confirma la continuidad tutelada bajo autoritarismo competitivo con linkage selectivo. E3 alcanza 52% (+4pp) porque la inmunidad soberana de Delcy Rodríguez, la facturación de PDVSA y los acuerdos energéticos consolidan la arquitectura institucional y rentística. E1 cae a 22% (−5pp): el reconocimiento público a María Corina Machado todavía no produce participación efectiva. E4 sube a 17% (+1pp) por Southern Spear y E2 permanece en 9%, pese a la presión habitacional y fiscal, al no observarse fractura civil-militar ni pérdida territorial.",
+    "actores": [
+      { "name": "Gobierno encargado", "items": ["Firma acuerdos INSA–GE para incorporar 7.400 MW en cuatro años.", "Accede a USD 346M de reservas propias en el FMI y recibe la primera misión de alto nivel del BID en unos siete años.", "Mantiene el plazo del 28 de julio para migrar contratos petroleros y entrega 200 viviendas en Ciudad Tiuna."] },
+      { "name": "Estados Unidos", "items": ["Rubio reconoce un papel importante para Machado en la reconciliación.", "OFAC permite transferir asistencia sísmica directamente al gobierno encargado bajo GL60.", "Reconoce inmunidad soberana a Delcy Rodríguez y mantiene bajo custodia más de USD 13.000M petroleros."] },
+      { "name": "Oposición y sociedad civil", "items": ["Figuera convoca a todos los sectores democráticos desde el 1° de agosto.", "Capriles y Ramos Allup advierten que excluir a Machado restaría legitimidad.", "Un Nuevo Tiempo propone relanzar la coalición de 2024 y Vente Venezuela exige cronograma verificable."] },
+      { "name": "Comunidad internacional", "items": ["BID y Banco Mundial ofrecen recursos no reembolsables aún sin monto o cronograma.", "Israel concluye una misión humanitaria de casi tres semanas, primer gesto de distensión en 17 años.", "Rusia sostiene ayuda humanitaria y participa en los acuerdos eléctricos mediante INSA."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesPlenas": 9000, "privadosLiberados": 1400, "cautelares": 8426, "militares": 187, "fpVerificados": 857, "fpDetenidos": 404, "fpNota": "Sin nuevo balance verificable en los documentos de S28; se conserva la última referencia disponible." },
+      "rodriguez": [
+        { "title": "Normalización financiera", "text": "Acceso a reservas del FMI y recepción de una misión técnica del BID." },
+        { "title": "Reordenamiento energético", "text": "Acuerdos eléctricos por 7.400 MW y plazo contractual petrolero del 28 de julio." },
+        { "title": "Inmunidad soberana", "text": "Washington la reconoce como jefa de Estado en funciones en el caso Kenemore." },
+        { "title": "Reconstrucción", "text": "11.794 viviendas en proceso y meta de 4.000 entregas adicionales hasta diciembre." }
+      ],
+      "mcmAgenda": ["Convertir el reconocimiento discursivo en un mecanismo formal de participación.", "Obtener garantías verificables de retorno.", "Acordar delegación, cronograma y reglas de la hoja de ruta desde el 1° de agosto."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "USD 11.200M", "label": "Facturación PDVSA · +52%", "color": "#22c55e" },
+        { "value": ">1,2M b/d", "label": "Exportaciones petroleras", "color": "#22c55e" },
+        { "value": "USD 19.600M", "label": "Daños estimados por BM", "color": "#dc2626" },
+        { "value": "129,82%", "label": "Inflación acumulada semestral", "color": "#dc2626" }
+      ],
+      "empresas": [
+        { "empresa": "PDVSA", "desarrollo": "Facturación semestral de USD 11.200M y exportaciones superiores a 1,2M b/d." },
+        { "empresa": "Repsol", "desarrollo": "Mantiene 71.000 bepd y acuerda Cardón IV, Petroquiriquire y evaluación de Horcón." },
+        { "empresa": "INSA / GE", "desarrollo": "Acuerdos para incorporar 7.400 MW al sistema eléctrico en cuatro años." },
+        { "empresa": "Fluxus", "desarrollo": "Adquiere 49% de Petrolera Roraima y proyecta cuadruplicar producción en cinco años." },
+        { "empresa": "FMI / BID / Banco Mundial", "desarrollo": "Abren canales de reconstrucción, todavía sin financiamiento nuevo vinculante ni cronograma público." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 28, "promDiario": 7, "periodo": "20–23 jul", "variacion": "Máximo diario de 10 protestas el 22 de julio", "composicion": "Vivienda, trabajo, servicios, justicia, participación política y seguridad.", "nota": "Distrito Capital aparece de manera recurrente y Morrocoy concentra una protesta territorial de más de 720 prestadores." },
+      "percepcion": { "fuente": "Atenas Grupo · 1.208 hogares", "titulo": "Duelo, alerta y solidaridad un mes después del sismo", "nota": "La crisis habitacional conecta la emergencia humanitaria con la conflictividad social.", "datos": [{ "factor": "En duelo", "pct": 63 }, { "factor": "En alerta o temor", "pct": 60 }, { "factor": "Crisis habitacional", "pct": 64 }, { "factor": "Hogares vinculados a donaciones", "pct": 67 }] },
+      "excarcelados": { "fp": 857, "presos": 404, "militares": 187, "fuente": "Foro Penal / último dato verificado" }
+    },
+    "marcoNormativo": {
+      "titulo": "Migración contractual, GL60 e inmunidad soberana",
+      "resumen": "La semana combina aceleración regulatoria del sector energético, flexibilización humanitaria y un tratamiento jurídico diferenciado de las autoridades venezolanas.",
+      "cambios": [
+        { "titulo": "Plazo del 28 de julio", "texto": "Unas dos docenas de empresas deben migrar contratos al nuevo marco de hidrocarburos.", "color": "#22c55e" },
+        { "titulo": "OFAC GL60", "texto": "La FAQ 1263 permite transferencias directas de asistencia sísmica al gobierno encargado.", "color": "#0468B1" },
+        { "titulo": "Inmunidad de Rodríguez", "texto": "El Departamento de Estado la reconoce como jefa de Estado en funciones en el caso Kenemore.", "color": "#ca8a04" },
+        { "titulo": "Juicio de Maduro", "texto": "La audiencia sobre su propia moción de inmunidad queda fijada para el 17 de noviembre de 2026.", "color": "#dc2626" }
+      ],
+      "lecturaAnalitica": "El marco regulatorio y diplomático favorece a quien controla la administración y la renta estatal. La apertura contractual aumenta capacidad operativa, pero la transparencia de fondos y las garantías políticas siguen rezagadas."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "52%", "color": "#0468B1", "text": "Sube por inmunidad soberana, expansión rentística y profundización contractual." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "22%", "color": "#2d8a30", "text": "Baja porque la inclusión de Machado permanece discursiva y sin garantías concretas." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "17%", "color": "#ca8a04", "text": "Sube moderadamente por Southern Spear y la presencia de seguridad estadounidense." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "9%", "color": "#dc2626", "text": "Permanece estable: la crisis humanitaria no produce fractura sistémica observable." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Mecanismo del 1° de agosto", "text": "Cronograma, composición y garantías mostrarán si la incorporación de Machado es efectiva o nominal." },
+      { "tag": "Transparencia", "color": "#f59e0b", "title": "Fondos petroleros bajo escrutinio", "text": "El balance verificable de los USD 13.000M es central para la legitimidad fiscal de la tutela." },
+      { "tag": "Humanitario", "color": "#ca8a04", "title": "La Guaira llega al límite", "text": "El 100% de ocupación y la falta de PDNA mantienen presión sobre vivienda y reconstrucción." },
+      { "tag": "Energía", "color": "#22c55e", "title": "El 28 de julio ordena la agenda", "text": "La ejecución contractual permitirá distinguir anuncios de inversión efectiva." }
+    ]
+  },
+  {
+    "period": "24 de julio – 3 de agosto de 2026",
+    "periodShort": "24 jul–3 ago 2026",
+    "keyPoints": [
+      { "tag": "Institucional", "color": "#7c3aed", "title": "Venezuela formaliza el retiro de la CPI", "text": "La denuncia del Estatuto de Roma entrará en vigor un año después y recibe respaldo explícito de Estados Unidos." },
+      { "tag": "Seguridad", "color": "#ca8a04", "title": "La cúpula militar se reestructura sin fisuras", "text": "Rodríguez ratifica al ministro de Defensa y reorganiza los cinco componentes y las ocho REDI sin resistencia pública." },
+      { "tag": "Petróleo", "color": "#22c55e", "title": "Los pagos internacionales pasan al Tesoro de EE.UU.", "text": "Chevron, Repsol, Maurel & Prom y Eni canalizarán impuestos y regalías a cuentas estadounidenses con una tasa progresiva de 20% a 35%." },
+      { "tag": "Fiscalización", "color": "#f59e0b", "title": "La GAO investiga el fondo petrolero", "text": "La controversia por más de USD 13.000M bajo custodia estadounidense escala a una investigación formal del Congreso." },
+      { "tag": "Economía", "color": "#dc2626", "title": "La liquidez crece 159% en siete meses", "text": "La deuda externa se estima en 290% del PIB, aunque los bonos soberanos acumulan un alza superior a 60% en 2026." },
+      { "tag": "Emergencia", "color": "#dc2626", "title": "Solo 39% de la respuesta humanitaria está financiada", "text": "Unas 1,3 millones de personas requieren asistencia y cerca de 24.000 niños permanecen fuera de las aulas." },
+      { "tag": "Social", "color": "#ca8a04", "title": "62 protestas y un pico nacional el 28 de julio", "text": "La fecha concentra 38 movilizaciones en 20 estados; Bolívar mantiene conflictividad durante cuatro días consecutivos." },
+      { "tag": "Opinión", "color": "#0468B1", "title": "La aceptación de Rodríguez cae a 40,2%", "text": "Dos mediciones independientes reflejan deterioro de gestión, mayor pesimismo y ventaja de imagen de Machado." },
+      { "tag": "Escenarios", "color": "#0468B1", "title": "E3 alcanza 56%, su máximo del ciclo", "text": "El control cruzado institucional, militar y petrolero eleva 4pp la continuidad negociada." },
+      { "tag": "Escenarios", "color": "#2d8a30", "title": "E1 cae a 14% en movimiento disruptivo", "text": "La mesa aplazada y restringida a PJ–VP reduce E1 en 8pp; E4 sube a 20% y E2 a 10%." }
+    ],
+    "sintesis": "El período 24 de julio–3 de agosto consolida una arquitectura de tutela negociada sostenida desde Caracas y Washington. E3 sube a 56% (+4pp), máximo del ciclo, por el retiro de la CPI, la reestructuración militar integral y la centralización de pagos petroleros en el Tesoro estadounidense. E1 cae a 14% (−8pp), Movimiento Disruptivo Justificado, tras formalizarse una delegación AN2015 restringida a PJ y VP y aplazarse la mesa sin explicación. E4 sube a 20% (+3pp) por la consolidación coercitiva y E2 a 10% (+1pp) ante protestas, deterioro de gestión y brecha humanitaria, sin fractura civil-militar.",
+    "actores": [
+      { "name": "Gobierno encargado", "items": ["Formaliza el retiro del Estatuto de Roma y recibe respaldo estadounidense.", "Reestructura la cúpula FANB, los componentes y las REDI sin fricción pública.", "Amplía la jurisdicción de reconstrucción, los créditos hipotecarios y el nuevo régimen de arrendamientos."] },
+      { "name": "Estados Unidos", "items": ["La GAO investiga la administración de los fondos petroleros venezolanos.", "Evalúa una administración temporal con cerca de 3.000 técnicos y USD 3.000M iniciales.", "Centraliza en el Tesoro pagos tributarios de petroleras internacionales y flexibiliza temporalmente reglas FinCEN."] },
+      { "name": "Oposición y sociedad civil", "items": ["PJ y VP ocupan la totalidad de la delegación AN2015; otros partidos y Machado quedan fuera.", "Machado condiciona respaldo a liberaciones, garantías, CNE legítimo y cronograma electoral.", "El chavismo crítico y sectores sindicales cuestionan la tutela externa y exigen resultados verificables."] },
+      { "name": "Comunidad internacional", "items": ["Perú y Chile avanzan en la normalización de relaciones con Venezuela.", "El Reino Unido respalda el diálogo condicionado al respeto de la voluntad popular.", "El FMI supervisará técnicamente recursos de reconstrucción y la reanudación de estadísticas."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesPlenas": 9000, "privadosLiberados": 1400, "cautelares": 8426, "militares": 187, "fpVerificados": 857, "fpDetenidos": 404, "fpNota": "Sin nuevo balance verificable en S29; la liberación de presos políticos permanece como condición de la oposición para respaldar la mesa." },
+      "rodriguez": [
+        { "title": "Reestructuración militar", "text": "Ratifica a Gustavo González López y reorganiza mandos operativos y territoriales." },
+        { "title": "Retiro de la CPI", "text": "Ordena denunciar formalmente el Estatuto de Roma con entrada en vigor en un año." },
+        { "title": "Reconstrucción habitacional", "text": "Impulsa jurisdicción especial, propiedad horizontal, créditos subsidiados y nueva ley de alquileres." },
+        { "title": "Energía", "text": "Ordena incorporar 4.800 MW termoeléctricos y recupera parcialmente Termocarabobo." }
+      ],
+      "mcmAgenda": ["Exigir liberación de presos políticos y retorno de exiliados.", "Lograr un CNE legítimo y cronograma electoral verificable.", "Vincular su respaldo a resultados concretos de la mesa, que no integra directamente."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "+159%", "label": "Liquidez · dic.–jul.", "color": "#dc2626" },
+        { "value": "290% PIB", "label": "Deuda externa estimada", "color": "#dc2626" },
+        { "value": "+60%", "label": "Bonos venezolanos · 2026", "color": "#22c55e" },
+        { "value": "Bs 742,23", "label": "USD oficial · cierre julio", "color": "#f59e0b" }
+      ],
+      "empresas": [
+        { "empresa": "Chevron", "desarrollo": "Produce 280.000 b/d (+15% trimestral) y prevé recuperar su deuda a comienzos de 2027." },
+        { "empresa": "Halliburton", "desarrollo": "El TSJ ordena reactivar operaciones bajo depósito y veeduría judicial." },
+        { "empresa": "Hunt Oil", "desarrollo": "Firma un memorando para evaluar proyectos petroleros en Venezuela." },
+        { "empresa": "Comité de Acreedores", "desarrollo": "Más de 15 fondos se incorporan ante una eventual reestructuración de USD 60.000M en bonos." },
+        { "empresa": "Tesoro / GAO", "desarrollo": "Centralizan pagos petroleros mientras el Congreso abre fiscalización formal del fondo." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 62, "promDiario": 12.4, "periodo": "24–31 jul · cinco cortes", "variacion": "38 protestas el 28 de julio en 20 estados", "composicion": "Participación política, justicia, trabajo, vivienda, seguridad social, agua y salud.", "nota": "Bolívar es el único estado con protestas durante cuatro días consecutivos." },
+      "percepcion": { "fuente": "More Consulting / Poder & Estrategia", "titulo": "Deterioro de gestión y aumento del pesimismo", "nota": "La aceptación de Rodríguez pierde casi 30 puntos desde enero y cambia la percepción de la relación con Estados Unidos.", "datos": [{ "factor": "Aceptación de Rodríguez", "pct": 40.2 }, { "factor": "Imagen positiva de Machado", "pct": 46.2 }, { "factor": "Pesimistas", "pct": 34.8 }, { "factor": "Relación percibida como sumisión", "pct": 34 }] },
+      "excarcelados": { "fp": 857, "presos": 404, "militares": 187, "fuente": "Foro Penal / último dato verificado" }
+    },
+    "marcoNormativo": {
+      "titulo": "Retiro de la CPI, jurisdicción especial y nuevo régimen de alquileres",
+      "resumen": "El Ejecutivo combina reducción de controles externos, consolidación castrense y una ampliación regulatoria de la reconstrucción habitacional.",
+      "cambios": [
+        { "titulo": "Estatuto de Roma", "texto": "La denuncia formal entra en vigor un año después de la notificación.", "color": "#dc2626" },
+        { "titulo": "Ley de Arrendamiento", "texto": "La AN sanciona 27 artículos con canon acordado, depósito máximo y arbitraje.", "color": "#22c55e" },
+        { "titulo": "Jurisdicción especial", "texto": "Acelera trámites administrativos, registrales y judiciales de reconstrucción.", "color": "#f59e0b" },
+        { "titulo": "Pagos petroleros", "texto": "Impuestos y regalías de empresas internacionales se canalizan al Tesoro de EE.UU.", "color": "#0468B1" }
+      ],
+      "lecturaAnalitica": "La reconfiguración normativa aumenta capacidad de ejecución y control, pero reduce contrapesos externos y profundiza la dependencia fiscal de Washington. La efectividad habitacional seguirá condicionada por financiamiento y capacidad institucional."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "56%", "color": "#0468B1", "text": "Sube por control militar, tutela fiscal y reconfiguración institucional coordinada." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "20%", "color": "#ca8a04", "text": "Sube por consolidación de la FANB y reducción del costo institucional externo." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "14%", "color": "#2d8a30", "text": "Cae 8pp por una mesa restringida, aplazada y sin Machado." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "10%", "color": "#dc2626", "text": "Sube moderadamente por conflictividad, pesimismo y brecha humanitaria." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Primera reunión presencial", "text": "Los resultados del 3–9 de agosto determinarán si la mesa produce transición o solo gestiona tiempo." },
+      { "tag": "Disruptivo", "color": "#ca8a04", "title": "E1 cae a su mínimo del ciclo", "text": "La composición nominal de la delegación cristaliza la exclusión funcional de la oposición no institucional." },
+      { "tag": "Fiscalización", "color": "#f59e0b", "title": "La GAO eleva el riesgo de ejecución", "text": "La investigación condiciona la sostenibilidad y transparencia de la arquitectura petrolera bilateral." },
+      { "tag": "Humanitario", "color": "#dc2626", "title": "La cobertura permanece en 39%", "text": "La brecha entre necesidades y recursos amenaza la recuperación habitacional y el aguante social." }
+    ]
+  },
+  {
+    "period": "3 de agosto – 7 de agosto de 2026",
+    "periodShort": "3–7 ago 2026",
+    "keyPoints": [
+      { "tag": "Diálogo", "color": "#0468B1", "title": "La mesa AN2015–Gobierno queda formalmente instalada", "text": "Jorge Rodríguez y Dinorah Figuera abren el proceso el 6 de agosto, con sesión permanente hasta el día 12 y tres ejes iniciales de trabajo." },
+      { "tag": "Político", "color": "#ca8a04", "title": "La composición opositora sigue restringida", "text": "PJ y VP integran la delegación; Machado y cinco partidos de la PUD permanecen fuera, mientras AD y La Causa R reconocen diferencias internas." },
+      { "tag": "Emergencia", "color": "#dc2626", "title": "El balance oficial sube a 6.125 fallecidos", "text": "El corte del 3 de agosto omite heridos, damnificados y campamentos y no explica la brecha entre 157 desaparecidos nacionales y 1.338 reportados en La Guaira." },
+      { "tag": "Reconstrucción", "color": "#f59e0b", "title": "41.624 viviendas presentan afectaciones", "text": "Solo se ha retirado 16,51% de los escombros estimados y la pista principal de Maiquetía permanece cerrada hasta el 3 de noviembre." },
+      { "tag": "Petróleo", "color": "#22c55e", "title": "Las exportaciones caen por segundo mes consecutivo", "text": "La producción nacional ronda 1,2M b/d; PetroPiar amplía su área y ONGC Videsh obtiene licencia para operar proyectos upstream." },
+      { "tag": "Economía", "color": "#dc2626", "title": "El dólar oficial acumula 150,4% en el año", "text": "La tasa se ubica en Bs 746,63 por dólar y la deuda externa se estima en USD 170.000M." },
+      { "tag": "Social", "color": "#ca8a04", "title": "25 protestas en 12 entidades", "text": "Las demandas por vivienda, agua y trabajo se combinan con participación política, libertad de expresión, justicia y derechos de detenidos." },
+      { "tag": "Opinión", "color": "#7c3aed", "title": "Machado alcanza 72% de imagen positiva", "text": "Rodríguez registra 71% de rechazo; 94,1% desconfía de la información oficial y 91,6% evalúa negativamente la respuesta gubernamental." },
+      { "tag": "Escenarios", "color": "#0468B1", "title": "E3 baja a 52% pese a la instalación de la mesa", "text": "El avance procedimental carece todavía de cronograma electoral, reforma del CNE o resultados sustantivos verificables." },
+      { "tag": "Escenarios", "color": "#dc2626", "title": "E4 sube a 23% y E2 a 13%", "text": "La cohesión coercitiva y la erosión humanitaria ganan peso; E1 baja a 12% y no se declara movimiento disruptivo." }
+    ],
+    "sintesis": "El corte del 3 al 7 de agosto instala formalmente la mesa AN2015–Gobierno Nacional y consolida el canal procedimental, pero no produce todavía resultados sustantivos verificables. E3 baja a 52% (−4pp) por deterioro de legitimidad y opacidad humanitaria; E1 desciende a 12% (−2pp) por la exclusión persistente de Machado y buena parte de la PUD. E4 sube a 23% (+3pp) por la cohesión de la nueva cúpula militar y E2 a 13% (+3pp) por protestas, desconfianza y debilidad de gestión. Todos los movimientos permanecen dentro del techo metodológico ordinario.",
+    "actores": [
+      { "name": "Gobierno encargado", "items": ["Instala la mesa con la AN2015 y mantiene sesión permanente hasta el 12 de agosto.", "Sostiene la reestructuración militar y recibe ratificación de lealtad de la GNB.", "Publica un balance sísmico actualizado, pero metodológicamente incompleto."] },
+      { "name": "Estados Unidos", "items": ["Da la bienvenida a la mesa dentro del esquema de estabilización, recuperación y transición.", "El Senado impulsa una resolución bipartidista con supervisión y metas verificables.", "Circulan señales no confirmadas de un relevo de Claver-Carone por Caleb Orr en el expediente venezolano."] },
+      { "name": "Oposición y sociedad civil", "items": ["Figuera encabeza una delegación compuesta por seis representantes de PJ y cuatro de VP.", "Machado y cinco partidos permanecen fuera; AD y La Causa R reconocen diferencias.", "Sindicatos exigen elecciones en 2026, nuevo CNE y cronograma público."] },
+      { "name": "Comunidad internacional", "items": ["Chile y Venezuela restablecen relaciones consulares.", "El BID activa cooperación técnica no reembolsable por al menos USD 800.000, sin préstamos nuevos.", "ONGC Videsh obtiene licencia mientras gestiona una deuda cercana a USD 536M."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesPlenas": 9000, "privadosLiberados": 1400, "cautelares": 8426, "militares": 187, "fpVerificados": 857, "fpDetenidos": 404, "fpNota": "Sin nuevo balance verificable; la liberación de presos políticos y el fin de la persecución forman parte de las exigencias de la PUD." },
+      "rodriguez": [
+        { "title": "Mesa permanente", "text": "El Ejecutivo abre negociación formal con la AN2015 hasta el 12 de agosto." },
+        { "title": "Cohesión militar", "text": "La nueva cúpula continúa sin fisuras y la GNB ratifica lealtad." },
+        { "title": "Balance humanitario", "text": "Actualiza fallecidos y viviendas, pero omite variables previamente publicadas." },
+        { "title": "Contingencia eléctrica", "text": "Centraliza el plan ante el fenómeno Súper Niño y un posible aumento de demanda." }
+      ],
+      "mcmAgenda": ["Vincular la mesa con resultados electorales verificables.", "Exigir liberación de presos políticos y fin de la persecución.", "Definir una posición unitaria ante su exclusión de la delegación."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "Bs 746,63", "label": "Tipo oficial de cambio", "color": "#dc2626" },
+        { "value": "+150,4%", "label": "Dólar oficial · 2026", "color": "#dc2626" },
+        { "value": "USD 170.000M", "label": "Deuda externa estimada", "color": "#f59e0b" },
+        { "value": "1,2M b/d", "label": "Producción petrolera actual", "color": "#22c55e" }
+      ],
+      "empresas": [
+        { "empresa": "PetroPiar", "desarrollo": "Amplía el área de operación de 460 a 907 km²." },
+        { "empresa": "ONGC Videsh", "desarrollo": "Obtiene licencia para proyectos upstream y gestiona una deuda de USD 536M." },
+        { "empresa": "Chevron / Maurel & Prom", "desarrollo": "Consolidan posiciones autorizadas sin una apertura amplia a nuevos operadores." },
+        { "empresa": "BID", "desarrollo": "Moviliza al menos USD 800.000 de cooperación técnica, sin reanudar préstamos." },
+        { "empresa": "General Motors", "desarrollo": "Evalúa de forma exploratoria un eventual regreso, sin inversiones anunciadas." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 25, "promDiario": 8.3, "periodo": "4–6 ago", "variacion": "Tendencia ascendente: 6, 8 y 11 protestas", "composicion": "Vivienda, agua, trabajo, seguridad social, participación, expresión y justicia.", "nota": "Siete entidades muestran recurrencia territorial durante el corto período." },
+      "percepcion": { "fuente": "AtlasIntel / Poder y Estrategia / Meganálisis", "titulo": "Brecha extrema entre legitimidad opositora y confianza gubernamental", "nota": "La desconfianza informativa y la evaluación de la respuesta humanitaria alcanzan niveles críticos.", "datos": [{ "factor": "Imagen positiva de Machado", "pct": 72 }, { "factor": "Rechazo a Rodríguez", "pct": 71 }, { "factor": "Desconfía de información oficial", "pct": 94.1 }, { "factor": "Respuesta mala o muy mala", "pct": 91.6 }] },
+      "excarcelados": { "fp": 857, "presos": 404, "militares": 187, "fuente": "Foro Penal / último dato verificado" }
+    },
+    "marcoNormativo": {
+      "titulo": "Mesa formal, disputa institucional y balance humanitario incompleto",
+      "resumen": "La negociación abre un cauce procedimental, pero el marco jurídico de transición y la transparencia de la emergencia siguen bajo disputa.",
+      "cambios": [
+        { "titulo": "Sesión permanente", "texto": "La mesa trabaja del 6 al 12 de agosto sobre atención sísmica, democracia y garantías.", "color": "#0468B1" },
+        { "titulo": "CNE y TSJ", "texto": "Figuera plantea reformulación electoral y reinstitucionalización judicial sin resultados aún.", "color": "#22c55e" },
+        { "titulo": "Estatuto de Transición", "texto": "Cabello lo rechaza como aberración jurídica y mantiene capacidad de veto.", "color": "#dc2626" },
+        { "titulo": "Balance oficial", "texto": "La actualización retrae variables y deja discrepancias metodológicas sin aclarar.", "color": "#f59e0b" }
+      ],
+      "lecturaAnalitica": "La institucionalización del diálogo no equivale aún a transición. Sin resultados verificables, mayor representación y transparencia humanitaria, el proceso favorece una liberalización controlada bajo tutela externa."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "52%", "color": "#0468B1", "text": "Baja porque la mesa formal carece aún de resultados y enfrenta una base social erosionada." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "23%", "color": "#ca8a04", "text": "Sube por cohesión militar, lealtad de la GNB y centralización operativa." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "13%", "color": "#dc2626", "text": "Sube por desconfianza, protestas y omisiones del balance humanitario." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "12%", "color": "#2d8a30", "text": "Baja por exclusión persistente y ausencia de avances electorales verificables." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Cierre del 12 de agosto", "text": "Compromisos verificables o una nueva prórroga determinarán la credibilidad de la mesa." },
+      { "tag": "Humanitario", "color": "#f59e0b", "title": "La discrepancia sobre desaparecidos", "text": "La diferencia entre el dato nacional y La Guaira exige corrección metodológica inmediata." },
+      { "tag": "Legitimidad", "color": "#7c3aed", "title": "La opinión se desacopla de la mesa", "text": "Machado concentra respaldo mientras la delegación formal no la incorpora." },
+      { "tag": "Seguridad", "color": "#ca8a04", "title": "La cohesión castrense contiene E2", "text": "No aparecen señales de fractura interna pese al deterioro de confianza pública." }
+    ]
   }
 ];
 
