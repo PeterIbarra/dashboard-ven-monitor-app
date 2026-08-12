@@ -349,7 +349,7 @@ Task 6 del cron, ejecutada a las **11:00 UTC (7:00 AM VET)** vía cron-job.org. 
 
 Estrategia de parsing JSON (3 capas): limpieza agresiva → extracción regex por campos → texto raw como fallback.
 
-Proveedor de email: Mailgun (Resend y Brevo/SendGrid probados previamente — no funcionales en este entorno).
+Proveedor de email: Resend, modo sandbox (SendGrid descartado — créditos de prueba agotados). Sin dominio propio verificado, Resend solo entrega al correo dueño de la API key; Peter reenvía manualmente al resto del equipo.
 
 ---
 
@@ -542,7 +542,7 @@ Toggle Absoluto / Variación interanual (%) para BCV, paralelo y brecha cambiari
 - **IODA sin batch**: No existe endpoint batch — se hacen llamadas individuales por estado (23 estados × endpoints).
 - **Google Trends**: Bloqueado desde IPs datacenter.
 - **`merit-nt` excluido** si baseline < 10 para un estado (señal insuficiente).
-- **Daily Brief email**: Resend (JSON issues) y Brevo/SendGrid (no funcionales) descartados. Mailgun activo.
+- **Daily Brief email**: SendGrid descartado (créditos de prueba agotados, ago 2026). Resend activo en modo sandbox — sin dominio propio verificado, solo entrega al correo dueño de `RESEND_API_KEY`.
 - **Consistencia `SUPABASE_SECRET`**: Nombre de variable inconsistente entre módulos — no crítico pero pendiente.
 
 ---
