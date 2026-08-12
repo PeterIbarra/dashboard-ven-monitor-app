@@ -23,9 +23,10 @@ CREATE INDEX IF NOT EXISTS idx_daily_briefs_date ON daily_briefs(date DESC);
 -- Settings > Environment Variables
 -- ═══════════════════════════════════════════════════════════
 --
--- SENDGRID_API_KEY       = SG.xxxxxxxxxxxx (de sendgrid.com > Settings > API Keys)
--- DAILY_BRIEF_TO         = email1@dominio.com,email2@dominio.com,email3@dominio.com
--- DAILY_BRIEF_FROM       = tu-email-verificado@dominio.com (el Single Sender verificado)
+-- RESEND_API_KEY         = re_xxxxxxxxxxxx (de resend.com > API Keys)
+-- DAILY_BRIEF_TO         = tu-correo@dominio.com (SOLO el correo dueño de la cuenta Resend —
+--                          en modo sandbox, sin dominio verificado, Resend no entrega a nadie más)
+-- DAILY_BRIEF_FROM       = onboarding@resend.dev (fijo en sandbox; solo cambia si se verifica un dominio propio)
 -- DAILY_BRIEF_FROM_NAME  = Monitor PNUD Venezuela (opcional, nombre del remitente)
 --
 -- ═══════════════════════════════════════════════════════════
@@ -50,18 +51,20 @@ CREATE INDEX IF NOT EXISTS idx_daily_briefs_date ON daily_briefs(date DESC);
 --    Method: GET
 --
 -- ═══════════════════════════════════════════════════════════
--- NOTA SOBRE SENDGRID (Twilio)
+-- NOTA SOBRE RESEND (modo sandbox, sin dominio propio)
 -- ═══════════════════════════════════════════════════════════
 --
--- SendGrid NO requiere dominio propio. Solo necesitas:
---   1. Crear cuenta gratis en sendgrid.com (100 emails/día)
---   2. Settings > Sender Authentication > Single Sender Verification
---   3. Agregas tu email personal (Gmail, Outlook, etc.)
---   4. SendGrid te envía un email de confirmación → click verify
---   5. Settings > API Keys > Create API Key (Full Access)
---   6. Puedes enviar a CUALQUIER email sin restricción
+--   1. Crear cuenta gratis en resend.com (sin tarjeta)
+--   2. Dashboard > API Keys > Create API Key (Full Access)
+--   3. Sin verificar un dominio propio, Resend SOLO entrega al
+--      correo con el que se creó la cuenta — ningún otro destinatario
+--      recibirá el email, aunque la API devuelva éxito
+--   4. DAILY_BRIEF_TO debe ser exactamente ese correo
+--   5. Peter reenvía manualmente el brief al resto del equipo
 --
--- Para agregar más destinatarios, solo edita DAILY_BRIEF_TO
--- en Vercel separando por coma:
---   email1@org.com,email2@org.com,email3@org.com
+-- Para enviar directo a varios destinatarios sin reenvío manual,
+-- el siguiente paso es verificar un dominio propio en Resend
+-- (Domains > Add Domain > agregar registros DNS) — una vez
+-- verificado, DAILY_BRIEF_FROM puede usar ese dominio y
+-- DAILY_BRIEF_TO puede listar múltiples correos separados por coma.
 --
