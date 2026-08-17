@@ -4,6 +4,7 @@ export const EARTHQUAKE_HISTORY = [
   { date:"22–23 jul", period:"S28 · 17–24 jul", deaths:5398, injured:16740, campPeople:23843, camps:107, buildings:856, homesAffected:null, rubble:null, note:"La Guaira alcanza 100% de ocupación de campamentos." },
   { date:"31 jul", period:"S29 · 24 jul–3 ago", deaths:5398, injured:16740, campPeople:24477, camps:107, buildings:856, homesAffected:null, rubble:null, note:"Último corte desagregado antes del cambio metodológico del 3 de agosto." },
   { date:"3 ago", period:"S30 · 3–7 ago", deaths:6125, injured:null, campPeople:null, camps:null, buildings:null, homesAffected:41624, rubble:16.51, note:"El balance cambia de estructura: omite heridos y campamentos e incorpora viviendas y escombros." },
+  { date:"10 ago", period:"S31 · 7–14 ago", deaths:6301, injured:null, campPeople:null, camps:null, buildings:null, homesAffected:53314, rubble:23.26, note:"Avanza la reconstrucción, pero continúan sin publicarse heridos y campamentos; persiste la brecha entre 157 y 1.338 desaparecidos." },
 ];
 
 export const EARTHQUAKE_MILESTONES = [
@@ -12,4 +13,5 @@ export const EARTHQUAKE_MILESTONES = [
   { date:"16 jul", title:"Expansión humanitaria", text:"La red alcanza 107 campamentos y 21.210 personas alojadas." },
   { date:"23 jul", title:"Saturación en La Guaira", text:"23.843 personas en campamentos y 100% de ocupación en La Guaira." },
   { date:"3 ago", title:"Cambio metodológico", text:"6.125 fallecidos y 41.624 viviendas afectadas; dejan de publicarse variables antes disponibles." },
+  { date:"10 ago", title:"Reconstrucción y brecha informativa", text:"6.301 fallecidos, 53.314 viviendas evaluadas y 23,26% de escombros retirados; la PDNA sigue pendiente." },
 ];

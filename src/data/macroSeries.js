@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────────────────
 // Base de datos macroeconómica Venezuela — Indicadores históricos
 // Fuentes: LBMA, BCV, OPEP, SENIAT, Dólar Today, Foro Penal
-// Última actualización: Marzo 2026
+// Última actualización parcial: Agosto 2026
 // ──────────────────────────────────────────────────────────
 
 export const MACRO_SERIES_META = {
@@ -2933,6 +2933,10 @@ export const MACRO_SERIES = {
     {
       "d": "2026-03",
       "v": 13.0946
+    },
+    {
+      "d": "2026-07",
+      "v": 19.9
     }
   ],
   "canasta_basica_usd": [
@@ -5591,6 +5595,10 @@ export const MACRO_SERIES = {
     {
       "d": "2026-02",
       "v": 903.0
+    },
+    {
+      "d": "2026-07",
+      "v": 1200.0
     }
   ],
   "precio_merey_usd": [

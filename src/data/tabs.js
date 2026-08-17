@@ -4,6 +4,7 @@ export const TABS = [
   { id:"sitrep", label:"SITREP", icon:"📋" },
   { id:"matriz", label:"Matriz", icon:"🎯" },
   { id:"monitor", label:"Monitor", icon:"🚦" },
+  { id:"gacetas", label:"Gacetas", icon:"🏛️" },
   { id:"clima", label:"Clima Social", icon:"🌡️" },
   { id:"opinion", label:"Opinión Pública", icon:"◉" },
   { id:"gdelt", label:"Medios", icon:"📡" },

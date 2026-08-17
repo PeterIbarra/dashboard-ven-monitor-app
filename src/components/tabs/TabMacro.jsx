@@ -9,6 +9,7 @@ import { BG2, BORDER, TEXT, MUTED, ACCENT, font } from "../../constants";
 import { IS_DEPLOYED } from "../../utils";
 import { MACRO_SERIES, MACRO_SERIES_META, MACRO_GROUPS } from "../../data/macroSeries.js";
 import { HistoricoPanel } from "../HistoricoPanel.jsx";
+import { MACRO_LATEST, MACRO_LATEST_CUT } from "../../data/macroLatest.js";
 
 export function TabMacro() {
   const mob = useIsMobile();
@@ -153,22 +154,6 @@ export function TabMacro() {
     return () => { clearInterval(iv2); document.removeEventListener("visibilitychange", onVis2); };
   }, []);
 
-  // Static macro indicators (update weekly/monthly)
-  const MACRO = [
-    { k:"PIB proyectado 2025", v:"10–15%", c:"#22c55e", s:"FMI / Ecoanalítica · crecimiento estimado" },
-    { k:"Inflación mensual (mar 2026)", v:"13.1%", c:"#E5243B", s:"BCV · var. mensual avance · INPC" },
-    { k:"Reservas internacionales", v:"$13,239M", c:"#f59e0b", s:"BCV mar 2026 · incluye oro monetario" },
-    { k:"Deuda externa", v:">$150B", c:"#E5243B", s:"FMI: >180% del PIB · en default" },
-    { k:"Ingreso mínimo integral", v:"~$38.85", c:"#E5243B", s:"Mar 2026 · sector privado · BCV/IGTF" },
-    { k:"Canasta básica (CENDAS)", v:"$503.73", c:"#f59e0b", s:"Abr 2025 · última publicación disponible" },
-    { k:"Producción petrolera (OPEP)", v:"903 kbd", c:"#22c55e", s:"Feb 2026 · fuentes sec. OPEP" },
-    { k:"Producción petrolera (PDVSA)", v:"1,021 kbd", c:"#22c55e", s:"Feb 2026 · cifras oficiales PDVSA" },
-    { k:"Precio Merey (cesta VEN)", v:"$73.33/bl", c:"#f59e0b", s:"Mar 2026 · OPEP" },
-    { k:"Crédito bancario", v:"$3,234M", c:"#22c55e", s:"Mar 2026 · SUDEBAN · cartera bruta total" },
-    { k:"Recaudación SENIAT", v:"$1,606M", c:"#22c55e", s:"Mar 2026 · ingresos no petroleros" },
-    { k:"Liquidez M2", v:"$2,430M", c:"#f59e0b", s:"Mar 2026 · BCV · agregados monetarios" },
-  ];
-
   return (
     <div>
       {/* Header */}
@@ -219,7 +204,7 @@ export function TabMacro() {
             <div style={{ fontSize:26, fontWeight:800, color:"#7c3aed", fontFamily:"'Playfair Display',serif" }}>
               {loading ? "..." : dolar?.par ? `~${(dolar.par * 1.02).toFixed(0)}` : "—"}
             </div>
-            <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>Estimado · Binance P2P +2%</div>
+            <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>Estimación técnica: paralelo +2% · no es cotización Binance</div>
           </Card>
         </div>
 
@@ -244,8 +229,8 @@ export function TabMacro() {
             <div style={{ fontSize:12, color:MUTED, lineHeight:1.6 }}>Precio del dólar en el mercado no oficial. Referencia real para la mayoría de transacciones cotidianas.</div>
           </Card>
           <Card accent="#7c3aed">
-            <div style={{ fontSize:13, fontWeight:600, color:"#7c3aed", marginBottom:4 }}>₿ USDT / Binance P2P</div>
-            <div style={{ fontSize:12, color:MUTED, lineHeight:1.6 }}>Precio del USDT en bolívares via Binance P2P. Usado masivamente para remesas y ahorro digital.</div>
+            <div style={{ fontSize:13, fontWeight:600, color:"#7c3aed", marginBottom:4 }}>₿ Referencia USDT</div>
+            <div style={{ fontSize:12, color:MUTED, lineHeight:1.6 }}>Aproximación técnica construida como tasa paralela +2%. No representa una consulta directa ni una cotización de Binance P2P.</div>
           </Card>
         </div>
 
@@ -255,10 +240,10 @@ export function TabMacro() {
             Implicaciones por escenario
           </div>
           {[
-            { esc:"E1", label:"Transición", cond:"Brecha <20%", desc:"Convergencia cambiaria. Señal de estabilización y confianza.", color:"#1a7a1a" },
-            { esc:"E3", label:"Continuidad", cond:"Brecha 20-40%", desc:"Brecha manejable. Subastas BCV sostienen la tasa. Equilibrio frágil.", color:"#0468B1" },
-            { esc:"E4", label:"Resistencia", cond:"Brecha 40-55%", desc:"Presión cambiaria creciente. Riesgo de espiral si supera 55%.", color:"#b45309" },
-            { esc:"E2", label:"Colapso", cond:"Brecha >55%", desc:"Zona de alerta. Pérdida de control cambiario. Activa indicador E2.", color:"#c92a2a" },
+            { esc:"E1", label:"Señal compatible con E1", cond:"Brecha <20%", desc:"Convergencia cambiaria; requiere corroboración política e institucional.", color:"#1a7a1a" },
+            { esc:"E3", label:"Señal compatible con E3", cond:"Brecha 20-40%", desc:"Brecha administrada y equilibrio cambiario frágil.", color:"#0468B1" },
+            { esc:"E4", label:"Señal compatible con E4", cond:"Brecha 40-55%", desc:"Presión creciente; no determina por sí sola el escenario.", color:"#b45309" },
+            { esc:"E2", label:"Alerta asociada a E2", cond:"Brecha >55%", desc:"Pérdida de control cambiario; debe validarse con otras señales sistémicas.", color:"#c92a2a" },
           ].map((e,i) => {
             const isActive = dolar?.brecha && (
               (e.esc==="E1" && dolar.brecha < 20) || (e.esc==="E3" && dolar.brecha >= 20 && dolar.brecha < 40) ||
@@ -279,21 +264,24 @@ export function TabMacro() {
 
         {dolar?.updated && (
           <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}60`, marginTop:8 }}>
-            Fuente: DolarAPI.com (ve.dolarapi.com) · Última actualización: {new Date(dolar.updated).toLocaleString("es")} · Refresco cada 2 min
+            Fuente: DolarAPI.com (ve.dolarapi.com) · Última actualización: {new Date(dolar.updated).toLocaleString("es")} · Refresco cada 5 min
           </div>
         )}
       </>)}
 
       {/* ── INDICADORES ── */}
       {seccion === "indicadores" && (
-        <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:10 }}>
-          {MACRO.map((m,i) => (
+        <div>
+          <div style={{ fontSize:10, color:MUTED, fontFamily:font, marginBottom:8 }}>Corte analítico: {MACRO_LATEST_CUT} · cada tarjeta identifica si el dato es observado, estimado o rezagado.</div>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:10 }}>
+          {MACRO_LATEST.map((m,i) => (
             <Card key={i} accent={m.c}>
               <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{m.k}</div>
               <div style={{ fontSize:20, fontWeight:800, color:m.c, fontFamily:"'Syne',sans-serif" }}>{m.v}</div>
               <div style={{ fontSize:10, color:MUTED, marginTop:4, lineHeight:1.5 }}>{m.s}</div>
             </Card>
           ))}
+          </div>
         </div>
       )}
 

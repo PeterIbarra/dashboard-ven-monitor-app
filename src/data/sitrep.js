@@ -5316,6 +5316,82 @@ export const SITREP_ALL = [
       { "tag": "Legitimidad", "color": "#7c3aed", "title": "La opinión se desacopla de la mesa", "text": "Machado concentra respaldo mientras la delegación formal no la incorpora." },
       { "tag": "Seguridad", "color": "#ca8a04", "title": "La cohesión castrense contiene E2", "text": "No aparecen señales de fractura interna pese al deterioro de confianza pública." }
     ]
+  },
+  {
+    "period": "7 de agosto – 14 de agosto de 2026",
+    "periodShort": "7–14 ago 2026",
+    "keyPoints": [
+      { "tag": "Diálogo", "color": "#0468B1", "title": "Primer ciclo cierra con acuerdos institucionales verificables", "text": "Tras cinco sesiones plenarias y cinco técnicas, Gobierno Nacional y AN2015 acuerdan renovar integralmente el TSJ y trabajar en la recuperación auditada de activos del Banco de Inglaterra." },
+      { "tag": "Electoral", "color": "#ca8a04", "title": "La agenda electoral queda pendiente", "text": "El comunicado de cierre no incorpora un cronograma electoral; la hoja de ruta anunciada por la AN2015 no es vinculante y una segunda ronda se prevé para septiembre." },
+      { "tag": "Representación", "color": "#7c3aed", "title": "Primer contacto con la Plataforma Unitaria, sin ampliación formal", "text": "La comisión de la AN2015 sostiene una reunión reservada con la Plataforma Unitaria, pero María Corina Machado y Edmundo González permanecen fuera del formato." },
+      { "tag": "Emergencia", "color": "#dc2626", "title": "El balance sísmico aumenta a 6.301 fallecidos", "text": "Al 10 de agosto se reportan 53.314 viviendas evaluadas y 23,26% de escombros retirados; no existe PDNA formal y persiste la discrepancia sobre desaparecidos." },
+      { "tag": "Social", "color": "#dc2626", "title": "54 protestas conectan el malestar con la negociación", "text": "El pico de 18 movilizaciones del 12 de agosto coincide con el cierre del diálogo; sindicatos y sociedad civil exigen incorporación, justicia y derechos laborales." },
+      { "tag": "Economía", "color": "#dc2626", "title": "Inflación de julio llega a 19,9%", "text": "El acumulado de 2026 se aproxima a 176%, mientras la Bolsa de Caracas pierde 72% del impulso registrado tras la captura de Maduro." },
+      { "tag": "Petróleo", "color": "#22c55e", "title": "Producción estable y máximo semanal hacia EE.UU.", "text": "Venezuela produce 1,2M b/d en julio y exporta 743.000 b/d a Estados Unidos en la semana cerrada el 7 de agosto, 81% más que la semana previa." },
+      { "tag": "Electricidad", "color": "#f59e0b", "title": "Reinician Tocoma y Macagua con meta de 672 MW", "text": "IMPSA y Corpoelec reactivan obras para fortalecer el Sistema Eléctrico Nacional tras los daños ocasionados por los sismos." },
+      { "tag": "Escenarios", "color": "#0468B1", "title": "E3 permanece en 52% y E1 sube a 13%", "text": "Los acuerdos procedimentales consolidan la continuidad negociada, mientras la segunda ronda y el contacto opositor elevan marginalmente la transición pacífica." },
+      { "tag": "Escenarios", "color": "#dc2626", "title": "E2 sube a 15% y E4 baja a 20%", "text": "La protesta y el deterioro macroeconómico elevan fragmentación; la coerción pierde peso relativo al integrarse en la arquitectura de tutela negociada." }
+    ],
+    "sintesis": "El cierre del primer ciclo de diálogo consolida la Continuidad Negociada en 52% con avances institucionales concretos —renovación integral del TSJ y recuperación auditada de activos—, pero sin acuerdo electoral. La Transición Pacífica sube a 13% por la segunda ronda prevista y el primer contacto con la Plataforma Unitaria. El Colapso y Fragmentación aumenta a 15% por 54 protestas y una inflación mensual de 19,9%; la Resistencia Coercitiva baja a 20% al operar las facultades extraordinarias dentro de la misma arquitectura negociada.",
+    "actores": [
+      { "name": "Gobierno Nacional", "items": ["Cierra el primer ciclo con acuerdos sobre TSJ y activos internacionales.", "Ratifica el Decreto 7.066 de Emergencia Económica.", "Reinicia obras en Tocoma y Macagua con IMPSA y Corpoelec."] },
+      { "name": "AN2015 y oposición", "items": ["Dinorah Figuera anuncia una hoja de ruta institucional entre octubre y diciembre.", "La comisión sostiene un primer contacto reservado con la Plataforma Unitaria.", "María Corina Machado y Edmundo González continúan sin participación formal."] },
+      { "name": "Estados Unidos", "items": ["Marco Rubio opera como mediador informal y garante político de facto.", "Una delegación del Tesoro mantiene interlocución de alto nivel con Delcy Rodríguez.", "La arquitectura de tres fases continúa condicionando el proceso."] },
+      { "name": "Sociedad civil", "items": ["Sindicatos marchan hacia la sede del cierre para exigir incorporación a la mesa.", "Jubilados petroleros reclaman la devolución del fondo de pensiones.", "Las demandas combinan trabajo, seguridad social, justicia, vivienda y salud."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesPlenas": 9000, "privadosLiberados": 1400, "cautelares": 8426, "militares": 187, "fpVerificados": 857, "fpDetenidos": 404, "fpNota": "Sin nuevo balance verificable ni resultado específico sobre presos políticos al cierre del primer ciclo." },
+      "rodriguez": [
+        { "title": "Acuerdos institucionales", "text": "Conduce el cierre del ciclo con renovación integral del TSJ y mecanismo sobre activos externos." },
+        { "title": "Emergencia económica", "text": "Ratifica el Decreto 7.066 en un contexto de inflación de 19,9%." },
+        { "title": "Reconstrucción", "text": "El balance oficial sube a 6.301 fallecidos y reporta 23,26% de escombros retirados." },
+        { "title": "Energía", "text": "El Ejecutivo activa obras hidroeléctricas y consolida la renta petrolera bajo licencias existentes." }
+      ],
+      "mcmAgenda": ["Exigir un cronograma electoral verificable.", "Lograr incorporación formal de la Plataforma Unitaria.", "Vincular la renovación del TSJ con garantías competitivas."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "19,9%", "label": "Inflación mensual de julio", "color": "#dc2626" },
+        { "value": "≈176%", "label": "Inflación acumulada en 2026", "color": "#dc2626" },
+        { "value": "−72%", "label": "Pérdida del impulso bursátil", "color": "#f59e0b" },
+        { "value": "1,2M b/d", "label": "Producción petrolera de julio", "color": "#22c55e" },
+        { "value": "USD 350M", "label": "Tramo de reserva FMI movilizado", "color": "#0468B1" }
+      ],
+      "empresas": [
+        { "empresa": "PDVSA / exportaciones", "desarrollo": "743.000 b/d enviados a EE.UU. en la semana cerrada el 7 de agosto, máximo semanal desde 2017." },
+        { "empresa": "ConocoPhillips", "desarrollo": "Considera poco competitivo el marco fiscal venezolano para nuevas inversiones." },
+        { "empresa": "BP / NGC", "desarrollo": "BP vende a NGC su participación de 20% en el bloque Manakin." },
+        { "empresa": "IMPSA / Corpoelec", "desarrollo": "Reinician obras en Tocoma y Macagua con una meta inicial de 672 MW." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 54, "promDiario": 7.7, "periodo": "7–13 ago", "variacion": "Pico de 18 protestas el 12 de agosto", "composicion": "Trabajo, seguridad social, justicia, presos políticos, vivienda, salud e incorporación al diálogo.", "nota": "El pico coincide con el cierre del primer ciclo y politiza de forma explícita demandas sociales." },
+      "percepcion": { "fuente": "Seguimiento acumulado S30–S31", "titulo": "La negociación avanza con una base social exigente", "nota": "No se incorpora una nueva encuesta nacional comparable; se mantienen como referencia las mediciones de agosto y el registro de conflictividad.", "datos": [{ "factor": "Imagen positiva de María Corina Machado", "pct": 72 }, { "factor": "Rechazo a Delcy Rodríguez", "pct": 71 }, { "factor": "Desconfianza de información oficial", "pct": 94.1 }, { "factor": "Respuesta gubernamental mala/muy mala", "pct": 91.6 }] },
+      "excarcelados": { "fp": 857, "presos": 404, "militares": 187, "fuente": "Foro Penal / último dato verificado" }
+    },
+    "marcoNormativo": {
+      "titulo": "Renovación integral del TSJ y recuperación auditada de activos",
+      "resumen": "El diálogo acuerda reiniciar la renovación judicial desde una nueva base y trabajar conjuntamente en activos del Banco de Inglaterra, sin producir todavía un compromiso electoral específico.",
+      "cambios": [
+        { "titulo": "TSJ integral", "texto": "La renovación abarcará todas las salas y no solo las vacantes existentes.", "color": "#22c55e" },
+        { "titulo": "Comité paritario", "texto": "Se amplía el Comité de Postulaciones y se revisan credenciales bajo un nuevo mecanismo.", "color": "#0468B1" },
+        { "titulo": "Activos externos", "texto": "Se acuerdan mecanismos de transparencia, trazabilidad y auditoría para su recuperación.", "color": "#0468B1" },
+        { "titulo": "Vacío electoral", "texto": "La agenda electoral no figura entre los resultados comunicados del primer ciclo.", "color": "#dc2626" }
+      ],
+      "lecturaAnalitica": "Los acuerdos reducen incertidumbre procedimental, pero todavía no redistribuyen poder político ni garantizan competencia electoral. La ronda de septiembre será la prueba decisiva."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "52%", "color": "#0468B1", "text": "Se mantiene por acuerdos verificables y consolidación de la tutela transaccional." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "20%", "color": "#ca8a04", "text": "Baja 3pp al no observarse una escalada coercitiva autónoma frente al diálogo." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "15%", "color": "#dc2626", "text": "Sube 2pp por inflación, deterioro bursátil y el pico de conflictividad social." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "13%", "color": "#2d8a30", "text": "Sube 1pp por la segunda ronda y el contacto opositor, aún sin incorporación plena." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Ronda de septiembre", "text": "Un compromiso electoral verificable o su ausencia definirá la credibilidad del siguiente ciclo." },
+      { "tag": "Institucional", "color": "#0468B1", "title": "Implementación del TSJ", "text": "La composición y transparencia del Comité de Postulaciones determinarán el alcance real del acuerdo." },
+      { "tag": "Social", "color": "#ca8a04", "title": "Protesta y diálogo se sincronizan", "text": "El pico del 12 de agosto muestra que los sectores sociales buscan incidencia directa en la negociación." },
+      { "tag": "Humanitario", "color": "#dc2626", "title": "La PDNA sigue pendiente", "text": "La ausencia de evaluación formal y la brecha de desaparecidos siguen limitando la confianza en la reconstrucción." }
+    ]
   }
 ];
 

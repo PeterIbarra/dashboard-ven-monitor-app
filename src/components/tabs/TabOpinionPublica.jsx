@@ -10,7 +10,7 @@ const sections = [
   { id:"liderazgo", label:"Liderazgos" },
   { id:"instituciones", label:"Confianza y ánimo" },
   { id:"terremoto", label:"Terremoto" },
-  { id:"archivo", label:"Archivo S1–S30" },
+  { id:"archivo", label:"Archivo S1–S31" },
   { id:"metodologia", label:"Fuentes" },
 ];
 
@@ -89,7 +89,7 @@ export function TabOpinionPublica({ section, setSection }) {
 
     {section==="archivo" && <>
       <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:10, marginBottom:12 }}>
-        <Card><div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Semanas cubiertas</div><div style={{ fontSize:27, fontWeight:800, color:ACCENT }}>30</div><div style={{ fontSize:10, color:MUTED }}>S1–S30</div></Card>
+        <Card><div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Semanas cubiertas</div><div style={{ fontSize:27, fontWeight:800, color:ACCENT }}>31</div><div style={{ fontSize:10, color:MUTED }}>S1–S31</div></Card>
         <Card><div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Cortes estructurados</div><div style={{ fontSize:27, fontWeight:800, color:TEXT }}>{archive.filter(r=>r.perception).length}</div><div style={{ fontSize:10, color:MUTED }}>SITREP con bloque de percepción</div></Card>
         <Card><div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Cortes con encuestas</div><div style={{ fontSize:27, fontWeight:800, color:"#2d8a30" }}>{surveyRecords.length}</div><div style={{ fontSize:10, color:MUTED }}>mediciones o estudios identificados</div></Card>
         <Card><div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Fuentes identificadas</div><div style={{ fontSize:27, fontWeight:800, color:"#7c3aed" }}>{distinctSources.length}</div><div style={{ fontSize:10, color:MUTED }}>firmas y estudios distintos</div></Card>

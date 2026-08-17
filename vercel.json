@@ -22,6 +22,7 @@
     { "source": "/api/bilateral", "destination": "/api/bilateral/index.js" },
     { "source": "/api/polymarket", "destination": "/api/polymarket/index.js" },
     { "source": "/api/socioeconomic", "destination": "/api/socioeconomic/index.js" },
+    { "source": "/api/gacetas", "destination": "/api/gacetas/index.js" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [

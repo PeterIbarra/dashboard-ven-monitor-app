@@ -11,6 +11,8 @@ import { CohesionMiniWidget } from "../CohesionMiniWidget";
 import { RedesMiniWidget } from "../RedesMiniWidget";
 import { OpinionPulseWidget } from "../OpinionPulseWidget";
 import { EarthquakeIndicatorsWidget } from "../EarthquakeIndicatorsWidget";
+import { ProtestasWidget } from "../ProtestasWidget";
+import { GacetasMiniWidget } from "../GacetasMiniWidget";
 import { WEEKS, KPIS_LATEST, TENSIONS, CONF_SEMANAL } from "../../data/weekly.js";
 import { INDICATORS, SCENARIO_SIGNALS } from "../../data/indicators.js";
 import { SCENARIOS, CONF_MESES } from "../../data/static.js";
@@ -562,14 +564,23 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
         );
       })()}
 
-      {/* ── ROW 1c: Pulso de Opinión Pública ── */}
+      {/* ── ROW 1c: Pulso de protestas ── */}
+      <ProtestasWidget onOpen={() => {
+        setTab("conflictividad");
+        window.scrollTo({ top:0, behavior:"smooth" });
+      }} />
+
+      {/* ── ROW 1d: Pulso de Opinión Pública ── */}
       <OpinionPulseWidget onNavigate={(section) => {
         setOpinionSection(section);
         setTab("opinion");
         window.scrollTo({ top:0, behavior:"smooth" });
       }} />
 
-      {/* ── ROW 1e: Conflictividad Bilateral EE.UU.–Venezuela ── */}
+      {/* ── ROW 1e: Monitor de Gacetas Oficiales ── */}
+      <GacetasMiniWidget setTab={setTab} />
+
+      {/* ── ROW 1f: Conflictividad Bilateral EE.UU.–Venezuela ── */}
       {liveData?.bilateral?.latest && (() => {
         const bil = liveData.bilateral;
         const lat = bil.latest;

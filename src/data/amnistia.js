@@ -474,5 +474,12 @@ export const AMNISTIA_TRACKER = [
     "gob": { "solicitudes": null, "libertades": 9000, "privadosLiberados": 1400, "cautelares": 8426, "militares": 187 },
     "fp": { "verificados": 857, "detenidos": 404, "militares": 187 },
     "hito": "Sin nuevo balance verificable. La PUD respalda el esquema de diálogo, pero exige liberación de presos políticos, fin de la persecución y garantías electorales como condiciones de legitimidad y resultados."
+  },
+  {
+    "week": "S31",
+    "label": "7–14 ago",
+    "gob": { "solicitudes": null, "libertades": 9000, "privadosLiberados": 1400, "cautelares": 8426, "militares": 187 },
+    "fp": { "verificados": 857, "detenidos": 404, "militares": 187 },
+    "hito": "Sin nuevo balance verificable. El primer ciclo de diálogo produjo acuerdos judiciales y humanitarios, pero no comunicó resultados específicos sobre presos políticos; sindicatos y sociedad civil mantuvieron la exigencia de liberaciones durante el cierre del 12 de agosto."
   }
 ];

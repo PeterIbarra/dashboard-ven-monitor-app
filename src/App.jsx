@@ -29,6 +29,7 @@ import { TabDashboard } from "./components/tabs/TabDashboard";
 import { TabSitrep } from "./components/tabs/TabSitrep";
 import { TabMatriz } from "./components/tabs/TabMatriz";
 import { TabMonitor } from "./components/tabs/TabMonitor";
+import { TabGacetas } from "./components/tabs/TabGacetas";
 import { TabClimaSocial } from "./components/tabs/TabClimaSocial";
 import { TabOpinionPublica } from "./components/tabs/TabOpinionPublica";
 import { TabGdelt } from "./components/tabs/TabGdelt";
@@ -510,6 +511,7 @@ export default function MonitorPNUD() {
         {tab === "sitrep" && <TabSitrep week={week} liveData={liveData} />}
         {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
+        {tab === "gacetas" && <TabGacetas />}
         {tab === "clima" && <TabClimaSocial liveData={liveData} />}
         {tab === "opinion" && <TabOpinionPublica section={opinionSection} setSection={setOpinionSection} />}
         {tab === "gdelt" && <TabGdelt />}

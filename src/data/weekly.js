@@ -6,62 +6,62 @@ export const KPIS_LATEST = {
       "c": "#22c55e"
     },
     {
-      "k": "Exportaciones",
-      "v": "2° mes consecutivo de caída",
+      "k": "Exportaciones a EE.UU.",
+      "v": "743.000 b/d · +81% semanal",
       "c": "#22c55e"
     },
     {
-      "k": "PetroPiar",
-      "v": "907 km² · antes 460",
+      "k": "Producción julio",
+      "v": "1,2M b/d · estable",
       "c": "#f59e0b"
     },
     {
-      "k": "ONGC Videsh",
-      "v": "Licencia · deuda USD 536M",
+      "k": "Tocoma y Macagua",
+      "v": "Meta inicial · 672 MW",
       "c": "#22c55e"
     }
   ],
   "politico": [
     {
       "k": "E3 dominante",
-      "v": "52% · −4pp",
+      "v": "52% · sin cambio",
       "c": "#38bdf8"
     },
     {
       "k": "E1",
-      "v": "12% · −2pp",
+      "v": "13% · +1pp",
       "c": "#22c55e"
     },
     {
       "k": "E4",
-      "v": "23% · +3pp",
+      "v": "20% · −3pp",
       "c": "#ca8a04"
     },
     {
       "k": "E2",
-      "v": "13% · +3pp",
+      "v": "15% · +2pp",
       "c": "#ef4444"
     }
   ],
   "opinion": [
     {
       "k": "Balance oficial",
-      "v": "6.125 fallecidos",
+      "v": "6.301 fallecidos",
       "c": "#ef4444"
     },
     {
       "k": "Viviendas afectadas",
-      "v": "41.624 de 43.679",
+      "v": "53.314 evaluadas",
       "c": "#f59e0b"
     },
     {
-      "k": "Rechazo Rodríguez",
-      "v": "71% · +10pp",
+      "k": "Protestas",
+      "v": "54 · 7–13 ago",
       "c": "#ef4444"
     },
     {
       "k": "Brecha E3–E1",
-      "v": "40 puntos",
+      "v": "39 puntos",
       "c": "#f59e0b"
     }
   ]
@@ -2270,37 +2270,86 @@ export const WEEKS = [
       "E1 baja a 12% por exclusión persistente y divisiones dentro de la oposición",
       "E4 sube a 23% y E2 a 13% por control coercitivo, desconfianza y retracción del balance humanitario"
     ]
+  },
+  {
+    "label": "7–14 ago",
+    "short": "S31",
+    "probs": [
+      { "sc": 1, "v": 13, "t": "up" },
+      { "sc": 2, "v": 15, "t": "up" },
+      { "sc": 3, "v": 52, "t": "flat" },
+      { "sc": 4, "v": 20, "t": "down" }
+    ],
+    "xy": { "x": 0.13, "y": 0.52 },
+    "sem": { "g": 6, "y": 10, "r": 8 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "743.000 b/d hacia EE.UU. en la semana cerrada el 7 de agosto (+81%)",
+        "ingresos": "Producción nacional estable en 1,2M b/d durante julio",
+        "licencias": "BP vende 20% de Manakin a NGC; cautela de nuevos entrantes",
+        "cambio": "IMPSA–Corpoelec reinicia Tocoma y Macagua con meta inicial de 672 MW"
+      },
+      "economico": {
+        "inflacion": "19,9% en julio; acumulado cercano a 176% en 2026",
+        "ingresos_pob": "Tramo de reserva FMI movilizado: cerca de USD 350M",
+        "electricidad": "Reinicio formal de obras hidroeléctricas tras daños sísmicos",
+        "pib": "Bolsa de Caracas pierde 72% del impulso posterior a la captura de Maduro"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha de 39pp",
+        "elecciones": "Segunda ronda en septiembre; agenda electoral sin resultado en el primer ciclo",
+        "mcm": "María Corina Machado y Edmundo González continúan fuera del formato",
+        "eeuu": "Rubio opera como garante informal; visita de alto nivel del Tesoro"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Acuerdos verificables:</b> El diálogo acuerda renovar integralmente el TSJ y recuperar activos del Banco de Inglaterra." },
+      { "l": "green", "t": "<b>Canal político:</b> Se confirma una segunda ronda en septiembre y un primer contacto AN2015–Plataforma Unitaria." },
+      { "l": "yellow", "t": "<b>Agenda pendiente:</b> El cierre del primer ciclo no incorpora compromisos electorales específicos." },
+      { "l": "yellow", "t": "<b>Representación restringida:</b> María Corina Machado y Edmundo González siguen fuera del proceso." },
+      { "l": "yellow", "t": "<b>Reconstrucción parcial:</b> Se ha retirado 23,26% de los escombros y no existe una PDNA formal." },
+      { "l": "red", "t": "<b>Presión macroeconómica:</b> La inflación de julio alcanza 19,9% y la Bolsa pierde 72% de su impulso." },
+      { "l": "red", "t": "<b>Conflictividad:</b> 54 protestas, con pico de 18 el 12 de agosto, interpelan directamente al diálogo." },
+      { "l": "red", "t": "<b>Brecha humanitaria:</b> Persisten cifras incompatibles de desaparecidos y una cobertura habitacional limitada." }
+    ],
+    "lectura": "El cierre del primer ciclo de diálogo AN2015–Gobierno Nacional consolida la arquitectura de continuidad negociada con resultados verificables en materia judicial y de recuperación de activos, pero sin compromiso electoral específico. E3 se mantiene en 52% (0pp).\n\nE1 sube a 13% (+1pp) por la hoja de ruta declarada, una segunda ronda prevista para septiembre y el primer contacto con la Plataforma Unitaria, aunque María Corina Machado y Edmundo González siguen fuera. E2 aumenta a 15% (+2pp) por 54 protestas y el deterioro macroeconómico. E4 baja a 20% (−3pp) al integrarse el Decreto 7.066 y la renta petrolera dentro de la misma tutela negociada.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 se mantiene en 52% tras acuerdos judiciales y sobre activos, sin resultado electoral",
+      "E1 sube a 13% por la segunda ronda y el contacto con la Plataforma Unitaria",
+      "E2 sube a 15% por protestas e inflación; E4 baja a 20%"
+    ]
   }
 ];
 
 export const TENSIONS = [
   {
     "level": "green",
-    "text": "La mesa AN2015–Gobierno Nacional se instala formalmente con sesión permanente hasta el 12 de agosto."
+    "text": "El primer ciclo de diálogo concluye con acuerdos verificables sobre el TSJ y activos del Banco de Inglaterra."
   },
   {
     "level": "green",
-    "text": "La nueva cúpula militar se mantiene sin fisuras y la Guardia Nacional ratifica lealtad a Rodríguez."
+    "text": "La producción petrolera se mantiene en 1,2M b/d y las exportaciones a EE.UU. alcanzan un máximo semanal desde 2017."
   },
   {
     "level": "yellow",
-    "text": "La mesa aún no produce cronograma electoral, reforma del CNE o reinstitucionalización del TSJ."
+    "text": "La agenda electoral no figura entre los resultados del primer ciclo y la hoja de ruta de la AN2015 no es vinculante."
   },
   {
     "level": "yellow",
-    "text": "La delegación permanece limitada a PJ y VP, con diferencias reconocidas por AD y La Causa R."
+    "text": "María Corina Machado y Edmundo González permanecen fuera del formato negociador."
   },
   {
     "level": "yellow",
-    "text": "El balance humanitario omite variables y mantiene una discrepancia sin explicar sobre desaparecidos."
+    "text": "La reconstrucción alcanza 23,26% de escombros retirados, sin PDNA formal y con brecha de desaparecidos sin resolver."
   },
   {
     "level": "red",
-    "text": "El rechazo a Rodríguez alcanza 71% y la imagen positiva de Machado llega a 72%."
+    "text": "La inflación mensual alcanza 19,9% y la Bolsa de Caracas pierde 72% del impulso posterior a enero."
   },
   {
     "level": "red",
-    "text": "El 94,1% desconfía de la información oficial y 91,6% califica negativamente la respuesta gubernamental."
+    "text": "Se registran 54 protestas; el pico del 12 de agosto coincide con el cierre del diálogo."
   }
 ];
 
@@ -2334,7 +2383,8 @@ export const MONITOR_WEEKS = [
   "S27",
   "S28",
   "S29",
-  "S30"
+  "S30",
+  "S31"
 ];
 
 export const ICG_HISTORY = [
@@ -2517,6 +2567,12 @@ export const ICG_HISTORY = [
     "score": 76,
     "sitrep": true,
     "note": "La cúpula militar mantiene cohesión y la mesa formaliza el canal político, pero la fuerte desconfianza pública, las omisiones humanitarias y la ausencia de resultados verificables reducen la fortaleza del arreglo."
+  },
+  {
+    "week": "S31",
+    "score": 77,
+    "sitrep": true,
+    "note": "Los acuerdos sobre renovación integral del TSJ y recuperación de activos fortalecen la coordinación institucional. La agenda electoral pendiente, el pico de protestas y el deterioro macroeconómico limitan la mejora."
   }
 ];
 
@@ -3392,6 +3448,19 @@ export const CONF_SEMANAL = [
       { "fecha": "4 Agosto", "protestas": 6, "estados": 4, "tipo": "Mixto", "exigencias": "Vivienda, agua, trabajo, seguridad social y participación política" },
       { "fecha": "5 Agosto", "protestas": 8, "estados": 7, "tipo": "Mixto", "exigencias": "Vivienda, trabajo, participación, expresión, detenidos, justicia y agua" },
       { "fecha": "6 Agosto", "protestas": 11, "estados": 8, "tipo": "Mixto", "exigencias": "Vivienda, trabajo, participación, expresión, detenidos, justicia y agua" }
+    ]
+  },
+  {
+    "week": "S31",
+    "label": "7–14 ago",
+    "protestas": 54,
+    "estados": 0,
+    "reprimidas": 0,
+    "motivos": ["Derechos laborales", "Seguridad social", "Justicia", "Presos políticos", "Vivienda", "Salud", "Participación en el diálogo"],
+    "hecho": "Entre el 7 y el 13 de agosto se registraron 54 protestas. El pico de 18 movilizaciones del día 12 coincidió con el cierre del primer ciclo de diálogo y trasladó demandas sociales directamente al proceso negociador.",
+    "dias": [
+      { "fecha": "7–11 Agosto", "protestas": 36, "estados": 0, "tipo": "Social/laboral", "exigencias": "Trabajo, pensiones, seguridad social, justicia, vivienda y salud" },
+      { "fecha": "12 Agosto", "protestas": 18, "estados": 0, "tipo": "Social/político", "exigencias": "Incorporación a la mesa, derechos laborales, justicia y libertad de presos políticos" }
     ]
   }
 ];

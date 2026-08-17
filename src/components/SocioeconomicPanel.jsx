@@ -3,6 +3,7 @@ import { Card } from "./Card";
 import { Badge } from "./Badge";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, font } from "../constants";
 import { IS_DEPLOYED } from "../utils";
+import { SOCIOECONOMIC_LOCAL, MACRO_LATEST_CUT } from "../data/macroLatest.js";
 
 export function SocioeconomicPanel({ mob }) {
   const [data, setData] = useState(null);
@@ -17,7 +18,18 @@ export function SocioeconomicPanel({ mob }) {
   }, []);
 
   if (loading) return <Card><div style={{ textAlign:"center", padding:20, fontFamily:font, color:MUTED }}>Cargando datos socioeconómicos...</div></Card>;
-  if (!data) return <Card><div style={{ textAlign:"center", padding:20, fontFamily:font, color:MUTED }}>Sin datos disponibles. Solo en producción.</div></Card>;
+  if (!data) return <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+    <Card accent={ACCENT}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:8, flexWrap:"wrap", marginBottom:10 }}>
+        <div><div style={{ fontSize:13, fontWeight:700, color:TEXT, textTransform:"uppercase" }}>Panorama socioeconómico — vista local</div><div style={{ fontSize:10, color:MUTED, fontFamily:font }}>Corte analítico: {MACRO_LATEST_CUT}</div></div>
+        <Badge color="#f59e0b">Snapshot documental</Badge>
+      </div>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8 }}>
+        {SOCIOECONOMIC_LOCAL.summary.map((kpi)=><div key={kpi.label} style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`3px solid ${kpi.color}`, padding:mob?"8px":"10px 12px" }}><div style={{ fontSize:8, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>{kpi.label}</div><div style={{ fontSize:mob?16:20, fontWeight:800, color:kpi.color, marginTop:2 }}>{kpi.value}</div><div style={{ fontSize:8, color:MUTED, marginTop:2 }}>{kpi.sub}</div></div>)}
+      </div>
+    </Card>
+    <Card><div style={{ fontSize:11, color:TEXT, lineHeight:1.6 }}><b>Nota metodológica.</b> En local se muestra el último corte documental validado. Al desplegar, este bloque se complementa automáticamente con las series anuales de World Bank, las proyecciones del FMI y R4V/UNHCR.</div></Card>
+  </div>;
 
   const fmt = (v, unit) => {
     if (v == null) return "—";

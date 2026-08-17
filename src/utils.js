@@ -3,7 +3,15 @@
 // ═══════════════════════════════════════════════════════════════
 
 // ── Environment detection ──
-export const IS_DEPLOYED = typeof window !== "undefined" && (window.location.hostname.includes("vercel.app") || window.location.hostname.includes(".") && !window.location.hostname.includes("localhost"));
+// 127.0.0.1 contains dots, so a generic "hostname includes dot" check incorrectly
+// treated the local Vite server as a deployment and sent requests to /api/*.
+const runtimeHostname = typeof window !== "undefined" ? window.location.hostname : "";
+const isLocalRuntime = runtimeHostname === "localhost"
+  || runtimeHostname === "127.0.0.1"
+  || runtimeHostname === "0.0.0.0"
+  || runtimeHostname === "::1"
+  || runtimeHostname.endsWith(".localhost");
+export const IS_DEPLOYED = typeof window !== "undefined" && !isLocalRuntime && runtimeHostname.length > 0;
 
 // ── Lazy script/CSS loader — deduplicates, caches, returns promise ──
 const _scriptCache = {};
