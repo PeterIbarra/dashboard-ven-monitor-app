@@ -5,7 +5,7 @@ module.exports = async function handler(req, res) {
 
   try {
     // === LIVE: fetch paralelo + oficial in parallel ===
-    if (type !== "historico") {
+    if (type === "live") {
       const [resArr, resOficial] = await Promise.all([
         fetch("https://ve.dolarapi.com/v1/dolares", {
           signal: AbortSignal.timeout(10000),
