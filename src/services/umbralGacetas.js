@@ -7,7 +7,7 @@ const fields = "id,gazette_number,gazette_type,gazette_date,decree_number,change
 
 export async function fetchUmbralGacetas(limit=5000) {
   if (IS_DEPLOYED) {
-    const response = await fetch(`/api/gacetas?limit=${limit}`, { signal:AbortSignal.timeout(18000) });
+    const response = await fetch(`/api/articles?type=gacetas&limit=${limit}`, { signal:AbortSignal.timeout(18000) });
     if (!response.ok) throw new Error(`API Gacetas: ${response.status}`);
     return response.json();
   }
