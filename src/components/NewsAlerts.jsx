@@ -3,7 +3,7 @@ import { Card } from "./Card";
 import { BORDER, TEXT, MUTED, font, fontSans } from "../constants";
 import { IS_DEPLOYED } from "../utils";
 
-export const NewsAlerts = memo(function NewsAlerts({ liveData, mob }) {
+export const NewsAlerts = memo(function NewsAlerts({ liveData, mob, setTab }) {
   const [alerts, setAlerts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [provider, setProvider] = useState("");
@@ -71,10 +71,11 @@ ${allHeadlines.map((h,i) => `${i+1}. ${h}`).join("\n")}
 INSTRUCCIONES:
 1. Responde SOLO en formato JSON válido, sin markdown ni backticks.
 2. Aplica el filtro estricto: si Venezuela no es el sujeto principal, EXCLÚYELO.
-3. Cada alerta: "nivel" (🔴/🟡/🟢), "titular", "fuente", "dimension" (POLÍTICO/ECONÓMICO/INTERNACIONAL/DDHH/ENERGÍA), "impacto" (1 frase de por qué importa).
-4. 🔴 = Evento que podría mover escenarios. 🟡 = Desarrollo para seguimiento. 🟢 = Contexto informativo.
+3. Cada alerta: "nivel" (🔴/🟠/🔵), "titular", "fuente", "dimension" (POLÍTICA/PROTESTAS/DDHH/ECONOMÍA/ENERGÍA_Y_RED/SISMOS/INSTITUCIONAL/HUMANITARIO/INTERNACIONAL), "impacto" (1 frase de por qué importa) y "territorio" (estado, municipio, NACIONAL o EXTERIOR).
+4. 🔴 = ALERTA INMEDIATA: evento confirmado con impacto inmediato o capacidad de mover escenarios. 🟠 = ADVERTENCIA DE ESCALADA: desarrollo relevante que puede intensificarse. 🔵 = EN VIGILANCIA: señal incipiente o contexto que requiere seguimiento.
 5. Máximo 8, mínimo 2. Ordena: 🔴 primero, luego 🟡, luego 🟢.
-6. Formato: [{"nivel":"🔴","titular":"...","fuente":"...","dimension":"...","impacto":"..."}]`;
+6. No clasifiques como 🔴 una opinión, especulación o anuncio sin efecto confirmado.
+7. Formato: [{"nivel":"🔴","titular":"...","fuente":"...","dimension":"...","territorio":"NACIONAL","impacto":"..."}]`;
 
       try {
         if (IS_DEPLOYED) {
@@ -127,9 +128,12 @@ INSTRUCCIONES:
 
   if (status === "waiting") return null;
 
-  const nivelColor = { "🔴":"#dc2626", "🟡":"#ca8a04", "🟢":"#16a34a" };
-  const nivelBg = { "🔴":"#dc262608", "🟡":"#ca8a0408", "🟢":"#16a34a08" };
-  const dimColor = { "POLÍTICO":"#7c3aed", "ECONÓMICO":"#0e7490", "INTERNACIONAL":"#0468B1", "DDHH":"#dc2626", "ENERGÍA":"#ca8a04" };
+  const normalizeLevel = level => level === "🟡" ? "🟠" : level === "🟢" ? "🔵" : level;
+  const nivelColor = { "🔴":"#dc2626", "🟠":"#ca8a04", "🔵":"#2563eb" };
+  const nivelBg = { "🔴":"#dc262608", "🟠":"#ca8a0408", "🔵":"#2563eb08" };
+  const nivelLabel = { "🔴":"Alerta inmediata", "🟠":"Advertencia de escalada", "🔵":"En vigilancia" };
+  const dimColor = { "POLÍTICA":"#7c3aed", "POLÍTICO":"#7c3aed", "PROTESTAS":"#e11d48", "ECONOMÍA":"#0e7490", "ECONÓMICO":"#0e7490", "INTERNACIONAL":"#0468B1", "DDHH":"#dc2626", "ENERGÍA":"#ca8a04", "ENERGÍA_Y_RED":"#ca8a04", "SISMOS":"#b45309", "INSTITUCIONAL":"#0f766e", "HUMANITARIO":"#be185d" };
+  const dimTab = { "PROTESTAS":"conflictividad", "DDHH":"monitor", "ECONOMÍA":"macro", "ECONÓMICO":"macro", "ENERGÍA":"ioda", "ENERGÍA_Y_RED":"ioda", "SISMOS":"sismos", "INSTITUCIONAL":"gacetas", "INTERNACIONAL":"gdelt", "POLÍTICA":"sitrep", "POLÍTICO":"sitrep", "HUMANITARIO":"sitrep" };
 
   const badgeColor = provider.includes("mistral") ? "#ff6f00" : provider.includes("gemini") ? "#4285f4" : provider.includes("groq")||provider.includes("llama") ? "#f97316" : provider.includes("openrouter")||provider.includes("free") ? "#06b6d4" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "#ffbf00" : provider === "cached" ? "#64748b" : "#8b5cf6";
   const badgeLabel = provider.includes("mistral") ? "MISTRAL" : provider.includes("gemini") ? "GEMINI" : provider.includes("groq")||provider.includes("llama") ? "GROQ" : provider.includes("openrouter")||provider.includes("free") ? "OPENROUTER" : provider.includes("hugging")||provider.includes("qwen")||provider.includes("hf") ? "HUGGINGFACE" : provider === "cached" ? "CACHED" : "CLAUDE";
@@ -157,9 +161,9 @@ INSTRUCCIONES:
         </div>
       )}
       {alerts && alerts.map((a, i) => (
-        <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:8, padding:"6px 0",
-          borderTop:i>0?`1px solid ${BORDER}30`:"none", background:nivelBg[a.nivel] || "transparent" }}>
-          <span style={{ fontSize:14, flexShrink:0, marginTop:1 }}>{a.nivel}</span>
+        <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:8, padding:"8px 0",
+          borderTop:i>0?`1px solid ${BORDER}30`:"none", background:nivelBg[normalizeLevel(a.nivel)] || "transparent" }}>
+          <span title={nivelLabel[normalizeLevel(a.nivel)]} style={{ fontSize:14, flexShrink:0, marginTop:1 }}>{normalizeLevel(a.nivel)}</span>
           <div style={{ flex:1, minWidth:0 }}>
             <div style={{ fontSize:12, fontFamily:fontSans, color:TEXT, lineHeight:1.4 }}>
               {a.titular}
@@ -173,7 +177,16 @@ INSTRUCCIONES:
                   {a.dimension}
                 </span>
               )}
+              <span style={{ fontSize:8, fontFamily:font, color:nivelColor[normalizeLevel(a.nivel)] || MUTED, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em" }}>
+                {nivelLabel[normalizeLevel(a.nivel)] || "En seguimiento"}
+              </span>
+              {a.territorio && <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>📍 {a.territorio}</span>}
               {a.impacto && <span style={{ fontSize:10, fontFamily:font, color:MUTED, fontStyle:"italic" }}>{a.impacto}</span>}
+              {setTab && dimTab[a.dimension] && (
+                <button onClick={() => { setTab(dimTab[a.dimension]); window.scrollTo({ top:0, behavior:"smooth" }); }} style={{ marginLeft:"auto", border:`1px solid ${dimColor[a.dimension] || MUTED}40`, background:"#fff", color:dimColor[a.dimension] || MUTED, padding:"3px 7px", fontSize:8, fontFamily:font, cursor:"pointer" }}>
+                  Ver módulo →
+                </button>
+              )}
             </div>
           </div>
         </div>

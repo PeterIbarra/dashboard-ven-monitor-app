@@ -5,13 +5,26 @@ import { ConflictividadChart } from "../charts/ConflictividadChart";
 import { EstadosMap } from "../EstadosMap";
 import { AcledSection } from "../AcledSection";
 import { ConfMensual2026 } from "../ConfMensual2026";
+import { ConfSemestre2026 } from "../ConfSemestre2026";
 import { CONF_HISTORICO, CONF_MESES, CONF_DERECHOS, CONF_SERVICIOS, CONF_ESTADOS } from "../../data/static.js";
 import { CONF_SEMANAL } from "../../data/weekly.js";
 import { BG2, BORDER, TEXT, MUTED, ACCENT, font } from "../../constants";
 
+const SECCIONES = [
+  { id:"semestre26", label:"1er semestre 2026" },
+  { id:"semanal26", label:"Semanal 2026" },
+  { id:"mensual26", label:"Mensual 2026" },
+  { id:"resumen", label:"Resumen 2025" },
+  { id:"mensual", label:"Mensual 2025" },
+  { id:"derechos", label:"Derechos 2025" },
+  { id:"estados", label:"Estados 2025" },
+  { id:"historico", label:"Histórico" },
+  { id:"acled", label:"ACLED" },
+];
+
 export function TabConflictividad() {
   const mob = useIsMobile();
-  const [seccion, setSeccion] = useState("semanal26");
+  const [seccion, setSeccion] = useState("semestre26");
   const [weekDetail, setWeekDetail] = useState(null);
 
   const maxMes = Math.max(...CONF_MESES.map(m=>m.t));
@@ -28,16 +41,23 @@ export function TabConflictividad() {
           <div style={{ fontSize:15, fontWeight:700, color:TEXT, fontFamily:"'Syne',sans-serif", letterSpacing:"0.05em", textTransform:"uppercase" }}>Conflictividad Social — Venezuela</div>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Fuente: OVCS · <span style={{ fontSize:10 }}>DCP: Derechos Civiles y Políticos · DESCA: Derechos Económicos, Sociales, Culturales y Ambientales</span></div>
         </div>
-        <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
-          {[{id:"semanal26",label:"Semanal 2026"},{id:"mensual26",label:"Mensual 2026"},{id:"resumen",label:"Resumen 2025"},{id:"mensual",label:"Mensual 2025"},{id:"derechos",label:"Derechos"},{id:"estados",label:"Estados"},{id:"historico",label:"Histórico"},{id:"acled",label:"ACLED"}].map(s => (
-            <button key={s.id} onClick={() => setSeccion(s.id)}
-              style={{ fontSize:12, fontFamily:font, padding:"6px 12px", border:"none",
-                background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
-              {s.label}
-            </button>
-          ))}
+        <div style={{ minWidth:mob?"100%":230 }}>
+          <label htmlFor="conflictividad-vista" style={{ display:"block", fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>
+            Vista del monitor
+          </label>
+          <div style={{ position:"relative" }}>
+            <select id="conflictividad-vista" value={seccion} onChange={e=>setSeccion(e.target.value)}
+              style={{ width:"100%", appearance:"none", WebkitAppearance:"none", background:BG2, color:TEXT,
+                border:`1px solid ${BORDER}`, borderLeft:`3px solid ${ACCENT}`, padding:"8px 34px 8px 11px",
+                fontSize:12, fontFamily:font, fontWeight:600, letterSpacing:"0.04em", cursor:"pointer", outline:"none" }}>
+              {SECCIONES.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}
+            </select>
+            <span aria-hidden="true" style={{ position:"absolute", right:11, top:"50%", transform:"translateY(-50%)", color:ACCENT, fontSize:11, pointerEvents:"none" }}>▼</span>
+          </div>
         </div>
       </div>
+
+      {seccion === "semestre26" && <ConfSemestre2026 mobile={mob} />}
 
       {/* ── SEMANAL 2026 ── */}
       {seccion === "semanal26" && (() => {

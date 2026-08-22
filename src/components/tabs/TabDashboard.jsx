@@ -167,6 +167,14 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         if (liveAlerts.length === 0) return null;
 
         const reds = liveAlerts.filter(a => a.level === "red");
+        const alertDestination = (name) => {
+          if (/Protestas|Cobertura|Aceleración/i.test(name)) return "conflictividad";
+          if (/Internet|Electricidad|⚡/i.test(name)) return "ioda";
+          if (/Dólar|Brecha/i.test(name)) return "macro";
+          if (/Brent|WTI/i.test(name)) return "mercados";
+          if (/Bilateral/i.test(name)) return "gdelt";
+          return null;
+        };
 
         return (
           <div style={{ border:`1px solid ${reds.length > 0 ? "#dc262640" : "#ca8a0440"}`,
@@ -194,6 +202,11 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
                     <span style={{ color:a.level==="red"?"#dc2626":"#ca8a04", fontWeight:700, minWidth:mob?90:130 }}>{a.name}</span>
                     <span style={{ color:TEXT, fontWeight:600, minWidth:60 }}>{a.val}</span>
                     <span style={{ color:MUTED, fontSize:11, flex:1 }}>{a.umbral}</span>
+                    {alertDestination(a.name) && (
+                      <button onClick={() => { setTab(alertDestination(a.name)); window.scrollTo({ top:0, behavior:"smooth" }); }} style={{ border:`1px solid ${a.level==="red"?"#dc262640":"#ca8a0440"}`, background:"#fff", color:a.level==="red"?"#dc2626":"#a16207", padding:"3px 7px", fontSize:8, fontFamily:font, cursor:"pointer", flexShrink:0 }}>
+                        Ver módulo →
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1080,7 +1093,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
       </Card>
 
       {/* ── ROW 5: Alertas Inteligentes de Noticias ── */}
-      <NewsAlerts liveData={liveData} mob={mob} />
+      <NewsAlerts liveData={liveData} mob={mob} setTab={setTab} />
 
     </div>
   );
