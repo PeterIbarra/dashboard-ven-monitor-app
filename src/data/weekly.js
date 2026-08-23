@@ -2367,7 +2367,94 @@ export const WEEKS = [
       "E3 sube a 54% por disciplina institucional, reforma judicial y continuidad del canal negociador",
       "E1 baja a 10% por fragmentación opositora y ausencia de garantías electorales verificables",
       "E2 sube a 18% por protestas y brecha de reconstrucción; E4 baja a 18%"
-    ]
+    ],
+    "dominantComposition": {
+      "scenario": 3,
+      "method": "impacto × persistencia × evidencia",
+      "factors": [
+        {
+          "name": "Continuidad del canal negociador",
+          "detail": "Segunda fase prevista para septiembre y preservación del canal transaccional.",
+          "impact": 5,
+          "persistence": 5,
+          "evidence": 5,
+          "confidence": "Alta"
+        },
+        {
+          "name": "Disciplina y coordinación institucional",
+          "detail": "El aparato estatal mantiene coordinación y capacidad de administración sin fractura observable.",
+          "impact": 5,
+          "persistence": 5,
+          "evidence": 4,
+          "confidence": "Alta"
+        },
+        {
+          "name": "Reforma judicial administrada",
+          "detail": "El nuevo procedimiento de postulaciones modifica el mecanismo sin romper el arreglo de poder.",
+          "impact": 4,
+          "persistence": 4,
+          "evidence": 5,
+          "confidence": "Alta"
+        },
+        {
+          "name": "Arquitectura energética y financiera",
+          "detail": "Exportaciones sostenidas, nuevos operadores y activos externos auditados amplían los amortiguadores.",
+          "impact": 4,
+          "persistence": 5,
+          "evidence": 4,
+          "confidence": "Media-alta"
+        },
+        {
+          "name": "Ausencia de compromiso electoral verificable",
+          "detail": "El proceso conserva procedimiento y negociación, pero no transfiere poder ni fija una ruta electoral.",
+          "impact": 4,
+          "persistence": 4,
+          "evidence": 4,
+          "confidence": "Media-alta"
+        },
+        {
+          "name": "Fragmentación de la alternativa opositora",
+          "detail": "La exclusión de María Corina Machado y nuevas divisiones reducen la presión coordinada hacia E1.",
+          "impact": 3,
+          "persistence": 3,
+          "evidence": 4,
+          "confidence": "Media"
+        }
+      ]
+    },
+    "scenarioCompositions": {
+      "1": {
+        "scenario": 1,
+        "method": "impacto × persistencia × evidencia",
+        "factors": [
+          { "name": "Canal político abierto", "detail": "La segunda fase mantiene abierta una vía para garantías políticas y civiles.", "impact": 4, "persistence": 3, "evidence": 4, "confidence": "Media-alta" },
+          { "name": "Presión por garantías electorales", "detail": "La ausencia de un compromiso verificable mantiene activa la demanda de una ruta electoral.", "impact": 4, "persistence": 4, "evidence": 4, "confidence": "Media-alta" },
+          { "name": "Capacidad opositora residual", "detail": "María Corina Machado conserva centralidad política pese a permanecer fuera del formato.", "impact": 3, "persistence": 4, "evidence": 3, "confidence": "Media" },
+          { "name": "Reforma institucional potencial", "detail": "El proceso judicial podría abrir cambios si adquiere independencia y garantías verificables.", "impact": 3, "persistence": 3, "evidence": 3, "confidence": "Media" }
+        ]
+      },
+      "2": {
+        "scenario": 2,
+        "method": "impacto × persistencia × evidencia",
+        "factors": [
+          { "name": "Brecha de reconstrucción sísmica", "detail": "La respuesta habitacional continúa muy por debajo de las necesidades estimadas.", "impact": 5, "persistence": 5, "evidence": 4, "confidence": "Alta" },
+          { "name": "Conflictividad social", "detail": "Las protestas y demandas laborales mantienen presión territorial y fiscal.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+          { "name": "Deterioro macroeconómico", "detail": "Inflación, fallas eléctricas y contracción de pequeñas industrias elevan fragilidad.", "impact": 4, "persistence": 5, "evidence": 4, "confidence": "Media-alta" },
+          { "name": "Brecha humanitaria", "detail": "Las víctimas, viviendas en riesgo y ausencia de PDNA limitan la recuperación.", "impact": 4, "persistence": 4, "evidence": 4, "confidence": "Media-alta" },
+          { "name": "Contención petrolera y financiera", "detail": "Los ingresos externos reducen el riesgo de colapso inmediato y contienen E2.", "impact": 3, "persistence": 4, "evidence": 4, "confidence": "Media-alta" }
+        ]
+      },
+      "4": {
+        "scenario": 4,
+        "method": "impacto × persistencia × evidencia",
+        "factors": [
+          { "name": "Control administrativo de recursos", "detail": "El poder conserva capacidad de asignar renta, ayuda y procedimientos institucionales.", "impact": 5, "persistence": 5, "evidence": 4, "confidence": "Alta" },
+          { "name": "Exclusión política selectiva", "detail": "Actores centrales continúan fuera del formato negociador y de decisiones efectivas.", "impact": 4, "persistence": 4, "evidence": 4, "confidence": "Media-alta" },
+          { "name": "Capacidad coercitiva preservada", "detail": "El aparato de seguridad permanece cohesionado aunque sin escalada autónoma esta semana.", "impact": 4, "persistence": 5, "evidence": 3, "confidence": "Media" },
+          { "name": "Ausencia de escalada represiva sistémica", "detail": "La falta de represión generalizada limita el avance de E4 en el corte semanal.", "impact": 3, "persistence": 3, "evidence": 4, "confidence": "Media-alta" }
+        ]
+      }
+    }
   }
 ];
 
