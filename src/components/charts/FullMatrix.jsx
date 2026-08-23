@@ -2,6 +2,7 @@ import { useState } from "react";
 import { WEEKS } from "../../data/weekly.js";
 import { SCENARIOS } from "../../data/static.js";
 import { BG, BORDER, MUTED, SC, font } from "../../constants";
+import { getScenarioCoordinates } from "../../utils/scenarioCoordinates.js";
 
 export function FullMatrix({ weekIdx, onClickWeek, onArrowClick }) {
   const W=560, H=400;
@@ -12,10 +13,13 @@ export function FullMatrix({ weekIdx, onClickWeek, onArrowClick }) {
   const trendColor = trendSc.color;
 
   // Trail points
-  const trail = WEEKS.slice(0, weekIdx+1).map((w,i) => ({
-    px: w.xy.x * W, py: (1-w.xy.y) * H, idx: i,
-    dom: SCENARIOS.find(s=>s.id===w.probs.reduce((a,b)=>a.v>b.v?a:b).sc),
-  }));
+  const trail = WEEKS.slice(0, weekIdx+1).map((w,i) => {
+    const coordinates = getScenarioCoordinates(w.probs);
+    return {
+      px: coordinates.x * W, py: (1-coordinates.y) * H, idx: i,
+      dom: SCENARIOS.find(s=>s.id===w.probs.reduce((a,b)=>a.v>b.v?a:b).sc),
+    };
+  });
   const cur = trail[trail.length-1];
 
   // Compute drift direction based on trend scenario's quadrant center
