@@ -561,7 +561,7 @@ Toggle Absoluto / Variación interanual (%) para BCV, paralelo y brecha cambiari
 | Email | Mailgun (cron-job.org scheduler) |
 | Mapas | Leaflet vía CDN |
 | Exportación | html2canvas + jsPDF |
-| Tipografía | Space Mono + DM Sans |
+| Tipografía | Syne (títulos y cifras) + DM Sans (lectura) + Space Mono (datos y controles) |
 
 ---
 
