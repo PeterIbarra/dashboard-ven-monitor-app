@@ -13,6 +13,7 @@ import { OpinionPulseWidget } from "../OpinionPulseWidget";
 import { EarthquakeIndicatorsWidget } from "../EarthquakeIndicatorsWidget";
 import { ProtestasWidget } from "../ProtestasWidget";
 import { GacetasMiniWidget } from "../GacetasMiniWidget";
+import { MacroPulseWidget } from "../MacroPulseWidget";
 import { WEEKS, KPIS_LATEST, TENSIONS, CONF_SEMANAL } from "../../data/weekly.js";
 import { INDICATORS, SCENARIO_SIGNALS } from "../../data/indicators.js";
 import { SCENARIOS, CONF_MESES } from "../../data/static.js";
@@ -20,7 +21,7 @@ import { AMNISTIA_TRACKER } from "../../data/amnistia.js";
 import { REDES_TOTALS } from "../../data/redes.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SC, SEM, font, fontSans } from "../../constants";
 
-export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, setSismosSection }) {
+export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, setSismosSection, setMacroSection }) {
   const mob = useIsMobile();
   const [aiExplanation, setAiExplanation] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -254,6 +255,13 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
       <EarthquakeIndicatorsWidget onOpen={() => {
         setSismosSection("evolucion");
         setTab("sismos");
+        window.scrollTo({ top:0, behavior:"smooth" });
+      }} />
+
+      {/* ── ROW 1a.1: Pulso cambiario, inflación e intervención ── */}
+      <MacroPulseWidget liveData={liveData} onOpen={() => {
+        setMacroSection("intervencion");
+        setTab("macro");
         window.scrollTo({ top:0, behavior:"smooth" });
       }} />
 

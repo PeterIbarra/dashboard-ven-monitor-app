@@ -112,6 +112,7 @@ export default function MonitorPNUD() {
   const [tab, setTab] = useState("dashboard");
   const [opinionSection, setOpinionSection] = useState("panorama");
   const [sismosSection, setSismosSection] = useState("principal");
+  const [macroSection, setMacroSection] = useState("cambio");
   const [week, setWeek] = useState(WEEKS.length - 1);
   const mob = useIsMobile();
 
@@ -507,7 +508,7 @@ export default function MonitorPNUD() {
 
       {/* CONTENT */}
       <div style={{ maxWidth:1340, margin:"0 auto", padding:mob?"12px 10px 40px":"24px 24px 60px" }}>
-        {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} setTab={setTab} setOpinionSection={setOpinionSection} setSismosSection={setSismosSection} />}
+        {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} setTab={setTab} setOpinionSection={setOpinionSection} setSismosSection={setSismosSection} setMacroSection={setMacroSection} />}
         {tab === "sitrep" && <TabSitrep week={week} liveData={liveData} />}
         {tab === "matriz" && <TabMatriz week={week} setWeek={setWeek} />}
         {tab === "monitor" && <TabMonitor />}
@@ -518,7 +519,7 @@ export default function MonitorPNUD() {
         {tab === "conflictividad" && <TabConflictividad />}
         {tab === "ioda" && <TabIODA />}
         {tab === "mercados" && <TabMercados />}
-        {tab === "macro" && <TabMacro />}
+        {tab === "macro" && <TabMacro section={macroSection} setSection={setMacroSection} />}
         {tab === "ambiental" && <TabAmbiental />}
         {tab === "sismos" && <TabSismos subView={sismosSection} setSubView={setSismosSection} />}
       </div>

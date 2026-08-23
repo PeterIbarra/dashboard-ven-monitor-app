@@ -11,8 +11,8 @@ import { CONF_SEMANAL } from "../../data/weekly.js";
 import { BG2, BORDER, TEXT, MUTED, ACCENT, font } from "../../constants";
 
 const SECCIONES = [
-  { id:"semestre26", label:"1er semestre 2026" },
   { id:"semanal26", label:"Semanal 2026" },
+  { id:"semestre26", label:"1er semestre 2026" },
   { id:"mensual26", label:"Mensual 2026" },
   { id:"resumen", label:"Resumen 2025" },
   { id:"mensual", label:"Mensual 2025" },
@@ -24,8 +24,10 @@ const SECCIONES = [
 
 export function TabConflictividad() {
   const mob = useIsMobile();
-  const [seccion, setSeccion] = useState("semestre26");
+  const [seccion, setSeccion] = useState("semanal26");
   const [weekDetail, setWeekDetail] = useState(null);
+  const [weeklyHistoryOpen, setWeeklyHistoryOpen] = useState(false);
+  const [dailyDetailOpen, setDailyDetailOpen] = useState(false);
 
   const maxMes = Math.max(...CONF_MESES.map(m=>m.t));
   const maxEst = Math.max(...CONF_ESTADOS.map(e=>e.p));
@@ -168,7 +170,15 @@ export function TabConflictividad() {
 
           {/* Table: all weeks */}
           <Card>
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>Detalle semanal · Ciclo 2026</div>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10, flexWrap:"wrap" }}>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>
+                Detalle semanal · {weeklyHistoryOpen ? "Ciclo 2026 completo" : `Últimas ${Math.min(6, CONF_SEMANAL.length)} semanas`}
+              </div>
+              <button onClick={() => setWeeklyHistoryOpen(value => !value)} aria-expanded={weeklyHistoryOpen}
+                style={{ marginLeft:"auto", border:`1px solid ${ACCENT}45`, background:weeklyHistoryOpen?`${ACCENT}10`:"#fff", color:ACCENT, padding:"5px 10px", fontSize:9, fontFamily:font, fontWeight:700, cursor:"pointer" }}>
+                {weeklyHistoryOpen ? "Mostrar solo recientes ▲" : `Ver ciclo completo (${CONF_SEMANAL.length}) ▼`}
+              </button>
+            </div>
             <div style={{ overflowX:"auto" }}>
               <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12, fontFamily:font }}>
                 <thead>
@@ -179,10 +189,10 @@ export function TabConflictividad() {
                   </tr>
                 </thead>
                 <tbody>
-                  {CONF_SEMANAL.map((w, i) => {
-                    const isLast = i === CONF_SEMANAL.length - 1;
+                  {(weeklyHistoryOpen ? CONF_SEMANAL : CONF_SEMANAL.slice(-6)).map((w) => {
+                    const isLast = w.week === latest.week;
                     return (
-                      <tr key={i} style={{ borderBottom:`1px solid ${BORDER}30`, background:isLast ? `${ACCENT}06` : "transparent" }}>
+                      <tr key={w.week} style={{ borderBottom:`1px solid ${BORDER}30`, background:isLast ? `${ACCENT}06` : "transparent" }}>
                         <td style={{ padding:"6px 8px", fontWeight:isLast ? 700 : 400, color:isLast ? ACCENT : TEXT }}>{w.week}</td>
                         <td style={{ padding:"6px 8px", color:MUTED }}>{w.label}</td>
                         <td style={{ padding:"6px 8px", fontWeight:600, color:w.protestas > 50 ? "#dc2626" : w.protestas > 30 ? "#ca8a04" : TEXT }}>{w.protestas}</td>
@@ -207,41 +217,36 @@ export function TabConflictividad() {
               <Card>
                 <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:8, flexWrap:"wrap" }}>
                   <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>Detalle diario</div>
-                  <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, marginLeft:"auto" }}>
-                    {weeksWithDays.map(w => (
-                      <button key={w.week} onClick={() => setWeekDetail(w.week)}
-                        style={{ fontSize:11, fontFamily:font, padding:"4px 12px", border:"none",
-                          background:(selWeek.week===w.week)?ACCENT:"transparent", color:(selWeek.week===w.week)?"#fff":MUTED,
-                          cursor:"pointer", letterSpacing:"0.06em" }}>
-                        {w.week} ({w.label})
-                      </button>
-                    ))}
+                  <select aria-label="Semana para detalle diario" value={selWeek.week} onChange={event => setWeekDetail(event.target.value)}
+                    style={{ marginLeft:"auto", minWidth:mob?"100%":210, border:`1px solid ${BORDER}`, borderLeft:`3px solid ${ACCENT}`, background:BG2, color:TEXT, padding:"6px 9px", fontSize:10, fontFamily:font, fontWeight:600, cursor:"pointer" }}>
+                    {weeksWithDays.map(w => <option key={w.week} value={w.week}>{w.week} · {w.label}</option>)}
+                  </select>
+                  <button onClick={() => setDailyDetailOpen(value => !value)} aria-expanded={dailyDetailOpen}
+                    style={{ border:`1px solid ${ACCENT}45`, background:dailyDetailOpen?`${ACCENT}10`:ACCENT, color:dailyDetailOpen?ACCENT:"#fff", padding:"6px 10px", fontSize:9, fontFamily:font, fontWeight:700, cursor:"pointer" }}>
+                    {dailyDetailOpen ? "Ocultar desglose ▲" : "Ver desglose diario ▼"}
+                  </button>
+                </div>
+
+                {/* Compact summary */}
+                <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"110px 110px 110px 1fr", gap:1, background:BORDER, border:`1px solid ${BORDER}` }}>
+                  {[
+                    { value:selWeek.protestas, label:"Protestas", color:selWeek.protestas>50?"#dc2626":TEXT },
+                    { value:`${selWeek.estados}/24`, label:"Estados", color:selWeek.estados>18?"#dc2626":TEXT },
+                    { value:selWeek.reprimidas, label:"Reprimidas", color:selWeek.reprimidas>0?"#dc2626":"#16a34a" },
+                  ].map(item => <div key={item.label} style={{ background:BG2, padding:"8px 10px", textAlign:"center" }}>
+                    <span style={{ fontSize:18, fontWeight:800, color:item.color, fontFamily:"'Playfair Display',serif" }}>{item.value}</span>
+                    <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>{item.label}</div>
+                  </div>)}
+                  <div style={{ background:BG2, padding:"8px 12px", display:"flex", alignItems:"center", gap:8, minWidth:0 }}>
+                    <span style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0 }}>Motivos</span>
+                    <span style={{ fontSize:10, fontFamily:font, color:ACCENT, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{selWeek.motivos.slice(0,3).join(" · ")}</span>
                   </div>
                 </div>
-                <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginBottom:12, lineHeight:1.5 }}>
+
+                {dailyDetailOpen && <>
+                <div style={{ fontSize:9, fontFamily:font, color:MUTED, margin:"10px 0 12px", lineHeight:1.5 }}>
                   <strong style={{ color:"#0A97D9" }}>ESCP</strong> = Exigencias Económicas, Sociales, Culturales y Políticas · <strong style={{ color:"#4C9F38" }}>CPP</strong> = Civiles y Políticas Puras · <strong style={{ color:"#0A97D9" }}>DCP</strong> = Derechos Civiles y Políticos · <strong style={{ color:"#4C9F38" }}>DESCA</strong> = Derechos Económicos, Sociales, Culturales y Ambientales
                 </div>
-
-                {/* KPI row */}
-                <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8, marginBottom:14 }}>
-                  <div style={{ background:`${ACCENT}06`, border:`1px solid ${BORDER}`, padding:"10px 12px", textAlign:"center" }}>
-                    <div style={{ fontSize:22, fontWeight:800, color:TEXT, fontFamily:"'Playfair Display',serif" }}>{selWeek.protestas}</div>
-                    <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Total protestas</div>
-                  </div>
-                  <div style={{ background:`${ACCENT}06`, border:`1px solid ${BORDER}`, padding:"10px 12px", textAlign:"center" }}>
-                    <div style={{ fontSize:22, fontWeight:800, color:selWeek.estados > 18 ? "#dc2626" : TEXT, fontFamily:"'Playfair Display',serif" }}>{selWeek.estados}/24</div>
-                    <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Estados</div>
-                  </div>
-                  <div style={{ background:`${ACCENT}06`, border:`1px solid ${BORDER}`, padding:"10px 12px", textAlign:"center" }}>
-                    <div style={{ fontSize:22, fontWeight:800, color:selWeek.reprimidas > 0 ? "#dc2626" : "#16a34a", fontFamily:"'Playfair Display',serif" }}>{selWeek.reprimidas}</div>
-                    <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Reprimidas</div>
-                  </div>
-                  <div style={{ background:`${ACCENT}06`, border:`1px solid ${BORDER}`, padding:"10px 12px", textAlign:"center" }}>
-                    <div style={{ fontSize:14, fontWeight:600, color:ACCENT, fontFamily:font }}>{selWeek.motivos.slice(0,3).join(", ")}</div>
-                    <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginTop:4 }}>Motivos principales</div>
-                  </div>
-                </div>
-
                 {/* Bar chart + table */}
                 <div style={{ display:"flex", gap:4, alignItems:"flex-end", height:100, marginBottom:6, padding:"0 4px" }}>
                   {selWeek.dias.map((d, i) => {
@@ -292,6 +297,7 @@ export function TabConflictividad() {
                 <div style={{ marginTop:10, padding:"8px 12px", background:`${ACCENT}06`, border:`1px solid ${BORDER}`, fontSize:12, fontFamily:font, color:TEXT }}>
                   📋 <strong>Hecho clave:</strong> {selWeek.hecho}
                 </div>
+                </>}
               </Card>
             );
           })()}

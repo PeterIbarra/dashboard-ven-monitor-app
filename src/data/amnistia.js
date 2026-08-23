@@ -481,5 +481,12 @@ export const AMNISTIA_TRACKER = [
     "gob": { "solicitudes": null, "libertades": 9000, "privadosLiberados": 1400, "cautelares": 8426, "militares": 187 },
     "fp": { "verificados": 857, "detenidos": 404, "militares": 187 },
     "hito": "Sin nuevo balance verificable. El primer ciclo de diálogo produjo acuerdos judiciales y humanitarios, pero no comunicó resultados específicos sobre presos políticos; sindicatos y sociedad civil mantuvieron la exigencia de liberaciones durante el cierre del 12 de agosto."
+  },
+  {
+    "week": "S32",
+    "label": "14–21 ago",
+    "gob": { "solicitudes": null, "libertades": 9000, "privadosLiberados": 1046, "cautelares": 8426, "militares": 187 },
+    "fp": { "verificados": 857, "detenidos": 404, "militares": 187 },
+    "hito": "El Gobierno encargado reporta 1.046 personas privadas de libertad retornadas a sus hogares como balance acumulado. Fuentes independientes verifican alrededor de 70 de las 131 liberaciones anunciadas más recientemente; no se publica un nuevo total comparable de presos políticos."
   }
 ];

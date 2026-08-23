@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card } from "./Card";
 import { OVCS_2026 } from "../data/confSemestre2026";
 import { BG2, BORDER, TEXT, MUTED, ACCENT, font } from "../constants";
+import { LeafletSemestreMap } from "./LeafletSemestreMap";
 
 const CAT = { DCP:"#0A97D9", DESCA:"#4C9F38" };
 
@@ -18,7 +19,7 @@ export function ConfSemestre2026({ mobile=false }) {
   const d = OVCS_2026;
   const maxMes = Math.max(...d.meses.map(m=>m.total));
   const trimestre2Delta = Math.round((d.trimestre2.total / d.trimestre1.total - 1) * 100);
-  const data = vista === "derechos" ? d.derechos : vista === "servicios" ? d.servicios : d.estados.slice(0,12);
+  const data = vista === "derechos" ? d.derechos : vista === "servicios" ? d.servicios : d.estados;
   const max = Math.max(...data.map(x=>x.total));
 
   return <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
@@ -81,12 +82,18 @@ export function ConfSemestre2026({ mobile=false }) {
 
     <Card>
       <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap", marginBottom:12 }}>
-        <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>Composición del semestre</div>
+        <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase" }}>
+          {vista === "estados" ? "Distribución territorial · 24 entidades" : "Composición del semestre"}
+        </div>
         <div style={{ display:"flex", border:`1px solid ${BORDER}`, marginLeft:mobile?0:"auto" }}>
           {[{id:"derechos",label:"Derechos"},{id:"servicios",label:"Servicios"},{id:"estados",label:"Territorio"}].map(v=><button key={v.id} onClick={()=>setVista(v.id)} style={{ border:0, padding:"5px 11px", fontSize:11, fontFamily:font, cursor:"pointer", background:vista===v.id?ACCENT:"transparent", color:vista===v.id?"#fff":MUTED }}>{v.label}</button>)}
         </div>
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:mobile?"1fr":"repeat(2,1fr)", columnGap:22, rowGap:8 }}>
+      {vista === "estados" && <div style={{ fontSize:10, color:MUTED, fontFamily:font, marginBottom:10, lineHeight:1.5 }}>
+        Protestas registradas entre enero y junio de 2026 · orden descendente. Distrito Capital encabeza la movilización; Amazonas presenta el menor registro.
+      </div>}
+      {vista === "estados" && <LeafletSemestreMap estados={d.estados} mobile={mobile} />}
+      <div style={{ display:vista==="estados"?"none":"grid", gridTemplateColumns:mobile?"1fr":"repeat(2,1fr)", columnGap:22, rowGap:8 }}>
         {data.map((item,i)=>{
           const label=item.nombre;
           const color=item.cat?CAT[item.cat]:vista==="servicios"?"#dc2626":ACCENT;

@@ -5392,6 +5392,85 @@ export const SITREP_ALL = [
       { "tag": "Social", "color": "#ca8a04", "title": "Protesta y diálogo se sincronizan", "text": "El pico del 12 de agosto muestra que los sectores sociales buscan incidencia directa en la negociación." },
       { "tag": "Humanitario", "color": "#dc2626", "title": "La PDNA sigue pendiente", "text": "La ausencia de evaluación formal y la brecha de desaparecidos siguen limitando la confianza en la reconstrucción." }
     ]
+  },
+  {
+    "period": "14 de agosto – 21 de agosto de 2026",
+    "periodShort": "14–21 ago 2026",
+    "keyPoints": [
+      { "tag": "Diálogo", "color": "#0468B1", "title": "La segunda fase se traslada a septiembre", "text": "El siguiente ciclo se concentrará en garantías políticas y civiles, todavía sin cronograma electoral verificable." },
+      { "tag": "Judicial", "color": "#0468B1", "title": "Se reinicia el mecanismo de postulaciones", "text": "El procedimiento anterior queda sin efecto y un nuevo comité de 23 integrantes, con mayoría de sociedad civil, evaluará las candidaturas." },
+      { "tag": "Representación", "color": "#7c3aed", "title": "La fragmentación opositora reduce E1", "text": "El Pacto por Venezuela de Enrique Márquez emerge mientras María Corina Machado mantiene una ruta electoral verificable y permanece fuera del formato." },
+      { "tag": "Social", "color": "#dc2626", "title": "50 protestas mantienen presión territorial", "text": "El pico de 20 movilizaciones del 14 de agosto coincide con un acto oficial de vivienda y conecta servicios, trabajo, justicia y participación." },
+      { "tag": "Emergencia", "color": "#dc2626", "title": "El balance sísmico sube a 6.438 fallecidos", "text": "Se han evaluado 59.109 viviendas y retirado 25,15% de los escombros, pero solo se entregaron 335 viviendas y la PDNA sigue pendiente." },
+      { "tag": "Petróleo", "color": "#22c55e", "title": "Segunda semana sobre 700.000 b/d hacia EE.UU.", "text": "Las exportaciones alcanzan 730.000 b/d y el promedio de cuatro semanas ronda 639.000 b/d, máximo desde 2017." },
+      { "tag": "Economía", "color": "#22c55e", "title": "El PIB del segundo trimestre crece 7,14%", "text": "El BCV atribuye el avance a petróleo (+9,10%) y sectores no petroleros (+5,79%); CEPAL proyecta 3,0% para 2026." },
+      { "tag": "Electricidad", "color": "#f59e0b", "title": "Tocoma conecta 160 MW, pero persisten fallas industriales", "text": "La primera fase entra al SEN mientras la industria reporta afectación durante 214 de 488 horas laborables." },
+      { "tag": "Escenarios", "color": "#0468B1", "title": "E3 sube a 54% y E1 baja a 10%", "text": "La disciplina institucional fortalece continuidad; la fragmentación y la falta de garantías reducen la transición pacífica." },
+      { "tag": "Escenarios", "color": "#dc2626", "title": "E2 sube a 18% y E4 baja a 18%", "text": "La protesta y la brecha de reconstrucción elevan fragmentación, sin una escalada coercitiva autónoma." }
+    ],
+    "sintesis": "La semana consolida la Continuidad Negociada en 54% (+2pp): la segunda fase del diálogo, el nuevo procedimiento judicial y la disciplina del aparato refuerzan la capacidad de administración sin producir todavía una ruta electoral verificable. La Transición Pacífica baja a 10% (−3pp) por exclusión y fragmentación opositora. El Colapso y Fragmentación sube a 18% (+3pp) por 50 protestas y una reconstrucción limitada; la Resistencia Coercitiva baja a 18% (−2pp) al no observarse una escalada represiva autónoma.",
+    "actores": [
+      { "name": "Gobierno encargado", "items": ["Prepara la segunda fase del diálogo para septiembre.", "Reinicia la selección judicial mediante un comité de 23 integrantes.", "Reporta 1.046 personas privadas de libertad retornadas a sus hogares."] },
+      { "name": "Oposición", "items": ["María Corina Machado mantiene la exigencia de una ruta electoral verificable.", "Enrique Márquez lanza el Pacto por Venezuela.", "La fragmentación reduce la probabilidad de transición pacífica."] },
+      { "name": "Sector energético", "items": ["Hunt Oil y SLB avanzan en proyectos y estudios.", "ONGC Videsh obtiene licencia para San Cristóbal y Carabobo-1.", "Tocoma conecta 160 MW al SEN."] },
+      { "name": "Sociedad civil", "items": ["Registra 50 protestas en cinco jornadas.", "Mantiene demandas de trabajo, servicios, justicia, vivienda y participación.", "La vigilia por detenidos cumple 221 días en Rodeo I."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesPlenas": 9000, "privadosLiberados": 1046, "cautelares": 8426, "militares": 187, "fpVerificados": 857, "fpDetenidos": 404, "fpNota": "El dato de 1.046 corresponde al balance acumulado oficial de personas retornadas a sus hogares; no equivale a una verificación independiente integral." },
+      "rodriguez": [
+        { "title": "Segunda fase", "text": "Mantiene el canal negociador y traslada garantías políticas a septiembre." },
+        { "title": "Reforma judicial", "text": "Sustituye el procedimiento anterior por un comité ampliado de 23 miembros." },
+        { "title": "Reconstrucción", "text": "Reporta 6.438 fallecidos, 59.109 viviendas evaluadas y 335 entregadas." },
+        { "title": "Renta y energía", "text": "Consolida exportaciones petroleras y conecta 160 MW de Tocoma." }
+      ],
+      "mcmAgenda": ["Exigir un compromiso electoral verificable.", "Evitar una mayor fragmentación opositora.", "Vincular la reforma judicial con garantías competitivas."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "+7,14%", "label": "PIB interanual · II trimestre", "color": "#22c55e" },
+        { "value": "730 mil b/d", "label": "Exportaciones a EE.UU.", "color": "#22c55e" },
+        { "value": "+8,1%", "label": "Industria privada · I semestre", "color": "#22c55e" },
+        { "value": "160 MW", "label": "Tocoma conectado", "color": "#0468B1" },
+        { "value": "−4,7%", "label": "Pequeña industria", "color": "#dc2626" }
+      ],
+      "empresas": [
+        { "empresa": "Hunt Oil", "desarrollo": "Avanza en Caro y Carisito dentro del nuevo ciclo de inversión." },
+        { "empresa": "SLB", "desarrollo": "Realiza estudios y proyecta movilizar 15 taladros." },
+        { "empresa": "ONGC Videsh", "desarrollo": "Obtiene licencia para San Cristóbal y Carabobo-1 y gestiona dividendos superiores a USD 500M." },
+        { "empresa": "Crossover", "desarrollo": "Se incorpora a la cartera de proyectos petroleros." },
+        { "empresa": "IMPSA / Corpoelec", "desarrollo": "Conectan 160 MW de la primera fase de Tocoma." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 50, "promDiario": 10, "periodo": "14–20 ago · cinco jornadas", "variacion": "Pico de 20 protestas el 14 de agosto", "composicion": "Trabajo, seguridad social, vivienda, agua, justicia, salud, detenidos y participación política.", "nota": "La actividad diaria alcanza entre cinco y trece estados; 18 entidades aparecen al menos una vez en el período." },
+      "percepcion": { "fuente": "Seguimiento acumulado S30–S32", "titulo": "Sin nueva encuesta nacional comparable", "nota": "Se mantienen las últimas mediciones como referencia y se prioriza el registro observable de conflictividad.", "datos": [{ "factor": "Imagen positiva de María Corina Machado", "pct": 72 }, { "factor": "Rechazo a Delcy Rodríguez", "pct": 71 }, { "factor": "Desconfianza de información oficial", "pct": 94.1 }, { "factor": "Respuesta gubernamental mala/muy mala", "pct": 91.6 }] },
+      "excarcelados": { "fp": 857, "presos": 404, "militares": 187, "fuente": "Foro Penal / último dato verificado; balance oficial separado: 1.046 retornos al hogar" }
+    },
+    "marcoNormativo": {
+      "titulo": "Nuevo procedimiento judicial y simplificación administrativa",
+      "resumen": "El período combina reinicio de postulaciones al TSJ, cambios tributarios y una consulta popular, sin cerrar la agenda electoral nacional.",
+      "cambios": [
+        { "titulo": "Comité de 23", "texto": "Se anula el procedimiento anterior y se instala una nueva mayoría de sociedad civil.", "color": "#0468B1" },
+        { "titulo": "Evaluación judicial", "texto": "Una comisión de siete juristas y una nueva escala revisarán credenciales.", "color": "#22c55e" },
+        { "titulo": "RIF simplificado", "texto": "Se elimina la fecha de vencimiento y requisitos de cartelera fiscal.", "color": "#22c55e" },
+        { "titulo": "Consulta popular", "texto": "Se convoca una consulta para el 18 de octubre de 2026.", "color": "#ca8a04" },
+        { "titulo": "Representación diplomática", "texto": "La AN tramita la designación de Henrique Hilarión Ochoa Antich ante Suiza, con concurrencia ante Liechtenstein.", "color": "#7c3aed" },
+        { "titulo": "Agenda legislativa", "texto": "Entran en discusión la Alianza Internacional de Grandes Felinos y la reforma de la Ley contra la Estafa Inmobiliaria.", "color": "#f97316" }
+      ],
+      "lecturaAnalitica": "La reforma procedimental mejora capacidad institucional, pero su valor transicional dependerá de independencia, transparencia y conexión con garantías electorales verificables."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "54%", "color": "#0468B1", "text": "Sube 2pp por disciplina institucional, reforma judicial y continuidad del canal." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "18%", "color": "#dc2626", "text": "Sube 3pp por protestas, víctimas y brecha habitacional." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "18%", "color": "#ca8a04", "text": "Baja 2pp al no observarse una escalada coercitiva autónoma." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "10%", "color": "#2d8a30", "text": "Baja 3pp por fragmentación, exclusión y ausencia de compromiso electoral." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Garantías en septiembre", "text": "La existencia o ausencia de un compromiso electoral verificable definirá el alcance del siguiente ciclo." },
+      { "tag": "Social", "color": "#ca8a04", "title": "El pico coincide con la vivienda oficial", "text": "La protesta del 14 de agosto evidencia la distancia entre entrega institucional y demanda acumulada." },
+      { "tag": "Humanitario", "color": "#dc2626", "title": "335 viviendas no cierran la brecha", "text": "La cobertura representa alrededor de 1,4% de las viviendas afectadas y la PDNA continúa pendiente." },
+      { "tag": "Energía", "color": "#22c55e", "title": "Renta y electricidad sostienen capacidad", "text": "Exportaciones altas y 160 MW de Tocoma refuerzan la capacidad material del arreglo." }
+    ]
   }
 ];
 

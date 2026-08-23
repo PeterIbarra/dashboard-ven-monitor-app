@@ -10,12 +10,16 @@ import { IS_DEPLOYED } from "../../utils";
 import { MACRO_SERIES, MACRO_SERIES_META, MACRO_GROUPS } from "../../data/macroSeries.js";
 import { HistoricoPanel } from "../HistoricoPanel.jsx";
 import { MACRO_LATEST, MACRO_LATEST_CUT } from "../../data/macroLatest.js";
+import { MacroPerspective } from "../MacroPerspective.jsx";
+import { InterventionPanel } from "../InterventionPanel.jsx";
 
-export function TabMacro() {
+export function TabMacro({ section, setSection }) {
   const mob = useIsMobile();
   const [dolar, setDolar] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [seccion, setSeccion] = useState("cambio");
+  const [internalSection, setInternalSection] = useState("cambio");
+  const seccion = section ?? internalSection;
+  const setSeccion = setSection ?? setInternalSection;
   const [rateHistory, setRateHistory] = useState([]);
 
   useEffect(() => {
@@ -164,7 +168,7 @@ export function TabMacro() {
           <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Tipo de cambio en vivo · Actualiza cada 5 min · Mercado cambiario</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
-          {[{id:"cambio",label:"Tipo de cambio"},{id:"indicadores",label:"Indicadores"},{id:"charts",label:"Gráficos"},{id:"historico",label:"Series históricas"},{id:"socioeco",label:"Socioeconómico"}].map(s => (
+          {[{id:"cambio",label:"Tipo de cambio"},{id:"socioeco",label:"Socioeconómico"},{id:"indicadores",label:"Indicadores"},{id:"intervencion",label:"Intervención cambiaria"},{id:"perspectiva",label:"Perspectiva"},{id:"charts",label:"Gráficos"},{id:"historico",label:"Series históricas"}].map(s => (
             <button key={s.id} onClick={() => setSeccion(s.id)}
               style={{ fontSize:12, fontFamily:font, padding:"6px 12px", border:"none",
                 background:seccion===s.id?ACCENT:"transparent", color:seccion===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>
@@ -268,6 +272,12 @@ export function TabMacro() {
           </div>
         )}
       </>)}
+
+      {/* ── PERSPECTIVA MACRO Y FINANCIERA ── */}
+      {seccion === "perspectiva" && <MacroPerspective mob={mob} />}
+
+      {/* ── INTERVENCIÓN CAMBIARIA ── */}
+      {seccion === "intervencion" && <InterventionPanel mob={mob} />}
 
       {/* ── INDICADORES ── */}
       {seccion === "indicadores" && (

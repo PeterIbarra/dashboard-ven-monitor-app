@@ -1,49 +1,49 @@
 export const WEEK_DRIVERS = {
   "1": {
-    "label": "Transición pacífica — 13% · +1pp",
+    "label": "Transición pacífica — 10% · −3pp",
     "drivers": [
-      "La AN2015 presenta una primera hoja de ruta con hitos entre octubre y diciembre.",
-      "Se confirma una segunda ronda de diálogo en septiembre con discusión de la reforma electoral.",
-      "La Plataforma Unitaria sostiene un primer contacto reservado con la comisión de la AN2015.",
-      "La renovación integral del TSJ abre una vía de reinstitucionalización verificable.",
-      "María Corina Machado y Edmundo González permanecen fuera del formato negociador.",
-      "E1 sube solo 1pp porque los avances aún no incorporan un compromiso electoral vinculante."
+      "La segunda fase del diálogo prevé discutir garantías políticas y civiles en septiembre.",
+      "El nuevo Comité de Postulaciones Judiciales reinicia el proceso con 23 integrantes.",
+      "La agenda electoral continúa sin un compromiso verificable ni cronograma vinculante.",
+      "María Corina Machado permanece fuera del formato negociador.",
+      "El Pacto por Venezuela de Enrique Márquez amplía la fragmentación opositora.",
+      "E1 baja 3pp porque el avance institucional no garantiza competencia electoral."
     ],
     "signals": ["Cronograma electoral verificable", "Reformulación del CNE", "Incorporación de la Plataforma Unitaria", "Participación de María Corina Machado", "Implementación del nuevo TSJ"]
   },
   "2": {
-    "label": "Colapso y fragmentación — 15% · +2pp",
+    "label": "Colapso y fragmentación — 18% · +3pp",
     "drivers": [
-      "La inflación de julio alcanza 19,9% y el acumulado anual se aproxima a 176%.",
-      "La Bolsa de Caracas pierde 72% del impulso acumulado tras la captura de Maduro.",
-      "Se registran 54 protestas, con un pico de 18 el 12 de agosto.",
-      "La protesta social empieza a interpelar directamente al proceso de diálogo.",
-      "La reconstrucción conserva brechas: no existe PDNA formal y persiste la discrepancia sobre desaparecidos.",
-      "E2 sube 2pp, sin evidencia de fractura territorial, militar o de mando."
+      "Se registran 50 protestas, con un pico de 20 el 14 de agosto.",
+      "El pico coincide con un acto oficial de entrega de viviendas.",
+      "El balance sísmico sube a 6.438 fallecidos y 10.696 viviendas de alto riesgo.",
+      "Solo se han entregado 335 viviendas frente a unas 24.400 afectadas y no existe PDNA.",
+      "Las fallas eléctricas afectan 214 de 488 horas laborables de la industria.",
+      "E2 sube 3pp, sin evidencia de fractura territorial, militar o de mando."
     ],
     "signals": ["Inflación y tipo de cambio", "Recurrencia territorial de protestas", "Publicación de PDNA", "Brecha de desaparecidos", "Fractura civil-militar"]
   },
   "3": {
-    "label": "Continuidad negociada — 52% · 0pp",
+    "label": "Continuidad negociada — 54% · +2pp",
     "drivers": [
-      "El primer ciclo de diálogo concluye con acuerdos verificables en materia judicial y humanitaria.",
-      "Las partes acuerdan renovar integralmente el TSJ y ampliar el Comité de Postulaciones.",
-      "Se abre un mecanismo para recuperar activos del Banco de Inglaterra con trazabilidad y auditoría.",
-      "Marco Rubio actúa como garante informal y el Tesoro mantiene interlocución de alto nivel con Rodríguez.",
-      "La renta petrolera y energética se consolida bajo actores ya licenciados.",
-      "E3 permanece en 52% porque el avance procedimental no amplía el reparto efectivo de poder."
+      "La segunda fase del diálogo mantiene el canal transaccional y traslada las garantías políticas a septiembre.",
+      "El nuevo procedimiento judicial sustituye el mecanismo anterior sin romper la coordinación.",
+      "La omisión de Nicolás Maduro y Cilia Flores en cinco sesiones sugiere disciplina del aparato.",
+      "Los activos en oro por unos USD 4.000M entran en un esquema auditado vinculado al Tesoro.",
+      "Las exportaciones superan 700.000 b/d por segunda semana y atraen nuevos operadores.",
+      "E3 sube 2pp por mayor capacidad de administración sin redistribución efectiva del poder."
     ],
     "signals": ["Resultados de la ronda de septiembre", "Auditoría de activos del Banco de Inglaterra", "Implementación del TSJ", "Nuevos acuerdos petroleros", "Compromiso electoral"]
   },
   "4": {
-    "label": "Resistencia coercitiva — 20% · −3pp",
+    "label": "Resistencia coercitiva — 18% · −2pp",
     "drivers": [
-      "La ratificación del Decreto 7.066 amplía facultades económicas del Ejecutivo.",
+      "El aparato estatal conserva disciplina y capacidad de control sobre recursos estratégicos.",
       "La estructura militar y el mando coercitivo continúan sin fisuras públicas.",
-      "La recuperación de Tocoma y Macagua centraliza capacidad de respuesta eléctrica.",
-      "No se documenta represión masiva durante las 54 protestas del período.",
-      "Las facultades de emergencia y la renta petrolera operan dentro de la tutela negociada.",
-      "E4 baja 3pp al no observarse una escalada coercitiva autónoma frente al diálogo."
+      "La conexión de 160 MW de Tocoma mejora parcialmente la capacidad material del Estado.",
+      "No se documenta represión masiva durante las 50 protestas del período.",
+      "El control opera mediante procedimiento, renta y asignación de recursos.",
+      "E4 baja 2pp al no observarse una escalada coercitiva autónoma frente al diálogo."
     ],
     "signals": ["Uso del Decreto 7.066", "Tratamiento de las protestas", "Fricción en la cúpula militar", "Escalada represiva", "Autonomía del aparato coercitivo"]
   }

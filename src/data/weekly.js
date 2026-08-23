@@ -7,61 +7,61 @@ export const KPIS_LATEST = {
     },
     {
       "k": "Exportaciones a EE.UU.",
-      "v": "743.000 b/d · +81% semanal",
+      "v": "730.000 b/d · 2ª semana >700k",
       "c": "#22c55e"
     },
     {
-      "k": "Producción julio",
-      "v": "1,2M b/d · estable",
+      "k": "Promedio 4 semanas",
+      "v": "≈639.000 b/d · máximo desde 2017",
       "c": "#f59e0b"
     },
     {
-      "k": "Tocoma y Macagua",
-      "v": "Meta inicial · 672 MW",
+      "k": "Tocoma",
+      "v": "160 MW conectados al SEN",
       "c": "#22c55e"
     }
   ],
   "politico": [
     {
       "k": "E3 dominante",
-      "v": "52% · sin cambio",
+      "v": "54% · +2pp",
       "c": "#38bdf8"
     },
     {
       "k": "E1",
-      "v": "13% · +1pp",
+      "v": "10% · −3pp",
       "c": "#22c55e"
     },
     {
       "k": "E4",
-      "v": "20% · −3pp",
+      "v": "18% · −2pp",
       "c": "#ca8a04"
     },
     {
       "k": "E2",
-      "v": "15% · +2pp",
+      "v": "18% · +3pp",
       "c": "#ef4444"
     }
   ],
   "opinion": [
     {
       "k": "Balance oficial",
-      "v": "6.301 fallecidos",
+      "v": "6.438 fallecidos",
       "c": "#ef4444"
     },
     {
       "k": "Viviendas afectadas",
-      "v": "53.314 evaluadas",
+      "v": "59.109 evaluadas",
       "c": "#f59e0b"
     },
     {
       "k": "Protestas",
-      "v": "54 · 7–13 ago",
+      "v": "50 · 14–20 ago",
       "c": "#ef4444"
     },
     {
       "k": "Brecha E3–E1",
-      "v": "39 puntos",
+      "v": "44 puntos",
       "c": "#f59e0b"
     }
   ]
@@ -2319,37 +2319,86 @@ export const WEEKS = [
       "E1 sube a 13% por la segunda ronda y el contacto con la Plataforma Unitaria",
       "E2 sube a 15% por protestas e inflación; E4 baja a 20%"
     ]
+  },
+  {
+    "label": "14–21 ago",
+    "short": "S32",
+    "probs": [
+      { "sc": 1, "v": 10, "t": "down" },
+      { "sc": 2, "v": 18, "t": "up" },
+      { "sc": 3, "v": 54, "t": "up" },
+      { "sc": 4, "v": 18, "t": "down" }
+    ],
+    "xy": { "x": 0.10, "y": 0.54 },
+    "sem": { "g": 7, "y": 10, "r": 9 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "730.000 b/d hacia EE.UU.; segunda semana consecutiva sobre 700.000 b/d",
+        "ingresos": "Promedio de cuatro semanas cercano a 639.000 b/d, máximo desde 2017",
+        "licencias": "Hunt Oil, SLB, ONGC Videsh y Crossover amplían la cartera de proyectos",
+        "cambio": "Primera fase de Tocoma aporta 160 MW al Sistema Eléctrico Nacional"
+      },
+      "economico": {
+        "inflacion": "PIB del segundo trimestre crece 7,14% interanual según el BCV",
+        "ingresos_pob": "Industria privada crece 8,1% en el primer semestre; pequeñas industrias caen 4,7%",
+        "electricidad": "214 de 488 horas laborables afectadas por fallas eléctricas; Zulia acumula 333 horas",
+        "pib": "CEPAL proyecta crecimiento de 3,0% para 2026"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha aumenta a 44pp",
+        "elecciones": "Segunda fase del diálogo prevista para septiembre, aún sin compromiso electoral verificable",
+        "mcm": "María Corina Machado permanece fuera; el Pacto por Venezuela amplía la fragmentación opositora",
+        "eeuu": "Activos en oro por unos USD 4.000M bajo un mecanismo auditado vinculado al Tesoro"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Canal negociador:</b> La segunda fase del diálogo se prepara para septiembre con foco en garantías políticas y civiles." },
+      { "l": "green", "t": "<b>Capacidad energética:</b> Tocoma conecta 160 MW y la actividad petrolera atrae nuevos operadores." },
+      { "l": "yellow", "t": "<b>Sin compromiso electoral:</b> El proceso conserva procedimiento, pero no entrega una ruta verificable." },
+      { "l": "yellow", "t": "<b>Fragmentación opositora:</b> El Pacto por Venezuela de Enrique Márquez amplía la distancia con María Corina Machado." },
+      { "l": "yellow", "t": "<b>Reforma judicial:</b> El nuevo Comité de Postulaciones aumenta a 23 integrantes y reinicia la evaluación." },
+      { "l": "red", "t": "<b>Conflictividad:</b> 50 protestas en cinco jornadas; el pico de 20 coincide con un acto oficial de vivienda." },
+      { "l": "red", "t": "<b>Reconstrucción insuficiente:</b> 335 viviendas entregadas frente a unas 24.400 afectadas y sin PDNA formal." },
+      { "l": "red", "t": "<b>Balance sísmico:</b> Las muertes aumentan a 6.438 y 10.696 viviendas quedan clasificadas en alto riesgo." }
+    ],
+    "lectura": "La continuidad negociada sube a 54% (+2pp). La preparación de una segunda fase, el nuevo procedimiento de postulaciones judiciales y la disciplina del aparato estatal refuerzan la administración transaccional del poder, aunque sigue ausente un compromiso electoral verificable.\n\nE1 baja a 10% (−3pp) por la exclusión de María Corina Machado y la fragmentación opositora. E2 aumenta a 18% (+3pp) por el pico de protestas, el aumento de víctimas sísmicas y una reconstrucción habitacional todavía limitada. E4 baja a 18% (−2pp) porque no se observa una escalada coercitiva autónoma: el control se ejerce principalmente mediante recursos, procedimiento y renta.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 sube a 54% por disciplina institucional, reforma judicial y continuidad del canal negociador",
+      "E1 baja a 10% por fragmentación opositora y ausencia de garantías electorales verificables",
+      "E2 sube a 18% por protestas y brecha de reconstrucción; E4 baja a 18%"
+    ]
   }
 ];
 
 export const TENSIONS = [
   {
     "level": "green",
-    "text": "El primer ciclo de diálogo concluye con acuerdos verificables sobre el TSJ y activos del Banco de Inglaterra."
+    "text": "La segunda fase del diálogo se prepara para septiembre y el procedimiento de renovación judicial entra en una nueva etapa."
   },
   {
     "level": "green",
-    "text": "La producción petrolera se mantiene en 1,2M b/d y las exportaciones a EE.UU. alcanzan un máximo semanal desde 2017."
+    "text": "Las exportaciones a EE.UU. superan 700.000 b/d por segunda semana y Tocoma conecta 160 MW."
   },
   {
     "level": "yellow",
-    "text": "La agenda electoral no figura entre los resultados del primer ciclo y la hoja de ruta de la AN2015 no es vinculante."
+    "text": "La segunda fase aún no contiene un compromiso electoral verificable."
   },
   {
     "level": "yellow",
-    "text": "María Corina Machado y Edmundo González permanecen fuera del formato negociador."
+    "text": "La exclusión de María Corina Machado y el Pacto por Venezuela amplían la fragmentación opositora."
   },
   {
     "level": "yellow",
-    "text": "La reconstrucción alcanza 23,26% de escombros retirados, sin PDNA formal y con brecha de desaparecidos sin resolver."
+    "text": "La reconstrucción alcanza 25,15% de escombros retirados, pero solo 335 viviendas entregadas y sin PDNA formal."
   },
   {
     "level": "red",
-    "text": "La inflación mensual alcanza 19,9% y la Bolsa de Caracas pierde 72% del impulso posterior a enero."
+    "text": "Las fallas eléctricas afectan 214 de 488 horas laborables y las pequeñas industrias se contraen 4,7%."
   },
   {
     "level": "red",
-    "text": "Se registran 54 protestas; el pico del 12 de agosto coincide con el cierre del diálogo."
+    "text": "Se registran 50 protestas; el pico de 20 del 14 de agosto coincide con un acto oficial de vivienda."
   }
 ];
 
@@ -2384,7 +2433,8 @@ export const MONITOR_WEEKS = [
   "S28",
   "S29",
   "S30",
-  "S31"
+  "S31",
+  "S32"
 ];
 
 export const ICG_HISTORY = [
@@ -2573,6 +2623,12 @@ export const ICG_HISTORY = [
     "score": 77,
     "sitrep": true,
     "note": "Los acuerdos sobre renovación integral del TSJ y recuperación de activos fortalecen la coordinación institucional. La agenda electoral pendiente, el pico de protestas y el deterioro macroeconómico limitan la mejora."
+  },
+  {
+    "week": "S32",
+    "score": 78,
+    "sitrep": true,
+    "note": "La continuidad del diálogo, el nuevo procedimiento judicial y la disciplina del aparato elevan marginalmente la cohesión; la protesta y la brecha de reconstrucción limitan la mejora."
   }
 ];
 
@@ -3454,13 +3510,29 @@ export const CONF_SEMANAL = [
     "week": "S31",
     "label": "7–14 ago",
     "protestas": 54,
-    "estados": 0,
+    "estados": 17,
     "reprimidas": 0,
     "motivos": ["Derechos laborales", "Seguridad social", "Justicia", "Presos políticos", "Vivienda", "Salud", "Participación en el diálogo"],
     "hecho": "Entre el 7 y el 13 de agosto se registraron 54 protestas. El pico de 18 movilizaciones del día 12 coincidió con el cierre del primer ciclo de diálogo y trasladó demandas sociales directamente al proceso negociador.",
     "dias": [
-      { "fecha": "7–11 Agosto", "protestas": 36, "estados": 0, "tipo": "Social/laboral", "exigencias": "Trabajo, pensiones, seguridad social, justicia, vivienda y salud" },
-      { "fecha": "12 Agosto", "protestas": 18, "estados": 0, "tipo": "Social/político", "exigencias": "Incorporación a la mesa, derechos laborales, justicia y libertad de presos políticos" }
+      { "fecha": "7–11 Agosto", "protestas": 36, "estados": 13, "tipo": "Social/laboral", "exigencias": "Trabajo, pensiones, seguridad social, justicia, vivienda y salud" },
+      { "fecha": "12 Agosto", "protestas": 18, "estados": 10, "tipo": "Social/político", "exigencias": "Incorporación a la mesa, derechos laborales, justicia y libertad de presos políticos" }
+    ]
+  },
+  {
+    "week": "S32",
+    "label": "14–21 ago",
+    "protestas": 50,
+    "estados": 18,
+    "reprimidas": 0,
+    "motivos": ["Seguridad social", "Derechos laborales", "Vivienda", "Agua", "Justicia", "Participación política", "Libertad de detenidos", "Salud"],
+    "hecho": "Entre el 14 y el 20 de agosto se registraron 50 protestas. El pico de 20 movilizaciones del 14 de agosto coincidió con un acto oficial de entrega de viviendas y evidenció la brecha entre legitimación institucional y demanda social.",
+    "dias": [
+      { "fecha": "14 Agosto", "protestas": 20, "estados": 13, "tipo": "Social/político", "exigencias": "Seguridad social, trabajo, vivienda, agua y participación política" },
+      { "fecha": "16 Agosto", "protestas": 9, "estados": 8, "tipo": "Social/laboral", "exigencias": "Seguridad social, trabajo, vivienda, agua y justicia" },
+      { "fecha": "18 Agosto", "protestas": 7, "estados": 5, "tipo": "Social", "exigencias": "Vivienda, agua y justicia" },
+      { "fecha": "19 Agosto", "protestas": 8, "estados": 6, "tipo": "Mixto", "exigencias": "Detenidos, justicia, participación, salud, agua, trabajo y vivienda" },
+      { "fecha": "20 Agosto", "protestas": 6, "estados": 5, "tipo": "Mixto", "exigencias": "Detenidos, justicia, participación, salud, agua, trabajo y vivienda" }
     ]
   }
 ];

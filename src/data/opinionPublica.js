@@ -1,5 +1,5 @@
 export const OPINION_SNAPSHOT = {
-  period: "7–14 ago 2026",
+  period: "14–21 ago 2026",
   source: "AtlasIntel/Bloomberg · Poder y Estrategia · Meganálisis",
   cards: [
     { label: "Imagen positiva MCM", value: 72, suffix: "%", delta: "+19pp vs. junio", color: "#2d8a30" },

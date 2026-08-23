@@ -44,6 +44,17 @@ export function TabMercados() {
           {/* OilPriceAPI live ticker */}
           <OilPriceTicker />
 
+          <Card accent="#22c55e">
+            <div style={{display:"flex",justifyContent:"space-between",gap:8,flexWrap:"wrap",marginBottom:9}}><div style={{fontSize:12,fontWeight:800,color:TEXT}}>Pulso petrolero semanal · 14–21 ago</div><div style={{fontSize:8,color:MUTED,fontFamily:font}}>Datos del corte analítico; separados de precios en vivo</div></div>
+            <div style={{display:"grid",gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)",gap:7}}>{[
+              ["730 mil b/d","Exportaciones a EE.UU.","Segunda semana consecutiva sobre 700 mil"],
+              ["639 mil b/d","Promedio de 4 semanas","Mayor nivel desde 2017"],
+              ["94,1M barriles","Envíos acumulados a EE.UU.","Hasta mediados de agosto · +85% vs. todo 2025"],
+              ["916","Oportunidades de inversión","Portafolio petrolero y gasífero presentado en Houston"]
+            ].map(([value,label,detail])=><div key={label} style={{padding:"9px 10px",border:`1px solid ${BORDER}`,background:BG2}}><div style={{fontSize:18,fontWeight:900,color:"#22c55e"}}>{value}</div><div style={{fontSize:8,fontFamily:font,color:TEXT,textTransform:"uppercase",fontWeight:700}}>{label}</div><div style={{fontSize:8,color:MUTED,marginTop:3,lineHeight:1.35}}>{detail}</div></div>)}</div>
+            <div style={{fontSize:9,color:MUTED,lineHeight:1.5,marginTop:8}}>Nuevos frentes: Hunt Oil (Caro y Carisito), SLB (estudios y hasta 15 taladros), ONGC Videsh (San Cristóbal y Carabobo-1), Crossover Energy y BP costa afuera.</div>
+          </Card>
+
           {/* Price cards */}
           <LivePriceCards />
 
@@ -54,10 +65,9 @@ export function TabMercados() {
           <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:10 }}>
             <Card accent="#22c55e">
               <div style={{ fontSize:13, fontWeight:600, color:"#22c55e", marginBottom:6 }}>Exportaciones Venezuela</div>
-              <div style={{ fontSize:18, fontWeight:900, color:"#22c55e", fontFamily:"'Playfair Display',serif" }}>~800K bpd</div>
+              <div style={{ fontSize:18, fontWeight:900, color:"#22c55e", fontFamily:"'Playfair Display',serif" }}>730K bpd</div>
               <div style={{ fontSize:12, color:MUTED, marginTop:4, lineHeight:1.5 }}>
-                Destino: India (Reliance, BPCL, HPCL-Mittal), EE.UU. (Valero, Phillips 66, Citgo). 
-                VLCC de hasta 2M barriles. Vitol/Trafigura 3 buques marzo.
+                Envíos hacia Estados Unidos durante la semana cerrada el 14 de agosto. Segunda semana consecutiva por encima de 700K bpd.
               </div>
             </Card>
             <Card accent={ACCENT}>
