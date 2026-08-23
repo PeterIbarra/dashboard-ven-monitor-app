@@ -49,13 +49,13 @@ export function ProtestasWidget({ onOpen }) {
     <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"150px 150px 1fr", minHeight:112 }}>
       <div style={{ padding:"13px 14px", borderRight:`1px solid ${BORDER}`, borderBottom:mob?`1px solid ${BORDER}`:"none" }}>
         <div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Protestas registradas</div>
-        <div style={{ fontSize:34, fontWeight:900, color:"#dc2626", lineHeight:1.05 }}>{current.protestas}</div>
+        <div style={{ fontSize:34, fontWeight:900, color:"#dc2626", fontFamily:font, lineHeight:1.05 }}>{current.protestas}</div>
         <div style={{ fontSize:10, color:delta > 0 ? "#dc2626" : "#16a34a", fontFamily:font, marginTop:4 }}>{delta == null ? "Sin comparación" : `${delta > 0 ? "▲" : "▼"} ${Math.abs(Math.round(delta))}% vs ${previous.short || previous.week}`}</div>
       </div>
 
       <div style={{ padding:"13px 14px", borderRight:mob?"none":`1px solid ${BORDER}`, borderBottom:mob?`1px solid ${BORDER}`:"none" }}>
         <div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Pico del período</div>
-        <div style={{ fontSize:27, fontWeight:900, color:"#f97316", lineHeight:1.1 }}>{peak?.protestas || "—"}</div>
+        <div style={{ fontSize:27, fontWeight:900, color:"#f97316", fontFamily:font, lineHeight:1.1 }}>{peak?.protestas || "—"}</div>
         <div style={{ fontSize:9, color:MUTED, marginTop:4 }}>{peak?.fecha || "Sin desglose diario"}</div>
         <div style={{ fontSize:9, color:TEXT, marginTop:3, lineHeight:1.35 }}>{peak ? (current.week === "S31" ? "Coincide con el cierre del diálogo" : peak.exigencias) : "El documento no ofrece desglose diario comparable"}</div>
       </div>

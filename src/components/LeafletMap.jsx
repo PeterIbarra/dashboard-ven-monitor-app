@@ -47,7 +47,7 @@ export function LeafletMap({ events, EC, TR }) {
         radius: r, fillColor: color, color: color, weight: 1, opacity: 0.8, fillOpacity: 0.5,
       });
       circle.bindPopup(
-        `<div style="font-family:monospace;font-size:11px;max-width:250px">` +
+        `<div style="font-family:'Space Mono',monospace;font-size:11px;max-width:250px">` +
         `<b>${e.event_date}</b><br>` +
         `<span style="color:${color};font-weight:bold">${TR[e.sub_event_type]||TR[e.event_type]||e.sub_event_type||e.event_type}</span><br>` +
         `📍 ${e.location}${e.admin1 ? `, ${e.admin1}` : ""}<br>` +

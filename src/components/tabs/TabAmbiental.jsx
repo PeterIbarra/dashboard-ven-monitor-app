@@ -808,7 +808,7 @@ function RainHistoryPanel({ estado, history, historyLoading, historyWeeks, setHi
                 <div key={i} style={{ background:BG3, padding:"8px 12px", border:`1px solid ${BORDER}` }}>
                   <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase",
                     letterSpacing:"0.1em", marginBottom:3 }}>{k.sub}</div>
-                  <div style={{ fontSize:20, fontWeight:700, color:k.col, fontFamily:"'Syne',sans-serif" }}>{k.val}</div>
+                  <div style={{ fontSize:20, fontWeight:700, color:k.col, fontFamily:font }}>{k.val}</div>
                 </div>
               ))}
             </div>
@@ -1041,11 +1041,11 @@ function RainHistoryPanel({ estado, history, historyLoading, historyWeeks, setHi
             <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, marginBottom:12 }}>
               <div style={{ background:BG3, padding:"8px 12px", border:`1px solid ${BORDER}` }}>
                 <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:3 }}>Lluvia total</div>
-                <div style={{ fontSize:20, fontWeight:700, color:ACCENT, fontFamily:"'Syne',sans-serif" }}>{nasaTotal?.toLocaleString()} mm</div>
+                <div style={{ fontSize:20, fontWeight:700, color:ACCENT, fontFamily:font }}>{nasaTotal?.toLocaleString()} mm</div>
               </div>
               <div style={{ background:BG3, padding:"8px 12px", border:`1px solid ${BORDER}` }}>
                 <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:3 }}>vs. norma histórica</div>
-                <div style={{ fontSize:20, fontWeight:700, fontFamily:"'Syne',sans-serif",
+                <div style={{ fontSize:20, fontWeight:700, fontFamily:font,
                   color: nasaAnom < -20 ? "#ca8a04" : nasaAnom > 20 ? "#1d4ed8" : "#16a34a" }}>
                   {nasaAnom != null ? (nasaAnom >= 0 ? "+" : "") + nasaAnom + "%" : "—"}
                 </div>
@@ -1578,7 +1578,7 @@ function FireLeafletMap({ fireData, rawPoints, selected, onSelect, mob }) {
         fillOpacity: 0.75,
       });
       marker.bindTooltip(
-        `<div style="font-family:monospace;font-size:10px;line-height:1.4">` +
+        `<div style="font-family:'Space Mono',monospace;font-size:10px;line-height:1.4">` +
         `<b>${pointToState(p.lat, p.lon) || "Venezuela"}</b><br/>` +
         `FRP: <b>${Math.round(p.frp)} MW</b> · ${p.date}<br/>` +
         `Confianza: ${p.conf} · ${p.dn === "D" ? "Diurno" : "Nocturno"}` +
@@ -1604,7 +1604,7 @@ function FireLeafletMap({ fireData, rawPoints, selected, onSelect, mob }) {
         fillOpacity: isSelected ? 0.4 : 0.25,
       });
       sumMarker.bindTooltip(
-        `<div style="font-family:monospace;font-size:11px;line-height:1.45">` +
+        `<div style="font-family:'Space Mono',monospace;font-size:11px;line-height:1.45">` +
         `<b>${estado.id}</b><br/>` +
         `Focos: <b>${d.count}</b> · Alta confianza: ${d.high}<br/>` +
         `FRP total: ${Math.round(d.frpTotal)} MW` +
@@ -1765,15 +1765,15 @@ function TabIncendios({ mob }) {
         {!fireLoading && totalFocos > 0 && (
           <div style={{ marginLeft:"auto", display:"flex", gap:12, flexWrap:"wrap" }}>
             <div style={{ textAlign:"right" }}>
-              <div style={{ fontSize:18, fontWeight:800, color:"#dc2626", fontFamily:"'Syne',sans-serif" }}>{totalFocos}</div>
+              <div style={{ fontSize:18, fontWeight:800, color:"#dc2626", fontFamily:font }}>{totalFocos}</div>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>focos VIIRS</div>
             </div>
             <div style={{ textAlign:"right" }}>
-              <div style={{ fontSize:18, fontWeight:800, color:"#f97316", fontFamily:"'Syne',sans-serif" }}>{Math.round(totalFrp)}</div>
+              <div style={{ fontSize:18, fontWeight:800, color:"#f97316", fontFamily:font }}>{Math.round(totalFrp)}</div>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>MW FRP total</div>
             </div>
             <div style={{ textAlign:"right" }}>
-              <div style={{ fontSize:18, fontWeight:800, color:fireSource === "live" ? "#22c55e" : "#f59e0b", fontFamily:"'Syne',sans-serif" }}>
+              <div style={{ fontSize:18, fontWeight:800, color:fireSource === "live" ? "#22c55e" : "#f59e0b", fontFamily:font }}>
                 {fireSource === "live" ? "LIVE" : "HIST"}
               </div>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>
@@ -1816,11 +1816,11 @@ function TabIncendios({ mob }) {
               textTransform:"uppercase", marginBottom:6 }}>Histórico local</div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
               <div>
-                <div style={{ fontSize:20, fontWeight:800, color:TEXT, fontFamily:"'Syne',sans-serif" }}>{savedSnapshots}</div>
+                <div style={{ fontSize:20, fontWeight:800, color:TEXT, fontFamily:font }}>{savedSnapshots}</div>
                 <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>snapshots guardados</div>
               </div>
               <div>
-                <div style={{ fontSize:20, fontWeight:800, color:savedSevenDay ? "#22c55e" : "#f59e0b", fontFamily:"'Syne',sans-serif" }}>
+                <div style={{ fontSize:20, fontWeight:800, color:savedSevenDay ? "#22c55e" : "#f59e0b", fontFamily:font }}>
                   {savedSevenDay ? "7d" : "—"}
                 </div>
                 <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>ventana acumulada</div>
@@ -1906,7 +1906,7 @@ function TabIncendios({ mob }) {
                 </div>
                 <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
                   <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase", letterSpacing:"0.1em" }}>Focos activos</div>
-                  <div style={{ fontSize:26, fontWeight:800, color:"#dc2626", fontFamily:"'Syne',sans-serif" }}>
+                  <div style={{ fontSize:26, fontWeight:800, color:"#dc2626", fontFamily:font }}>
                     {selFire.count}
                   </div>
                   <div style={{ fontSize:11, fontFamily:font, color:MUTED, marginTop:2 }}>
@@ -2272,7 +2272,7 @@ export function TabAmbiental() {
                     <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em",
                       textTransform:"uppercase" }}>Lluvia acumulada — últimos 7 días</div>
                     <div style={{ fontSize:26, fontWeight:800, color:precipColor(selData.acum7d) === "#fde68a" ? "#ca8a04" : "#1d4ed8",
-                      fontFamily:"'Syne',sans-serif", lineHeight:1.2 }}>
+                      fontFamily:font, lineHeight:1.2 }}>
                       {Math.round(selData.acum7d)} mm
                     </div>
                     <div style={{ fontSize:11, fontFamily:font, marginTop:4 }}>
@@ -2289,7 +2289,7 @@ export function TabAmbiental() {
                   <div style={{ background:BG3, padding:"10px 12px", border:`1px solid ${BORDER}` }}>
                     <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em",
                       textTransform:"uppercase", marginBottom:6 }}>Lluvia esperada — próximos 7 días</div>
-                    <div style={{ fontSize:22, fontWeight:700, color:ACCENT, fontFamily:"'Syne',sans-serif" }}>
+                    <div style={{ fontSize:22, fontWeight:700, color:ACCENT, fontFamily:font }}>
                       {Math.round(selData.acumFcst7d)} mm
                     </div>
                     {/* Mini barras diarias del pronóstico */}

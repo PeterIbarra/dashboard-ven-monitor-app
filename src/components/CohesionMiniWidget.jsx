@@ -43,7 +43,7 @@ export const CohesionMiniWidget = memo(function CohesionMiniWidget({ liveData = 
           <div>
             <div style={{ fontSize:8, fontFamily:font, letterSpacing:"0.12em", textTransform:"uppercase", color:MUTED }}>Cohesión de Gobierno</div>
             <div style={{ display:"flex", alignItems:"baseline", gap:4, marginTop:1 }}>
-              <span style={{ fontSize:mob?20:26, fontWeight:900, fontFamily:"'Playfair Display',serif", color:col, lineHeight:1 }}>{score}</span>
+              <span style={{ fontSize:mob?20:26, fontWeight:900, fontFamily:"'Space Mono',monospace", color:col, lineHeight:1 }}>{score}</span>
               <span style={{ fontSize:10, fontFamily:font, color:MUTED }}>/100</span>
             </div>
           </div>

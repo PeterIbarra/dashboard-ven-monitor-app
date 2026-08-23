@@ -9,7 +9,7 @@ const CAT = { DCP:"#0A97D9", DESCA:"#4C9F38" };
 function Kpi({ label, value, note, color=TEXT }) {
   return <Card accent={color}>
     <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{label}</div>
-    <div style={{ fontSize:27, lineHeight:1.1, fontWeight:800, fontFamily:"'Playfair Display',serif", color }}>{value}</div>
+    <div style={{ fontSize:27, lineHeight:1.1, fontWeight:800, fontFamily:"'Space Mono',monospace", color }}>{value}</div>
     <div style={{ fontSize:10.5, color:MUTED, marginTop:4, lineHeight:1.4 }}>{note}</div>
   </Card>;
 }
@@ -64,7 +64,7 @@ export function ConfSemestre2026({ mobile=false }) {
         {[{label:"1er trimestre",...d.trimestre1},{label:"2º trimestre",...d.trimestre2}].map((t,i)=><div key={t.label} style={{ marginBottom:i?0:18 }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
             <span style={{ fontSize:13, fontWeight:700, color:TEXT }}>{t.label}</span>
-            <span style={{ fontSize:18, fontWeight:800, color:i?CAT.DESCA:CAT.DCP }}>{t.total.toLocaleString("es-VE")}</span>
+            <span style={{ fontSize:18, fontWeight:800, color:i?CAT.DESCA:CAT.DCP, fontFamily:"'Space Mono',monospace" }}>{t.total.toLocaleString("es-VE")}</span>
           </div>
           <div style={{ height:18, display:"flex", overflow:"hidden", borderRadius:3, background:BG2 }}>
             <div style={{ width:`${t.dcp/t.total*100}%`, background:CAT.DCP }} />

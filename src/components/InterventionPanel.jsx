@@ -21,7 +21,7 @@ export function InterventionPanel({ mob }) {
         {k:"Enero–julio",v:"USD 9.200 MM",s:"≈4× igual período 2025",c:"#7c3aed"},
         {k:"Semana 10–14 ago",v:"USD 450 MM",s:"USD 120 MM el viernes",c:"#0f766e"},
         {k:"Semana 17–21 ago",v:"USD 550 MM",s:"Estimación de la fuente",c:"#b45309"},
-      ].map(item=><Card key={item.k} accent={item.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,textTransform:"uppercase",letterSpacing:"0.07em"}}>{item.k}</div><div style={{fontSize:19,fontWeight:800,color:item.c,fontFamily:"'Syne',sans-serif",margin:"4px 0"}}>{item.v}</div><div style={{fontSize:10,color:MUTED}}>{item.s}</div></Card>)}
+      ].map(item=><Card key={item.k} accent={item.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,textTransform:"uppercase",letterSpacing:"0.07em"}}>{item.k}</div><div style={{fontSize:19,fontWeight:800,color:item.c,fontFamily:font,margin:"4px 0"}}>{item.v}</div><div style={{fontSize:10,color:MUTED}}>{item.s}</div></Card>)}
     </div>
 
     <Card>
@@ -29,7 +29,7 @@ export function InterventionPanel({ mob }) {
       <div style={{display:"grid",gridTemplateColumns:mob?"1fr":"repeat(4,1fr)",gap:10,alignItems:"end"}}>
         {INTERVENTION_OBSERVED.map(item=><div key={item.period} style={{minWidth:0}}>
           <div style={{height:90,display:"flex",alignItems:"flex-end",justifyContent:"center",borderBottom:`1px solid ${BORDER}`}}><div style={{width:"52%",height:Math.max(8,item.value/maxObserved*82),background:ACCENT,opacity:item.value===maxObserved?1:.55,borderRadius:"3px 3px 0 0"}} /></div>
-          <div style={{fontSize:14,fontWeight:800,color:item.value===maxObserved?ACCENT:TEXT,textAlign:"center",marginTop:5}}>{item.value.toLocaleString("es-VE")}</div>
+          <div style={{fontSize:14,fontWeight:800,color:item.value===maxObserved?ACCENT:TEXT,fontFamily:font,textAlign:"center",marginTop:5}}>{item.value.toLocaleString("es-VE")}</div>
           <div style={{fontSize:9,fontFamily:font,color:MUTED,textAlign:"center"}}>{item.period}</div>
           <div style={{fontSize:8,fontFamily:font,color:MUTED,textAlign:"center",marginTop:3,lineHeight:1.35}}>{item.note}</div>
         </div>)}

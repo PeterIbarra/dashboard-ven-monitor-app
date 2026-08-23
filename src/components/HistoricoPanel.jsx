@@ -182,7 +182,7 @@ export function HistoricoPanel({ mob }) {
                     <div style={{ fontSize: 10, color: MUTED, marginTop: 2 }}>{meta.unit} · {meta.source}</div>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: meta.color, fontFamily: "'Playfair Display',serif" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: meta.color, fontFamily: font }}>
                       {last ? (last.v >= 1000 ? `${(last.v/1000).toFixed(1)}k` : last.v >= 1 ? last.v.toFixed(1) : last.v.toFixed(2)) : "—"}
                     </div>
                     {delta !== null && (
@@ -218,7 +218,7 @@ export function HistoricoPanel({ mob }) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
                   {last && (
-                    <div style={{ fontSize: 22, fontWeight: 800, color: activeMeta.color, fontFamily: "'Playfair Display',serif", lineHeight: 1 }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: activeMeta.color, fontFamily: font, lineHeight: 1 }}>
                       {last.v >= 1000 ? `${(last.v/1000).toFixed(2)}k` : last.v >= 1 ? last.v.toFixed(2) : last.v.toFixed(4)}
                       <span style={{ fontSize: 12, fontFamily: font, color: MUTED, marginLeft: 4 }}>{activeMeta.unit}</span>
                     </div>
@@ -263,7 +263,7 @@ export function HistoricoPanel({ mob }) {
                 ].map((st, i) => (
                   <div key={i} style={{ background: BG3, padding: "8px 10px", borderRadius: 3 }}>
                     <div style={{ fontSize: 9, color: MUTED, fontFamily: font, letterSpacing: "0.08em", textTransform: "uppercase" }}>{st.l}</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: activeMeta.color, fontFamily: "'Playfair Display',serif", marginTop: 2 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: activeMeta.color, fontFamily: font, marginTop: 2 }}>
                       {st.v != null ? (st.v >= 1000 ? `${(st.v/1000).toFixed(1)}k` : st.v >= 1 ? st.v.toFixed(1) : st.v.toFixed(3)) : "—"}
                     </div>
                   </div>

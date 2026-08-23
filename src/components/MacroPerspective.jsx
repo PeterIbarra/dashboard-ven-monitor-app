@@ -30,7 +30,7 @@ export function MacroPerspective({ mob }) {
     <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8 }}>
       {OBSERVED.map(item => <Card key={item.k} accent={item.c}>
         <div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase", letterSpacing:"0.08em" }}>{item.k}</div>
-        <div style={{ fontSize:20, fontWeight:800, color:item.c, fontFamily:"'Syne',sans-serif", margin:"3px 0" }}>{item.v}</div>
+        <div style={{ fontSize:20, fontWeight:800, color:item.c, fontFamily:font, margin:"3px 0" }}>{item.v}</div>
         <div style={{ fontSize:10, color:MUTED }}>{item.s}</div>
       </Card>)}
     </div>

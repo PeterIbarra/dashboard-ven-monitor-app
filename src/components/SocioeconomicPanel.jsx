@@ -25,7 +25,7 @@ export function SocioeconomicPanel({ mob }) {
         <Badge color="#f59e0b">Snapshot documental</Badge>
       </div>
       <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8 }}>
-        {SOCIOECONOMIC_LOCAL.summary.map((kpi)=><div key={kpi.label} style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`3px solid ${kpi.color}`, padding:mob?"8px":"10px 12px" }}><div style={{ fontSize:8, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>{kpi.label}</div><div style={{ fontSize:mob?16:20, fontWeight:800, color:kpi.color, marginTop:2 }}>{kpi.value}</div><div style={{ fontSize:8, color:MUTED, marginTop:2 }}>{kpi.sub}</div></div>)}
+        {SOCIOECONOMIC_LOCAL.summary.map((kpi)=><div key={kpi.label} style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`3px solid ${kpi.color}`, padding:mob?"8px":"10px 12px" }}><div style={{ fontSize:8, fontFamily:font, color:MUTED, textTransform:"uppercase" }}>{kpi.label}</div><div style={{ fontSize:mob?16:20, fontWeight:800, color:kpi.color, fontFamily:font, marginTop:2 }}>{kpi.value}</div><div style={{ fontSize:8, color:MUTED, marginTop:2 }}>{kpi.sub}</div></div>)}
       </div>
     </Card>
     <Card><div style={{ fontSize:11, color:TEXT, lineHeight:1.6 }}><b>Nota metodológica.</b> En local se muestra el último corte documental validado. Al desplegar, este bloque se complementa automáticamente con las series anuales de World Bank, las proyecciones del FMI y R4V/UNHCR.</div></Card>
@@ -89,7 +89,7 @@ export function SocioeconomicPanel({ mob }) {
           ].map((kpi, i) => (
             <div key={i} style={{ background:BG2, border:`1px solid ${BORDER}`, borderTop:`3px solid ${kpi.color}`, padding:mob?"8px":"10px 12px" }}>
               <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>{kpi.label}</div>
-              <div style={{ fontSize:mob?16:20, fontWeight:800, color:kpi.color, fontFamily:"'Playfair Display',serif", lineHeight:1, marginTop:2 }}>{kpi.value}</div>
+              <div style={{ fontSize:mob?16:20, fontWeight:800, color:kpi.color, fontFamily:font, lineHeight:1, marginTop:2 }}>{kpi.value}</div>
               <div style={{ fontSize:8, fontFamily:font, color:MUTED, marginTop:2 }}>{kpi.sub}</div>
             </div>
           ))}
@@ -145,7 +145,7 @@ export function SocioeconomicPanel({ mob }) {
                 <div style={{ flex:1 }}>
                   <div style={{ fontSize:10, fontFamily:font, color:TEXT, fontWeight:600 }}>{ind.label}</div>
                   <div style={{ display:"flex", alignItems:"baseline", gap:4, marginTop:2 }}>
-                    <span style={{ fontSize:16, fontWeight:800, color:catColors[catKey], fontFamily:"'Playfair Display',serif" }}>
+                    <span style={{ fontSize:16, fontWeight:800, color:catColors[catKey], fontFamily:font }}>
                       {fmt(ind.latest.value, ind.unit)}
                     </span>
                     <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>({ind.latest.year})</span>

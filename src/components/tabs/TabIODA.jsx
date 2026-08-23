@@ -832,7 +832,7 @@ function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset
         weight: selectedState === r.name ? 3 : 1.5, opacity: 0.9, fillOpacity: 0.65,
       });
       circle.bindPopup(
-        `<div style="font-family:monospace;font-size:11px;min-width:160px">` +
+        `<div style="font-family:'Space Mono',monospace;font-size:11px;min-width:160px">` +
         `<b style="font-size:13px">${r.name}</b><br/>` +
         `Conectividad: <b style="color:${color}">${severity}%</b><br/>` +
         `Electricidad: <b>${elecSev}%</b> ${r.elecLabel || ""}<br/>` +
@@ -2073,7 +2073,7 @@ export function TabIODA() {
                       <div style={{ padding:"8px 10px", borderRadius:4, border:`1px solid ${getSeverityColor(rd.connectivityHealth)}30`, background:`${getSeverityColor(rd.connectivityHealth)}08` }}>
                         <div style={{ fontSize:10, color:MUTED, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:4 }}>🌐 Conectividad</div>
                         <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
-                          <span style={{ fontSize:24, fontWeight:900, fontFamily:"'Playfair Display',serif", color:getSeverityColor(rd.connectivityHealth) }}>{rd.connectivityHealth}%</span>
+                          <span style={{ fontSize:24, fontWeight:900, fontFamily:"'Space Mono',monospace", color:getSeverityColor(rd.connectivityHealth) }}>{rd.connectivityHealth}%</span>
                           {rd.connectivityScore > 0 && <span style={{ fontSize:10, color:MUTED }}>Score: {fmtVal(rd.connectivityScore)}</span>}
                         </div>
                       </div>
@@ -2081,7 +2081,7 @@ export function TabIODA() {
                       <div style={{ padding:"8px 10px", borderRadius:4, border:`1px solid ${elecColor}30`, background:`${elecColor}08` }}>
                         <div style={{ fontSize:10, color:MUTED, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:4 }}>⚡ Electricidad</div>
                         <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
-                          <span style={{ fontSize:24, fontWeight:900, fontFamily:"'Playfair Display',serif", color:elecColor }}>{rd.elecHealth}%</span>
+                          <span style={{ fontSize:24, fontWeight:900, fontFamily:"'Space Mono',monospace", color:elecColor }}>{rd.elecHealth}%</span>
                         </div>
                         <div style={{ fontSize:10, color:elecColor, fontWeight:600 }}>
                           {rd.elecLabel}{rd.elecEvents > 0 ? ` · ${rd.elecEvents} evento${rd.elecEvents > 1 ? "s" : ""}` : ""}
@@ -2111,7 +2111,7 @@ export function TabIODA() {
                               <div style={{ width:36, height:4, background:`${BORDER}30`, borderRadius:2, overflow:"hidden" }}>
                                 <div style={{ width:`${d.health}%`, height:4, background:c, borderRadius:2 }} />
                               </div>
-                              <span style={{ fontWeight:700, color:c, minWidth:28, textAlign:"right", fontSize:10 }}>{d.health}%</span>
+                              <span style={{ fontWeight:700, color:c, minWidth:28, textAlign:"right", fontSize:10, fontFamily:font }}>{d.health}%</span>
                               <span style={{ color:MUTED, fontSize:9 }}>{detail}</span>
                             </div>
                           </div>
@@ -2416,7 +2416,7 @@ export function TabIODA() {
                             </span>
                           </td>
                           <td style={{ padding:"8px", textAlign:"right" }}>
-                            <span style={{ fontWeight:700, color:sevColor, fontSize:13 }}>{fmtVal(ev.score || ev.value)}</span>
+                            <span style={{ fontWeight:700, color:sevColor, fontSize:13, fontFamily:font }}>{fmtVal(ev.score || ev.value)}</span>
                             {ev.duration > 0 && <div style={{ fontSize:10, color:MUTED }}>{fmtDuration(ev.duration)}</div>}
                           </td>
                         </tr>
@@ -2529,7 +2529,7 @@ export function TabIODA() {
                               <div key={src} style={{ padding:8, background:`${BORDER}08`, borderRadius:4, borderLeft:`3px solid ${color}` }}>
                                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                                   <span style={{ fontSize:11, fontWeight:600, color }}>{label}</span>
-                                  <span style={{ fontSize:13, fontWeight:900, color:getSeverityColor(health) }}>{health}%</span>
+                                  <span style={{ fontSize:13, fontWeight:900, color:getSeverityColor(health), fontFamily:font }}>{health}%</span>
                                 </div>
                                 <svg width="100%" viewBox={`0 0 ${W2} ${H2}`} style={{ display:"block", marginTop:4 }}>
                                   <path d={spark} fill="none" stroke={color} strokeWidth={1.5} />

@@ -369,7 +369,7 @@ function SismoMap({ reports, acopios, buildings, buildingDamageSocial = [], esco
           fillOpacity: 0.72,
         });
         marker.bindPopup(
-          `<div style="font-family:monospace;font-size:11px;max-width:260px;line-height:1.45">` +
+          `<div style="font-family:'Space Mono',monospace;font-size:11px;max-width:260px;line-height:1.45">` +
           `<strong>${report.place || "Reporte ciudadano"}</strong><br/>` +
           `<span style="color:${meta.color};font-weight:700">Reporte ${meta.label}</span><br/>` +
           `${formatDate(report.created_at)}<br/>` +
@@ -403,7 +403,7 @@ function SismoMap({ reports, acopios, buildings, buildingDamageSocial = [], esco
           fillOpacity: 0.78,
         });
         marker.bindPopup(
-          `<div style="font-family:monospace;font-size:11px;max-width:280px;line-height:1.45">` +
+          `<div style="font-family:'Space Mono',monospace;font-size:11px;max-width:280px;line-height:1.45">` +
           `<strong>${building.name || "Edificio afectado"}</strong><br/>` +
           `<span style="color:${meta.color};font-weight:700">Daño ${meta.label}</span><br/>` +
           `${building.city || ""}${building.zone ? ` · ${building.zone}` : ""}<br/>` +
@@ -433,7 +433,7 @@ function SismoMap({ reports, acopios, buildings, buildingDamageSocial = [], esco
           fillOpacity: 0.7,
         });
         marker.bindPopup(
-          `<div style="font-family:monospace;font-size:11px;max-width:280px;line-height:1.45">` +
+          `<div style="font-family:'Space Mono',monospace;font-size:11px;max-width:280px;line-height:1.45">` +
           `<strong>${item.place || "Dano reportado (redes)"}</strong><br/>` +
           `<span style="color:#ea580c;font-weight:700">${item.damage_type || "Corroboracion social"} - ${item.confirmations || 0} confirmaciones</span><br/>` +
           `${formatDate(item.reported_at)}<br/>` +
@@ -463,7 +463,7 @@ function SismoMap({ reports, acopios, buildings, buildingDamageSocial = [], esco
           fillOpacity: 0.82,
         });
         marker.bindPopup(
-          `<div style="font-family:monospace;font-size:11px;max-width:260px;line-height:1.45">` +
+          `<div style="font-family:'Space Mono',monospace;font-size:11px;max-width:260px;line-height:1.45">` +
           `<strong>${acopio.name || "Centro de acopio"}</strong><br/>` +
           `<span style="color:#16a34a;font-weight:700">Acopio / apoyo</span><br/>` +
           (acopio.needs ? `<div>Necesidades: ${String(acopio.needs).slice(0, 180)}</div>` : "") +
@@ -514,7 +514,7 @@ function SismoMap({ reports, acopios, buildings, buildingDamageSocial = [], esco
           onEachFeature: (feature, layer) => {
             const tipo = feature.properties?.TipoVia || "Sin clasificar";
             layer.bindPopup(
-              `<div style="font-family:monospace;font-size:11px">` +
+              `<div style="font-family:'Space Mono',monospace;font-size:11px">` +
               `<strong>Escombro en vía</strong><br/>` +
               `<span style="color:${tipo.toLowerCase().includes("principal") ? "#dc2626" : "#f97316"}">` +
               `${tipo}</span><br/>` +
@@ -583,7 +583,7 @@ function Kpi({ label, value, tone }) {
       <div style={{ fontSize: 10, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase" }}>
         {label}
       </div>
-      <div style={{ fontSize: 28, fontWeight: 800, color: tone || ACCENT, lineHeight: 1.1 }}>
+      <div style={{ fontSize: 28, fontWeight: 800, color: tone || ACCENT, fontFamily: font, lineHeight: 1.1 }}>
         {value}
       </div>
     </div>
@@ -730,7 +730,7 @@ function QuakeRegistry({ mob }) {
         fillOpacity: 0.62,
       });
       marker.bindPopup(
-        `<div style="font-family:monospace;font-size:11px;max-width:240px;line-height:1.45">` +
+        `<div style="font-family:'Space Mono',monospace;font-size:11px;max-width:240px;line-height:1.45">` +
         `<strong>M${q.mag != null ? q.mag.toFixed(1) : "?"}</strong> - ${q.place}<br/>` +
         `${formatQuakeTime(q.time)}<br/>` +
         `Profundidad: ${q.depth != null ? q.depth.toFixed(1) + " km" : "Sin dato"}<br/>` +
@@ -825,7 +825,7 @@ function QuakeRegistry({ mob }) {
           </div>
           {selectedQuake ? (
             <div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: magColor(selectedQuake.mag || 0) }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: magColor(selectedQuake.mag || 0), fontFamily: font }}>
                 M{selectedQuake.mag != null ? selectedQuake.mag.toFixed(1) : "?"}
               </div>
               <div style={{ fontSize: 13, fontFamily: fontSans, color: TEXT, marginTop: 4, lineHeight: 1.5 }}>
@@ -1026,7 +1026,7 @@ function CopernicusDamage({ mob }) {
         onEachFeature: (feature, layer) => {
           const cls = classifyCdiFeature(feature.properties);
           layer.bindPopup(
-            `<div style="font-family:monospace;font-size:11px;max-width:220px;line-height:1.4">` +
+            `<div style="font-family:'Space Mono',monospace;font-size:11px;max-width:220px;line-height:1.4">` +
             `<strong>${CDI_DAMAGE_LABELS[cls]}</strong><br/>` +
             `AOI: ${selectedAoi.nameEs}` +
             `</div>`
@@ -1119,7 +1119,7 @@ function CopernicusDamage({ mob }) {
           </div>
           {selectedFeature ? (
             <div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: CDI_DAMAGE_COLORS[classifyCdiFeature(selectedFeature.properties)] }}>
+              <div style={{ fontSize: 16, fontWeight: 800, color: CDI_DAMAGE_COLORS[classifyCdiFeature(selectedFeature.properties)], fontFamily: font }}>
                 {CDI_DAMAGE_LABELS[classifyCdiFeature(selectedFeature.properties)]}
               </div>
               <div style={{ fontSize: 11, fontFamily: font, color: MUTED, marginTop: 8 }}>
@@ -1284,7 +1284,7 @@ function MicrosoftAI4GDamage({ mob }) {
         fillOpacity: 0.85,
       });
       marker.bindPopup(
-        `<div style="font-family:monospace;font-size:11px">${unknown ? "Sin dato (cubierto por nubes)" : `Dano estimado: ${Math.round(d10 * 100)}%`}</div>`
+        `<div style="font-family:'Space Mono',monospace;font-size:11px">${unknown ? "Sin dato (cubierto por nubes)" : `Dano estimado: ${Math.round(d10 * 100)}%`}</div>`
       );
       group.addLayer(marker);
     });
@@ -1833,7 +1833,7 @@ function LandslideRisk({ buildings, mob }) {
         stroke: false,
         fillColor: DAMAGE[d]?.color || "#9ca3af",
         fillOpacity: 0.85,
-      }).bindPopup(`<div style="font-family:monospace;font-size:11px">Edificio - dano ${DAMAGE[d]?.label || "sin clasificar"}</div>`));
+      }).bindPopup(`<div style="font-family:'Space Mono',monospace;font-size:11px">Edificio - dano ${DAMAGE[d]?.label || "sin clasificar"}</div>`));
     });
     group.addTo(map);
     buildingsLayerRef.current = group;
@@ -2320,7 +2320,7 @@ function EscombrosMap({ features, counts, vantorDespues, mob }) {
         },
         onEachFeature: (f, lyr) => {
           const tipo = f.properties?.TipoVia || "Sin clasificar";
-          lyr.bindPopup(`<div style="font-family:monospace;font-size:11px"><strong>Escombro en vía ${tipo}</strong></div>`);
+          lyr.bindPopup(`<div style="font-family:'Space Mono',monospace;font-size:11px"><strong>Escombro en vía ${tipo}</strong></div>`);
         },
       }
     );
@@ -2776,7 +2776,7 @@ export function TabSismos({ subView, setSubView }) {
         </div>
       </div>` : "";
 
-    return `<div style="font-family:Arial,sans-serif;color:#1f2937;width:760px;">
+    return `<div style="font-family:'DM Sans',sans-serif;color:#1f2937;width:760px;">
       <div style="border-bottom:3px solid #7f1d1d;padding-bottom:12px;margin-bottom:18px;">
         <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#6b7280;">PNUD Venezuela · Monitor de Contexto Situacional</div>
         <div style="font-size:20px;font-weight:800;margin-top:4px;color:#111827;">Reporte de Sismos — Impacto y Respuesta</div>
@@ -3323,11 +3323,11 @@ export function TabSismos({ subView, setSubView }) {
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                           <div style={{ background: BG3, border: `1px solid ${BORDER}`, padding: 8 }}>
                             <div style={{ fontSize: 9, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Fotos</div>
-                            <div style={{ fontSize: 18, fontWeight: 800, color: TEXT }}>{mediaCount(selectedItem)}</div>
+                            <div style={{ fontSize: 18, fontWeight: 800, color: TEXT, fontFamily: font }}>{mediaCount(selectedItem)}</div>
                           </div>
                           <div style={{ background: BG3, border: `1px solid ${BORDER}`, padding: 8 }}>
                             <div style={{ fontSize: 9, fontFamily: font, color: MUTED, textTransform: "uppercase" }}>Evaluacion</div>
-                            <div style={{ fontSize: 18, fontWeight: 800, color: selectedItem.is_technically_evaluated ? "#16a34a" : MUTED }}>
+                            <div style={{ fontSize: 18, fontWeight: 800, color: selectedItem.is_technically_evaluated ? "#16a34a" : MUTED, fontFamily: font }}>
                               {selectedItem.is_technically_evaluated ? "Si" : "No"}
                             </div>
                           </div>

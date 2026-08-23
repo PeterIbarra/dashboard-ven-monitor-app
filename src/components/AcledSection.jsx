@@ -148,7 +148,7 @@ export function AcledSection() {
         ].map((k,i) => (
           <Card key={i} accent={k.c}>
             <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>{k.l}</div>
-            <div style={{ fontSize:22, fontWeight:800, color:k.c, fontFamily:"'Playfair Display',serif" }}>{k.v}</div>
+            <div style={{ fontSize:22, fontWeight:800, color:k.c, fontFamily:font }}>{k.v}</div>
           </Card>
         ))}
       </div>
@@ -200,7 +200,7 @@ export function AcledSection() {
             <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8 }}>
               {[{l:`Semana ${wkDate}`,v:wkEvents.length,c:ACCENT},{l:"Fatalidades",v:wkFatal,c:"#dc2626"},
                 {l:"Tipos activos",v:Object.keys(wkTypes).length,c:"#4C9F38"},{l:"",v:<span style={{fontSize:10,cursor:"pointer",color:MUTED}} onClick={() => setFilter("all")}>✕ Cerrar</span>,c:MUTED}
-              ].map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
+              ].map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:font}}>{k.v}</div></Card>)}
             </div>
             <Card>
               {wkEvents.slice(0,15).map((e,i) => (
@@ -271,7 +271,7 @@ export function AcledSection() {
           return (<>
             <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8 }}>
               {[{l:filter,v:tEvents.length,c:EC[filter]||ACCENT},{l:"Fatalidades",v:tFatal,c:"#dc2626"},{l:"Estados",v:Object.keys(tStates).length,c:"#0A97D9"},{l:"Actores",v:Object.keys(tActors).length,c:"#9b59b6"}]
-                .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
+                .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:font}}>{k.v}</div></Card>)}
             </div>
             <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:10 }}>
               <Card>
@@ -332,7 +332,7 @@ export function AcledSection() {
           return (<>
             <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8 }}>
               {[{l:actorFilter.slice(0,35),v:aEvents.length,c:ACCENT},{l:"Fatalidades",v:aFatal,c:"#dc2626"},{l:"Tipos",v:Object.keys(aTypes).length,c:"#4C9F38"},{l:"Estados",v:Object.keys(aStates).length,c:"#0A97D9"}]
-                .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'Playfair Display',serif"}}>{k.v}</div></Card>)}
+                .map((k,i) => <Card key={i} accent={k.c}><div style={{fontSize:9,fontFamily:font,color:MUTED,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>{k.l}</div><div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:font}}>{k.v}</div></Card>)}
             </div>
             <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:10 }}>
               <Card>
@@ -471,7 +471,7 @@ export function AcledSection() {
               ].map((k,i) => (
                 <Card key={i} accent={k.c}>
                   <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>{k.l}</div>
-                  <div style={{ fontSize:20, fontWeight:800, color:k.c, fontFamily:"'Playfair Display',serif" }}>{k.v}</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:k.c, fontFamily:font }}>{k.v}</div>
                 </Card>
               ))}
             </div>
@@ -595,27 +595,27 @@ export function AcledSection() {
               <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(5,1fr)", gap:8, marginBottom:12 }}>
                 <Card accent="#f59e0b">
                   <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Eventos previstos</div>
-                  <div style={{ fontSize:20, fontWeight:800, color:"#f59e0b", fontFamily:"'Playfair Display',serif" }}>{totalF}</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:"#f59e0b", fontFamily:font }}>{totalF}</div>
                   <div style={{ fontSize:9, color:MUTED }}>Próximos meses</div>
                 </Card>
                 <Card accent={ACCENT}>
                   <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Eventos observados</div>
-                  <div style={{ fontSize:20, fontWeight:800, color:ACCENT, fontFamily:"'Playfair Display',serif" }}>{totalO}</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:ACCENT, fontFamily:font }}>{totalO}</div>
                   <div style={{ fontSize:9, color:MUTED }}>Hasta ahora</div>
                 </Card>
                 <Card accent={trendColor}>
                   <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Tendencia</div>
-                  <div style={{ fontSize:16, fontWeight:800, color:trendColor, fontFamily:"'Syne',sans-serif" }}>{trend}</div>
+                  <div style={{ fontSize:16, fontWeight:800, color:trendColor, fontFamily:font }}>{trend}</div>
                   <div style={{ fontSize:9, color:MUTED }}>{diff > 0 ? `+${diff}` : diff} vs observado</div>
                 </Card>
                 <Card accent="#E5243B">
                   <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Batallas previstas</div>
-                  <div style={{ fontSize:20, fontWeight:800, color:"#E5243B", fontFamily:"'Playfair Display',serif" }}>{battlesF}</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:"#E5243B", fontFamily:font }}>{battlesF}</div>
                   <div style={{ fontSize:9, color:MUTED }}>Enfrentamientos armados</div>
                 </Card>
                 <Card accent="#dc2626">
                   <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:3 }}>Violencia civil prev.</div>
-                  <div style={{ fontSize:20, fontWeight:800, color:"#dc2626", fontFamily:"'Playfair Display',serif" }}>{vacF}</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:"#dc2626", fontFamily:font }}>{vacF}</div>
                   <div style={{ fontSize:9, color:MUTED }}>Contra civiles</div>
                 </Card>
               </div>
@@ -721,7 +721,7 @@ export function AcledSection() {
                           ].map((k,i) => (
                             <div key={i} style={{ padding:"4px 6px", background:BG2, border:`1px solid ${BORDER}` }}>
                               <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>{k.l}</div>
-                              <div style={{ fontSize:16, fontWeight:800, color:k.c, fontFamily:"'Playfair Display',serif" }}>{k.v}</div>
+                              <div style={{ fontSize:16, fontWeight:800, color:k.c, fontFamily:font }}>{k.v}</div>
                             </div>
                           ))}
                         </div>

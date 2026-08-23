@@ -184,28 +184,28 @@ export function TabMacro({ section, setSection }) {
         <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"1fr 1fr 1fr 1fr", gap:10, marginBottom:16 }}>
           <Card accent="#0468B1">
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Dólar BCV (oficial)</div>
-            <div style={{ fontSize:26, fontWeight:800, color:"#0468B1", fontFamily:"'Playfair Display',serif" }}>
+            <div style={{ fontSize:26, fontWeight:800, color:"#0468B1", fontFamily:"'Space Mono',monospace" }}>
               {loading ? "..." : dolar?.bcv ? `${dolar.bcv.toFixed(2)}` : "—"}
             </div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>Bs/USD · Fuente: BCV</div>
           </Card>
           <Card accent="#E5243B">
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Dólar Paralelo</div>
-            <div style={{ fontSize:26, fontWeight:800, color:"#E5243B", fontFamily:"'Playfair Display',serif" }}>
+            <div style={{ fontSize:26, fontWeight:800, color:"#E5243B", fontFamily:"'Space Mono',monospace" }}>
               {loading ? "..." : dolar?.par ? `${dolar.par.toFixed(2)}` : "—"}
             </div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>Bs/USD · Mercado no oficial</div>
           </Card>
           <Card accent={dolar?.brecha > 50 ? "#E5243B" : dolar?.brecha > 30 ? "#f59e0b" : "#22c55e"}>
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Brecha cambiaria</div>
-            <div style={{ fontSize:26, fontWeight:800, color:dolar?.brecha > 50 ? "#E5243B" : dolar?.brecha > 30 ? "#f59e0b" : "#22c55e", fontFamily:"'Playfair Display',serif" }}>
+            <div style={{ fontSize:26, fontWeight:800, color:dolar?.brecha > 50 ? "#E5243B" : dolar?.brecha > 30 ? "#f59e0b" : "#22c55e", fontFamily:"'Space Mono',monospace" }}>
               {loading ? "..." : dolar?.brecha ? `${dolar.brecha.toFixed(1)}%` : "—"}
             </div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>{dolar?.brecha > 55 ? "⚠ Zona de alerta E2" : dolar?.brecha > 40 ? "Monitoreo activo" : "Rango aceptable"}</div>
           </Card>
           <Card accent="#7c3aed">
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>USDT/VES (ref.)</div>
-            <div style={{ fontSize:26, fontWeight:800, color:"#7c3aed", fontFamily:"'Playfair Display',serif" }}>
+            <div style={{ fontSize:26, fontWeight:800, color:"#7c3aed", fontFamily:"'Space Mono',monospace" }}>
               {loading ? "..." : dolar?.par ? `~${(dolar.par * 1.02).toFixed(0)}` : "—"}
             </div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>Estimación técnica: paralelo +2% · no es cotización Binance</div>
@@ -287,7 +287,7 @@ export function TabMacro({ section, setSection }) {
           {MACRO_LATEST.map((m,i) => (
             <Card key={i} accent={m.c}>
               <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{m.k}</div>
-              <div style={{ fontSize:20, fontWeight:800, color:m.c, fontFamily:"'Syne',sans-serif" }}>{m.v}</div>
+              <div style={{ fontSize:20, fontWeight:800, color:m.c, fontFamily:font }}>{m.v}</div>
               <div style={{ fontSize:10, color:MUTED, marginTop:4, lineHeight:1.5 }}>{m.s}</div>
             </Card>
           ))}

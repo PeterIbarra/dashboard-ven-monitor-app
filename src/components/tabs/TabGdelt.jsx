@@ -98,7 +98,7 @@ export function TabGdelt() {
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Inestabilidad Δ</div>
             <div style={{ display:"flex", alignItems:"center", gap:6 }}>
               <span style={{ fontSize:12 }}>{stats.instDelta>0?"📈":"📉"}</span>
-              <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
+              <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Space Mono',monospace",
                 color:stats.instDelta>0?"#ff3b3b":"#7c3aed" }}>
                 {stats.instDelta!==null ? `${stats.instDelta>0?"+":""}${stats.instDelta.toFixed(1)}%` : "—"}
               </span>
@@ -107,7 +107,7 @@ export function TabGdelt() {
           </Card>
           <Card accent={(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#7c3aed"}>
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Tono Mediático</div>
-            <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
+            <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Space Mono',monospace",
               color:(stats.tone||0)<-5?"#ff3b3b":(stats.tone||0)<-2?"#f59e0b":"#7c3aed" }}>
               {stats.tone!==null ? stats.tone.toFixed(2) : "—"}
             </span>
@@ -115,7 +115,7 @@ export function TabGdelt() {
           </Card>
           <Card accent={stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#7c3aed"}>
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>Señal Compuesta</div>
-            <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Playfair Display',serif",
+            <span style={{ fontSize:20, fontWeight:800, fontFamily:"'Space Mono',monospace",
               color:stats.phase==="CRISIS"?"#ff3b3b":stats.phase==="ELEVADO"?"#f59e0b":"#7c3aed" }}>
               {stats.phase || "—"}
             </span>

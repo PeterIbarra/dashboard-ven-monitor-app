@@ -514,7 +514,7 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
                 <div style={{ display:"flex", gap:12, marginBottom:10 }}>
                   {[{l:"Verde",c:SEM.green,n:wk.sem.g},{l:"Amarillo",c:SEM.yellow,n:wk.sem.y},{l:"Rojo",c:SEM.red,n:wk.sem.r}].map((s,i) => (
                     <div key={i} style={{ textAlign:"center" }}>
-                      <div style={{ fontSize:18, fontWeight:800, color:s.c }}>{s.n}</div>
+                      <div style={{ fontSize:18, fontWeight:800, color:s.c, fontFamily:font }}>{s.n}</div>
                       <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>{s.l}</div>
                     </div>
                   ))}

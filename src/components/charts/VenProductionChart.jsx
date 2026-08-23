@@ -97,7 +97,7 @@ export const VenProductionChart = memo(function VenProductionChart({ data: apiDa
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 2 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-          <span style={{ fontSize: 18, fontWeight: 900, color: ACCENT, fontFamily: "'Playfair Display',serif" }}>
+          <span style={{ fontSize: 18, fontWeight: 900, color: ACCENT, fontFamily: font }}>
             {latest.value.toFixed(0)}
           </span>
           <span style={{ fontSize: 10, fontFamily: font, color: MUTED }}>kbd</span>

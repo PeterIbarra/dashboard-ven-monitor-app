@@ -40,15 +40,15 @@ export function MereyEstimator() {
       </div>
       <div style={{ background:BG, border:`1px solid ${BORDER}`, padding:"12px 14px", display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:12 }}>
         <div style={{ textAlign:"center" }}>
-          <div style={{ fontSize:22, fontWeight:900, color:"#b8860b", fontFamily:"'Playfair Display',serif" }}>${merey.toFixed(1)}</div>
+          <div style={{ fontSize:22, fontWeight:900, color:"#b8860b", fontFamily:"'Space Mono',monospace" }}>${merey.toFixed(1)}</div>
           <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Merey est. /bbl</div>
         </div>
         <div style={{ textAlign:"center" }}>
-          <div style={{ fontSize:22, fontWeight:900, color:ACCENT, fontFamily:"'Playfair Display',serif" }}>${revenue800k}M</div>
+          <div style={{ fontSize:22, fontWeight:900, color:ACCENT, fontFamily:"'Space Mono',monospace" }}>${revenue800k}M</div>
           <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Ingreso diario 800K bpd</div>
         </div>
         <div style={{ textAlign:"center" }}>
-          <div style={{ fontSize:22, fontWeight:900, color:"#22c55e", fontFamily:"'Playfair Display',serif" }}>${revenueYear}B</div>
+          <div style={{ fontSize:22, fontWeight:900, color:"#22c55e", fontFamily:"'Space Mono',monospace" }}>${revenueYear}B</div>
           <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>Proyección anualizada</div>
         </div>
       </div>

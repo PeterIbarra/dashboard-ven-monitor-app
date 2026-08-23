@@ -77,7 +77,7 @@ export function TabConflictividad() {
             <Card accent={latest.protestas > 50 ? "#dc2626" : latest.protestas > 30 ? "#ca8a04" : "#16a34a"}>
               <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Protestas semana</div>
               <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
-                <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:latest.protestas > 50 ? "#dc2626" : latest.protestas > 30 ? "#ca8a04" : TEXT }}>{latest.protestas}</span>
+                <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:latest.protestas > 50 ? "#dc2626" : latest.protestas > 30 ? "#ca8a04" : TEXT }}>{latest.protestas}</span>
                 {deltaP != null && deltaP !== 0 && (
                   <span style={{ fontSize:12, fontFamily:font, color:deltaP > 0 ? "#dc2626" : "#16a34a", fontWeight:600 }}>
                     {deltaP > 0 ? "▲" : "▼"}{Math.abs(deltaP)} ({deltaPct > 0 ? "+" : ""}{deltaPct}%)
@@ -88,22 +88,22 @@ export function TabConflictividad() {
             </Card>
             <Card>
               <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Estados</div>
-              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:latest.estados > 18 ? "#dc2626" : TEXT }}>{latest.estados}</span>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:latest.estados > 18 ? "#dc2626" : TEXT }}>{latest.estados}</span>
               <div style={{ fontSize:10, color:MUTED }}>de 24 entidades</div>
             </Card>
             <Card>
               <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Reprimidas</div>
-              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:latest.reprimidas > 0 ? "#dc2626" : "#16a34a" }}>{latest.reprimidas}</span>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:latest.reprimidas > 0 ? "#dc2626" : "#16a34a" }}>{latest.reprimidas}</span>
               <div style={{ fontSize:10, color:MUTED }}>esta semana</div>
             </Card>
             <Card>
               <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Acumulado 2026</div>
-              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:ACCENT }}>{totalAcum}</span>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:ACCENT }}>{totalAcum}</span>
               <div style={{ fontSize:10, color:MUTED }}>S1–{latest.week}</div>
             </Card>
             <Card>
               <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Prom. semanal</div>
-              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:TEXT }}>{Math.round(totalAcum / CONF_SEMANAL.length)}</span>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:TEXT }}>{Math.round(totalAcum / CONF_SEMANAL.length)}</span>
               <div style={{ fontSize:10, color:MUTED }}>protestas/semana</div>
             </Card>
           </div>
@@ -234,7 +234,7 @@ export function TabConflictividad() {
                     { value:`${selWeek.estados}/24`, label:"Estados", color:selWeek.estados>18?"#dc2626":TEXT },
                     { value:selWeek.reprimidas, label:"Reprimidas", color:selWeek.reprimidas>0?"#dc2626":"#16a34a" },
                   ].map(item => <div key={item.label} style={{ background:BG2, padding:"8px 10px", textAlign:"center" }}>
-                    <span style={{ fontSize:18, fontWeight:800, color:item.color, fontFamily:"'Playfair Display',serif" }}>{item.value}</span>
+                    <span style={{ fontSize:18, fontWeight:800, color:item.color, fontFamily:"'Space Mono',monospace" }}>{item.value}</span>
                     <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>{item.label}</div>
                   </div>)}
                   <div style={{ background:BG2, padding:"8px 12px", display:"flex", alignItems:"center", gap:8, minWidth:0 }}>
@@ -315,7 +315,7 @@ export function TabConflictividad() {
           ].map((d,i) => (
             <Card key={i} accent={d.c}>
               <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{d.k}</div>
-              <div style={{ fontSize:22, fontWeight:800, color:d.c, fontFamily:"'Syne',sans-serif" }}>{d.v}</div>
+              <div style={{ fontSize:22, fontWeight:800, color:d.c, fontFamily:font }}>{d.v}</div>
               <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>{d.s}</div>
             </Card>
           ))}
@@ -355,12 +355,12 @@ export function TabConflictividad() {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, marginBottom:16 }}>
           <Card accent="#E5243B">
             <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Mes pico</div>
-            <div style={{ fontSize:22, fontWeight:800, color:"#E5243B", fontFamily:"'Syne',sans-serif" }}>Enero · 401</div>
+            <div style={{ fontSize:22, fontWeight:800, color:"#E5243B", fontFamily:font }}>Enero · 401</div>
             <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>36 reprimidas · DCP dominante</div>
           </Card>
           <Card accent="#4C9F38">
             <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Mes mínimo</div>
-            <div style={{ fontSize:22, fontWeight:800, color:"#4C9F38", fontFamily:"'Syne',sans-serif" }}>Diciembre · 123</div>
+            <div style={{ fontSize:22, fontWeight:800, color:"#4C9F38", fontFamily:font }}>Diciembre · 123</div>
             <div style={{ fontSize:10, color:MUTED, marginTop:2 }}>1 reprimida · DESCA dominante</div>
           </Card>
         </div>
@@ -406,13 +406,13 @@ export function TabConflictividad() {
         <div>
           {CONF_DERECHOS.map((d,i) => (
             <div key={i} style={{ display:"grid", gridTemplateColumns:"30px 1fr 60px 50px", gap:10, padding:"10px 0", borderBottom:`1px solid ${BORDER}30`, alignItems:"center" }}>
-              <span style={{ fontSize:16, fontWeight:800, color:catColor[d.cat], fontFamily:"'Syne',sans-serif", textAlign:"center" }}>#{i+1}</span>
+              <span style={{ fontSize:16, fontWeight:800, color:catColor[d.cat], fontFamily:font, textAlign:"center" }}>#{i+1}</span>
               <div>
                 <div style={{ fontSize:14, fontWeight:600, color:TEXT }}>{d.d}</div>
                 <span style={{ fontSize:9, fontFamily:font, padding:"1px 5px", background:`${catColor[d.cat]}15`, color:catColor[d.cat], border:`1px solid ${catColor[d.cat]}30` }}>{d.cat}</span>
               </div>
               <div style={{ textAlign:"right" }}>
-                <div style={{ fontSize:16, fontWeight:700, color:catColor[d.cat], fontFamily:"'Syne',sans-serif" }}>{d.p}</div>
+                <div style={{ fontSize:16, fontWeight:700, color:catColor[d.cat], fontFamily:font }}>{d.p}</div>
                 <div style={{ fontSize:10, color:MUTED }}>{d.pct}%</div>
               </div>
               <div style={{ height:6, background:BORDER, borderRadius:3 }}>

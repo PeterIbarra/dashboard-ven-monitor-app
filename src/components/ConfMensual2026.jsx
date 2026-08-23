@@ -43,7 +43,7 @@ export function ConfMensual2026() {
         ].map((k, i) => (
           <Card key={i}>
             <div style={{ textAlign:"center" }}>
-              <div style={{ fontSize:mob?20:26, fontWeight:800, color:k.c, fontFamily:"'Playfair Display',serif" }}>{k.v}</div>
+              <div style={{ fontSize:mob?20:26, fontWeight:800, color:k.c, fontFamily:"'Space Mono',monospace" }}>{k.v}</div>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginTop:4 }}>{k.l}</div>
             </div>
           </Card>
@@ -84,14 +84,14 @@ export function ConfMensual2026() {
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                 <div style={{ width:12, height:12, background:catColor.DCP, borderRadius:2 }} />
                 <div>
-                  <div style={{ fontSize:14, fontWeight:700, color:catColor.DCP }}>{d.dcp} ({d.dcpPct}%)</div>
+                  <div style={{ fontSize:14, fontWeight:700, color:catColor.DCP, fontFamily:font }}>{d.dcp} ({d.dcpPct}%)</div>
                   <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Derechos Civiles y Políticos</div>
                 </div>
               </div>
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                 <div style={{ width:12, height:12, background:catColor.DESCA, borderRadius:2 }} />
                 <div>
-                  <div style={{ fontSize:14, fontWeight:700, color:catColor.DESCA }}>{d.desca} ({d.descaPct}%)</div>
+                  <div style={{ fontSize:14, fontWeight:700, color:catColor.DESCA, fontFamily:font }}>{d.desca} ({d.descaPct}%)</div>
                   <div style={{ fontSize:9, fontFamily:font, color:MUTED }}>Derechos Económicos, Sociales</div>
                 </div>
               </div>
@@ -168,7 +168,7 @@ export function ConfMensual2026() {
         <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
           Contexto del período
         </div>
-        <div style={{ fontSize:12.5, fontFamily:"'Libre Baskerville','Georgia',serif", color:TEXT, lineHeight:1.65 }}>
+        <div style={{ fontSize:12.5, fontFamily:"'DM Sans',sans-serif", color:TEXT, lineHeight:1.65 }}>
           {d.contexto}
         </div>
         <div style={{ fontSize:11, fontFamily:font, color:MUTED, marginTop:8, padding:"6px 10px", background:`${ACCENT}06`, border:`1px solid ${BORDER}` }}>

@@ -62,13 +62,13 @@ export function TabClimaSocial({ liveData = {} }) {
         <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(5,1fr)", gap:10, marginBottom:16 }}>
           <Card accent={ACCENT}>
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Interacciones</div>
-            <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:ACCENT }}>{(R.total/1e6).toFixed(1)}M</span>
+            <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:ACCENT }}>{(R.total/1e6).toFixed(1)}M</span>
             <div style={{ fontSize:10, color:MUTED }}>{R.days} días analizados</div>
           </Card>
           <Card accent="#dc2626">
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Polarización</div>
             <div style={{ display:"flex", alignItems:"baseline", gap:4 }}>
-              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:"#dc2626" }}>{((R.totPolA + R.totPolM) / R.total * 100).toFixed(0)}%</span>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:"#dc2626" }}>{((R.totPolA + R.totPolM) / R.total * 100).toFixed(0)}%</span>
               <span style={{ fontSize:11, fontFamily:font, color:MUTED }}>mod+alta</span>
             </div>
             <div style={{ fontSize:10, color:MUTED }}>Alta {R.polAltoPct}% · Mod {(R.totPolM/R.total*100).toFixed(0)}%</div>
@@ -76,19 +76,19 @@ export function TabClimaSocial({ liveData = {} }) {
           <Card accent="#16a34a">
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Convivencia</div>
             <div style={{ display:"flex", alignItems:"baseline", gap:4 }}>
-              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:"#16a34a" }}>{((R.totConvA + R.totConvM) / R.total * 100).toFixed(0)}%</span>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:"#16a34a" }}>{((R.totConvA + R.totConvM) / R.total * 100).toFixed(0)}%</span>
               <span style={{ fontSize:11, fontFamily:font, color:MUTED }}>mod+alta</span>
             </div>
             <div style={{ fontSize:10, color:MUTED }}>Alta {R.convAltoPct}% · Mod {(R.totConvM/R.total*100).toFixed(0)}%</div>
           </Card>
           <Card accent={thermoColor}>
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Índice neto</div>
-            <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:thermoColor }}>+{R.netIdx}pp</span>
+            <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:thermoColor }}>+{R.netIdx}pp</span>
             <div style={{ fontSize:10, color:MUTED }}>Polarización domina</div>
           </Card>
           <Card accent="#dc2626">
             <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Pico</div>
-            <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Playfair Display',serif", color:"#dc2626" }}>Ene 8</span>
+            <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:"#dc2626" }}>Ene 8</span>
             <div style={{ fontSize:10, color:MUTED }}>295K pol. alta · 527K total</div>
           </Card>
         </div>

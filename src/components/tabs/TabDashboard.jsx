@@ -230,7 +230,7 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
               </div>
               <div style={{ fontSize:12, fontWeight:600, color:sc.color, marginBottom:6, lineHeight:1.2 }}>{sc.name}</div>
               <div style={{ display:"flex", alignItems:"flex-end", gap:8, marginBottom:6 }}>
-                <span style={{ fontSize:26, fontWeight:900, color:sc.color, fontFamily:"'Playfair Display',serif", lineHeight:1 }}>{p.v}%</span>
+                <span style={{ fontSize:26, fontWeight:900, color:sc.color, fontFamily:"'Space Mono',monospace", lineHeight:1 }}>{p.v}%</span>
                 {delta !== null && delta !== 0 && (
                   <span style={{ fontSize:13, fontFamily:font, fontWeight:600, color:delta>0?"#22c55e":"#ef4444", marginBottom:2 }}>
                     {delta>0?"▲":"▼"}{Math.abs(delta)}pp
@@ -454,7 +454,7 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
                 Índice de Inestabilidad
               </div>
               <div style={{ display:"flex", alignItems:"flex-end", gap:6 }}>
-                <span style={{ fontSize:mob?40:52, fontWeight:900, fontFamily:"'Playfair Display',serif", color:zone.color, lineHeight:1 }}>
+                <span style={{ fontSize:mob?40:52, fontWeight:900, fontFamily:"'Space Mono',monospace", color:zone.color, lineHeight:1 }}>
                   {displayIndex}
                 </span>
                 <span style={{ fontSize:14, fontFamily:font, color:MUTED, marginBottom:mob?4:8 }}>/100</span>
@@ -652,7 +652,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
               ].map((kpi, i) => (
                 <div key={i} style={{ flex:1, padding:mob?"5px 4px":"6px 8px", textAlign:"center", borderRight:i<3?`1px solid ${BORDER}40`:"none" }}>
                   <div style={{ fontSize:7, fontFamily:font, letterSpacing:"0.08em", textTransform:"uppercase", color:MUTED }}>{kpi.label}</div>
-                  <div style={{ fontSize:mob?14:16, fontWeight:800, fontFamily:"'Playfair Display',serif", color:kpi.color, lineHeight:1, marginTop:1 }}>
+                  <div style={{ fontSize:mob?14:16, fontWeight:800, fontFamily:"'Space Mono',monospace", color:kpi.color, lineHeight:1, marginTop:1 }}>
                     {kpi.value}<span style={{ fontSize:8, fontWeight:400 }}>{kpi.unit}</span>
                   </div>
                 </div>
@@ -871,7 +871,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
                       <div>
                         {/* Headline */}
                         <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:10 }}>
-                          <span style={{ fontFamily:fontSans, fontSize:mob?32:40, fontWeight:800, color:"#dc2626", lineHeight:1 }}>
+                          <span style={{ fontFamily:font, fontSize:mob?32:40, fontWeight:800, color:"#dc2626", lineHeight:1 }}>
                             {num(fp.presosTotal)}
                           </span>
                           <span style={{ fontFamily:font, fontSize:10, color:MUTED }}>presos políticos en Venezuela</span>
@@ -1069,7 +1069,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
           ))}
           <div style={{ marginTop:10, paddingTop:10, borderTop:`1px solid ${BORDER}`, textAlign:"center" }}>
             <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Dominante</div>
-            <div style={{ fontSize:16, fontWeight:800, color:domSc.color, fontFamily:"'Syne',sans-serif" }}>E{domSc.id} · {dom.v}%</div>
+            <div style={{ fontSize:16, fontWeight:800, color:domSc.color, fontFamily:font }}>E{domSc.id} · {dom.v}%</div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>{domSc.short}</div>
           </div>
         </Card>

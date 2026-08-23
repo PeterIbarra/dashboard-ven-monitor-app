@@ -148,7 +148,7 @@ export function LivePriceCards() {
               <span style={{ fontSize: 9, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase" }}>{item.label}</span>
               {i === 0 && <Badge color={source === "live" ? "#22c55e" : source === "yahoo" ? "#22c55e" : "#a17d08"}>{source === "live" || source === "yahoo" ? "EN VIVO" : source === "eia" ? "EIA" : "ESTÁTICO"}</Badge>}
             </div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: item.color, fontFamily: "'Playfair Display',serif", lineHeight: 1 }}>
+            <div style={{ fontSize: 28, fontWeight: 900, color: item.color, fontFamily: "'Space Mono',monospace", lineHeight: 1 }}>
               ${item.value.toFixed(2)}
             </div>
             <div style={{ fontSize: 9, fontFamily: font, color: MUTED, marginTop: 6 }}>{item.unit} · {item.desc}</div>

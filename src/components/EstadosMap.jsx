@@ -87,12 +87,12 @@ export const EstadosMap = memo(function EstadosMap() {
           <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:8 }}>
             <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Protestas</div>
-              <div style={{ fontSize:20, fontWeight:800, color:ACCENT, fontFamily:"'Syne',sans-serif" }}>{sel.p}</div>
+              <div style={{ fontSize:20, fontWeight:800, color:ACCENT, fontFamily:font }}>{sel.p}</div>
               <div style={{ fontSize:10, color:MUTED }}>{((sel.p/2219)*100).toFixed(1)}% del total nacional</div>
             </div>
             <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Reprimidas</div>
-              <div style={{ fontSize:20, fontWeight:800, color:sel.r>3?"#E5243B":sel.r>0?"#a17d08":"#22c55e", fontFamily:"'Syne',sans-serif" }}>{sel.r}</div>
+              <div style={{ fontSize:20, fontWeight:800, color:sel.r>3?"#E5243B":sel.r>0?"#a17d08":"#22c55e", fontFamily:font }}>{sel.r}</div>
               <div style={{ fontSize:10, color:MUTED }}>{sel.r > 0 ? `${((sel.r/55)*100).toFixed(1)}% de las 55 nacionales` : "Sin represión documentada"}</div>
             </div>
           </div>
@@ -100,7 +100,7 @@ export const EstadosMap = memo(function EstadosMap() {
           {sel.c > 0 && (
             <div style={{ background:BG, padding:"10px", border:`1px solid ${BORDER}` }}>
               <div style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Por combustible</div>
-              <div style={{ fontSize:16, fontWeight:700, color:"#f59e0b", fontFamily:"'Syne',sans-serif" }}>{sel.c}</div>
+              <div style={{ fontSize:16, fontWeight:700, color:"#f59e0b", fontFamily:font }}>{sel.c}</div>
               <div style={{ fontSize:10, color:MUTED }}>protestas por desabastecimiento</div>
             </div>
           )}

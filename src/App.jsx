@@ -17,7 +17,7 @@ import { AMNISTIA_TRACKER } from "./data/amnistia.js";
 // ═══════════════════════════════════════════════════════════════
 // SHARED
 // ═══════════════════════════════════════════════════════════════
-import { BG, BG2, BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "./constants";
+import { BG, BG2, BORDER, TEXT, MUTED, ACCENT, font, fontSans, FONT_DISPLAY } from "./constants";
 import { IS_DEPLOYED, loadScript } from "./utils";
 import { useIsMobile } from "./hooks/useIsMobile";
 import { Badge } from "./components/Badge";
@@ -417,7 +417,7 @@ export default function MonitorPNUD() {
             </svg>
           </div>
           {/* Title - appears after logo finishes building */}
-          <div style={{ fontSize:28, fontWeight:900, fontFamily:"'Playfair Display',serif", color:ACCENT,
+          <div style={{ fontSize:28, fontWeight:900, fontFamily:FONT_DISPLAY, color:ACCENT,
             letterSpacing:"0.02em", opacity:0, animation:"slideDown 0.5s ease 3.2s forwards", textAlign:"center", padding:"0 20px" }}>
             Monitor de Contexto Situacional
           </div>
@@ -462,7 +462,6 @@ export default function MonitorPNUD() {
           svg text { font-size:9px !important; }
         }
       `}</style>
-      <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap" rel="stylesheet" />
 
       {/* TICKER BAR */}
       <NewsTicker />

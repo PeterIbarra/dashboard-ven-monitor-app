@@ -24,7 +24,7 @@ export function OpinionPulseWidget({ onNavigate }) {
         <div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase", marginBottom:8 }}>Brecha de liderazgos</div>
         <div style={{ display:"flex", justifyContent:"space-between", gap:8, fontSize:11, marginBottom:4 }}><span>María Corina Machado</span><b style={{ color:"#2d8a30", whiteSpace:"nowrap" }}>+58 pp</b></div>
         <div style={{ display:"flex", justifyContent:"space-between", gap:8, fontSize:11, marginBottom:8 }}><span>Delcy Rodríguez</span><b style={{ color:"#dc2626", whiteSpace:"nowrap" }}>−52 pp</b></div>
-        <div style={{ background:"#f5f3ff", border:"1px solid #7c3aed22", padding:"6px 8px", marginBottom:9 }}><span style={{ fontSize:9, color:MUTED }}>Brecha neta</span><div style={{ fontSize:22, fontWeight:900, color:"#7c3aed", lineHeight:1.05 }}>110 puntos</div></div>
+        <div style={{ background:"#f5f3ff", border:"1px solid #7c3aed22", padding:"6px 8px", marginBottom:9 }}><span style={{ fontSize:9, color:MUTED }}>Brecha neta</span><div style={{ fontSize:22, fontWeight:900, color:"#7c3aed", fontFamily:font, lineHeight:1.05 }}>110 puntos</div></div>
         <ActionButton onClick={()=>onNavigate("liderazgo")} color="#7c3aed">Ver liderazgos</ActionButton>
       </div>
       <div style={{ padding:"13px 14px", borderRight:mob?"none":`1px solid ${BORDER}`, borderBottom:mob?`1px solid ${BORDER}`:"none" }}>
@@ -35,7 +35,7 @@ export function OpinionPulseWidget({ onNavigate }) {
       </div>
       <div style={{ padding:"13px 14px" }}>
         <div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase", marginBottom:8 }}>Confianza institucional</div>
-        <div style={{ display:"flex", alignItems:"baseline", gap:6 }}><span style={{ fontSize:30, fontWeight:900, color:"#dc2626" }}>94,1%</span><span style={{ fontSize:9, color:MUTED }}>desconfía</span></div>
+        <div style={{ display:"flex", alignItems:"baseline", gap:6 }}><span style={{ fontSize:30, fontWeight:900, color:"#dc2626", fontFamily:font }}>94,1%</span><span style={{ fontSize:9, color:MUTED }}>desconfía</span></div>
         <div style={{ height:7, background:"#e7ebf0", borderRadius:5, overflow:"hidden", margin:"5px 0 7px" }}><div style={{ width:"94.1%", height:"100%", background:"#dc2626" }} /></div>
         <div style={{ fontSize:10, color:TEXT, lineHeight:1.45, marginBottom:9 }}>La credibilidad de la información oficial se encuentra en nivel crítico.</div>
         <ActionButton onClick={()=>onNavigate("instituciones")} color="#dc2626">Ver confianza y ánimo</ActionButton>

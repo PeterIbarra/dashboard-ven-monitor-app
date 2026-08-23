@@ -60,7 +60,7 @@ export function TabMonitor() {
         ].map((c,i) => (
           <Card key={i} accent={typeof c.color==="string"&&c.color.startsWith("#")?c.color:SEM[c.color]}>
             <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:4 }}>{c.label}</div>
-            <div style={{ fontSize:22, fontWeight:800, color:typeof c.color==="string"&&c.color.startsWith("#")?c.color:SEM[c.color], fontFamily:"'Syne',sans-serif" }}>{c.count}</div>
+            <div style={{ fontSize:22, fontWeight:800, color:typeof c.color==="string"&&c.color.startsWith("#")?c.color:SEM[c.color], fontFamily:font }}>{c.count}</div>
             <div style={{ fontSize:12, color:MUTED, marginTop:2 }}>{c.desc}</div>
           </Card>
         ))}
@@ -123,7 +123,7 @@ export function TabMonitor() {
                     <span style={{ fontSize:12, fontFamily:font, color:SEM[sem] }}>{{green:"Verde",yellow:"Amarillo",red:"Rojo"}[sem]}</span>
                   </div>
                   {/* Trend */}
-                  <div style={{ fontSize:16, fontWeight:700, color:trendColorMap[trend], textAlign:"center" }}>
+                  <div style={{ fontSize:16, fontWeight:700, color:trendColorMap[trend], fontFamily:font, textAlign:"center" }}>
                     {trendIconMap[trend]}
                   </div>
                 </div>

@@ -273,7 +273,7 @@ export function TabMatriz() {
             <span style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase" }}>
               Lectura analítica · {wk.label}
             </span>
-            <span style={{ fontSize:14, fontWeight:700, color:domSc.color }}>E{domSc.id}: {domSc.name} · {dom.v}%</span>
+            <span style={{ fontSize:14, fontWeight:700, color:domSc.color, fontFamily:font }}>E{domSc.id}: {domSc.name} · {dom.v}%</span>
           </div>
           <div style={{ fontSize:14, color:"#3d4f5f", lineHeight:1.75, fontStyle:"italic" }}>
             {wk.lectura}

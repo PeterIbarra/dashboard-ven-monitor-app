@@ -101,7 +101,7 @@ export const BrentChart = memo(function BrentChart({ history: rawHistory, foreca
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 2 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-          <span style={{ fontSize: 18, fontWeight: 900, color: "#22c55e", fontFamily: "'Playfair Display',serif" }}>
+          <span style={{ fontSize: 18, fontWeight: 900, color: "#22c55e", fontFamily: font }}>
             ${last.toFixed(2)}
           </span>
           <span style={{ fontSize: 11, fontFamily: font, fontWeight: 600, color: isUp ? "#22c55e" : "#ef4444" }}>

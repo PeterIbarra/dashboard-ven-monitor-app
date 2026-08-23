@@ -79,7 +79,7 @@ export function NewsTicker() {
               <>
                 <span style={{ color:"#a78bfa", fontSize:9, fontWeight:700 }}>📊</span>
                 <span style={{ color:"#e2e8f0" }}>{item.text}</span>
-                <span style={{ color:item.price > 50 ? "#22c55e" : item.price < 20 ? "#ef4444" : "#eab308", fontWeight:700, fontSize:12 }}>{item.price}%</span>
+                <span style={{ color:item.price > 50 ? "#22c55e" : item.price < 20 ? "#ef4444" : "#eab308", fontWeight:700, fontSize:12, fontFamily:font }}>{item.price}%</span>
               </>
             )}
             <span style={{ color:"#334155", margin:"0 8px" }}>·</span>
