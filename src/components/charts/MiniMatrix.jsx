@@ -1,18 +1,14 @@
 import { WEEKS } from "../../data/weekly.js";
 import { SCENARIOS } from "../../data/static.js";
 import { BG, BORDER, MUTED, ACCENT, SC, font } from "../../constants";
-import { getScenarioCoordinates } from "../../utils/scenarioCoordinates.js";
 
 export function MiniMatrix({ weekIdx }) {
   const W=280, H=180, pad=14;
   const cW=W-2*pad, cH=H-2*pad;
-  const trail = WEEKS.slice(0, weekIdx+1).map(w => {
-    const coordinates = getScenarioCoordinates(w.probs);
-    return {
-      px: pad + coordinates.x * cW,
-      py: pad + (1-coordinates.y) * cH,
-    };
-  });
+  const trail = WEEKS.slice(0, weekIdx+1).map(w => ({
+    px: pad + w.xy.x * cW,
+    py: pad + (1-w.xy.y) * cH,
+  }));
   const cur = trail[trail.length-1];
   const dom = WEEKS[weekIdx].probs.reduce((a,b)=>a.v>b.v?a:b);
   const domC = SC[dom.sc];
