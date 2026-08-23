@@ -1,23 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { WEEKS } from "../../data/weekly.js";
 import { SCENARIOS } from "../../data/static.js";
 import { INDICATORS, SCENARIO_SIGNALS } from "../../data/indicators.js";
-import { WEEK_DRIVERS } from "../../data/weekDrivers.js";
+import { WEEK_DRIVERS, WEEK_DRIVERS_BY_WEEK } from "../../data/weekDrivers.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SC, SEM, font, fontSans } from "../../constants";
 import { Card } from "../Card";
 import { SemDot } from "../SemDot";
 import { FullMatrix } from "../charts/FullMatrix";
 import { Sparkline } from "../charts/Sparkline";
 import { TabProspectiva } from "./TabProspectiva";
+import { getScenarioCoordinates } from "../../utils/scenarioCoordinates.js";
 
 const SUBTABS = [
   { id: "escenarios", label: "Escenarios" },
   { id: "prospectivas", label: "Prospectivas" },
 ];
 
-export function TabMatriz({ week, setWeek }) {
+export function TabMatriz() {
   const mob = useIsMobile();
+  const [week, setWeek] = useState(WEEKS.length - 1);
   const [subtab, setSubtab] = useState("escenarios");
   const [sel, setSel] = useState(3);
   const [showTrend, setShowTrend] = useState(false);
@@ -26,10 +28,21 @@ export function TabMatriz({ week, setWeek }) {
   const dom = wk.probs.reduce((a,b)=>a.v>b.v?a:b);
   const domSc = SCENARIOS.find(s=>s.id===dom.sc);
   const isCurrentWeek = week === WEEKS.length - 1;
+  const archivedDrivers = WEEK_DRIVERS_BY_WEEK[wk.short];
+
+  useEffect(()=>{
+    try {
+      const snapshot=buildMatrixBackup();
+      localStorage.setItem(`matrix-backup-${WEEKS[WEEKS.length-1].short}`,JSON.stringify(snapshot));
+      localStorage.setItem("matrix-backup-latest",JSON.stringify(snapshot));
+    } catch (_) { /* El respaldo descargable sigue disponible si localStorage está bloqueado. */ }
+  },[]);
 
   // Para la semana actual usar WEEK_DRIVERS (más detallados)
   // Para semanas anteriores usar los trendDrivers embebidos en WEEKS
-  const selDrivers = isCurrentWeek
+  const selDrivers = archivedDrivers
+    ? (archivedDrivers[sel] || {})
+    : isCurrentWeek
     ? (WEEK_DRIVERS[sel] || {})
     : {
         drivers: sel === (wk.trendSc || dom.sc)
@@ -49,7 +62,7 @@ export function TabMatriz({ week, setWeek }) {
     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
       {/* ── SUBTAB NAV ── */}
-      <div style={{ display:"flex", gap:6, borderBottom:`1px solid ${BORDER}`, paddingBottom:0 }}>
+      <div style={{ display:"flex", gap:6, borderBottom:`1px solid ${BORDER}`, paddingBottom:0, alignItems:"center", flexWrap:"wrap" }}>
         {SUBTABS.map(st => (
           <button key={st.id} onClick={() => setSubtab(st.id)} style={{
             fontFamily: font, fontSize:12, fontWeight: subtab===st.id ? 700 : 400,
@@ -58,11 +71,33 @@ export function TabMatriz({ week, setWeek }) {
             padding:"6px 14px 8px", cursor:"pointer", transition:"all 0.15s",
           }}>{st.label}</button>
         ))}
+        <div style={{marginLeft:"auto",display:"flex",gap:5,paddingBottom:5}}>
+          <button onClick={()=>downloadBackup("json")} title="Descargar todas las semanas, probabilidades, coordenadas, semáforos y lecturas" style={backupButton}>↓ Respaldo JSON</button>
+          <button onClick={()=>downloadBackup("csv")} title="Descargar serie histórica de probabilidades" style={backupButton}>↓ Serie CSV</button>
+        </div>
       </div>
 
       {subtab === "prospectivas" && <TabProspectiva />}
 
       {subtab === "escenarios" && <>
+
+      {/* ── WEEK NAVIGATOR ── */}
+      <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap", padding:"8px 10px", background:BG2, border:`1px solid ${BORDER}` }}>
+        <span style={{ fontFamily:font, fontSize:9, color:MUTED, letterSpacing:"0.1em", marginRight:3 }}>SEMANA DE ANÁLISIS</span>
+        <button disabled={week===0} onClick={()=>setWeek(Math.max(0,week-1))} style={{...weekNavButton,opacity:week===0 ? .4 : 1,cursor:week===0?"default":"pointer"}}>
+          ← Anterior
+        </button>
+        <select value={week} onChange={event=>setWeek(Number(event.target.value))} aria-label="Semana de la matriz" style={{ border:`1px solid ${ACCENT}`, background:"#fff", color:ACCENT, padding:"6px 9px", fontFamily:font, fontSize:10, fontWeight:700, minWidth:mob?"150px":"210px", cursor:"pointer" }}>
+          {WEEKS.map((item,index)=><option key={item.short} value={index}>{item.short} · {item.label}</option>)}
+        </select>
+        <button disabled={week===WEEKS.length-1} onClick={()=>setWeek(Math.min(WEEKS.length-1,week+1))} style={{...weekNavButton,opacity:week===WEEKS.length-1 ? .4 : 1,cursor:week===WEEKS.length-1?"default":"pointer"}}>
+          Siguiente →
+        </button>
+        {week!==WEEKS.length-1 && <button onClick={()=>setWeek(WEEKS.length-1)} style={{...weekNavButton,color:ACCENT,borderColor:ACCENT,marginLeft:mob?0:"auto"}}>Última semana</button>}
+        <span style={{ marginLeft:week===WEEKS.length-1&&!mob?"auto":0, fontFamily:font, fontSize:9, color:isCurrentWeek?"#16a34a":MUTED }}>
+          {isCurrentWeek ? "● CORTE ACTUAL" : "○ ARCHIVO HISTÓRICO"}
+        </span>
+      </div>
 
       {/* ── ROW 1: Matrix + Sidebar ── */}
       <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 320px", gap:14 }}>
@@ -249,3 +284,38 @@ export function TabMatriz({ week, setWeek }) {
     </div>
   );
 }
+
+const backupButton={border:`1px solid ${BORDER}`,background:"#fff",color:ACCENT,padding:"5px 8px",fontSize:9,fontFamily:font,cursor:"pointer",borderRadius:3};
+const weekNavButton={border:`1px solid ${BORDER}`,background:"#fff",color:MUTED,padding:"6px 9px",fontSize:9,fontFamily:font,borderRadius:2};
+
+function buildMatrixBackup(){
+  return {
+    schemaVersion:1,
+    generatedAt:new Date().toISOString(),
+    latestWeek:WEEKS[WEEKS.length-1]?.short,
+    scenarios:SCENARIOS.map(({id,name,short,color})=>({id,name,short,color})),
+    weeks:WEEKS.map(w=>({
+      short:w.short,label:w.label,probabilities:w.probs,coordinates:getScenarioCoordinates(w.probs),semaphore:w.sem,
+      tensions:w.tensiones||[],analysis:w.lectura||"",trendScenario:w.trendSc||null,
+      trendDrivers:w.trendDrivers||[],detailedDrivers:WEEK_DRIVERS_BY_WEEK[w.short]||null,
+    })),
+  };
+}
+
+function downloadBackup(format){
+  const backup=buildMatrixBackup();
+  const latest=backup.latestWeek||"actual";
+  if(format==="csv"){
+    const header=["semana","periodo","E1","E2","E3","E4","x","y","verde","amarillo","rojo"];
+    const rows=backup.weeks.map(w=>{
+      const values=Object.fromEntries(w.probabilities.map(p=>[`E${p.sc}`,p.v]));
+      return [w.short,w.label,values.E1,values.E2,values.E3,values.E4,w.coordinates?.x,w.coordinates?.y,w.semaphore?.g,w.semaphore?.y,w.semaphore?.r];
+    });
+    saveFile(`matriz-escenarios-${latest}.csv`,[header,...rows].map(row=>row.map(csvCell).join(",")).join("\n"),"text/csv;charset=utf-8");
+    return;
+  }
+  saveFile(`matriz-escenarios-${latest}.json`,JSON.stringify(backup,null,2),"application/json");
+}
+
+function csvCell(value){const text=String(value??"");return /[",\n]/.test(text)?`"${text.replace(/"/g,'""')}"`:text;}
+function saveFile(name,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);}
