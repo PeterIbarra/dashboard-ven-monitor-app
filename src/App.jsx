@@ -114,7 +114,14 @@ export default function MonitorPNUD() {
   const [sismosSection, setSismosSection] = useState("principal");
   const [macroSection, setMacroSection] = useState("cambio");
   const [week, setWeek] = useState(WEEKS.length - 1);
+  const [splashElapsed, setSplashElapsed] = useState(false);
   const mob = useIsMobile();
+
+  // Keep the branded opening visible long enough to complete its full sequence.
+  useEffect(() => {
+    const timer = window.setTimeout(() => setSplashElapsed(true), 4000);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   // ── Shared live data (fetched once, available to all tabs including AI) ──
   const [liveData, setLiveData] = useState({ dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, cohesion:null, ioda:null, fetched:false });
@@ -348,19 +355,18 @@ export default function MonitorPNUD() {
   return (
     <AuthGate>
     <div style={{ fontFamily:fontSans, background:BG, minHeight:"100vh", color:TEXT, overflowX:"hidden" }}>
-      {/* Loading splash — shown until liveData finishes first fetch */}
-      {!liveData.fetched && (
+      {/* Loading splash — completes its sequence and also waits for the first data fetch */}
+      {(!liveData.fetched || !splashElapsed) && (
         <div style={{ position:"fixed", inset:0, zIndex:99999, background:BG, display:"flex", flexDirection:"column",
           alignItems:"center", justifyContent:"center", gap:0 }}>
           {/* Animated pixel art PNUD logo — builds itself piece by piece */}
           <div style={{ marginBottom:20, position:"relative" }}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 44" width="72" height="100" shapeRendering="crispEdges">
               <style>{`
-                .px { opacity:0; animation: pxIn 0.15s ease forwards; }
-                .gl { animation: glowPx 2s ease-in-out infinite alternate; }
+                .px { opacity:0; animation: pxIn 0.15s ease forwards; transform-box:fill-box; transform-origin:center; }
+                .gl { animation: pxIn 0.15s ease forwards, glowPx 2s ease-in-out 1.7s infinite alternate; }
                 @keyframes pxIn { from { opacity:0; transform:scale(0); } to { opacity:1; transform:scale(1); } }
-                @keyframes glowPx { 0% { filter:brightness(1); } 100% { filter:brightness(1.3); } }
-                @keyframes globeSpin { 0% { transform:translateX(0); } 50% { transform:translateX(2px); } 100% { transform:translateX(0); } }
+                @keyframes glowPx { 0% { filter:brightness(1); } 100% { filter:brightness(1.25); } }
               `}</style>
               {/* Blue background - fades in first */}
               <rect width="32" height="22" fill={ACCENT} className="px" style={{animationDelay:"0s"}} />
@@ -416,23 +422,23 @@ export default function MonitorPNUD() {
               ))}
             </svg>
           </div>
-          {/* Title - appears after logo finishes building */}
+          {/* Title appears after the logo has completed its construction. */}
           <div style={{ fontSize:28, fontWeight:900, fontFamily:FONT_DISPLAY, color:ACCENT,
-            letterSpacing:"0.02em", opacity:0, animation:"slideDown 0.5s ease 3.2s forwards", textAlign:"center", padding:"0 20px" }}>
+            letterSpacing:"0.02em", opacity:0, animation:"slideDown 0.5s ease 3.15s forwards", textAlign:"center", padding:"0 20px" }}>
             Monitor de Contexto Situacional
           </div>
           <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.2em", textTransform:"uppercase",
-            marginTop:4, opacity:0, animation:"slideDown 0.5s ease 3.4s forwards", textAlign:"center" }}>
+            marginTop:4, opacity:0, animation:"fadeIn 0.4s ease 3.3s forwards", textAlign:"center" }}>
             Venezuela 2026
           </div>
           {/* Progress bar */}
           <div style={{ width:200, height:3, background:`${BORDER}30`, borderRadius:2, marginTop:20, overflow:"hidden",
-            opacity:0, animation:"fadeIn 0.3s ease 3.5s forwards" }}>
+            opacity:0, animation:"fadeIn 0.35s ease 3.4s forwards" }}>
             <div style={{ width:"100%", height:"100%", background:`linear-gradient(90deg, transparent, ${ACCENT}, transparent)`,
               animation:"shimmer 1.2s ease infinite" }} />
           </div>
           <div style={{ marginTop:10, fontSize:10, fontFamily:font, color:MUTED, opacity:0,
-            animation:"fadeIn 0.3s ease 3.6s forwards" }}>
+            animation:"fadeIn 0.35s ease 3.5s forwards" }}>
             <span style={{ animation:"pulse 1.5s infinite" }}>Cargando datos en vivo...</span>
           </div>
         </div>
