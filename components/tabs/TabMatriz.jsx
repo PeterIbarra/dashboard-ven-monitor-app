@@ -1,0 +1,321 @@
+import { useEffect, useState } from "react";
+import { useIsMobile } from "../../hooks/useIsMobile";
+import { WEEKS } from "../../data/weekly.js";
+import { SCENARIOS } from "../../data/static.js";
+import { INDICATORS, SCENARIO_SIGNALS } from "../../data/indicators.js";
+import { WEEK_DRIVERS, WEEK_DRIVERS_BY_WEEK } from "../../data/weekDrivers.js";
+import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SC, SEM, font, fontSans } from "../../constants";
+import { Card } from "../Card";
+import { SemDot } from "../SemDot";
+import { FullMatrix } from "../charts/FullMatrix";
+import { Sparkline } from "../charts/Sparkline";
+import { TabProspectiva } from "./TabProspectiva";
+import { getScenarioCoordinates } from "../../utils/scenarioCoordinates.js";
+
+const SUBTABS = [
+  { id: "escenarios", label: "Escenarios" },
+  { id: "prospectivas", label: "Prospectivas" },
+];
+
+export function TabMatriz() {
+  const mob = useIsMobile();
+  const [week, setWeek] = useState(WEEKS.length - 1);
+  const [subtab, setSubtab] = useState("escenarios");
+  const [sel, setSel] = useState(3);
+  const [showTrend, setShowTrend] = useState(false);
+  const wk = WEEKS[week];
+  const prevWk = week > 0 ? WEEKS[week-1] : null;
+  const dom = wk.probs.reduce((a,b)=>a.v>b.v?a:b);
+  const domSc = SCENARIOS.find(s=>s.id===dom.sc);
+  const isCurrentWeek = week === WEEKS.length - 1;
+  const archivedDrivers = WEEK_DRIVERS_BY_WEEK[wk.short];
+
+  useEffect(()=>{
+    try {
+      const snapshot=buildMatrixBackup();
+      localStorage.setItem(`matrix-backup-${WEEKS[WEEKS.length-1].short}`,JSON.stringify(snapshot));
+      localStorage.setItem("matrix-backup-latest",JSON.stringify(snapshot));
+    } catch (_) { /* El respaldo descargable sigue disponible si localStorage está bloqueado. */ }
+  },[]);
+
+  // Para la semana actual usar WEEK_DRIVERS (más detallados)
+  // Para semanas anteriores usar los trendDrivers embebidos en WEEKS
+  const selDrivers = archivedDrivers
+    ? (archivedDrivers[sel] || {})
+    : isCurrentWeek
+    ? (WEEK_DRIVERS[sel] || {})
+    : {
+        drivers: sel === (wk.trendSc || dom.sc)
+          ? (wk.trendDrivers || [])
+          : [],
+        signals: [],
+        _isArchive: true,
+      };
+
+  const trendSc = SCENARIOS.find(s=>s.id===(wk.trendSc||dom.sc));
+  const trendDriversList = wk.trendDrivers || [];
+  const isSameTrend = (wk.trendSc||dom.sc) === dom.sc;
+  const trendIconMap = { up:"↑", down:"↓", flat:"→" };
+  const trendColorMap = { up:"#22c55e", down:"#ef4444", flat:MUTED };
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+
+      {/* ── SUBTAB NAV ── */}
+      <div style={{ display:"flex", gap:6, borderBottom:`1px solid ${BORDER}`, paddingBottom:0, alignItems:"center", flexWrap:"wrap" }}>
+        {SUBTABS.map(st => (
+          <button key={st.id} onClick={() => setSubtab(st.id)} style={{
+            fontFamily: font, fontSize:12, fontWeight: subtab===st.id ? 700 : 400,
+            color: subtab===st.id ? ACCENT : MUTED,
+            background:"transparent", border:"none", borderBottom: subtab===st.id ? `3px solid ${ACCENT}` : "3px solid transparent",
+            padding:"6px 14px 8px", cursor:"pointer", transition:"all 0.15s",
+          }}>{st.label}</button>
+        ))}
+        <div style={{marginLeft:"auto",display:"flex",gap:5,paddingBottom:5}}>
+          <button onClick={()=>downloadBackup("json")} title="Descargar todas las semanas, probabilidades, coordenadas, semáforos y lecturas" style={backupButton}>↓ Respaldo JSON</button>
+          <button onClick={()=>downloadBackup("csv")} title="Descargar serie histórica de probabilidades" style={backupButton}>↓ Serie CSV</button>
+        </div>
+      </div>
+
+      {subtab === "prospectivas" && <TabProspectiva />}
+
+      {subtab === "escenarios" && <>
+
+      {/* ── WEEK NAVIGATOR ── */}
+      <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap", padding:"8px 10px", background:BG2, border:`1px solid ${BORDER}` }}>
+        <span style={{ fontFamily:font, fontSize:9, color:MUTED, letterSpacing:"0.1em", marginRight:3 }}>SEMANA DE ANÁLISIS</span>
+        <button disabled={week===0} onClick={()=>setWeek(Math.max(0,week-1))} style={{...weekNavButton,opacity:week===0 ? .4 : 1,cursor:week===0?"default":"pointer"}}>
+          ← Anterior
+        </button>
+        <select value={week} onChange={event=>setWeek(Number(event.target.value))} aria-label="Semana de la matriz" style={{ border:`1px solid ${ACCENT}`, background:"#fff", color:ACCENT, padding:"6px 9px", fontFamily:font, fontSize:10, fontWeight:700, minWidth:mob?"150px":"210px", cursor:"pointer" }}>
+          {WEEKS.map((item,index)=><option key={item.short} value={index}>{item.short} · {item.label}</option>)}
+        </select>
+        <button disabled={week===WEEKS.length-1} onClick={()=>setWeek(Math.min(WEEKS.length-1,week+1))} style={{...weekNavButton,opacity:week===WEEKS.length-1 ? .4 : 1,cursor:week===WEEKS.length-1?"default":"pointer"}}>
+          Siguiente →
+        </button>
+        {week!==WEEKS.length-1 && <button onClick={()=>setWeek(WEEKS.length-1)} style={{...weekNavButton,color:ACCENT,borderColor:ACCENT,marginLeft:mob?0:"auto"}}>Última semana</button>}
+        <span style={{ marginLeft:week===WEEKS.length-1&&!mob?"auto":0, fontFamily:font, fontSize:9, color:isCurrentWeek?"#16a34a":MUTED }}>
+          {isCurrentWeek ? "● CORTE ACTUAL" : "○ ARCHIVO HISTÓRICO"}
+        </span>
+      </div>
+
+      {/* ── ROW 1: Matrix + Sidebar ── */}
+      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 320px", gap:14 }}>
+
+        {/* Matrix SVG */}
+        <div>
+          <div style={{ border:`1px solid ${BORDER}`, position:"relative" }}>
+            <FullMatrix weekIdx={week} onClickWeek={setWeek} onArrowClick={() => setShowTrend(!showTrend)} />
+          </div>
+
+          {/* ── TREND PANEL (appears when arrow is clicked) ── */}
+          {showTrend && (
+            <div style={{ marginTop:8, background:`linear-gradient(135deg, ${trendSc.color}0a, transparent)`,
+              border:`1px solid ${trendSc.color}25`, padding:"14px 18px", position:"relative" }}>
+              <button onClick={() => setShowTrend(false)}
+                style={{ position:"absolute", top:8, right:12, background:"transparent", border:"none",
+                  color:MUTED, cursor:"pointer", fontSize:16, fontFamily:font }}>×</button>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+                <span style={{ fontSize:16 }}>{isSameTrend ? "→" : "↑"}</span>
+                <div>
+                  <div style={{ fontSize:12, fontFamily:font, color:trendSc.color, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:700 }}>
+                    {isSameTrend ? "CONSOLIDANDO" : "PRESIÓN HACIA TRANSICIÓN"}
+                  </div>
+                  <div style={{ fontSize:12, fontWeight:700, color:TEXT }}>
+                    E{trendSc.id}: {trendSc.name}
+                  </div>
+                </div>
+                <span style={{ marginLeft:"auto", fontSize:14, fontFamily:font, color:trendSc.color, fontWeight:700 }}>
+                  {wk.probs.find(p=>p.sc===trendSc.id)?.v}%
+                </span>
+              </div>
+              <div style={{ fontSize:12, fontFamily:font, color:trendSc.color, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>
+                Factores que empujan en esta dirección
+              </div>
+              {trendDriversList.map((d,i) => (
+                <div key={i} style={{ display:"flex", gap:8, marginBottom:5, fontSize:13, color:"#3d4f5f", lineHeight:1.6 }}>
+                  <span style={{ color:trendSc.color, flexShrink:0 }}>›</span>{d}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Probability bars below matrix */}
+          <div style={{ marginTop:12, display:"flex", flexDirection:"column", gap:6 }}>
+            {wk.probs.map(p => {
+              const sc = SCENARIOS.find(s=>s.id===p.sc);
+              const delta = p.reportedDelta ?? (prevWk ? p.v - (prevWk.probs.find(pp=>pp.sc===p.sc)?.v||0) : null);
+              return (
+                <div key={p.sc} style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", padding:"3px 0" }} onClick={()=>setSel(p.sc)}>
+                  <span style={{ fontSize:13, fontFamily:font, color:sc.color, width:22, fontWeight:sel===p.sc?700:400 }}>E{sc.id}</span>
+                  <div style={{ flex:1, height:6, background:BORDER, borderRadius:2 }}>
+                    <div style={{ height:6, background:sc.color, width:`${p.v}%`, borderRadius:2, transition:"width 0.4s", opacity:sel===p.sc?1:0.6 }} />
+                  </div>
+                  <span style={{ fontSize:14, fontFamily:font, color:sc.color, width:32, textAlign:"right", fontWeight:700 }}>{p.v}%</span>
+                  {delta !== null && delta !== 0 && (
+                    <span style={{ fontSize:12, fontFamily:font, color:delta>0?"#22c55e":"#ef4444", width:32 }}>
+                      {delta>0?"+":""}{delta}pp
+                    </span>
+                  )}
+                  <span style={{ fontSize:12, color:trendColorMap[p.t] }}>{trendIconMap[p.t]}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Sidebar: Scenario cards + detail */}
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {SCENARIOS.map(sc => {
+            const p = wk.probs.find(p=>p.sc===sc.id);
+            const isActive = sel === sc.id;
+            return (
+              <div key={sc.id} onClick={()=>setSel(sc.id)}
+                style={{ background:isActive?`${sc.color}08`:BG2, border:`1px solid ${isActive?sc.color:BORDER}`, borderLeft:`3px solid ${sc.color}`,
+                  padding:"10px 14px", cursor:"pointer", transition:"all 0.2s" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:3 }}>
+                  <span style={{ fontSize:12, fontFamily:font, color:sc.color, letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:700 }}>
+                    E{sc.id} {p.sc===dom.sc?"· DOMINANTE":""}
+                  </span>
+                  <span style={{ fontSize:15, fontFamily:font, fontWeight:700, color:sc.color }}>{p.v}%</span>
+                </div>
+                <div style={{ fontSize:14, fontWeight:600, color:isActive?TEXT:`${TEXT}90`, lineHeight:1.3 }}>{sc.name}</div>
+              </div>
+            );
+          })}
+
+          {/* Detail panel for selected scenario */}
+          <div style={{ background:BG3, border:`1px solid ${BORDER}`, padding:"14px 16px", flex:1 }}>
+            <div style={{ fontSize:12, fontFamily:"'Syne',sans-serif", fontWeight:700, color:SC[sel], letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:8, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
+              E{sel} — {SCENARIOS.find(s=>s.id===sel)?.name}
+            </div>
+
+            {/* Modo archivo — aviso + trendDrivers del escenario dominante */}
+            {selDrivers._isArchive && (
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, background:`${MUTED}10`, border:`1px solid ${BORDER}`, borderRadius:4, padding:"6px 10px", marginBottom:10, lineHeight:1.5 }}>
+                📁 Semana archivada · {wk.label} — mostrando drivers del escenario dominante (E{wk.trendSc || dom.sc})
+              </div>
+            )}
+
+            {selDrivers.drivers && selDrivers.drivers.length > 0 && (
+              <>
+                <div style={{ fontSize:10, fontFamily:font, color:SC[sel], letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
+                  Drivers estructurales
+                </div>
+                {selDrivers.drivers.map((d,i) => (
+                  <div key={i} style={{ display:"flex", gap:6, marginBottom:4, fontSize:13, color:"#3d4f5f", lineHeight:1.5 }}>
+                    <span style={{ color:`${SC[sel]}80`, flexShrink:0 }}>›</span>{d}
+                  </div>
+                ))}
+              </>
+            )}
+
+            {/* Modo archivo sin datos del escenario seleccionado */}
+            {selDrivers._isArchive && selDrivers.drivers.length === 0 && (
+              <div style={{ fontSize:12, color:MUTED, fontFamily:font, lineHeight:1.6, marginTop:8 }}>
+                Los drivers detallados de E{sel} para esta semana están disponibles en la <strong>Lectura analítica</strong> ↓
+              </div>
+            )}
+
+            {selDrivers.signals && selDrivers.signals.length > 0 && (
+              <>
+                <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginTop:10, marginBottom:6 }}>
+                  Señales de activación
+                </div>
+                {selDrivers.signals.map((s,i) => (
+                  <div key={i} style={{ display:"flex", gap:6, marginBottom:4, fontSize:13, color:"#6b7280", lineHeight:1.5 }}>
+                    <span style={{ color:`${MUTED}80`, flexShrink:0 }}>›</span>{s}
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── ROW 2: Weekly evolution chart ── */}
+      <div style={{ border:`1px solid ${BORDER}`, padding:"14px 16px" }}>
+        <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:12 }}>
+          Evolución de probabilidades por semana
+        </div>
+        <div style={{ display:"flex", gap:3, alignItems:"flex-end", height:90 }}>
+          {WEEKS.map((w,i) => (
+            <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", cursor:"pointer" }}
+              onClick={() => setWeek && setWeek(i)}>
+              {/* Stacked bars */}
+              <div style={{ display:"flex", flexDirection:"column", gap:1, width:"85%", alignItems:"center" }}>
+                {w.probs.slice().sort((a,b)=>b.v-a.v).map(p => (
+                  <div key={p.sc} style={{ width:"100%", height:Math.max(2, p.v*0.7), background:SC[p.sc], borderRadius:1,
+                    opacity:i===week?1:0.4, transition:"opacity 0.2s" }} />
+                ))}
+              </div>
+              {/* Label */}
+              <span style={{ fontSize:10, fontFamily:font, color:i===week?ACCENT:MUTED, marginTop:6, fontWeight:i===week?700:400 }}>
+                {w.short}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div style={{ display:"flex", gap:14, marginTop:10, justifyContent:"center" }}>
+          {SCENARIOS.map(sc => (
+            <div key={sc.id} style={{ display:"flex", alignItems:"center", gap:5, fontSize:12, color:MUTED }}>
+              <span style={{ width:8, height:8, background:sc.color, borderRadius:1, flexShrink:0 }} />
+              E{sc.id}: {sc.short}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── ROW 3: Lectura analítica ── */}
+      {wk.lectura && (
+        <div style={{ background:`linear-gradient(135deg, ${domSc.color}06, transparent)`, border:`1px solid ${domSc.color}15`, padding:"16px 20px" }}>
+          <div style={{ display:"flex", alignItems:"baseline", gap:12, marginBottom:10 }}>
+            <span style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase" }}>
+              Lectura analítica · {wk.label}
+            </span>
+            <span style={{ fontSize:14, fontWeight:700, color:domSc.color }}>E{domSc.id}: {domSc.name} · {dom.v}%</span>
+          </div>
+          <div style={{ fontSize:14, color:"#3d4f5f", lineHeight:1.75, fontStyle:"italic" }}>
+            {wk.lectura}
+          </div>
+        </div>
+      )}
+      </>}
+    </div>
+  );
+}
+
+const backupButton={border:`1px solid ${BORDER}`,background:"#fff",color:ACCENT,padding:"5px 8px",fontSize:9,fontFamily:font,cursor:"pointer",borderRadius:3};
+const weekNavButton={border:`1px solid ${BORDER}`,background:"#fff",color:MUTED,padding:"6px 9px",fontSize:9,fontFamily:font,borderRadius:2};
+
+function buildMatrixBackup(){
+  return {
+    schemaVersion:1,
+    generatedAt:new Date().toISOString(),
+    latestWeek:WEEKS[WEEKS.length-1]?.short,
+    scenarios:SCENARIOS.map(({id,name,short,color})=>({id,name,short,color})),
+    weeks:WEEKS.map(w=>({
+      short:w.short,label:w.label,probabilities:w.probs,coordinates:getScenarioCoordinates(w.probs),semaphore:w.sem,
+      tensions:w.tensiones||[],analysis:w.lectura||"",trendScenario:w.trendSc||null,
+      trendDrivers:w.trendDrivers||[],detailedDrivers:WEEK_DRIVERS_BY_WEEK[w.short]||null,
+    })),
+  };
+}
+
+function downloadBackup(format){
+  const backup=buildMatrixBackup();
+  const latest=backup.latestWeek||"actual";
+  if(format==="csv"){
+    const header=["semana","periodo","E1","E2","E3","E4","x","y","verde","amarillo","rojo"];
+    const rows=backup.weeks.map(w=>{
+      const values=Object.fromEntries(w.probabilities.map(p=>[`E${p.sc}`,p.v]));
+      return [w.short,w.label,values.E1,values.E2,values.E3,values.E4,w.coordinates?.x,w.coordinates?.y,w.semaphore?.g,w.semaphore?.y,w.semaphore?.r];
+    });
+    saveFile(`matriz-escenarios-${latest}.csv`,[header,...rows].map(row=>row.map(csvCell).join(",")).join("\n"),"text/csv;charset=utf-8");
+    return;
+  }
+  saveFile(`matriz-escenarios-${latest}.json`,JSON.stringify(backup,null,2),"application/json");
+}
+
+function csvCell(value){const text=String(value??"");return /[",\n]/.test(text)?`"${text.replace(/"/g,'""')}"`:text;}
+function saveFile(name,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);}
