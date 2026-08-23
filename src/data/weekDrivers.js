@@ -48,3 +48,9 @@ export const WEEK_DRIVERS = {
     "signals": ["Uso del Decreto 7.066", "Tratamiento de las protestas", "Fricción en la cúpula militar", "Escalada represiva", "Autonomía del aparato coercitivo"]
   }
 };
+
+// Archivo acumulativo de drivers detallados. Al incorporar una semana nueva,
+// agregar una nueva clave y conservar todas las anteriores.
+export const WEEK_DRIVERS_BY_WEEK = {
+  S32: WEEK_DRIVERS,
+};
