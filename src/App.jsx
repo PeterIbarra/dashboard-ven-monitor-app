@@ -17,7 +17,7 @@ import { AMNISTIA_TRACKER } from "./data/amnistia.js";
 // ═══════════════════════════════════════════════════════════════
 // SHARED
 // ═══════════════════════════════════════════════════════════════
-import { BG, BG2, BORDER, TEXT, MUTED, ACCENT, font, fontSans, FONT_DISPLAY } from "./constants";
+import { BG, BG2, BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "./constants";
 import { IS_DEPLOYED, loadScript } from "./utils";
 import { useIsMobile } from "./hooks/useIsMobile";
 import { Badge } from "./components/Badge";
@@ -422,23 +422,23 @@ export default function MonitorPNUD() {
               ))}
             </svg>
           </div>
-          {/* Title appears after the logo has completed its construction. */}
-          <div style={{ fontSize:28, fontWeight:900, fontFamily:FONT_DISPLAY, color:ACCENT,
-            letterSpacing:"0.02em", opacity:0, animation:"slideDown 0.5s ease 3.15s forwards", textAlign:"center", padding:"0 20px" }}>
+          {/* All splash elements enter with the logo; the pixel construction continues behind them. */}
+          <div style={{ fontSize:28, fontWeight:800, fontFamily:fontSans, color:ACCENT,
+            letterSpacing:"-0.01em", opacity:0, animation:"slideDown 0.5s ease .08s forwards", textAlign:"center", padding:"0 20px" }}>
             Monitor de Contexto Situacional
           </div>
-          <div style={{ fontSize:11, fontFamily:font, color:MUTED, letterSpacing:"0.2em", textTransform:"uppercase",
-            marginTop:4, opacity:0, animation:"fadeIn 0.4s ease 3.3s forwards", textAlign:"center" }}>
+          <div style={{ fontSize:11, fontFamily:fontSans, fontWeight:600, color:MUTED, letterSpacing:"0.16em", textTransform:"uppercase",
+            marginTop:4, opacity:0, animation:"fadeIn 0.4s ease .14s forwards", textAlign:"center" }}>
             Venezuela 2026
           </div>
           {/* Progress bar */}
           <div style={{ width:200, height:3, background:`${BORDER}30`, borderRadius:2, marginTop:20, overflow:"hidden",
-            opacity:0, animation:"fadeIn 0.35s ease 3.4s forwards" }}>
+            opacity:0, animation:"fadeIn 0.35s ease .18s forwards" }}>
             <div style={{ width:"100%", height:"100%", background:`linear-gradient(90deg, transparent, ${ACCENT}, transparent)`,
               animation:"shimmer 1.2s ease infinite" }} />
           </div>
-          <div style={{ marginTop:10, fontSize:10, fontFamily:font, color:MUTED, opacity:0,
-            animation:"fadeIn 0.35s ease 3.5s forwards" }}>
+          <div style={{ marginTop:10, fontSize:10, fontFamily:fontSans, fontWeight:500, color:MUTED, opacity:0,
+            animation:"fadeIn 0.35s ease .22s forwards" }}>
             <span style={{ animation:"pulse 1.5s infinite" }}>Cargando datos en vivo...</span>
           </div>
         </div>
