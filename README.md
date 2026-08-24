@@ -1,587 +1,496 @@
 # Monitor de Contexto Situacional — Venezuela 2026
 
-**PNUD Venezuela · Programa de las Naciones Unidas para el Desarrollo · Análisis Estratégico**
+**PNUD Venezuela · Análisis Estratégico · Uso institucional**
 
-Dashboard de inteligencia situacional para el monitoreo del proceso de estabilización venezolano post-3 de enero de 2026. Integra un marco de cuatro escenarios con probabilidades semanales, índice de inestabilidad compuesto (19 factores), índice de cohesión gubernamental con IA, asistente analítico conversacional con function calling, análisis prospectivo por sesiones, tracker de amnistía política, conflictividad social, conectividad e inferencia eléctrica vía IODA, mercados energéticos y condiciones macroeconómicas.
+Plataforma de análisis situacional para el monitoreo del proceso de estabilización venezolano posterior al 3 de enero de 2026, bajo el liderazgo interino de Delcy Rodríguez (juramentada como presidenta encargada por el TSJ). Integra información editorial semanal, escenarios prospectivos, indicadores en vivo y series históricas para apoyar la lectura estratégica y la toma de decisiones.
 
-**Live**: [dashboard-ven-monitor-app.vercel.app](https://dashboard-ven-monitor-app.vercel.app/)
+**Último corte editorial:** S32 · 14–21 de agosto de 2026
+**Cobertura:** S1–S32 · enero–agosto de 2026
+**Producción:** [dashboard-ven-monitor-app.vercel.app](https://dashboard-ven-monitor-app.vercel.app/)
 
----
-
-## Marco Analítico
-
-El dashboard opera sobre un **marco de cuatro escenarios** con probabilidades asignadas semanalmente mediante un proceso human-in-the-loop:
-
-| Escenario | Código | Descripción |
-|-----------|--------|-------------|
-| Transición política pacífica | E1 | Apertura democrática progresiva con calendario electoral |
-| Colapso y fragmentación | E2 | Desintegración institucional, crisis económica terminal |
-| Continuidad negociada | E3 | Estabilización bajo el esquema energético-diplomático actual |
-| Resistencia coercitiva | E4 | Control discrecional con fachada de apertura |
-
-**Workflow editorial**: Recolección de inteligencia humana → Estructuración asistida con IA (Claude) → Diálogo analítico conjunto → Asignación de probabilidades. La IA asiste pero no decide.
+> El dashboard combina fuentes con frecuencias y alcances distintos. Las probabilidades, inferencias y resultados asistidos por IA no sustituyen la validación analítica humana.
 
 ---
 
-## Arquitectura
+## Capacidades
 
-```
-dashboard-ven-monitor-app/
-│
-├── src/
-│   ├── App.jsx                   # Orquestador principal + liveData state
-│   ├── constants.js              # Tokens de diseño (BG2, BG3, BORDER, TEXT, MUTED,
-│   │                             #   ACCENT, SC, SEM, font, fontSans)
-│   ├── utils.js                  # IS_DEPLOYED, CORS, GDELT fetcher, PDF export
-│   │
-│   ├── hooks/
-│   │   └── useIsMobile.js
-│   │
-│   ├── data/                     # 20 archivos — datos editoriales + configuración
-│   │   ├── weekly.js             # WEEKS (S1–S15), KPIS_LATEST, TENSIONS,
-│   │   │                         #   MONITOR_WEEKS, ICG_HISTORY, CONF_SEMANAL
-│   │   ├── indicators.js         # INDICATORS (38 indicadores) + SCENARIO_SIGNALS
-│   │   ├── sitrep.js             # SITREP_ALL (S1–S15), CURATED_NEWS,
-│   │   │                         #   CURATED_FACTCHECK
-│   │   ├── weekDrivers.js        # WEEK_DRIVERS: drivers y señales semana actual
-│   │   ├── prospectiva.js        # PROSPECTIVA_SESSIONS, PROSPECTIVA_ESCENARIOS,
-│   │   │                         #   COMPARATIVE_TABLE, CONSIDERACIONES_FINALES
-│   │   ├── conflictividad.js     # CONF_HISTORICO (2011–2025), CONF_MESES,
-│   │   │                         #   CONF_DERECHOS, CONF_SERVICIOS, CONF_ESTADOS
-│   │   ├── confMensual2026.js    # CONF_MENSUAL_2026, VZ_STATE_COORDS
-│   │   ├── amnistia.js           # AMNISTIA_TRACKER (S1–S15)
-│   │   ├── macroSeries.js        # MACRO_SERIES, MACRO_SERIES_META, MACRO_GROUPS
-│   │   ├── redes.js              # REDES_DATA + REDES_TOTALS
-│   │   ├── tensions.js           # TENSIONS (semaforizadas semana actual)
-│   │   ├── kpis.js               # KPIS_LATEST snapshot
-│   │   ├── static.js             # SCENARIOS, GDELT_ANNOTATIONS, POLYMARKET_SLUGS,
-│   │   │                         #   CONF_HISTORICO legacy, VEN_PRODUCTION_MANUAL,
-│   │   │                         #   VZ_MAP
-│   │   ├── scenarios.js          # Definición de escenarios (id, name, color)
-│   │   ├── tabs.js               # Configuración de 10 tabs
-│   │   └── index.js              # Re-exports
-│   │
-│   └── components/
-│       ├── tabs/
-│       │   ├── TabDashboard.jsx  # Alertas, índice inestabilidad, bilateral, KPIs
-│       │   ├── TabSitrep.jsx     # SITREP, Daily Brief IA, exportación PDF
-│       │   ├── TabMatriz.jsx     # Subtabs: Escenarios | Prospectivas
-│       │   ├── TabProspectiva.jsx# Proximidad escenarios + historial sesiones
-│       │   ├── TabMonitor.jsx    # 38 indicadores + señales + noticias + factcheck
-│       │   ├── TabClimaSocial.jsx# ICG + Redes: Cohesión | Redes | Análisis | Metodología
-│       │   ├── TabCohesion.jsx   # Sub-componente ICG dentro de ClimaS
-│       │   ├── TabGdelt.jsx      # GDELT medios
-│       │   ├── TabConflictividad.jsx # OVCS + ACLED + mapas
-│       │   ├── TabIODA.jsx       # Dual index: conectividad + electricidad
-│       │   ├── TabMercados.jsx   # Petróleo + Polymarket
-│       │   └── TabMacro.jsx      # BCV + paralelo + World Bank + IMF
-│       ├── charts/               # Visualizaciones (Sparkline, FullMatrix,
-│       │                         #   ConflictividadChart, RedesChart, etc.)
-│       ├── ChatBot.jsx           # Asistente con function calling
-│       ├── AuthGate.jsx          # Clerk auth: OTP + contraseña
-│       ├── NewsTicker.jsx        # Barra noticias + Polymarket scroll
-│       └── *.jsx                 # Widgets y componentes compartidos
-│
-├── api/                          # Vercel Serverless Functions (12/12 Hobby)
-│   ├── ai/index.js               # Modo A: tool calling (Groq+Mistral)
-│   │                             # Modo B: inyección clásica (cascada completa)
-│   ├── bilateral/index.js        # PizzINT bilateral threat index USA↔VEN
-│   ├── gdelt/index.js            # GDELT DOC API v2 + Google News RSS
-│   ├── ioda/index.js             # IODA API v2 (Georgia Tech)
-│   ├── oil-prices/index.js       # EIA histórico + STEO forecast + OilPriceAPI
-│   ├── news/index.js             # RSS aggregator + motor cohesión gubernamental
-│   ├── articles/index.js         # Artículos + alertas desde Supabase
-│   ├── polymarket/index.js       # Polymarket Gamma API (11 contratos Venezuela)
-│   ├── socioeconomic/index.js    # World Bank + IMF WEO + UNHCR/R4V + Supabase
-│   ├── dolar/index.js            # BCV + paralelo (DolarAPI)
-│   ├── acled/index.js            # ACLED CAST
-│   └── cron/index.js             # Orquestador: ?task= routing
-│
-├── lib/cron/                     # Módulos cron (fuera de api/ — no consumen slots)
-│   ├── config.js                 # Feeds RSS, tags, cascada IA
-│   ├── utils.js                  # classify(), parseRSS(), upsertToSupabase()
-│   ├── ai.js                     # callAICascade() genérico
-│   └── tasks/
-│       ├── fetchRates.js         # Task 1: DolarAPI → Supabase rates
-│       ├── fetchRSS.js           # Task 2: 60+ feeds → artículos
-│       ├── dailyReadings.js      # Task 3: GDELT + EIA + bilateral → snapshot
-│       ├── icgAnalysis.js        # Task 4: ICG con IA (13 actores)
-│       ├── newsAlerts.js         # Task 5: headlines + IA → alertas
-│       └── dailyBrief.js         # Task 6: email diario 11:00 UTC (cron-job.org)
-│
-├── vercel.json                   # Rewrites, CORS, cron 6:00 UTC,
-│                                 #   maxDuration: ai=60s, ioda=45s
-└── package.json                  # React 18 + Vite 5
+- Síntesis semanal con alertas, tensiones, KPI e índice compuesto de inestabilidad.
+- Matriz de cuatro escenarios con probabilidades, trayectoria y explicación metodológica.
+- SITREP semanal y briefing asistido por IA, con envío diario por correo (Daily Brief).
+- Asistente conversacional con IA que consulta datos reales del dashboard mediante *tool calling* (historial semanal, señales, SITREP, conflictividad, KPIs, indicadores, prospectiva, amnistía y datos en vivo).
+- Monitoreo institucional mediante Gacetas Oficiales (cambios, designaciones, actividad diaria).
+- Conflictividad social semanal, mensual, semestral e histórica (OVCS, ACLED).
+- Energía, conectividad e inferencias de interrupción eléctrica mediante IODA.
+- Índice de tensión bilateral EE. UU.–Venezuela (PizzINT), integrado en alertas y cohesión gubernamental.
+- Tipo de cambio, inflación, indicadores socioeconómicos e intervención cambiaria.
+- Opinión pública, liderazgos, encuestas y percepción posterior al terremoto.
+- Cohesión gubernamental, clima social y conversación digital.
+- Medios internacionales, petróleo, mercados y producción energética.
+- Monitoreo sísmico, evolución de la emergencia, daños territoriales y reportes de campo.
+- Precipitación, anomalías, incendios y vigilancia ambiental por estado.
+- Autenticación institucional (Clerk) con gestión de perfil de usuario.
+- Exportación de visualizaciones, respaldos JSON/CSV y traducción mediante Google Translate.
+
+---
+
+## Navegación
+
+| # | Módulo | Contenido principal |
+|---:|---|---|
+| 1 | **Dashboard** | Síntesis, escenarios, alertas, inestabilidad, protestas, opinión, macro y sismos |
+| 2 | **SITREP** | Informe semanal, puntos clave y briefing asistido por IA |
+| 3 | **Matriz** | Trayectoria, probabilidades, composición, metodología y sub-tab Prospectiva |
+| 4 | **Monitor** | Indicadores, señales E1–E4, noticias y verificación |
+| 5 | **Gacetas** | Cambios institucionales, designaciones, organismos y actividad diaria |
+| 6 | **Conflictividad** | OVCS, ACLED, series 2026, semestre, estados y mapas Leaflet |
+| 7 | **Energía y Red** | Electricidad, conectividad, IODA, BGP y alertas territoriales |
+| 8 | **Macro VEN** | Tipo de cambio, socioeconómico, indicadores e intervención cambiaria |
+| 9 | **Opinión Pública** | Liderazgos, confianza, encuestas y percepción post-sismo |
+| 10 | **Clima Social** | Cohesión gubernamental (sub-tab Cohesión), polarización, convivencia y redes |
+| 11 | **Medios** | Cobertura internacional, volumen y tono mediático |
+| 12 | **Mercados** | Petróleo, producción, precios, estimaciones y mercados predictivos |
+| 13 | **Sismos** | Eventos, evolución, daños, infraestructura y evidencia territorial |
+| 14 | **Ambiental** | Lluvia, anomalías, pronósticos, incendios y seguimiento por estado |
+
+Dos módulos adicionales viven como sub-tabs dentro de otros (no aparecen en la barra principal): **Cohesión** (dentro de Clima Social) y **Prospectiva** (dentro de Matriz).
+
+El asistente conversacional (ChatBot) y el control de sesión (Clerk) están disponibles de forma persistente sobre los 14 módulos, no como un tab independiente.
+
+---
+
+## Ejecución local
+
+Requisitos: Node.js 18 o superior y npm.
+
+```bash
+npm install
+npm run dev
 ```
 
-### Decisiones de arquitectura
+Vite mostrará la dirección local, normalmente:
 
-**12 slots serverless ocupados**: Vercel Hobby tiene límite duro de 12 funciones. Todas están en uso. Nuevas funcionalidades se fusionan en endpoints existentes vía `?task=` o `?source=` parameters.
-
-**Cron modular**: El cron nativo de Vercel (`0 6 * * *`) ejecuta las Tasks 1–5. La Task 6 (Daily Brief email) se ejecuta a las 11:00 UTC vía cron-job.org (el timeout de 30s del cliente no afecta — Vercel continúa ejecutando). `maxDuration` = 60s para `/api/ai`, 45s para `/api/ioda`.
-
-**Datos editoriales en código**: Todos los datasets viven en `src/data/`. El protocolo SITREP edita solo estos archivos — nunca toca componentes ni App.jsx.
-
-**Human-in-the-loop deliberado**: La IA clasifica noticias y calcula cohesión. Las probabilidades de escenario, lectura estratégica e indicadores son asignados por analistas humanos.
-
-**liveData centralizado**: App.jsx gestiona un único objeto `liveData` con todo el estado live: `{ dolar, oil, gdeltSummary, news, bilateral, cohesion, ioda, fetched }`. Todos los tabs lo reciben como prop.
-
----
-
-## Autenticación (Clerk)
-
-Pantalla de login con fondo animado (gradiente + anillos pulsantes PNUD). Dos métodos:
-- **OTP**: código de 6 dígitos por correo en cada sesión
-- **Contraseña**: acceso directo con clave permanente
-
-Sesión recordada 30 días. La sección de contraseña del perfil de Clerk está oculta por CSS custom para simplificar la interfaz. El badge "Secured by Clerk" también está oculto.
-
----
-
-## Tabs del Dashboard
-
-| # | Tab | Componente | Descripción |
-|---|-----|-----------|-------------|
-| 1 | **Dashboard** | TabDashboard | 10 triggers de alerta, índice inestabilidad (19 factores), bilateral USA↔VEN, tracker amnistía, KPIs, semáforo, tensiones, botón "Explicar IA" |
-| 2 | **SITREP** | TabSitrep | Informe semanal (S1–S15), Daily Brief con IA, vista Informe / Briefing, exportación PDF |
-| 3 | **Matriz** | TabMatriz | Subtab Escenarios: matriz 2×2 + trayectoria + drivers. Subtab Prospectivas: proximidad + sesiones + comparativo |
-| 4 | **Monitor** | TabMonitor | 38 indicadores semafóricos, secciones: Indicadores / Señales E1–E4 / Noticias / Verificación |
-| 5 | **Clima Social** | TabClimaSocial | Secciones: Cohesión GOB (ICG) / Redes / Análisis / Metodología |
-| 6 | **Medios** | TabGdelt | GDELT: volumen, tono mediático, índice inestabilidad — 120 días |
-| 7 | **Conflictividad** | TabConflictividad | OVCS anual 2011–2025, semanal 2026, ACLED: por derecho, servicio, estado, represión |
-| 8 | **Conectividad** | TabIODA | Dual index: conectividad + electricidad por estado, alertas, BGP, mapa interactivo |
-| 9 | **Mercados** | TabMercados | Brent/WTI/Merey, producción VEN dual-source, Polymarket 11 contratos |
-| 10 | **Macro VEN** | TabMacro | BCV vs paralelo + brecha, serie histórica, KPIs macro, World Bank + IMF + UNHCR/R4V |
-
----
-
-## Alertas en Vivo — 10 Triggers
-
-El sistema de alertas en `TabDashboard` calcula triggers en tiempo real combinando datos live y datos editoriales:
-
-| Trigger | 🔴 Crítico | 🟡 Seguimiento | Fuente |
-|---------|-----------|----------------|--------|
-| Brecha cambiaria | >55% | >45% / >40% | /api/dolar |
-| Dólar paralelo | >700 Bs | >600 Bs | /api/dolar |
-| Brent | <$60 o >$95 | <$65 o >$85 | OilPriceAPI / EIA |
-| WTI | <$55 o >$90 | <$60 o >$80 | OilPriceAPI / EIA |
-| Bilateral USA↔VEN | >2.0σ | >1.0σ | /api/bilateral (PizzINT) |
-| Protestas semanales | >50/sem | >35/sem | CONF_SEMANAL |
-| Cobertura territorial | >18 estados | >12 estados | CONF_SEMANAL |
-| Aceleración protestas | >100% vs anterior | >50% vs anterior | CONF_SEMANAL |
-| Internet 🌐 | avg nacional <70% | avg <85% o peor estado <50% | /api/ioda (IODA) |
-| Electricidad ⚡ | caídas >40% con BGP estable | caídas 20–40% | /api/ioda (IODA) |
-
-Las alertas de electricidad distinguen entre cortes eléctricos (BGP estable) y cortes deliberados de conectividad (BGP también cae). Cada alerta eléctrica genera además una fila individual por estado afectado.
-
----
-
-## Índice de Inestabilidad Compuesto (19 factores)
-
-Score 0–100. Los pesos se descuentan entre sí — los estabilizadores E1 y E3 restan del total:
-
-| # | Factor | Peso | Fuente | Frecuencia |
-|---|--------|------|--------|------------|
-| 1 | Indicadores en rojo | 9% | INDICATORS | Semanal |
-| 2 | E2 Colapso (prob.) | 7% | WEEKS | Semanal |
-| 3 | E4 Resistencia (prob.) | 6% | WEEKS | Semanal |
-| 4 | Brecha cambiaria | 9% | /api/dolar | ~5 min |
-| 5 | Tensiones rojas | 5% | WEEKS | Semanal |
-| 6 | Señales E4+E2 activas | 5% | SCENARIO_SIGNALS | Semanal |
-| 7 | Brent presión | 4% | /api/oil-prices | ~5 min |
-| 8 | Bilateral Threat Index | 4% | /api/bilateral | Diario |
-| 9 | Cohesión GOB (invertida) | 4% | ICG vía Supabase | Diario |
-| 10 | Protestas semanal | 5% | CONF_SEMANAL | Semanal |
-| 11 | Cobertura territorial | 4% | CONF_SEMANAL | Semanal |
-| 12 | Tendencia mensual vs 2025 | 3% | CONF_SEMANAL + CONF_MESES | Semanal |
-| 13 | Represión | 3% | CONF_SEMANAL | Semanal |
-| 14 | Brecha amnistía (gov vs FP) | 3% | AMNISTIA_TRACKER | Semanal |
-| 15 | Presos políticos | 3% | AMNISTIA_TRACKER | Semanal |
-| 16 | Polarización alta (Redes X) | 5% | REDES_TOTALS | Por período |
-| 17 | Convivencia baja (Redes X) | 4% | REDES_TOTALS | Por período |
-| 18 | E1 Transición (estabilizador) | **-6%** | WEEKS | Semanal |
-| 19 | E3 Continuidad (estabilizador) | **-3%** | WEEKS | Semanal |
-
-Zonas: 0–25 Estabilidad · 26–50 Tensión moderada · 51–75 Inestabilidad alta · 76–100 Crisis inminente
-
-El botón **"🤖 Explicar IA"** genera un análisis narrativo de 2 párrafos en tiempo real usando la cascada de IA con todos los 19 factores como contexto.
-
----
-
-## Tab Matriz — Subtabs
-
-### Escenarios
-Matriz 2×2 (eje X: cambio político / eje Y: violencia). Muestra la posición de Venezuela semana a semana con línea de trayectoria. Panel lateral con probabilidades, semáforo de drivers, tendencia de escenario y lectura analítica de la semana seleccionada.
-
-### Prospectivas
-Conecta los datos vivos con el marco de análisis prospectivo (sesiones anuales/semestrales):
-
-- **Proximidad a escenarios**: 4 cards calculadas desde `SCENARIO_SIGNALS` — señales activas / total, badge Dominante/Latente, implicaciones PNUD y líneas de acción expandibles
-- **Historial de sesiones**: línea de tiempo que crece con cada nueva sesión en `prospectiva.js`
-- **Análisis comparativo**: tabla sesión anterior vs sesión actual (actualización automática)
-- **Consideraciones finales**: hallazgos de la sesión más reciente
-
-Mantenimiento: señales se actualizan cada SITREP (sin trabajo adicional). Contenido estático solo se toca al cerrar cada nueva sesión prospectiva.
-
----
-
-## Tab Conectividad (IODA) — Dual Index
-
-El tab implementa **dos índices independientes** por estado:
-
-**Índice 1 — Conectividad**: Health score 0–100 basado en sondeo activo (`ping-slash24`), pérdida de paquetes y latencia. Detecta degradación de red, cortes parciales o totales.
-
-**Índice 2 — Electricidad**: Detecta caídas abruptas en el telescopio pasivo de red nacional (`merit-nt`), correlacionadas con estabilidad BGP. Lógica: si los dispositivos finales dejan de responder pero las rutas BGP se mantienen, el patrón es consistente con corte eléctrico (los routers tienen UPS, los dispositivos de usuario no).
-
-Etiquetado honesto: "Posible interrupción eléctrica" con niveles de confianza (baja/media) según si el telescopio confirma o no. No se usa "corte" como hecho sino como hipótesis.
-
-Señales procesadas: `ping-slash24` (sondeo activo), `merit-nt` (telescopio pasivo, excluido si baseline <10), `bgp` (rutas Border Gateway Protocol).
-
-Picker de tiempo unificado para ambos índices. Mapa interactivo Venezuela (Leaflet vía CDN) con puntos de color por estado. Tabla de ranking con score de outage IODA nativo (endpoints `/outages/alerts`, `/outages/events`, `/outages/summary`).
-
----
-
-## Asistente IA (ChatBot)
-
-Panel flotante accesible desde cualquier tab (💬 esquina inferior derecha). Soporta pantalla completa (⊞). Botón "limpiar" en el header.
-
-### Function Calling
-
+```text
+http://127.0.0.1:5173/
 ```
+
+Para validar la versión de producción:
+
+```bash
+npm run build
+npm run preview
+```
+
+No abrir `index.html` directamente mediante `file://`: los módulos, rutas y solicitudes del dashboard requieren un servidor local.
+
+---
+
+## Marco analítico
+
+El sistema utiliza cuatro escenarios mutuamente comparables. Sus probabilidades semanales suman 100 %.
+
+| Código | Escenario | Lectura |
+|---|---|---|
+| E1 | Transición política pacífica | Apertura institucional y cambio político sin violencia dominante |
+| E2 | Colapso y fragmentación | Cambio desordenado, ruptura institucional y mayor riesgo de violencia |
+| E3 | Continuidad negociada | Estabilización transaccional sin transformación estructural suficiente |
+| E4 | Resistencia coercitiva | Continuidad con mayor coerción, cierre institucional o violencia |
+
+### Metodología de la Matriz
+
+La Matriz separa dos preguntas:
+
+- **Probabilidad:** cuán plausible es cada escenario durante el horizonte analizado.
+- **Ubicación:** dónde se sitúa la semana según cambio estructural y violencia/coerción.
+
+Por eso, el escenario dominante no determina por sí solo la posición del punto. Desde S32, cada escenario incorpora una composición cuantitativa auditable basada en:
+
+1. evidencia estructural;
+2. señales y acontecimientos semanales;
+3. consistencia de la trayectoria;
+4. juicio analítico validado por el equipo.
+
+El selector interno de la Matriz es independiente del selector general del Dashboard. La sección desplegable explica la composición de E1–E4, el método de ubicación y la lectura de la semana seleccionada. La serie puede respaldarse mediante JSON y CSV.
+
+### Índice de inestabilidad (19 factores)
+
+El índice compuesto se expresa en una escala de 0 a 100 (`TabDashboard.jsx`). Los factores de presión suman puntos; los dos estabilizadores (E1 y E3) restan:
+
+| # | Factor | Peso | Fuente |
+|---:|---|---:|---|
+| 1 | Indicadores en rojo | 9 % | `INDICATORS` |
+| 2 | E2 Colapso y fragmentación (prob.) | 7 % | `WEEKS` |
+| 3 | E4 Resistencia coercitiva (prob.) | 6 % | `WEEKS` |
+| 4 | Brecha cambiaria | 9 % | `/api/dolar` |
+| 5 | Tensiones rojas | 5 % | `WEEKS` |
+| 6 | Señales activas E4+E2 | 5 % | `SCENARIO_SIGNALS` |
+| 7 | Presión del Brent | 4 % | `/api/oil-prices` |
+| 8 | Índice bilateral (PizzINT) | 4 % | `/api/bilateral` |
+| 9 | Cohesión gubernamental (invertida) | 4 % | ICG en vivo |
+| 10 | Protestas semanales | 5 % | `CONF_SEMANAL` |
+| 11 | Cobertura territorial de protestas | 4 % | `CONF_SEMANAL` |
+| 12 | Tendencia mensual vs. 2025 | 3 % | `CONF_SEMANAL` + `CONF_MESES` |
+| 13 | Represión | 3 % | `CONF_SEMANAL` |
+| 14 | Brecha de amnistía (gobierno vs. Foro Penal) | 3 % | `AMNISTIA_TRACKER` |
+| 15 | Presos políticos | 3 % | `AMNISTIA_TRACKER` |
+| 16 | Polarización alta en redes (X) | 5 % | `REDES_TOTALS` |
+| 17 | Convivencia baja en redes — invertida (X) | 4 % | `REDES_TOTALS` |
+| 18 | E1 Transición pacífica (prob.) | **−6 %** (estabilizador) | `WEEKS` |
+| 19 | E3 Continuidad negociada (prob.) | **−3 %** (estabilizador) | `WEEKS` |
+
+| Rango | Lectura |
+|---:|---|
+| 0–25 | Estabilidad |
+| 26–50 | Tensión moderada |
+| 51–75 | Inestabilidad alta |
+| 76–100 | Crisis inminente |
+
+El botón "Explicar con IA" del panel genera, bajo demanda, un análisis narrativo de 2 párrafos citando los factores concretos que más influyen esa semana. El valor es una herramienta de síntesis, no un pronóstico determinista.
+
+---
+
+## Alertas en vivo
+
+`TabDashboard.jsx` calcula 10 disparadores de alerta combinando datos en vivo y datos editoriales, cada uno con dos niveles (seguimiento / crítico):
+
+| Alerta | 🟡 Seguimiento | 🔴 Crítico | Fuente |
+|---|---|---|---|
+| Brecha cambiaria | >40–45 % | >55 % | `/api/dolar` |
+| Dólar paralelo | >600 Bs | >700 Bs | `/api/dolar` |
+| Brent | <$65 o >$85 | <$60 o >$95 | OilPriceAPI / EIA |
+| WTI | <$60 o >$80 | <$55 o >$90 | OilPriceAPI / EIA |
+| Índice bilateral EE. UU.–Venezuela | >1.0σ | >2.0σ | `/api/bilateral` (PizzINT) |
+| Protestas semanales | >35/semana | >50/semana | `CONF_SEMANAL` |
+| Cobertura territorial | >12 estados | >18 estados | `CONF_SEMANAL` |
+| Aceleración de protestas | >50 % vs. semana anterior | >100 % vs. semana anterior | `CONF_SEMANAL` |
+| Conectividad (Internet) | degradación en un estado | promedio nacional <70 % | `/api/ioda` |
+| Electricidad | fluctuaciones o interrupciones puntuales | caídas >40 % con BGP estable en varios estados | `/api/ioda` |
+
+Las alertas de electricidad distinguen cortes eléctricos (rutas BGP estables, dispositivos de usuario sin respuesta) de cortes de conectividad deliberados (BGP también cae) — ver Conectividad e inferencia eléctrica (IODA) más abajo.
+
+---
+
+## Asistente de IA (ChatBot)
+
+El dashboard incluye un asistente conversacional persistente (`src/components/ChatBot.jsx`) que responde preguntas analíticas citando datos reales del sistema, no desde memoria del modelo.
+
+**Modo herramientas (tool calling):** el asistente tiene acceso a 10 funciones que consultan directamente los datos editoriales y en vivo del dashboard — historial semanal S1–S32 con probabilidades exactas, señales por escenario, SITREP de una semana puntual, conflictividad histórica y mensual, tensiones activas, KPIs recientes, indicadores por dimensión, sesiones prospectivas, tracker de amnistía y datos en vivo (BCV, paralelo, brecha, Brent, WTI). El modelo debe invocar estas herramientas antes de responder sobre cualquier dato del dashboard.
+
+**Proveedores del modo herramientas:** Groq (`llama-3.3-70b-versatile`) → Mistral (`mistral-small-latest`).
+
+**Cascada de respaldo (sin herramientas, inyección de contexto):** si ningún proveedor con *tool calling* responde, el sistema reintenta con Gemini (`gemini-1.5-flash` / `gemini-2.0-flash`) → OpenRouter (`llama-3.1-8b-instruct:free`) → HuggingFace (`Qwen2.5-72B-Instruct`) → Anthropic (Claude).
+
+Flujo del modo herramientas:
+
+```text
 Usuario → /api/ai (use_tools: true, messages: [...])
               ↓
-    Groq llama-3.3-70b o Mistral small-latest
-    con 10 herramientas definidas
+    Groq llama-3.3-70b o Mistral small-latest, con las 10 herramientas
               ↓
-    { tool_calls: ["get_conflictividad", "get_signals"] }  ← paralelo
+    Modelo devuelve qué herramientas necesita (puede pedir varias en paralelo)
               ↓
-    Frontend ejecuta localmente (datos ya cargados en memoria)
+    El frontend las resuelve localmente (los datos ya están en memoria, sin nueva llamada a red)
               ↓
-    /api/ai con tool results → respuesta final con badges 🔧
+    Resultados de vuelta a /api/ai → respuesta final, con indicador de qué se consultó
 ```
 
-Máximo 3 rondas. Si Groq y Mistral fallan → fallback automático a inyección clásica con cascada completa.
+Máximo 3 rondas de herramientas por conversación. `/api/ai` responde en uno de tres formatos: `{ tool_calls, assistant_message }` (el modelo pidió herramientas), `{ text }` (respuesta directa) o una señal de que ningún proveedor con *tool calling* respondió, momento en el que el frontend reintenta con la cascada de respaldo.
 
-### 10 Herramientas
-
-| Herramienta | Datos |
-|-------------|-------|
-| `get_weekly_history` | Probabilidades S1–S15, lecturas analíticas, semáforos |
-| `get_signals` | Señales activas por escenario (sem, val, isNew) |
-| `get_sitrep` | SITREP completo de semana específica o última |
-| `get_conflictividad` | Histórico anual, mensual 2026, por derecho/servicio/estado |
-| `get_tensions` | Tensiones activas semaforizadas semana actual |
-| `get_kpis` | KPIs por dimensión |
-| `get_indicators` | 38 indicadores semafóricos por dimensión |
-| `get_prospectiva` | Sesiones, dominante/latente, implicaciones PNUD |
-| `get_amnistia` | Cifras gobierno vs Foro Penal S1–S15 |
-| `get_live_data` | BCV, paralelo, brecha, Brent, WTI |
-
-Las respuestas muestran badges 🔧 indicando qué herramientas consultó el modelo. El markdown se renderiza correctamente: tablas HTML, negritas, listas, headings — sin `**` ni `##` visibles en pantalla.
-
----
-
-## Endpoint `/api/ai` — Dos Modos
-
-### Modo A — Tool calling (ChatBot)
-```json
-POST /api/ai
-{ "messages": [...], "use_tools": true, "max_tokens": 2500 }
-```
-Respuestas posibles:
-- `{ "tool_calls": [...], "assistant_message": {...}, "provider": "groq/llama-3.3-70b" }`
-- `{ "text": "...", "provider": "..." }`
-- `{ "fallback": true }` → frontend activa inyección clásica
-
-### Modo B — Inyección clásica (ICG, Daily Brief, SITREP IA, fallback ChatBot)
-```json
-POST /api/ai
-{ "prompt": "texto con contexto completo", "max_tokens": 2000 }
-```
-Cascada: Groq → Mistral → Gemini (1.5-flash / 2.0-flash) → OpenRouter → HuggingFace → Claude
-
----
-
-## Cascada IA
-
-| # | Proveedor | Modelo | Tool calling | Uso |
-|---|-----------|--------|-------------|-----|
-| 1 | **Groq** | llama-3.3-70b-versatile | ✅ | ChatBot Modo A, ICG |
-| 2 | **Mistral** | mistral-small-latest | ✅ | ChatBot Modo A, alertas |
-| 3 | Gemini | gemini-1.5-flash / 2.0-flash | ❌ | Fallback inyección |
-| 4 | OpenRouter | llama-3.1-8b-instruct:free | ❌ | Fallback inyección |
-| 5 | HuggingFace | Qwen2.5-72B (+ Mistral-7B fallback) | ❌ | Fallback inyección |
-| 6 | Claude | claude-sonnet-4-20250514 | ❌ | Premium / último recurso |
+Este es un subsistema de IA distinto al que usa el cron diario (ver siguiente sección): el ChatBot vive en `api/ai/index.js` y opera bajo demanda del usuario; el cron usa `lib/cron/ai.js` para tareas de clasificación y síntesis programadas.
 
 ---
 
 ## Índice de Cohesión de Gobierno (ICG)
 
-Mide la alineación interna de la élite gobernante (0–100). Calculado diariamente por el cron.
+Mide la alineación interna de la élite gobernante en una escala de 0 a 100, sobre 13 actores: 8 individuales (Delcy Rodríguez, Jorge Rodríguez, Diosdado Cabello, FANB, Vladimir Padrino López, Jorge Arreaza, Nicolás Maduro Guerra, Asamblea Nacional) y 5 sistémicos (PSUV, Chavismo, Colectivos, Gobernadores chavistas, Sector militar amplio). El sistema tiene **dos motores separados**, no uno:
 
-**13 actores**:
-- Individuales: Delcy Rodríguez, Jorge Rodríguez, Diosdado Cabello, FANB, Vladimir Padrino López, Jorge Arreaza, Nicolás Maduro Guerra, Asamblea Nacional
-- Sistémicos: PSUV, Chavismo, Colectivos, Gobernadores chavistas, Sector militar amplio
-
-**Pipeline**: Fetch artículos 24h → Ordenar fuentes oficialistas primero (VTV, MINCI, RNV, Correo del Orinoco = indicadores primarios de cohesión) → Prompt IA → ALINEADO / NEUTRO / TENSIÓN → Scoring → Supabase
-
-**Pesos del ICG**:
+**Motor en vivo** (`api/news/index.js?source=cohesion`, el que alimenta el tab Clima Social → Cohesión): combina clasificación de artículos por IA con GDELT, Polymarket y — cuando hay un corte editorial disponible — una validación manual del SITREP:
 
 | Componente | Con SITREP | Sin SITREP |
-|------------|-----------|-----------|
-| Alineación IA (13 actores) | 25% | 35% |
-| Validación SITREP (manual) | 30% | — |
-| Divergencia tono GDELT | 10% | 15% |
-| Cohesión sistémica | 10% | 15% |
-| Señal Polymarket | 10% | 10% |
-| Silencio mediático | 5% | 10% |
+|---|---:|---:|
+| Alineación IA (13 actores) | 25 % | 35 % |
+| Validación SITREP | 30 % | — |
+| Divergencia de tono GDELT | 10 % | 15 % |
+| Silencio mediático | 5 % | 10 % |
+| Cohesión sistémica | 10 % | 15 % |
+| Señal Polymarket | 10 % | 10 % |
 
-**Reglas críticas (en código, no solo en prompt)**:
-- Actor reemplazado → nunca ALINEADO — post-procesamiento obligatorio
-- Sin noticias / silencio → NEUTRO, no ALINEADO
-- El frontend NUNCA escribe scores ICG a Supabase — solo el cron es fuente autoritativa
+**Motor del cron diario** (`lib/cron/tasks/icgAnalysis.js`, el que persiste el histórico en Supabase): es más simple — promedio ponderado de la alineación de cada actor (ALINEADO=90, NEUTRO=50, TENSIÓN=15) usando como peso la confianza que la IA le asignó a esa clasificación, sin componentes de GDELT, Polymarket o SITREP. Ambos motores comparten el mismo prompt base y las mismas reglas de clasificación, pero producen el score por caminos distintos — si los números no coinciden exactamente entre el tab en vivo y el histórico persistido, esta es la razón.
 
----
+Reglas de clasificación (aplicadas en código, no solo sugeridas al modelo):
 
-## Daily Brief (Email Diario)
-
-Task 6 del cron, ejecutada a las **11:00 UTC (7:00 AM VET)** vía cron-job.org. Lee de Supabase los artículos de las últimas 24h, los datos del daily_reading más reciente y genera un email de resumen analítico con la cascada IA.
-
-Estrategia de parsing JSON (3 capas): limpieza agresiva → extracción regex por campos → texto raw como fallback.
-
-Proveedor de email: Resend, modo sandbox (SendGrid descartado — créditos de prueba agotados). Sin dominio propio verificado, Resend solo entrega al correo dueño de la API key; Peter reenvía manualmente al resto del equipo.
+- Un actor reemplazado de su cargo nunca puede quedar como ALINEADO, aunque el reemplazo se presente como "transición ordenada".
+- Ausencia de noticias sobre un actor se clasifica como NEUTRO, nunca como ALINEADO — la ausencia de críticas no es evidencia de alineación.
+- Solo el cron escribe el score histórico en Supabase; el frontend nunca lo hace directamente.
 
 ---
 
-## Actualización Semanal (Protocolo SITREP)
+## Tipos de datos
 
-### Proceso editorial
+| Tipo | Ejemplos | Frecuencia |
+|---|---|---|
+| Editorial | SITREP, probabilidades, drivers, tensiones y puntos clave | Semanal |
+| API | Tipo de cambio, petróleo, GDELT, IODA, ACLED, Polymarket y bilateral | En vivo o según proveedor |
+| Documental | OVCS, encuestas, intervención, sismos y balances institucionales | Según publicación |
+| Calculado | Inestabilidad, brechas, agregaciones, tendencias e inferencias | Al cargar o actualizar datos |
+| Persistido | Artículos, tasas, lecturas diarias, alertas, Daily Brief, gacetas e infraestructura sísmica | Cron y Supabase |
 
-1. **Recolección** (lunes–jueves): inteligencia de fuentes abiertas, RSS, GDELT, ACLED, mercados, señales del dashboard
-2. **Estructuración con IA** (jueves–viernes): sesión con Claude para estructurar hallazgos y asignar probabilidades preliminares
-3. **Edición de datos** (viernes): solo se editan archivos en `src/data/`
-4. **Deploy** (viernes): `git push` → Vercel build → dashboard actualizado en 1–2 min
+Los datos mostrados como "en vivo" pueden conservar el último valor disponible si una fuente externa no responde. Las inferencias de electricidad o conectividad deben leerse como señales técnicas, no como confirmaciones oficiales.
 
-### Archivos que se editan cada SITREP
+---
 
-| Archivo | Qué actualizar |
-|---------|---------------|
-| `weekly.js` → WEEKS | Nueva semana: probs E1–E4, xy, semáforo g/y/r, KPIs por dimensión, tensiones, lectura analítica, trendSc, trendDrivers |
-| `weekly.js` → KPIS_LATEST | Snapshot KPIs semana actual |
-| `weekly.js` → TENSIONS | Tensiones activas semaforizadas |
-| `weekly.js` → ICG_HISTORY | Score ICG (0–100, `sitrep:true`) |
-| `weekly.js` → CONF_SEMANAL | Protestas, estados, reprimidas, hecho de la semana |
-| `sitrep.js` → SITREP_ALL | Informe completo: dims, keyPoints, sintesis |
-| `sitrep.js` → CURATED_NEWS | Noticias curadas de la semana |
-| `indicators.js` → INDICATORS | Nueva entrada `hist[]` en cada indicador |
-| `indicators.js` → SCENARIO_SIGNALS | Actualizar sem, val; `vigpierde:true` cuando pierde relevancia |
-| `weekDrivers.js` → WEEK_DRIVERS | Drivers y señales por escenario |
-| `amnistia.js` → AMNISTIA_TRACKER | Cifras gobierno + Foro Penal + hito |
+## Actualización semanal
 
-**Regla**: Tanto `CURATED_NEWS` como `SITREP_ALL` deben actualizarse en cada ciclo. Señales que pierden relevancia se marcan `vigpierde:true`, no se eliminan.
+### Flujo editorial
 
-### Archivos que se editan por sesión prospectiva (no semanal)
+1. Revisar el Análisis de Contexto Situacional y la Matriz de Escenarios.
+2. Extraer acontecimientos, puntos clave, tensiones, indicadores y señales.
+3. Crear la nueva semana y asignar probabilidades E1–E4.
+4. Validar la composición de los escenarios y sus coordenadas.
+5. Actualizar SITREP, drivers y datos temáticos afectados.
+6. Ejecutar `npm run build`.
+7. Revisar localmente el Dashboard, SITREP, Matriz y los tabs modificados.
+8. Descargar el respaldo JSON/CSV de la Matriz cuando corresponda.
+9. Subir los cambios a GitHub y verificar el despliegue en Vercel.
 
-| Archivo | Qué actualizar |
-|---------|---------------|
-| `prospectiva.js` → PROSPECTIVA_SESSIONS | Nueva sesión: label, date, escDominante, escLatente, nota |
-| `prospectiva.js` → COMPARATIVE_TABLE | Nueva columna de comparación |
-| `prospectiva.js` → CONSIDERACIONES_FINALES | Hallazgos de la nueva sesión |
-| `prospectiva.js` → PROSPECTIVA_ESCENARIOS | Implicaciones PNUD y lineasAccion si cambian |
+El protocolo detallado archivo por archivo (estructura exacta de cada objeto, validaciones y errores frecuentes) se mantiene como documentación interna del equipo editorial y no forma parte de este repositorio.
 
-### Flujo de distribución
+### Archivos editoriales principales
 
+| Archivo | Responsabilidad |
+|---|---|
+| `src/data/weekly.js` | Semanas, probabilidades, tensiones, KPI, ICG y conflictividad semanal |
+| `src/data/weeks.js` | Barrel de `WEEKS` consumido junto con `weekly.js` |
+| `src/data/sitrep.js` | Informe semanal, síntesis, puntos clave y `CURATED_FACTCHECK` |
+| `src/data/indicators.js` | 38 indicadores por dimensión y `SCENARIO_SIGNALS` (autoritativo) |
+| `src/data/signals.js` | Barrel secundario de señales — debe mantenerse sincronizado con `indicators.js` |
+| `src/data/weekDrivers.js` | Drivers y señales de activación por escenario |
+| `src/data/static.js` | `GDELT_ANNOTATIONS` que consumen `TabGdelt` y `GdeltChart` (duplica `gdeltAnnotations.js`) |
+| `src/data/amnistia.js` | Seguimiento de amnistía, liberaciones y brechas de verificación |
+| `src/data/conflictividad.js` | Series históricas y distribución territorial |
+| `src/data/confMensual2026.js` | Conflictividad mensual de 2026 |
+| `src/data/opinionPublica.js` | Encuestas, liderazgos y cortes de opinión |
+| `src/data/intervencion.js` | Intervención cambiaria y cortes documentales |
+| `src/data/macroLatest.js` | Último corte macroeconómico validado |
+| `src/data/earthquakeHistory.js` | Evolución y balances de la emergencia sísmica |
+| `src/data/prospectiva.js` | Sesiones, comparativos e implicaciones prospectivas |
+
+Las señales que pierden vigencia deben conservarse como registro histórico y marcarse como no vigentes; no deben eliminarse sin una decisión editorial explícita.
+
+> **Nota:** `static.js` y `gdeltAnnotations.js` mantienen el mismo array (`GDELT_ANNOTATIONS`) de forma duplicada por cómo importan los componentes de medios. Actualizar solo uno de los dos hace que el tab Medios no muestre los eventos nuevos.
+
+---
+
+## Arquitectura
+
+```text
+dashboard-ven-monitor-app-main/
+├── src/
+│   ├── App.jsx                 # Shell, navegación, liveData y splash (~560 líneas)
+│   ├── main.jsx                # Entry point, ClerkProvider
+│   ├── constants.js            # Colores y sistema tipográfico
+│   ├── components/             # 66 archivos
+│   │   ├── tabs/               # 16 (14 módulos de navegación + Cohesión + Prospectiva)
+│   │   ├── charts/             # 17 (matrices, series y mapas)
+│   │   ├── ChatBot.jsx         # Asistente conversacional con tool calling
+│   │   ├── AuthGate.jsx        # Autenticación Clerk, perfil embebido
+│   │   └── *.jsx                # 31 widgets y primitivos adicionales
+│   ├── data/                   # 27 archivos, contenido editorial y series locales
+│   ├── hooks/
+│   ├── services/
+│   │   └── umbralGacetas.js    # Cliente de Gacetas (API propia o Supabase de Umbral)
+│   └── utils/
+├── public/data/                 # GeoJSON, perfiles de riesgo y datos territoriales (sismos)
+├── api/                          # 12 funciones serverless
+├── lib/cron/                    # Lógica y tareas compartidas del cron
+├── vercel.json
+├── package.json
+└── README.md
 ```
-weekly.js ──────────┬──→ Dashboard (KPIs, 10 alertas, semáforo, tensiones, inestabilidad)
-                    ├──→ SITREP (contexto para Daily Brief + IA)
-                    ├──→ Matriz / Escenarios (probabilidades, trayectoria)
-                    ├──→ Conflictividad (CONF_SEMANAL)
-                    └──→ ChatBot (get_weekly_history, get_tensions, get_kpis)
 
-indicators.js ──────┬──→ Dashboard (inestabilidad: factores 1, 6)
-                    ├──→ Monitor (38 indicadores × semanas)
-                    ├──→ Matriz / Prospectivas (barras de proximidad por escenario)
-                    └──→ ChatBot (get_signals, get_indicators)
+### Decisiones relevantes
 
-sitrep.js ──────────┬──→ SITREP (informe completo S1–S15, Daily Brief)
-                    ├──→ Monitor (noticias curadas, fact-check)
-                    └──→ ChatBot (get_sitrep)
+- `App.jsx` centraliza `liveData` para evitar solicitudes duplicadas entre tabs.
+- Los datos editoriales se mantienen en `src/data/` y no dentro de componentes visuales.
+- Las funciones de cron compartidas viven fuera de `api/` para no consumir funciones adicionales.
+- La IA asiste en clasificación, síntesis y explicación; las probabilidades y lecturas institucionales permanecen bajo validación humana.
+- El frontend degrada de forma controlada cuando una API externa no está disponible.
+- Las dependencias npm son deliberadamente mínimas (`@clerk/clerk-react`, `leaflet`, `react`, `react-dom`, `xlsx`). Leaflet CSS/JS, Chart.js, jsPDF y html2canvas se cargan bajo demanda vía CDN (`loadScript`/`loadCSS` en `utils.js`) para mantener liviano el bundle inicial.
+- `AuthGate.jsx` envuelve toda la aplicación con Clerk, operando en modo de prueba por decisión de alcance del proyecto (el plan pago no es necesario en esta etapa). El login soporta dos métodos — contraseña directa o código de un solo uso (OTP) por correo — con verificación adicional por OTP cuando Clerk la exige y recuperación de contraseña también vía OTP. La sesión se recuerda por 30 días. La interfaz oculta por CSS el badge "Secured by Clerk" y la sección de cambio de contraseña del perfil, para mantener una experiencia institucional simple.
+- Algunas integraciones (Clerk, Sismos, Gacetas) usan claves públicas (`publishable`, seguras de exponer en el cliente) definidas directamente en el código en lugar de variables de entorno. No representa un riesgo de seguridad, pero migrarlas facilitaría rotarlas sin un nuevo despliegue.
 
-weekDrivers.js ─────┬──→ Matriz / Escenarios (drivers y señales)
-                    └──→ ChatBot (contexto en fallback de inyección)
+### Funciones serverless
 
-prospectiva.js ─────┬──→ Matriz / Prospectivas (sesiones, comparativo, consideraciones)
-                    └──→ ChatBot (get_prospectiva)
+El proyecto utiliza las 12 funciones admitidas por el plan Vercel Hobby:
 
-amnistia.js ────────┬──→ Dashboard (tracker: gov vs FP, factor 14 y 15 del índice)
-                    └──→ ChatBot (get_amnistia)
-
-conflictividad.js ──┬──→ Conflictividad (gráficas históricas, por derecho/estado)
-confMensual2026.js  └──→ ChatBot (get_conflictividad)
-
-redes.js ───────────┬──→ Dashboard (mini widget polarización, factores 16 y 17 del índice)
-                    └──→ Clima Social / Redes (charts, KPIs, ratio semanal)
+```text
+acled · ai · articles · bilateral · cron · dolar
+gdelt · ioda · news · oil-prices · polymarket · socioeconomic
 ```
 
-**Tabs que NO dependen del SITREP** (solo APIs live):
-- Medios → GDELT API
-- Conectividad → IODA API
-- Mercados → OilPriceAPI + EIA + Polymarket
-- Macro VEN → DolarAPI + Supabase rates + World Bank + IMF
+No se debe crear una carpeta adicional dentro de `api/` sin consolidar otra función. Las nuevas operaciones deben incorporarse a endpoints existentes mediante parámetros como `task`, `source` o `type`. Ejemplo real: `api/gdelt/index.js` sirve tanto los datos de cobertura mediática como los de infraestructura sísmica (reportes, edificios, acopios), y `api/articles/index.js` sirve además las Gacetas Oficiales vía `?type=gacetas`.
 
 ---
 
-## Backend: Cron Diario
+## Automatización y persistencia
 
-Cron nativo Vercel: `0 6 * * *` → `/api/cron` (Tasks 1–5)
-cron-job.org: 11:00 UTC → `/api/cron?task=dailyBrief` (Task 6)
+El cron diario se ejecuta mediante `/api/cron` y coordina, en un único disparo (`0 6 * * *`, 6:00 UTC / 02:00 hora Venezuela):
 
-| Task | Módulo | Qué hace |
-|------|--------|----------|
-| 1 | fetchRates.js | DolarAPI → Supabase `rates` |
-| 2 | fetchRSS.js | 60+ feeds en batches de 10 → Supabase `articles` |
-| 3 | dailyReadings.js | GDELT tone + EIA oil + PizzINT bilateral → Supabase `daily_readings` |
-| 4 | icgAnalysis.js | Artículos (24h) + prompt IA → scoring 13 actores → Supabase `daily_readings` |
-| 5 | newsAlerts.js | Headlines + IA → 8 alertas clasificadas → Supabase `news_alerts` |
-| 6 | dailyBrief.js | Artículos + datos → email IA 11:00 UTC vía Mailgun |
+1. tasas de cambio (`fetchRates`);
+2. ingestión RSS de 61 feeds (`fetchRSS`);
+3. lecturas diarias — GDELT, petróleo, bilateral (`dailyReadings`);
+4. análisis de cohesión gubernamental con IA (`icgAnalysis`);
+5. alertas de noticias clasificadas con IA (`newsAlerts`).
 
-Ejecutar manualmente: `GET /api/cron?task=alerts`, `GET /api/cron?task=dailyBrief`
+El **Daily Brief** (`lib/cron/tasks/dailyBrief.js`) no forma parte de este disparo automático: se ejecuta como una tarea separada vía `GET /api/cron?task=dailybrief`. Como Vercel Hobby permite un único `schedule` en `vercel.json`, este segundo envío se dispara mediante un servicio de cron externo (fuera de Vercel), configurado para llamar ese endpoint **tres veces al día**. El diseño completo (arquitectura, fuentes de datos, plantilla de email) está en `DAILY_BRIEF_DESIGN.md` y el esquema en `DAILY_BRIEF_SETUP.sql`.
 
----
+Ejecutar solo alertas: `GET /api/cron?task=alerts`.
 
-## Persistencia (Supabase)
+Supabase almacena, entre otras, las siguientes tablas:
 
-| Tabla | Qué guarda | Quién escribe |
-|-------|-----------|--------------|
-| `daily_readings` | Foto diaria: bilateral, ICG, GDELT tone, brecha, Brent, WTI | Cron Tasks 3–4 + frontend write-back |
-| `articles` | Artículos RSS clasificados por escenario y dimensión | Cron Task 2 |
-| `rates` | Tipo de cambio diario (BCV + paralelo) | Cron Task 1 |
-| `news_alerts` | 8 alertas clasificadas por IA | Cron Task 5 |
+| Tabla | Contenido |
+|---|---|
+| `daily_readings` | Lecturas diarias, ICG, GDELT, mercados y variables compuestas |
+| `articles` | Artículos RSS clasificados |
+| `rates` | Tipo de cambio oficial y de mercado |
+| `news_alerts` | Alertas clasificadas con IA |
+| `daily_briefs` | Registro de envíos del Daily Brief por correo |
+| `gazette_batches` / `gazette_records` | Lotes y registros de Gaceta Oficial (fuente: Umbral, ver Fuentes principales) |
+| `buildings` / `building_damage` / `building_status_timeline` | Inventario y estado de infraestructura afectada por la emergencia sísmica |
+| `structural_evaluations` | Evaluaciones estructurales de edificaciones |
+| `casualty_stats` | Estadísticas de víctimas de la emergencia sísmica |
+| `acopios` | Puntos de acopio y ayuda humanitaria |
+| `reports` | Reportes de campo geolocalizados |
 
-**Write-back**: el frontend también escribe en `daily_readings` cuando obtiene datos live (bilateral, ICG, petróleo), construyendo el historial automáticamente sin esperar al cron.
-
-**Nota de mantenimiento**: La variable de entorno se llama `SUPABASE_SECRET` en algunos módulos y `SUPABASE_SECRET_KEY` en otros — inconsistencia no crítica pero a resolver en refactor futuro.
-
----
-
-## Funcionalidades Notables
-
-### Splash Screen animado
-Logo PNUD en pixel art SVG construido en `App.jsx`. El dashboard aparece solo cuando todos los datos iniciales (`liveData.fetched`) están listos — evita que el usuario vea información incompleta.
-
-### News Ticker
-Barra superior con scroll continuo: últimas noticias Google News sobre Venezuela + precios de contratos Polymarket. Actualización cada 5 minutos.
-
-### Precios de petróleo — 3 niveles
-1. **Browser-side OilPriceAPI** (IP del usuario, no bloqueada)
-2. **Widget DOM** — monta widget oculto y extrae precios si falla lo anterior
-3. **EIA** — fallback con 3–5 días de retraso
-
-### Producción petrolera dual-source
-68 puntos históricos 2016–2026 con dos valores: fuentes secundarias (OPEC/EIA/Venezuelanalysis/CEIC) vs comunicación directa PDVSA.
-
-### Gráficas interactivas
-Zoom: 1M / 3M / 6M / 1A / Todo. Exportación PDF con html2canvas + jsPDF. Tooltips en cada punto.
-
-### Vista YoY — Macro VEN
-Toggle Absoluto / Variación interanual (%) para BCV, paralelo y brecha cambiaria.
-
-### Pausa inteligente
-3 intervalos de actualización (petróleo, dólar, datos generales) se pausan cuando el usuario cambia de pestaña del navegador y se reactivan al volver.
-
-### Componentes optimizados
-11 componentes con `React.memo` para evitar re-renders innecesarios.
+Los datos sísmicos (edificios, daños, acopios, reportes) se consultan mediante claves de un proyecto Supabase dedicado, distinto al principal — ver la nota sobre `SISMO_API_KEY` en Variables de entorno.
 
 ---
 
-## Variables de Entorno
+## Variables de entorno
 
-| Variable | Requerida | Uso |
-|----------|-----------|-----|
-| `SUPABASE_URL` | Sí | Persistencia |
-| `SUPABASE_SECRET_KEY` / `SUPABASE_SECRET` | Sí | Auth Supabase |
-| `EIA_API_KEY` | Sí | Petróleo + producción VEN |
-| `MISTRAL_API_KEY` | Sí | IA Modo B + tool calling |
-| `GROQ_API_KEY` | Recomendada | IA tool calling + ICG |
-| `GEMINI_API_KEY` | Recomendada | Fallback inyección |
-| `CLERK_SECRET_KEY` | Sí | Autenticación backend |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Sí | Autenticación frontend |
-| `OILPRICE_API_KEY` | Opcional | Precios live browser-side |
-| `OPENROUTER_API_KEY` | Opcional | Fallback IA |
-| `ACLED_API_KEY` | Opcional | Conflicto armado |
-| `HF_API_KEY` | Opcional | HuggingFace fallback |
-| `ANTHROPIC_API_KEY` | Opcional | Claude premium |
-| `MAILGUN_API_KEY` / `MAILGUN_DOMAIN` | Opcional | Daily Brief email |
+La aplicación puede operar parcialmente sin todas las integraciones. Configurar únicamente las variables necesarias y nunca subir archivos `.env` a GitHub.
 
----
+| Grupo | Variables principales |
+|---|---|
+| Base de datos | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SECRET_KEY` |
+| Inteligencia artificial | `GROQ_API_KEY`, `MISTRAL_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `HF_API_KEY`, `ANTHROPIC_API_KEY` |
+| Energía y mercados | `EIA_API_KEY`, `OILPRICE_API_KEY` |
+| Conflictividad | `ACLED_EMAIL`, `ACLED_PASSWORD` |
+| Ambiente | `FIRMS_API_KEY` |
+| Sismos | `SISMO_API_KEY`, `SISMO_BUILDINGS_API_KEY` |
+| Correo | `RESEND_API_KEY`, `DAILY_BRIEF_FROM`, `DAILY_BRIEF_FROM_NAME`, `DAILY_BRIEF_TO` |
+| Aplicación | `APP_BASE_URL` |
 
-## Frecuencia de Actualización
+Los nombres exactos deben comprobarse en el endpoint que consume cada integración antes de modificar la configuración de producción.
 
-| Dato | Frecuencia | Mecanismo |
-|------|-----------|-----------|
-| Brecha cambiaria, paralelo | ~5 min | Frontend → /api/dolar |
-| Brent / WTI | ~5 min | OilPriceAPI browser / widget / EIA |
-| Conectividad + electricidad IODA | Al cargar tab | /api/ioda |
-| Bilateral USA↔VEN | Diario | Cron Task 3 |
-| ICG cohesión | Diario | Cron Task 4 |
-| Alertas IA | Diario | Cron Task 5 |
-| Noticias RSS | Diario | Cron Task 2 |
-| Daily Brief email | Diario 11:00 UTC | cron-job.org Task 6 |
-| Polymarket | Al cargar tab | /api/polymarket |
-| Escenarios, KPIs, indicadores | Semanal | Protocolo editorial |
-| SITREP, lectura analítica | Semanal | Protocolo editorial |
-| Prospectiva (sesiones) | Por sesión (~trimestral) | Edición manual |
-| World Bank / IMF / R4V | Trimestral/anual | /api/socioeconomic |
+> **Nota:** `SISMO_API_KEY` y `SISMO_BUILDINGS_API_KEY` figuran en esta tabla como referencia, pero hoy no se leen de variables de entorno — ver la nota sobre claves públicas hardcodeadas en Arquitectura.
 
 ---
 
-## Limitaciones Conocidas
+## Diseño visual
 
-- **Vercel Hobby**: 12/12 slots ocupados. Todo nuevo endpoint debe fusionarse en uno existente.
-- **Yahoo Finance**: Bloqueado desde IPs datacenter — no intentar.
-- **IODA sin batch**: No existe endpoint batch — se hacen llamadas individuales por estado (23 estados × endpoints).
-- **Google Trends**: Bloqueado desde IPs datacenter.
-- **`merit-nt` excluido** si baseline < 10 para un estado (señal insuficiente).
-- **Daily Brief email**: SendGrid descartado (créditos de prueba agotados, ago 2026). Resend activo en modo sandbox — sin dominio propio verificado, solo entrega al correo dueño de `RESEND_API_KEY`.
-- **Consistencia `SUPABASE_SECRET`**: Nombre de variable inconsistente entre módulos — no crítico pero pendiente.
+El sistema tipográfico utiliza:
+
+- **Syne:** títulos y encabezados de sección.
+- **DM Sans:** texto general, lectura y splash screen.
+- **Space Mono:** KPI, tasas, porcentajes, fechas, controles y datos.
+
+El splash institucional mantiene una secuencia mínima de cuatro segundos: el logotipo se construye en píxeles mientras título, subtítulo, barra y mensaje aparecen desde el comienzo.
+
+Los colores de los escenarios son consistentes en todo el sistema:
+
+- E1: verde;
+- E2: rojo;
+- E3: azul;
+- E4: ámbar.
+
+---
+
+## Fuentes principales
+
+| Fuente | Uso |
+|---|---|
+| Documentos de análisis situacional | Lectura semanal, drivers, escenarios y puntos clave |
+| Gaceta Oficial (vía Umbral) | Cambios institucionales y designaciones — `umbral.watch`, servicio de terceros que clasifica y estructura la Gaceta Oficial |
+| OVCS | Conflictividad social histórica, semestral y territorial |
+| ACLED | Eventos, actores, estados y alertas de conflicto |
+| IODA / Georgia Tech | Conectividad y señales técnicas de interrupción |
+| GDELT | Cobertura y tono mediático internacional |
+| PizzINT | Índice de tensión bilateral EE. UU.–Venezuela |
+| EIA | Petróleo, producción y proyecciones energéticas |
+| DolarAPI / BCV | Tipo de cambio oficial y de mercado |
+| World Bank / IMF / R4V | Variables socioeconómicas y migratorias |
+| Polymarket | Probabilidades implícitas de mercados predictivos |
+| Foro Penal | Verificación de liberaciones y presos políticos |
+| NASA POWER / FIRMS / Open-Meteo | Precipitación, incendios y pronósticos ambientales (Open-Meteo se consulta desde el navegador, un punto por estado) |
+| Base sísmica dedicada (Supabase) | Reportes de campo, edificios, evaluaciones estructurales y acopios de la emergencia |
+| Clerk | Autenticación y gestión de sesión/perfil de usuario |
+| Resend | Envío del Daily Brief por correo |
+| Supabase | Persistencia de lecturas, tasas, artículos, alertas, Daily Brief, Gacetas e infraestructura sísmica |
+
+Cada tab muestra sus fuentes y fechas de corte cuando están disponibles.
+
+---
+
+## Funcionalidades técnicas notables
+
+- **Precios de petróleo en 3 niveles:** el navegador del usuario intenta consultar OilPriceAPI directamente (su IP no está bloqueada, a diferencia de las IPs de servidor de Vercel); si falla, se monta un widget oculto que extrae el precio del DOM; como último recurso se usa EIA, con 3–5 días de retraso. Las alertas indican la fuente cuando el dato no es en vivo.
+- **Producción petrolera de dos fuentes:** la serie histórica combina fuentes secundarias (OPEC, EIA, Venezuelanalysis, CEIC) con comunicación directa de PDVSA, mostradas por separado para comparar la cifra oficial contra fuentes independientes.
+- **Vista año contra año (YoY):** en Macro VEN y en Conflictividad semestral, un toggle cambia entre valores absolutos y variación interanual.
+- **Pausa inteligente:** los intervalos de actualización en vivo se pausan automáticamente cuando el usuario cambia de pestaña del navegador (`visibilitychange`) y se reanudan al volver, para ahorrar llamadas a APIs externas.
+
+---
+
+## Limitaciones y cautelas
+
+- Las probabilidades de escenarios representan juicio analítico, no predicciones deterministas.
+- Las fuentes externas pueden fallar, cambiar su contrato o presentar retrasos.
+- IODA permite formular hipótesis técnicas sobre electricidad y conectividad, no confirmar causas por sí solo.
+- Las cifras de documentos diferentes no deben agregarse sin revisar período, universo y metodología.
+- Los resultados generados por IA requieren revisión humana antes de su uso institucional, tanto en el ChatBot como en el cron.
+- El plan Vercel Hobby limita el despliegue a 12 funciones serverless y a un único `schedule` de cron — el envío del Daily Brief depende de un disparador externo (ver Automatización y persistencia).
+- El bundle principal supera actualmente 500 kB; la división de código es una mejora pendiente.
+- La autenticación (Clerk) opera en modo de prueba por decisión de costo/alcance — es el primer punto a revisar si el proyecto escala a un uso que lo requiera.
+- Gacetas depende de un servicio externo (Umbral) fuera del control directo del equipo; si Umbral cambia su esquema o deja de operar, el tab Gacetas se degrada.
+- Los datos sísmicos usan un proyecto Supabase separado del principal.
 
 ---
 
 ## Stack
 
 | Capa | Tecnología |
-|------|-----------|
+|---|---|
 | Frontend | React 18 + Vite 5 |
-| Auth | Clerk (OTP + contraseña) |
-| Hosting | Vercel Hobby (12 functions) |
-| DB | Supabase free tier |
-| IA — tool calling | Groq llama-3.3-70b + Mistral small |
-| IA — inyección | Gemini → OpenRouter → HuggingFace → Claude |
-| APIs externas | PizzINT, GDELT, EIA, IODA, DolarAPI, ACLED, Polymarket, World Bank, IMF, UNHCR/R4V, OilPriceAPI |
-| Email | Mailgun (cron-job.org scheduler) |
-| Mapas | Leaflet vía CDN |
-| Exportación | html2canvas + jsPDF |
-| Tipografía | Syne (títulos y cifras) + DM Sans (lectura) + Space Mono (datos y controles) |
+| Autenticación | Clerk |
+| Hosting | Vercel (plan Hobby) |
+| Persistencia | Supabase (principal + proyecto dedicado de Umbral para Gacetas + proyecto dedicado para Sismos) |
+| Mapas | Leaflet (cargado vía CDN) |
+| Hojas de cálculo | SheetJS / XLSX |
+| IA — asistente | Groq → Mistral (tool calling) · Gemini → OpenRouter → HuggingFace → Anthropic (respaldo) |
+| IA — cron | Mistral → Gemini → Groq → OpenRouter |
+| Correo | Resend |
+| Tipografía | Syne + DM Sans + Space Mono |
 
 ---
 
-## Fuentes y Créditos
+## Verificación antes de publicar
 
-| Fuente | Qué aporta |
-|--------|-----------|
-| PizzINT | Índice de amenaza bilateral USA↔VEN |
-| GDELT (Georgia Tech) | Monitoreo global medios: volumen, tono, inestabilidad |
-| EIA | Precios petróleo, producción VEN, forecast STEO |
-| IODA (Georgia Tech) | Conectividad + inferencia de cortes eléctricos |
-| OVCS | Conflictividad social Venezuela (anual + semanal) |
-| Polymarket | Mercados de predicción (11 contratos Venezuela) |
-| ACLED | Conflicto armado y protestas |
-| Foro Penal | Excarcelaciones verificadas, presos políticos |
-| DolarAPI | Tipo de cambio Venezuela (BCV + paralelo) |
-| World Bank / IMF WEO / UNHCR R4V | Macro, proyecciones, migración |
-| Supabase | Base de datos y persistencia |
-| Clerk | Autenticación |
+```bash
+npm run build
+```
+
+Comprobar además:
+
+- navegación de los 14 tabs y los 2 sub-tabs (Cohesión, Prospectiva);
+- selectores de semana del Dashboard, SITREP y Matriz;
+- probabilidades E1–E4 y suma igual a 100 %;
+- textos, fechas de corte y fuentes;
+- comportamiento responsive;
+- ausencia de credenciales sensibles (no públicas) en el repositorio;
+- número total de carpetas dentro de `api/`;
+- funcionamiento del despliegue después del push;
+- si corresponde, que el disparador externo del Daily Brief siga activo.
 
 ---
 
-*Monitor de Contexto Situacional · PNUD Venezuela · Abril 2026 · S15*
+*Monitor de Contexto Situacional · PNUD Venezuela · S32 · 14–21 de agosto de 2026*
+
