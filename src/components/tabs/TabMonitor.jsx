@@ -13,6 +13,7 @@ export function TabMonitor() {
   const mob = useIsMobile();
   const [seccion, setSeccion] = useState("indicadores");
   const [expanded, setExpanded] = useState(null);
+  const [showAllHist, setShowAllHist] = useState({});
   const dims = [...new Set(INDICATORS.map(i=>i.dim))];
   const grouped = dims.map(d => ({ dim:d, icon:INDICATORS.find(i=>i.dim===d).icon, inds:INDICATORS.filter(i=>i.dim===d) }));
 
@@ -75,7 +76,7 @@ export function TabMonitor() {
             <span style={{ fontSize:12, color:MUTED, marginLeft:"auto" }}>{g.inds.length} indicadores</span>
           </div>
           {/* Column headers */}
-          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr auto":"1fr 100px auto 80px 40px", gap:8, padding:"2px 0 6px", borderBottom:`1px solid ${BORDER}30` }}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr auto":"1fr 150px auto 80px 40px", gap:8, padding:"2px 0 6px", borderBottom:`1px solid ${BORDER}30` }}>
             <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Indicador</span>
             <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Historial</span>
             <span style={{ fontSize:9, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase" }}>Valor actual</span>
@@ -90,7 +91,7 @@ export function TabMonitor() {
             const isExpanded = expanded === `${g.dim}-${j}`;
             return (
               <div key={j} style={{ borderBottom:`1px solid ${BORDER}30` }}>
-                <div style={{ display:"grid", gridTemplateColumns:mob?"1fr auto":"1fr 100px auto 80px 40px", gap:8, padding:"8px 0", alignItems:"center",
+                <div style={{ display:"grid", gridTemplateColumns:mob?"1fr auto":"1fr 150px auto 80px 40px", gap:8, padding:"8px 0", alignItems:"center",
                   cursor:"pointer" }} onClick={() => setExpanded(isExpanded ? null : `${g.dim}-${j}`)}>
                   <div>
                     <div style={{ display:"flex", alignItems:"center", gap:6 }}>
@@ -103,16 +104,15 @@ export function TabMonitor() {
                         color:"#16a34a", border:"1px solid #22c55e30", letterSpacing:"0.12em", fontWeight:700 }}>NUEVO</span>}
                     </div>
                   </div>
-                  {/* History dots */}
-                  <div style={{ display:"flex", gap:3, alignItems:"center" }}>
+                  {/* History strip — fixed-width, one bar per week, hover/tap for detail */}
+                  <div style={{ display:"flex", gap:1, alignItems:"center", minWidth:0, width:"100%" }}>
                     {ind.hist.map((h,k) => (
-                      <div key={k} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:1 }}>
-                        <div style={{ fontSize:5, color:MUTED, fontFamily:font }}>{MONITOR_WEEKS[k]}</div>
-                        {h ? <div style={{ width:7, height:7, borderRadius:"50%", background:SEM[h[0]],
-                          boxShadow:k===ind.hist.length-1?`0 0 4px ${SEM[h[0]]}`:"none",
-                          opacity:0.4+(k/ind.hist.length)*0.6 }} />
-                        : <div style={{ width:7, height:7, borderRadius:"50%", background:`${BORDER}60`, opacity:0.3 }} />}
-                      </div>
+                      <div key={k}
+                        title={h ? `${MONITOR_WEEKS[k]}: ${h[2]}` : `${MONITOR_WEEKS[k]}: sin datos`}
+                        style={{ flex:1, minWidth:1, height:14, borderRadius:1,
+                          background:h?SEM[h[0]]:`${BORDER}60`,
+                          opacity:h?(0.35+(k/ind.hist.length)*0.65):0.3,
+                          boxShadow:(k===ind.hist.length-1 && h)?`0 0 3px ${SEM[h[0]]}`:"none" }} />
                     ))}
                   </div>
                   {/* Current value */}
@@ -135,14 +135,40 @@ export function TabMonitor() {
                       ⚠ {ind.umbral}
                     </div>
                     <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Historial</div>
-                    <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
-                      {ind.hist.map((h,k) => h ? (
-                        <div key={k} style={{ fontSize:12, padding:"3px 8px", background:`${SEM[h[0]]}10`, border:`1px solid ${SEM[h[0]]}25`,
-                          color:SEM[h[0]], fontFamily:font, whiteSpace:"nowrap" }}>
-                          <span style={{ color:MUTED, marginRight:4 }}>{MONITOR_WEEKS[k]}</span>{h[2]}
+                    {(() => {
+                      const rowKey = `${g.dim}-${j}`;
+                      const RECENT_N = 5;
+                      const withData = ind.hist.map((h,k) => ({ h, k })).filter(x => x.h).reverse();
+                      const recent = withData.slice(0, RECENT_N);
+                      const older = withData.slice(RECENT_N);
+                      const showAll = !!showAllHist[rowKey];
+                      const histRow = ({ h, k }) => (
+                        <div key={k} style={{ display:"grid", gridTemplateColumns:"44px 10px 1fr", gap:8, alignItems:"center",
+                          padding:"4px 2px", fontSize:12.5, fontFamily:font, borderBottom:`1px solid ${BORDER}20` }}>
+                          <span style={{ color:MUTED, fontSize:11 }}>{MONITOR_WEEKS[k]}</span>
+                          <span style={{ width:7, height:7, borderRadius:"50%", background:SEM[h[0]], flexShrink:0 }} />
+                          <span style={{ color:TEXT }}>{h[2]}</span>
                         </div>
-                      ) : null)}
-                    </div>
+                      );
+                      return (
+                        <>
+                          <div>{recent.map(histRow)}</div>
+                          {older.length > 0 && (
+                            <>
+                              <div style={{ maxHeight:showAll?260:0, overflowY:"auto", overflowX:"hidden", transition:"max-height 0.2s ease" }}>
+                                {older.map(histRow)}
+                              </div>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setShowAllHist(s => ({ ...s, [rowKey]: !s[rowKey] })); }}
+                                style={{ marginTop:8, fontSize:11, fontFamily:font, background:"none", border:`1px solid ${BORDER}`,
+                                  color:ACCENT, padding:"5px 12px", cursor:"pointer", letterSpacing:"0.05em" }}>
+                                {showAll ? "▴ Ocultar semanas anteriores" : `▾ Ver semanas anteriores (${older.length} más)`}
+                              </button>
+                            </>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
