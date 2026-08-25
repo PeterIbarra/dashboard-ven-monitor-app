@@ -5907,6 +5907,123 @@ export const INDICATORS = [
         "Sin nuevo pronunciamiento sobre el artículo 234 S32; consulta popular convocada para el 18 de octubre no resuelve el vacío del interinato"
       ]
     ]
+  },
+  {
+    "dim": "Político",
+    "icon": "🏛",
+    "esc": "E1",
+    "name": "Mesa de diálogo AN2015–Gobierno",
+    "desc": "Instalación, ciclos y resultados verificables de la mesa AN2015–Gobierno Nacional",
+    "umbral": "Acuerdos verificables (TSJ, activos, cronograma electoral) consolidan E1. Estancamiento sin agenda electoral sostiene E3.",
+    "addedWeek": 23,
+    "hist": [
+      [
+        "green",
+        "up",
+        "Retorno de Figuera instala mesa técnica con la AN2015; primer canal político formal respaldado por el Departamento de Estado (S23)."
+      ],
+      [
+        "yellow",
+        "flat",
+        "El canal AN2015–Figuera continúa pese al sismo del 24 de junio; sin nuevos hitos verificables esta semana (S24)."
+      ],
+      [
+        "yellow",
+        "flat",
+        "La comisión AN2015–Gobierno permanece abierta, pero sin avances verificables durante el período (S25)."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin novedades reportadas sobre la mesa; la atención se concentra en el vencimiento del artículo 234 (S26)."
+      ],
+      [
+        "red",
+        "down",
+        "La hoja de ruta electoral del 1° de agosto se anuncia sin incorporar a Machado ni a la PUD; la PUD termina la semana sin posición común (S27)."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Rubio y Figuera reconocen el papel de Machado en la reconciliación, pero sin cronograma, delegación ni garantías concretas (S28)."
+      ],
+      [
+        "red",
+        "down",
+        "La delegación AN2015 queda restringida a PJ y VP; Machado y cinco partidos de la PUD quedan fuera del formato (S29)."
+      ],
+      [
+        "green",
+        "up",
+        "La mesa AN2015–Gobierno queda formalmente instalada el 6 de agosto, con sesión permanente hasta el 12 (S30)."
+      ],
+      [
+        "green",
+        "up",
+        "Primer ciclo cierra con acuerdos verificables: renovación integral del TSJ y recuperación auditada de activos del Banco de Inglaterra; primer contacto reservado con la Plataforma Unitaria (S31)."
+      ],
+      [
+        "yellow",
+        "flat",
+        "La segunda fase se traslada a septiembre; el nuevo comité de 23 integrantes reinicia las postulaciones al TSJ, pero sigue sin cronograma electoral vinculante (S32)."
+      ]
+    ]
+  },
+  {
+    "dim": "Económico",
+    "icon": "📊",
+    "esc": "E2",
+    "name": "Reestructuración de deuda externa (Centerview)",
+    "desc": "Proceso de reestructuración de deuda externa liderado por Centerview Partners y evolución del monto de deuda reportado",
+    "umbral": "Acuerdo cerrado con acreedores y DSA del FMI fortalecen E3. Deuda sin reestructurar + EMBI sostenido activa E2.",
+    "addedWeek": 24,
+    "hist": [
+      [
+        "yellow",
+        "flat",
+        "El sismo introduce una nueva variable fiscal: costo estimado de 1%-7% del PIB coincide con la presentación del plan de Centerview sobre una deuda externa reportada en USD 240.000M (S24)."
+      ],
+      [
+        "red",
+        "down",
+        "El USGS eleva las pérdidas a un rango de 4%-20% del PIB frente a un fondo de reconstrucción de solo USD 200M y un flujo petrolero en caída (S25)."
+      ],
+      [
+        "red",
+        "down",
+        "El EMBI sube 836 puntos básicos hasta 7.098 puntos; la deuda externa estimada se precisa en un rango de USD 150.000-240.000M y los daños divergen entre USD 6.700M y USD 37.000M; el FMI dialoga sobre DEG pero no participa en la reestructuración (S26)."
+      ],
+      [
+        "yellow",
+        "flat",
+        "La inflación de junio (13,8%) y el acumulado semestral (129,82%) presionan el marco fiscal; el financiamiento de la reconstrucción permanece sin precisar (S27)."
+      ],
+      [
+        "yellow",
+        "up",
+        "El Banco Mundial estima los daños en USD 19.600M; Venezuela accede a USD 346M de reservas propias en el FMI y recibe la primera misión de alto nivel del BID en unos siete años (S28)."
+      ],
+      [
+        "red",
+        "down",
+        "La liquidez crece 159% en siete meses y la deuda externa se estima en 290% del PIB, pese a que los bonos acumulan un alza superior a 60% en 2026; la GAO abre investigación formal sobre el fondo petrolero de más de USD 13.000M (S29)."
+      ],
+      [
+        "yellow",
+        "flat",
+        "El dólar oficial acumula 150,4% en el año y la deuda externa se estima en USD 170.000M; el BID activa cooperación técnica no reembolsable de al menos USD 800.000, sin préstamos nuevos (S30)."
+      ],
+      [
+        "red",
+        "down",
+        "La inflación de julio llega a 19,9% (acumulado 2026 cercano a 176%); la Bolsa de Caracas pierde 72% del impulso registrado tras la captura de Maduro; el FMI moviliza un tramo de reserva de USD 350M (S31)."
+      ],
+      [
+        "green",
+        "up",
+        "El PIB del segundo trimestre crece 7,14% interanual (petróleo +9,10%, no petrolero +5,79%); CEPAL proyecta 3,0% para 2026, aunque sin acuerdo de reestructuración cerrado con acreedores (S32)."
+      ]
+    ]
   }
 ];
 
@@ -5917,7 +6034,7 @@ export const SCENARIO_SIGNALS = [
       {
         "name": "Centerview/Pigasse para deuda USD 150.000M",
         "sem": "green",
-        "val": "La reestructuración de deuda convierte la normalización financiera en proceso operativo."
+        "val": "La reestructuración de deuda avanza en fase de preparación (propuesta de Centerview a acreedores desde julio), sin cierre confirmado al corte de S32."
       },
       {
         "name": "Comisiones presidenciales de 90 días",
@@ -5930,19 +6047,14 @@ export const SCENARIO_SIGNALS = [
         "val": "Abanca Europa, Banesco USA y Erebor consolidan reinserción bancaria."
       },
       {
-        "name": "Venezuela 4° proveedor petrolero de India",
+        "name": "India consolida su rol como 2° comprador de crudo venezolano",
         "sem": "green",
-        "val": "Agrega amortiguador externo adicional."
+        "val": "India pasa de ser el 4° proveedor a absorber 427.000 bpd como segundo comprador (S21-S22), con acuerdos de suministro de hasta 400.000 bpd en evaluación (Reliance) y pagos pendientes a ONGC Videsh superiores a USD 500M."
       },
       {
         "name": "Manifiesto reconoce plan Washington",
         "sem": "green",
         "val": "La oposición opera dentro del marco estratégico externo."
-      },
-      {
-        "name": "Aprobación doméstica en mínimo",
-        "sem": "red",
-        "val": "25,2% de aprobación (Latam Pulse, mayo) tensiona sostenibilidad interna."
       },
       {
         "name": "Decretos de comisiones pendientes",
@@ -6010,7 +6122,7 @@ export const SCENARIO_SIGNALS = [
       {
         "name": "180 días del artículo 234 sin resolución formal",
         "sem": "red",
-        "val": "TSJ, AN y MP guardan silencio; el gobierno encargado continúa de facto sin mecanismo jurídico de extensión o sustitución.",
+        "val": "TSJ, AN y MP guardan silencio; el gobierno encargado continúa de facto sin mecanismo jurídico de extensión o sustitución. Última confirmación explícita en SITREP S26; ningún corte posterior (S27-S32) volvió a mencionarlo, aunque nada indica que se haya resuelto.",
         "isNew": true
       },
       {
@@ -6023,6 +6135,12 @@ export const SCENARIO_SIGNALS = [
         "name": "Segunda fase del diálogo trasladada a septiembre",
         "sem": "yellow",
         "val": "Garantías políticas y civiles quedan pendientes; la consulta popular del 18 de octubre no resuelve el vacío electoral ni constitucional.",
+        "isNew": true
+      },
+      {
+        "name": "Comité de 23 reinicia el proceso de postulaciones del TSJ",
+        "sem": "green",
+        "val": "El procedimiento anterior queda sin efecto; un nuevo comité de 23 integrantes, con mayoría de sociedad civil, evaluará las candidaturas (S32).",
         "isNew": true
       }
     ]
@@ -6113,6 +6231,12 @@ export const SCENARIO_SIGNALS = [
         "sem": "red",
         "val": "Retrocede desde el pico de 39% (S24) por bloqueo, exclusión y fragmentación acumulados; -29pp en ocho semanas.",
         "isNew": true
+      },
+      {
+        "name": "Consulta popular convocada para el 18 de octubre",
+        "sem": "yellow",
+        "val": "Mecanismo participativo anunciado en S32; el propio corte aclara que no resuelve el vacío electoral ni constitucional.",
+        "isNew": true
       }
     ]
   },
@@ -6153,7 +6277,7 @@ export const SCENARIO_SIGNALS = [
       {
         "name": "Pérdidas del sismo de 4%-20% del PIB",
         "sem": "red",
-        "val": "USGS/Banco Mundial; daños estimados entre USD 6.700M y USD 37.000M frente a un fondo de reconstrucción de solo USD 200M.",
+        "val": "USGS/Banco Mundial; daños estimados entre USD 6.700M y USD 37.000M (S26); el Banco Mundial precisa USD 19.600M en su estimación posterior (S28), frente a un fondo de reconstrucción de solo USD 200M.",
         "isNew": true
       },
       {
@@ -6165,7 +6289,7 @@ export const SCENARIO_SIGNALS = [
       {
         "name": "Inflación mensual acelera a 19,9% en julio",
         "sem": "red",
-        "val": "Acumulado 2026 cercano a 176%; deuda externa estimada en 290% del PIB y liquidez +159% en siete meses (S29).",
+        "val": "Inflación de julio (S31); acumulado 2026 cercano a 176% (S31). Deuda externa estimada en 290% del PIB y liquidez +159% en siete meses (S29).",
         "isNew": true
       },
       {
@@ -6218,11 +6342,6 @@ export const SCENARIO_SIGNALS = [
         "val": "1.200 reclusos denuncian requisas violentas."
       },
       {
-        "name": "Represalia al retorno de MCM",
-        "sem": "red",
-        "val": "Activador más potente de E4; no se ha probado porque el retorno físico fue bloqueado antes de producirse, no reprimido tras ocurrir."
-      },
-      {
         "name": "Fallecimientos de familiares de presos políticos",
         "sem": "yellow",
         "val": "Quinto caso de madre fallecida en 2026."
@@ -6255,6 +6374,12 @@ export const SCENARIO_SIGNALS = [
         "name": "E4 alcanza su máximo del ciclo (23%) y luego retrocede a 18%",
         "sem": "yellow",
         "val": "Pico en S30 tras la instalación de la mesa; sin escalada coercitiva autónoma que lo sostenga hacia S32.",
+        "isNew": true
+      },
+      {
+        "name": "Vigilia por detenidos cumple 221 días en Rodeo I",
+        "sem": "yellow",
+        "val": "Tensión social sostenida en torno a presos políticos, confirmada en S32, sin resolución del reclamo de fondo.",
         "isNew": true
       }
     ]
