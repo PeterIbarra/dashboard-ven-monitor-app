@@ -747,6 +747,462 @@ export const GDELT_ANNOTATIONS = [
     "tier": "CRITICAL",
     "tierEs": "CRÍTICO",
     "label": "Matriz 22–29 mayo ubica E3 en 47%, E1 en 37%, E4 en 12% y E2 en 4%; brecha E3-E1 baja a 10pp."
+  },
+  {
+    "date": "2026-06-01",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Foro Penal registra 404 presos políticos al 1 de junio; documenta 29 excarcelaciones del caso Mibiturven."
+  },
+  {
+    "date": "2026-06-01",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Dan Caine realiza la primera visita a Caracas de un jefe del Estado Mayor Conjunto de EE.UU.; eleva la cooperación de seguridad a pilar bilateral."
+  },
+  {
+    "date": "2026-06-02",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Asamblea Nacional aprueba por unanimidad en primera discusión la reforma eléctrica de 42 artículos, con concesiones privadas de hasta 25 años."
+  },
+  {
+    "date": "2026-06-03",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Marcha Chacaíto–Embajada de EE.UU. exige presos políticos, calendario electoral y salarios; es absorbida sin represión sistémica."
+  },
+  {
+    "date": "2026-06-05",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 29 may–5 jun ubica E3 en 49% (brecha de 15pp sobre E1), E1 en 34%, E4 en 13%; normalización se institucionaliza vía PDVSA-Tesoro, Dan Caine y reforma eléctrica."
+  },
+  {
+    "date": "2026-06-07",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Gira de Rodríguez por India y Türkiye incorpora a Reliance, Tata, Essar y ONGC Videsh, con meta de comercio bilateral de USD 3.000M con Türkiye."
+  },
+  {
+    "date": "2026-06-08",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "OFAC amplía siete licencias (GL-46C, 47A, 48B, 50B, 51B, 52A, 54A) y admite arbitraje en Reino Unido, Francia y Singapur."
+  },
+  {
+    "date": "2026-06-08",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Roberto Marrero recibe amnistía tras su retorno; familiares de presos políticos sostienen vigilias el 8 y 9 de junio ante la Embajada de EE.UU."
+  },
+  {
+    "date": "2026-06-09",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "CorteIDH ordena cerrar El Helicoide en 18 meses; Cabello informa 58.714 personas privadas de libertad y 12.425 con más de dos años sin sentencia."
+  },
+  {
+    "date": "2026-06-09",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "FANB despliega control territorial en el Arco Minero (Las Claritas y Km 88) para desplazar estructuras armadas y habilitar apertura extractiva."
+  },
+  {
+    "date": "2026-06-10",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "75 protestas en 19 entidades (+79% frente a la semana previa), máximo reciente; sindicatos protestan ante el CNE por rectores y cronograma."
+  },
+  {
+    "date": "2026-06-11",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Cabello descarta públicamente negociar con María Corina Machado pese a la presión de Rubio por renovar el CNE."
+  },
+  {
+    "date": "2026-06-12",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 5–12 jun ubica E3 en 50%, primer cruce de ese umbral y brecha máxima de 16pp sobre E1 (33%); E4 en 13%, E2 en 4%."
+  },
+  {
+    "date": "2026-06-15",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Dinorah Figuera retorna e instala una mesa técnica con la Asamblea Nacional, primer canal político formal respaldado por el Departamento de Estado."
+  },
+  {
+    "date": "2026-06-16",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Operación conjunta SOUTHCOM–FANB neutraliza a Héctor Guerrero Flores (Tren de Aragua) en Bolívar."
+  },
+  {
+    "date": "2026-06-17",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Acuerdos de IMPSA, GE Vernova y PDVSA–Repsol elevan la densidad contractual eléctrica e hidrocarburífera, aún sin montos verificables."
+  },
+  {
+    "date": "2026-06-17",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "27 protestas en 13 estados; IODA registra 12 eventos eléctricos en 6 estados, con Guárico afectado en 50%."
+  },
+  {
+    "date": "2026-06-19",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 12–19 jun ubica E3 en 47% (cede 3pp), E1 en 37% (brecha se comprime a 10pp) por la mesa AN–Figuera; E4 en 12%, E2 en 4%."
+  },
+  {
+    "date": "2026-06-24",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Doblete sísmico Mw 7.2/7.5 sacude Venezuela y reordena la agenda nacional hacia respuesta humanitaria y reconstrucción."
+  },
+  {
+    "date": "2026-06-25",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Comisión negociadora AN2015–Figuera continúa pese al sismo; la OEA se declara lista para apoyar una transición electoral."
+  },
+  {
+    "date": "2026-06-25",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "El costo estimado del sismo (1%–7% del PIB) se cruza con la presentación del plan de Centerview sobre una deuda externa reportada en USD 240.000M."
+  },
+  {
+    "date": "2026-06-25",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "PDVSA acumula USD 9.400M facturados entre enero y mayo (+54% interanual); BCV flexibiliza el mercado cambiario y la brecha paralela llega a 36%."
+  },
+  {
+    "date": "2026-06-25",
+    "tier": "LOW",
+    "tierEs": "BAJA",
+    "label": "USGS estima 24% de probabilidad de un sismo M6 adicional y 3% de M7+ en Venezuela."
+  },
+  {
+    "date": "2026-06-26",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 19–26 jun ubica E3 en 49% por necesidad operativa del gobierno encargado durante la emergencia; E1 sube a 39% por el canal AN2015–Figuera y la OEA; E4 baja a 9%, E2 a 3%."
+  },
+  {
+    "date": "2026-06-30",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Dos intentos de retorno de María Corina Machado son frenados sin respaldo operativo de Washington; el Grupo IDEA cuestiona el bloqueo."
+  },
+  {
+    "date": "2026-07-02",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "SOUTHCOM despliega cerca de 2.000 efectivos en apoyo a la respuesta sísmica; EE.UU. eleva su asistencia anunciada a USD 200M, CERF aporta USD 15M y la UE EUR 5M."
+  },
+  {
+    "date": "2026-07-02",
+    "tier": "LOW",
+    "tierEs": "BAJA",
+    "label": "147 países y 31 organismos internacionales expresan solidaridad con Venezuela tras el sismo."
+  },
+  {
+    "date": "2026-07-03",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Balance oficial del sismo alcanza 2.295 fallecidos, 12.400 heridos, 855 edificaciones afectadas y 11.546 personas atendidas en 46 campamentos."
+  },
+  {
+    "date": "2026-07-03",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 26 jun–3 jul ubica E3 en 44% (-2pp) por presión fiscal y de legitimidad; E1 en 36% (-2pp) por el bloqueo a Machado; E4 en 12% (+2pp), E2 en 8% (+2pp); vence el segundo plazo constitucional del interinato entre el 3 y el 5 de julio."
+  },
+  {
+    "date": "2026-07-05",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Se cumplen los 180 días del artículo 234 sin pronunciamiento del TSJ, la AN ni el Ministerio Público; el gobierno encargado continúa de facto."
+  },
+  {
+    "date": "2026-07-06",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "El gobierno encargado firma el Reglamento de Hidrocarburos tras revisar 1.389 resoluciones y reorganiza SENIAT, Pequiven, Banco de Venezuela y CIIP sin disidencia pública."
+  },
+  {
+    "date": "2026-07-07",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "El EMBI de Venezuela sube 836 puntos básicos a 7.098; los daños del sismo estimados divergen entre USD 6.700M y USD 37.000M."
+  },
+  {
+    "date": "2026-07-08",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "WSJ y Axios documentan el bloqueo al retorno de Machado; Trump lo niega públicamente sin que cambie la conducta operativa observada."
+  },
+  {
+    "date": "2026-07-09",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 3–9 jul ubica E3 en 46% (+2pp) por disciplina de élite y silencio institucional; E1 cae a 33% (-3pp) por el bloqueo reiterado a Machado; E4 en 13%, E2 en 8%."
+  },
+  {
+    "date": "2026-07-11",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "AN2015 y gobierno encargado anuncian una hoja de ruta electoral desde el 1 de agosto para conformar un nuevo CNE, con respaldo formal de Washington."
+  },
+  {
+    "date": "2026-07-11",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "La PUD concluye una reunión de tres horas convocada por Machado y González Urrutia sin acuerdo sobre representación ni mecanismo decisorio."
+  },
+  {
+    "date": "2026-07-12",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Mayor reestructuración ministerial del ciclo: Félix Plasencia funde Cancillería y Comercio Exterior; Yván Gil pasa a Ciencia y Tecnología."
+  },
+  {
+    "date": "2026-07-13",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "NYT y Financial Times documentan la coordinación operativa de Diosdado Cabello con el Comando Sur pese a la recompensa vigente de USD 25M."
+  },
+  {
+    "date": "2026-07-14",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Inflación de junio alcanza 13,8%; el acumulado semestral llega a 129,82%."
+  },
+  {
+    "date": "2026-07-16",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Balance sísmico sube a 4.930 fallecidos, 16.740 heridos y 21.210 personas en 107 campamentos, con 1.308 réplicas registradas."
+  },
+  {
+    "date": "2026-07-17",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 10–17 jul: E3 sube a 48% (+2pp) por tutela operativa de Washington; E1 cae 6pp a 27% ('Movimiento Disruptivo') porque EE.UU. reconoce que la amnistía no garantiza el retorno de Machado; E4 sube a 16%, E2 a 9%."
+  },
+  {
+    "date": "2026-07-18",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Venezuela accede a USD 346M de reservas propias en el FMI; OFAC flexibiliza la GL60 y BID–Banco Mundial abren una vía multilateral aún sin monto ni cronograma."
+  },
+  {
+    "date": "2026-07-19",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Más de USD 13.000M del fondo petrolero bajo custodia de EE.UU. carecen de balance público verificable; genera cuestionamientos bipartidistas en el Congreso."
+  },
+  {
+    "date": "2026-07-20",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "PDVSA factura USD 11.200M en el semestre (+52%); exportaciones superan 1,2M b/d y el plazo del 28 de julio moviliza a unas dos docenas de empresas."
+  },
+  {
+    "date": "2026-07-21",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Acuerdos INSA–GE proyectan 7.400 MW en cuatro años; GE Vernova evalúa rehabilitar 11 GW instalados."
+  },
+  {
+    "date": "2026-07-22",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "28 protestas en cuatro días, con máximo diario de 10 el 22 de julio, por vivienda, trabajo y servicios."
+  },
+  {
+    "date": "2026-07-22",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Rubio y Figuera reconocen el papel de María Corina Machado en la reconciliación, sin cronograma, delegación ni garantías concretas de retorno."
+  },
+  {
+    "date": "2026-07-23",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Balance sísmico sube a 5.398 fallecidos y 23.843 personas en campamentos; La Guaira alcanza 100% de ocupación un mes después del sismo."
+  },
+  {
+    "date": "2026-07-24",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 17–24 jul: E3 se consolida en 52% (+4pp) por inmunidad soberana de Rodríguez y expansión de PDVSA; E1 retrocede a 22% (-5pp); E4 sube a 17%, E2 en 9%."
+  },
+  {
+    "date": "2026-07-27",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Solo 39% de la respuesta humanitaria post-sismo está financiada; cerca de 1,3 millones de personas requieren asistencia y 24.000 niños permanecen fuera de las aulas."
+  },
+  {
+    "date": "2026-07-28",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "62 protestas con pico nacional el 28 de julio (38 movilizaciones en 20 estados); Bolívar registra conflictividad durante cuatro días consecutivos."
+  },
+  {
+    "date": "2026-07-29",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Venezuela formaliza el retiro del Estatuto de Roma (CPI); la denuncia entra en vigor un año después con respaldo explícito de EE.UU."
+  },
+  {
+    "date": "2026-07-30",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Rodríguez reestructura la cúpula militar sin fisuras: ratifica al ministro de Defensa y reorganiza los cinco componentes y las ocho REDI."
+  },
+  {
+    "date": "2026-07-31",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Chevron, Repsol, Maurel & Prom y Eni canalizan impuestos y regalías al Tesoro de EE.UU. bajo una tasa progresiva de 20% a 35%."
+  },
+  {
+    "date": "2026-08-01",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "La GAO escala a investigación formal del Congreso sobre la administración de más de USD 13.000M del fondo petrolero venezolano."
+  },
+  {
+    "date": "2026-08-01",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Aceptación de Delcy Rodríguez cae a 40,2% (More Consulting); imagen positiva de Machado sube a 46,2%."
+  },
+  {
+    "date": "2026-08-03",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 24 jul–3 ago: E3 alcanza 56% (+4pp), máximo del ciclo; E1 cae a 14% (-8pp, 'Movimiento Disruptivo') al restringirse la delegación AN2015 a PJ y VP sin Machado; E4 sube a 20%, E2 a 10%."
+  },
+  {
+    "date": "2026-08-03",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Balance sísmico sube a 6.125 fallecidos; persiste discrepancia entre 157 desaparecidos a nivel nacional y 1.338 reportados en La Guaira."
+  },
+  {
+    "date": "2026-08-05",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Machado alcanza 72% de imagen positiva y Rodríguez 71% de rechazo; 94,1% desconfía de la información oficial y 91,6% evalúa mal la respuesta sísmica."
+  },
+  {
+    "date": "2026-08-05",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "La delegación opositora ante la mesa AN2015 queda restringida a PJ y VP; Machado y cinco partidos de la PUD permanecen fuera del formato."
+  },
+  {
+    "date": "2026-08-06",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Jorge Rodríguez y Dinorah Figuera instalan formalmente la mesa AN2015–Gobierno Nacional, con sesión permanente hasta el 12 de agosto."
+  },
+  {
+    "date": "2026-08-07",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 3–7 ago: E3 baja a 52% (-4pp) pese a la instalación de la mesa por falta de resultados verificables; E1 desciende a 12% (-2pp); E4 sube a 23%, E2 a 13%."
+  },
+  {
+    "date": "2026-08-10",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Balance sísmico sube a 6.301 fallecidos; se evalúan 53.314 viviendas y se retira 23,26% de los escombros estimados, sin PDNA formal."
+  },
+  {
+    "date": "2026-08-12",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Primer ciclo de diálogo AN2015–Gobierno cierra con acuerdo de renovación integral del TSJ y mecanismo auditado para recuperar activos del Banco de Inglaterra."
+  },
+  {
+    "date": "2026-08-12",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "La comisión de la AN2015 sostiene un primer contacto reservado con la Plataforma Unitaria; Machado y González Urrutia permanecen fuera del formato."
+  },
+  {
+    "date": "2026-08-12",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "54 protestas con pico de 18 movilizaciones el 12 de agosto, coincidiendo con el cierre del primer ciclo de diálogo."
+  },
+  {
+    "date": "2026-08-13",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Inflación de julio llega a 19,9% (acumulado 2026 cercano a 176%); la Bolsa de Caracas pierde 72% del impulso registrado tras la captura de Maduro."
+  },
+  {
+    "date": "2026-08-14",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 7–14 ago: E3 permanece en 52% y E1 sube a 13% por la segunda ronda prevista y el contacto con la Plataforma Unitaria; E2 sube a 15%, E4 baja a 20%."
+  },
+  {
+    "date": "2026-08-14",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "50 protestas con pico de 20 movilizaciones el 14 de agosto, coincidiendo con un acto oficial de entrega de vivienda."
+  },
+  {
+    "date": "2026-08-15",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Enrique Márquez lanza el Pacto por Venezuela y profundiza la fragmentación opositora mientras Machado mantiene su propia ruta electoral."
+  },
+  {
+    "date": "2026-08-16",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Se instala un nuevo comité de 23 integrantes, con mayoría de sociedad civil, que anula el procedimiento anterior de postulaciones al TSJ."
+  },
+  {
+    "date": "2026-08-17",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Balance sísmico sube a 6.438 fallecidos y 59.109 viviendas evaluadas (25,15% de escombros retirados); solo 335 viviendas han sido entregadas."
+  },
+  {
+    "date": "2026-08-17",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Exportaciones a EE.UU. alcanzan 730.000 b/d, segunda semana consecutiva sobre 700.000 b/d y máximo desde 2017."
+  },
+  {
+    "date": "2026-08-18",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "El PIB del segundo trimestre crece 7,14% interanual (petróleo +9,10%, no petrolero +5,79%); CEPAL proyecta 3,0% para 2026."
+  },
+  {
+    "date": "2026-08-19",
+    "tier": "MEDIUM",
+    "tierEs": "MEDIA",
+    "label": "Se convoca una consulta popular para el 18 de octubre de 2026; la segunda fase del diálogo AN2015–Gobierno se traslada a septiembre."
+  },
+  {
+    "date": "2026-08-21",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 14–21 ago ubica E3 en 54% (+2pp) por disciplina institucional y reforma judicial; E1 baja a 10% (-3pp) por fragmentación opositora; E2 sube a 18% (+3pp), E4 baja a 18% (-2pp)."
   }
 ];
 
