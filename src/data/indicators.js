@@ -106,6 +106,66 @@ export const INDICATORS = [
         "green",
         "flat",
         ">10M barriles a EE.UU.; India 4° proveedor; producción neta ~980K bpd"
+      ],
+      [
+        "green",
+        "up",
+        "PDVSA–Tesoro centraliza exportaciones; 1,25M bpd totales, India 427K bpd como 2° comprador, Chevron 269K bpd"
+      ],
+      [
+        "green",
+        "flat",
+        "Gira India–Türkiye amplía cartera de compradores; Reliance evalúa hasta 400K bpd adicionales"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de volumen S23 · acuerdos IMPSA/GE Vernova/PDVSA-Repsol amplían infraestructura asociada"
+      ],
+      [
+        "green",
+        "flat",
+        "Sismo Mw7.2/7.5 desplaza agenda; PDVSA factura USD9.400M ene-may (+54% interanual) sin afectar exportaciones reportadas"
+      ],
+      [
+        "green",
+        "down",
+        "Exportaciones de junio bajan a ~1,20M bpd; flujo de caja petrolero USD1.110M, -USD260M vs mayo"
+      ],
+      [
+        "yellow",
+        "down",
+        "Reglamento de Hidrocarburos firmado; sin cifra de volumen semanal, EMBI sube a 7.098 pts eleva percepción de riesgo sectorial"
+      ],
+      [
+        "yellow",
+        "down",
+        "Producción OPEP 1,070-1,187M bpd (brecha de 117.000 bpd vs meta oficial de 1,5M bpd)"
+      ],
+      [
+        "green",
+        "up",
+        "Exportaciones superan 1,2M bpd; facturación semestral PDVSA USD11.200M (+52%)"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de volumen S29 · pagos internacionales de majors migran al Tesoro de EE.UU. con tasa 20-35%"
+      ],
+      [
+        "yellow",
+        "down",
+        "Exportaciones caen por segundo mes consecutivo; producción ronda 1,2M bpd"
+      ],
+      [
+        "green",
+        "up",
+        "743.000 bpd a EE.UU. en semana cerrada 7 ago (+81%), máximo semanal desde 2017; producción de julio 1,2M bpd"
+      ],
+      [
+        "green",
+        "flat",
+        "Segunda semana consecutiva >700K bpd a EE.UU. (730.000 bpd); promedio de 4 semanas 639.000 bpd, máximo desde 2017"
       ]
     ]
   },
@@ -216,6 +276,66 @@ export const INDICATORS = [
         "green",
         "up",
         "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
+      ],
+      [
+        "green",
+        "up",
+        "PDVSA–Tesoro centraliza supervisión de ingresos petroleros (instrucción del 28 de mayo)"
+      ],
+      [
+        "green",
+        "up",
+        "OFAC amplía 7 licencias (GL-46C,47A,48B,50B,51B,52A,54A) y arbitraje UK/Francia/Singapur; flujo USD1.500M mensual"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de flujo S23 · acuerdos SLB, IMPSA y PDVSA-Repsol amplían pipeline de ingresos futuros"
+      ],
+      [
+        "yellow",
+        "down",
+        "Sismo desvía atención fiscal hacia reconstrucción; PDVSA factura USD9.400M ene-may (+54% interanual) pese a emergencia"
+      ],
+      [
+        "yellow",
+        "down",
+        "Flujo de caja petrolero cae a USD1.110M en junio (-USD260M vs mayo)"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Flujo esperado de julio USD1.869M; EMBI sube 836pb a 7.098 puntos eleva costo de financiamiento"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Meta oficial de producción 1,5M bpd frente a brecha OPEP de 117.000 bpd; inflación de junio 13,8%"
+      ],
+      [
+        "green",
+        "up",
+        "Facturación semestral PDVSA USD11.200M (+52%); acceso a USD346M de reservas propias en el FMI vía GL60"
+      ],
+      [
+        "green",
+        "up",
+        "Pagos de Chevron, Repsol, Maurel&Prom y Eni se centralizan en el Tesoro de EE.UU. con tasa progresiva 20-35%"
+      ],
+      [
+        "yellow",
+        "down",
+        "Exportaciones caen por segundo mes consecutivo; USD13.000M bajo custodia de EE.UU. sin balance público (investigación GAO)"
+      ],
+      [
+        "green",
+        "up",
+        "Exportaciones a EE.UU. alcanzan máximo semanal desde 2017 (743.000 bpd); tramo de reserva FMI de USD350M movilizado"
+      ],
+      [
+        "green",
+        "flat",
+        "Segunda semana >700K bpd a EE.UU.; PIB del sector petrolero +9,10% interanual en el II trimestre"
       ]
     ]
   },
@@ -326,6 +446,66 @@ export const INDICATORS = [
         "green",
         "up",
         "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
+      ],
+      [
+        "green",
+        "up",
+        "PDVSA–Tesoro centraliza supervisión operativa bajo licencias vigentes; sin revocaciones reportadas"
+      ],
+      [
+        "green",
+        "up",
+        "OFAC amplía 7 licencias generales (GL-46C,47A,48B,50B,51B,52A,54A) y arbitraje en Reino Unido, Francia y Singapur"
+      ],
+      [
+        "green",
+        "up",
+        "OFAC ajusta GL-59, 24A y 5X en aviación, telecomunicaciones, paquetería y PDVSA 2020"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de licencias S24 · agenda desplazada por el sismo del 24 de junio"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin nuevas licencias reportadas S25 · marco OFAC vigente sostiene exportaciones de ~1,20M bpd"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de licencias S26 · Reglamento de Hidrocarburos amplía participación privada bajo el marco existente"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin nuevas licencias reportadas S27 · hoja de ruta electoral anunciada para el 1° de agosto no altera marco OFAC"
+      ],
+      [
+        "green",
+        "up",
+        "OFAC flexibiliza la GL60 (FAQ 1263) para canalizar asistencia sísmica directamente al gobierno encargado"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin nuevas licencias S29 · pagos de majors se centralizan en el Tesoro sin cambios en licencias vigentes"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de licencias S30 · ONGC Videsh obtiene licencia para operar proyectos upstream"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin nuevas licencias reportadas S31 · producción y exportaciones se sostienen bajo marco vigente"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de licencias S32 · ONGC Videsh obtiene licencia para San Cristóbal y Carabobo-1"
       ]
     ]
   },
@@ -436,6 +616,66 @@ export const INDICATORS = [
         "green",
         "flat",
         ">10M barriles a EE.UU.; India 4° proveedor; producción neta ~980K bpd"
+      ],
+      [
+        "green",
+        "up",
+        "Chevron exporta 269.000 bpd dentro de canasta más diversificada; Hogan Lovells se incorpora al frente legal de deuda"
+      ],
+      [
+        "green",
+        "up",
+        "Reliance evalúa acuerdo de suministro con PDVSA de hasta 400.000 bpd; SLB firma MOU de digitalización con PDVSA"
+      ],
+      [
+        "green",
+        "up",
+        "PDVSA–Repsol profundiza recuperación en Petroquiriquire, meta adicional de 20.000 bpd"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de operaciones de majors S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos S25 · flujo de caja petrolero cae a USD1.110M en junio"
+      ],
+      [
+        "green",
+        "up",
+        "Reglamento de Hidrocarburos amplía participación privada bajo control ministerial; Vitol abre oficina en Caracas"
+      ],
+      [
+        "green",
+        "up",
+        "Repsol mantiene 71.000 bepd; 30 acuerdos petroleros internacionales en negociación bajo la nueva ley"
+      ],
+      [
+        "green",
+        "up",
+        "Plazo del 28 de julio moviliza a unas dos docenas de empresas para migrar contratos; Fluxus adquiere 49% de Petrolera Roraima"
+      ],
+      [
+        "green",
+        "up",
+        "Chevron produce 280.000 bpd (+15% trimestral); Halliburton reactiva operaciones bajo depósito y veeduría judicial"
+      ],
+      [
+        "yellow",
+        "flat",
+        "ConocoPhillips considera poco competitivo el marco fiscal para nuevas inversiones; BP vende a NGC su 20% en Manakin"
+      ],
+      [
+        "green",
+        "up",
+        "PetroPiar amplía su área de 460 a 907 km²; ONGC Videsh obtiene licencia para proyectos upstream"
+      ],
+      [
+        "green",
+        "up",
+        "Hunt Oil avanza en Caro y Carisito; SLB proyecta movilizar 15 taladros; ONGC Videsh obtiene licencia para San Cristóbal y Carabobo-1"
       ]
     ]
   },
@@ -551,6 +791,66 @@ export const INDICATORS = [
         "green",
         "up",
         "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de refinación S21 · previo sostenimiento de exportaciones bajo licencias vigentes"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de refinación S22 · gira India-Türkiye no reporta cambios en capacidad de refino"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de refinación S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sismo del 24 de junio introduce riesgo sobre infraestructura industrial; sin balance específico de refinerías"
+      ],
+      [
+        "yellow",
+        "down",
+        "Afectaciones eléctricas condicionan la operación de las refinerías El Palito y Morón"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de refinación S26 · Reglamento de Hidrocarburos no reporta cambios en capacidad instalada"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de refinación S27 · producción OPEP con brecha de 117.000 bpd frente a meta de 1,5M bpd"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de refinación S28"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de refinación S29"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de refinación S30"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de refinación S31"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de refinación S32"
       ]
     ]
   },
@@ -661,6 +961,66 @@ export const INDICATORS = [
         "green",
         "up",
         "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de taladros S21"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de taladros S22 · gira India–Türkiye enfatiza acuerdos de servicio, no cifra de taladros"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de taladros S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de taladros S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de taladros S25"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de taladros S26"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de taladros S27"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de taladros S28"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de taladros S29"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de taladros S30 · Hunt Oil firma memorando para evaluar proyectos petroleros"
+      ],
+      [
+        "yellow",
+        "up",
+        "Hunt Oil avanza en Caro y Carisito dentro del nuevo ciclo de inversión"
+      ],
+      [
+        "yellow",
+        "up",
+        "SLB proyecta movilizar 15 taladros; aún por debajo del umbral de recuperación sostenida"
       ]
     ]
   },
@@ -747,6 +1107,61 @@ export const INDICATORS = [
         "green",
         "up",
         "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de recaudación S22 · flujo de divisas mensual estimado en USD1.500M sostiene base tributaria"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de recaudación S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sismo del 24 de junio introduce riesgo fiscal; costo estimado 1%-7% del PIB"
+      ],
+      [
+        "yellow",
+        "down",
+        "Riesgo fiscal se amplía a 4%-20% del PIB (USGS); deuda externa revelada en USD240.000M"
+      ],
+      [
+        "yellow",
+        "down",
+        "SENIAT se reorganiza junto a Pequiven, Banco de Venezuela y CIIP; EMBI sube a 7.098 puntos"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Inflación de junio 13,8%, acumulado semestral 129,82%; sin cifra de recaudación específica"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de recaudación S28 · GAO investiga el fondo petrolero bajo custodia de EE.UU. (>USD13.000M)"
+      ],
+      [
+        "yellow",
+        "up",
+        "Liquidez crece 159% en siete meses; deuda externa estimada en 290% del PIB"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de recaudación S30 · dólar oficial acumula 150,4% en el año"
+      ],
+      [
+        "yellow",
+        "down",
+        "Inflación de julio 19,9%; acumulado 2026 ~176%"
+      ],
+      [
+        "yellow",
+        "up",
+        "SENIAT simplifica el RIF (elimina vencimiento y cartelera fiscal); PIB del sector no petrolero +5,79% interanual"
       ]
     ]
   },
@@ -828,6 +1243,61 @@ export const INDICATORS = [
         "green",
         "up",
         "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
+      ],
+      [
+        "yellow",
+        "flat",
+        "FANB despliega control territorial en el Arco Minero (Las Claritas, Km 88); riesgos humanitarios y ambientales sin balance oficial"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de apertura minera S23 · Provea y SOS Orinoco alertan sobre riesgos del operativo minero"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de apertura minera S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de apertura minera S25"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de apertura minera S26"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de apertura minera S27"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de apertura minera S28"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de apertura minera S29"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de apertura minera S30"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de apertura minera S31"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de apertura minera S32"
       ]
     ]
   },
@@ -899,6 +1369,61 @@ export const INDICATORS = [
         "green",
         "up",
         "Centerview, GL-58 y negociaciones Exxon/Conoco sostienen apertura energética-financiera"
+      ],
+      [
+        "green",
+        "up",
+        "Shell/BP aceleran proyectos gasíferos vinculados a Trinidad y Tobago"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de gas natural S23"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de gas natural S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de gas natural S25"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de gas natural S26"
+      ],
+      [
+        "green",
+        "up",
+        "Shell evalúa Patao y Mejillones; proyecta primera producción del campo Dragón para 2029"
+      ],
+      [
+        "green",
+        "up",
+        "Repsol mantiene 71.000 bepd y acuerda avances en Cardón IV, Petroquiriquire y evaluación de Horcón"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de gas natural S29"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de gas natural S30"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de gas natural S31"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de gas natural S32"
       ]
     ]
   },
@@ -1009,6 +1534,66 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Foro Penal registra 404 presos políticos al 1 jun; Ejecutivo reporta 314 privados de libertad liberados y 8.740 libertades acumuladas, sin verificación integral"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Cifras oficiales sin cambios (314 liberados, 8.740 libertades); Roberto Marrero recibe amnistía tras su retorno"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo balance oficial de amnistía S23 · foco se desplaza a revisión de más de 12.000 expedientes pendientes"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de amnistía S24 · agenda desplazada por el sismo del 24 de junio"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de amnistía S25"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de amnistía S26"
+      ],
+      [
+        "yellow",
+        "up",
+        "Ejecutivo reporta ~9.000 beneficiarios de la Ley de Amnistía (900 liberaciones en enero + 500+ por convivencia democrática); Weiland advierte que el texto vigente no ofrece garantías suficientes para el retorno de Machado"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo balance oficial S28 · Rubio y Figuera reconocen el papel de Machado sin garantías legales concretas de retorno"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de amnistía S29 · Machado y PJ condicionan legitimidad de la mesa a la liberación de detenidos"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de amnistía S30 · la PUD exige liberación de presos políticos como condición de la mesa"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo balance verificable S31 · el primer ciclo de diálogo no comunica resultados específicos sobre presos políticos"
+      ],
+      [
+        "red",
+        "down",
+        "Balance oficial de liberados retrocede de 1.400 a 1.046; fuentes independientes verifican solo ~70 de las 131 liberaciones anunciadas (~53% sin verificar), superando el umbral de alerta"
       ]
     ]
   },
@@ -1119,6 +1704,66 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Foro Penal verifica 29 excarcelaciones del caso Mibiturven; 404 presos políticos activos al 1 jun, El Helicoide sigue operativo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "404 presos políticos se mantienen (35+ mujeres); CorteIDH ordena cerrar El Helicoide en 18 meses"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo balance verificable de excarcelaciones S23 · revisión de más de 12.000 expedientes pendientes de juicio"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de excarcelaciones S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de excarcelaciones S25"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de excarcelaciones S26"
+      ],
+      [
+        "yellow",
+        "up",
+        "Ritmo repunta: ~900 liberaciones reportadas en enero más 500+ por convivencia democrática, aunque sin verificación independiente plena"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo balance verificable S28"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo balance verificable S29 · liberación de detenidos como condición explícita de la oposición"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo balance verificable S30"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo balance verificable S31 · sindicatos mantienen exigencia de liberaciones al cierre del primer ciclo (12 ago)"
+      ],
+      [
+        "red",
+        "down",
+        "Reversión: el balance oficial de retornados a hogares cae de 1.400 a 1.046; fuentes independientes verifican solo ~70 de 131 liberaciones anunciadas, por debajo del ritmo mínimo esperado"
       ]
     ]
   },
@@ -1200,6 +1845,61 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Cabello informa 58.714 personas privadas de libertad y 12.425 con más de dos años sin sentencia; cautelares oficiales se mantienen en 8.426"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Revisión de más de 12.000 expedientes pendientes de juicio, ~70% a cargo de Defensa Pública"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de cautelares S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de cautelares S25"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de cautelares S26"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de cautelares S27 · cifra oficial se mantiene en 8.426"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de cautelares S28"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de cautelares S29"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de cautelares S30"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de cautelares S31"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Cifra oficial de cautelares se mantiene en 8.426, por debajo del umbral de alerta (10.000)"
       ]
     ]
   },
@@ -1310,6 +2010,66 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
+      ],
+      [
+        "green",
+        "up",
+        "ICG sube a 59: centralización PDVSA-Tesoro, primera visita CJCS y reforma eléctrica refuerzan cohesión sin fractura sistémica"
+      ],
+      [
+        "green",
+        "up",
+        "ICG sube a 61: gira India-Türkiye y operativo en el Arco Minero elevan capacidad institucional y territorial sin fisuras"
+      ],
+      [
+        "green",
+        "up",
+        "ICG sube a 64: mesa técnica AN-Figuera y operación SOUTHCOM-FANB refuerzan coordinación de seguridad"
+      ],
+      [
+        "green",
+        "up",
+        "ICG sube a 67: respuesta al sismo se coordina sin fractura civil-militar visible"
+      ],
+      [
+        "green",
+        "down",
+        "ICG baja a 65: cohesión se mantiene, pero 86% de desaprobación y presión fiscal erosionan legitimidad operativa"
+      ],
+      [
+        "green",
+        "up",
+        "ICG sube a 68: enroque económico y silencio institucional tras 180 días confirman disciplina de élite"
+      ],
+      [
+        "green",
+        "up",
+        "ICG sube a 71: reestructuración del gabinete sin disidencias y consolidación de Cabello refuerzan cohesión"
+      ],
+      [
+        "green",
+        "up",
+        "ICG sube a 74: inmunidad de Rodríguez y expansión de PDVSA refuerzan cohesión y capacidad estatal"
+      ],
+      [
+        "green",
+        "up",
+        "ICG sube a 78: reestructuración integral de la FANB (5 componentes, 8 REDI) sin fricción pública"
+      ],
+      [
+        "green",
+        "flat",
+        "ICG baja levemente a 76: cúpula militar mantiene cohesión pese a fuerte desconfianza pública"
+      ],
+      [
+        "green",
+        "up",
+        "ICG sube a 77: acuerdos sobre renovación del TSJ fortalecen coordinación institucional"
+      ],
+      [
+        "green",
+        "up",
+        "ICG sube a 78: continuidad del diálogo y disciplina del aparato elevan marginalmente la cohesión"
       ]
     ]
   },
@@ -1425,6 +2185,66 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de reorganización S21 · Ejecutivo centraliza gestión petrolera bajo esquema PDVSA-Tesoro"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de reorganización S22"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de reorganización S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de reorganización S24 · agenda desplazada por el sismo, Estado Mayor coordina respuesta"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Estado Mayor con cuatro vicepresidencias sectoriales coordina respuesta sísmica; ~19.000 funcionarios desplegados"
+      ],
+      [
+        "yellow",
+        "up",
+        "Reorganiza SENIAT, Pequiven, Banco de Venezuela y CIIP sin disidencia pública tras vencimiento del artículo 234"
+      ],
+      [
+        "yellow",
+        "up",
+        "Mayor reestructuración ministerial: Plasencia funde Cancillería y Comercio Exterior; Gil pasa a Ciencia y Tecnología; fundaciones sociales centralizadas en Presidencia"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de reorganización S28"
+      ],
+      [
+        "yellow",
+        "up",
+        "Retiro formal de la CPI (Estatuto de Roma); reestructuración integral de la cúpula militar (5 componentes, 8 REDI) sin disidencias"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Reinicia el mecanismo de postulaciones al TSJ; Cabello rechaza el Estatuto de Transición como 'aberración jurídica'"
+      ],
+      [
+        "yellow",
+        "up",
+        "Acuerdo de renovación integral del TSJ (todas las salas) y comité paritario de postulaciones ampliado"
+      ],
+      [
+        "yellow",
+        "up",
+        "Nuevo comité de 23 integrantes con mayoría de sociedad civil sustituye el procedimiento anterior de postulaciones judiciales"
       ]
     ]
   },
@@ -1535,6 +2355,66 @@ export const INDICATORS = [
         "green",
         "up",
         "Manifiesto Panamá, retornos opositores y MCM 55% fortalecen E1"
+      ],
+      [
+        "green",
+        "flat",
+        "E1 se mantiene en 34%; sin nuevo anuncio de calendario electoral"
+      ],
+      [
+        "yellow",
+        "down",
+        "E1 baja a 33%; Rubio exige renovación del CNE pero Cabello descarta negociar con Machado"
+      ],
+      [
+        "green",
+        "up",
+        "E1 sube a 37%; mesa técnica AN-Figuera abre canal político con respaldo del Departamento de Estado"
+      ],
+      [
+        "green",
+        "up",
+        "E1 sube a 39%; OEA se declara lista para apoyar una transición electoral pese al sismo"
+      ],
+      [
+        "yellow",
+        "down",
+        "E1 baja a 36%; dos intentos de retorno de Machado bloqueados sin avances de la comisión AN2015-Gobierno"
+      ],
+      [
+        "yellow",
+        "down",
+        "E1 baja a 33%; bloqueo reiterado al retorno de Machado documentado por WSJ y Axios"
+      ],
+      [
+        "yellow",
+        "down",
+        "E1 cae 6pp a 27% ('Movimiento Disruptivo'): Washington anuncia hoja de ruta electoral desde el 1° de agosto, pero reconoce que la amnistía no garantiza el retorno de Machado"
+      ],
+      [
+        "red",
+        "down",
+        "E1 cae a 22%; inclusión discursiva de Machado sin cronograma, delegación ni garantías concretas"
+      ],
+      [
+        "red",
+        "down",
+        "E1 cae 8pp a 14% ('Movimiento Disruptivo'): mesa AN2015 se restringe a PJ y VP, Machado y la PUD quedan fuera"
+      ],
+      [
+        "red",
+        "down",
+        "E1 cae a 12%; exclusión persistente de Machado y ausencia de avances electorales verificables"
+      ],
+      [
+        "red",
+        "up",
+        "E1 sube 1pp a 13% por la segunda ronda prevista y primer contacto reservado con la Plataforma Unitaria"
+      ],
+      [
+        "red",
+        "down",
+        "E1 cae a 10%, mínimo del ciclo; fragmentación opositora (Pacto por Venezuela) reduce probabilidad de transición pacífica"
       ]
     ]
   },
@@ -1645,6 +2525,66 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
+      ],
+      [
+        "yellow",
+        "flat",
+        "El Helicoide continúa operativo; persisten detenciones focalizadas y acciones patrimoniales contra dirigentes opositores"
+      ],
+      [
+        "yellow",
+        "up",
+        "CorteIDH ordena cerrar El Helicoide en 18 meses; Cabello informa 58.714 personas privadas de libertad"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de marcos restrictivos S23 · revisión de más de 12.000 expedientes pendientes de juicio"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de marcos restrictivos S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "up",
+        "Controles sobre voluntariado, ayuda humanitaria y prensa elevan riesgo de securitización de la respuesta al sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de marcos restrictivos S26"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de marcos restrictivos S27"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de marcos restrictivos S28"
+      ],
+      [
+        "yellow",
+        "up",
+        "Venezuela formaliza el retiro del Estatuto de Roma (CPI), con respaldo explícito de EE.UU."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Cabello rechaza el Estatuto de Transición como 'aberración jurídica' y mantiene capacidad de veto"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de marcos restrictivos S31"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de marcos restrictivos S32"
       ]
     ]
   },
@@ -1726,6 +2666,61 @@ export const INDICATORS = [
         "green",
         "up",
         "Manifiesto Panamá, retornos opositores y MCM 55% fortalecen E1"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin nueva medición de liderazgo S22 · Cabello descarta negociar con Machado"
+      ],
+      [
+        "green",
+        "up",
+        "Retorno de Dinorah Figuera reconstruye presencia institucional opositora vía mesa técnica AN-Figuera"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin nueva medición S24 · Figuera deslinda su rol negociador del liderazgo electoral de Machado"
+      ],
+      [
+        "yellow",
+        "down",
+        "Dos intentos de retorno de Machado bloqueados sin respaldo operativo de Washington; Grupo IDEA cuestiona el bloqueo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Machado conserva 53% de imagen positiva; declara respeto hacia la Administración Trump"
+      ],
+      [
+        "yellow",
+        "down",
+        "PUD concluye reunión de tres horas sin posición común sobre representación en la agenda AN2015-Ejecutivo"
+      ],
+      [
+        "yellow",
+        "up",
+        "Machado alcanza 46,2% de imagen positiva; Capriles y Ramos Allup advierten que excluirla resta legitimidad"
+      ],
+      [
+        "yellow",
+        "down",
+        "Delegación AN2015 se restringe a PJ y VP; Machado condiciona su respaldo a liberaciones, garantías y CNE legítimo"
+      ],
+      [
+        "green",
+        "up",
+        "Machado alcanza 72% de imagen positiva frente a 71% de rechazo a Delcy Rodríguez"
+      ],
+      [
+        "green",
+        "flat",
+        "Machado mantiene 72% de imagen positiva; primer contacto reservado AN2015-Plataforma Unitaria sin incorporarla aún"
+      ],
+      [
+        "yellow",
+        "down",
+        "Fragmentación opositora: emerge el Pacto por Venezuela (Enrique Márquez) mientras Machado mantiene su ruta electoral fuera del formato"
       ]
     ]
   },
@@ -1836,6 +2831,66 @@ export const INDICATORS = [
         "red",
         "up",
         "Inflación anualizada ~600%; canasta USD 730,59 vs ingreso USD 240"
+      ],
+      [
+        "yellow",
+        "down",
+        "Brecha cambiaria en 35%, por debajo del umbral de alerta (55%)"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato específico de brecha S22 · flujo de divisas mensual estimado en USD1.500M sostiene el mercado paralelo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato específico de brecha S23 · intervención BCV programada en USD580M"
+      ],
+      [
+        "yellow",
+        "flat",
+        "BCV flexibiliza el mercado cambiario tras el sismo; sin cifra puntual de brecha S24"
+      ],
+      [
+        "green",
+        "down",
+        "Brecha cambiaria baja a 20% al cierre de junio, dentro del rango que fortalece E3"
+      ],
+      [
+        "yellow",
+        "up",
+        "Dólar oficial sube de Bs.639,70 a Bs.652,97; EMBI sube a 7.098 puntos eleva presión cambiaria"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato específico de brecha S27 · inflación de junio 13,8%"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato específico de brecha S28"
+      ],
+      [
+        "yellow",
+        "up",
+        "Liquidez crece 159% en siete meses; presión cambiaria se amplía"
+      ],
+      [
+        "yellow",
+        "up",
+        "Dólar oficial acumula +150,4% en el año (Bs746,63); deuda externa estimada en USD170.000M"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato específico de brecha S31 · inflación de julio 19,9%"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato específico de brecha S32 · PIB no petrolero crece 5,79% interanual en el II trimestre"
       ]
     ]
   },
@@ -1946,6 +3001,66 @@ export const INDICATORS = [
         "red",
         "up",
         "Inflación anualizada ~600%; canasta USD 730,59 vs ingreso USD 240"
+      ],
+      [
+        "yellow",
+        "down",
+        "Inflación de mayo estimada en 9,2%-12,2% mensual, por debajo del umbral de alerta (30%)"
+      ],
+      [
+        "green",
+        "down",
+        "Inflación mensual de mayo (BCV) baja a 6,3%; interanual 525%"
+      ],
+      [
+        "green",
+        "flat",
+        "Inflación de mayo se mantiene en 6,3% (BCV)"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin dato mensual nuevo S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin dato mensual nuevo S25"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin dato mensual nuevo S26"
+      ],
+      [
+        "yellow",
+        "up",
+        "Inflación de junio sube a 13,8%; acumulado semestral 129,82%"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato mensual nuevo S28 · acumulado semestral se mantiene en 129,82%"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato mensual nuevo S29"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato mensual nuevo S30"
+      ],
+      [
+        "yellow",
+        "up",
+        "Inflación de julio sube a 19,9%; acumulado 2026 se aproxima a 176%"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato mensual nuevo S32 · PIB del II trimestre crece 7,14% interanual pese a la presión inflacionaria"
       ]
     ]
   },
@@ -2056,6 +3171,66 @@ export const INDICATORS = [
         "red",
         "up",
         "Inflación anualizada ~600%; canasta USD 730,59 vs ingreso USD 240"
+      ],
+      [
+        "red",
+        "flat",
+        "Relación ingreso/canasta alimentaria en 32,8%; brecha estructural persiste sin ajuste salarial"
+      ],
+      [
+        "red",
+        "flat",
+        "68% de los hogares reporta ingresos iguales o menores al salario mínimo"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin dato nuevo de ingresos S23"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin dato nuevo de ingresos S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin dato nuevo de ingresos S25 · 86% evalúa la gestión como deficiente o muy deficiente"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin dato nuevo de ingresos S26 · 46% prioriza elecciones frente a la crisis económica"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin dato nuevo de ingresos S27 · inflación de junio 13,8% erosiona aún más el poder adquisitivo"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin dato nuevo de ingresos S28"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin dato nuevo de ingresos S29 · 24.000 niños permanecen fuera de las aulas por la emergencia"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin dato nuevo de ingresos S30"
+      ],
+      [
+        "red",
+        "up",
+        "Inflación de julio 19,9% profundiza la pérdida de poder adquisitivo; acumulado 2026 ~176%"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin dato nuevo de ingresos S32 · PIB crece 7,14% interanual sin traducirse aún en mejora del ingreso real"
       ]
     ]
   },
@@ -2166,6 +3341,66 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Bonos a 40 ctvs y Centerview contienen colapso, pero bienestar no mejora"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de sistema eléctrico S21 · reforma eléctrica aprobada en primera discusión (42 artículos, concesiones hasta 25 años)"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de sistema eléctrico S22"
+      ],
+      [
+        "yellow",
+        "up",
+        "IODA registra 12 eventos eléctricos en 6 estados; Guárico con afectación estimada del 50%"
+      ],
+      [
+        "yellow",
+        "up",
+        "Sismo del 24 de junio agrega riesgo sobre infraestructura eléctrica y de telecomunicaciones"
+      ],
+      [
+        "yellow",
+        "up",
+        "Afectaciones eléctricas condicionan la operación de las refinerías El Palito y Morón; electricidad restablecida en 75% de La Guaira"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de sistema eléctrico S26"
+      ],
+      [
+        "yellow",
+        "up",
+        "GE acuerda recuperar 1.000MW en 24 meses y 4.000MW en 4 años; IMSA proyecta +2.400MW en Tocoma y Macagua"
+      ],
+      [
+        "yellow",
+        "up",
+        "Acuerdos INSA-GE proyectan incorporar 7.400MW en 4 años; GE Vernova evalúa rehabilitar 11GW instalados"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de sistema eléctrico S29"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de sistema eléctrico S30"
+      ],
+      [
+        "yellow",
+        "up",
+        "Reinician obras en Tocoma y Macagua (IMPSA/Corpoelec) con meta inicial de 672MW"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Tocoma conecta 160MW al Sistema Eléctrico Nacional; industria reporta afectación durante 214 de 488 horas laborables"
       ]
     ]
   },
@@ -2276,6 +3511,66 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Bonos a 40 ctvs y Centerview contienen colapso, pero bienestar no mejora"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nueva encuesta de percepción S21 · 62,5% de los estados con protestas activas"
+      ],
+      [
+        "yellow",
+        "flat",
+        "81% respalda capital privado en electricidad; 66% evalúa negativamente el servicio eléctrico"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nueva encuesta de percepción S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nueva encuesta de percepción S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "red",
+        "down",
+        "86% evalúa la gestión gubernamental como deficiente o muy deficiente (Mass Behavior Research)"
+      ],
+      [
+        "red",
+        "down",
+        "63,3% desaprueba a Delcy Rodríguez; 65% desaprueba la respuesta al sismo; solo 46% prioriza elecciones"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nueva encuesta de percepción S27"
+      ],
+      [
+        "red",
+        "down",
+        "Aceptación de Rodríguez cae a 40,2%; 34,8% se declara pesimista sobre el rumbo del país"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nueva encuesta de percepción S29"
+      ],
+      [
+        "red",
+        "down",
+        "71% rechaza a Delcy Rodríguez; 94,1% desconfía de la información oficial; 91,6% evalúa mal la respuesta gubernamental"
+      ],
+      [
+        "red",
+        "flat",
+        "Percepción se mantiene sin nueva medición S31; se conservan los datos de agosto (71% rechazo a Rodríguez)"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nueva encuesta nacional comparable S32; se mantienen las últimas mediciones (71% rechazo, 94,1% desconfianza)"
       ]
     ]
   },
@@ -2362,6 +3657,61 @@ export const INDICATORS = [
         "yellow",
         "down",
         "PIB Q1 +2,51% vs +7,19% Q1 2025; inversión -12,3%"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo dato de PIB S22"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo dato de PIB S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo dato de PIB S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "down",
+        "Riesgo fiscal por pérdidas sísmicas estimadas en 4%-20% del PIB (USGS)"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo dato de PIB S26"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo dato de PIB S27 · inflación acumulada semestral 129,82%"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo dato de PIB S28"
+      ],
+      [
+        "yellow",
+        "down",
+        "Deuda externa estimada en 290% del PIB; liquidez crece 159% en siete meses"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo dato de PIB S30"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo dato de PIB S31"
+      ],
+      [
+        "green",
+        "up",
+        "PIB del segundo trimestre crece 7,14% interanual (petróleo +9,10%, no petrolero +5,79%); CEPAL proyecta 3,0% para 2026"
       ]
     ]
   },
@@ -2472,6 +3822,66 @@ export const INDICATORS = [
         "green",
         "up",
         "SOUTHCOM, Tesoro/KPMG, Claver-Carone y protección DOJ sostienen vínculo con Washington"
+      ],
+      [
+        "green",
+        "up",
+        "Dan Caine realiza la primera visita de un jefe del Estado Mayor Conjunto de EE.UU. a Caracas; cooperación de seguridad se eleva a pilar explícito"
+      ],
+      [
+        "green",
+        "up",
+        "OFAC amplía 7 licencias y arbitraje internacional; delegación técnica de EE.UU. viajará a Caracas para ajustes petroleros"
+      ],
+      [
+        "green",
+        "up",
+        "Operación conjunta SOUTHCOM-FANB neutraliza a Héctor Guerrero Flores (Tren de Aragua) en Bolívar"
+      ],
+      [
+        "green",
+        "up",
+        "SOUTHCOM despliega ~2.000 efectivos en apoyo a la respuesta sísmica; EE.UU. eleva asistencia a USD200M"
+      ],
+      [
+        "green",
+        "flat",
+        "Asistencia estadounidense continúa; FMI y BID activan instrumentos de apoyo post-sismo"
+      ],
+      [
+        "green",
+        "up",
+        "Asistencia humanitaria estadounidense supera USD386M; jefe de SOUTHCOM se reúne con Rodríguez y Cabello"
+      ],
+      [
+        "yellow",
+        "down",
+        "Washington reconoce que la amnistía no garantiza el retorno seguro de Machado; respalda hoja de ruta que no la incorpora"
+      ],
+      [
+        "green",
+        "up",
+        "OFAC permite transferencias directas de asistencia sísmica (GL60); EE.UU. reconoce inmunidad soberana a Delcy Rodríguez"
+      ],
+      [
+        "yellow",
+        "flat",
+        "GAO investiga la administración de los fondos petroleros venezolanos bajo custodia de EE.UU. (>USD13.000M)"
+      ],
+      [
+        "green",
+        "up",
+        "Senado impulsa resolución bipartidista con supervisión y metas verificables; EE.UU. da la bienvenida a la mesa AN2015-Gobierno"
+      ],
+      [
+        "green",
+        "up",
+        "Rubio opera como mediador informal; delegación del Tesoro mantiene interlocución de alto nivel con Delcy Rodríguez"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de cooperación bilateral S32 · exportaciones a EE.UU. sostienen máximo desde 2017 (730.000 bpd)"
       ]
     ]
   },
@@ -2582,6 +3992,66 @@ export const INDICATORS = [
         "green",
         "up",
         "SOUTHCOM, Tesoro/KPMG, Claver-Carone y protección DOJ sostienen vínculo con Washington"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S21"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S22"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S23"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S24 · la UE aporta EUR5M a la respuesta humanitaria post-sismo"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S25"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S26"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S27"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S28"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S29"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S30"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S31"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S32"
       ]
     ]
   },
@@ -2692,6 +4162,66 @@ export const INDICATORS = [
         "yellow",
         "up",
         "Caso Zapatero/Plus Ultra tensiona España; India agrega amortiguador petrolero"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de China/Rusia S21 · India se consolida como segundo comprador de crudo (427K bpd)"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de China/Rusia S22 · gira prioriza India y Türkiye como ejes alternativos"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de China/Rusia S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de China/Rusia S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de China/Rusia S25"
+      ],
+      [
+        "yellow",
+        "up",
+        "China y Uruguay envían nuevos cargamentos de ayuda humanitaria tras el sismo"
+      ],
+      [
+        "yellow",
+        "up",
+        "Rusia entrega 35 toneladas adicionales de ayuda; sexto puente aéreo de EE.UU."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de China/Rusia S28"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de China/Rusia S29"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de China/Rusia S30"
+      ],
+      [
+        "yellow",
+        "up",
+        "Rusia participa en acuerdos eléctricos mediante INSA junto con IMPSA en Tocoma"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de China/Rusia S32"
       ]
     ]
   },
@@ -2802,6 +4332,66 @@ export const INDICATORS = [
         "yellow",
         "up",
         "Caso Zapatero/Plus Ultra tensiona España; India agrega amortiguador petrolero"
+      ],
+      [
+        "yellow",
+        "up",
+        "FMI (Álvaro Piris) y Hogan Lovells amplían soporte técnico para relación multilateral, deuda y acreedores"
+      ],
+      [
+        "yellow",
+        "flat",
+        "FMI mantiene cooperación técnica, pero no participa en la reestructuración de deuda; PIIE advierte riesgos de bonistas adelantándose"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de FMI S23"
+      ],
+      [
+        "yellow",
+        "up",
+        "FMI y BID activan instrumentos de asistencia rápida; fondo inicial de USD200M para recuperación post-sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "BID reanuda relaciones formales, aunque aclara que no implica acceso inmediato a nuevos préstamos"
+      ],
+      [
+        "yellow",
+        "up",
+        "FMI dialoga sobre tramo de reserva y DEG, separado de la reestructuración de deuda"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de FMI S27"
+      ],
+      [
+        "green",
+        "up",
+        "Venezuela accede a USD346M de reservas propias en el FMI; recibe primera misión de alto nivel del BID en ~7 años"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de FMI S29 · GAO investiga fondo petrolero bajo custodia de EE.UU."
+      ],
+      [
+        "yellow",
+        "flat",
+        "BID activa cooperación técnica no reembolsable por al menos USD800.000, sin préstamos nuevos"
+      ],
+      [
+        "green",
+        "up",
+        "Tramo de reserva del FMI de USD350M movilizado"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de FMI S32"
       ]
     ]
   },
@@ -2912,6 +4502,66 @@ export const INDICATORS = [
         "yellow",
         "up",
         "Caso Zapatero/Plus Ultra tensiona España; India agrega amortiguador petrolero"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de normalización diplomática S21"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de normalización diplomática S22"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de normalización diplomática S23"
+      ],
+      [
+        "yellow",
+        "up",
+        "+25 países y organismos multilaterales movilizan asistencia tras el sismo"
+      ],
+      [
+        "yellow",
+        "up",
+        "147 países y 31 organismos internacionales expresan solidaridad con Venezuela"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de normalización diplomática S26"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de normalización diplomática S27"
+      ],
+      [
+        "yellow",
+        "up",
+        "Israel concluye misión humanitaria de casi tres semanas, primer gesto de distensión en 17 años"
+      ],
+      [
+        "yellow",
+        "up",
+        "Perú y Chile avanzan en la normalización de relaciones; Reino Unido respalda el diálogo condicionado"
+      ],
+      [
+        "yellow",
+        "up",
+        "Chile y Venezuela restablecen relaciones consulares"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de normalización diplomática S31"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de normalización diplomática S32"
       ]
     ]
   },
@@ -2993,6 +4643,61 @@ export const INDICATORS = [
         "green",
         "up",
         "SOUTHCOM, Tesoro/KPMG, Claver-Carone y protección DOJ sostienen vínculo con Washington"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de presión legislativa S22"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de presión legislativa S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de presión legislativa S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de presión legislativa S25"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de presión legislativa S26"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de presión legislativa S27"
+      ],
+      [
+        "yellow",
+        "up",
+        "Fondo petrolero de USD13.000M bajo custodia de EE.UU. genera cuestionamientos bipartidistas en el Congreso"
+      ],
+      [
+        "yellow",
+        "up",
+        "GAO escala a investigación formal del Congreso sobre la administración del fondo petrolero"
+      ],
+      [
+        "yellow",
+        "up",
+        "Senado impulsa resolución bipartidista con supervisión y metas verificables sobre Venezuela"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de presión legislativa S31"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de presión legislativa S32"
       ]
     ]
   },
@@ -3064,6 +4769,61 @@ export const INDICATORS = [
         "yellow",
         "up",
         "Caso Zapatero/Plus Ultra tensiona España; India agrega amortiguador petrolero"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de relación Venezuela-Colombia S22"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de relación Venezuela-Colombia S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de relación Venezuela-Colombia S24"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de relación Venezuela-Colombia S25"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de relación Venezuela-Colombia S26"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de relación Venezuela-Colombia S27"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de relación Venezuela-Colombia S28"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de relación Venezuela-Colombia S29"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de relación Venezuela-Colombia S30"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de relación Venezuela-Colombia S31"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de relación Venezuela-Colombia S32"
       ]
     ]
   },
@@ -3135,6 +4895,61 @@ export const INDICATORS = [
         "yellow",
         "up",
         "Caso Zapatero/Plus Ultra tensiona España; India agrega amortiguador petrolero"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del proceso judicial S22"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del proceso judicial S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del proceso judicial S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del proceso judicial S25"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del proceso judicial S26"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del proceso judicial S27"
+      ],
+      [
+        "yellow",
+        "up",
+        "Audiencia sobre la moción de inmunidad propia de Maduro queda fijada para el 17 de noviembre de 2026"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del proceso judicial S29"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del proceso judicial S30"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del proceso judicial S31"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del proceso judicial S32"
       ]
     ]
   },
@@ -3245,6 +5060,66 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "43 protestas en 17 entidades; agua, vivienda, justicia y derechos de detenidos"
+      ],
+      [
+        "yellow",
+        "flat",
+        "42 protestas en 15 entidades (29 may-4 jun), estable frente a S20; supera el umbral de escalada (35+)"
+      ],
+      [
+        "red",
+        "up",
+        "75 protestas en 19 entidades (+79% vs semana previa), máximo reciente y por encima del umbral de presión política de primer orden (50+)"
+      ],
+      [
+        "yellow",
+        "down",
+        "27 protestas en 13 estados, descenso frente al máximo de 75 de la semana previa"
+      ],
+      [
+        "yellow",
+        "down",
+        "0 protestas contabilizadas; agenda social desplazada por el sismo del 24 de junio, no implica ausencia de presión"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin conteo verificable de protestas S25; desaprobación de gestión alcanza 86%"
+      ],
+      [
+        "yellow",
+        "up",
+        "15 protestas en tres jornadas (3-9 jul), enfocadas en justicia, trabajo y participación política"
+      ],
+      [
+        "yellow",
+        "down",
+        "Sin conteo verificable de protestas S27; agenda dominada por la reestructuración ministerial y la emergencia sísmica"
+      ],
+      [
+        "yellow",
+        "up",
+        "28 protestas en cuatro días, con máximo diario de 10 el 22 de julio"
+      ],
+      [
+        "red",
+        "up",
+        "62 protestas con pico nacional el 28 de julio (38 movilizaciones en 20 estados), por encima del umbral de presión política de primer orden"
+      ],
+      [
+        "yellow",
+        "down",
+        "25 protestas en 12 entidades, descenso frente al pico de la semana previa"
+      ],
+      [
+        "yellow",
+        "up",
+        "54 protestas con pico de 18 el 12 de agosto, coincidiendo con el cierre del primer ciclo de diálogo"
+      ],
+      [
+        "yellow",
+        "down",
+        "50 protestas con pico de 20 el 14 de agosto, coincidiendo con un acto oficial de vivienda"
       ]
     ]
   },
@@ -3360,6 +5235,66 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "43 protestas en 17 entidades; agua, vivienda, justicia y derechos de detenidos"
+      ],
+      [
+        "yellow",
+        "flat",
+        "15 entidades con protestas activas (29 may-4 jun), por debajo del umbral multi-regional alto (18+)"
+      ],
+      [
+        "red",
+        "up",
+        "19 entidades con protestas activas, por encima del umbral de alcance casi nacional (18+)"
+      ],
+      [
+        "yellow",
+        "down",
+        "13 estados con protestas activas, dentro del rango multi-regional (12+)"
+      ],
+      [
+        "yellow",
+        "down",
+        "Sin conteo territorial verificable S24; agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin conteo territorial verificable S25"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin conteo territorial verificable S26 · Distrito Capital, Lara y Anzoátegui como focos reiterados"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin conteo territorial verificable S27"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin conteo territorial detallado S28 · Distrito Capital aparece de forma recurrente"
+      ],
+      [
+        "red",
+        "up",
+        "20 estados con movilizaciones el pico del 28 de julio, por encima del umbral de alcance casi nacional"
+      ],
+      [
+        "yellow",
+        "down",
+        "12 entidades con protestas activas, en el límite del umbral multi-regional"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Siete entidades muestran recurrencia territorial durante el corto período (7-13 ago)"
+      ],
+      [
+        "yellow",
+        "up",
+        "18 entidades registran protestas al menos una vez en el período, en el umbral de alcance casi nacional"
       ]
     ]
   },
@@ -3431,6 +5366,61 @@ export const INDICATORS = [
         "yellow",
         "up",
         "ICC -8,1 y deterioro de situación actual elevan presión social"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de conectividad S22"
+      ],
+      [
+        "yellow",
+        "down",
+        "IODA registra 12 eventos eléctricos en 6 estados; Guárico con afectación estimada del 50%"
+      ],
+      [
+        "red",
+        "down",
+        "Sismo del 24 de junio agrava riesgo sobre electricidad y telecomunicaciones regionales"
+      ],
+      [
+        "yellow",
+        "up",
+        "Electricidad restablecida en 75% de La Guaira y agua en 68%, tras el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Starlink piloto autorizado por Conatel tras la emergencia, como respaldo de conectividad"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de conectividad S27"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de conectividad S28"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de conectividad S29"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de conectividad S30"
+      ],
+      [
+        "yellow",
+        "up",
+        "Reinician obras en Tocoma y Macagua con meta inicial de 672MW"
+      ],
+      [
+        "yellow",
+        "down",
+        "Tocoma conecta 160MW, pero la industria reporta afectación durante 214 de 488 horas laborables (~44%)"
       ]
     ]
   },
@@ -3497,6 +5487,61 @@ export const INDICATORS = [
         "yellow",
         "up",
         "ICC -8,1 y deterioro de situación actual elevan presión social"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nueva encuesta de percepción S22"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nueva encuesta de percepción S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nueva encuesta de percepción S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "red",
+        "down",
+        "86% evalúa la gestión gubernamental como deficiente o muy deficiente"
+      ],
+      [
+        "red",
+        "flat",
+        "63,3% desaprueba a Delcy Rodríguez; 46% prioriza elecciones como demanda democrática"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nueva encuesta de percepción S27"
+      ],
+      [
+        "yellow",
+        "up",
+        "Aceptación de Rodríguez en 40,2%, aún por encima del umbral crítico de erosión (30%)"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nueva encuesta de percepción S29"
+      ],
+      [
+        "red",
+        "down",
+        "Rechazo a Rodríguez sube a 71% (aceptación ~29%), por debajo del umbral que sostiene E3; 94,1% desconfía de la información oficial"
+      ],
+      [
+        "red",
+        "flat",
+        "Se mantienen las mediciones de agosto: 71% de rechazo a Rodríguez, sin nueva encuesta comparable"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nueva encuesta nacional comparable S32; se conservan los datos de agosto (71% rechazo, 94,1% desconfianza)"
       ]
     ]
   },
@@ -3568,6 +5613,61 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Bonos a 40 ctvs y Centerview contienen colapso, pero bienestar no mejora"
+      ],
+      [
+        "green",
+        "up",
+        "Reliance evalúa suministro hasta 400.000 bpd; SLB firma MOU con PDVSA; contrato modelo elimina cláusula de interés público"
+      ],
+      [
+        "green",
+        "up",
+        "IMPSA, GE Vernova y PDVSA-Repsol amplían compromisos eléctricos e hidrocarburíferos"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de inversión S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de inversión S25"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Vitol abre oficina en Caracas; contrato con Trafigura supera 100M de barriles"
+      ],
+      [
+        "yellow",
+        "flat",
+        "30 acuerdos petroleros internacionales en negociación bajo la nueva Ley de Hidrocarburos"
+      ],
+      [
+        "green",
+        "up",
+        "Fluxus adquiere 49% de Petrolera Roraima; acuerdos INSA-GE proyectan 7.400MW"
+      ],
+      [
+        "yellow",
+        "down",
+        "ConocoPhillips considera poco competitivo el marco fiscal para nuevas inversiones"
+      ],
+      [
+        "yellow",
+        "flat",
+        "General Motors evalúa de forma exploratoria un eventual regreso, sin inversiones anunciadas"
+      ],
+      [
+        "green",
+        "up",
+        "Hunt Oil firma memorando para evaluar proyectos petroleros; PetroPiar amplía su área operativa"
+      ],
+      [
+        "green",
+        "up",
+        "Hunt Oil avanza en Caro y Carisito; SLB proyecta movilizar 15 taladros; ONGC Videsh obtiene nuevas licencias"
       ]
     ]
   },
@@ -3634,6 +5734,61 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Bonos a 40 ctvs y Centerview contienen colapso, pero bienestar no mejora"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de rehabilitación eléctrica S22"
+      ],
+      [
+        "yellow",
+        "up",
+        "IODA registra 12 eventos eléctricos en 6 estados; Guárico con afectación del 50%"
+      ],
+      [
+        "red",
+        "down",
+        "Sismo del 24 de junio agrava el riesgo sobre la infraestructura eléctrica nacional"
+      ],
+      [
+        "yellow",
+        "up",
+        "Electricidad restablecida en 75% de La Guaira tras el sismo"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de rehabilitación eléctrica S26"
+      ],
+      [
+        "yellow",
+        "up",
+        "GE acuerda recuperar 1.000MW en 24 meses y 4.000MW en 4 años; IMSA proyecta +2.400MW en Tocoma/Macagua"
+      ],
+      [
+        "green",
+        "up",
+        "Acuerdos INSA-GE proyectan 7.400MW en 4 años; GE Vernova evalúa rehabilitar 11GW instalados"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de rehabilitación eléctrica S29"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de rehabilitación eléctrica S30"
+      ],
+      [
+        "yellow",
+        "up",
+        "Reinician obras en Tocoma y Macagua (IMPSA/Corpoelec) con meta inicial de 672MW"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Tocoma conecta 160MW al SEN; industria reporta afectación durante 214 de 488 horas laborables"
       ]
     ]
   },
@@ -3695,6 +5850,61 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "E3 dominante con sector duro activo e Iris Varela descartando presidenciales"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del reloj constitucional S22"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del reloj constitucional S23"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del reloj constitucional S24 · agenda desplazada por el sismo"
+      ],
+      [
+        "red",
+        "down",
+        "Vence el segundo plazo constitucional del interinato (3-5 jul) sin mecanismo formal de extensión o sustitución"
+      ],
+      [
+        "red",
+        "flat",
+        "Se cumplen 180 días (art. 234) sin pronunciamiento del TSJ, la AN ni el MP; el gobierno encargado continúa de facto, indefinición supera el umbral de crisis"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nuevo pronunciamiento sobre el artículo 234 S27; continuidad de facto se mantiene"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nuevo pronunciamiento sobre el artículo 234 S28"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nuevo pronunciamiento sobre el artículo 234 S29; retiro de la CPI profundiza la reconfiguración institucional sin resolver el vacío"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nuevo pronunciamiento sobre el artículo 234 S30; Cabello rechaza el Estatuto de Transición como 'aberración jurídica'"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nuevo pronunciamiento sobre el artículo 234 S31; el primer ciclo de diálogo no aborda el vacío constitucional"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nuevo pronunciamiento sobre el artículo 234 S32; consulta popular convocada para el 18 de octubre no resuelve el vacío del interinato"
       ]
     ]
   }
