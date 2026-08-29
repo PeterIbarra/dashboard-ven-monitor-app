@@ -19,6 +19,9 @@ import { INDICATORS, SCENARIO_SIGNALS } from "../../data/indicators.js";
 import { SCENARIOS, CONF_MESES } from "../../data/static.js";
 import { AMNISTIA_TRACKER, FORO_PENAL_LATEST } from "../../data/amnistia.js";
 import { REDES_TOTALS } from "../../data/redes.js";
+import { OPINION_SNAPSHOT, RODRIGUEZ_TREND } from "../../data/opinionPublica.js";
+import { MACRO_LATEST } from "../../data/macroLatest.js";
+import { WEEKLY_INSTITUTIONAL } from "../../data/weeklyInstitutional.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SC, SEM, font, fontSans } from "../../constants";
 
 export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, setSismosSection, setMacroSection }) {
@@ -265,9 +268,9 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         window.scrollTo({ top:0, behavior:"smooth" });
       }} />
 
-      {/* ── ROW 1b: Índice de Inestabilidad Compuesto (19 factores) ── */}
+      {/* ── ROW 1b: Índice de Inestabilidad Compuesto (23 factores) ── */}
       {(() => {
-        // ── 19-input Composite Instability Index (0-100) ──
+        // ── 23-input Composite Instability Index (0-100) ──
         const e1 = wk.probs.find(p=>p.sc===1)?.v || 0;
         const e2 = wk.probs.find(p=>p.sc===2)?.v || 0;
         const e3 = wk.probs.find(p=>p.sc===3)?.v || 0;
@@ -330,26 +333,48 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         const convAltaPct = parseFloat(REDES_TOTALS.convAltoPct) || 10; // % convivencia alta (0-100)
         const convInverted = Math.max(0, 100 - (convAltaPct * 5)); // Inverted + amplified: 8% conv alta → 60 risk, 0% → 100 risk
 
-        // ── FORMULA (19 inputs, weights sum to ~100 with stabilizers) ──
-        const raw = (redCount/totalInds)*9              // Ind. rojos: 9% (was 10)
-          + (e2/100)*7                                    // E2 Colapso: 7% (was 8)
-          + (e4/100)*6                                    // E4 Resistencia: 6% (was 7)
-          + (Math.min(brechaLive,100)/100)*9             // Brecha cambiaria: 9% (was 10)
-          + (tensRed/totalTens)*5                          // Tensiones rojas: 5% (was 6)
-          + (sigActive/sigTotal)*5                         // Señales E4+E2: 5% (was 6)
-          + (brentFactor/100)*4                            // Brent presión: 4%
-          + (bilPct/100)*4                                 // Bilateral Threat: 4% (was 5)
-          + ((icgInverted != null ? icgInverted : 50)/100)*4  // Cohesión GOB (inv): 4% (was 5)
-          + (protestPct/100)*5                             // Protestas semanal: 5%
-          + (spreadPct/100)*4                              // Cobertura territorial: 4%
-          + (Math.min(monthlyTrendPct,150)/150)*3          // Tendencia mensual: 3%
-          + (repressionPct/100)*3                          // Represión: 3%
-          + (amnBrechaPct/100)*3                           // Brecha amnistía: 3% (was 4)
-          + (presosPct/100)*3                              // Presos políticos: 3%
-          + (polAltaPct/100)*5                             // Polarización alta redes: 5% (NEW)
-          + (convInverted/100)*4                           // Convivencia baja redes (inv): 4% (NEW)
-          - (e1/100)*6                                     // E1 Transición: -6% (estabilizador)
-          - (e3/100)*3;                                    // E3 Continuidad: -3% (estabilizador)
+        // Internet/electric connectivity health (IODA) — LIVE (inverted: low health = high instability)
+        const iodaHealth = liveData?.ioda?.avgHealth;
+        const iodaInverted = iodaHealth != null ? Math.max(0, 100 - iodaHealth) : null;
+
+        // Public disapproval of government management ("mal camino" — DatinCorp, corte semanal)
+        const desaprobacionCard = OPINION_SNAPSHOT?.cards?.find(c => /mal camino/i.test(c.label));
+        const desaprobacionPct = desaprobacionCard?.value
+          ?? (RODRIGUEZ_TREND?.length ? Math.max(0, 100 - RODRIGUEZ_TREND[RODRIGUEZ_TREND.length - 1].approval) : 50);
+
+        // Inflation pressure: latest monthly BCV inflation (% → 0-100 risk, saturates at 20%)
+        const inflacionRaw = MACRO_LATEST?.find(m => m.k === "Inflación mensual")?.v || "";
+        const inflacionPct = parseFloat(String(inflacionRaw).replace(",", ".")) || 0;
+        const inflacionFactor = Math.min(inflacionPct * 5, 100);
+
+        // Institutional/regulatory volatility: nº de cambios normativos relevantes en la semana
+        const institucionalCount = WEEKLY_INSTITUTIONAL?.items?.length || 0;
+        const institucionalFactor = Math.min((institucionalCount / 6) * 100, 100); // 6+ cambios/semana = saturado
+
+        // ── FORMULA (23 inputs, weights sum to ~100 with stabilizers) ──
+        const raw = (redCount/totalInds)*8              // Ind. rojos: 8% (was 9)
+          + (e2/100)*6                                    // E2 Colapso: 6% (was 7)
+          + (e4/100)*5                                    // E4 Resistencia: 5% (was 6)
+          + (Math.min(brechaLive,100)/100)*8              // Brecha cambiaria: 8% (was 9)
+          + (tensRed/totalTens)*4                          // Tensiones rojas: 4% (was 5)
+          + (sigActive/sigTotal)*4                         // Señales E4+E2: 4% (was 5)
+          + (brentFactor/100)*3                            // Brent presión: 3% (was 4)
+          + (bilPct/100)*3                                 // Bilateral Threat: 3% (was 4)
+          + ((icgInverted != null ? icgInverted : 50)/100)*3  // Cohesión GOB (inv): 3% (was 4)
+          + (protestPct/100)*4                             // Protestas semanal: 4% (was 5)
+          + (spreadPct/100)*3                              // Cobertura territorial: 3% (was 4)
+          + (Math.min(monthlyTrendPct,150)/150)*2          // Tendencia mensual: 2% (was 3)
+          + (repressionPct/100)*2                          // Represión: 2% (was 3)
+          + (amnBrechaPct/100)*2                           // Brecha amnistía: 2% (was 3)
+          + (presosPct/100)*2                              // Presos políticos: 2% (was 3)
+          + (polAltaPct/100)*4                             // Polarización alta redes: 4% (was 5)
+          + (convInverted/100)*3                           // Convivencia baja redes (inv): 3% (was 4)
+          + ((iodaInverted != null ? iodaInverted : 15)/100)*5  // Conectividad IODA (inv): 5% (NEW)
+          + (desaprobacionPct/100)*5                       // Desaprobación de gestión: 5% (NEW)
+          + (inflacionFactor/100)*6                        // Presión inflacionaria: 6% (NEW)
+          + (institucionalFactor/100)*4                    // Volatilidad institucional: 4% (NEW)
+          - (e1/100)*5                                     // E1 Transición: -5% (estabilizador, was -6)
+          - (e3/100)*2;                                    // E3 Continuidad: -2% (estabilizador, was -3)
         const index = Math.max(0, Math.min(100, Math.round(raw)));
 
         // Previous week index for delta (simplified: same formula with prev week probs)
@@ -358,12 +383,14 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           const pe1=prevWk.probs.find(p=>p.sc===1)?.v||0, pe2=prevWk.probs.find(p=>p.sc===2)?.v||0;
           const pe3=prevWk.probs.find(p=>p.sc===3)?.v||0, pe4=prevWk.probs.find(p=>p.sc===4)?.v||0;
           const pTR=prevWk.tensiones.filter(t=>t.l==="red").length, pTT=prevWk.tensiones.length||1;
-          const pRaw = (redCount/totalInds)*9 + (pe2/100)*7 + (pe4/100)*6
-            + (Math.min(brechaLive,100)/100)*9 + (pTR/pTT)*5 + (sigActive/sigTotal)*5
-            + (brentFactor/100)*4 + (bilPct/100)*4 + ((icgInverted != null ? icgInverted : 50)/100)*4
-            + (protestPct/100)*5 + (spreadPct/100)*4 + (Math.min(monthlyTrendPct,150)/150)*3 + (repressionPct/100)*3
-            + (amnBrechaPct/100)*3 + (presosPct/100)*3 + (polAltaPct/100)*5 + (convInverted/100)*4
-            - (pe1/100)*6 - (pe3/100)*3;
+          const pRaw = (redCount/totalInds)*8 + (pe2/100)*6 + (pe4/100)*5
+            + (Math.min(brechaLive,100)/100)*8 + (pTR/pTT)*4 + (sigActive/sigTotal)*4
+            + (brentFactor/100)*3 + (bilPct/100)*3 + ((icgInverted != null ? icgInverted : 50)/100)*3
+            + (protestPct/100)*4 + (spreadPct/100)*3 + (Math.min(monthlyTrendPct,150)/150)*2 + (repressionPct/100)*2
+            + (amnBrechaPct/100)*2 + (presosPct/100)*2 + (polAltaPct/100)*4 + (convInverted/100)*3
+            + ((iodaInverted != null ? iodaInverted : 15)/100)*5 + (desaprobacionPct/100)*5
+            + (inflacionFactor/100)*6 + (institucionalFactor/100)*4
+            - (pe1/100)*5 - (pe3/100)*2;
           prevIndex = Math.max(0, Math.min(100, Math.round(pRaw)));
         }
         const deltaLive = prevIndex !== null ? index - prevIndex : null;
@@ -404,12 +431,16 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           const wMonthSlice = CONF_SEMANAL.slice(Math.max(0, wi - 3), wi + 1);
           const wMonthTotal = wMonthSlice.reduce((s, c) => s + c.protestas, 0);
           const wMonthlyTrend = avg2025Monthly > 0 ? Math.min((wMonthTotal / avg2025Monthly) * 100, 150) : 50;
-          const wr = (wRedProxy/wTotalSem)*9 + (we2/100)*7 + (we4/100)*6
-            + (Math.min(wBrecha,100)/100)*9 + (wtr/wtt)*5 + (sigActive/sigTotal)*5
-            + (wBrent/100)*4 + (wBil/100)*4 + (wIcg/100)*4 + (wProtestPct/100)*5 + (wSpreadPct/100)*4
-            + (Math.min(wMonthlyTrend,150)/150)*3 + (wReprPct/100)*3
-            + (wAmnBrecha/100)*3 + (wPresos/100)*3 + (polAltaPct/100)*5 + (convInverted/100)*4
-            - (we1/100)*6 - (we3/100)*3;
+          // Nuevos factores: sin serie histórica propia — se usa el valor actual para la última semana
+          // y un valor neutral/repetido para semanas de archivo (misma convención que wBrent/wIcg arriba).
+          const wIoda = (wi === WEEKS.length - 1 && iodaInverted != null) ? iodaInverted : 15;
+          const wr = (wRedProxy/wTotalSem)*8 + (we2/100)*6 + (we4/100)*5
+            + (Math.min(wBrecha,100)/100)*8 + (wtr/wtt)*4 + (sigActive/sigTotal)*4
+            + (wBrent/100)*3 + (wBil/100)*3 + (wIcg/100)*3 + (wProtestPct/100)*4 + (wSpreadPct/100)*3
+            + (Math.min(wMonthlyTrend,150)/150)*2 + (wReprPct/100)*2
+            + (wAmnBrecha/100)*2 + (wPresos/100)*2 + (polAltaPct/100)*4 + (convInverted/100)*3
+            + (wIoda/100)*5 + (desaprobacionPct/100)*5 + (inflacionFactor/100)*6 + (institucionalFactor/100)*4
+            - (we1/100)*5 - (we3/100)*2;
           return Math.max(0, Math.min(100, Math.round(wr)));
         });
 
@@ -427,25 +458,29 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
 
         // Breakdown items for display
         const breakdown = [
-          { label:"Ind. rojos", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100), w:"9%" },
-          { label:"Brecha camb.", value:`${brechaLive.toFixed(0)}%`, pct:Math.min(brechaLive,100), w:"9%", live:true },
-          { label:"E2 Colapso", value:`${e2}%`, pct:e2, w:"7%" },
-          { label:"E4 Resistencia", value:`${e4}%`, pct:e4, w:"6%" },
-          { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100), w:"5%" },
-          { label:"Señales E4/E2", value:`${sigActive}/${sigTotal}`, pct:Math.round(sigActive/sigTotal*100), w:"5%" },
-          { label:"Protestas sem.", value:`${lastWeekConf?.protestas||"—"}`, pct:Math.round(protestPct), w:"5%" },
-          { label:"Pol. alta redes 🌡️", value:`${polAltaPct.toFixed(0)}%`, pct:Math.round(polAltaPct), w:"5%" },
-          { label:"Bilateral 🇺🇸🇻🇪", value:`${bilV.toFixed(1)}σ`, pct:Math.round(bilPct), w:"4%", live:true },
-          { label:"Cohesión GOB 🏛", value:icgRaw != null ? `${icgRaw}` : "—", pct:icgInverted != null ? Math.round(icgInverted) : 50, w:"4%", live:true },
-          { label:"Conv. baja redes 🌡️", value:`${convAltaPct.toFixed(0)}% alta`, pct:Math.round(convInverted), w:"4%" },
-          { label:"Cobertura terr.", value:`${lastWeekConf?.estados||"—"}/24`, pct:Math.round(spreadPct), w:"4%" },
-          { label:"Brent", value:`$${brentPrice}`, pct:brentFactor, w:"4%", live:true },
-          { label:"Brecha amnist.", value:`${amnBrechaPct.toFixed(0)}%`, pct:Math.round(amnBrechaPct), w:"3%" },
-          { label:"Tend. mensual", value:`${monthlyTotal} (4sem)`, pct:Math.round(Math.min(monthlyTrendPct,150)/1.5), w:"3%" },
-          { label:"Represión", value:`${lastWeekConf?.reprimidas||0}`, pct:Math.round(repressionPct), w:"3%" },
-          { label:"Presos pol.", value:`${amnLatest?.fp?.detenidos||"—"}`, pct:Math.round(presosPct), w:"3%" },
-          { label:"E1 Transición", value:`-${e1}%`, pct:0, w:"-6%", isNeg:true },
-          { label:"E3 Continuidad", value:`-${e3}%`, pct:0, w:"-3%", isNeg:true },
+          { label:"Ind. rojos", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100), w:"8%" },
+          { label:"Brecha camb.", value:`${brechaLive.toFixed(0)}%`, pct:Math.min(brechaLive,100), w:"8%", live:true },
+          { label:"Presión inflación", value:inflacionPct ? `${inflacionPct.toFixed(1)}%` : "—", pct:Math.round(inflacionFactor), w:"6%" },
+          { label:"E2 Colapso", value:`${e2}%`, pct:e2, w:"6%" },
+          { label:"E4 Resistencia", value:`${e4}%`, pct:e4, w:"5%" },
+          { label:"Conectividad 🌐", value:iodaHealth != null ? `${iodaHealth}` : "—", pct:iodaInverted != null ? Math.round(iodaInverted) : 15, w:"5%", live:true },
+          { label:"Desaprobación gob.", value:`${desaprobacionPct.toFixed(0)}%`, pct:Math.round(desaprobacionPct), w:"5%" },
+          { label:"Pol. alta redes 🌡️", value:`${polAltaPct.toFixed(0)}%`, pct:Math.round(polAltaPct), w:"4%" },
+          { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100), w:"4%" },
+          { label:"Señales E4/E2", value:`${sigActive}/${sigTotal}`, pct:Math.round(sigActive/sigTotal*100), w:"4%" },
+          { label:"Protestas sem.", value:`${lastWeekConf?.protestas||"—"}`, pct:Math.round(protestPct), w:"4%" },
+          { label:"Volatilidad instit.", value:`${institucionalCount} cambios`, pct:Math.round(institucionalFactor), w:"4%" },
+          { label:"Bilateral 🇺🇸🇻🇪", value:`${bilV.toFixed(1)}σ`, pct:Math.round(bilPct), w:"3%", live:true },
+          { label:"Cohesión GOB 🏛", value:icgRaw != null ? `${icgRaw}` : "—", pct:icgInverted != null ? Math.round(icgInverted) : 50, w:"3%", live:true },
+          { label:"Conv. baja redes 🌡️", value:`${convAltaPct.toFixed(0)}% alta`, pct:Math.round(convInverted), w:"3%" },
+          { label:"Cobertura terr.", value:`${lastWeekConf?.estados||"—"}/24`, pct:Math.round(spreadPct), w:"3%" },
+          { label:"Brent", value:`$${brentPrice}`, pct:brentFactor, w:"3%", live:true },
+          { label:"Tend. mensual", value:`${monthlyTotal} (4sem)`, pct:Math.round(Math.min(monthlyTrendPct,150)/1.5), w:"2%" },
+          { label:"Represión", value:`${lastWeekConf?.reprimidas||0}`, pct:Math.round(repressionPct), w:"2%" },
+          { label:"Brecha amnist.", value:`${amnBrechaPct.toFixed(0)}%`, pct:Math.round(amnBrechaPct), w:"2%" },
+          { label:"Presos pol.", value:`${amnLatest?.fp?.detenidos||"—"}`, pct:Math.round(presosPct), w:"2%" },
+          { label:"E1 Transición", value:`-${e1}%`, pct:0, w:"-5%", isNeg:true },
+          { label:"E3 Continuidad", value:`-${e3}%`, pct:0, w:"-2%", isNeg:true },
         ];
 
         return (

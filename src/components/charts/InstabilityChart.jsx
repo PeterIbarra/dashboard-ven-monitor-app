@@ -30,7 +30,7 @@ export const InstabilityChart = memo(function InstabilityChart({ histIdx, index,
   return (
     <div>
       <div style={{ fontSize:9, fontFamily:font, color:MUTED, marginBottom:3, display:"flex", justifyContent:"space-between" }}>
-        <span>Evolución semanal · 19 factores</span>
+        <span>Evolución semanal · 23 factores</span>
         <span style={{ display:"flex", gap:8 }}>
           <span style={{ display:"flex", alignItems:"center", gap:2 }}><span style={{ display:"inline-block", width:10, height:2, background:zone.color }} /><span style={{ fontSize:7 }}>Índice</span></span>
           <span style={{ display:"flex", alignItems:"center", gap:2 }}><span style={{ display:"inline-block", width:10, height:2, background:"#22d3ee" }} /><span style={{ fontSize:7 }}>MA4</span></span>

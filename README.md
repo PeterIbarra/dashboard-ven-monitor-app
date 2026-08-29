@@ -111,31 +111,35 @@ Por eso, el escenario dominante no determina por sí solo la posición del punto
 
 El selector interno de la Matriz es independiente del selector general del Dashboard. La sección desplegable explica la composición de E1–E4, el método de ubicación y la lectura de la semana seleccionada. La serie puede respaldarse mediante JSON y CSV.
 
-### Índice de inestabilidad (19 factores)
+### Índice de inestabilidad (23 factores)
 
 El índice compuesto se expresa en una escala de 0 a 100 (`TabDashboard.jsx`). Los factores de presión suman puntos; los dos estabilizadores (E1 y E3) restan:
 
 | # | Factor | Peso | Fuente |
 |---:|---|---:|---|
-| 1 | Indicadores en rojo | 9 % | `INDICATORS` |
-| 2 | E2 Colapso y fragmentación (prob.) | 7 % | `WEEKS` |
-| 3 | E4 Resistencia coercitiva (prob.) | 6 % | `WEEKS` |
-| 4 | Brecha cambiaria | 9 % | `/api/dolar` |
-| 5 | Tensiones rojas | 5 % | `WEEKS` |
-| 6 | Señales activas E4+E2 | 5 % | `SCENARIO_SIGNALS` |
-| 7 | Presión del Brent | 4 % | `/api/oil-prices` |
-| 8 | Índice bilateral (PizzINT) | 4 % | `/api/bilateral` |
-| 9 | Cohesión gubernamental (invertida) | 4 % | ICG en vivo |
-| 10 | Protestas semanales | 5 % | `CONF_SEMANAL` |
-| 11 | Cobertura territorial de protestas | 4 % | `CONF_SEMANAL` |
-| 12 | Tendencia mensual vs. 2025 | 3 % | `CONF_SEMANAL` + `CONF_MESES` |
-| 13 | Represión | 3 % | `CONF_SEMANAL` |
-| 14 | Brecha de amnistía (gobierno vs. Foro Penal) | 3 % | `AMNISTIA_TRACKER` |
-| 15 | Presos políticos | 3 % | `AMNISTIA_TRACKER` |
-| 16 | Polarización alta en redes (X) | 5 % | `REDES_TOTALS` |
-| 17 | Convivencia baja en redes — invertida (X) | 4 % | `REDES_TOTALS` |
-| 18 | E1 Transición pacífica (prob.) | **−6 %** (estabilizador) | `WEEKS` |
-| 19 | E3 Continuidad negociada (prob.) | **−3 %** (estabilizador) | `WEEKS` |
+| 1 | Indicadores en rojo | 8 % | `INDICATORS` |
+| 2 | E2 Colapso y fragmentación (prob.) | 6 % | `WEEKS` |
+| 3 | E4 Resistencia coercitiva (prob.) | 5 % | `WEEKS` |
+| 4 | Brecha cambiaria | 8 % | `/api/dolar` |
+| 5 | Tensiones rojas | 4 % | `WEEKS` |
+| 6 | Señales activas E4+E2 | 4 % | `SCENARIO_SIGNALS` |
+| 7 | Presión del Brent | 3 % | `/api/oil-prices` |
+| 8 | Índice bilateral (PizzINT) | 3 % | `/api/bilateral` |
+| 9 | Cohesión gubernamental (invertida) | 3 % | ICG en vivo |
+| 10 | Protestas semanales | 4 % | `CONF_SEMANAL` |
+| 11 | Cobertura territorial de protestas | 3 % | `CONF_SEMANAL` |
+| 12 | Tendencia mensual vs. 2025 | 2 % | `CONF_SEMANAL` + `CONF_MESES` |
+| 13 | Represión | 2 % | `CONF_SEMANAL` |
+| 14 | Brecha de amnistía (gobierno vs. Foro Penal) | 2 % | `AMNISTIA_TRACKER` |
+| 15 | Presos políticos | 2 % | `AMNISTIA_TRACKER` |
+| 16 | Polarización alta en redes (X) | 4 % | `REDES_TOTALS` |
+| 17 | Convivencia baja en redes — invertida (X) | 3 % | `REDES_TOTALS` |
+| 18 | Conectividad a internet — invertida | 5 % | IODA en vivo |
+| 19 | Desaprobación de gestión ("mal camino") | 5 % | `OPINION_SNAPSHOT` |
+| 20 | Presión inflacionaria (inflación mensual BCV) | 6 % | `MACRO_LATEST` |
+| 21 | Volatilidad institucional/normativa (cambios/semana) | 4 % | `WEEKLY_INSTITUTIONAL` |
+| 22 | E1 Transición pacífica (prob.) | **−5 %** (estabilizador) | `WEEKS` |
+| 23 | E3 Continuidad negociada (prob.) | **−2 %** (estabilizador) | `WEEKS` |
 
 | Rango | Lectura |
 |---:|---|
