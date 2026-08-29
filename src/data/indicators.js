@@ -6349,7 +6349,7 @@ export const SCENARIO_SIGNALS = [
       {
         "name": "Reversión del balance de amnistía",
         "sem": "red",
-        "val": "El total oficial de liberados retrocede de 1.400 a 1.046; solo ~70 de 131 liberaciones recientes verificadas por fuentes independientes (~53%), por debajo del ritmo mínimo esperado (S32).",
+        "val": "Gobierno: 1.046 liberaciones y 12.000 beneficios procesales. Foro Penal: 326 presos políticos y 1.065 liberaciones/excarcelaciones en 2026 al 24 ago. Del lote reciente de 131 anuncios, FP confirma 81 y la PUD 105; los acumulados no comparten metodología.",
         "isNew": true
       },
       {

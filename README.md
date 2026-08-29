@@ -4,8 +4,8 @@
 
 Plataforma de análisis situacional para el monitoreo del proceso de estabilización venezolano posterior al 3 de enero de 2026, bajo el liderazgo interino de Delcy Rodríguez (juramentada como presidenta encargada por el TSJ). Integra información editorial semanal, escenarios prospectivos, indicadores en vivo y series históricas para apoyar la lectura estratégica y la toma de decisiones.
 
-**Último corte editorial:** S32 · 14–21 de agosto de 2026
-**Cobertura:** S1–S32 · enero–agosto de 2026
+**Último corte editorial:** S33 · 21–28 de agosto de 2026
+**Cobertura:** S1–S33 · enero–agosto de 2026
 **Producción:** [dashboard-ven-monitor-app.vercel.app](https://dashboard-ven-monitor-app.vercel.app/)
 
 > El dashboard combina fuentes con frecuencias y alcances distintos. Las probabilidades, inferencias y resultados asistidos por IA no sustituyen la validación analítica humana.
@@ -173,7 +173,7 @@ Las alertas de electricidad distinguen cortes eléctricos (rutas BGP estables, d
 
 El dashboard incluye un asistente conversacional persistente (`src/components/ChatBot.jsx`) que responde preguntas analíticas citando datos reales del sistema, no desde memoria del modelo.
 
-**Modo herramientas (tool calling):** el asistente tiene acceso a 10 funciones que consultan directamente los datos editoriales y en vivo del dashboard — historial semanal S1–S32 con probabilidades exactas, señales por escenario, SITREP de una semana puntual, conflictividad histórica y mensual, tensiones activas, KPIs recientes, indicadores por dimensión, sesiones prospectivas, tracker de amnistía y datos en vivo (BCV, paralelo, brecha, Brent, WTI). El modelo debe invocar estas herramientas antes de responder sobre cualquier dato del dashboard.
+**Modo herramientas (tool calling):** el asistente tiene acceso a 10 funciones que consultan directamente los datos editoriales y en vivo del dashboard — historial semanal S1–S33 con probabilidades exactas, señales por escenario, SITREP de una semana puntual, conflictividad histórica y mensual, tensiones activas, KPIs recientes, indicadores por dimensión, sesiones prospectivas, tracker de amnistía y datos en vivo (BCV, paralelo, brecha, Brent, WTI). El modelo debe invocar estas herramientas antes de responder sobre cualquier dato del dashboard.
 
 **Proveedores del modo herramientas:** Groq (`llama-3.3-70b-versatile`) → Mistral (`mistral-small-latest`).
 
@@ -492,5 +492,4 @@ Comprobar además:
 
 ---
 
-*Monitor de Contexto Situacional · PNUD Venezuela · S32 · 14–21 de agosto de 2026*
-
+*Monitor de Contexto Situacional · PNUD Venezuela · S33 · 21–28 de agosto de 2026*

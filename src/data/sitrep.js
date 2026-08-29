@@ -5471,6 +5471,80 @@ export const SITREP_ALL = [
       { "tag": "Humanitario", "color": "#dc2626", "title": "335 viviendas no cierran la brecha", "text": "La cobertura representa alrededor de 1,4% de las viviendas afectadas y la PDNA continúa pendiente." },
       { "tag": "Energía", "color": "#22c55e", "title": "Renta y electricidad sostienen capacidad", "text": "Exportaciones altas y 160 MW de Tocoma refuerzan la capacidad material del arreglo." }
     ]
+  },
+  {
+    "period": "21 de agosto – 28 de agosto de 2026",
+    "periodShort": "21–28 ago 2026",
+    "keyPoints": [
+      { "tag": "Petróleo", "color": "#22c55e", "title": "Negociación sobre 17 campos redefine la tutela energética", "text": "Estados Unidos evalúa participación directa en campos con cerca de 90.000 millones de barriles, mediante empresas mixtas, operadores y contratos de largo plazo." },
+      { "tag": "Judicial", "color": "#0468B1", "title": "La reforma del TSJ entra en primera discusión", "text": "El comité mantiene 23 integrantes y amplía participación civil, pero la designación final continúa en la Asamblea Nacional." },
+      { "tag": "Finanzas", "color": "#22c55e", "title": "La renta se integra a una arquitectura externa", "text": "Licencias OFAC, cuentas de garantía y coordinación con acreedores ordenan flujos sin cerrar la reestructuración de deuda." },
+      { "tag": "Opinión", "color": "#7c3aed", "title": "50,2% prefiere negociar acuerdos", "text": "DatinCorp registra demanda de renovación: 59% no se siente representado y 69,4% considera necesarios nuevos liderazgos." },
+      { "tag": "Social", "color": "#ca8a04", "title": "23 protestas en 14 entidades", "text": "Predominan demandas laborales, de vivienda, salud, agua, justicia y participación, sin represión documentada." },
+      { "tag": "DDHH", "color": "#dc2626", "title": "Foro Penal registra 326 presos políticos", "text": "Al 24 de agosto: 315 hombres, 11 mujeres, 182 civiles y 144 militares; 140 están condenados y 186 permanecen sin condena." },
+      { "tag": "Emergencia", "color": "#dc2626", "title": "La PDNA completa validación en 12 sectores", "text": "El balance sube a 6.509 fallecidos, 60.785 viviendas evaluadas y 28,61% de escombros retirados." },
+      { "tag": "Clima", "color": "#dc2626", "title": "Las lluvias agravan la vulnerabilidad", "text": "Más de 150 viviendas resultan afectadas y al menos seis personas quedan desaparecidas." },
+      { "tag": "Petróleo", "color": "#f59e0b", "title": "Los puertos limitan la expansión", "text": "Buques esperan hasta 30 días; José concentra 70% de los despachos y Guaraguao opera con capacidad reducida." },
+      { "tag": "Escenarios", "color": "#0468B1", "title": "E3 sube a 59%", "text": "La capacidad transaccional aumenta sin transferencia electoral; E1 baja a 8%, E2 a 16% y E4 a 17%." }
+    ],
+    "sintesis": "La semana profundiza la Continuidad Negociada (E3) hasta 59% (+5pp). La arquitectura petrolera, regulatoria y financiera, junto con una reforma judicial administrada y el avance de la PDNA, aumenta la capacidad de gestión sin redistribuir poder electoral. E1 baja a 8% por ausencia de garantías vinculantes; E2 baja a 16% porque la coordinación externa contiene parcialmente la brecha social; E4 baja a 17% al no observarse escalada coercitiva.",
+    "actores": [
+      { "name": "Gobierno encargado", "items": ["Impulsa la reforma del TSJ.", "Reorganiza el Banco de Venezuela.", "Negocia una arquitectura petrolera y financiera de largo plazo."] },
+      { "name": "Estados Unidos y operadores", "items": ["Evalúan participación en 17 campos.", "OFAC actualiza ocho licencias.", "Chevron, ONGC y SLB amplían actividad."] },
+      { "name": "Sociedad civil", "items": ["Registra 23 protestas en 14 entidades.", "Demanda renovación de liderazgos y negociación.", "Participa en la validación de la PDNA."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesOficiales": 1046, "beneficiosProcesales": 12000, "privadosLiberados": null, "cautelares": null, "militares": 144, "fpVerificados": 1065, "fpDetenidos": 326, "fpNota": "Cortes separados: el Gobierno reporta 1.046 liberaciones y 12.000 beneficios procesales; Foro Penal registra 1.065 liberaciones/excarcelaciones durante 2026 y 326 presos políticos al 24 de agosto. Del lote oficial reciente de 131 casos, Foro Penal confirma 81 y la PUD 105." },
+      "rodriguez": [
+        { "title": "Tutela energética", "text": "Negocia participación y mecanismos de garantía sobre activos petroleros." },
+        { "title": "Reforma judicial", "text": "Promueve renovación integral del TSJ bajo decisión final de la AN." },
+        { "title": "Reconstrucción", "text": "La PDNA avanza desde validación hacia un marco resiliente." }
+      ],
+      "mcmAgenda": ["Exigir garantías electorales vinculantes.", "Canalizar su ventaja relativa de liderazgo.", "Responder a la demanda de renovación política."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "Bs 794,99", "label": "Tipo oficial por USD · cierre 28 ago", "color": "#0468B1" },
+        { "value": "19,1%", "label": "Brecha cambiaria · cierre observado", "color": "#f59e0b" },
+        { "value": "USD 350M", "label": "Intervención · semana 24–28 ago", "color": "#0f766e" },
+        { "value": "USD 15.900M", "label": "Facturación PDVSA · ene–jul", "color": "#22c55e" },
+        { "value": "1,25M b/d", "label": "Techo exportador operativo", "color": "#f59e0b" },
+        { "value": ">USD 30.000M", "label": "Reclamos de acreedores", "color": "#dc2626" }
+      ],
+      "empresas": [
+        { "empresa": "Chevron", "desarrollo": "Producción estimada entre 269.000 y 280.000 b/d en julio–agosto." },
+        { "empresa": "ONGC Videsh", "desarrollo": "Plan de USD 200M para elevar San Cristóbal a 45.000–50.000 b/d." },
+        { "empresa": "SLB", "desarrollo": "Accede a bases de campos para digitalización y analítica." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 23, "promDiario": 7.7, "periodo": "21–26 ago · tres jornadas registradas", "variacion": "−54% frente a S32", "composicion": "Trabajo, seguridad social, vivienda, agua, salud, justicia y participación.", "nota": "Se identifican 14 entidades distintas y no se documenta represión." },
+      "percepcion": { "fuente": "DatinCorp", "titulo": "Preferencia negociadora y demanda de renovación", "nota": "1.200 entrevistas en hogares; Caracas y 16 estados; ±2,83%; 95% de confianza.", "datos": [{ "factor": "Prefiere negociar acuerdos", "pct": 50.2 }, { "factor": "Ningún líder lo representa", "pct": 59 }, { "factor": "Necesita nuevos liderazgos", "pct": 69.4 }, { "factor": "Independiente/no alineado", "pct": 64.6 }] },
+      "excarcelados": { "fp": 1065, "presos": 326, "militares": 144, "fuente": "Foro Penal · corte 24 ago 2026; balance oficial separado: 1.046 liberaciones y 12.000 beneficios procesales" }
+    },
+    "marcoNormativo": {
+      "titulo": "Reforma judicial, banca pública y licencias petroleras",
+      "resumen": "La institucionalidad se reorganiza alrededor de justicia, finanzas públicas, seguridad urbana y regulación petrolera.",
+      "cambios": [
+        { "titulo": "Reforma del TSJ", "texto": "Primera discusión unánime y renovación integral prevista.", "color": "#0468B1" },
+        { "titulo": "Banco de Venezuela", "texto": "Calixto Ortega asume la presidencia con junta de siete miembros.", "color": "#22c55e" },
+        { "titulo": "Licencias OFAC", "texto": "Ocho licencias actualizadas el 27 de agosto.", "color": "#f59e0b" },
+        { "titulo": "Patrullaje urbano", "texto": "Se anuncia sustitución de alcabalas por patrullaje preventivo.", "color": "#7c3aed" }
+      ],
+      "lecturaAnalitica": "Los cambios elevan capacidad de administración, pero la reforma judicial no transfiere por sí sola poder electoral ni garantiza independencia."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "59%", "color": "#0468B1", "text": "Sube 5pp por arquitectura petrolera, financiera, judicial y de recuperación." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "17%", "color": "#ca8a04", "text": "Baja 1pp: conserva capacidad, sin escalada represiva semanal." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "16%", "color": "#dc2626", "text": "Baja 2pp por contención externa, pese a brechas sísmica, climática y fiscal." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "8%", "color": "#2d8a30", "text": "Baja 2pp por ausencia de transferencia electoral y fractura institucional." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Términos petroleros", "text": "La transparencia y duración de los acuerdos determinarán estabilidad y legitimidad." },
+      { "tag": "Institucional", "color": "#0468B1", "title": "Independencia del TSJ", "text": "La composición final mostrará si la reforma es sustantiva o procedimental." },
+      { "tag": "Humanitario", "color": "#dc2626", "title": "Ejecución de la PDNA", "text": "La validación debe traducirse en metas, financiamiento y cobertura habitacional." },
+      { "tag": "Social", "color": "#7c3aed", "title": "Vacío de representación", "text": "La demanda de nuevos liderazgos puede reordenar alianzas y participación." }
+    ]
   }
 ];
 

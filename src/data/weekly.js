@@ -2455,37 +2455,115 @@ export const WEEKS = [
         ]
       }
     }
+  },
+  {
+    "label": "21–28 ago",
+    "short": "S33",
+    "probs": [
+      { "sc": 1, "v": 8, "t": "down" },
+      { "sc": 2, "v": 16, "t": "down" },
+      { "sc": 3, "v": 59, "t": "up" },
+      { "sc": 4, "v": 17, "t": "down" }
+    ],
+    "xy": { "x": 0.33, "y": 0.24 },
+    "sem": { "g": 8, "y": 10, "r": 8 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "Techo operativo estimado en 1,25M b/d; esperas portuarias de hasta 30 días",
+        "ingresos": "Facturación estimada de PDVSA: USD 15.900M entre enero y julio",
+        "licencias": "OFAC actualiza ocho licencias; ONGC proyecta USD 200M en San Cristóbal",
+        "cambio": "Demanda eléctrica máxima de 15.625 MW; persisten restricciones estructurales"
+      },
+      "economico": {
+        "inflacion": "Cierre 28 ago: oficial Bs 794,99/USD, mercado Bs 946,73 y brecha de 19,1%",
+        "ingresos_pob": "La economía es prioridad para 51,4% de los consultados",
+        "electricidad": "Reservas contables del BCV cercanas a USD 13.200M",
+        "pib": "Acreedores organizados reclaman más de USD 30.000M"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha aumenta a 51pp",
+        "elecciones": "50,2% prefiere negociar; 69,4% demanda nuevos liderazgos",
+        "mcm": "María Corina Machado lidera capacidad percibida de transición con 33,3%",
+        "eeuu": "Participación directa de EE.UU. en 17 campos redefine la arquitectura petrolera"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Cooperación para la recuperación:</b> La PDNA valida daños y necesidades en 12 sectores y avanza hacia un marco resiliente." },
+      { "l": "green", "t": "<b>Preferencia negociadora:</b> 50,2% favorece acuerdos frente a confrontación o intervención externa." },
+      { "l": "yellow", "t": "<b>Reforma judicial administrada:</b> La sociedad civil gana espacio en postulaciones, pero la decisión final sigue en la AN." },
+      { "l": "yellow", "t": "<b>Tutela petrolera:</b> La negociación de 17 campos puede estabilizar ingresos, con costos de legitimidad y soberanía." },
+      { "l": "yellow", "t": "<b>Representación:</b> 59% declara que ningún liderazgo actual lo representa." },
+      { "l": "red", "t": "<b>Brecha sísmica:</b> 25.240 viviendas están restringidas o en alto riesgo; solo se reportan 377 entregadas." },
+      { "l": "red", "t": "<b>Choque climático:</b> Las lluvias afectan más de 150 viviendas y dejan al menos seis desaparecidos." },
+      { "l": "red", "t": "<b>Cuello de botella petrolero:</b> Buques esperan hasta 30 días y José concentra 70% de las exportaciones." }
+    ],
+    "lectura": "La Continuidad Negociada sube a 59% (+5pp). La negociación de participación estadounidense en 17 campos, la actualización de licencias OFAC, los mecanismos de garantía financiera, la reforma administrada del TSJ y el avance de la PDNA amplían la capacidad de gestión transaccional sin producir transferencia electoral.\n\nE1 baja a 8% (−2pp) porque la reforma judicial conserva la decisión final en la Asamblea Nacional y no aparece una coalición democratizadora ni una fractura institucional. E2 baja a 16% (−2pp): la brecha sísmica, las lluvias y la presión fiscal son severas, pero las protestas siguen dispersas y la PDNA introduce coordinación. E4 baja a 17% (−1pp) al no registrarse escalada represiva, aunque la capacidad coercitiva permanece intacta y los acuerdos petroleros pueden activar tensiones soberanistas.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 sube a 59% por tutela petrolera, arquitectura financiera, reforma judicial administrada y avance de la PDNA",
+      "E1 baja a 8% por falta de transferencia electoral y ausencia de fractura institucional",
+      "E2 baja a 16% y E4 a 17%: persisten riesgos sociales y coercitivos, pero no dominan la trayectoria"
+    ],
+    "dominantComposition": {
+      "scenario": 3,
+      "method": "impacto × persistencia × evidencia",
+      "factors": [
+        { "name": "Tutela petrolera de largo plazo", "detail": "Participación estadounidense negociada en 17 campos y mecanismos de operación de largo plazo.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Arquitectura regulatoria y financiera", "detail": "Licencias OFAC, cuentas de garantía y coordinación con acreedores ordenan la renta.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Reforma judicial administrada", "detail": "El comité amplía participación civil, pero la AN conserva la designación final.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "PDNA y cooperación internacional", "detail": "La validación en 12 sectores institucionaliza la recuperación sin alterar el arreglo político.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Preferencia social por negociar", "detail": "50,2% favorece acuerdos, por encima de confrontación e intervención extranjera.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Ausencia de transferencia electoral", "detail": "La administración gana capacidad sin una ruta vinculante de alternancia.", "impact": 4, "persistence": 5, "evidence": 5, "confidence": "Alta" }
+      ]
+    },
+    "scenarioCompositions": {
+      "1": { "scenario": 1, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Potencial de independencia judicial", "detail": "La renovación integral puede abrir cambios si adquiere autonomía efectiva.", "impact": 3, "persistence": 3, "evidence": 4, "confidence": "Media-alta" },
+        { "name": "Demanda de nuevos liderazgos", "detail": "69,4% considera necesaria una renovación política.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Exclusión electoral", "detail": "Actores opositores centrales permanecen fuera de una ruta vinculante.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" }
+      ] },
+      "2": { "scenario": 2, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Brecha de reconstrucción", "detail": "25.240 viviendas restringidas o en alto riesgo frente a 377 entregadas.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Choque por lluvias", "detail": "Más de 150 viviendas afectadas y al menos seis desaparecidos.", "impact": 4, "persistence": 3, "evidence": 4, "confidence": "Media-alta" },
+        { "name": "Contención externa", "detail": "La PDNA y el ingreso petrolero reducen el riesgo de colapso inmediato.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" }
+      ] },
+      "4": { "scenario": 4, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Capacidad coercitiva preservada", "detail": "El aparato conserva cohesión y control territorial.", "impact": 5, "persistence": 5, "evidence": 4, "confidence": "Alta" },
+        { "name": "Ausencia de escalada", "detail": "No se documenta represión en las 23 protestas del corte.", "impact": 4, "persistence": 3, "evidence": 5, "confidence": "Alta" },
+        { "name": "Riesgo soberanista", "detail": "Los términos petroleros pueden activar resistencia nacionalista.", "impact": 4, "persistence": 4, "evidence": 3, "confidence": "Media" }
+      ] }
+    }
   }
 ];
 
 export const TENSIONS = [
   {
     "level": "green",
-    "text": "La segunda fase del diálogo se prepara para septiembre y el procedimiento de renovación judicial entra en una nueva etapa."
+    "text": "La PDNA completa su validación multisectorial y avanza hacia un marco de recuperación resiliente."
   },
   {
     "level": "green",
-    "text": "Las exportaciones a EE.UU. superan 700.000 b/d por segunda semana y Tocoma conecta 160 MW."
+    "text": "La preferencia por negociación alcanza 50,2% y refuerza la salida transaccional."
   },
   {
     "level": "yellow",
-    "text": "La segunda fase aún no contiene un compromiso electoral verificable."
+    "text": "La reforma del TSJ amplía la participación civil, pero la designación final permanece bajo control de la AN."
   },
   {
     "level": "yellow",
-    "text": "La exclusión de María Corina Machado y el Pacto por Venezuela amplían la fragmentación opositora."
+    "text": "La participación extranjera en 17 campos puede estabilizar ingresos, pero abre riesgos de legitimidad y soberanía."
   },
   {
     "level": "yellow",
-    "text": "La reconstrucción alcanza 25,15% de escombros retirados, pero solo 335 viviendas entregadas y sin PDNA formal."
+    "text": "25.240 viviendas están restringidas o en alto riesgo y solo se reportan 377 entregadas."
   },
   {
     "level": "red",
-    "text": "Las fallas eléctricas afectan 214 de 488 horas laborables y las pequeñas industrias se contraen 4,7%."
+    "text": "Las lluvias afectan más de 150 viviendas y dejan al menos seis personas desaparecidas."
   },
   {
     "level": "red",
-    "text": "Se registran 50 protestas; el pico de 20 del 14 de agosto coincide con un acto oficial de vivienda."
+    "text": "El cuello de botella portuario genera esperas de hasta 30 días y limita la expansión exportadora."
   }
 ];
 
@@ -2521,7 +2599,8 @@ export const MONITOR_WEEKS = [
   "S29",
   "S30",
   "S31",
-  "S32"
+  "S32",
+  "S33"
 ];
 
 export const ICG_HISTORY = [
@@ -2716,6 +2795,12 @@ export const ICG_HISTORY = [
     "score": 78,
     "sitrep": true,
     "note": "La continuidad del diálogo, el nuevo procedimiento judicial y la disciplina del aparato elevan marginalmente la cohesión; la protesta y la brecha de reconstrucción limitan la mejora."
+  },
+  {
+    "week": "S33",
+    "score": 80,
+    "sitrep": true,
+    "note": "La arquitectura petrolera y financiera, la reforma judicial administrada y la coordinación de la PDNA elevan la cohesión operativa; la baja representación y los costos de legitimidad limitan el avance."
   }
 ];
 
@@ -3620,6 +3705,20 @@ export const CONF_SEMANAL = [
       { "fecha": "18 Agosto", "protestas": 7, "estados": 5, "tipo": "Social", "exigencias": "Vivienda, agua y justicia" },
       { "fecha": "19 Agosto", "protestas": 8, "estados": 6, "tipo": "Mixto", "exigencias": "Detenidos, justicia, participación, salud, agua, trabajo y vivienda" },
       { "fecha": "20 Agosto", "protestas": 6, "estados": 5, "tipo": "Mixto", "exigencias": "Detenidos, justicia, participación, salud, agua, trabajo y vivienda" }
+    ]
+  },
+  {
+    "week": "S33",
+    "label": "21–28 ago",
+    "protestas": 23,
+    "estados": 14,
+    "reprimidas": 0,
+    "motivos": ["Derechos laborales", "Seguridad social", "Vivienda", "Agua", "Salud", "Justicia", "Participación política", "Presos políticos"],
+    "hecho": "Entre el 21 y el 26 de agosto se registraron 23 protestas en 14 entidades distintas. Predominaron las demandas socioeconómicas y reivindicativas, sin represión documentada ni escalada territorial sostenida.",
+    "dias": [
+      { "fecha": "21 Agosto", "protestas": 9, "estados": 7, "tipo": "Social/político", "exigencias": "Participación política, salud, trabajo y vivienda" },
+      { "fecha": "25 Agosto", "protestas": 7, "estados": 5, "tipo": "Social/laboral", "exigencias": "Salud, trabajo, vivienda y agua" },
+      { "fecha": "26 Agosto", "protestas": 7, "estados": 6, "tipo": "Mixto", "exigencias": "Seguridad social, trabajo, vivienda, justicia y protesta pacífica" }
     ]
   }
 ];

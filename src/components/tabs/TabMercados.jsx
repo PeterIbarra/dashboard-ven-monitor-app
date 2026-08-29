@@ -45,14 +45,14 @@ export function TabMercados() {
           <OilPriceTicker />
 
           <Card accent="#22c55e">
-            <div style={{display:"flex",justifyContent:"space-between",gap:8,flexWrap:"wrap",marginBottom:9}}><div style={{fontSize:12,fontWeight:800,color:TEXT}}>Pulso petrolero semanal · 14–21 ago</div><div style={{fontSize:8,color:MUTED,fontFamily:font}}>Datos del corte analítico; separados de precios en vivo</div></div>
+            <div style={{display:"flex",justifyContent:"space-between",gap:8,flexWrap:"wrap",marginBottom:9}}><div style={{fontSize:12,fontWeight:800,color:TEXT}}>Pulso petrolero semanal · 21–28 ago</div><div style={{fontSize:8,color:MUTED,fontFamily:font}}>Datos del corte analítico; separados de precios en vivo</div></div>
             <div style={{display:"grid",gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)",gap:7}}>{[
-              ["730 mil b/d","Exportaciones a EE.UU.","Segunda semana consecutiva sobre 700 mil"],
-              ["639 mil b/d","Promedio de 4 semanas","Mayor nivel desde 2017"],
-              ["94,1M barriles","Envíos acumulados a EE.UU.","Hasta mediados de agosto · +85% vs. todo 2025"],
-              ["916","Oportunidades de inversión","Portafolio petrolero y gasífero presentado en Houston"]
+              ["1,25M b/d","Techo operativo exportador","Limitado por infraestructura portuaria"],
+              ["30 días","Espera máxima de buques","Cuello de botella en terminales"],
+              ["USD 15.900M","Facturación PDVSA","Estimación enero–julio 2026"],
+              ["USD 200M","Plan de ONGC","San Cristóbal · meta 45–50 mil b/d"]
             ].map(([value,label,detail])=><div key={label} style={{padding:"9px 10px",border:`1px solid ${BORDER}`,background:BG2}}><div style={{fontSize:18,fontWeight:900,color:"#22c55e",fontFamily:font}}>{value}</div><div style={{fontSize:8,fontFamily:font,color:TEXT,textTransform:"uppercase",fontWeight:700}}>{label}</div><div style={{fontSize:8,color:MUTED,marginTop:3,lineHeight:1.35}}>{detail}</div></div>)}</div>
-            <div style={{fontSize:9,color:MUTED,lineHeight:1.5,marginTop:8}}>Nuevos frentes: Hunt Oil (Caro y Carisito), SLB (estudios y hasta 15 taladros), ONGC Videsh (San Cristóbal y Carabobo-1), Crossover Energy y BP costa afuera.</div>
+            <div style={{fontSize:9,color:MUTED,lineHeight:1.5,marginTop:8}}>El terminal de José concentra alrededor de 70% de las exportaciones; Guaraguao operaba con dos de siete puestos. OFAC actualizó ocho licencias y SLB obtuvo acceso a bases de campos para digitalización y analítica.</div>
           </Card>
 
           {/* Price cards */}
@@ -65,18 +65,16 @@ export function TabMercados() {
           <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:10 }}>
             <Card accent="#22c55e">
               <div style={{ fontSize:13, fontWeight:600, color:"#22c55e", marginBottom:6 }}>Exportaciones Venezuela</div>
-              <div style={{ fontSize:18, fontWeight:900, color:"#22c55e", fontFamily:"'Space Mono',monospace" }}>730K bpd</div>
+              <div style={{ fontSize:18, fontWeight:900, color:"#22c55e", fontFamily:"'Space Mono',monospace" }}>1,25M bpd</div>
               <div style={{ fontSize:12, color:MUTED, marginTop:4, lineHeight:1.5 }}>
-                Envíos hacia Estados Unidos durante la semana cerrada el 14 de agosto. Segunda semana consecutiva por encima de 700K bpd.
+                Techo operativo estimado de exportación. Las esperas portuarias de hasta 30 días impiden convertir capacidad productiva en mayores despachos.
               </div>
             </Card>
             <Card accent={ACCENT}>
               <div style={{ fontSize:13, fontWeight:600, color:ACCENT, marginBottom:6 }}>Licencias OFAC activas</div>
-              <div style={{ fontSize:14, fontWeight:700, color:ACCENT, fontFamily:font }}>GL49 · GL50 · GL50A</div>
+              <div style={{ fontSize:14, fontWeight:700, color:ACCENT, fontFamily:font }}>8 licencias actualizadas</div>
               <div style={{ fontSize:12, color:MUTED, marginTop:4, lineHeight:1.5 }}>
-                FAQ 1238: marco regulado para licencias a Cuba condicionado. 
-                BP, Chevron, Eni, Repsol, Shell autorizadas bajo ley EE.UU.
-                19 contratos en revisión de solvencia.
+                OFAC actualizó el 27 de agosto las licencias 46D, 47B, 48C, 50C, 51C, 52B, 54B y 61A.
               </div>
             </Card>
             <Card accent="#ef4444">

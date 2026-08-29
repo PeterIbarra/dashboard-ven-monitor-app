@@ -1203,6 +1203,18 @@ export const GDELT_ANNOTATIONS = [
     "tier": "CRITICAL",
     "tierEs": "CRÍTICO",
     "label": "Matriz 14–21 ago ubica E3 en 54% (+2pp) por disciplina institucional y reforma judicial; E1 baja a 10% (-3pp) por fragmentación opositora; E2 sube a 18% (+3pp), E4 baja a 18% (-2pp)."
+  },
+  {
+    "date": "2026-08-24",
+    "tier": "HIGH",
+    "tierEs": "ALTA",
+    "label": "Balance sísmico sube a 6.509 fallecidos y 60.785 viviendas evaluadas; la PDNA completa validación en 12 sectores."
+  },
+  {
+    "date": "2026-08-27",
+    "tier": "CRITICAL",
+    "tierEs": "CRÍTICO",
+    "label": "Matriz 21–28 ago ubica E3 en 59% (+5pp) por arquitectura petrolera, financiera, judicial y de recuperación; E1 baja a 8%, E2 a 16% y E4 a 17%."
   }
 ];
 

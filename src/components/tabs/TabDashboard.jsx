@@ -17,7 +17,7 @@ import { MacroPulseWidget } from "../MacroPulseWidget";
 import { WEEKS, KPIS_LATEST, TENSIONS, CONF_SEMANAL } from "../../data/weekly.js";
 import { INDICATORS, SCENARIO_SIGNALS } from "../../data/indicators.js";
 import { SCENARIOS, CONF_MESES } from "../../data/static.js";
-import { AMNISTIA_TRACKER } from "../../data/amnistia.js";
+import { AMNISTIA_TRACKER, FORO_PENAL_LATEST } from "../../data/amnistia.js";
 import { REDES_TOTALS } from "../../data/redes.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SC, SEM, font, fontSans } from "../../constants";
 
@@ -27,7 +27,7 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
   const [aiLoading, setAiLoading] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [fpOpen, setFpOpen] = useState(false);
-  const [fpData, setFpData] = useState(null);
+  const [fpData, setFpData] = useState(FORO_PENAL_LATEST);
   const [fpLoading, setFpLoading] = useState(false);
   const [fpError, setFpError] = useState(null);
 
@@ -311,7 +311,10 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         const amnLatest = AMNISTIA_TRACKER[AMNISTIA_TRACKER.length - 1];
         const gobLib = amnLatest?.gob?.libertades || amnLatest?.gob?.excarcelados || 1;
         const fpVerif = amnLatest?.fp?.verificados || 0;
-        const amnBrechaPct = Math.max(0, (1 - fpVerif / gobLib) * 100);
+        const recentBatch = amnLatest?.recentBatch;
+        const amnBrechaPct = recentBatch?.official
+          ? Math.max(0, (1 - recentBatch.foroPenal / recentBatch.official) * 100)
+          : Math.max(0, (1 - fpVerif / gobLib) * 100);
         const presosPct = amnLatest?.fp?.detenidos ? Math.min((amnLatest.fp.detenidos / 1000) * 100, 100) : 50;
 
         // Bilateral Threat Index (PizzINT/GDELT) — LIVE
@@ -714,9 +717,10 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
         const trkFpVerif = latest.fp.verificados || 0;
         const trkFpPresos = latest.fp.detenidos || 0;
 
-        // Brecha solo cuando trkGobLib > trkFpVerif (gobierno reporta más que FP verifica)
-        const trkBrechaValida = trkGobLib > 0 && trkFpVerif > 0 && trkGobLib > trkFpVerif;
-        const trkBrecha = trkBrechaValida ? Math.round((1 - trkFpVerif / trkGobLib) * 100) : null;
+        const recentBatch = latest.recentBatch;
+        const trkBrecha = recentBatch?.official
+          ? Math.round((1 - recentBatch.foroPenal / recentBatch.official) * 100)
+          : (trkGobLib > trkFpVerif && trkFpVerif > 0 ? Math.round((1 - trkFpVerif / trkGobLib) * 100) : null);
 
         // Detectar si los datos son carry-forward (sin nuevos datos oficiales)
         const sinDatosNuevos = latest.gob.solicitudes !== null && prev &&
@@ -725,7 +729,9 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
 
         // Delta de excarcelaciones nuevas esta semana
         const excNuevos = latest.gob.excarcelados || null;
-        const trkFpDelta = (prev?.fp?.verificados && trkFpVerif !== prev.fp.verificados) ? trkFpVerif - prev.fp.verificados : null;
+        const trkFpDelta = latest.week !== "S33" && prev?.fp?.verificados && trkFpVerif !== prev.fp.verificados
+          ? trkFpVerif - prev.fp.verificados
+          : null;
         return (
           <Card>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
@@ -745,9 +751,9 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
             </div>
             <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"1fr 1fr 1fr 1fr", gap:mob?6:8, marginBottom:12 }}>
               {[
-                { v:latest.gob.solicitudes?.toLocaleString() || "—", l:"Solicitudes acum.", sub:"Gobierno", c:ACCENT },
-                { v:trkGobLib ? trkGobLib.toLocaleString() : "—", l:"Libertades plenas acum.", sub:"Gobierno", c:"#16a34a", extra: excNuevos ? `+${excNuevos} sem.` : null },
-                { v:trkFpVerif ? trkFpVerif.toLocaleString() : "—", l:"Excarcelaciones verif.", sub:"Foro Penal", c:"#ca8a04", extra: trkFpDelta ? `+${trkFpDelta}` : null },
+                { v:latest.gob.beneficiosProcesales?.toLocaleString() || latest.gob.solicitudes?.toLocaleString() || "—", l:latest.gob.beneficiosProcesales ? "Beneficios procesales" : "Solicitudes acum.", sub:"Gobierno", c:ACCENT },
+                { v:trkGobLib ? trkGobLib.toLocaleString() : "—", l:latest.gob.beneficiosProcesales ? "Liberaciones desde enero" : "Libertades plenas acum.", sub:"Gobierno", c:"#16a34a", extra: excNuevos ? `+${excNuevos} sem.` : null },
+                { v:trkFpVerif ? trkFpVerif.toLocaleString() : "—", l:latest.fp.detenidos === 326 ? "Liberaciones 2026" : "Excarcelaciones verif.", sub:"Foro Penal", c:"#ca8a04", extra: trkFpDelta ? `+${trkFpDelta}` : null },
                 { v:latest.fp.detenidos?.toLocaleString() || "—", l:"Presos políticos", sub:"Foro Penal", c:"#dc2626", clickable:true },
               ].map((item, i) => (
                 <div
@@ -958,15 +964,16 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
             {trkBrecha !== null && (
               <div style={{ marginBottom:12, padding:mob?"8px 10px":"10px 14px", background:`#dc262608`, border:`1px solid #dc262620` }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
-                  <span style={{ fontSize:11, fontFamily:font, color:"#dc2626", letterSpacing:"0.1em", textTransform:"uppercase" }}>Brecha verificación</span>
+                  <span style={{ fontSize:11, fontFamily:font, color:"#dc2626", letterSpacing:"0.1em", textTransform:"uppercase" }}>Lote reciente · pendiente de confirmar por FP</span>
                   <span style={{ fontSize:16, fontFamily:fontSans, fontWeight:700, color:"#dc2626" }}>{trkBrecha}%</span>
                 </div>
                 <div style={{ height:6, background:BORDER, borderRadius:3 }}>
                   <div style={{ height:6, borderRadius:3, background:`linear-gradient(90deg, #16a34a ${100-trkBrecha}%, #dc2626 ${100-trkBrecha}%)`, width:"100%" }} />
                 </div>
                 <div style={{ display:"flex", justifyContent:"space-between", marginTop:4 }}>
-                  <span style={{ fontSize:9, fontFamily:font, color:"#16a34a" }}>Foro Penal: {trkFpVerif.toLocaleString()}</span>
-                  <span style={{ fontSize:9, fontFamily:font, color:ACCENT }}>Gobierno: {trkGobLib.toLocaleString()}</span>
+                  <span style={{ fontSize:9, fontFamily:font, color:"#16a34a" }}>Foro Penal: {recentBatch?.foroPenal?.toLocaleString() || trkFpVerif.toLocaleString()} de {recentBatch?.official?.toLocaleString() || trkGobLib.toLocaleString()}</span>
+                  {recentBatch?.pud && <span style={{ fontSize:9, fontFamily:font, color:"#7c3aed" }}>PUD: {recentBatch.pud.toLocaleString()}</span>}
+                  <span style={{ fontSize:9, fontFamily:font, color:ACCENT }}>Anuncio oficial: {recentBatch?.official?.toLocaleString() || trkGobLib.toLocaleString()}</span>
                 </div>
               </div>
             )}
@@ -998,9 +1005,9 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
                 <div style={{ width:8, height:8, background:"#ca8a04", borderRadius:1 }} />
                 <span style={{ fontSize:10, color:MUTED }}>Foro Penal</span>
               </div>
-              {latest.gob.militares && (
+              {(latest.fp.militares || latest.gob.militares) && (
                 <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:"auto" }}>
-                  {latest.gob.militares} militares · {latest.gob.cautelares?.toLocaleString() || "—"} cautelares
+                  {latest.fp.militares || latest.gob.militares} militares · {latest.fp.civiles ? `${latest.fp.civiles} civiles` : `${latest.gob.cautelares?.toLocaleString() || "—"} cautelares`}
                 </span>
               )}
             </div>

@@ -39,7 +39,7 @@ export function ProtestasWidget({ onOpen }) {
         <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>Conflictividad social · semana seleccionada: <b style={{ color:"#dc2626" }}>{current.week} · {current.label}</b></div>
       </div>
       <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
-        <span style={{ fontSize:10, color:"#dc2626", fontFamily:font, fontWeight:800 }}>{latest.protestas} protestas · ▲116% semanal</span>
+        <span style={{ fontSize:10, color:delta > 0 ? "#dc2626" : "#16a34a", fontFamily:font, fontWeight:800 }}>{current.protestas} protestas · {delta == null ? "sin comparación" : `${delta > 0 ? "▲" : "▼"}${Math.abs(Math.round(delta))}% semanal`}</span>
         <button onClick={()=>setExpanded(value=>!value)} aria-expanded={expanded} style={{ border:`1px solid #dc262650`, background:expanded?"#fee2e2":"#fff", color:"#dc2626", padding:"6px 10px", fontFamily:font, fontSize:9, cursor:"pointer", borderRadius:3 }}>{expanded?"Ocultar ▲":"Desplegar ▼"}</button>
         <button onClick={onOpen} style={{ border:"none", background:"#dc2626", color:"#fff", padding:"6px 10px", fontFamily:font, fontSize:9, cursor:"pointer", borderRadius:3 }}>Ver conflictividad →</button>
       </div>
@@ -78,7 +78,7 @@ export function ProtestasWidget({ onOpen }) {
 
     <div style={{ padding:"10px 14px 12px", borderTop:`1px solid ${BORDER}` }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", gap:8, flexWrap:"wrap", marginBottom:8 }}>
-        <div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Gráfica de demandas · recurrencia S26–S31</div>
+        <div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Gráfica de demandas · últimas 6 semanas</div>
         <div style={{ fontSize:8, color:MUTED, fontFamily:font }}>Unidad: semanas con presencia · no número de protestas</div>
       </div>
       <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:"6px 18px" }}>

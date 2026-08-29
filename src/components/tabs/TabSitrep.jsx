@@ -631,9 +631,9 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
                 {[
                   { v:d.nacional.amnistia.solicitudes?.toLocaleString() || d.nacional.amnistia.fpDetenidos?.toLocaleString() || "—", l:d.nacional.amnistia.solicitudes ? "Solicitudes recibidas" : "Presos políticos (FP)", c:d.nacional.amnistia.solicitudes ? ACCENT : "#dc2626" },
-                  { v:d.nacional.amnistia.libertadesPlenas?.toLocaleString() || "—", l:"Libertades plenas", c:"#16a34a" },
-                  { v:d.nacional.amnistia.privadosLiberados?.toLocaleString() || d.nacional.amnistia.fpVerificados?.toLocaleString() || "—", l:d.nacional.amnistia.privadosLiberados ? "Privados liberados" : "Excarcelaciones verif. (FP)", c:d.nacional.amnistia.privadosLiberados ? TEXT : "#ca8a04" },
-                  { v:d.nacional.amnistia.cautelares?.toLocaleString() || "—", l:"Con cautelares", c:TEXT },
+                  { v:d.nacional.amnistia.libertadesOficiales?.toLocaleString() || d.nacional.amnistia.libertadesPlenas?.toLocaleString() || "—", l:d.nacional.amnistia.libertadesOficiales ? "Liberaciones oficiales" : "Libertades plenas", c:"#16a34a" },
+                  { v:d.nacional.amnistia.fpVerificados?.toLocaleString() || d.nacional.amnistia.privadosLiberados?.toLocaleString() || "—", l:d.nacional.amnistia.libertadesOficiales ? "Liberaciones 2026 (FP)" : (d.nacional.amnistia.privadosLiberados ? "Privados liberados" : "Excarcelaciones verif. (FP)"), c:d.nacional.amnistia.libertadesOficiales ? "#ca8a04" : TEXT },
+                  { v:d.nacional.amnistia.beneficiosProcesales?.toLocaleString() || d.nacional.amnistia.cautelares?.toLocaleString() || "—", l:d.nacional.amnistia.beneficiosProcesales ? "Beneficios procesales" : "Con cautelares", c:TEXT },
                 ].map((item, i) => (
                   <div key={i} style={{ background:BG3, padding:mob?10:14, textAlign:"center" }}>
                     <div style={{ fontFamily:fontSans, fontSize:mob?22:28, fontWeight:700, color:item.c }}>{item.v}</div>

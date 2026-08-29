@@ -1,6 +1,13 @@
-export const MACRO_LATEST_CUT = "21 de agosto de 2026";
+export const MACRO_LATEST_CUT = "28 de agosto de 2026";
 
 export const MACRO_LATEST = [
+  { k:"Tipo oficial", v:"Bs 794,99/USD", c:"#0468B1", s:"28 de agosto de 2026 · cierre observado" },
+  { k:"Tasa de mercado", v:"Bs 946,73/USD", c:"#E5243B", s:"28 de agosto de 2026 · cierre observado" },
+  { k:"Brecha cambiaria", v:"19,1%", c:"#f59e0b", s:"28 de agosto de 2026 · +0,6pp semanal" },
+  { k:"Intervención cambiaria", v:"USD 350M", c:"#0f766e", s:"Semana 24–28 ago · USD 150M menos que la semana previa" },
+  { k:"Facturación PDVSA", v:"USD 15.900M", c:"#22c55e", s:"Enero–julio 2026 · estimación ACS" },
+  { k:"Reclamos de acreedores", v:">USD 30.000M", c:"#E5243B", s:"Comité de acreedores · agosto 2026" },
+  { k:"Producción Chevron", v:"269–280 mil b/d", c:"#22c55e", s:"Julio–agosto 2026 · estimación del corte" },
   { k:"Inflación mensual", v:"19,9%", c:"#E5243B", s:"Julio 2026 · BCV · observado" },
   { k:"Inflación acumulada 2026", v:"≈176%", c:"#E5243B", s:"Enero–julio 2026 · cálculo acumulado · estimado" },
   { k:"Producción petrolera", v:"1,2M b/d", c:"#22c55e", s:"Julio 2026 · OPEP · observado" },
@@ -30,6 +37,6 @@ export const SOCIOECONOMIC_LOCAL = {
     { label:"Pobreza monetaria", value:"68,5%", sub:"ENCOVI 2025", color:"#f59e0b" },
     { label:"Pobreza extrema", value:"31,7%", sub:"ENCOVI 2025", color:"#f59e0b" },
     { label:"Refugiados y migrantes", value:"7,9M", sub:"R4V/UNHCR · nov. 2025", color:"#8b5cf6" },
-    { label:"Escombros retirados", value:"25,15%", sub:"Reconstrucción · 17 ago", color:"#0468B1" },
+    { label:"Escombros retirados", value:"28,61%", sub:"Reconstrucción · 24 ago", color:"#0468B1" },
   ],
 };

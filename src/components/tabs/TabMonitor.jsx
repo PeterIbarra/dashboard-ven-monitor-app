@@ -87,6 +87,8 @@ export function TabMonitor() {
             const lastEntry = ind.hist.filter(h => h !== null).pop();
             if (!lastEntry) return null;
             const sem = lastEntry[0], trend = lastEntry[1], val = lastEntry[2];
+            const currentEntry = ind.hist[MONITOR_WEEKS.length - 1];
+            const displayVal = currentEntry ? currentEntry[2] : `S33 · sin dato nuevo`;
             const isNew = !!ind.addedWeek;
             const isExpanded = expanded === `${g.dim}-${j}`;
             return (
@@ -106,17 +108,17 @@ export function TabMonitor() {
                   </div>
                   {/* History strip — fixed-width, one bar per week, hover/tap for detail */}
                   <div style={{ display:"flex", gap:1, alignItems:"center", minWidth:0, width:"100%" }}>
-                    {ind.hist.map((h,k) => (
+                    {MONITOR_WEEKS.map((_,k) => { const h=ind.hist[k]; return (
                       <div key={k}
                         title={h ? `${MONITOR_WEEKS[k]}: ${h[2]}` : `${MONITOR_WEEKS[k]}: sin datos`}
                         style={{ flex:1, minWidth:1, height:14, borderRadius:1,
                           background:h?SEM[h[0]]:`${BORDER}60`,
                           opacity:h?(0.35+(k/ind.hist.length)*0.65):0.3,
                           boxShadow:(k===ind.hist.length-1 && h)?`0 0 3px ${SEM[h[0]]}`:"none" }} />
-                    ))}
+                    )})}
                   </div>
                   {/* Current value */}
-                  <div style={{ fontSize:13, fontFamily:font, color:SEM[sem], maxWidth:150, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{val}</div>
+                  <div title={currentEntry?val:`Último dato disponible: ${val}`} style={{ fontSize:13, fontFamily:font, color:currentEntry?SEM[sem]:MUTED, maxWidth:150, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{displayVal}</div>
                   {/* Semaforo */}
                   <div style={{ display:"flex", alignItems:"center", gap:4 }}>
                     <SemDot color={sem} size={7} />

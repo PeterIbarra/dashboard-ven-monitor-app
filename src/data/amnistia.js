@@ -1,3 +1,24 @@
+export const FORO_PENAL_LATEST = {
+  fechaActualizacion: "24 ago 2026",
+  presosTotal: 326,
+  genero: { hombres: 315, mujeres: 11 },
+  tipo: { civiles: 182, militares: 144 },
+  edad: { adultos: 326, adolescentes: 0 },
+  situacionJudicial: { condenados: 140, noCondenados: 186 },
+  movimientosRecientes: { encarcelaciones: 0, excarcelaciones: 88, reportadosRecien: 23, extranjeros: 33 },
+  arrestosAcumulados: {
+    total: 19207,
+    asistidosExcarcelados: 14000,
+    cautelaresVigentes: 11465,
+    fallecidosCustodia: 21,
+    presentadosTribunalesMilitares: 875
+  },
+  amnistia: { libertadPlenaPrivados: 188, libertadPlenaCautelar: 582 },
+  arrestos2026: { detenciones: 32, liberaciones: 1065 },
+  fuente: "Foro Penal · La represión en cifras",
+  corte: "24/08/2026"
+};
+
 export const AMNISTIA_TRACKER = [
   {
     "week": "S1",
@@ -487,6 +508,14 @@ export const AMNISTIA_TRACKER = [
     "label": "14–21 ago",
     "gob": { "solicitudes": null, "libertades": 9000, "privadosLiberados": 1046, "cautelares": 8426, "militares": 187 },
     "fp": { "verificados": 857, "detenidos": 404, "militares": 187 },
-    "hito": "El Gobierno encargado reporta 1.046 personas privadas de libertad retornadas a sus hogares como balance acumulado. Fuentes independientes verifican alrededor de 70 de las 131 liberaciones anunciadas más recientemente; no se publica un nuevo total comparable de presos políticos."
+    "hito": "El Gobierno encargado reporta 1.046 personas liberadas desde enero. Del lote reciente de 131 anuncios, Foro Penal confirma 81 casos y la PUD 105; los universos y fechas de corte no son equivalentes."
+  },
+  {
+    "week": "S33",
+    "label": "21–28 ago",
+    "gob": { "solicitudes": null, "libertades": 1046, "privadosLiberados": 1046, "beneficiosProcesales": 12000, "cautelares": null, "militares": null },
+    "fp": { "verificados": 1065, "detenidos": 326, "militares": 144, "civiles": 182, "hombres": 315, "mujeres": 11, "condenados": 140, "noCondenados": 186 },
+    "recentBatch": { "official": 131, "foroPenal": 81, "pud": 105 },
+    "hito": "Corte actualizado: el Gobierno reporta 1.046 liberaciones y 12.000 beneficios procesales. Foro Penal registra 326 presos políticos y 1.065 liberaciones/excarcelaciones en 2026 al 24 de agosto. Los acumulados responden a metodologías distintas; el contraste comparable del lote reciente es 131 anunciadas, 81 confirmadas por Foro Penal y 105 por la PUD."
   }
 ];

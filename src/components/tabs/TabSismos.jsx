@@ -3,6 +3,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "../../constants";
 import { loadCSS, loadScript } from "../../utils";
 import { EarthquakeEvolution } from "../EarthquakeEvolution";
+import { EARTHQUAKE_HISTORY } from "../../data/earthquakeHistory";
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -674,7 +675,7 @@ function QuakeRegistry({ mob }) {
 
       setQuakes(mergeQuakeSources(usgsParsed, emscParsed));
     } catch (e) {
-      setError(e.message || "No se pudo conectar con las fuentes sismicas en este momento.");
+      setError("Los catálogos USGS y EMSC requieren el backend local o el despliegue web; la evolución consolidada permanece disponible.");
       setQuakes([]);
     } finally {
       setLoading(false);
@@ -945,7 +946,7 @@ function CopernicusDamage({ mob }) {
         ));
       }
     } catch (e) {
-      setError(e.message || "No se pudo conectar con Crisis Damage Intelligence.");
+      setError("Copernicus CDI requiere el backend local o el despliegue web. El archivo histórico no se ha perdido.");
     } finally {
       setLoading(false);
     }
@@ -1509,7 +1510,7 @@ function SeverityByZone({ buildings, reports, mob }) {
         if (cancelled) return;
         setAois(Array.isArray(json.aois) ? json.aois.filter(a => a.status === "official-vector") : []);
       } catch (e) {
-        if (!cancelled) setError(e.message || "No se pudo cargar Copernicus.");
+        if (!cancelled) setError("Copernicus requiere el backend local o el despliegue web; no hay pérdida de datos históricos.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -2577,7 +2578,14 @@ export function TabSismos({ subView, setSubView }) {
       setLastUpdated(completedAt);
       setNextRefreshAt(new Date(completedAt.getTime() + REFRESH_INTERVAL_MS));
     } catch (e) {
-      setError(e.message || "No se pudo cargar la data de sismos");
+      const latest = EARTHQUAKE_HISTORY.at(-1);
+      setData(prev => ({
+        ...prev,
+        casualtiesLatest: latest ? { deaths:latest.deaths, injured:latest.injured, date:latest.date } : null,
+        casualtiesHistory: EARTHQUAKE_HISTORY,
+        counts: prev.counts || { reports:0, acopios:0, buildings:0, damage:{} },
+      }));
+      setError("Los datos operativos en vivo requieren el backend local o el despliegue web. La evolución histórica S1–S33 permanece disponible en este entorno.");
     } finally {
       setLoading(false);
     }

@@ -1,11 +1,11 @@
 export const OPINION_SNAPSHOT = {
-  period: "14–21 ago 2026",
-  source: "AtlasIntel/Bloomberg · Poder y Estrategia · Meganálisis",
+  period: "21–28 ago 2026",
+  source: "DatinCorp · AtlasIntel/Bloomberg · Meganálisis",
   cards: [
-    { label: "Imagen positiva MCM", value: 72, suffix: "%", delta: "+19pp vs. junio", color: "#2d8a30" },
-    { label: "Rechazo a D. Rodríguez", value: 71, suffix: "%", delta: "+10pp vs. junio", color: "#dc2626" },
-    { label: "Desconfianza información oficial", value: 94.1, suffix: "%", delta: "Medición post-sismo", color: "#dc2626" },
-    { label: "Corrupción: principal preocupación", value: 66.2, suffix: "%", delta: "LATAM Pulse", color: "#ca8a04" },
+    { label: "Gestión de Delcy Rodríguez: mal camino", value: 53, suffix: "%", delta: "DatinCorp · 23 ago", color: "#dc2626" },
+    { label: "Prefiere negociar acuerdos", value: 50.2, suffix: "%", delta: "vs. 22,6% confrontar", color: "#2d8a30" },
+    { label: "Ningún líder lo representa", value: 59, suffix: "%", delta: "69,4% pide nuevos liderazgos", color: "#ca8a04" },
+    { label: "Independiente / no alineado", value: 64.6, suffix: "%", delta: "DatinCorp · muestra nacional", color: "#7c3aed" },
   ],
 };
 
@@ -57,12 +57,28 @@ export const US_RELATION = [
 ];
 
 export const SURVEY_SOURCES = [
+  { name: "DatinCorp", period: "23 de agosto de 2026", scope: "1.200 entrevistas en hogares · Caracas y 16 estados · ≈90% de la población electoral", note: "Margen de error ±2,83% y 95% de confianza. Comparar cada pregunta con su formulación original." },
   { name: "AtlasIntel / Bloomberg LATAM Pulse", period: "Agosto 2026", scope: "Imagen de liderazgos y preocupaciones", note: "Comparar solo con olas de la misma firma y formulación." },
   { name: "More Consulting", period: "Enero–julio 2026", scope: "Aceptación de la presidenta encargada", note: "Serie longitudinal utilizada para mostrar tendencia interna." },
   { name: "Poder y Estrategia", period: "24–31 julio 2026", scope: "1.040 entrevistas presenciales en ocho ciudades", note: "Cobertura urbana; no equivale automáticamente a una muestra nacional rural." },
   { name: "Meganálisis", period: "Post-terremoto", scope: "Emociones, confianza informativa y respuesta pública", note: "Indicadores asociados a la emergencia; no son aprobación política general." },
   { name: "Atenas Grupo", period: "Julio 2026", scope: "1.208 hogares · clima social y consumo", note: "Se usa como contexto humanitario, no para construir una serie partidista." },
 ];
+
+export const DATINCORP_2026 = {
+  period: "23 de agosto de 2026",
+  methodology: "1.200 entrevistas en hogares · Caracas y 16 estados · ±2,83% · 95% de confianza",
+  findings: [
+    { label:"Economía como prioridad", value:51.4 },
+    { label:"Prefiere negociar acuerdos", value:50.2 },
+    { label:"Considera limitada la negociación", value:41.4 },
+    { label:"Ningún líder lo representa", value:59.0 },
+    { label:"Necesita nuevos liderazgos", value:69.4 },
+    { label:"Prefiere liderazgos completamente nuevos", value:65.9 },
+    { label:"Independiente o no alineado", value:64.6 },
+    { label:"María Corina Machado puede conducir transición", value:33.3 }
+  ]
+};
 
 export const EARTHQUAKE_OPINION = {
   headline: {
@@ -101,3 +117,51 @@ export const EARTHQUAKE_OPINION = {
     { label: "Agua restablecida en La Guaira", value: 68, source: "Mass Behavior Research" },
   ],
 };
+
+// Archivo acumulativo: cada estudio conserva su propia pregunta, universo y metodología.
+// No se combinan porcentajes de firmas distintas en una serie única.
+export const SURVEY_ARCHIVE = [
+  {
+    id:"datincorp-2026-08-23", source:"DatinCorp", period:"23 ago 2026",
+    methodology:"1.200 entrevistas en hogares · Caracas y 16 estados · ±2,83% · 95% de confianza",
+    results:[
+      ["Gestión de Delcy Rodríguez: mal camino",53], ["Prefiere negociar acuerdos",50.2],
+      ["Ningún líder lo representa",59], ["Necesita nuevos liderazgos",69.4],
+      ["Independiente/no alineado",64.6], ["María Corina Machado puede conducir transición",33.3]
+    ]
+  },
+  {
+    id:"atlas-2026-08", source:"AtlasIntel / Bloomberg LATAM Pulse", period:"Agosto 2026",
+    methodology:"Ola regional de imagen de liderazgos y preocupaciones; comparar solo con mediciones equivalentes de la misma firma",
+    results:[
+      ["Imagen positiva de María Corina Machado",72], ["Imagen positiva de Edmundo González",61],
+      ["Imagen positiva de Lorenzo Mendoza",58], ["Imagen negativa de Delcy Rodríguez",71],
+      ["Desaprueba la respuesta sísmica",65], ["Confía en EE.UU. para la reconstrucción",75]
+    ]
+  },
+  {
+    id:"more-2026-ene-jul", source:"More Consulting", period:"Enero–julio 2026",
+    methodology:"Serie comparable de aceptación de Delcy Rodríguez como presidenta encargada",
+    results:[["Enero",69.9],["Marzo",66.8],["Abril",65.7],["Junio",55.6],["Julio",40.2]]
+  },
+  {
+    id:"poder-estrategia-2026-07", source:"Poder y Estrategia", period:"24–31 jul 2026",
+    methodology:"1.040 entrevistas presenciales en ocho ciudades · cobertura principalmente urbana",
+    results:[["Rescatistas internacionales",95],["Bomberos",78],["Iglesias",72],["Protección Civil",68],["FAN",17],["PNB",16]]
+  },
+  {
+    id:"meganalisis-post-sismo", source:"Meganálisis", period:"Post-terremoto 2026",
+    methodology:"Clima emocional, confianza informativa y evaluación de la emergencia; respuestas emocionales múltiples",
+    results:[["Desconfía de la información oficial",94.1],["Respuesta gubernamental mala/muy mala",91.6],["Solidaridad ciudadana",90.3],["Indignación",80.2],["Impotencia",73.8]]
+  },
+  {
+    id:"atenas-2026-07", source:"Atenas Grupo", period:"Julio 2026",
+    methodology:"1.208 hogares · clima social, consumo y prioridades humanitarias",
+    results:[["Hogares vinculados a donaciones",67],["Crisis habitacional como prioridad",64],["En duelo",63],["En alerta o temor",60]]
+  },
+  {
+    id:"mass-behavior-post-sismo", source:"Mass Behavior Research", period:"Post-terremoto 2026",
+    methodology:"Evaluación de gestión y recuperación de servicios; mantener separada de aprobación política general",
+    results:[["Gestión deficiente/muy deficiente",86],["Acceso vial restablecido",90],["Electricidad restablecida en La Guaira",75],["Agua restablecida en La Guaira",68]]
+  }
+];

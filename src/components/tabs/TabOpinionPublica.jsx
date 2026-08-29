@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { Card } from "../Card";
 import { BG2, BORDER, TEXT, MUTED, ACCENT, font } from "../../constants";
-import { OPINION_SNAPSHOT, LEADERSHIP, RODRIGUEZ_TREND, INSTITUTION_TRUST, SOCIAL_MOOD, US_RELATION, SURVEY_SOURCES, EARTHQUAKE_OPINION } from "../../data/opinionPublica";
+import { OPINION_SNAPSHOT, LEADERSHIP, RODRIGUEZ_TREND, INSTITUTION_TRUST, SOCIAL_MOOD, US_RELATION, SURVEY_SOURCES, EARTHQUAKE_OPINION, DATINCORP_2026, SURVEY_ARCHIVE } from "../../data/opinionPublica";
 import { SITREP_ALL } from "../../data/sitrep";
 
 const sections = [
@@ -10,7 +10,7 @@ const sections = [
   { id:"liderazgo", label:"Liderazgos" },
   { id:"instituciones", label:"Confianza y ánimo" },
   { id:"terremoto", label:"Terremoto" },
-  { id:"archivo", label:"Archivo S1–S31" },
+  { id:"archivo", label:"Archivo S1–S33" },
   { id:"metodologia", label:"Fuentes" },
 ];
 
@@ -58,6 +58,7 @@ export function TabOpinionPublica({ section, setSection }) {
 
     {section==="panorama" && <>
       <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:10, marginBottom:12 }}>{OPINION_SNAPSHOT.cards.map(c=><Card key={c.label} accent={c.color}><div style={{ fontSize:9, fontFamily:font, color:MUTED, textTransform:"uppercase", minHeight:28 }}>{c.label}</div><div style={{ fontSize:mob?24:30, fontWeight:800, color:c.color, fontFamily:font }}>{c.value}{c.suffix}</div><div style={{ fontSize:10, color:MUTED }}>{c.delta}</div></Card>)}</div>
+      <Card accent="#7c3aed" style={{ marginBottom:12 }}><div style={{ display:"flex",justifyContent:"space-between",gap:10,flexWrap:"wrap",marginBottom:10 }}><div><div style={{fontSize:11,fontFamily:font,color:"#7c3aed",textTransform:"uppercase"}}>DatinCorp · prioridades, ruta política y representación</div><div style={{fontSize:9,color:MUTED,marginTop:3}}>{DATINCORP_2026.methodology}</div></div><div style={{fontSize:9,color:MUTED}}>{DATINCORP_2026.period}</div></div><div style={{display:"grid",gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)",gap:9}}>{DATINCORP_2026.findings.map(x=><div key={x.label} style={{border:`1px solid ${BORDER}`,padding:"8px 9px",background:BG2}}><div style={{fontSize:19,fontWeight:800,color:"#7c3aed",fontFamily:font}}>{x.value}%</div><div style={{fontSize:9,color:MUTED,lineHeight:1.35}}>{x.label}</div></div>)}</div></Card>
       <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1.45fr 1fr", gap:12 }}>
         <Card><div style={{ fontSize:11, fontFamily:font, color:MUTED, textTransform:"uppercase", marginBottom:8 }}>Aceptación de Delcy Rodríguez · serie comparable</div><TrendChart/><div style={{ fontSize:10, color:MUTED }}>Fuente: More Consulting. La serie muestra aceptación como presidenta encargada; no debe mezclarse con aprobación de gestión de otras firmas.</div></Card>
         <Card><div style={{ fontSize:11, fontFamily:font, color:MUTED, textTransform:"uppercase", marginBottom:12 }}>Relación Venezuela–EE. UU.</div>{US_RELATION.map(r=><div key={r.label} style={{ marginBottom:16 }}><div style={{ display:"flex", justifyContent:"space-between", gap:8, fontSize:11, marginBottom:5 }}><span>{r.label}</span><b>{r.value}%</b></div><Bar value={r.value} color={r.value>r.previous?"#dc2626":ACCENT}/><div style={{ fontSize:9, color:MUTED, marginTop:3 }}>Medición previa: {r.previous}% · {r.value-r.previous>0?"+":""}{r.value-r.previous}pp</div></div>)}</Card>
@@ -88,14 +89,15 @@ export function TabOpinionPublica({ section, setSection }) {
     </>}
 
     {section==="archivo" && <>
+      <Card accent="#7c3aed" style={{marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",gap:10,flexWrap:"wrap",marginBottom:10}}><div><div style={{fontSize:12,fontWeight:800,color:TEXT}}>Archivo acumulativo de encuestas</div><div style={{fontSize:9,color:MUTED,marginTop:3}}>Cada ola conserva fuente, fecha, metodología y preguntas propias. DatinCorp se añade; no sustituye las mediciones anteriores.</div></div><div style={{fontSize:22,fontWeight:900,color:"#7c3aed",fontFamily:font}}>{SURVEY_ARCHIVE.length} estudios</div></div><div style={{display:"grid",gridTemplateColumns:mob?"1fr":"repeat(2,1fr)",gap:9}}>{SURVEY_ARCHIVE.map(study=><details key={study.id} style={{border:`1px solid ${BORDER}`,background:BG2,padding:"9px 10px"}}><summary style={{cursor:"pointer",fontSize:11,fontWeight:800,color:TEXT}}>{study.source} · {study.period}</summary><div style={{fontSize:9,color:MUTED,lineHeight:1.45,margin:"7px 0"}}>{study.methodology}</div><div style={{display:"grid",gap:4}}>{study.results.map(([label,value])=><div key={label} style={{display:"flex",justifyContent:"space-between",gap:8,borderTop:`1px solid ${BORDER}80`,paddingTop:4,fontSize:9}}><span>{label}</span><b style={{color:"#7c3aed",fontFamily:font}}>{value}%</b></div>)}</div></details>)}</div></Card>
       <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:10, marginBottom:12 }}>
-        <Card><div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Semanas cubiertas</div><div style={{ fontSize:27, fontWeight:800, color:ACCENT, fontFamily:font }}>31</div><div style={{ fontSize:10, color:MUTED }}>S1–S31</div></Card>
+        <Card><div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Semanas cubiertas</div><div style={{ fontSize:27, fontWeight:800, color:ACCENT, fontFamily:font }}>33</div><div style={{ fontSize:10, color:MUTED }}>S1–S33</div></Card>
         <Card><div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Cortes estructurados</div><div style={{ fontSize:27, fontWeight:800, color:TEXT, fontFamily:font }}>{archive.filter(r=>r.perception).length}</div><div style={{ fontSize:10, color:MUTED }}>SITREP con bloque de percepción</div></Card>
         <Card><div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Cortes con encuestas</div><div style={{ fontSize:27, fontWeight:800, color:"#2d8a30", fontFamily:font }}>{surveyRecords.length}</div><div style={{ fontSize:10, color:MUTED }}>mediciones o estudios identificados</div></Card>
         <Card><div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Fuentes identificadas</div><div style={{ fontSize:27, fontWeight:800, color:"#7c3aed", fontFamily:font }}>{distinctSources.length}</div><div style={{ fontSize:10, color:MUTED }}>firmas y estudios distintos</div></Card>
       </div>
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, flexWrap:"wrap", marginBottom:10 }}>
-        <div style={{ fontSize:11, color:MUTED, lineHeight:1.5 }}>Archivo cronológico de los bloques de opinión contenidos en cada SITREP. Los valores se presentan como fueron reportados y no se fusionan en un índice único.</div>
+        <div style={{ fontSize:11, color:MUTED, lineHeight:1.5 }}>Archivo semanal de los bloques de opinión contenidos en cada SITREP. Complementa el archivo de estudios superior y conserva el contexto de cada semana.</div>
         <div style={{ display:"flex", border:`1px solid ${BORDER}` }}>{[{id:"encuestas",label:"Solo encuestas"},{id:"todos",label:"Todo el archivo"}].map(f=><button key={f.id} onClick={()=>setArchiveFilter(f.id)} style={{ border:"none", padding:"6px 10px", fontFamily:font, fontSize:10, cursor:"pointer", background:archiveFilter===f.id?ACCENT:"transparent", color:archiveFilter===f.id?"#fff":MUTED }}>{f.label}</button>)}</div>
       </div>
       <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"repeat(2,1fr)", gap:10 }}>

@@ -6,6 +6,7 @@ export const EARTHQUAKE_HISTORY = [
   { date:"3 ago", period:"S30 · 3–7 ago", deaths:6125, injured:null, campPeople:null, camps:null, buildings:null, homesAffected:41624, rubble:16.51, note:"El balance cambia de estructura: omite heridos y campamentos e incorpora viviendas y escombros." },
   { date:"10 ago", period:"S31 · 7–14 ago", deaths:6301, injured:null, campPeople:null, camps:null, buildings:null, homesAffected:53314, rubble:23.26, note:"Avanza la reconstrucción, pero continúan sin publicarse heridos y campamentos; persiste la brecha entre 157 y 1.338 desaparecidos." },
   { date:"17 ago", period:"S32 · 14–21 ago", deaths:6438, injured:86358, campPeople:null, camps:null, buildings:null, homesAffected:59109, rubble:25.15, note:"Se reportan 6.462 rescates con vida, 86.358 atenciones hospitalarias y 10.696 viviendas de alto riesgo; la PDNA formal sigue pendiente." },
+  { date:"24 ago", period:"S33 · 21–28 ago", deaths:6509, injured:226696, campPeople:null, camps:null, buildings:13000, homesAffected:60785, rubble:28.61, note:"El balance reporta 6.462 rescates con vida, 226.696 atenciones hospitalarias y 25.240 viviendas restringidas o de alto riesgo. La PDNA completó su validación multisectorial." },
 ];
 
 export const EARTHQUAKE_MILESTONES = [
@@ -16,4 +17,5 @@ export const EARTHQUAKE_MILESTONES = [
   { date:"3 ago", title:"Cambio metodológico", text:"6.125 fallecidos y 41.624 viviendas afectadas; dejan de publicarse variables antes disponibles." },
   { date:"10 ago", title:"Reconstrucción y brecha informativa", text:"6.301 fallecidos, 53.314 viviendas evaluadas y 23,26% de escombros retirados; la PDNA sigue pendiente." },
   { date:"17 ago", title:"Cobertura habitacional insuficiente", text:"6.438 fallecidos, 59.109 viviendas evaluadas y 25,15% de escombros retirados; solo 335 viviendas han sido entregadas." },
+  { date:"24 ago", title:"Validación de la PDNA", text:"6.509 fallecidos, 60.785 viviendas evaluadas y 28,61% de escombros retirados. La evaluación valida daños y necesidades en 12 sectores." },
 ];

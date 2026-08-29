@@ -2168,6 +2168,11 @@ export function TabAmbiental() {
         )}
       </div>
 
+      <div style={{background:"#eff6ff",border:"1px solid #60a5fa66",borderLeft:"4px solid #2563eb",padding:"10px 13px",marginBottom:12,display:"grid",gridTemplateColumns:mob?"1fr":"1fr auto",gap:10,alignItems:"center"}}>
+        <div><div style={{fontSize:9,fontFamily:font,color:"#1d4ed8",textTransform:"uppercase",letterSpacing:".1em",fontWeight:800}}>Evento del corte S33 · onda tropical 40</div><div style={{fontSize:12,fontWeight:800,color:TEXT,marginTop:3}}>Inundaciones en la Gran Caracas y corredor Valle–Coche</div><div style={{fontSize:10,color:MUTED,lineHeight:1.5,marginTop:3}}>Más de 150 viviendas afectadas y al menos seis personas desaparecidas. La limpieza de escuelas utilizadas como alojamientos temporales añade presión sobre la recuperación sísmica.</div></div>
+        <div style={{display:"flex",gap:8}}><div style={{textAlign:"center",padding:"6px 9px",background:"#fff",border:`1px solid ${BORDER}`}}><div style={{fontSize:18,fontWeight:900,color:"#2563eb",fontFamily:font}}>&gt;150</div><div style={{fontSize:8,color:MUTED}}>viviendas</div></div><div style={{textAlign:"center",padding:"6px 9px",background:"#fff",border:`1px solid ${BORDER}`}}><div style={{fontSize:18,fontWeight:900,color:"#dc2626",fontFamily:font}}>≥6</div><div style={{fontSize:8,color:MUTED}}>desaparecidos</div></div></div>
+      </div>
+
       {/* ── SECCIÓN LLUVIAS ── */}
       {seccion === "lluvia" && (<>
       {/* ── LOADING ── */}
