@@ -36,6 +36,7 @@ import { TabGdelt } from "./components/tabs/TabGdelt";
 import { TabConflictividad } from "./components/tabs/TabConflictividad";
 import { TabIODA } from "./components/tabs/TabIODA";
 import { computeRegionElectric, summarizeNationalElectric } from "./lib/iodaElectric";
+import { computeInstabilityIndex } from "./lib/instabilityIndex";
 import { TabMercados } from "./components/tabs/TabMercados";
 import { TabMacro } from "./components/tabs/TabMacro";
 import { TabAmbiental } from "./components/tabs/TabAmbiental";
@@ -326,6 +327,16 @@ export default function MonitorPNUD() {
           if (results.dolar?.paralelo) params.set("paralelo", results.dolar.paralelo);
           if (results.oil?.brent) params.set("brent", results.oil.brent);
           if (results.oil?.wti) params.set("wti", results.oil.wti);
+          // Índice de Inestabilidad Compuesto — SIEMPRE de la última semana SITREP
+          // (no de `week`, que puede estar en una semana de archivo si el usuario
+          // navegó el selector), calculado con la misma fórmula que TabDashboard
+          // (src/lib/instabilityIndex.js) para que el Daily Brief pueda anclar su
+          // Nivel de Riesgo al mismo número que muestra el dashboard.
+          try {
+            const latestWk = WEEKS[WEEKS.length - 1];
+            const { index } = computeInstabilityIndex(latestWk, results);
+            if (Number.isFinite(index)) params.set("instability_index", index);
+          } catch {}
           // Only write if we have at least 2 data points (avoid writing empty rows)
           const fieldCount = [...params.entries()].filter(([k]) => k !== "type").length;
           if (fieldCount >= 2) {

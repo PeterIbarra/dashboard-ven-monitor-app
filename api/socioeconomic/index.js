@@ -94,7 +94,7 @@ module.exports = async function handler(req, res) {
     try {
       const today = new Date().toISOString().slice(0, 10);
       // Only accept known numeric fields — sanitize input
-      const allowed = ["gdelt_tone","gdelt_volume","brent","wti","bilateral_v","brecha","paralelo"];
+      const allowed = ["gdelt_tone","gdelt_volume","brent","wti","bilateral_v","brecha","paralelo","instability_index"];
       const update = { date: today };
       let fieldsSet = 0;
       for (const key of allowed) {
