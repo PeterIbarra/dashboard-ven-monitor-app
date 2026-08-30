@@ -268,9 +268,9 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         window.scrollTo({ top:0, behavior:"smooth" });
       }} />
 
-      {/* ── ROW 1b: Índice de Inestabilidad Compuesto (23 factores) ── */}
+      {/* ── ROW 1b: Índice de Inestabilidad Compuesto (24 factores) ── */}
       {(() => {
-        // ── 23-input Composite Instability Index (0-100) ──
+        // ── 24-input Composite Instability Index (0-100) ──
         const e1 = wk.probs.find(p=>p.sc===1)?.v || 0;
         const e2 = wk.probs.find(p=>p.sc===2)?.v || 0;
         const e3 = wk.probs.find(p=>p.sc===3)?.v || 0;
@@ -333,9 +333,17 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         const convAltaPct = parseFloat(REDES_TOTALS.convAltoPct) || 10; // % convivencia alta (0-100)
         const convInverted = Math.max(0, 100 - (convAltaPct * 5)); // Inverted + amplified: 8% conv alta → 60 risk, 0% → 100 risk
 
-        // Internet/electric connectivity health (IODA) — LIVE (inverted: low health = high instability)
+        // Internet connectivity health (IODA) — LIVE (inverted: low health = high instability)
         const iodaHealth = liveData?.ioda?.avgHealth;
         const iodaInverted = iodaHealth != null ? Math.max(0, 100 - iodaHealth) : null;
+
+        // Electric-outage severity (IODA tier-aware rationing model) — LIVE (inverted)
+        // Distinct from "Conectividad IODA" above: this uses the CORPOELEC rationing-prior
+        // classifier (src/lib/iodaElectric.js) that separates real power outages from
+        // ordinary internet/BGP congestion, normalized against each state's known
+        // rationing schedule so chronic scheduled blackouts don't saturate the signal.
+        const elecHealth = liveData?.ioda?.electric?.avgElecHealth;
+        const elecInverted = elecHealth != null ? Math.max(0, 100 - elecHealth) : null;
 
         // Public disapproval of government management ("mal camino" — DatinCorp, corte semanal)
         const desaprobacionCard = OPINION_SNAPSHOT?.cards?.find(c => /mal camino/i.test(c.label));
@@ -351,7 +359,7 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         const institucionalCount = WEEKLY_INSTITUTIONAL?.items?.length || 0;
         const institucionalFactor = Math.min((institucionalCount / 6) * 100, 100); // 6+ cambios/semana = saturado
 
-        // ── FORMULA (23 inputs, weights sum to ~100 with stabilizers) ──
+        // ── FORMULA (24 inputs, weights sum to ~100 with stabilizers) ──
         const raw = (redCount/totalInds)*8              // Ind. rojos: 8% (was 9)
           + (e2/100)*6                                    // E2 Colapso: 6% (was 7)
           + (e4/100)*5                                    // E4 Resistencia: 5% (was 6)
@@ -359,20 +367,21 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           + (tensRed/totalTens)*4                          // Tensiones rojas: 4% (was 5)
           + (sigActive/sigTotal)*4                         // Señales E4+E2: 4% (was 5)
           + (brentFactor/100)*3                            // Brent presión: 3% (was 4)
-          + (bilPct/100)*3                                 // Bilateral Threat: 3% (was 4)
-          + ((icgInverted != null ? icgInverted : 50)/100)*3  // Cohesión GOB (inv): 3% (was 4)
+          + (bilPct/100)*2                                 // Bilateral Threat: 2% (was 3)
+          + ((icgInverted != null ? icgInverted : 50)/100)*2  // Cohesión GOB (inv): 2% (was 3)
           + (protestPct/100)*4                             // Protestas semanal: 4% (was 5)
           + (spreadPct/100)*3                              // Cobertura territorial: 3% (was 4)
-          + (Math.min(monthlyTrendPct,150)/150)*2          // Tendencia mensual: 2% (was 3)
-          + (repressionPct/100)*2                          // Represión: 2% (was 3)
-          + (amnBrechaPct/100)*2                           // Brecha amnistía: 2% (was 3)
-          + (presosPct/100)*2                              // Presos políticos: 2% (was 3)
+          + (Math.min(monthlyTrendPct,150)/150)*1          // Tendencia mensual: 1% (was 2)
+          + (repressionPct/100)*1                          // Represión: 1% (was 2)
+          + (amnBrechaPct/100)*1                            // Brecha amnistía: 1% (was 2)
+          + (presosPct/100)*2                              // Presos políticos: 2%
           + (polAltaPct/100)*4                             // Polarización alta redes: 4% (was 5)
-          + (convInverted/100)*3                           // Convivencia baja redes (inv): 3% (was 4)
-          + ((iodaInverted != null ? iodaInverted : 15)/100)*5  // Conectividad IODA (inv): 5% (NEW)
-          + (desaprobacionPct/100)*5                       // Desaprobación de gestión: 5% (NEW)
-          + (inflacionFactor/100)*6                        // Presión inflacionaria: 6% (NEW)
-          + (institucionalFactor/100)*4                    // Volatilidad institucional: 4% (NEW)
+          + (convInverted/100)*2                           // Convivencia baja redes (inv): 2% (was 3)
+          + ((iodaInverted != null ? iodaInverted : 15)/100)*5  // Conectividad IODA (inv): 5%
+          + (desaprobacionPct/100)*5                       // Desaprobación de gestión: 5%
+          + (inflacionFactor/100)*6                        // Presión inflacionaria: 6%
+          + (institucionalFactor/100)*4                    // Volatilidad institucional: 4%
+          + ((elecInverted != null ? elecInverted : 10)/100)*6  // Cortes eléctricos (IODA racionamiento): 6% (NEW)
           - (e1/100)*5                                     // E1 Transición: -5% (estabilizador, was -6)
           - (e3/100)*2;                                    // E3 Continuidad: -2% (estabilizador, was -3)
         const index = Math.max(0, Math.min(100, Math.round(raw)));
@@ -385,11 +394,12 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           const pTR=prevWk.tensiones.filter(t=>t.l==="red").length, pTT=prevWk.tensiones.length||1;
           const pRaw = (redCount/totalInds)*8 + (pe2/100)*6 + (pe4/100)*5
             + (Math.min(brechaLive,100)/100)*8 + (pTR/pTT)*4 + (sigActive/sigTotal)*4
-            + (brentFactor/100)*3 + (bilPct/100)*3 + ((icgInverted != null ? icgInverted : 50)/100)*3
-            + (protestPct/100)*4 + (spreadPct/100)*3 + (Math.min(monthlyTrendPct,150)/150)*2 + (repressionPct/100)*2
-            + (amnBrechaPct/100)*2 + (presosPct/100)*2 + (polAltaPct/100)*4 + (convInverted/100)*3
+            + (brentFactor/100)*3 + (bilPct/100)*2 + ((icgInverted != null ? icgInverted : 50)/100)*2
+            + (protestPct/100)*4 + (spreadPct/100)*3 + (Math.min(monthlyTrendPct,150)/150)*1 + (repressionPct/100)*1
+            + (amnBrechaPct/100)*1 + (presosPct/100)*2 + (polAltaPct/100)*4 + (convInverted/100)*2
             + ((iodaInverted != null ? iodaInverted : 15)/100)*5 + (desaprobacionPct/100)*5
             + (inflacionFactor/100)*6 + (institucionalFactor/100)*4
+            + ((elecInverted != null ? elecInverted : 10)/100)*6
             - (pe1/100)*5 - (pe3/100)*2;
           prevIndex = Math.max(0, Math.min(100, Math.round(pRaw)));
         }
@@ -434,12 +444,14 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           // Nuevos factores: sin serie histórica propia — se usa el valor actual para la última semana
           // y un valor neutral/repetido para semanas de archivo (misma convención que wBrent/wIcg arriba).
           const wIoda = (wi === WEEKS.length - 1 && iodaInverted != null) ? iodaInverted : 15;
+          const wElec = (wi === WEEKS.length - 1 && elecInverted != null) ? elecInverted : 10;
           const wr = (wRedProxy/wTotalSem)*8 + (we2/100)*6 + (we4/100)*5
             + (Math.min(wBrecha,100)/100)*8 + (wtr/wtt)*4 + (sigActive/sigTotal)*4
-            + (wBrent/100)*3 + (wBil/100)*3 + (wIcg/100)*3 + (wProtestPct/100)*4 + (wSpreadPct/100)*3
-            + (Math.min(wMonthlyTrend,150)/150)*2 + (wReprPct/100)*2
-            + (wAmnBrecha/100)*2 + (wPresos/100)*2 + (polAltaPct/100)*4 + (convInverted/100)*3
+            + (wBrent/100)*3 + (wBil/100)*2 + (wIcg/100)*2 + (wProtestPct/100)*4 + (wSpreadPct/100)*3
+            + (Math.min(wMonthlyTrend,150)/150)*1 + (wReprPct/100)*1
+            + (wAmnBrecha/100)*1 + (wPresos/100)*2 + (polAltaPct/100)*4 + (convInverted/100)*2
             + (wIoda/100)*5 + (desaprobacionPct/100)*5 + (inflacionFactor/100)*6 + (institucionalFactor/100)*4
+            + (wElec/100)*6
             - (we1/100)*5 - (we3/100)*2;
           return Math.max(0, Math.min(100, Math.round(wr)));
         });
@@ -464,20 +476,21 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           { label:"E2 Colapso", value:`${e2}%`, pct:e2, w:"6%" },
           { label:"E4 Resistencia", value:`${e4}%`, pct:e4, w:"5%" },
           { label:"Conectividad 🌐", value:iodaHealth != null ? `${iodaHealth}` : "—", pct:iodaInverted != null ? Math.round(iodaInverted) : 15, w:"5%", live:true },
+          { label:"Cortes eléctricos ⚡", value:elecHealth != null ? `${elecHealth}` : "—", pct:elecInverted != null ? Math.round(elecInverted) : 10, w:"6%", live:true },
           { label:"Desaprobación gob.", value:`${desaprobacionPct.toFixed(0)}%`, pct:Math.round(desaprobacionPct), w:"5%" },
           { label:"Pol. alta redes 🌡️", value:`${polAltaPct.toFixed(0)}%`, pct:Math.round(polAltaPct), w:"4%" },
           { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100), w:"4%" },
           { label:"Señales E4/E2", value:`${sigActive}/${sigTotal}`, pct:Math.round(sigActive/sigTotal*100), w:"4%" },
           { label:"Protestas sem.", value:`${lastWeekConf?.protestas||"—"}`, pct:Math.round(protestPct), w:"4%" },
           { label:"Volatilidad instit.", value:`${institucionalCount} cambios`, pct:Math.round(institucionalFactor), w:"4%" },
-          { label:"Bilateral 🇺🇸🇻🇪", value:`${bilV.toFixed(1)}σ`, pct:Math.round(bilPct), w:"3%", live:true },
-          { label:"Cohesión GOB 🏛", value:icgRaw != null ? `${icgRaw}` : "—", pct:icgInverted != null ? Math.round(icgInverted) : 50, w:"3%", live:true },
-          { label:"Conv. baja redes 🌡️", value:`${convAltaPct.toFixed(0)}% alta`, pct:Math.round(convInverted), w:"3%" },
+          { label:"Bilateral 🇺🇸🇻🇪", value:`${bilV.toFixed(1)}σ`, pct:Math.round(bilPct), w:"2%", live:true },
+          { label:"Cohesión GOB 🏛", value:icgRaw != null ? `${icgRaw}` : "—", pct:icgInverted != null ? Math.round(icgInverted) : 50, w:"2%", live:true },
+          { label:"Conv. baja redes 🌡️", value:`${convAltaPct.toFixed(0)}% alta`, pct:Math.round(convInverted), w:"2%" },
           { label:"Cobertura terr.", value:`${lastWeekConf?.estados||"—"}/24`, pct:Math.round(spreadPct), w:"3%" },
           { label:"Brent", value:`$${brentPrice}`, pct:brentFactor, w:"3%", live:true },
-          { label:"Tend. mensual", value:`${monthlyTotal} (4sem)`, pct:Math.round(Math.min(monthlyTrendPct,150)/1.5), w:"2%" },
-          { label:"Represión", value:`${lastWeekConf?.reprimidas||0}`, pct:Math.round(repressionPct), w:"2%" },
-          { label:"Brecha amnist.", value:`${amnBrechaPct.toFixed(0)}%`, pct:Math.round(amnBrechaPct), w:"2%" },
+          { label:"Tend. mensual", value:`${monthlyTotal} (4sem)`, pct:Math.round(Math.min(monthlyTrendPct,150)/1.5), w:"1%" },
+          { label:"Represión", value:`${lastWeekConf?.reprimidas||0}`, pct:Math.round(repressionPct), w:"1%" },
+          { label:"Brecha amnist.", value:`${amnBrechaPct.toFixed(0)}%`, pct:Math.round(amnBrechaPct), w:"1%" },
           { label:"Presos pol.", value:`${amnLatest?.fp?.detenidos||"—"}`, pct:Math.round(presosPct), w:"2%" },
           { label:"E1 Transición", value:`-${e1}%`, pct:0, w:"-5%", isNeg:true },
           { label:"E3 Continuidad", value:`-${e3}%`, pct:0, w:"-2%", isNeg:true },

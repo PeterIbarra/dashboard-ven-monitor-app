@@ -49,7 +49,7 @@ export function MethodologyFooter({ mob }) {
               <span>🌡️</span> <span>Índice de Inestabilidad Compuesto</span> <span style={{ marginLeft:"auto", fontSize:10, color:MUTED }}>{section==="idx"?"▼":"▶"}</span>
             </div>
             {section==="idx" && <div style={bodyStyle}>
-              Es un número de <b>0 a 100</b> que resume "qué tan inestable está la situación" combinando 23 factores diferentes. Funciona como un termómetro:<br/><br/>
+              Es un número de <b>0 a 100</b> que resume "qué tan inestable está la situación" combinando 24 factores diferentes. Funciona como un termómetro:<br/><br/>
               <b style={{color:"#16a34a"}}>0-25</b>: Estabilidad relativa — las cosas están relativamente calmadas.<br/>
               <b style={{color:"#ca8a04"}}>26-50</b>: Tensión moderada — hay presiones pero están contenidas.<br/>
               <b style={{color:"#f97316"}}>51-75</b>: Inestabilidad alta — múltiples factores de riesgo activos.<br/>
@@ -59,8 +59,9 @@ export function MethodologyFooter({ mob }) {
               • Si el <b>precio del petróleo</b> baja mucho, el índice sube — porque Venezuela depende del petróleo para sus ingresos.<br/>
               • Si la <b>inflación mensual</b> o la <b>desaprobación de gestión</b> suben, el índice sube — son presión económica y desgaste de legitimidad.<br/>
               • Si la <b>conectividad a internet</b> cae (cortes, apagones digitales), el índice sube — suele acompañar episodios de control social.<br/>
+              • Si los <b>cortes eléctricos</b> se agravan más allá del racionamiento habitual de CORPOELEC en cada estado, el índice sube — se distingue de la conectividad porque compara cada apagón contra el patrón de racionamiento ya conocido de ese estado, en vez de tratar todo corte como igual de grave.<br/>
               • Si la probabilidad de <b>E1 (transición pacífica)</b> es alta, el índice baja — porque es un factor estabilizador.<br/><br/>
-              <b>4 de los 23 factores se actualizan solos</b> en tiempo real (brecha cambiaria, petróleo, índice bilateral, conectividad IODA). Los demás se actualizan con cada informe semanal.
+              <b>5 de los 24 factores se actualizan solos</b> en tiempo real (brecha cambiaria, petróleo, índice bilateral, conectividad IODA, cortes eléctricos IODA). Los demás se actualizan con cada informe semanal.
             </div>}
           </div>
 

@@ -111,7 +111,7 @@ Por eso, el escenario dominante no determina por sí solo la posición del punto
 
 El selector interno de la Matriz es independiente del selector general del Dashboard. La sección desplegable explica la composición de E1–E4, el método de ubicación y la lectura de la semana seleccionada. La serie puede respaldarse mediante JSON y CSV.
 
-### Índice de inestabilidad (23 factores)
+### Índice de inestabilidad (24 factores)
 
 El índice compuesto se expresa en una escala de 0 a 100 (`TabDashboard.jsx`). Los factores de presión suman puntos; los dos estabilizadores (E1 y E3) restan:
 
@@ -124,22 +124,25 @@ El índice compuesto se expresa en una escala de 0 a 100 (`TabDashboard.jsx`). L
 | 5 | Tensiones rojas | 4 % | `WEEKS` |
 | 6 | Señales activas E4+E2 | 4 % | `SCENARIO_SIGNALS` |
 | 7 | Presión del Brent | 3 % | `/api/oil-prices` |
-| 8 | Índice bilateral (PizzINT) | 3 % | `/api/bilateral` |
-| 9 | Cohesión gubernamental (invertida) | 3 % | ICG en vivo |
+| 8 | Índice bilateral (PizzINT) | 2 % | `/api/bilateral` |
+| 9 | Cohesión gubernamental (invertida) | 2 % | ICG en vivo |
 | 10 | Protestas semanales | 4 % | `CONF_SEMANAL` |
 | 11 | Cobertura territorial de protestas | 3 % | `CONF_SEMANAL` |
-| 12 | Tendencia mensual vs. 2025 | 2 % | `CONF_SEMANAL` + `CONF_MESES` |
-| 13 | Represión | 2 % | `CONF_SEMANAL` |
-| 14 | Brecha de amnistía (gobierno vs. Foro Penal) | 2 % | `AMNISTIA_TRACKER` |
+| 12 | Tendencia mensual vs. 2025 | 1 % | `CONF_SEMANAL` + `CONF_MESES` |
+| 13 | Represión | 1 % | `CONF_SEMANAL` |
+| 14 | Brecha de amnistía (gobierno vs. Foro Penal) | 1 % | `AMNISTIA_TRACKER` |
 | 15 | Presos políticos | 2 % | `AMNISTIA_TRACKER` |
 | 16 | Polarización alta en redes (X) | 4 % | `REDES_TOTALS` |
-| 17 | Convivencia baja en redes — invertida (X) | 3 % | `REDES_TOTALS` |
+| 17 | Convivencia baja en redes — invertida (X) | 2 % | `REDES_TOTALS` |
 | 18 | Conectividad a internet — invertida | 5 % | IODA en vivo |
 | 19 | Desaprobación de gestión ("mal camino") | 5 % | `OPINION_SNAPSHOT` |
 | 20 | Presión inflacionaria (inflación mensual BCV) | 6 % | `MACRO_LATEST` |
 | 21 | Volatilidad institucional/normativa (cambios/semana) | 4 % | `WEEKLY_INSTITUTIONAL` |
-| 22 | E1 Transición pacífica (prob.) | **−5 %** (estabilizador) | `WEEKS` |
-| 23 | E3 Continuidad negociada (prob.) | **−2 %** (estabilizador) | `WEEKS` |
+| 22 | Cortes eléctricos — tier-aware, normalizado por racionamiento (invertida) | 6 % | IODA en vivo (`src/lib/iodaElectric.js`) |
+| 23 | E1 Transición pacífica (prob.) | **−5 %** (estabilizador) | `WEEKS` |
+| 24 | E3 Continuidad negociada (prob.) | **−2 %** (estabilizador) | `WEEKS` |
+
+El factor 22 ("Cortes eléctricos") usa el mismo clasificador de la pestaña "Monitor de Conectividad y Energía": compara cada caída de señal contra el patrón de racionamiento ya conocido de CORPOELEC para ese estado específico (`RATIONING_PRIOR`), en vez de tratar cualquier corte como igual de grave — así un apagón rutinario de 8h en Táchira no dispara el índice igual que uno inesperado en Distrito Capital. Es distinto del factor 18 ("Conectividad a internet"), que mide salud general de la red sin diferenciar causa eléctrica de otras.
 
 | Rango | Lectura |
 |---:|---|

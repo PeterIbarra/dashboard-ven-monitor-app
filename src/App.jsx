@@ -35,6 +35,7 @@ import { TabOpinionPublica } from "./components/tabs/TabOpinionPublica";
 import { TabGdelt } from "./components/tabs/TabGdelt";
 import { TabConflictividad } from "./components/tabs/TabConflictividad";
 import { TabIODA } from "./components/tabs/TabIODA";
+import { computeRegionElectric, summarizeNationalElectric } from "./lib/iodaElectric";
 import { TabMercados } from "./components/tabs/TabMercados";
 import { TabMacro } from "./components/tabs/TabMacro";
 import { TabAmbiental } from "./components/tabs/TabAmbiental";
@@ -290,13 +291,25 @@ export default function MonitorPNUD() {
             worstState: worstInternet?.name || null,
             worstHealth: worstInternet?.health ?? null,
             states: stateData,
-            // Electrical alerts (7d persistence)
+            // Electrical alerts (7d persistence) — crude count-based signal, kept as-is
+            // for the "Electricidad ⚡" live-alerts panel in TabDashboard (unchanged).
             elecAlerts: elecStates.map(s => ({
               state: s.name, dropPct: s.worstElecDrop,
               lastTime: s.lastElecTime, events: s.electricAlerts.length,
             })),
             elecCount: elecStates.reduce((acc, s) => acc + s.electricAlerts.length, 0),
           };
+
+          // Tier-aware electricity severity (same Phase-1 rationing-calibrated model
+          // as the "Monitor de Conectividad y Energía" tab, via src/lib/iodaElectric.js)
+          // — feeds the Composite Instability Index's "Cortes eléctricos" factor.
+          // Kept separate from the crude elecAlerts above (used only by the live-alerts
+          // panel) so neither consumer's behavior changes unexpectedly.
+          try {
+            const from24h = now - 24 * 3600;
+            const regionScores = await computeRegionElectric({ twFrom: from24h, twUntil: now });
+            results.ioda.electric = summarizeNationalElectric(regionScores);
+          } catch {}
         }
       } catch {}
       setLiveData(results);
