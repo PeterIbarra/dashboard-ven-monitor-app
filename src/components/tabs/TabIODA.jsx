@@ -4,9 +4,9 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import { Badge } from "../Badge";
 import { Card } from "../Card";
 import { TwitterTimeline } from "../TwitterTimeline";
-import { loadScript, loadCSS } from "../../utils";
 import * as XLSX from "xlsx";
 import { VE_REGIONS, getPrior, iodaFetch, computeRegionElectric } from "../../lib/iodaElectric";
+import { IODAChoroplethMap } from "../IODAChoroplethMap";
 
 const hoursMap = { "24h":24, "48h":48, "7d":168, "30d":720 };
 
@@ -678,108 +678,6 @@ function InteractiveChart({ states, timePreset, selectedState, onSelectState, pa
       </div>
     </div>
   );
-}
-
-// ── Venezuela state centroids for Leaflet ──
-const STATE_COORDS = {
-  "Amazonas":[3.4,-66.0],"Anzoátegui":[8.6,-64.2],"Apure":[7.0,-69.5],"Aragua":[10.2,-67.6],
-  "Barinas":[8.4,-70.2],"Bolívar":[6.5,-63.5],"Carabobo":[10.2,-68.0],"Cojedes":[9.4,-68.6],
-  "Delta Amacuro":[8.8,-61.3],"Distrito Capital":[10.5,-66.9],"Falcón":[11.2,-69.9],"Guárico":[8.7,-66.5],
-  "Lara":[10.1,-69.8],"Mérida":[8.4,-71.1],"Miranda":[10.2,-66.4],"Monagas":[9.3,-63.2],
-  "Nueva Esparta":[11.0,-63.9],"Portuguesa":[9.1,-69.3],"Sucre":[10.4,-63.1],"Táchira":[7.8,-72.2],
-  "Trujillo":[9.4,-70.5],"Vargas":[10.6,-67.0],"Yaracuy":[10.3,-68.7],"Zulia":[9.8,-71.6],
-};
-
-// ── Leaflet map for IODA regional outages ──
-function IODALeafletMap({ regionScores, selectedState, onSelectState, timePreset }) {
-  const mapRef = useRef(null);
-  const mapInst = useRef(null);
-  const markersRef = useRef(null);
-
-  // Load Leaflet + init map
-  useEffect(() => {
-    loadCSS("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
-    loadScript("https://unpkg.com/leaflet@1.9.4/dist/leaflet.js").then(() => {
-      if (!mapRef.current || mapInst.current) return;
-      const L = window.L;
-      const map = L.map(mapRef.current, { zoomControl: true, scrollWheelZoom: true, attributionControl: false }).setView([7.5, -66.5], 6);
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", { maxZoom: 12 }).addTo(map);
-      L.control.attribution({ prefix: false }).addTo(map).addAttribution("© OSM · CARTO · IODA");
-      mapInst.current = map;
-    });
-    return () => { if (mapInst.current) { mapInst.current.remove(); mapInst.current = null; } };
-  }, []);
-
-  // Update markers when regionScores change
-  useEffect(() => {
-    if (!mapInst.current || !window.L || !regionScores || regionScores.length === 0) return;
-    const L = window.L;
-    const map = mapInst.current;
-    // Force map to recalculate size (fixes invisible dots after tab switch)
-    setTimeout(() => map.invalidateSize(), 100);
-    if (markersRef.current) { map.removeLayer(markersRef.current); }
-    const group = L.layerGroup();
-    const scores = regionScores.map(r => r.displayScore || r.dropScore || 0);
-    const maxScore = Math.max(...scores, 1);
-
-    regionScores.forEach(r => {
-      const coords = STATE_COORDS[r.name];
-      if (!coords) return;
-      const severity = r.connectivityHealth ?? r.healthPct ?? 100;
-      const elecSev  = r.elecHealth ?? 100;
-      const prior    = getPrior(r.name);
-      const elecForColor = r.elecConfidence === "baja" ? Math.max(65, elecSev) : elecSev;
-
-      // Color: electricity takes precedence (as requested)
-      // For T0 states (no rationing): average of connectivity and elec (not worst)
-      // For T1/T2/T3: elecHealth drives the color when events detected
-      const colorSev = prior.tier === 0
-        ? Math.round((severity + elecForColor) / 2) // T0: average of both
-        : elecForColor < 80
-          ? elecForColor                            // T1-T3 with real electric signal: elec drives fully
-          : elecForColor < 100
-            ? Math.min(elecForColor, severity + 15) // T1-T3 with mild electric: elec primary, connectivity secondary
-            : severity;                           // no electric: connectivity drives
-      const color = colorSev >= 90 ? "#34d399" : colorSev >= 70 ? "#fbbf24" : colorSev >= 50 ? "#f97316" : "#ef4444";
-      const ds = r.displayScore || r.dropScore || 0;
-      const elecBonus = elecSev < 100 && prior.tier >= 1 ? (
-        (prior.tier === 1 ? 5 : prior.tier === 2 ? 3 : 1) +
-        Math.min(4, (r.elecEvents || 0) * 1)
-      ) : 0;
-      const baseRadius = ds > 0
-        ? Math.max(6, Math.min(20, (ds / maxScore) * 20))
-        : (colorSev >= 90 ? 6 : colorSev >= 70 ? 8 : colorSev >= 50 ? 12 : 16);
-      const radius = Math.min(24, baseRadius + elecBonus);
-      const circle = L.circleMarker(coords, {
-        radius, fillColor: color, color: selectedState === r.name ? "#fff" : color,
-        weight: selectedState === r.name ? 3 : 1.5, opacity: 0.9, fillOpacity: 0.65,
-      });
-      circle.bindPopup(
-        `<div style="font-family:'Space Mono',monospace;font-size:11px;min-width:160px">` +
-        `<b style="font-size:13px">${r.name}</b><br/>` +
-        `Conectividad: <b style="color:${color}">${severity}%</b><br/>` +
-        `Electricidad: <b>${elecSev}%</b> ${r.elecLabel || ""}<br/>` +
-        `Score IODA: <b>${ds > 0 ? ds.toLocaleString() : "0"}</b>` +
-        `</div>`, { className: "ioda-popup" }
-      );
-      circle.on("click", () => onSelectState(r.name));
-      group.addLayer(circle);
-
-      // Add label for non-normal states (connectivity OR electricity)
-      if (colorSev < 90 || ds > maxScore * 0.05) {
-        const label = L.divIcon({
-          className: "ioda-label",
-          html: `<div style="font:bold 10px monospace;color:${color};text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap">${r.name}</div>`,
-          iconSize: [80, 14], iconAnchor: [40, -radius - 2],
-        });
-        L.marker(coords, { icon: label, interactive: false }).addTo(group);
-      }
-    });
-    group.addTo(map);
-    markersRef.current = group;
-  }, [regionScores, selectedState, timePreset]);
-
-  return <div ref={mapRef} style={{ width:"100%", height: 350, borderRadius:4, border:`1px solid ${BORDER}` }} />;
 }
 
 export function TabIODA() {
@@ -1633,7 +1531,7 @@ export function TabIODA() {
                   ))}
                 </div>
               </div>
-              <IODALeafletMap regionScores={activeData} selectedState={selectedState} timePreset={timePreset}
+              <IODAChoroplethMap regionScores={activeData} selectedState={selectedState}
                 onSelectState={s => setSelectedState(selectedState === s ? null : s)} />
             </Card>
 
