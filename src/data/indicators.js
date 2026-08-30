@@ -166,6 +166,11 @@ export const INDICATORS = [
         "green",
         "flat",
         "Segunda semana consecutiva >700K bpd a EE.UU. (730.000 bpd); promedio de 4 semanas 639.000 bpd, máximo desde 2017"
+      ],
+      [
+        "green",
+        "up",
+        "Exportaciones a EE. UU. alcanzan 786.000 bpd en julio, máximo desde 2019 (reportes de mercado); el techo operativo se mantiene en ~1,25M bpd por cuellos de botella portuarios, con esperas de hasta 30 días en José, que concentra ~70% de las exportaciones (Reuters)."
       ]
     ]
   },
@@ -336,6 +341,11 @@ export const INDICATORS = [
         "green",
         "flat",
         "Segunda semana >700K bpd a EE.UU.; PIB del sector petrolero +9,10% interanual en el II trimestre"
+      ],
+      [
+        "yellow",
+        "flat",
+        "PDVSA factura ≈USD 15.900M entre enero y julio (+89% interanual, Bitácora Económica); el Financial Times estimó en julio que EE. UU. habría recaudado unos USD 13.000M de esos ingresos, sin conciliación pública entre lo facturado y lo efectivamente disponible para la banca venezolana."
       ]
     ]
   },
@@ -506,6 +516,11 @@ export const INDICATORS = [
         "green",
         "flat",
         "Sin datos nuevos de licencias S32 · ONGC Videsh obtiene licencia para San Cristóbal y Carabobo-1"
+      ],
+      [
+        "green",
+        "up",
+        "OFAC emite las Licencias Generales 61 y 62 (telecomunicaciones, 21 ago.) y actualiza ocho licencias adicionales —46D, 47B, 48C, 50C, 51C, 52B, 54B y 61A— el 27 de agosto, eliminando la obligación de que ciertos contratos se rijan por legislación estadounidense, con exclusión explícita de China, Rusia, Irán, Corea del Norte y Cuba."
       ]
     ]
   },
@@ -676,6 +691,11 @@ export const INDICATORS = [
         "green",
         "up",
         "Hunt Oil avanza en Caro y Carisito; SLB proyecta movilizar 15 taladros; ONGC Videsh obtiene licencia para San Cristóbal y Carabobo-1"
+      ],
+      [
+        "green",
+        "up",
+        "Chevron eleva su producción a 269.000–280.000 bpd (desde 228.000 en enero), con una inversión estimada entre USD 400M y 1.000M (Finanzas Digital); ONGC Videsh anuncia USD 200M para reactivar San Cristóbal (meta: 45.000–50.000 bpd) y SLB obtiene acceso a las bases de datos petroleras de PDVSA."
       ]
     ]
   },
@@ -851,6 +871,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de refinación S32"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de infraestructura de refinación S33."
       ]
     ]
   },
@@ -1021,6 +1046,11 @@ export const INDICATORS = [
         "yellow",
         "up",
         "SLB proyecta movilizar 15 taladros; aún por debajo del umbral de recuperación sostenida"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato nuevo de taladros activos S33; SLB obtiene acceso a las bases de datos petroleras de PDVSA para digitalizar información fragmentada u obsoleta, sin cifra de despliegue de taladros confirmada esta semana."
       ]
     ]
   },
@@ -1162,6 +1192,11 @@ export const INDICATORS = [
         "yellow",
         "up",
         "SENIAT simplifica el RIF (elimina vencimiento y cartelera fiscal); PIB del sector no petrolero +5,79% interanual"
+      ],
+      [
+        "yellow",
+        "up",
+        "Delcy Rodríguez presenta una agenda de digitalización de servicios públicos y simplificación tributaria (sistema más simple, digital y automatizado) en el marco de la reducción de la brecha cambiaria; sin dato de recaudación mensual nuevo S33."
       ]
     ]
   },
@@ -1298,6 +1333,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de apertura minera S32"
+      ],
+      [
+        "yellow",
+        "flat",
+        "OFAC actualiza ocho licencias generales que incluyen minería (incluido el oro) el 27 de agosto, ampliando el marco regulatorio sin inversión minera adicional verificable confirmada esta semana."
       ]
     ]
   },
@@ -1424,6 +1464,11 @@ export const INDICATORS = [
         "green",
         "flat",
         "Sin datos nuevos de gas natural S32"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de gas natural S33."
       ]
     ]
   },
@@ -1594,6 +1639,11 @@ export const INDICATORS = [
         "red",
         "down",
         "Balance oficial de liberados retrocede de 1.400 a 1.046; fuentes independientes verifican solo ~70 de las 131 liberaciones anunciadas (~53% sin verificar), superando el umbral de alerta"
+      ],
+      [
+        "red",
+        "flat",
+        "El balance oficial se mantiene en 1.046 retornados a hogares, sin recuperación desde la caída registrada en S32; Diosdado Cabello niega que las excarcelaciones estén en la mesa de diálogo, atribuyéndolas a decisiones internas del sistema de justicia."
       ]
     ]
   },
@@ -1764,6 +1814,11 @@ export const INDICATORS = [
         "red",
         "down",
         "Reversión: el balance oficial de retornados a hogares cae de 1.400 a 1.046; fuentes independientes verifican solo ~70 de 131 liberaciones anunciadas, por debajo del ritmo mínimo esperado"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nuevas verificaciones independientes reportadas esta semana; el balance oficial permanece estancado en 1.046 retornados y ≈12.000 beneficiados con medidas procesales, por debajo del ritmo esperado de excarcelaciones."
       ]
     ]
   },
@@ -1900,6 +1955,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Cifra oficial de cautelares se mantiene en 8.426, por debajo del umbral de alerta (10.000)"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato específico de cautelares vigentes S33; el Gobierno reporta ≈12.000 beneficiados acumulados por medidas procesales, una métrica distinta que no permite actualizar la cifra de cautelares pendientes (8.426 en S32)."
       ]
     ]
   },
@@ -2070,6 +2130,11 @@ export const INDICATORS = [
         "green",
         "up",
         "ICG sube a 78: continuidad del diálogo y disciplina del aparato elevan marginalmente la cohesión"
+      ],
+      [
+        "green",
+        "up",
+        "No se registran señales de fricción en la cúpula coercitiva; la rápida destitución de Ecarri de la presidencia del Grupo de Amistad AN–EE. UU. por su iniciativa de dolarización demuestra disciplina interna, mientras el escrow y el comité de acreedores reducen el margen para una estrategia coercitiva autónoma."
       ]
     ]
   },
@@ -2245,6 +2310,11 @@ export const INDICATORS = [
         "yellow",
         "up",
         "Nuevo comité de 23 integrantes con mayoría de sociedad civil sustituye el procedimiento anterior de postulaciones judiciales"
+      ],
+      [
+        "yellow",
+        "up",
+        "Calixto Ortega asume la presidencia del Banco de Venezuela con una nueva junta de siete directores; el Ejecutivo anuncia la eliminación de alcabalas policiales urbanas y un nuevo esquema de patrullaje preventivo; la AN autoriza una nueva designación diplomática ante Egipto, Eritrea y Sudán."
       ]
     ]
   },
@@ -2415,6 +2485,11 @@ export const INDICATORS = [
         "red",
         "down",
         "E1 cae a 10%, mínimo del ciclo; fragmentación opositora (Pacto por Venezuela) reduce probabilidad de transición pacífica"
+      ],
+      [
+        "red",
+        "down",
+        "E1 cae a 8%, nuevo mínimo del ciclo (matriz de escenarios); Machado y González Urrutia continúan excluidos de los canales de diálogo facilitados por Qatar, y Washington mantiene las fases económicas antes de una fase electoral, sin compromiso de cronograma verificable."
       ]
     ]
   },
@@ -2585,6 +2660,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de marcos restrictivos S32"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevos marcos restrictivos formales S33; la destitución de Ecarri de la presidencia del Grupo de Amistad Parlamentaria AN–EE. UU. por su iniciativa de dolarización ilustra límites disciplinarios internos de la AN, no una medida represiva hacia la oposición externa."
       ]
     ]
   },
@@ -2721,6 +2801,11 @@ export const INDICATORS = [
         "yellow",
         "down",
         "Fragmentación opositora: emerge el Pacto por Venezuela (Enrique Márquez) mientras Machado mantiene su ruta electoral fuera del formato"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Encuesta DatinCorp (23 ago., n=1.200): Machado lidera con 33,3% de capacidad percibida para dirigir una transición y 25,0% de 'mucha confianza', por encima de Lorenzo Mendoza y Delcy Rodríguez; no obstante, 59,0% no se siente representado por ningún liderazgo y 66,6% no se identifica con ningún partido."
       ]
     ]
   },
@@ -2891,6 +2976,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin dato específico de brecha S32 · PIB no petrolero crece 5,79% interanual en el II trimestre"
+      ],
+      [
+        "green",
+        "down",
+        "Brecha cambiaria en 19,1% al cierre del 28 de agosto (oficial Bs. 794,99/USD vs. mercado Bs. 946,73/USD); el Gobierno reporta además una reducción a 12,3% en su propia métrica (desde ≈30% en dos meses), sosteniéndose por debajo del umbral de alerta (30%)."
       ]
     ]
   },
@@ -3061,6 +3151,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin dato mensual nuevo S32 · PIB del II trimestre crece 7,14% interanual pese a la presión inflacionaria"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato mensual de inflación nuevo S33."
       ]
     ]
   },
@@ -3231,6 +3326,11 @@ export const INDICATORS = [
         "red",
         "flat",
         "Sin dato nuevo de ingresos S32 · PIB crece 7,14% interanual sin traducirse aún en mejora del ingreso real"
+      ],
+      [
+        "red",
+        "flat",
+        "51,4% de los consultados identifica inflación, ingresos y desempleo como la prioridad inmediata del país (DatinCorp, 23 ago.), confirmando la persistencia de la presión sobre el ingreso real; sin ajuste salarial nuevo S33."
       ]
     ]
   },
@@ -3401,6 +3501,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Tocoma conecta 160MW al Sistema Eléctrico Nacional; industria reporta afectación durante 214 de 488 horas laborables"
+      ],
+      [
+        "yellow",
+        "up",
+        "La demanda eléctrica nacional marca récord del año: 15.625 MW el 10 de agosto (Ecoanalítica), reflejando recuperación del consumo residencial e industrial pero elevando la presión sobre generación, transmisión y distribución; sin reporte específico de horas de corte urbano esta semana."
       ]
     ]
   },
@@ -3571,6 +3676,11 @@ export const INDICATORS = [
         "red",
         "flat",
         "Sin nueva encuesta nacional comparable S32; se mantienen las últimas mediciones (71% rechazo, 94,1% desconfianza)"
+      ],
+      [
+        "red",
+        "flat",
+        "Nueva encuesta DatinCorp (23 ago.): solo 21,8% percibe buen rumbo del país, 46,0% regular y 27,9% mal camino; 53,0% evalúa negativamente la gestión de Delcy Rodríguez y 41,4% considera que las condiciones empeoraron respecto a hace un año."
       ]
     ]
   },
@@ -3712,6 +3822,11 @@ export const INDICATORS = [
         "green",
         "up",
         "PIB del segundo trimestre crece 7,14% interanual (petróleo +9,10%, no petrolero +5,79%); CEPAL proyecta 3,0% para 2026"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin nuevo dato trimestral de PIB S33; PDVSA reporta facturación de USD 15.900M entre enero y julio (+89% interanual), consistente con la expansión petrolera del trimestre anterior."
       ]
     ]
   },
@@ -3882,6 +3997,11 @@ export const INDICATORS = [
         "green",
         "flat",
         "Sin datos nuevos de cooperación bilateral S32 · exportaciones a EE.UU. sostienen máximo desde 2017 (730.000 bpd)"
+      ],
+      [
+        "green",
+        "up",
+        "EE. UU. negocia participación directa de largo plazo en 17 campos petroleros (~90.000M bbl), liderada por Rubio y Delcy Rodríguez, con posible viaje de Chris Wright; OFAC amplía licencias (GL 61/62 de telecomunicaciones más ocho licencias actualizadas); la Embajada de EE. UU. y FIBA capacitan al BCV y la banca privada, y Project HOPE financia centros de salud."
       ]
     ]
   },
@@ -4052,6 +4172,11 @@ export const INDICATORS = [
         "green",
         "flat",
         "Sin datos nuevos de sanciones UE S32"
+      ],
+      [
+        "green",
+        "flat",
+        "Sin datos nuevos de sanciones UE S33."
       ]
     ]
   },
@@ -4222,6 +4347,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de China/Rusia S32"
+      ],
+      [
+        "yellow",
+        "down",
+        "OFAC excluye explícitamente a China, Rusia, Irán, Corea del Norte y Cuba de las licencias generales actualizadas (GL 61/62 y ocho licencias adicionales); Axios señala que algunos de los 17 campos en negociación con EE. UU. estuvieron vinculados previamente a intereses chinos, sin reacción pública de Beijing o Moscú."
       ]
     ]
   },
@@ -4392,6 +4522,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de FMI S32"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de FMI S33."
       ]
     ]
   },
@@ -4562,6 +4697,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de normalización diplomática S32"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin novedades sobre reapertura de embajada de EE. UU. S33; el canciller Félix Plasencia se reúne con el Nuncio Apostólico, monseñor Alberto Ortega Martín, para ratificar la agenda de diálogo con la Santa Sede."
       ]
     ]
   },
@@ -4698,6 +4838,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de presión legislativa S32"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de presión legislativa en el Congreso de EE. UU. S33."
       ]
     ]
   },
@@ -4824,6 +4969,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de relación Venezuela-Colombia S32"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos de la relación Venezuela-Colombia S33."
       ]
     ]
   },
@@ -4950,6 +5100,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos del proceso judicial S32"
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin datos nuevos del proceso judicial de Maduro S33."
       ]
     ]
   },
@@ -5120,6 +5275,11 @@ export const INDICATORS = [
         "yellow",
         "down",
         "50 protestas con pico de 20 el 14 de agosto, coincidiendo con un acto oficial de vivienda"
+      ],
+      [
+        "yellow",
+        "down",
+        "23 protestas registradas en tres jornadas (21, 25 y 26 de agosto), muy por debajo de las 50 del corte anterior; predominan demandas socioeconómicas, laborales y de vivienda en 14 entidades (OVCS)."
       ]
     ]
   },
@@ -5295,6 +5455,11 @@ export const INDICATORS = [
         "yellow",
         "up",
         "18 entidades registran protestas al menos una vez en el período, en el umbral de alcance casi nacional"
+      ],
+      [
+        "yellow",
+        "down",
+        "La cobertura desciende a 14 entidades distintas (21–26 de agosto), por debajo del umbral casi nacional de 18, aunque se mantiene en el rango multi-regional (OVCS)."
       ]
     ]
   },
@@ -5421,6 +5586,11 @@ export const INDICATORS = [
         "yellow",
         "down",
         "Tocoma conecta 160MW, pero la industria reporta afectación durante 214 de 488 horas laborables (~44%)"
+      ],
+      [
+        "yellow",
+        "down",
+        "Sin nuevo dato de conectividad eléctrica por estado S33; la demanda nacional alcanza un récord del año (15.625 MW, 10 de agosto, Ecoanalítica), lo que eleva el riesgo de sobrecarga sobre la capacidad instalada."
       ]
     ]
   },
@@ -5542,6 +5712,11 @@ export const INDICATORS = [
         "red",
         "flat",
         "Sin nueva encuesta nacional comparable S32; se conservan los datos de agosto (71% rechazo, 94,1% desconfianza)"
+      ],
+      [
+        "red",
+        "flat",
+        "Nueva encuesta DatinCorp (23 ago.): 53,0% evalúa negativamente la gestión de Delcy Rodríguez (solo 5,3% de forma positiva); 59,0% no se siente representado por ningún liderazgo actual y 69,4% considera necesario un liderazgo nuevo."
       ]
     ]
   },
@@ -5668,6 +5843,11 @@ export const INDICATORS = [
         "green",
         "up",
         "Hunt Oil avanza en Caro y Carisito; SLB proyecta movilizar 15 taladros; ONGC Videsh obtiene nuevas licencias"
+      ],
+      [
+        "green",
+        "up",
+        "Continúa la expansión de inversión de majors: Chevron incrementa capital en sus empresas mixtas hasta 269.000–280.000 bpd, ONGC Videsh compromete USD 200M en San Cristóbal buscando además recuperar más de USD 500M en dividendos pendientes, y SLB firma contrato de acceso a datos con PDVSA."
       ]
     ]
   },
@@ -5789,6 +5969,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Tocoma conecta 160MW al SEN; industria reporta afectación durante 214 de 488 horas laborables"
+      ],
+      [
+        "yellow",
+        "flat",
+        "La demanda eléctrica récord (15.625 MW, 10 de agosto) confirma la recuperación del consumo, pero el plan de reconstrucción energética (~USD 100.000M) sigue priorizando la producción petrolera sobre transmisión, almacenamiento y transporte (Reuters)."
       ]
     ]
   },
@@ -5905,6 +6090,11 @@ export const INDICATORS = [
         "red",
         "flat",
         "Sin nuevo pronunciamiento sobre el artículo 234 S32; consulta popular convocada para el 18 de octubre no resuelve el vacío del interinato"
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nuevo pronunciamiento sobre el artículo 234 S33; la Consulta Popular convocada para el 18 de octubre continúa sin resolver el vacío de continuidad del interinato."
       ]
     ]
   },
@@ -5966,6 +6156,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "La segunda fase se traslada a septiembre; el nuevo comité de 23 integrantes reinicia las postulaciones al TSJ, pero sigue sin cronograma electoral vinculante (S32)."
+      ],
+      [
+        "yellow",
+        "up",
+        "La AN aprueba en primera discusión, por unanimidad, la reforma de la Ley Orgánica del TSJ (27 ago.), ampliando el Comité de Postulaciones Judiciales de 21 a 23 miembros —primer resultado legislativo verificable del ciclo de diálogo iniciado el 12 de agosto—; la designación final de los magistrados permanece en manos de la AN, sin cronograma electoral vinculante."
       ]
     ]
   },
@@ -6022,6 +6217,11 @@ export const INDICATORS = [
         "green",
         "up",
         "El PIB del segundo trimestre crece 7,14% interanual (petróleo +9,10%, no petrolero +5,79%); CEPAL proyecta 3,0% para 2026, aunque sin acuerdo de reestructuración cerrado con acreedores (S32)."
+      ],
+      [
+        "yellow",
+        "down",
+        "Asesores legales y financieros organizan un comité de acreedores comerciales para agrupar reclamaciones y laudos arbitrales por más de USD 30.000M, dentro de un pasivo total estimado en USD 150.000–240.000M; el comité aún no ha contactado a Centerview Partners, el asesor financiero designado por Venezuela para la reestructuración."
       ]
     ]
   }
@@ -6142,6 +6342,24 @@ export const SCENARIO_SIGNALS = [
         "sem": "green",
         "val": "El procedimiento anterior queda sin efecto; un nuevo comité de 23 integrantes, con mayoría de sociedad civil, evaluará las candidaturas (S32).",
         "isNew": true
+      },
+      {
+        "name": "EE. UU. negocia participación directa en 17 campos petroleros (~90.000M bbl)",
+        "sem": "green",
+        "val": "Rubio y Delcy Rodríguez encabezan conversaciones sobre empresas mixtas, operadores o arrendamientos de hasta 100 años; posible viaje de Chris Wright (S33).",
+        "isNew": true
+      },
+      {
+        "name": "AN aprueba en primera discusión la reforma de la Ley Orgánica del TSJ",
+        "sem": "yellow",
+        "val": "Comité de Postulaciones amplía a 23 miembros con mayoría civil (27 ago.), pero la AN conserva la designación final de los magistrados (S33).",
+        "isNew": true
+      },
+      {
+        "name": "OFAC amplía licencias en petróleo, minería y telecomunicaciones",
+        "sem": "green",
+        "val": "GL 61 y 62 (telecom, 21 ago.) y ocho licencias actualizadas (27 ago.), excluyendo a China, Rusia, Irán, Corea del Norte y Cuba (S33).",
+        "isNew": true
       }
     ]
   },
@@ -6237,6 +6455,12 @@ export const SCENARIO_SIGNALS = [
         "sem": "yellow",
         "val": "Mecanismo participativo anunciado en S32; el propio corte aclara que no resuelve el vacío electoral ni constitucional.",
         "isNew": true
+      },
+      {
+        "name": "E1 cae a 8%, nuevo mínimo del ciclo",
+        "sem": "red",
+        "val": "Matriz de escenarios 21–28 ago.: ausencia de escisión de aparato y exclusión persistente de Machado y González Urrutia de los canales de diálogo.",
+        "isNew": true
       }
     ]
   },
@@ -6315,6 +6539,12 @@ export const SCENARIO_SIGNALS = [
         "sem": "yellow",
         "val": "Más de USD 13.000M bajo custodia de EE.UU. sin balance público; riesgo de fractura del canal financiero bilateral.",
         "isNew": true
+      },
+      {
+        "name": "Comité de acreedores comerciales se organiza ante la reestructuración de deuda",
+        "sem": "yellow",
+        "val": "Reclamaciones y laudos arbitrales por más de USD 30.000M; el comité aún no ha contactado a Centerview Partners (S33).",
+        "isNew": true
       }
     ]
   },
@@ -6380,6 +6610,12 @@ export const SCENARIO_SIGNALS = [
         "name": "Vigilia por detenidos cumple 221 días en Rodeo I",
         "sem": "yellow",
         "val": "Tensión social sostenida en torno a presos políticos, confirmada en S32, sin resolución del reclamo de fondo.",
+        "isNew": true
+      },
+      {
+        "name": "Sin fricción visible en la cúpula coercitiva",
+        "sem": "green",
+        "val": "Eliminación de alcabalas urbanas, cooperación con el CICR y sanción disciplinaria rápida a Ecarri sugieren descompresión selectiva sin escalada represiva (S33).",
         "isNew": true
       }
     ]

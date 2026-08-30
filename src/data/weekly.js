@@ -2,66 +2,66 @@ export const KPIS_LATEST = {
   "energia": [
     {
       "k": "Producción actual",
-      "v": "1,2M b/d",
+      "v": "≈1,1–1,25M b/d",
       "c": "#22c55e"
     },
     {
       "k": "Exportaciones a EE.UU.",
-      "v": "730.000 b/d · 2ª semana >700k",
+      "v": "786.000 b/d en julio · máx. desde 2019",
       "c": "#22c55e"
     },
     {
-      "k": "Promedio 4 semanas",
-      "v": "≈639.000 b/d · máximo desde 2017",
+      "k": "Techo operativo portuario",
+      "v": "1,25M b/d · esperas de hasta 30 días en José",
       "c": "#f59e0b"
     },
     {
-      "k": "Tocoma",
-      "v": "160 MW conectados al SEN",
-      "c": "#22c55e"
+      "k": "Demanda eléctrica",
+      "v": "15.625 MW · récord del año (10 ago.)",
+      "c": "#f59e0b"
     }
   ],
   "politico": [
     {
       "k": "E3 dominante",
-      "v": "54% · +2pp",
+      "v": "59% · +5pp",
       "c": "#38bdf8"
     },
     {
       "k": "E1",
-      "v": "10% · −3pp",
+      "v": "8% · −2pp",
       "c": "#22c55e"
     },
     {
       "k": "E4",
-      "v": "18% · −2pp",
+      "v": "17% · −1pp",
       "c": "#ca8a04"
     },
     {
       "k": "E2",
-      "v": "18% · +3pp",
+      "v": "16% · −2pp",
       "c": "#ef4444"
     }
   ],
   "opinion": [
     {
       "k": "Balance oficial",
-      "v": "6.438 fallecidos",
+      "v": "6.509 fallecidos",
       "c": "#ef4444"
     },
     {
       "k": "Viviendas afectadas",
-      "v": "59.109 evaluadas",
+      "v": "60.785 evaluadas",
       "c": "#f59e0b"
     },
     {
       "k": "Protestas",
-      "v": "50 · 14–20 ago",
-      "c": "#ef4444"
+      "v": "23 · 21–26 ago",
+      "c": "#f59e0b"
     },
     {
       "k": "Brecha E3–E1",
-      "v": "44 puntos",
+      "v": "51 puntos",
       "c": "#f59e0b"
     }
   ]

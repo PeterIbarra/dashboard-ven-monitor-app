@@ -87,8 +87,13 @@ export function TabMonitor() {
             const lastEntry = ind.hist.filter(h => h !== null).pop();
             if (!lastEntry) return null;
             const sem = lastEntry[0], trend = lastEntry[1], val = lastEntry[2];
-            const currentEntry = ind.hist[MONITOR_WEEKS.length - 1];
-            const displayVal = currentEntry ? currentEntry[2] : `S33 · sin dato nuevo`;
+            // hist[] is stored compact (one entry per week since the indicator was added,
+            // NOT null-padded from S1), so the current week's entry is always the last
+            // element — not ind.hist[MONITOR_WEEKS.length - 1], which only works for
+            // indicators tracked since week 1.
+            const weekOffset = MONITOR_WEEKS.length - ind.hist.length;
+            const currentEntry = ind.hist[ind.hist.length - 1];
+            const displayVal = currentEntry ? currentEntry[2] : `${MONITOR_WEEKS[MONITOR_WEEKS.length - 1]} · sin dato nuevo`;
             const isNew = !!ind.addedWeek;
             const isExpanded = expanded === `${g.dim}-${j}`;
             return (
@@ -108,13 +113,13 @@ export function TabMonitor() {
                   </div>
                   {/* History strip — fixed-width, one bar per week, hover/tap for detail */}
                   <div style={{ display:"flex", gap:1, alignItems:"center", minWidth:0, width:"100%" }}>
-                    {MONITOR_WEEKS.map((_,k) => { const h=ind.hist[k]; return (
+                    {MONITOR_WEEKS.map((_,k) => { const h=k>=weekOffset?ind.hist[k-weekOffset]:null; return (
                       <div key={k}
                         title={h ? `${MONITOR_WEEKS[k]}: ${h[2]}` : `${MONITOR_WEEKS[k]}: sin datos`}
                         style={{ flex:1, minWidth:1, height:14, borderRadius:1,
                           background:h?SEM[h[0]]:`${BORDER}60`,
-                          opacity:h?(0.35+(k/ind.hist.length)*0.65):0.3,
-                          boxShadow:(k===ind.hist.length-1 && h)?`0 0 3px ${SEM[h[0]]}`:"none" }} />
+                          opacity:h?(0.35+(k/MONITOR_WEEKS.length)*0.65):0.3,
+                          boxShadow:(k===MONITOR_WEEKS.length-1 && h)?`0 0 3px ${SEM[h[0]]}`:"none" }} />
                     )})}
                   </div>
                   {/* Current value */}
@@ -140,7 +145,10 @@ export function TabMonitor() {
                     {(() => {
                       const rowKey = `${g.dim}-${j}`;
                       const RECENT_N = 5;
-                      const withData = ind.hist.map((h,k) => ({ h, k })).filter(x => x.h).reverse();
+                      // k here must be the absolute week index (MONITOR_WEEKS), not the
+                      // position within ind.hist — hist is compact/trailing for indicators
+                      // added after S1, so it needs the same weekOffset shift as the strip above.
+                      const withData = ind.hist.map((h,k) => ({ h, k: k+weekOffset })).filter(x => x.h).reverse();
                       const recent = withData.slice(0, RECENT_N);
                       const older = withData.slice(RECENT_N);
                       const showAll = !!showAllHist[rowKey];
