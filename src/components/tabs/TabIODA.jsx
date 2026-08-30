@@ -1544,7 +1544,7 @@ export function TabIODA() {
 
       {/* ── Sub-navigation ── */}
       <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, marginBottom:14 }}>
-        {[{id:"estados",label:"🗺 Estados"},{id:"eventos",label:"⚡ Eventos"},{id:"nacional",label:"📡 Nacional"}].map(s => (
+        {[{id:"estados",label:"🗺 Estados"},{id:"eventos",label:"⚡ Eventos"},{id:"electricidad",label:"🔌 Cortes eléctricos"},{id:"nacional",label:"📡 Nacional"}].map(s => (
           <button key={s.id} onClick={() => setSubView(s.id)}
             style={{ fontSize:12, fontFamily:font, padding:"7px 16px", border:"none", flex:1,
               background:subView===s.id?ACCENT:"transparent", color:subView===s.id?"#fff":MUTED, cursor:"pointer", letterSpacing:"0.06em" }}>{s.label}</button>
@@ -2037,6 +2037,115 @@ export function TabIODA() {
           </div>
         </Card>
       )}
+
+      {/* ══════ CORTES ELÉCTRICOS (detectados vs. posibles) ══════ */}
+      {subView === "electricidad" && (() => {
+        const detected = activeData.filter(r => r.elecEvents > 0).slice().sort((a,b) => a.elecHealth - b.elecHealth);
+        const possible = activeData.filter(r => r.elecHealth < 100 && r.elecEvents === 0).slice().sort((a,b) => a.elecHealth - b.elecHealth);
+        const normalCount = activeData.filter(r => r.elecHealth === 100).length;
+        const jumpToState = (name) => { setSelectedState(name); setSubView("estados"); };
+        return (
+          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+            {/* Summary bar */}
+            <div style={{ display:"flex", gap:8, flexWrap:"wrap", fontSize:11, fontFamily:font }}>
+              <span style={{ padding:"3px 10px", borderRadius:12, background:"#ef444415", color:"#ef4444", fontWeight:700 }}>{detected.length} con evento detectado</span>
+              <span style={{ padding:"3px 10px", borderRadius:12, background:"#f9731615", color:"#f97316", fontWeight:700 }}>{possible.length} con posible racionamiento (inferido)</span>
+              <span style={{ padding:"3px 10px", borderRadius:12, background:"#34d39915", color:"#16a34a", fontWeight:700 }}>{normalCount} sin anomalías</span>
+            </div>
+
+            {/* Section 1: Detected — explicit alert-cluster evidence */}
+            <Card accent="#ef4444">
+              <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>
+                ⚡ Eventos eléctricos detectados
+              </div>
+              <div style={{ fontSize:11, color:`${MUTED}90`, marginBottom:10, lineHeight:1.5 }}>
+                Estados con al menos un clúster de alertas IODA (caída de sondeo, BGP estable) que supera el umbral calibrado contra el racionamiento ya declarado de ese estado — evidencia directa de un evento puntual, no solo degradación general de conectividad.
+              </div>
+              {detected.length === 0 ? (
+                <div style={{ textAlign:"center", padding:"20px 0", color:MUTED, fontSize:12 }}>No hay eventos eléctricos con evidencia directa en este período.</div>
+              ) : (
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  {detected.map(r => {
+                    const prior = getPrior(r.name);
+                    const elecC = getSeverityColor(r.elecHealth);
+                    const confColor = r.elecConfidence === "alta" ? "#16a34a" : r.elecConfidence === "media" ? "#ca8a04" : "#94a3b8";
+                    const stateEvents = (r.powerEvents || []).filter(ev => ev.isElectric);
+                    return (
+                      <div key={r.code} onClick={() => jumpToState(r.name)}
+                        style={{ padding:"8px 10px", borderRadius:4, border:`1px solid ${elecC}30`, background:`${elecC}08`, cursor:"pointer" }}>
+                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:6 }}>
+                          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                            <span style={{ fontSize:13, fontWeight:700, color:TEXT }}>{r.name}</span>
+                            {prior.tier > 0 && <span style={{ fontSize:8, fontFamily:font, padding:"1px 4px", borderRadius:2, background:"#fef2f2", color:"#ef4444", fontWeight:700 }}>T{prior.tier} · ~{prior.hoursPerDay}h/día</span>}
+                            <span title={`Confianza ${r.elecConfidence}`} style={{ fontSize:9, fontFamily:font, fontWeight:700, padding:"1px 5px", borderRadius:2, background:`${confColor}25`, color:confColor }}>
+                              {r.elecConfidence === "alta" ? "ALTA" : r.elecConfidence === "media" ? "MEDIA" : "BAJA"}
+                            </span>
+                          </div>
+                          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                            <span style={{ fontSize:14, fontWeight:900, fontFamily:font, color:elecC }}>{r.elecHealth}%</span>
+                            <span style={{ fontSize:10, color:MUTED }}>{r.elecLabel}</span>
+                          </div>
+                        </div>
+                        <div style={{ marginTop:6, display:"flex", flexDirection:"column", gap:2 }}>
+                          {stateEvents.slice(0, 5).map((ev, i) => (
+                            <div key={i} style={{ fontSize:10, color:MUTED }}>
+                              {fmtTime(ev.ts)} · −{ev.dropPct}% · {fmtDuration(ev.durationSec)}
+                              {ev.isNational && ev.nationalSeverity === "network_mild" && <span style={{ color:"#2563eb" }}> · 🌐 red (avg −{ev.nationalAvgDrop}%)</span>}
+                              {ev.isNational && ev.nationalSeverity === "blackout_moderate" && <span style={{ color:"#f97316" }}> · ⚡ nacional (avg −{ev.nationalAvgDrop}%)</span>}
+                              {ev.isNational && ev.nationalSeverity === "blackout_severe" && <span style={{ color:"#ef4444" }}> · ⚡⚡ nacional severo (avg −{ev.nationalAvgDrop}%)</span>}
+                              {!ev.isNational && <span style={{ color:"#7c3aed" }}> · 📍 regional</span>}
+                            </div>
+                          ))}
+                          {stateEvents.length > 5 && <div style={{ fontSize:9, color:`${MUTED}70` }}>+{stateEvents.length - 5} evento{stateEvents.length - 5 > 1 ? "s" : ""} más — ver detalle en Estados</div>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+
+            {/* Section 2: Possible/inferred — degradation without an explicit alert-cluster */}
+            <Card accent="#f97316">
+              <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>
+                🔶 Posible racionamiento (sin evento explícito)
+              </div>
+              <div style={{ fontSize:11, color:`${MUTED}90`, marginBottom:10, lineHeight:1.5 }}>
+                Estados con conectividad degradada y BGP estable — un patrón compatible con corte eléctrico — pero sin un clúster de alertas que confirme un evento puntual. Se infiere a partir del racionamiento ya declarado para ese estado; confianza siempre baja hasta que aparezca evidencia directa.
+              </div>
+              {possible.length === 0 ? (
+                <div style={{ textAlign:"center", padding:"20px 0", color:MUTED, fontSize:12 }}>No hay estados con racionamiento inferido en este período.</div>
+              ) : (
+                <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                  {possible.map(r => {
+                    const prior = getPrior(r.name);
+                    const elecC = getSeverityColor(r.elecHealth);
+                    return (
+                      <div key={r.code} onClick={() => jumpToState(r.name)}
+                        style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:6,
+                          padding:"7px 10px", borderRadius:4, border:`1px solid ${elecC}25`, background:`${elecC}06`, cursor:"pointer" }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                          <span style={{ fontSize:12, fontWeight:600, color:TEXT }}>{r.name}</span>
+                          {prior.tier > 0 && <span style={{ fontSize:8, fontFamily:font, padding:"1px 4px", borderRadius:2, background:"#fff7ed", color:"#f97316", fontWeight:700 }}>T{prior.tier} · ~{prior.hoursPerDay}h/día</span>}
+                          <span style={{ fontSize:9, fontFamily:font, fontWeight:700, padding:"1px 5px", borderRadius:2, background:"#94a3b825", color:"#94a3b8" }}>BAJA</span>
+                        </div>
+                        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                          <span style={{ fontSize:13, fontWeight:900, fontFamily:font, color:elecC }}>{r.elecHealth}%</span>
+                          <span style={{ fontSize:10, color:MUTED }}>{r.elecLabel}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+
+            <div style={{ fontSize:10, color:`${MUTED}60` }}>
+              Click en un estado para ver su detalle completo en "🗺 Estados" · {timeLabel}
+            </div>
+          </div>
+        );
+      })()}
 
             {/* Interactive temporal chart — selected state */}
             {selectedState && selectedStateData?.series?.length > 10 && (() => {
