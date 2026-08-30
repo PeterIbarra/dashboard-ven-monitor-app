@@ -53,10 +53,9 @@ export function IODAChoroplethMap({ regionScores, selectedState, onSelectState }
     const geojson = geojsonRef.current;
     if (!geojson || !mapNode.current) return;
     if (!mapInstance.current) {
-      const map = L.map(mapNode.current, { zoomControl: true, attributionControl: false, minZoom: 5, maxZoom: 10, scrollWheelZoom: true })
+      const map = L.map(mapNode.current, { zoomControl: true, attributionControl: true, minZoom: 4, maxZoom: 9, scrollWheelZoom: true })
         .setView([7.5, -66.5], 6);
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", { maxZoom: 12 }).addTo(map);
-      L.control.attribution({ prefix: false }).addTo(map).addAttribution("© OSM · CARTO · IODA");
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(map);
       mapInstance.current = map;
     }
     const map = mapInstance.current;
