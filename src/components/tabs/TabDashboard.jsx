@@ -273,7 +273,7 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         const { index, factors } = computeInstabilityIndex(wk, liveData);
         const {
           e1, e2, e3, e4, redCount, totalInds, tensRed, totalTens, sigActive, sigTotal,
-          brechaLive, brentFactor, lastWeekConf, protestPct, spreadPct, repressionPct,
+          brechaLive, brentPrice, brentFactor, lastWeekConf, protestPct, spreadPct, repressionPct,
           avg2025Monthly, monthlyTotal, monthlyTrendPct, amnLatest, amnBrechaPct, presosPct,
           bilV, bilPct, icgRaw, icgInverted, polAltaPct, convAltaPct, convInverted,
           iodaHealth, iodaInverted, elecHealth, elecInverted,
