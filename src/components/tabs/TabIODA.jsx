@@ -2041,9 +2041,16 @@ export function TabIODA() {
 
       {/* ══════ CORTES ELÉCTRICOS (detectados vs. posibles) ══════ */}
       {subView === "electricidad" && (() => {
-        const detected = activeData.filter(r => r.elecEvents > 0).slice().sort((a,b) => a.elecHealth - b.elecHealth);
-        const possible = activeData.filter(r => r.elecHealth < 100 && r.elecEvents === 0).slice().sort((a,b) => a.elecHealth - b.elecHealth);
-        const normal = activeData.filter(r => r.elecHealth === 100 && r.elecEvents === 0).slice().sort((a,b) => a.name.localeCompare(b.name));
+        // Group by actual alert-cluster evidence (r.powerEvents), NOT r.elecEvents — elecEvents is a
+        // merged counter that can also be bumped by the raw-signal/telescope background re-analysis
+        // (see the "Phase 2" enrichment in loadRegions) without ever adding a matching entry to
+        // powerEvents. Filtering on elecEvents alone could put a state in "detectado" with nothing
+        // to show in its expanded detail (Ev. column reading 0) — using powerEvents keeps the split
+        // consistent with what each section actually renders.
+        const hasDirectEvidence = r => (r.powerEvents || []).some(ev => ev.isElectric);
+        const detected = activeData.filter(hasDirectEvidence).slice().sort((a,b) => a.elecHealth - b.elecHealth);
+        const possible = activeData.filter(r => r.elecHealth < 100 && !hasDirectEvidence(r)).slice().sort((a,b) => a.elecHealth - b.elecHealth);
+        const normal = activeData.filter(r => r.elecHealth === 100 && !hasDirectEvidence(r)).slice().sort((a,b) => a.name.localeCompare(b.name));
         const toggleExpand = (name) => setExpandedElecState(cur => cur === name ? null : name);
         return (
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
@@ -2138,7 +2145,7 @@ export function TabIODA() {
                 🔶 Posible racionamiento (sin evento explícito)
               </div>
               <div style={{ fontSize:11, color:`${MUTED}90`, marginBottom:10, lineHeight:1.5 }}>
-                Estados con conectividad degradada y BGP estable — un patrón compatible con corte eléctrico — pero sin un clúster de alertas que confirme un evento puntual. Se infiere a partir del racionamiento ya declarado para ese estado; confianza siempre baja hasta que aparezca evidencia directa.
+                Estados con conectividad degradada y BGP estable — un patrón compatible con corte eléctrico — pero sin un clúster de alertas IODA que confirme un evento puntual. El valor sale de comparar la degradación contra el racionamiento ya declarado para ese estado, o de una reconfirmación por telescopio (señal independiente); la confianza varía según cuál de esas dos fuentes lo sostiene.
               </div>
               {possible.length === 0 ? (
                 <div style={{ textAlign:"center", padding:"20px 0", color:MUTED, fontSize:12 }}>No hay estados con racionamiento inferido en este período.</div>
@@ -2148,6 +2155,7 @@ export function TabIODA() {
                     const prior = getPrior(r.name);
                     const elecC = getSeverityColor(r.elecHealth);
                     const isOpen = expandedElecState === r.name;
+                    const confColor = r.elecConfidence === "alta" ? "#16a34a" : r.elecConfidence === "media" ? "#ca8a04" : "#94a3b8";
                     return (
                       <div key={r.code}>
                         <div onClick={() => toggleExpand(r.name)}
@@ -2161,7 +2169,11 @@ export function TabIODA() {
                             <span style={{ fontSize:9, color:MUTED, width:10 }}>{isOpen ? "▾" : "▸"}</span>
                             <span style={{ fontSize:12, fontWeight:600, color:TEXT }}>{r.name}</span>
                             {prior.tier > 0 && <span style={{ fontSize:8, fontFamily:font, padding:"1px 4px", borderRadius:2, background:"#fff7ed", color:"#f97316", fontWeight:700 }}>T{prior.tier} · ~{prior.hoursPerDay}h/día</span>}
-                            <span style={{ fontSize:9, fontFamily:font, fontWeight:700, padding:"1px 5px", borderRadius:2, background:"#94a3b825", color:"#94a3b8" }}>BAJA</span>
+                            {r.teleDetected && <span title="Reconfirmado por caída de telescopio nacional (señal independiente del sondeo activo)"
+                              style={{ fontSize:8, fontFamily:font, padding:"1px 4px", borderRadius:2, background:"#ede9fe", color:"#7c3aed", fontWeight:700 }}>🔭 TELESCOPIO</span>}
+                            <span style={{ fontSize:9, fontFamily:font, fontWeight:700, padding:"1px 5px", borderRadius:2, background:`${confColor}25`, color:confColor }}>
+                              {r.elecConfidence === "alta" ? "ALTA" : r.elecConfidence === "media" ? "MEDIA" : "BAJA"}
+                            </span>
                           </div>
                           <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                             <span style={{ fontSize:13, fontWeight:900, fontFamily:font, color:elecC }}>{r.elecHealth}%</span>
@@ -2170,7 +2182,10 @@ export function TabIODA() {
                         </div>
                         {isOpen && (
                           <div style={{ margin:"2px 4px 6px 20px", padding:"7px 10px", borderRadius:4, background:`${elecC}08`, borderLeft:`3px solid ${elecC}`, fontSize:10, color:MUTED, lineHeight:1.5 }}>
-                            Conectividad: {r.connectivityHealth}% · BGP {r.bgpStable ? "estable" : "inestable"} · sin clúster de alertas que confirme un evento puntual — el valor sale de comparar la degradación actual contra el racionamiento T{prior.tier} (~{prior.hoursPerDay}h/día) ya declarado para {r.name}.
+                            Conectividad: {r.connectivityHealth}% · BGP {r.bgpStable ? "estable" : "inestable"} · sin clúster de alertas IODA que confirme un evento puntual.{" "}
+                            {r.teleDetected
+                              ? `Reconfirmado por una caída del telescopio nacional (señal independiente del sondeo activo) durante el período, con BGP estable — patrón compatible con corte eléctrico.`
+                              : `El valor sale de comparar la degradación actual contra el racionamiento T${prior.tier} (~${prior.hoursPerDay}h/día) ya declarado para ${r.name}.`}
                           </div>
                         )}
                       </div>
