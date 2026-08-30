@@ -268,9 +268,9 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         window.scrollTo({ top:0, behavior:"smooth" });
       }} />
 
-      {/* ── ROW 1b: Índice de Inestabilidad Compuesto (24 factores) ── */}
+      {/* ── ROW 1b: Índice de Inestabilidad Compuesto (25 factores) ── */}
       {(() => {
-        // ── 24-input Composite Instability Index (0-100) ──
+        // ── 25-input Composite Instability Index (0-100) ──
         const e1 = wk.probs.find(p=>p.sc===1)?.v || 0;
         const e2 = wk.probs.find(p=>p.sc===2)?.v || 0;
         const e3 = wk.probs.find(p=>p.sc===3)?.v || 0;
@@ -345,6 +345,20 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         const elecHealth = liveData?.ioda?.electric?.avgElecHealth;
         const elecInverted = elecHealth != null ? Math.max(0, 100 - elecHealth) : null;
 
+        // Electric-outage breadth — a SEPARATE signal from severity above: how many
+        // states currently have a confirmed electric-event cluster (direct IODA
+        // evidence, not just inferred rationing), regardless of how deep any single
+        // state's drop is. A localized-but-severe outage and a shallow-but-national
+        // one read very differently, so this gets its own weighted factor instead of
+        // being folded into (and diluted by) the national average health above.
+        const elecStatesList = liveData?.ioda?.electric?.states;
+        const hasDirectElecEvidence = s => (s.powerEvents || []).some(ev => ev.isElectric);
+        const elecDetected = Array.isArray(elecStatesList) ? elecStatesList.filter(hasDirectElecEvidence) : null;
+        const elecDetectedCount = elecDetected?.length ?? null;
+        const elecTotalStates = Array.isArray(elecStatesList) ? elecStatesList.length : null;
+        const elecDetectedPct = elecDetectedCount != null && elecTotalStates > 0 ? (elecDetectedCount / elecTotalStates) * 100 : null;
+        const elecDetectedNames = elecDetected?.map(s => s.name).join(", ") || "";
+
         // Public disapproval of government management ("mal camino" — DatinCorp, corte semanal)
         const desaprobacionCard = OPINION_SNAPSHOT?.cards?.find(c => /mal camino/i.test(c.label));
         const desaprobacionPct = desaprobacionCard?.value
@@ -359,7 +373,7 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         const institucionalCount = WEEKLY_INSTITUTIONAL?.items?.length || 0;
         const institucionalFactor = Math.min((institucionalCount / 6) * 100, 100); // 6+ cambios/semana = saturado
 
-        // ── FORMULA (24 inputs, weights sum to ~100 with stabilizers) ──
+        // ── FORMULA (25 inputs, weights sum to ~100 with stabilizers) ──
         const raw = (redCount/totalInds)*8              // Ind. rojos: 8% (was 9)
           + (e2/100)*6                                    // E2 Colapso: 6% (was 7)
           + (e4/100)*5                                    // E4 Resistencia: 5% (was 6)
@@ -381,7 +395,8 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           + (desaprobacionPct/100)*5                       // Desaprobación de gestión: 5%
           + (inflacionFactor/100)*6                        // Presión inflacionaria: 6%
           + (institucionalFactor/100)*4                    // Volatilidad institucional: 4%
-          + ((elecInverted != null ? elecInverted : 10)/100)*6  // Cortes eléctricos (IODA racionamiento): 6% (NEW)
+          + ((elecInverted != null ? elecInverted : 10)/100)*4  // Cortes eléctricos (severidad promedio, IODA racionamiento): 4% (was 6)
+          + ((elecDetectedPct != null ? elecDetectedPct : 8)/100)*2  // Estados con evento eléctrico detectado (alcance): 2% (NEW)
           - (e1/100)*5                                     // E1 Transición: -5% (estabilizador, was -6)
           - (e3/100)*2;                                    // E3 Continuidad: -2% (estabilizador, was -3)
         const index = Math.max(0, Math.min(100, Math.round(raw)));
@@ -399,7 +414,8 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
             + (amnBrechaPct/100)*1 + (presosPct/100)*2 + (polAltaPct/100)*4 + (convInverted/100)*2
             + ((iodaInverted != null ? iodaInverted : 15)/100)*5 + (desaprobacionPct/100)*5
             + (inflacionFactor/100)*6 + (institucionalFactor/100)*4
-            + ((elecInverted != null ? elecInverted : 10)/100)*6
+            + ((elecInverted != null ? elecInverted : 10)/100)*4
+            + ((elecDetectedPct != null ? elecDetectedPct : 8)/100)*2
             - (pe1/100)*5 - (pe3/100)*2;
           prevIndex = Math.max(0, Math.min(100, Math.round(pRaw)));
         }
@@ -445,13 +461,14 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           // y un valor neutral/repetido para semanas de archivo (misma convención que wBrent/wIcg arriba).
           const wIoda = (wi === WEEKS.length - 1 && iodaInverted != null) ? iodaInverted : 15;
           const wElec = (wi === WEEKS.length - 1 && elecInverted != null) ? elecInverted : 10;
+          const wElecDetected = (wi === WEEKS.length - 1 && elecDetectedPct != null) ? elecDetectedPct : 8;
           const wr = (wRedProxy/wTotalSem)*8 + (we2/100)*6 + (we4/100)*5
             + (Math.min(wBrecha,100)/100)*8 + (wtr/wtt)*4 + (sigActive/sigTotal)*4
             + (wBrent/100)*3 + (wBil/100)*2 + (wIcg/100)*2 + (wProtestPct/100)*4 + (wSpreadPct/100)*3
             + (Math.min(wMonthlyTrend,150)/150)*1 + (wReprPct/100)*1
             + (wAmnBrecha/100)*1 + (wPresos/100)*2 + (polAltaPct/100)*4 + (convInverted/100)*2
             + (wIoda/100)*5 + (desaprobacionPct/100)*5 + (inflacionFactor/100)*6 + (institucionalFactor/100)*4
-            + (wElec/100)*6
+            + (wElec/100)*4 + (wElecDetected/100)*2
             - (we1/100)*5 - (we3/100)*2;
           return Math.max(0, Math.min(100, Math.round(wr)));
         });
@@ -476,7 +493,10 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           { label:"E2 Colapso", value:`${e2}%`, pct:e2, w:"6%" },
           { label:"E4 Resistencia", value:`${e4}%`, pct:e4, w:"5%" },
           { label:"Conectividad 🌐", value:iodaHealth != null ? `${iodaHealth}` : "—", pct:iodaInverted != null ? Math.round(iodaInverted) : 15, w:"5%", live:true },
-          { label:"Cortes eléctricos ⚡", value:elecHealth != null ? `${elecHealth}` : "—", pct:elecInverted != null ? Math.round(elecInverted) : 10, w:"6%", live:true },
+          { label:"Cortes eléctricos ⚡", value:elecHealth != null ? `${elecHealth}` : "—", pct:elecInverted != null ? Math.round(elecInverted) : 10, w:"4%", live:true,
+            title:"Salud eléctrica nacional ponderada (0-100, IODA/racionamiento) · ver Energía y Red" },
+          { label:"Estados con corte ⚡", value:elecDetectedCount != null ? `${elecDetectedCount}/${elecTotalStates}` : "—", pct:elecDetectedPct != null ? Math.round(elecDetectedPct) : 8, w:"2%", live:true,
+            title:elecDetectedNames ? `Con evento eléctrico detectado: ${elecDetectedNames} · ver Energía y Red` : "Estados con al menos un evento eléctrico confirmado (evidencia directa IODA) · ver Energía y Red" },
           { label:"Desaprobación gob.", value:`${desaprobacionPct.toFixed(0)}%`, pct:Math.round(desaprobacionPct), w:"5%" },
           { label:"Pol. alta redes 🌡️", value:`${polAltaPct.toFixed(0)}%`, pct:Math.round(polAltaPct), w:"4%" },
           { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100), w:"4%" },
@@ -605,7 +625,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
                 {/* Breakdown */}
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2px 8px", fontSize:10, fontFamily:font }}>
                   {breakdown.map((item,i) => (
-                    <div key={i} style={{ display:"flex", justifyContent:"space-between", color:item.isNeg?"#16a34a":MUTED, padding:"1px 0" }}>
+                    <div key={i} title={item.title} style={{ display:"flex", justifyContent:"space-between", color:item.isNeg?"#16a34a":MUTED, padding:"1px 0", cursor:item.title?"help":"default" }}>
                       <span style={{ display:"flex", alignItems:"center", gap:3 }}>
                         {item.label}
                         {item.live && <span style={{ width:4, height:4, borderRadius:"50%", background:"#22c55e", animation:"pulse 1.5s infinite" }} />}
