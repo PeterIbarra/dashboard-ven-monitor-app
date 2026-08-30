@@ -2043,7 +2043,7 @@ export function TabIODA() {
       {subView === "electricidad" && (() => {
         const detected = activeData.filter(r => r.elecEvents > 0).slice().sort((a,b) => a.elecHealth - b.elecHealth);
         const possible = activeData.filter(r => r.elecHealth < 100 && r.elecEvents === 0).slice().sort((a,b) => a.elecHealth - b.elecHealth);
-        const normalCount = activeData.filter(r => r.elecHealth === 100).length;
+        const normal = activeData.filter(r => r.elecHealth === 100 && r.elecEvents === 0).slice().sort((a,b) => a.name.localeCompare(b.name));
         const toggleExpand = (name) => setExpandedElecState(cur => cur === name ? null : name);
         return (
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
@@ -2051,7 +2051,7 @@ export function TabIODA() {
             <div style={{ display:"flex", gap:8, flexWrap:"wrap", fontSize:11, fontFamily:font }}>
               <span style={{ padding:"3px 10px", borderRadius:12, background:"#ef444415", color:"#ef4444", fontWeight:700 }}>{detected.length} con evento detectado</span>
               <span style={{ padding:"3px 10px", borderRadius:12, background:"#f9731615", color:"#f97316", fontWeight:700 }}>{possible.length} con posible racionamiento (inferido)</span>
-              <span style={{ padding:"3px 10px", borderRadius:12, background:"#34d39915", color:"#16a34a", fontWeight:700 }}>{normalCount} sin anomalías</span>
+              <span style={{ padding:"3px 10px", borderRadius:12, background:"#34d39915", color:"#16a34a", fontWeight:700 }}>{normal.length} sin anomalías</span>
             </div>
 
             {/* Section 1: Detected — explicit alert-cluster evidence. Priority section: compact rows, no sprawl. */}
@@ -2171,6 +2171,42 @@ export function TabIODA() {
                         {isOpen && (
                           <div style={{ margin:"2px 4px 6px 20px", padding:"7px 10px", borderRadius:4, background:`${elecC}08`, borderLeft:`3px solid ${elecC}`, fontSize:10, color:MUTED, lineHeight:1.5 }}>
                             Conectividad: {r.connectivityHealth}% · BGP {r.bgpStable ? "estable" : "inestable"} · sin clúster de alertas que confirme un evento puntual — el valor sale de comparar la degradación actual contra el racionamiento T{prior.tier} (~{prior.hoursPerDay}h/día) ya declarado para {r.name}.
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+
+            {/* Section 3: No anomaly — full connectivity health, no event, no inferred rationing */}
+            <Card accent="#34d399">
+              <div style={{ fontSize:13, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>
+                ✅ Sin anomalías
+              </div>
+              <div style={{ fontSize:11, color:`${MUTED}90`, marginBottom:10, lineHeight:1.5 }}>
+                Estados con conectividad eléctrica al 100% — sin evento detectado ni degradación compatible con racionamiento inferido. Click en un estado para ver su detalle.
+              </div>
+              {normal.length === 0 ? (
+                <div style={{ textAlign:"center", padding:"20px 0", color:MUTED, fontSize:12 }}>Ningún estado sin anomalías en este período.</div>
+              ) : (
+                <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                  {normal.map(r => {
+                    const prior = getPrior(r.name);
+                    const isOpen = expandedElecState === r.name;
+                    return (
+                      <div key={r.code} style={{ display: isOpen ? "block" : "inline-block" }}>
+                        <span onClick={() => toggleExpand(r.name)}
+                          style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 9px", borderRadius:12,
+                            cursor:"pointer", fontSize:11, fontFamily:font, fontWeight:600, color: isOpen ? "#fff" : "#16a34a",
+                            background: isOpen ? "#16a34a" : "#34d39915", border:"1px solid #34d39930" }}>
+                          {r.name}
+                          {prior.tier > 0 && <span style={{ fontSize:8, opacity:0.85 }}>T{prior.tier}</span>}
+                        </span>
+                        {isOpen && (
+                          <div style={{ margin:"4px 0 2px", padding:"7px 10px", borderRadius:4, background:"#34d39908", borderLeft:"3px solid #34d399", fontSize:10, color:MUTED, lineHeight:1.5, maxWidth:420 }}>
+                            Conectividad: {r.connectivityHealth}% · BGP {r.bgpStable ? "estable" : "inestable"} · sin clúster de alertas ni degradación compatible con el racionamiento T{prior.tier} (~{prior.hoursPerDay}h/día) declarado para {r.name}.
                           </div>
                         )}
                       </div>
