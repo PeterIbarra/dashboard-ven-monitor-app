@@ -138,7 +138,7 @@ async function callWithTools(messages, maxTokens) {
           }),
           signal: AbortSignal.timeout(25000),
         });
-        if (!res.ok) return null;
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
         return await res.json();
       }
     },
@@ -159,22 +159,28 @@ async function callWithTools(messages, maxTokens) {
           }),
           signal: AbortSignal.timeout(25000),
         });
-        if (!res.ok) return null;
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
         return await res.json();
       }
     },
   ];
 
-  for (const provider of toolProviders) {
-    const apiKey = process.env[provider.keyEnv];
-    if (!apiKey) continue;
-    try {
-      const data = await provider.call(messages, apiKey);
-      if (!data) continue;
-      const choice = data.choices?.[0];
-      if (!choice) continue;
+  // Se prueban EN PARALELO (Promise.any), no en serie: en serie, la suma de
+  // los timeouts de cada proveedor (25s + 25s = 50s) supera el maxDuration
+  // de la función (ver vercel.json) y Vercel mata la función a medio camino
+  // — eso hacía fallar el cascade completo aunque un proveedor más adelante
+  // en la lista sí hubiera respondido bien. En paralelo, el peor caso es el
+  // más lento de los dos (~25s), no la suma. Actualizado 2026-09-05.
+  const configured = toolProviders.filter(p => process.env[p.keyEnv]);
+  if (configured.length === 0) return null;
 
-      // Tool calls requested
+  try {
+    return await Promise.any(configured.map(async (provider) => {
+      const apiKey = process.env[provider.keyEnv];
+      const data = await provider.call(messages, apiKey);
+      const choice = data?.choices?.[0];
+      if (!choice) throw new Error("respuesta sin choices");
+
       if (choice.finish_reason === "tool_calls" && choice.message?.tool_calls?.length) {
         return {
           type: "tool_calls",
@@ -184,16 +190,14 @@ async function callWithTools(messages, maxTokens) {
         };
       }
 
-      // Direct text response
       const text = choice.message?.content;
-      if (text && text.length > 10) {
-        return { type: "text", text, provider: provider.name };
-      }
-    } catch (err) {
-      console.error(`${provider.name} tool call error:`, err.message);
-    }
+      if (text && text.length > 10) return { type: "text", text, provider: provider.name };
+      throw new Error("respuesta demasiado corta");
+    }));
+  } catch (aggErr) {
+    for (const e of (aggErr.errors || [aggErr])) console.error("tool call error:", e.message);
+    return null; // signal fallback needed
   }
-  return null; // signal fallback needed
 }
 
 // ── Injection fallback providers ──────────────────────────────────────────────
@@ -203,10 +207,12 @@ const INJECTION_PROVIDERS = [
     name: "gemini-3.6-flash",
     keyEnv: "GEMINI_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
-      let lastErr = null;
       // gemini-1.5-flash y gemini-2.0-flash fueron retirados por Google (404
       // "no longer available") — actualizado 2026-09-05 tras confirmar en vivo.
-      for (const model of ["gemini-3.6-flash", "gemini-2.5-flash"]) {
+      // Los dos modelos se intentan EN PARALELO (Promise.any), no en serie —
+      // en serie, 30s + 30s por sí solo ya casi agota el maxDuration de la
+      // función (ver nota en callWithTools / vercel.json).
+      const tryModel = async (model) => {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -214,15 +220,19 @@ const INJECTION_PROVIDERS = [
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
           }),
-          signal: AbortSignal.timeout(30000),
+          signal: AbortSignal.timeout(25000),
         });
-        if (!res.ok) { lastErr = `${model} HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`; continue; }
+        if (!res.ok) throw new Error(`${model} HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
         const data = await res.json();
         const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join("\n");
-        if (text) return text;
-        lastErr = `${model}: empty candidates — finishReason=${data.candidates?.[0]?.finishReason || "?"}`;
+        if (!text) throw new Error(`${model}: empty candidates — finishReason=${data.candidates?.[0]?.finishReason || "?"}`);
+        return text;
+      };
+      try {
+        return await Promise.any([tryModel("gemini-3.6-flash"), tryModel("gemini-2.5-flash")]);
+      } catch (aggErr) {
+        throw new Error((aggErr.errors || [aggErr]).map(e => e.message).join(" | "));
       }
-      throw new Error(lastErr || "no models responded");
     },
   },
   {
@@ -245,7 +255,7 @@ const INJECTION_PROVIDERS = [
           max_tokens: maxTokens,
           temperature: 0.7,
         }),
-        signal: AbortSignal.timeout(30000),
+        signal: AbortSignal.timeout(25000),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
       const data = await res.json();
@@ -270,7 +280,7 @@ const INJECTION_PROVIDERS = [
           max_tokens: maxTokens,
           temperature: 0.7,
         }),
-        signal: AbortSignal.timeout(45000),
+        signal: AbortSignal.timeout(25000),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
       const data = await res.json();
@@ -291,7 +301,7 @@ const INJECTION_PROVIDERS = [
           max_tokens: maxTokens,
           messages: [{ role: "user", content: prompt }],
         }),
-        signal: AbortSignal.timeout(30000),
+        signal: AbortSignal.timeout(25000),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
       const data = await res.json();
@@ -355,7 +365,7 @@ module.exports = async function handler(req, res) {
         const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
           body: JSON.stringify({ model: "openai/gpt-oss-120b", messages: [{ role: "user", content: p }], max_tokens: mt, temperature: 0.7 }),
-          signal: AbortSignal.timeout(30000),
+          signal: AbortSignal.timeout(25000),
         });
         if (!r.ok) throw new Error(`HTTP ${r.status}: ${(await r.text().catch(() => "")).slice(0, 200)}`);
         const d = await r.json();
@@ -369,7 +379,7 @@ module.exports = async function handler(req, res) {
         const r = await fetch("https://api.mistral.ai/v1/chat/completions", {
           method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
           body: JSON.stringify({ model: "mistral-small-latest", messages: [{ role: "user", content: p }], max_tokens: mt, temperature: 0.7 }),
-          signal: AbortSignal.timeout(30000),
+          signal: AbortSignal.timeout(25000),
         });
         if (!r.ok) throw new Error(`HTTP ${r.status}: ${(await r.text().catch(() => "")).slice(0, 200)}`);
         const d = await r.json();
@@ -381,22 +391,38 @@ module.exports = async function handler(req, res) {
     ...INJECTION_PROVIDERS,
   ];
 
-  const errors = [];
-  const attempted = [];
-  for (const provider of allProviders) {
-    const apiKey = process.env[provider.keyEnv];
-    if (!apiKey) { errors.push(`${provider.name}: no API key configured (${provider.keyEnv})`); continue; }
-    attempted.push(provider.name);
-    try {
-      const text = await provider.call(prompt, safeMaxTokens, apiKey);
-      if (text && text.length > 20) {
-        return res.status(200).json({ text, provider: provider.name });
-      }
-      errors.push(`${provider.name}: response too short (${text?.length || 0} chars)`);
-    } catch (err) {
-      errors.push(`${provider.name}: ${err.name === "AbortError" ? "timeout" : err.message}`);
-    }
+  // Se prueban EN PARALELO (Promise.any), no en serie — actualizado 2026-09-05.
+  // Con hasta 6 proveedores en serie, la SUMA de sus timeouts (hasta ~3 min)
+  // superaba por mucho el maxDuration de la función (ver vercel.json), así
+  // que Vercel mataba la función a medio cascade sin llegar nunca a probar
+  // la mayoría de los proveedores — esa era la causa real de que la alerta
+  // de noticias siguiera fallando incluso con los IDs de modelo corregidos.
+  // En paralelo, el tiempo total es el del proveedor más lento (~25s), no
+  // la suma de todos.
+  const configured = allProviders.filter(p => process.env[p.keyEnv]);
+  const attempted = configured.map(p => p.name);
+  const skippedNoKey = allProviders
+    .filter(p => !process.env[p.keyEnv])
+    .map(p => `${p.name}: no API key configured (${p.keyEnv})`);
+
+  if (configured.length === 0) {
+    return res.status(502).json({ error: "All AI providers failed.", attempted, details: skippedNoKey });
   }
 
-  return res.status(502).json({ error: "All AI providers failed.", attempted, details: errors });
+  try {
+    const winner = await Promise.any(configured.map(async (provider) => {
+      const apiKey = process.env[provider.keyEnv];
+      const text = await provider.call(prompt, safeMaxTokens, apiKey);
+      if (!text || text.length <= 20) throw new Error(`response too short (${text?.length || 0} chars)`);
+      return { text, provider: provider.name };
+    }));
+    return res.status(200).json({ text: winner.text, provider: winner.provider });
+  } catch (aggErr) {
+    const providerErrors = configured.map((p, i) => {
+      const err = aggErr.errors?.[i];
+      const msg = err ? (err.name === "AbortError" ? "timeout" : err.message) : "unknown error";
+      return `${p.name}: ${msg}`;
+    });
+    return res.status(502).json({ error: "All AI providers failed.", attempted, details: [...skippedNoKey, ...providerErrors] });
+  }
 };
