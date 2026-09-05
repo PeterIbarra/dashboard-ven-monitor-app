@@ -122,14 +122,14 @@ Cuando hagas recomendaciones para el PNUD, diferencia por escenario y área prog
 async function callWithTools(messages, maxTokens) {
   const toolProviders = [
     {
-      name: "groq/llama-3.3-70b",
+      name: "groq/gpt-oss-120b",
       keyEnv: "GROQ_API_KEY",
       call: async (msgs, apiKey) => {
         const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
           body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
+            model: "openai/gpt-oss-120b", // llama-3.3-70b-versatile: retirado por Groq (404), reemplazado 2026-09-05
             messages: msgs,
             tools: TOOL_DEFINITIONS,
             tool_choice: "auto",
@@ -200,11 +200,13 @@ async function callWithTools(messages, maxTokens) {
 
 const INJECTION_PROVIDERS = [
   {
-    name: "gemini-2.0-flash",
+    name: "gemini-3.6-flash",
     keyEnv: "GEMINI_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
       let lastErr = null;
-      for (const model of ["gemini-1.5-flash", "gemini-2.0-flash"]) {
+      // gemini-1.5-flash y gemini-2.0-flash fueron retirados por Google (404
+      // "no longer available") — actualizado 2026-09-05 tras confirmar en vivo.
+      for (const model of ["gemini-3.6-flash", "gemini-2.5-flash"]) {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -236,7 +238,9 @@ const INJECTION_PROVIDERS = [
           "X-Title": "PNUD Venezuela Monitor",
         },
         body: JSON.stringify({
-          model: "meta-llama/llama-3.1-8b-instruct:free",
+          // meta-llama/llama-3.1-8b-instruct:free ya no existe en el catálogo
+          // gratuito de OpenRouter (404) — reemplazado 2026-09-05.
+          model: "nvidia/nemotron-3.5-lightning:free",
           messages: [{ role: "user", content: prompt }],
           max_tokens: maxTokens,
           temperature: 0.7,
@@ -254,19 +258,24 @@ const INJECTION_PROVIDERS = [
     name: "huggingface/qwen-2.5-72b",
     keyEnv: "HF_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
-      const res = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2.5-72B-Instruct", {
+      // api-inference.huggingface.co fue retirado — HF movió todo a un router
+      // OpenAI-compatible (router.huggingface.co) que reparte entre providers
+      // de inferencia. Actualizado 2026-09-05 tras confirmar en vivo.
+      const res = await fetch("https://router.huggingface.co/v1/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
         body: JSON.stringify({
-          inputs: prompt,
-          parameters: { max_new_tokens: maxTokens, temperature: 0.7, return_full_text: false },
+          model: "Qwen/Qwen2.5-72B-Instruct",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: maxTokens,
+          temperature: 0.7,
         }),
         signal: AbortSignal.timeout(45000),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
       const data = await res.json();
-      const text = Array.isArray(data) ? data[0]?.generated_text : data.generated_text;
-      if (!text) throw new Error(`empty response — ${JSON.stringify(data).slice(0, 200)}`);
+      const text = data.choices?.[0]?.message?.content;
+      if (!text) throw new Error(`empty choices — ${JSON.stringify(data).slice(0, 200)}`);
       return text;
     },
   },
@@ -341,11 +350,11 @@ module.exports = async function handler(req, res) {
   }
 
   const allProviders = [
-    { name: "groq/llama-3.3-70b", keyEnv: "GROQ_API_KEY",
+    { name: "groq/gpt-oss-120b", keyEnv: "GROQ_API_KEY",
       call: async (p, mt, key) => {
         const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
-          body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: p }], max_tokens: mt, temperature: 0.7 }),
+          body: JSON.stringify({ model: "openai/gpt-oss-120b", messages: [{ role: "user", content: p }], max_tokens: mt, temperature: 0.7 }),
           signal: AbortSignal.timeout(30000),
         });
         if (!r.ok) throw new Error(`HTTP ${r.status}: ${(await r.text().catch(() => "")).slice(0, 200)}`);
