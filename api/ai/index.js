@@ -203,6 +203,7 @@ const INJECTION_PROVIDERS = [
     name: "gemini-2.0-flash",
     keyEnv: "GEMINI_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
+      let lastErr = null;
       for (const model of ["gemini-1.5-flash", "gemini-2.0-flash"]) {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
           method: "POST",
@@ -213,12 +214,13 @@ const INJECTION_PROVIDERS = [
           }),
           signal: AbortSignal.timeout(30000),
         });
-        if (!res.ok) continue;
+        if (!res.ok) { lastErr = `${model} HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`; continue; }
         const data = await res.json();
         const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join("\n");
         if (text) return text;
+        lastErr = `${model}: empty candidates — finishReason=${data.candidates?.[0]?.finishReason || "?"}`;
       }
-      return null;
+      throw new Error(lastErr || "no models responded");
     },
   },
   {
@@ -241,9 +243,11 @@ const INJECTION_PROVIDERS = [
         }),
         signal: AbortSignal.timeout(30000),
       });
-      if (!res.ok) return null;
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
       const data = await res.json();
-      return data.choices?.[0]?.message?.content || null;
+      const text = data.choices?.[0]?.message?.content;
+      if (!text) throw new Error(`empty choices — ${JSON.stringify(data).slice(0, 200)}`);
+      return text;
     },
   },
   {
@@ -259,9 +263,11 @@ const INJECTION_PROVIDERS = [
         }),
         signal: AbortSignal.timeout(45000),
       });
-      if (!res.ok) return null;
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
       const data = await res.json();
-      return Array.isArray(data) ? (data[0]?.generated_text || null) : (data.generated_text || null);
+      const text = Array.isArray(data) ? data[0]?.generated_text : data.generated_text;
+      if (!text) throw new Error(`empty response — ${JSON.stringify(data).slice(0, 200)}`);
+      return text;
     },
   },
   {
@@ -278,9 +284,11 @@ const INJECTION_PROVIDERS = [
         }),
         signal: AbortSignal.timeout(30000),
       });
-      if (!res.ok) return null;
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
       const data = await res.json();
-      return (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n") || null;
+      const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n");
+      if (!text) throw new Error(`empty content — ${JSON.stringify(data).slice(0, 200)}`);
+      return text;
     },
   },
 ];
@@ -340,9 +348,11 @@ module.exports = async function handler(req, res) {
           body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: p }], max_tokens: mt, temperature: 0.7 }),
           signal: AbortSignal.timeout(30000),
         });
-        if (!r.ok) return null;
+        if (!r.ok) throw new Error(`HTTP ${r.status}: ${(await r.text().catch(() => "")).slice(0, 200)}`);
         const d = await r.json();
-        return d.choices?.[0]?.message?.content || null;
+        const text = d.choices?.[0]?.message?.content;
+        if (!text) throw new Error(`empty choices — ${JSON.stringify(d).slice(0, 200)}`);
+        return text;
       }
     },
     { name: "mistral-small", keyEnv: "MISTRAL_API_KEY",
@@ -352,28 +362,32 @@ module.exports = async function handler(req, res) {
           body: JSON.stringify({ model: "mistral-small-latest", messages: [{ role: "user", content: p }], max_tokens: mt, temperature: 0.7 }),
           signal: AbortSignal.timeout(30000),
         });
-        if (!r.ok) return null;
+        if (!r.ok) throw new Error(`HTTP ${r.status}: ${(await r.text().catch(() => "")).slice(0, 200)}`);
         const d = await r.json();
-        return d.choices?.[0]?.message?.content || null;
+        const text = d.choices?.[0]?.message?.content;
+        if (!text) throw new Error(`empty choices — ${JSON.stringify(d).slice(0, 200)}`);
+        return text;
       }
     },
     ...INJECTION_PROVIDERS,
   ];
 
   const errors = [];
+  const attempted = [];
   for (const provider of allProviders) {
     const apiKey = process.env[provider.keyEnv];
-    if (!apiKey) continue;
+    if (!apiKey) { errors.push(`${provider.name}: no API key configured (${provider.keyEnv})`); continue; }
+    attempted.push(provider.name);
     try {
       const text = await provider.call(prompt, safeMaxTokens, apiKey);
       if (text && text.length > 20) {
         return res.status(200).json({ text, provider: provider.name });
       }
-      errors.push(`${provider.name}: empty response`);
+      errors.push(`${provider.name}: response too short (${text?.length || 0} chars)`);
     } catch (err) {
       errors.push(`${provider.name}: ${err.name === "AbortError" ? "timeout" : err.message}`);
     }
   }
 
-  return res.status(502).json({ error: "All AI providers failed.", details: errors });
+  return res.status(502).json({ error: "All AI providers failed.", attempted, details: errors });
 };
