@@ -10,9 +10,22 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #060c14; font-family: 'DM Sans', sans-serif; }
+    html[data-theme="dark"] body { background: #0b1220; }
+    body { background: #f4f6f9; font-family: 'DM Sans', sans-serif; }
     button, input, select, textarea { font: inherit; }
   </style>
+  <script>
+    // Applied before React mounts so the very first paint already matches
+    // the saved theme instead of flashing the other one. Light is always
+    // the default until the user explicitly picks dark.
+    (function () {
+      try {
+        var stored = window.localStorage.getItem("pnud-monitor-theme");
+        var theme = (stored === "light" || stored === "dark") ? stored : "light";
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
   <div id="root"></div>

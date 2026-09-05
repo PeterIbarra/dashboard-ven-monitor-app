@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { BORDER, font } from "../constants";
+import { BORDER, font, BG3 } from "../constants";
 import { loadScript, loadCSS } from "../utils";
 
 export function LeafletMap({ events, EC, TR }) {
@@ -63,5 +63,5 @@ export function LeafletMap({ events, EC, TR }) {
     markersRef.current = group;
   }
 
-  return <div ref={mapRef} style={{ width: "100%", height: typeof window !== "undefined" && window.innerWidth < 768 ? 300 : 450, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius:6 }} />;
+  return <div ref={mapRef} style={{ width: "100%", height: typeof window !== "undefined" && window.innerWidth < 768 ? 300 : 450, border: `1px solid ${BORDER}`, background: BG3, borderRadius:6 }} />;
 }

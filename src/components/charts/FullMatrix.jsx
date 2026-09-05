@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { WEEKS } from "../../data/weekly.js";
 import { SCENARIOS } from "../../data/static.js";
-import { BG, BORDER, MUTED, SC, font } from "../../constants";
+import { BG, BORDER, MUTED, SC, font, BG2, BG3 } from "../../constants";
 import { getScenarioCoordinates } from "../../utils/scenarioCoordinates.js";
 
 function normalizeComposition(factors = []) {
@@ -195,14 +195,14 @@ export function FullMatrix({ weekIdx, onClickWeek, onArrowClick }) {
         transform={`translate(9,${H/2}) rotate(-90)`}>BAJO ← CAMBIO ESTRUCTURAL → ALTO</text>
     </svg>
     {weekIdx >= 31 && (
-      <div style={{ borderTop:`1px solid ${BORDER}`, background:"#f8fafc" }}>
+      <div style={{ borderTop:`1px solid ${BORDER}`, background:BG3 }}>
         <button onClick={()=>setAnalysisOpen(open=>!open)} style={{ width:"100%", display:"flex", justifyContent:"space-between", alignItems:"center", gap:10, padding:"10px 12px", border:"none", background:"transparent", cursor:"pointer", fontFamily:font, color:"#334155", textAlign:"left" }}>
           <span style={{ fontSize:9, fontWeight:700, letterSpacing:"0.08em" }}>COMPOSICIÓN, METODOLOGÍA Y LECTURA · {wk.short}</span>
           <span style={{ fontSize:9, color:domSc.color, whiteSpace:"nowrap" }}>{analysisOpen ? "OCULTAR ▲" : "DESPLEGAR ▼"}</span>
         </button>
         {analysisOpen && <div style={{ padding:"2px 12px 12px" }}>
         {/* 1 · Composition of the dominant scenario */}
-        <div style={{ border:`1px solid ${selectedSc.color}30`, background:"#fff", padding:"10px 11px" }}>
+        <div style={{ border:`1px solid ${selectedSc.color}30`, background:BG2, padding:"10px 11px" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", gap:8, flexWrap:"wrap", marginBottom:7 }}>
             <div style={{ fontFamily:font, fontSize:9, fontWeight:700, color:selectedSc.color, letterSpacing:"0.08em" }}>
               COMPOSICIÓN DEL ESCENARIO
@@ -249,13 +249,13 @@ export function FullMatrix({ weekIdx, onClickWeek, onArrowClick }) {
           METODOLOGÍA DE UBICACIÓN
         </div>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(185px, 1fr))", gap:8 }}>
-          <div style={{ border:`1px solid ${BORDER}`, background:"#fff", padding:"8px 9px", fontSize:9, color:MUTED, lineHeight:1.55 }}>
+          <div style={{ border:`1px solid ${BORDER}`, background:BG2, padding:"8px 9px", fontSize:9, color:MUTED, lineHeight:1.55 }}>
             <b style={{color:"#334155"}}>1 · Intensidad coercitiva</b><br />
             <span style={{color:"#0f766e"}}>Curso no coercitivo: {nonCoercivePct}%</span> = E1 + E3.<br />
             <span style={{color:"#b45309"}}>Violencia o coerción: {violencePct}%</span> = E2 + E4.<br />
             La diferencia de {Math.abs(nonCoercivePct-violencePct)} puntos favorece un curso {nonCoercivePct >= violencePct ? "sin escalada coercitiva" : "con mayor presión coercitiva"}.
           </div>
-          <div style={{ border:`1px solid ${BORDER}`, background:"#fff", padding:"8px 9px", fontSize:9, color:MUTED, lineHeight:1.55 }}>
+          <div style={{ border:`1px solid ${BORDER}`, background:BG2, padding:"8px 9px", fontSize:9, color:MUTED, lineHeight:1.55 }}>
             <b style={{color:"#334155"}}>2 · Cambio político estructural</b><br />
             <span style={{color:"#0A97D9"}}>Sin transformación: {noChangePct}%</span> = E3 + E4.<br />
             <span style={{color:"#4C9F38"}}>Con transformación: {changePct}%</span> = E1 + E2.<br />
@@ -278,7 +278,7 @@ export function FullMatrix({ weekIdx, onClickWeek, onArrowClick }) {
       </div>
     )}
     {weekIdx < 31 && (
-      <div style={{ borderTop:`1px solid ${BORDER}`, padding:"9px 12px", background:"#f8fafc", fontSize:9, color:MUTED, lineHeight:1.5 }}>
+      <div style={{ borderTop:`1px solid ${BORDER}`, padding:"9px 12px", background:BG3, fontSize:9, color:MUTED, lineHeight:1.5 }}>
         <b style={{color:"#334155"}}>Archivo histórico · {wk.short}.</b> La trayectoria, las probabilidades, los drivers y la lectura semanal permanecen disponibles. La composición cuantitativa por escenario se incorpora a la metodología desde S32 para evitar asignar ponderaciones retrospectivas sin una auditoría equivalente.
       </div>
     )}

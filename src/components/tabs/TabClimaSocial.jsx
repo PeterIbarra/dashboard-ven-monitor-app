@@ -98,7 +98,7 @@ export function TabClimaSocial({ liveData = {} }) {
           <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Termómetro de polarización neta — promedio del período</div>
           <div style={{ position:"relative", height:14, background:"linear-gradient(to right, #16a34a, #ca8a04, #dc2626)", borderRadius:6, overflow:"hidden" }}>
             {[25,50,75].map(v => <div key={v} style={{ position:"absolute", left:`${v}%`, top:0, bottom:0, width:1, background:"rgba(255,255,255,0.35)" }} />)}
-            <div style={{ position:"absolute", left:`${thermoPos}%`, top:"50%", transform:"translate(-50%,-50%)", width:10, height:10, borderRadius:"50%", background:"#fff", border:`2.5px solid ${thermoColor}`, boxShadow:`0 0 6px ${thermoColor}` }} />
+            <div style={{ position:"absolute", left:`${thermoPos}%`, top:"50%", transform:"translate(-50%,-50%)", width:10, height:10, borderRadius:"50%", background:BG2, border:`2.5px solid ${thermoColor}`, boxShadow:`0 0 6px ${thermoColor}` }} />
           </div>
           <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, fontFamily:font, color:`${MUTED}60`, marginTop:3 }}>
             <span>Convivencia dominante</span><span>Equilibrio</span><span>Polarización dominante</span>

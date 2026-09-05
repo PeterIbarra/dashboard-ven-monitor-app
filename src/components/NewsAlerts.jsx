@@ -1,6 +1,6 @@
 import { memo, useState, useEffect, useRef } from "react";
 import { Card } from "./Card";
-import { BORDER, TEXT, MUTED, font, fontSans } from "../constants";
+import { BORDER, TEXT, MUTED, font, fontSans, BG2 } from "../constants";
 import { IS_DEPLOYED } from "../utils";
 
 export const NewsAlerts = memo(function NewsAlerts({ liveData, mob, setTab }) {
@@ -183,7 +183,7 @@ INSTRUCCIONES:
               {a.territorio && <span style={{ fontSize:8, fontFamily:font, color:MUTED }}>📍 {a.territorio}</span>}
               {a.impacto && <span style={{ fontSize:10, fontFamily:font, color:MUTED, fontStyle:"italic" }}>{a.impacto}</span>}
               {setTab && dimTab[a.dimension] && (
-                <button onClick={() => { setTab(dimTab[a.dimension]); window.scrollTo({ top:0, behavior:"smooth" }); }} style={{ marginLeft:"auto", border:`1px solid ${dimColor[a.dimension] || MUTED}40`, background:"#fff", color:dimColor[a.dimension] || MUTED, padding:"3px 7px", fontSize:8, fontFamily:font, cursor:"pointer" }}>
+                <button onClick={() => { setTab(dimTab[a.dimension]); window.scrollTo({ top:0, behavior:"smooth" }); }} style={{ marginLeft:"auto", border:`1px solid ${dimColor[a.dimension] || MUTED}40`, background:BG2, color:dimColor[a.dimension] || MUTED, padding:"3px 7px", fontSize:8, fontFamily:font, cursor:"pointer" }}>
                   Ver módulo →
                 </button>
               )}

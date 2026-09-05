@@ -52,7 +52,7 @@ export const CohesionMiniWidget = memo(function CohesionMiniWidget({ liveData = 
         <div style={{ flex:1, padding:mob?"6px 8px":"8px 14px" }}>
           <div style={{ position:"relative", height:10, background:"linear-gradient(to right, #dc2626, #f97316, #ca8a04, #16a34a)", borderRadius:4, overflow:"hidden" }}>
             {[25,50,75].map(v => <div key={v} style={{ position:"absolute", left:`${v}%`, top:0, bottom:0, width:1, background:"rgba(255,255,255,0.3)" }} />)}
-            <div style={{ position:"absolute", left:`${score}%`, top:"50%", transform:"translate(-50%,-50%)", width:8, height:8, borderRadius:"50%", background:"#fff", border:`2px solid ${col}`, boxShadow:`0 0 4px ${col}` }} />
+            <div style={{ position:"absolute", left:`${score}%`, top:"50%", transform:"translate(-50%,-50%)", width:8, height:8, borderRadius:"50%", background:BG2, border:`2px solid ${col}`, boxShadow:`0 0 4px ${col}` }} />
           </div>
           <div style={{ display:"flex", justifyContent:"space-between", fontSize:7, fontFamily:font, color:`${MUTED}60`, marginTop:2 }}>
             <span>Crítica</span><span>Baja</span><span>Media</span><span>Alta</span>
