@@ -254,6 +254,14 @@ const INJECTION_PROVIDERS = [
           messages: [{ role: "user", content: prompt }],
           max_tokens: maxTokens,
           temperature: 0.7,
+          // Nemotron emite su cadena de razonamiento ("thinking") por defecto
+          // dentro del contenido visible, consumiendo el presupuesto de
+          // max_tokens antes de llegar a la respuesta real -- con prompts que
+          // piden JSON estructurado, esto hacia que la respuesta nunca
+          // llegara a producir el JSON. effort:"none" apaga el razonamiento
+          // (no solo lo oculta) para los modelos que lo soportan como
+          // opcional. Anadido 2026-09-05 tras confirmarlo en vivo.
+          reasoning: { effort: "none", exclude: true },
         }),
         signal: AbortSignal.timeout(25000),
       });
