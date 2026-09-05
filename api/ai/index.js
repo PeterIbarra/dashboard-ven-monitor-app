@@ -409,6 +409,28 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ error: "All AI providers failed.", attempted, details: skippedNoKey });
   }
 
+  // Modo diagnóstico temporal (2026-09-05): con { debug: true } en el body,
+  // corre TODOS los proveedores configurados hasta que terminen (no se
+  // detiene en el primero exitoso) y reporta éxito/error + tiempo de cada
+  // uno. Solo se activa con el flag explícito — el comportamiento normal
+  // (Promise.any, responde con el primero que gane) no cambia.
+  if (body.debug === true) {
+    const t0 = Date.now();
+    const settled = await Promise.allSettled(configured.map(async (provider) => {
+      const start = Date.now();
+      const apiKey = process.env[provider.keyEnv];
+      const text = await provider.call(prompt, safeMaxTokens, apiKey);
+      return { ms: Date.now() - start, textLength: text?.length || 0, textPreview: (text || "").slice(0, 80) };
+    }));
+    const results = settled.map((r, i) => {
+      const name = configured[i].name;
+      if (r.status === "fulfilled") return { provider: name, ok: true, ...r.value };
+      const err = r.reason;
+      return { provider: name, ok: false, error: err?.name === "AbortError" ? "timeout" : (err?.message || String(err)) };
+    });
+    return res.status(200).json({ debug: true, totalMs: Date.now() - t0, skippedNoKey, results });
+  }
+
   try {
     const winner = await Promise.any(configured.map(async (provider) => {
       const apiKey = process.env[provider.keyEnv];
