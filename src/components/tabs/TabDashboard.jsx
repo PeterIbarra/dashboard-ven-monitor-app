@@ -203,7 +203,7 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
                     <span style={{ color:TEXT, fontWeight:600, minWidth:60 }}>{a.val}</span>
                     <span style={{ color:MUTED, fontSize:11, flex:1 }}>{a.umbral}</span>
                     {alertDestination(a.name) && (
-                      <button onClick={() => { setTab(alertDestination(a.name)); window.scrollTo({ top:0, behavior:"smooth" }); }} style={{ border:`1px solid ${a.level==="red"?"#dc262640":"#ca8a0440"}`, background:BG2, color:a.level==="red"?"#dc2626":"#a16207", padding:"3px 7px", fontSize:8, fontFamily:font, cursor:"pointer", flexShrink:0 }}>
+                      <button onClick={() => { setTab(alertDestination(a.name)); window.scrollTo({ top:0, behavior:"smooth" }); }} style={{ border:`1px solid ${a.level==="red"?"#dc262640":"#ca8a0440"}`, background:"#fff", color:a.level==="red"?"#dc2626":"#a16207", padding:"3px 7px", fontSize:8, fontFamily:font, cursor:"pointer", flexShrink:0 }}>
                         Ver módulo →
                       </button>
                     )}

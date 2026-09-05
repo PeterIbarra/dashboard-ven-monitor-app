@@ -72,8 +72,8 @@ export function TabMatriz() {
           }}>{st.label}</button>
         ))}
         <div style={{marginLeft:"auto",display:"flex",gap:5,paddingBottom:5}}>
-          <button onClick={()=>downloadBackup("json")} title="Descargar todas las semanas, probabilidades, coordenadas, semáforos y lecturas" style={backupButton()}>↓ Respaldo JSON</button>
-          <button onClick={()=>downloadBackup("csv")} title="Descargar serie histórica de probabilidades" style={backupButton()}>↓ Serie CSV</button>
+          <button onClick={()=>downloadBackup("json")} title="Descargar todas las semanas, probabilidades, coordenadas, semáforos y lecturas" style={backupButton}>↓ Respaldo JSON</button>
+          <button onClick={()=>downloadBackup("csv")} title="Descargar serie histórica de probabilidades" style={backupButton}>↓ Serie CSV</button>
         </div>
       </div>
 
@@ -84,16 +84,16 @@ export function TabMatriz() {
       {/* ── WEEK NAVIGATOR ── */}
       <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap", padding:"8px 10px", background:BG2, border:`1px solid ${BORDER}` }}>
         <span style={{ fontFamily:font, fontSize:9, color:MUTED, letterSpacing:"0.1em", marginRight:3 }}>SEMANA DE ANÁLISIS</span>
-        <button disabled={week===0} onClick={()=>setWeek(Math.max(0,week-1))} style={{...weekNavButton(),opacity:week===0 ? .4 : 1,cursor:week===0?"default":"pointer"}}>
+        <button disabled={week===0} onClick={()=>setWeek(Math.max(0,week-1))} style={{...weekNavButton,opacity:week===0 ? .4 : 1,cursor:week===0?"default":"pointer"}}>
           ← Anterior
         </button>
-        <select value={week} onChange={event=>setWeek(Number(event.target.value))} aria-label="Semana de la matriz" style={{ border:`1px solid ${ACCENT}`, background:BG2, color:ACCENT, padding:"6px 9px", fontFamily:font, fontSize:10, fontWeight:700, minWidth:mob?"150px":"210px", cursor:"pointer" }}>
+        <select value={week} onChange={event=>setWeek(Number(event.target.value))} aria-label="Semana de la matriz" style={{ border:`1px solid ${ACCENT}`, background:"#fff", color:ACCENT, padding:"6px 9px", fontFamily:font, fontSize:10, fontWeight:700, minWidth:mob?"150px":"210px", cursor:"pointer" }}>
           {WEEKS.map((item,index)=><option key={item.short} value={index}>{item.short} · {item.label}</option>)}
         </select>
-        <button disabled={week===WEEKS.length-1} onClick={()=>setWeek(Math.min(WEEKS.length-1,week+1))} style={{...weekNavButton(),opacity:week===WEEKS.length-1 ? .4 : 1,cursor:week===WEEKS.length-1?"default":"pointer"}}>
+        <button disabled={week===WEEKS.length-1} onClick={()=>setWeek(Math.min(WEEKS.length-1,week+1))} style={{...weekNavButton,opacity:week===WEEKS.length-1 ? .4 : 1,cursor:week===WEEKS.length-1?"default":"pointer"}}>
           Siguiente →
         </button>
-        {week!==WEEKS.length-1 && <button onClick={()=>setWeek(WEEKS.length-1)} style={{...weekNavButton(),color:ACCENT,borderColor:ACCENT,marginLeft:mob?0:"auto"}}>Última semana</button>}
+        {week!==WEEKS.length-1 && <button onClick={()=>setWeek(WEEKS.length-1)} style={{...weekNavButton,color:ACCENT,borderColor:ACCENT,marginLeft:mob?0:"auto"}}>Última semana</button>}
         <span style={{ marginLeft:week===WEEKS.length-1&&!mob?"auto":0, fontFamily:font, fontSize:9, color:isCurrentWeek?"#16a34a":MUTED }}>
           {isCurrentWeek ? "● CORTE ACTUAL" : "○ ARCHIVO HISTÓRICO"}
         </span>
@@ -285,8 +285,8 @@ export function TabMatriz() {
   );
 }
 
-const backupButton=()=>({border:`1px solid ${BORDER}`,background:BG2,color:ACCENT,padding:"5px 8px",fontSize:9,fontFamily:font,cursor:"pointer",borderRadius:3});
-const weekNavButton=()=>({border:`1px solid ${BORDER}`,background:BG2,color:MUTED,padding:"6px 9px",fontSize:9,fontFamily:font,borderRadius:2});
+const backupButton={border:`1px solid ${BORDER}`,background:"#fff",color:ACCENT,padding:"5px 8px",fontSize:9,fontFamily:font,cursor:"pointer",borderRadius:3};
+const weekNavButton={border:`1px solid ${BORDER}`,background:"#fff",color:MUTED,padding:"6px 9px",fontSize:9,fontFamily:font,borderRadius:2};
 
 function buildMatrixBackup(){
   return {

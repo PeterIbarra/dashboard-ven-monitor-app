@@ -1,6 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
 import { loadScript } from "../utils";
-import { BG2, getTheme } from "../constants";
 
 export function TwitterTimeline({ handle, height=280 }) {
   const ref = useCallback((node) => {
@@ -9,7 +8,7 @@ export function TwitterTimeline({ handle, height=280 }) {
     const a = document.createElement("a");
     a.className = "twitter-timeline";
     a.href = `https://twitter.com/${handle}`;
-    a.setAttribute("data-theme", getTheme() === "dark" ? "dark" : "light");
+    a.setAttribute("data-theme", "light");
     a.setAttribute("data-chrome", "noheader nofooter noborders");
     a.setAttribute("data-height", String(height));
     a.setAttribute("data-tweet-limit", "3");
@@ -23,5 +22,5 @@ export function TwitterTimeline({ handle, height=280 }) {
       window.twttr.widgets.load(node);
     }
   }, [handle, height]);
-  return <div ref={ref} style={{ minHeight:height, background:BG2, borderRadius:4 }} />;
+  return <div ref={ref} style={{ minHeight:height, background:"#fff", borderRadius:4 }} />;
 }

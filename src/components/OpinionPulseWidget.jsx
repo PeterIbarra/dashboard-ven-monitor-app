@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "./Card";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { BORDER, TEXT, MUTED, ACCENT, font, BG3 } from "../constants";
+import { BORDER, TEXT, MUTED, ACCENT, font } from "../constants";
 import { OPINION_SNAPSHOT } from "../data/opinionPublica";
 
 const ActionButton = ({ children, onClick, color=ACCENT }) => <button onClick={onClick} style={{ width:"100%", border:`1px solid ${color}35`, background:`${color}08`, color, padding:"6px 8px", fontFamily:font, fontSize:9, cursor:"pointer", borderRadius:3, textAlign:"left" }}>{children} →</button>;
@@ -41,7 +41,7 @@ export function OpinionPulseWidget({ onNavigate }) {
         <ActionButton onClick={()=>onNavigate("instituciones")} color="#dc2626">Ver confianza y ánimo</ActionButton>
       </div>
     </div>
-    <div style={{ padding:"8px 14px", background:BG3, borderTop:`1px solid ${BORDER}`, display:"flex", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}><span style={{ fontSize:9, color:MUTED, lineHeight:1.45 }}>La legitimidad social se distancia de la representación formal, mientras la solidaridad contiene parcialmente el deterioro de confianza posterior al terremoto.</span><span style={{ fontSize:8, color:MUTED, fontFamily:font }}>Indicadores de encuestas diferentes · no constituyen un índice agregado</span></div>
+    <div style={{ padding:"8px 14px", background:"#f8fafc", borderTop:`1px solid ${BORDER}`, display:"flex", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}><span style={{ fontSize:9, color:MUTED, lineHeight:1.45 }}>La legitimidad social se distancia de la representación formal, mientras la solidaridad contiene parcialmente el deterioro de confianza posterior al terremoto.</span><span style={{ fontSize:8, color:MUTED, fontFamily:font }}>Indicadores de encuestas diferentes · no constituyen un índice agregado</span></div>
     </>}
   </Card>;
 }

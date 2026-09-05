@@ -17,7 +17,7 @@ import { AMNISTIA_TRACKER } from "./data/amnistia.js";
 // ═══════════════════════════════════════════════════════════════
 // SHARED
 // ═══════════════════════════════════════════════════════════════
-import { BG, BG2, BORDER, TEXT, MUTED, ACCENT, font, fontSans, getTheme, setTheme } from "./constants";
+import { BG, BG2, BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "./constants";
 import { IS_DEPLOYED, loadScript } from "./utils";
 import { useIsMobile } from "./hooks/useIsMobile";
 import { Badge } from "./components/Badge";
@@ -118,19 +118,6 @@ export default function MonitorPNUD() {
   const [week, setWeek] = useState(WEEKS.length - 1);
   const [splashElapsed, setSplashElapsed] = useState(false);
   const mob = useIsMobile();
-
-  // ── Theme (light/dark, user-selectable) ──
-  // Colors live as plain hex strings in ./constants (re-assigned on toggle).
-  // Since components read them as module-level values rather than via
-  // context/props, we force a full remount of the content tree (via the
-  // `themeTick` key below) so every component re-reads the new palette.
-  const [themeTick, setThemeTick] = useState(0);
-  const theme = getTheme();
-  const handleSetTheme = (next) => {
-    if (next === theme) return;
-    setTheme(next);
-    setThemeTick(t => t + 1);
-  };
 
   // Keep the branded opening visible long enough to complete its full sequence.
   useEffect(() => {
@@ -391,7 +378,7 @@ export default function MonitorPNUD() {
 
   return (
     <AuthGate>
-    <div key={themeTick} style={{ fontFamily:fontSans, background:BG, minHeight:"100vh", color:TEXT, overflowX:"hidden" }}>
+    <div style={{ fontFamily:fontSans, background:BG, minHeight:"100vh", color:TEXT, overflowX:"hidden" }}>
       {/* Loading splash — completes its sequence and also waits for the first data fetch */}
       {(!liveData.fetched || !splashElapsed) && (
         <div style={{ position:"fixed", inset:0, zIndex:99999, background:BG, display:"flex", flexDirection:"column",
@@ -531,27 +518,6 @@ export default function MonitorPNUD() {
             </select>
             {!mob && <Badge color={week===WEEKS.length-1?"#22c55e":MUTED}>{week===WEEKS.length-1?"Más reciente":"Archivo"}</Badge>}
           </>}
-          {/* Selector de tema — ambas opciones visibles para que quede claro que hay dos modos */}
-          <div role="group" aria-label="Tema del dashboard"
-            style={{ display:"flex", alignItems:"center", background:BG, border:`1px solid ${BORDER}`,
-              borderRadius:20, padding:2, gap:2 }}>
-            <button onClick={() => handleSetTheme("light")} title="Modo claro" aria-pressed={theme==="light"}
-              style={{ display:"flex", alignItems:"center", gap:5, fontFamily:font, fontSize:mob?10:11,
-                letterSpacing:"0.04em", padding:mob?"4px 8px":"5px 10px", borderRadius:18, border:"none",
-                cursor:"pointer", lineHeight:1, transition:"all 0.15s",
-                background:theme==="light"?ACCENT:"transparent", color:theme==="light"?"#fff":MUTED,
-                fontWeight:theme==="light"?700:400 }}>
-              <span style={{ fontSize:mob?12:13 }}>☀</span>{!mob && "Claro"}
-            </button>
-            <button onClick={() => handleSetTheme("dark")} title="Modo oscuro" aria-pressed={theme==="dark"}
-              style={{ display:"flex", alignItems:"center", gap:5, fontFamily:font, fontSize:mob?10:11,
-                letterSpacing:"0.04em", padding:mob?"4px 8px":"5px 10px", borderRadius:18, border:"none",
-                cursor:"pointer", lineHeight:1, transition:"all 0.15s",
-                background:theme==="dark"?ACCENT:"transparent", color:theme==="dark"?"#fff":MUTED,
-                fontWeight:theme==="dark"?700:400 }}>
-              <span style={{ fontSize:mob?12:13 }}>☾</span>{!mob && "Oscuro"}
-            </button>
-          </div>
           <UserButton />
         </div>
       </div>

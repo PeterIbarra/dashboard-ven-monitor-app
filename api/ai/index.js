@@ -122,14 +122,14 @@ Cuando hagas recomendaciones para el PNUD, diferencia por escenario y área prog
 async function callWithTools(messages, maxTokens) {
   const toolProviders = [
     {
-      name: "groq/gpt-oss-120b",
+      name: "groq/llama-3.3-70b",
       keyEnv: "GROQ_API_KEY",
       call: async (msgs, apiKey) => {
         const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
           body: JSON.stringify({
-            model: "openai/gpt-oss-120b", // llama-3.3-70b-versatile: retirado por Groq (404), reemplazado 2026-09-05
+            model: "llama-3.3-70b-versatile",
             messages: msgs,
             tools: TOOL_DEFINITIONS,
             tool_choice: "auto",
@@ -200,13 +200,10 @@ async function callWithTools(messages, maxTokens) {
 
 const INJECTION_PROVIDERS = [
   {
-    name: "gemini-3.6-flash",
+    name: "gemini-2.0-flash",
     keyEnv: "GEMINI_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
-      let lastErr = null;
-      // gemini-1.5-flash y gemini-2.0-flash fueron retirados por Google (404
-      // "no longer available") — actualizado 2026-09-05 tras confirmar en vivo.
-      for (const model of ["gemini-3.6-flash", "gemini-2.5-flash"]) {
+      for (const model of ["gemini-1.5-flash", "gemini-2.0-flash"]) {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -216,13 +213,12 @@ const INJECTION_PROVIDERS = [
           }),
           signal: AbortSignal.timeout(30000),
         });
-        if (!res.ok) { lastErr = `${model} HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`; continue; }
+        if (!res.ok) continue;
         const data = await res.json();
         const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join("\n");
         if (text) return text;
-        lastErr = `${model}: empty candidates — finishReason=${data.candidates?.[0]?.finishReason || "?"}`;
       }
-      throw new Error(lastErr || "no models responded");
+      return null;
     },
   },
   {
@@ -238,45 +234,34 @@ const INJECTION_PROVIDERS = [
           "X-Title": "PNUD Venezuela Monitor",
         },
         body: JSON.stringify({
-          // meta-llama/llama-3.1-8b-instruct:free ya no existe en el catálogo
-          // gratuito de OpenRouter (404) — reemplazado 2026-09-05.
-          model: "nvidia/nemotron-3.5-lightning:free",
+          model: "meta-llama/llama-3.1-8b-instruct:free",
           messages: [{ role: "user", content: prompt }],
           max_tokens: maxTokens,
           temperature: 0.7,
         }),
         signal: AbortSignal.timeout(30000),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+      if (!res.ok) return null;
       const data = await res.json();
-      const text = data.choices?.[0]?.message?.content;
-      if (!text) throw new Error(`empty choices — ${JSON.stringify(data).slice(0, 200)}`);
-      return text;
+      return data.choices?.[0]?.message?.content || null;
     },
   },
   {
     name: "huggingface/qwen-2.5-72b",
     keyEnv: "HF_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
-      // api-inference.huggingface.co fue retirado — HF movió todo a un router
-      // OpenAI-compatible (router.huggingface.co) que reparte entre providers
-      // de inferencia. Actualizado 2026-09-05 tras confirmar en vivo.
-      const res = await fetch("https://router.huggingface.co/v1/chat/completions", {
+      const res = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2.5-72B-Instruct", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
         body: JSON.stringify({
-          model: "Qwen/Qwen2.5-72B-Instruct",
-          messages: [{ role: "user", content: prompt }],
-          max_tokens: maxTokens,
-          temperature: 0.7,
+          inputs: prompt,
+          parameters: { max_new_tokens: maxTokens, temperature: 0.7, return_full_text: false },
         }),
         signal: AbortSignal.timeout(45000),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+      if (!res.ok) return null;
       const data = await res.json();
-      const text = data.choices?.[0]?.message?.content;
-      if (!text) throw new Error(`empty choices — ${JSON.stringify(data).slice(0, 200)}`);
-      return text;
+      return Array.isArray(data) ? (data[0]?.generated_text || null) : (data.generated_text || null);
     },
   },
   {
@@ -293,11 +278,9 @@ const INJECTION_PROVIDERS = [
         }),
         signal: AbortSignal.timeout(30000),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+      if (!res.ok) return null;
       const data = await res.json();
-      const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n");
-      if (!text) throw new Error(`empty content — ${JSON.stringify(data).slice(0, 200)}`);
-      return text;
+      return (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n") || null;
     },
   },
 ];
@@ -350,18 +333,16 @@ module.exports = async function handler(req, res) {
   }
 
   const allProviders = [
-    { name: "groq/gpt-oss-120b", keyEnv: "GROQ_API_KEY",
+    { name: "groq/llama-3.3-70b", keyEnv: "GROQ_API_KEY",
       call: async (p, mt, key) => {
         const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
-          body: JSON.stringify({ model: "openai/gpt-oss-120b", messages: [{ role: "user", content: p }], max_tokens: mt, temperature: 0.7 }),
+          body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: p }], max_tokens: mt, temperature: 0.7 }),
           signal: AbortSignal.timeout(30000),
         });
-        if (!r.ok) throw new Error(`HTTP ${r.status}: ${(await r.text().catch(() => "")).slice(0, 200)}`);
+        if (!r.ok) return null;
         const d = await r.json();
-        const text = d.choices?.[0]?.message?.content;
-        if (!text) throw new Error(`empty choices — ${JSON.stringify(d).slice(0, 200)}`);
-        return text;
+        return d.choices?.[0]?.message?.content || null;
       }
     },
     { name: "mistral-small", keyEnv: "MISTRAL_API_KEY",
@@ -371,32 +352,28 @@ module.exports = async function handler(req, res) {
           body: JSON.stringify({ model: "mistral-small-latest", messages: [{ role: "user", content: p }], max_tokens: mt, temperature: 0.7 }),
           signal: AbortSignal.timeout(30000),
         });
-        if (!r.ok) throw new Error(`HTTP ${r.status}: ${(await r.text().catch(() => "")).slice(0, 200)}`);
+        if (!r.ok) return null;
         const d = await r.json();
-        const text = d.choices?.[0]?.message?.content;
-        if (!text) throw new Error(`empty choices — ${JSON.stringify(d).slice(0, 200)}`);
-        return text;
+        return d.choices?.[0]?.message?.content || null;
       }
     },
     ...INJECTION_PROVIDERS,
   ];
 
   const errors = [];
-  const attempted = [];
   for (const provider of allProviders) {
     const apiKey = process.env[provider.keyEnv];
-    if (!apiKey) { errors.push(`${provider.name}: no API key configured (${provider.keyEnv})`); continue; }
-    attempted.push(provider.name);
+    if (!apiKey) continue;
     try {
       const text = await provider.call(prompt, safeMaxTokens, apiKey);
       if (text && text.length > 20) {
         return res.status(200).json({ text, provider: provider.name });
       }
-      errors.push(`${provider.name}: response too short (${text?.length || 0} chars)`);
+      errors.push(`${provider.name}: empty response`);
     } catch (err) {
       errors.push(`${provider.name}: ${err.name === "AbortError" ? "timeout" : err.message}`);
     }
   }
 
-  return res.status(502).json({ error: "All AI providers failed.", attempted, details: errors });
+  return res.status(502).json({ error: "All AI providers failed.", details: errors });
 };

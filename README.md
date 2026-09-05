@@ -182,11 +182,9 @@ El dashboard incluye un asistente conversacional persistente (`src/components/Ch
 
 **Modo herramientas (tool calling):** el asistente tiene acceso a 10 funciones que consultan directamente los datos editoriales y en vivo del dashboard — historial semanal S1–S33 con probabilidades exactas, señales por escenario, SITREP de una semana puntual, conflictividad histórica y mensual, tensiones activas, KPIs recientes, indicadores por dimensión, sesiones prospectivas, tracker de amnistía y datos en vivo (BCV, paralelo, brecha, Brent, WTI). El modelo debe invocar estas herramientas antes de responder sobre cualquier dato del dashboard.
 
-**Proveedores del modo herramientas:** Groq (`openai/gpt-oss-120b`) → Mistral (`mistral-small-latest`).
+**Proveedores del modo herramientas:** Groq (`llama-3.3-70b-versatile`) → Mistral (`mistral-small-latest`).
 
-**Cascada de respaldo (sin herramientas, inyección de contexto):** si ningún proveedor con *tool calling* responde, el sistema reintenta con Gemini (`gemini-3.6-flash` / `gemini-2.5-flash`) → OpenRouter (`nvidia/nemotron-3.5-lightning:free`) → HuggingFace (`Qwen2.5-72B-Instruct` vía `router.huggingface.co`) → Anthropic (Claude).
-
-_Nota (2026-09-05): los modelos anteriores (`llama-3.3-70b-versatile`, `gemini-1.5-flash`/`gemini-2.0-flash`, `llama-3.1-8b-instruct:free`, y el endpoint `api-inference.huggingface.co`) fueron retirados por sus proveedores y reemplazados en el código — ver `api/ai/index.js`, `lib/cron/config.js`, `api/news/index.js`, `lib/cron/tasks/icgAnalysis.js`._
+**Cascada de respaldo (sin herramientas, inyección de contexto):** si ningún proveedor con *tool calling* responde, el sistema reintenta con Gemini (`gemini-1.5-flash` / `gemini-2.0-flash`) → OpenRouter (`llama-3.1-8b-instruct:free`) → HuggingFace (`Qwen2.5-72B-Instruct`) → Anthropic (Claude).
 
 Flujo del modo herramientas:
 

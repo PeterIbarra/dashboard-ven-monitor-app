@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { BORDER, TEXT, MUTED, ACCENT, font, BG2, BG3 } from "../constants";
+import { BORDER, TEXT, MUTED, ACCENT, font } from "../constants";
 
 const GEOJSON_URL = "/data/venezuela-adm1.geojson";
 
@@ -56,12 +56,12 @@ export function LeafletSemestreMap({ estados, mobile=false }) {
         ["#7f1d1d",">350"],["#dc2626","251–350"],["#f97316","151–250"],["#f59e0b","76–150"],["#38bdf8","≤75"],["#cbd5e1","Sin dato"]
       ].map(([color,label])=><span key={label} style={{display:"flex",alignItems:"center",gap:4,fontSize:8,color:MUTED,fontFamily:font}}><i style={{width:10,height:10,background:color,display:"inline-block"}}/>{label}</span>)}</div>
     </div>
-    <div style={{border:`1px solid ${BORDER}`,padding:12,background:BG3,minHeight:mobile?150:500}}>
+    <div style={{border:`1px solid ${BORDER}`,padding:12,background:"#f8fafc",minHeight:mobile?150:500}}>
       {selectedData?<>
         <div style={{fontSize:17,fontWeight:900,color:TEXT}}>{selectedData.nombre}</div>
         <div style={{fontSize:9,color:MUTED,fontFamily:font}}>Posición #{rank} de {estados.length} entidades</div>
-        <div style={{marginTop:14,padding:"12px",background:BG2,border:`1px solid ${BORDER}`,borderTop:`3px solid ${colorScale(selectedData.total,max)}`}}><div style={{fontSize:8,color:MUTED,fontFamily:font,textTransform:"uppercase"}}>Protestas · enero–junio</div><div style={{fontSize:30,fontWeight:900,color:colorScale(selectedData.total,max),fontFamily:font}}>{selectedData.total.toLocaleString("es-VE")}</div><div style={{fontSize:9,color:MUTED}}>{(selectedData.total/3495*100).toFixed(1)}% del total nacional</div></div>
-        <button onClick={()=>setSelected(null)} style={{marginTop:10,border:`1px solid ${BORDER}`,background:BG2,color:ACCENT,padding:"6px 9px",fontSize:9,cursor:"pointer"}}>Quitar selección</button>
+        <div style={{marginTop:14,padding:"12px",background:"#fff",border:`1px solid ${BORDER}`,borderTop:`3px solid ${colorScale(selectedData.total,max)}`}}><div style={{fontSize:8,color:MUTED,fontFamily:font,textTransform:"uppercase"}}>Protestas · enero–junio</div><div style={{fontSize:30,fontWeight:900,color:colorScale(selectedData.total,max),fontFamily:font}}>{selectedData.total.toLocaleString("es-VE")}</div><div style={{fontSize:9,color:MUTED}}>{(selectedData.total/3495*100).toFixed(1)}% del total nacional</div></div>
+        <button onClick={()=>setSelected(null)} style={{marginTop:10,border:`1px solid ${BORDER}`,background:"#fff",color:ACCENT,padding:"6px 9px",fontSize:9,cursor:"pointer"}}>Quitar selección</button>
         <div style={{marginTop:12,fontSize:9,color:MUTED,fontFamily:font,textTransform:"uppercase"}}>Todas las entidades</div>
         <div style={{maxHeight:250,overflowY:"auto",marginTop:4,paddingRight:4}}>{estados.map((e,i)=><button key={e.nombre} onClick={()=>setSelected(e.nombre)} style={{display:"flex",width:"100%",gap:7,alignItems:"center",border:0,borderBottom:`1px solid ${BORDER}`,background:e.nombre===selectedData.nombre?`${ACCENT}10`:"transparent",padding:"5px 2px",cursor:"pointer",textAlign:"left"}}><span style={{fontSize:9,color:MUTED,width:18,textAlign:"right"}}>{i+1}</span><span style={{fontSize:10,color:e.nombre===selectedData.nombre?ACCENT:TEXT,flex:1,fontWeight:e.nombre===selectedData.nombre?800:400}}>{e.nombre}</span><b style={{fontSize:10,color:ACCENT,width:28,textAlign:"right"}}>{e.total}</b></button>)}</div>
       </>:<>

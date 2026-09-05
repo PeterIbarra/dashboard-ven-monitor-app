@@ -571,7 +571,7 @@ function SismoMap({ reports, acopios, buildings, buildingDamageSocial = [], esco
         width: "100%",
         height: mob ? 380 : 580,
         border: `1px solid ${BORDER}`,
-        background: BG3,
+        background: "#eef1f5",
         borderRadius: 4,
       }}
     />
@@ -770,7 +770,7 @@ function QuakeRegistry({ mob }) {
               type="datetime-local"
               value={customFrom}
               onChange={e => setCustomFrom(e.target.value)}
-              style={{ border: `1px solid ${BORDER}`, padding: "7px 9px", fontFamily: fontSans, fontSize: 12, color: TEXT, background: BG2 }}
+              style={{ border: `1px solid ${BORDER}`, padding: "7px 9px", fontFamily: fontSans, fontSize: 12, color: TEXT, background: "#ffffff" }}
             />
           </label>
           <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 10, fontFamily: font, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase" }}>
@@ -779,7 +779,7 @@ function QuakeRegistry({ mob }) {
               type="datetime-local"
               value={customTo}
               onChange={e => setCustomTo(e.target.value)}
-              style={{ border: `1px solid ${BORDER}`, padding: "7px 9px", fontFamily: fontSans, fontSize: 12, color: TEXT, background: BG2 }}
+              style={{ border: `1px solid ${BORDER}`, padding: "7px 9px", fontFamily: fontSans, fontSize: 12, color: TEXT, background: "#ffffff" }}
             />
           </label>
         </div>
@@ -808,7 +808,7 @@ function QuakeRegistry({ mob }) {
           </div>
           <div
             ref={mapRef}
-            style={{ width: "100%", height: mob ? 320 : 480, border: `1px solid ${BORDER}`, background: BG3, borderRadius: 4 }}
+            style={{ width: "100%", height: mob ? 320 : 480, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }}
           />
           <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
             {[["M2.5-3.9", "#f59e0b"], ["M4-4.9", "#f97316"], ["M5-5.9", "#dc2626"], ["M6+", "#7f1d1d"]].map(([label, color]) => (
@@ -1098,7 +1098,7 @@ function CopernicusDamage({ mob }) {
           <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
             {selectedAoi ? selectedAoi.nameEs : "Cargando zona..."}{loading ? " - cargando..." : ""}
           </div>
-          <div ref={mapRef} style={{ width: "100%", height: mob ? 320 : 480, border: `1px solid ${BORDER}`, background: BG3, borderRadius: 4 }} />
+          <div ref={mapRef} style={{ width: "100%", height: mob ? 320 : 480, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
           <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
             {Object.entries(CDI_DAMAGE_LABELS).map(([key, label]) => (
               <div key={key} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
@@ -1343,7 +1343,7 @@ function MicrosoftAI4GDamage({ mob }) {
         <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
           Catia La Mar - dano por edificio{loading ? " - cargando..." : ""}
         </div>
-        <div ref={mapRef} style={{ width: "100%", height: mob ? 360 : 520, border: `1px solid ${BORDER}`, background: BG3, borderRadius: 4 }} />
+        <div ref={mapRef} style={{ width: "100%", height: mob ? 360 : 520, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
         <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
           {MSAI4G_BUCKETS.map(b => (
             <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
@@ -1664,7 +1664,7 @@ function SeverityByZone({ buildings, reports, mob }) {
             <div style={{ fontSize: 10, fontFamily: font, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>
               Mapa interactivo — aceleracion maxima del suelo (PGA, 475 anos, roca de referencia)
             </div>
-            <div ref={gemMapRef} style={{ width: "100%", height: mob ? 280 : 360, border: `1px solid ${BORDER}`, background: BG3, borderRadius: 4 }} />
+            <div ref={gemMapRef} style={{ width: "100%", height: mob ? 280 : 360, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
             <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
               {[
                 ["<0.05g", "#8fb3ff"],
@@ -1881,7 +1881,7 @@ function LandslideRisk({ buildings, mob }) {
         <div style={{ fontSize: 11, fontFamily: font, color: MUTED, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, paddingLeft: 4 }}>
           Riesgo de deslizamiento (NASA LHASA) + dano registrado - clic en el mapa para consultar un punto
         </div>
-        <div ref={mapRef} style={{ width: "100%", height: mob ? 360 : 520, border: `1px solid ${BORDER}`, background: BG3, borderRadius: 4 }} />
+        <div ref={mapRef} style={{ width: "100%", height: mob ? 360 : 520, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
         <div style={{ display: "flex", gap: 14, justifyContent: "center", marginTop: 8, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontFamily: font, color: MUTED }}>
             <span style={{ width: 10, height: 10, borderRadius: 2, background: "#facc15", display: "inline-block" }} />
@@ -2129,7 +2129,7 @@ function NationalSeverityMap({ buildings, reports, mob }) {
 
           <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 340px", gap: 12 }}>
             <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 8 }}>
-              <div ref={mapRef} style={{ width: "100%", height: mob ? 400 : 560, border: `1px solid ${BORDER}`, background: BG3, borderRadius: 4 }} />
+              <div ref={mapRef} style={{ width: "100%", height: mob ? 400 : 560, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
             </div>
 
             <div style={{ background: BG2, border: `1px solid ${BORDER}`, padding: 14 }}>
@@ -2464,7 +2464,7 @@ function VantorSwipe({ antes, despues, mob }) {
         onTouchEnd={() => setIsDragging(false)}
         onMouseLeave={() => setIsDragging(false)}
       >
-        <div ref={mapRef} style={{ width: "100%", height: mob ? 380 : 540, border: `1px solid ${BORDER}`, background: BG3, borderRadius: 4 }} />
+        <div ref={mapRef} style={{ width: "100%", height: mob ? 380 : 540, border: `1px solid ${BORDER}`, background: "#eef1f5", borderRadius: 4 }} />
 
         {mapReady && (
           <div
@@ -2477,7 +2477,7 @@ function VantorSwipe({ antes, despues, mob }) {
               left: `${swipePos}%`,
               transform: "translateX(-50%)",
               width: 3,
-              background: BG2,
+              background: "#ffffff",
               boxShadow: "0 0 4px rgba(0,0,0,0.5)",
               cursor: "col-resize",
               zIndex: 500,
@@ -2488,7 +2488,7 @@ function VantorSwipe({ antes, despues, mob }) {
           >
             <div style={{
               width: 32, height: 32, borderRadius: 32,
-              background: BG2, boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+              background: "#ffffff", boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 14, color: "#374151", fontWeight: 700,
             }}>⇔</div>
@@ -2999,7 +2999,7 @@ export function TabSismos({ subView, setSubView }) {
                 right: 0,
                 top: "calc(100% + 6px)",
                 zIndex: 30,
-                background: BG2,
+                background: "#ffffff",
                 border: `1px solid ${BORDER}`,
                 padding: 12,
                 width: 270,
@@ -3230,7 +3230,7 @@ export function TabSismos({ subView, setSubView }) {
                   type="datetime-local"
                   value={customStart}
                   onChange={e => setCustomStart(e.target.value)}
-                  style={{ border: `1px solid ${BORDER}`, padding: "7px 9px", fontFamily: fontSans, fontSize: 12, color: TEXT, background: BG2 }}
+                  style={{ border: `1px solid ${BORDER}`, padding: "7px 9px", fontFamily: fontSans, fontSize: 12, color: TEXT, background: "#ffffff" }}
                 />
               </label>
               <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 10, fontFamily: font, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase" }}>
@@ -3239,7 +3239,7 @@ export function TabSismos({ subView, setSubView }) {
                   type="datetime-local"
                   value={customEnd}
                   onChange={e => setCustomEnd(e.target.value)}
-                  style={{ border: `1px solid ${BORDER}`, padding: "7px 9px", fontFamily: fontSans, fontSize: 12, color: TEXT, background: BG2 }}
+                  style={{ border: `1px solid ${BORDER}`, padding: "7px 9px", fontFamily: fontSans, fontSize: 12, color: TEXT, background: "#ffffff" }}
                 />
               </label>
               <button
@@ -3487,7 +3487,7 @@ export function TabSismos({ subView, setSubView }) {
                     );
                   })}
                   {latestItems.length === 0 && (
-                    <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.5, padding: 10, background: BG2, border: `1px solid ${BORDER}` }}>
+                    <div style={{ fontSize: 12, fontFamily: fontSans, color: MUTED, lineHeight: 1.5, padding: 10, background: "#ffffff", border: `1px solid ${BORDER}` }}>
                       No hay registros para el filtro seleccionado.
                     </div>
                   )}

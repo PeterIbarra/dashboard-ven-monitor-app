@@ -158,14 +158,13 @@ const AI_PROVIDERS = [
     },
   },
   {
-    // llama-3.3-70b-versatile fue retirado por Groq (404) — reemplazado 2026-09-05
-    name: "groq/gpt-oss-120b",
+    name: "groq/llama-3.3-70b",
     keyEnv: "GROQ_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
-        body: JSON.stringify({ model: "openai/gpt-oss-120b", messages: [{ role: "user", content: prompt }], max_tokens: maxTokens, temperature: 0.1 }),
+        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }], max_tokens: maxTokens, temperature: 0.1 }),
         signal: AbortSignal.timeout(15000),
       });
       if (!res.ok) return null;
@@ -174,15 +173,13 @@ const AI_PROVIDERS = [
     },
   },
   {
-    // meta-llama/llama-3.1-8b-instruct:free ya no existe en el catálogo
-    // gratuito de OpenRouter (404) — reemplazado 2026-09-05
     name: "openrouter/free",
     keyEnv: "OPENROUTER_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}`, "HTTP-Referer": "https://dashboard-ven-monitor-app.vercel.app", "X-Title": "PNUD Monitor ICG" },
-        body: JSON.stringify({ model: "nvidia/nemotron-3.5-lightning:free", messages: [{ role: "user", content: prompt }], max_tokens: maxTokens, temperature: 0.1 }),
+        body: JSON.stringify({ model: "meta-llama/llama-3.1-8b-instruct:free", messages: [{ role: "user", content: prompt }], max_tokens: maxTokens, temperature: 0.1 }),
         signal: AbortSignal.timeout(15000),
       });
       if (!res.ok) return null;
@@ -191,20 +188,18 @@ const AI_PROVIDERS = [
     },
   },
   {
-    // api-inference.huggingface.co fue retirado por HF — reemplazado por el
-    // router OpenAI-compatible (router.huggingface.co) — 2026-09-05
     name: "huggingface/qwen",
     keyEnv: "HF_API_KEY",
     call: async (prompt, maxTokens, apiKey) => {
-      const res = await fetch("https://router.huggingface.co/v1/chat/completions", {
+      const res = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2.5-72B-Instruct", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
-        body: JSON.stringify({ model: "Qwen/Qwen2.5-72B-Instruct", messages: [{ role: "user", content: prompt }], max_tokens: maxTokens, temperature: 0.1 }),
+        body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: maxTokens, temperature: 0.1, return_full_text: false } }),
         signal: AbortSignal.timeout(20000),
       });
       if (!res.ok) return null;
       const data = await res.json();
-      return data.choices?.[0]?.message?.content || null;
+      return Array.isArray(data) ? (data[0]?.generated_text || null) : (data.generated_text || null);
     },
   },
 ];

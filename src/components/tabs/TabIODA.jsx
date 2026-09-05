@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { BORDER, TEXT, MUTED, ACCENT, font, fontSans, BG2 } from "../../constants";
+import { BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "../../constants";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { Badge } from "../Badge";
 import { Card } from "../Card";
@@ -1335,7 +1335,7 @@ export function TabIODA() {
     return (
       <div onClick={e=>{if(e.target===e.currentTarget)setExportOpen(false);}}
         style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center"}}>
-        <div style={{background:BG2,borderRadius:6,padding:24,minWidth:340,maxWidth:420,boxShadow:"0 8px 32px rgba(0,0,0,0.18)",fontFamily:font}}>
+        <div style={{background:"#fff",borderRadius:6,padding:24,minWidth:340,maxWidth:420,boxShadow:"0 8px 32px rgba(0,0,0,0.18)",fontFamily:font}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
             <div style={{fontSize:15,fontWeight:700,color:TEXT}}>📥 Exportar a XLSX</div>
             <button onClick={()=>setExportOpen(false)} style={{background:"none",border:"none",fontSize:18,cursor:"pointer",color:MUTED}}>✕</button>

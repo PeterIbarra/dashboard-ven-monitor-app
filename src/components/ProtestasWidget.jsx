@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "./Card";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { CONF_SEMANAL } from "../data/weekly.js";
-import { BORDER, TEXT, MUTED, font, BG2 } from "../constants";
+import { BORDER, TEXT, MUTED, font } from "../constants";
 
 export function ProtestasWidget({ onOpen }) {
   const mob = useIsMobile();
@@ -71,7 +71,7 @@ export function ProtestasWidget({ onOpen }) {
 
     <div style={{ padding:"8px 14px", borderTop:`1px solid ${BORDER}`, background:"#fff7ed", display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
       <span style={{ fontSize:9, color:"#9a3412", fontWeight:700, marginRight:3 }}>Demandas de {current.week}:</span>
-      {motives.map(item => <span key={item} style={{ fontSize:8, color:"#9a3412", fontFamily:font, padding:"2px 6px", border:"1px solid #fdba7460", background:BG2 }}>{item}</span>)}
+      {motives.map(item => <span key={item} style={{ fontSize:8, color:"#9a3412", fontFamily:font, padding:"2px 6px", border:"1px solid #fdba7460", background:"#fff" }}>{item}</span>)}
       <span style={{ width:"100%", fontSize:9, color:"#7c2d12", lineHeight:1.4 }}><b>Lectura semanal:</b> {current.hecho}</span>
       <span style={{ fontSize:8, color:MUTED, fontFamily:font, marginLeft:"auto" }}>Fuente: registro de conflictividad social · {current.label}</span>
     </div>
