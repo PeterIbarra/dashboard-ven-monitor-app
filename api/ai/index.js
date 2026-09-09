@@ -2,6 +2,8 @@
 // Mode A: { messages, use_tools, max_tokens } → tool-capable providers → { text } | { tool_calls, assistant_message }
 // Mode B: { prompt, max_tokens } → full cascade (backward compat for ICG/Daily Brief)
 
+const { enforceRateLimit, requireClerkSession } = require("../../lib/apiSecurity");
+
 // ── Tool definitions (sent to AI providers) ──────────────────────────────────
 
 const TOOL_DEFINITIONS = [
@@ -324,13 +326,16 @@ const INJECTION_PROVIDERS = [
 
 module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     return res.status(204).end();
   }
 
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed." });
+
+  const auth = await requireClerkSession(req, res);
+  if (!auth) return;
+  if (!enforceRateLimit(req, res, { key: `ai:${auth.userId}`, limit: 15, windowMs: 60_000 })) return;
 
   let body = req.body;
   if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
@@ -340,6 +345,16 @@ module.exports = async function handler(req, res) {
 
   const { prompt, messages, use_tools, max_tokens = 2000 } = body;
   const safeMaxTokens = Math.min(Math.max(parseInt(max_tokens) || 2000, 100), 4000);
+
+  if (typeof prompt === "string" && prompt.length > 30_000) {
+    return res.status(413).json({ error: "Prompt is too large." });
+  }
+  if (Array.isArray(messages)) {
+    const messageSize = messages.reduce((total, message) => total + String(message?.content || "").length, 0);
+    if (messages.length > 50 || messageSize > 30_000) {
+      return res.status(413).json({ error: "Conversation is too large." });
+    }
+  }
 
   // ── Mode A: tool-calling (ChatBot) ──
   if (use_tools && Array.isArray(messages)) {
@@ -422,7 +437,7 @@ module.exports = async function handler(req, res) {
   // detiene en el primero exitoso) y reporta éxito/error + tiempo de cada
   // uno. Solo se activa con el flag explícito — el comportamiento normal
   // (Promise.any, responde con el primero que gane) no cambia.
-  if (body.debug === true) {
+  if (body.debug === true && process.env.NODE_ENV !== "production") {
     const t0 = Date.now();
     const settled = await Promise.allSettled(configured.map(async (provider) => {
       const start = Date.now();

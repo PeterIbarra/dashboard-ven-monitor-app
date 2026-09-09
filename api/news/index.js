@@ -1,6 +1,7 @@
 // /api/news — Venezuela news + fact-check aggregator + Government Cohesion Index
 // Routes: default → RSS news, ?source=cohesion → ICG engine
 // AI: cascade Mistral → Groq → OpenRouter → HuggingFace (same as /api/ai)
+const { withInstitutionalAuth } = require("../../lib/apiSecurity");
 
 // ═══════════════════════════════════════════════════════════════
 // COHESION INDEX ENGINE — ?source=cohesion
@@ -732,8 +733,10 @@ async function handleNews(req, res) {
 // ROUTER
 // ═══════════════════════════════════════════════════════════════
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   const { source } = req.query;
   if (source === "cohesion") return handleCohesion(req, res);
   return handleNews(req, res);
 };
+
+module.exports = withInstitutionalAuth(handler, { limit: 40 });

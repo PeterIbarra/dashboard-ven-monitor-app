@@ -1,5 +1,6 @@
 // /api/articles — Read articles from Supabase
 // Query params: type=news|factcheck, limit=N, scenario=E1|E2|E3|E4
+const { withInstitutionalAuth } = require("../../lib/apiSecurity");
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON = process.env.SUPABASE_ANON_KEY;
@@ -36,7 +37,7 @@ async function fetchGacetas(req, res) {
   }
 }
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   const { type, limit = "30", scenario } = req.query;
 
   if (type === "gacetas") {
@@ -134,3 +135,5 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ error: e.message, articles: [] });
   }
 }
+
+module.exports = withInstitutionalAuth(handler);

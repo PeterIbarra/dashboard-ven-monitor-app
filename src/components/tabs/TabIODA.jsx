@@ -4,7 +4,6 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import { Badge } from "../Badge";
 import { Card } from "../Card";
 import { TwitterTimeline } from "../TwitterTimeline";
-import * as XLSX from "xlsx";
 import { VE_REGIONS, getPrior, iodaFetch, computeRegionElectric } from "../../lib/iodaElectric";
 import { IODAChoroplethMap } from "../IODAChoroplethMap";
 
@@ -1297,34 +1296,38 @@ export function TabIODA() {
       }));
       const regionRows = regScores.filter(r=>r.status==="fulfilled"&&r.value).map(r=>r.value).sort((a,b)=>a.connHealth-b.connHealth);
 
-      // Build workbook
-      const wb = XLSX.utils.book_new();
-      const ws1 = XLSX.utils.json_to_sheet(allEvts.length>0 ? allEvts.map(ev=>({
-        "Fecha (VET)":fmtDate(ev.time),"Región":ev.region,"Fuente":ev.datasource||"",
-        "Severidad":ev.condition==="critical"?"CRÍTICO":ev.condition==="high"?"ALTO":"MEDIO",
-        "Score IODA":ev.score,"Duración":ev.duration>0?(ev.duration<3600?`${Math.round(ev.duration/60)}m`:`${Math.floor(ev.duration/3600)}h ${Math.round((ev.duration%3600)/60)}m`):"en curso",
-      })) : [{"Fecha (VET)":"Sin eventos","Región":"","Fuente":"","Severidad":"","Score IODA":"","Duración":""}]);
-      ws1["!cols"]=[{wch:18},{wch:20},{wch:12},{wch:10},{wch:12},{wch:10}];
-      XLSX.utils.book_append_sheet(wb,ws1,"Eventos");
-      const ws2 = XLSX.utils.json_to_sheet(regionRows.length>0 ? regionRows.map(r=>({
-        "Estado":r.name,"Conectividad %":r.connHealth,"Electricidad %":r.elecHealth,
-        "Estado eléctrico":r.elecLabel,"Eventos eléctricos":r.elecEvents,
-        "Score IODA total":r.overallScore,"N° eventos IODA":r.eventCnt,
-      })) : [{"Estado":"Sin datos"}]);
-      ws2["!cols"]=[{wch:20},{wch:15},{wch:15},{wch:38},{wch:18},{wch:18},{wch:16}];
-      XLSX.utils.book_append_sheet(wb,ws2,"Ranking Estados");
-      const ws3 = XLSX.utils.json_to_sheet([
-        {"Campo":"Fuente","Valor":"IODA — Georgia Tech INETINTEL"},
-        {"Campo":"Período","Valor":periodLabel},
-        {"Campo":"Desde (UTC)","Valor":new Date(expFrom*1000).toISOString()},
-        {"Campo":"Hasta (UTC)","Valor":new Date(expUntil*1000).toISOString()},
-        {"Campo":"Generado","Valor":new Date().toLocaleString("es-VE",{timeZone:"America/Caracas"})},
-        {"Campo":"Total eventos","Valor":allEvts.length},
-        {"Campo":"Estados analizados","Valor":regionRows.length},
+      // Build workbook. Loaded only when exporting, keeping the writer out of the initial bundle.
+      const { default: writeExcelFile } = await import("write-excel-file/browser");
+      const header = value => ({ value, fontWeight:"bold", backgroundColor:"#E8EEF5" });
+      const eventsData = [
+        ["Fecha (VET)","Región","Fuente","Severidad","Score IODA","Duración"].map(header),
+        ...(allEvts.length ? allEvts.map(ev => [
+          fmtDate(ev.time), ev.region, ev.datasource || "",
+          ev.condition === "critical" ? "CRÍTICO" : ev.condition === "high" ? "ALTO" : "MEDIO",
+          ev.score,
+          ev.duration > 0 ? (ev.duration < 3600 ? `${Math.round(ev.duration/60)}m` : `${Math.floor(ev.duration/3600)}h ${Math.round((ev.duration%3600)/60)}m`) : "en curso",
+        ]) : [["Sin eventos","","","","",""]]),
+      ];
+      const regionsData = [
+        ["Estado","Conectividad %","Electricidad %","Estado eléctrico","Eventos eléctricos","Score IODA total","N° eventos IODA"].map(header),
+        ...(regionRows.length ? regionRows.map(r => [r.name,r.connHealth,r.elecHealth,r.elecLabel,r.elecEvents,r.overallScore,r.eventCnt]) : [["Sin datos","","","","","",""]]),
+      ];
+      const metadataData = [
+        ["Campo","Valor"].map(header),
+        ["Fuente","IODA — Georgia Tech INETINTEL"],
+        ["Período",periodLabel],
+        ["Desde (UTC)",new Date(expFrom*1000).toISOString()],
+        ["Hasta (UTC)",new Date(expUntil*1000).toISOString()],
+        ["Generado",new Date().toLocaleString("es-VE",{timeZone:"America/Caracas"})],
+        ["Total eventos",allEvts.length],
+        ["Estados analizados",regionRows.length],
+      ];
+      const workbook = writeExcelFile([
+        { data:eventsData, sheet:"Eventos", columns:[18,20,12,10,12,12].map(width=>({width})), stickyRowsCount:1 },
+        { data:regionsData, sheet:"Ranking Estados", columns:[20,15,15,38,18,18,16].map(width=>({width})), stickyRowsCount:1 },
+        { data:metadataData, sheet:"Metadata", columns:[{width:20},{width:45}], stickyRowsCount:1 },
       ]);
-      ws3["!cols"]=[{wch:20},{wch:45}];
-      XLSX.utils.book_append_sheet(wb,ws3,"Metadata");
-      XLSX.writeFile(wb,`IODA_Venezuela_${exportPreset}_${new Date().toISOString().slice(0,10)}.xlsx`);
+      await workbook.toFile(`IODA_Venezuela_${exportPreset}_${new Date().toISOString().slice(0,10)}.xlsx`);
       setExportOpen(false);
     } catch(e) { setExportError("Error al generar el archivo: "+e.message); }
     setExportLoading(false);

@@ -7,6 +7,7 @@ import { SITREP_ALL } from "../../data/sitrep.js";
 import { AMNISTIA_TRACKER } from "../../data/amnistia.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SEM, font, fontSans } from "../../constants";
 import { IS_DEPLOYED, loadScript } from "../../utils";
+import { sanitizeHtml } from "../../sanitize";
 
 export function TabSitrep({ liveData = {}, week }) {
   const mob = useIsMobile();
@@ -455,13 +456,13 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
           )}
           {dailyBrief && (
             <div style={{ fontSize:mob?12:13, fontFamily:fontSans, color:TEXT, lineHeight:1.7 }}
-              dangerouslySetInnerHTML={{ __html: dailyBrief
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(dailyBrief
                 .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
                 .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
                 .replace(/\*(.+?)\*/g, "<em>$1</em>")
                 .replace(/\[([^\]]+)\]/g, '<span style="color:#0e7490;font-size:11px;font-family:\'Space Mono\',monospace">[$1]</span>')
                 .replace(/\n/g, "<br/>")
-              }} />
+              ) }} />
           )}
         </div>
       )}
@@ -522,7 +523,7 @@ ${aiAnalysis ? `<h2 style="font-size:16px;color:#0468B1;border-bottom:2px solid 
                 {wk.tensiones.map((t,i) => (
                   <div key={i} style={{ display:"flex", gap:6, padding:"4px 0", borderBottom:i<wk.tensiones.length-1?`1px solid ${BORDER}30`:"none", alignItems:"flex-start" }}>
                     <div style={{ width:6, height:6, borderRadius:"50%", background:SEM[t.l], marginTop:5, flexShrink:0 }} />
-                    <div style={{ fontSize:11, color:MUTED, lineHeight:1.4 }} dangerouslySetInnerHTML={{__html:t.t}} />
+                    <div style={{ fontSize:11, color:MUTED, lineHeight:1.4 }} dangerouslySetInnerHTML={{__html:sanitizeHtml(t.t)}} />
                   </div>
                 ))}
               </div>

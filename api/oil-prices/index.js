@@ -2,11 +2,12 @@
 // Live prices: Supabase cached (cron saves OilPriceAPI every 12h) → OilPriceAPI direct → EIA (delayed)
 // Historical chart: EIA API v2 (daily, 365 days, free) — EIA_API_KEY
 // Returns: { brent, wti, natgas, brentHistory[], histPeriod, source, fetchedAt }
+const { withInstitutionalAuth } = require("../../lib/apiSecurity");
 
 const EIA_BASE = "https://api.eia.gov/v2/petroleum/pri/spt/data/";
 const OIL_BASE = "https://api.oilpriceapi.com/v1";
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   const eiaKey = process.env.EIA_API_KEY;
   const oilKey = process.env.OILPRICE_API_KEY;
 
@@ -157,3 +158,5 @@ async function fetchJson(url, timeout = 8000, headers = {}) {
     return null;
   }
 }
+
+module.exports = withInstitutionalAuth(handler);

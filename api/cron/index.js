@@ -10,8 +10,14 @@ const { dailyReadings } = require("../../lib/cron/tasks/dailyReadings");
 const { icgAnalysis } = require("../../lib/cron/tasks/icgAnalysis");
 const { classifyNewsAlerts } = require("../../lib/cron/tasks/newsAlerts");
 const { sendDailyBrief } = require("../../lib/cron/tasks/dailyBrief");
+const { requireCronSecret } = require("../../lib/apiSecurity");
 
 module.exports = async function handler(req, res) {
+  if (req.method !== "GET" && req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+  if (!requireCronSecret(req, res)) return;
+
   if (!SUPABASE_URL || !SUPABASE_SECRET) {
     return res.status(500).json({ error: "Supabase not configured" });
   }

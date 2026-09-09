@@ -297,7 +297,7 @@ dashboard-ven-monitor-app-main/
 │   ├── App.jsx                 # Shell, navegación, liveData y splash (~560 líneas)
 │   ├── main.jsx                # Entry point, ClerkProvider
 │   ├── constants.js            # Colores y sistema tipográfico
-│   ├── components/             # 66 archivos
+│   ├── components/             # Componentes activos; no existe una copia paralela fuera de src/
 │   │   ├── tabs/               # 16 (14 módulos de navegación + Cohesión + Prospectiva)
 │   │   ├── charts/             # 17 (matrices, series y mapas)
 │   │   ├── ChatBot.jsx         # Asistente conversacional con tool calling
@@ -323,9 +323,10 @@ dashboard-ven-monitor-app-main/
 - Las funciones de cron compartidas viven fuera de `api/` para no consumir funciones adicionales.
 - La IA asiste en clasificación, síntesis y explicación; las probabilidades y lecturas institucionales permanecen bajo validación humana.
 - El frontend degrada de forma controlada cuando una API externa no está disponible.
-- Las dependencias npm son deliberadamente mínimas (`@clerk/clerk-react`, `leaflet`, `react`, `react-dom`, `xlsx`). Leaflet CSS/JS, Chart.js, jsPDF y html2canvas se cargan bajo demanda vía CDN (`loadScript`/`loadCSS` en `utils.js`) para mantener liviano el bundle inicial.
-- `AuthGate.jsx` envuelve toda la aplicación con Clerk, operando en modo de prueba por decisión de alcance del proyecto (el plan pago no es necesario en esta etapa). El login soporta dos métodos — contraseña directa o código de un solo uso (OTP) por correo — con verificación adicional por OTP cuando Clerk la exige y recuperación de contraseña también vía OTP. La sesión se recuerda por 30 días. La interfaz oculta por CSS el badge "Secured by Clerk" y la sección de cambio de contraseña del perfil, para mantener una experiencia institucional simple.
-- Algunas integraciones (Clerk, Sismos, Gacetas) usan claves públicas (`publishable`, seguras de exponer en el cliente) definidas directamente en el código en lugar de variables de entorno. No representa un riesgo de seguridad, pero migrarlas facilitaría rotarlas sin un nuevo despliegue.
+- Las dependencias npm son deliberadamente mínimas (`@clerk/clerk-react`, `leaflet`, `react`, `react-dom`, `write-excel-file`). El generador Excel de IODA se importa solo al exportar; Leaflet CSS/JS, Chart.js, jsPDF y html2canvas también se cargan bajo demanda.
+- `AuthGate.jsx` envuelve toda la aplicación con Clerk. El endpoint de IA vuelve a validar la sesión en el servidor; ocultar contenido en el frontend no se considera autorización suficiente.
+- La clave pública de Clerk se configura mediante `VITE_CLERK_PUBLISHABLE_KEY`. Las credenciales privadas nunca deben usar el prefijo `VITE_`.
+- `src/` es la única fuente canónica del frontend. Las antiguas copias de `App.jsx` y `components/` en la raíz fueron retiradas para evitar divergencias.
 
 ### Funciones serverless
 
@@ -337,6 +338,16 @@ gdelt · ioda · news · oil-prices · polymarket · socioeconomic
 ```
 
 No se debe crear una carpeta adicional dentro de `api/` sin consolidar otra función. Las nuevas operaciones deben incorporarse a endpoints existentes mediante parámetros como `task`, `source` o `type`. Ejemplo real: `api/gdelt/index.js` sirve tanto los datos de cobertura mediática como los de infraestructura sísmica (reportes, edificios, acopios), y `api/articles/index.js` sirve además las Gacetas Oficiales vía `?type=gacetas`.
+
+Todas las funciones de consulta exigen una sesión institucional válida de Clerk y responden con `Cache-Control: private, no-store`. `/api/cron` es la única excepción: usa `Authorization: Bearer $CRON_SECRET`. Las escrituras de lecturas diarias pertenecen al cron; el navegador no dispone de una ruta de escritura con credenciales privilegiadas.
+
+### Verificación local
+
+```bash
+npm run check
+```
+
+El comando ejecuta las pruebas de seguridad y el build de producción. Las pruebas comprueban el cierre seguro sin credenciales, la autenticación del cron, el límite de solicitudes y el rechazo de métodos no permitidos.
 
 ---
 
@@ -387,9 +398,12 @@ La aplicación puede operar parcialmente sin todas las integraciones. Configurar
 | Ambiente | `FIRMS_API_KEY` |
 | Sismos | `SISMO_API_KEY`, `SISMO_BUILDINGS_API_KEY` |
 | Correo | `RESEND_API_KEY`, `DAILY_BRIEF_FROM`, `DAILY_BRIEF_FROM_NAME`, `DAILY_BRIEF_TO` |
+| Autenticación | `VITE_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `AUTHORIZED_PARTIES`, `CRON_SECRET` |
 | Aplicación | `APP_BASE_URL` |
 
 Los nombres exactos deben comprobarse en el endpoint que consume cada integración antes de modificar la configuración de producción.
+
+Copiar `.env.example` a `.env.local` para desarrollo. En producción, `AUTHORIZED_PARTIES` debe contener únicamente los orígenes aprobados. Vercel envía `Authorization: Bearer $CRON_SECRET` a las invocaciones programadas; las ejecuciones manuales deben usar el mismo encabezado.
 
 > **Nota:** `SISMO_API_KEY` y `SISMO_BUILDINGS_API_KEY` figuran en esta tabla como referencia, pero hoy no se leen de variables de entorno — ver la nota sobre claves públicas hardcodeadas en Arquitectura.
 
@@ -468,7 +482,7 @@ Cada tab muestra sus fuentes y fechas de corte cuando están disponibles.
 
 | Capa | Tecnología |
 |---|---|
-| Frontend | React 18 + Vite 5 |
+| Frontend | React 18 + Vite 8 |
 | Autenticación | Clerk |
 | Hosting | Vercel (plan Hobby) |
 | Persistencia | Supabase (principal + proyecto dedicado de Umbral para Gacetas + proyecto dedicado para Sismos) |

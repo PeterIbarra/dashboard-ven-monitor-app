@@ -1,5 +1,6 @@
 // /api/acled — Proxy for ACLED API with OAuth authentication
 // Supports: events (default), cast (predictions)
+const { withInstitutionalAuth } = require("../../lib/apiSecurity");
 
 const ACLED_EMAIL = process.env.ACLED_EMAIL;
 const ACLED_PASSWORD = process.env.ACLED_PASSWORD;
@@ -33,7 +34,7 @@ async function getToken() {
   return cachedToken;
 }
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   if (!ACLED_EMAIL || !ACLED_PASSWORD) {
     return res.status(500).json({ error: "ACLED credentials not configured" });
   }
@@ -86,3 +87,5 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ error: e.message });
   }
 }
+
+module.exports = withInstitutionalAuth(handler);

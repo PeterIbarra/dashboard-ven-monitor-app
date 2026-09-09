@@ -1,4 +1,6 @@
-module.exports = async function handler(req, res) {
+const { withInstitutionalAuth } = require("../../lib/apiSecurity");
+
+async function handler(req, res) {
   const days = parseInt(req.query.days) || 90;
   const end = new Date();
   const start = new Date(end);
@@ -38,3 +40,5 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ error: e.message, data: [] });
   }
 };
+
+module.exports = withInstitutionalAuth(handler);

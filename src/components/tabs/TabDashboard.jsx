@@ -19,6 +19,7 @@ import { SCENARIOS } from "../../data/static.js";
 import { AMNISTIA_TRACKER, FORO_PENAL_LATEST } from "../../data/amnistia.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SC, SEM, font, fontSans } from "../../constants";
 import { computeInstabilityIndex } from "../../lib/instabilityIndex";
+import { formatPlainText, sanitizeHtml } from "../../sanitize";
 
 export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, setSismosSection, setMacroSection }) {
   const mob = useIsMobile();
@@ -462,8 +463,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
                   if (res.ok) {
                     const data = await res.json();
                     let text = data.text || data.content || "Sin respuesta";
-                    text = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>").replace(/\*(.*?)\*/g, "<i>$1</i>");
-                    setAiExplanation(text);
+                    setAiExplanation(formatPlainText(text));
                   } else {
                     setAiExplanation("Error: no se pudo generar el análisis (" + res.status + ")");
                   }
@@ -522,7 +522,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
                     <div style={{ fontSize:9, fontFamily:font, color:ACCENT, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:6 }}>
                       🤖 Análisis IA · Índice de Inestabilidad
                     </div>
-                    <span dangerouslySetInnerHTML={{ __html: aiExplanation }} />
+                    <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(aiExplanation) }} />
                   </div>
                 )}
 
@@ -1050,7 +1050,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
         {wk.tensiones.map((t,i) => (
           <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:7, paddingBottom:7, borderBottom:i<wk.tensiones.length-1?`1px solid ${BORDER}40`:"none" }}>
             <SemDot color={t.l} />
-            <span style={{ fontSize:13, color:"#3d4f5f", lineHeight:1.6 }} dangerouslySetInnerHTML={{ __html:t.t }} />
+            <span style={{ fontSize:13, color:"#3d4f5f", lineHeight:1.6 }} dangerouslySetInnerHTML={{ __html:sanitizeHtml(t.t) }} />
           </div>
         ))}
       </Card>

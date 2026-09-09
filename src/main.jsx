@@ -3,7 +3,11 @@ import ReactDOM from 'react-dom/client'
 import { ClerkProvider } from '@clerk/clerk-react'
 import MonitorPNUD from './App.jsx'
 
-const PUBLISHABLE_KEY = "pk_test_a2Vlbi1hbHBhY2EtNDEuY2xlcmsuYWNjb3VudHMuZGV2JA";
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

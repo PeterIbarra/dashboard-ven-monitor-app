@@ -1,5 +1,6 @@
 // /api/socioeconomic — World Bank + IMF + R4V data for Venezuela
 // All APIs are free, no auth required
+const { withInstitutionalAuth } = require("../../lib/apiSecurity");
 
 const WB_BASE = "https://api.worldbank.org/v2/country/VE/indicator";
 
@@ -27,11 +28,11 @@ async function fetchJson(url, timeout = 10000) {
   } catch { return null; }
 }
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   // ── Route: ?type=readings → historical daily readings from Supabase ──
   if (req.query.type === "readings") {
     const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ANON_KEY;
+    const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
     if (!SUPABASE_URL || !SUPABASE_KEY) {
       return res.status(500).json({ error: "Supabase not configured" });
     }
@@ -54,7 +55,7 @@ module.exports = async function handler(req, res) {
   // ── Route: ?type=icg_latest → read latest ICG from Supabase (computed by cron) ──
   if (req.query.type === "icg_latest") {
     const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ANON_KEY;
+    const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
     if (!SUPABASE_URL || !SUPABASE_KEY) {
       return res.status(500).json({ error: "Supabase not configured" });
     }
@@ -79,44 +80,6 @@ module.exports = async function handler(req, res) {
         date: row.date,
         source: "supabase/cron",
       });
-    } catch (e) {
-      return res.status(502).json({ error: e.message });
-    }
-  }
-
-  // ── Route: ?type=write_reading → frontend persists live data to fill nulls ──
-  if (req.query.type === "write_reading") {
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
-    if (!SUPABASE_URL || !SUPABASE_KEY) {
-      return res.status(500).json({ error: "Supabase not configured" });
-    }
-    try {
-      const today = new Date().toISOString().slice(0, 10);
-      // Only accept known numeric fields — sanitize input
-      const allowed = ["gdelt_tone","gdelt_volume","brent","wti","bilateral_v","brecha","paralelo","instability_index"];
-      const update = { date: today };
-      let fieldsSet = 0;
-      for (const key of allowed) {
-        if (req.query[key] != null && req.query[key] !== "" && req.query[key] !== "null") {
-          update[key] = parseFloat(req.query[key]);
-          if (!isNaN(update[key])) fieldsSet++;
-        }
-      }
-      if (fieldsSet === 0) return res.status(400).json({ error: "No valid fields" });
-
-      // Upsert — merge with existing row (won't overwrite cron data that's already set)
-      const sbRes = await fetch(`${SUPABASE_URL}/rest/v1/daily_readings?on_conflict=date`, {
-        method: "POST",
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
-          "Content-Type": "application/json",
-          Prefer: "resolution=merge-duplicates,return=minimal",
-        },
-        body: JSON.stringify(update),
-      });
-      return res.status(sbRes.ok ? 200 : 502).json({ ok: sbRes.ok, date: today, fieldsSet });
     } catch (e) {
       return res.status(502).json({ error: e.message });
     }
@@ -227,3 +190,5 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ error: e.message });
   }
 };
+
+module.exports = withInstitutionalAuth(handler);

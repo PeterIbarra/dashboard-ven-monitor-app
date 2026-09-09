@@ -1,3 +1,4 @@
+const { withInstitutionalAuth } = require("../../lib/apiSecurity");
 const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 const FIRMS_BASE = "https://firms.modaps.eosdis.nasa.gov/api/area/csv";
 const OM_FORECAST_BASE = "https://api.open-meteo.com/v1/forecast";
@@ -8,7 +9,7 @@ const SISMO_API_KEY = "sb_publishable_WYdU76C5OLEfuUlY6n9UEg_GoUoVY_k";
 const SISMO_BUILDINGS_SUPABASE_URL = "https://jckifxsdlnsvbztxydes.supabase.co";
 const SISMO_BUILDINGS_API_KEY = "sb_publishable_i7iEDrCVZcSt0k3RGFrY4g_WrtZBB4w";
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   const { signal, source, days, bbox, key, lat, lon, past_days, forecast_days, start_date, end_date, building_id } = req.query;
 
   if (source === "sismovenezuela") {
@@ -366,6 +367,8 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ data: [], fetchedAt: new Date().toISOString(), error: e.message });
   }
 }
+
+module.exports = withInstitutionalAuth(handler);
 
 function parseCsv(csvText) {
   const map = new Map();
@@ -943,4 +946,3 @@ async function fetchVantorTilesInfo(debug) {
     return { antes: null, despues: null, error: e.message };
   }
 }
-

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SEM, font, fontSans } from "../constants";
+import { sanitizeHtml } from "../sanitize";
 
 const MAX_TOOL_ROUNDS = 3;
 
@@ -357,7 +358,7 @@ export function ChatBot({ weeks, liveData, signals, weekDrivers, indicators, sit
                   background:m.role==="user"?ACCENT:BG3, color:m.role==="user"?"white":TEXT,
                   border:m.role==="user"?"none":`1px solid ${BORDER}`,
                   whiteSpace:m.role==="user"?"pre-wrap":"normal" }}
-                  dangerouslySetInnerHTML={m.role==="assistant"?{ __html:renderMarkdown(m.content) }:undefined}>
+                  dangerouslySetInnerHTML={m.role==="assistant"?{ __html:sanitizeHtml(renderMarkdown(m.content)) }:undefined}>
                   {m.role==="user"?m.content:undefined}
                 </div>
               </div>

@@ -1,6 +1,7 @@
 // /api/dolar — Proxy for DolarAPI Venezuela (live + historical)
+const { withInstitutionalAuth } = require("../../lib/apiSecurity");
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   const { type = "live" } = req.query;
 
   try {
@@ -90,3 +91,5 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ error: e.message });
   }
 }
+
+module.exports = withInstitutionalAuth(handler);

@@ -1,4 +1,5 @@
 // /api/polymarket — Fetch live prices from Polymarket Gamma API (no auth needed)
+const { withInstitutionalAuth } = require("../../lib/apiSecurity");
 
 const SLUGS = [
   "will-venezuela-become-51st-state",
@@ -14,7 +15,7 @@ const SLUGS = [
   "venezuela-presidential-election-scheduled-by",
 ];
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   try {
     const results = [];
 
@@ -62,3 +63,5 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ error: e.message, markets: [] });
   }
 };
+
+module.exports = withInstitutionalAuth(handler);

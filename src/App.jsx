@@ -36,7 +36,6 @@ import { TabGdelt } from "./components/tabs/TabGdelt";
 import { TabConflictividad } from "./components/tabs/TabConflictividad";
 import { TabIODA } from "./components/tabs/TabIODA";
 import { computeRegionElectric, summarizeNationalElectric } from "./lib/iodaElectric";
-import { computeInstabilityIndex } from "./lib/instabilityIndex";
 import { TabMercados } from "./components/tabs/TabMercados";
 import { TabMacro } from "./components/tabs/TabMacro";
 import { TabAmbiental } from "./components/tabs/TabAmbiental";
@@ -317,32 +316,6 @@ export default function MonitorPNUD() {
 
       // ── Write-back to Supabase: persist live data to fill daily_readings nulls ──
       if (IS_DEPLOYED) {
-        try {
-          const params = new URLSearchParams({ type: "write_reading" });
-          if (results.bilateral?.latest?.v != null) params.set("bilateral_v", results.bilateral.latest.v.toFixed(2));
-          // ICG is NOT written back from frontend — cron is the authoritative source
-          if (results.gdeltSummary?.tone != null) params.set("gdelt_tone", results.gdeltSummary.tone.toFixed(2));
-          if (results.gdeltSummary?.volume != null) params.set("gdelt_volume", results.gdeltSummary.volume);
-          if (results.dolar?.brecha) params.set("brecha", parseFloat(results.dolar.brecha).toFixed(1));
-          if (results.dolar?.paralelo) params.set("paralelo", results.dolar.paralelo);
-          if (results.oil?.brent) params.set("brent", results.oil.brent);
-          if (results.oil?.wti) params.set("wti", results.oil.wti);
-          // Índice de Inestabilidad Compuesto — SIEMPRE de la última semana SITREP
-          // (no de `week`, que puede estar en una semana de archivo si el usuario
-          // navegó el selector), calculado con la misma fórmula que TabDashboard
-          // (src/lib/instabilityIndex.js) para que el Daily Brief pueda anclar su
-          // Nivel de Riesgo al mismo número que muestra el dashboard.
-          try {
-            const latestWk = WEEKS[WEEKS.length - 1];
-            const { index } = computeInstabilityIndex(latestWk, results);
-            if (Number.isFinite(index)) params.set("instability_index", index);
-          } catch {}
-          // Only write if we have at least 2 data points (avoid writing empty rows)
-          const fieldCount = [...params.entries()].filter(([k]) => k !== "type").length;
-          if (fieldCount >= 2) {
-            fetch(`/api/socioeconomic?${params.toString()}`, { signal: AbortSignal.timeout(5000) }).catch(() => {});
-          }
-        } catch {}
       }
     }
     fetchLiveData();

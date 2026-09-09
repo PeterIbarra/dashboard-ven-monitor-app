@@ -1,6 +1,7 @@
+const { withInstitutionalAuth } = require("../../lib/apiSecurity");
 const IODA_BASE = "https://api.ioda.inetintel.cc.gatech.edu/v2";
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   const { path, ...params } = req.query;
 
   if (!path) {
@@ -36,3 +37,5 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ error: `IODA API error: ${e.message}` });
   }
 }
+
+module.exports = withInstitutionalAuth(handler);
