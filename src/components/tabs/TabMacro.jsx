@@ -12,6 +12,8 @@ import { HistoricoPanel } from "../HistoricoPanel.jsx";
 import { MACRO_LATEST, MACRO_LATEST_CUT } from "../../data/macroLatest.js";
 import { MacroPerspective } from "../MacroPerspective.jsx";
 import { InterventionPanel } from "../InterventionPanel.jsx";
+import { apiFetch } from "../../lib/apiClient.js";
+import { DataFreshnessBadge } from "../DataFreshnessBadge.jsx";
 
 export function TabMacro({ section, setSection }) {
   const mob = useIsMobile();
@@ -55,7 +57,7 @@ export function TabMacro({ section, setSection }) {
       let liveBcv = null, livePar = null;
       try {
         const liveUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
-        const res = await fetch(liveUrl, { signal: AbortSignal.timeout(8000) });
+        const res = await (liveUrl.startsWith("/api/") ? apiFetch(liveUrl, { timeoutMs:8000 }) : fetch(liveUrl, { signal:AbortSignal.timeout(8000) }));
         if (res.ok) {
           const data = await res.json();
           const oficial = data.find(d => d.fuente === "oficial");
@@ -74,7 +76,7 @@ export function TabMacro({ section, setSection }) {
       // Try Supabase (accumulated daily history)
       if (IS_DEPLOYED) {
         try {
-          const res = await fetch("/api/dolar?type=supabase&limit=365", { signal: AbortSignal.timeout(6000) });
+          const res = await apiFetch("/api/dolar?type=supabase&limit=365", { timeoutMs:6000 });
           if (res.ok) {
             const data = await res.json();
             if (data.rates?.length > 0) {
@@ -87,7 +89,7 @@ export function TabMacro({ section, setSection }) {
       // Also try DolarAPI historical (adds recent ~30 days)
       try {
         const histUrl = IS_DEPLOYED ? "/api/dolar?type=historico" : "https://ve.dolarapi.com/v1/historicos/dolares";
-        const res = await fetch(histUrl, { signal: AbortSignal.timeout(12000) });
+        const res = await (histUrl.startsWith("/api/") ? apiFetch(histUrl) : fetch(histUrl, { signal:AbortSignal.timeout(12000) }));
         if (res.ok) {
           const data = await res.json();
           const apiRates = data.rates || [];
@@ -134,7 +136,7 @@ export function TabMacro({ section, setSection }) {
     // Auto-refresh live rates every 5 minutes — pause when tab not visible
     const refreshRates = () => {
       const liveUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
-      fetch(liveUrl, { signal: AbortSignal.timeout(8000) })
+      (liveUrl.startsWith("/api/") ? apiFetch(liveUrl, { timeoutMs:8000 }) : fetch(liveUrl, { signal:AbortSignal.timeout(8000) }))
         .then(r => r.ok ? r.json() : null).then(data => {
           if (!data || !Array.isArray(data)) return;
           const o = data.find(d => d.fuente === "oficial"), p = data.find(d => d.fuente === "paralelo");
@@ -268,6 +270,7 @@ export function TabMacro({ section, setSection }) {
 
         {dolar?.updated && (
           <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}60`, marginTop:8 }}>
+            <DataFreshnessBadge timestamp={dolar.updated} maxAgeMs={15*60*1000} compact />{" · "}
             Fuente: DolarAPI.com (ve.dolarapi.com) · Última actualización: {new Date(dolar.updated).toLocaleString("es")} · Refresco cada 5 min
           </div>
         )}

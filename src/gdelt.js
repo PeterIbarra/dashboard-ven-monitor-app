@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
+import { apiFetch } from "./lib/apiClient.js";
 const GDELT_TIMESPAN = "120d";
 
 // Detect if running on Vercel (has /api routes) vs local/Claude artifact
@@ -55,7 +56,7 @@ export async function fetchAllGdelt() {
   // If deployed on Vercel, use the serverless function (no CORS issues)
   if (IS_DEPLOYED && GDELT_QUERIES.all) {
     try {
-      const res = await fetch(GDELT_QUERIES.all, { signal: AbortSignal.timeout(12000) });
+      const res = await apiFetch(GDELT_QUERIES.all);
       if (res.ok) {
         const json = await res.json();
         if (json.data && json.data.length > 0) return json.data;

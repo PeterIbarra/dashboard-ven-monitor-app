@@ -460,6 +460,9 @@ Cada tab muestra sus fuentes y fechas de corte cuando están disponibles.
 - **Producción petrolera de dos fuentes:** la serie histórica combina fuentes secundarias (OPEC, EIA, Venezuelanalysis, CEIC) con comunicación directa de PDVSA, mostradas por separado para comparar la cifra oficial contra fuentes independientes.
 - **Vista año contra año (YoY):** en Macro VEN y en Conflictividad semestral, un toggle cambia entre valores absolutos y variación interanual.
 - **Pausa inteligente:** los intervalos de actualización en vivo se pausan automáticamente cuando el usuario cambia de pestaña del navegador (`visibilitychange`) y se reanudan al volver, para ahorrar llamadas a APIs externas.
+- **Carga diferida por módulo:** el Dashboard inicial se entrega de inmediato y los otros 13 módulos se descargan solamente al abrirlos. Cada módulo cuenta además con un límite de error independiente, de modo que un fallo puntual no derriba toda la aplicación.
+- **Cliente API institucional:** las llamadas internas pasan por un único cliente que incorpora automáticamente el token de sesión de Clerk, conserva las cookies del mismo origen, aplica tiempos de espera y normaliza errores HTTP, de red y de formato. Incluye una utilidad común para clasificar datos como vigentes, desactualizados o sin fecha verificable.
+- **Vigencia visible:** precios energéticos, alertas, macroeconomía, cohesión, conectividad y datos socioeconómicos muestran una señal común —verde al día, ámbar desactualizado o gris sin fecha— calculada con umbrales acordes a la frecuencia de cada fuente.
 
 ---
 
@@ -471,7 +474,7 @@ Cada tab muestra sus fuentes y fechas de corte cuando están disponibles.
 - Las cifras de documentos diferentes no deben agregarse sin revisar período, universo y metodología.
 - Los resultados generados por IA requieren revisión humana antes de su uso institucional, tanto en el ChatBot como en el cron.
 - El plan Vercel Hobby limita el despliegue a 12 funciones serverless y a un único `schedule` de cron — el envío del Daily Brief depende de un disparador externo (ver Automatización y persistencia).
-- El bundle principal supera actualmente 500 kB; la división de código es una mejora pendiente.
+- El bundle principal continúa por encima de la recomendación genérica de 500 kB, pero la división por módulos redujo la carga inicial de 2.135 MB (576 kB gzip) a 1.213 MB (351 kB gzip). Los módulos especializados se sirven en fragmentos separados.
 - La autenticación (Clerk) opera en modo de prueba por decisión de costo/alcance — es el primer punto a revisar si el proyecto escala a un uso que lo requiera.
 - Gacetas depende de un servicio externo (Umbral) fuera del control directo del equipo; si Umbral cambia su esquema o deja de operar, el tab Gacetas se degrada.
 - Los datos sísmicos usan un proyecto Supabase separado del principal.
@@ -487,7 +490,7 @@ Cada tab muestra sus fuentes y fechas de corte cuando están disponibles.
 | Hosting | Vercel (plan Hobby) |
 | Persistencia | Supabase (principal + proyecto dedicado de Umbral para Gacetas + proyecto dedicado para Sismos) |
 | Mapas | Leaflet (cargado vía CDN) |
-| Hojas de cálculo | SheetJS / XLSX |
+| Hojas de cálculo | write-excel-file (carga diferida al exportar) |
 | IA — asistente | Groq → Mistral (tool calling) · Gemini → OpenRouter → HuggingFace → Anthropic (respaldo) |
 | IA — cron | Mistral → Gemini → Groq → OpenRouter |
 | Correo | Resend |

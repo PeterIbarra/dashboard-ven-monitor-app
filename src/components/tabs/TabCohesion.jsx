@@ -5,6 +5,8 @@ import { CohesionChart } from "../charts/CohesionChart";
 import { ICG_HISTORY } from "../../data/weekly.js";
 import { BG3, BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "../../constants";
 import { IS_DEPLOYED } from "../../utils";
+import { apiFetch } from "../../lib/apiClient.js";
+import { DataFreshnessBadge } from "../DataFreshnessBadge.jsx";
 
 export function TabCohesion({ liveData = {} }) {
   const mob = useIsMobile();
@@ -28,7 +30,7 @@ export function TabCohesion({ liveData = {} }) {
       // Try Supabase cached ICG first (from cron, no AI call)
       if (IS_DEPLOYED) {
         try {
-          const cacheRes = await fetch("/api/articles?type=icg", { signal: AbortSignal.timeout(6000) });
+          const cacheRes = await apiFetch("/api/articles?type=icg", { timeoutMs:6000 });
           if (cacheRes.ok) {
             const cacheData = await cacheRes.json();
             if (cacheData.cached && cacheData.icg?.index != null) {
@@ -56,7 +58,7 @@ export function TabCohesion({ liveData = {} }) {
         try {
           const latestSitrep = [...ICG_HISTORY].reverse().find(h => h.sitrep && h.score != null);
           const sitrepParam = latestSitrep ? `&sitrep=${latestSitrep.score}` : "";
-          const res = await fetch(`/api/news?source=cohesion${sitrepParam}&_t=${Date.now()}`, { signal: AbortSignal.timeout(30000) });
+          const res = await apiFetch(`/api/news?source=cohesion${sitrepParam}&_t=${Date.now()}`, { timeoutMs:30000 });
           if (res.ok) { const json = await res.json(); if (json.index != null) { setData(json); setDataSource("live"); setLoading(false); return; } }
         } catch (e) { setError(e.message); }
       }
@@ -131,7 +133,7 @@ INSTRUCCIONES:
 
     try {
       if (IS_DEPLOYED) {
-        const res = await fetch("/api/ai", {
+        const res = await apiFetch("/api/ai", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt, max_tokens: 600 }),
@@ -169,7 +171,7 @@ INSTRUCCIONES:
     if (!IS_DEPLOYED) return;
     async function fetchDailyICG() {
       try {
-        const res = await fetch("/api/articles?type=icg_history", { signal: AbortSignal.timeout(6000) });
+        const res = await apiFetch("/api/articles?type=icg_history", { timeoutMs:6000 });
         if (res.ok) {
           const d = await res.json();
           if (d.readings?.length) setDailyICG(d.readings);
@@ -250,6 +252,7 @@ INSTRUCCIONES:
           <div style={{ fontSize:10, fontFamily:font, color:`${MUTED}80`, marginTop:4 }}>
             {new Date(data.fetchedAt).toLocaleString("es-VE",{timeZone:"America/Caracas"})}
           </div>
+          <div style={{ marginTop:5 }}><DataFreshnessBadge timestamp={data.fetchedAt} maxAgeMs={24*3600000} compact /></div>
         </Card>
       </div>
 

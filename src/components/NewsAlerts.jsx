@@ -2,6 +2,8 @@ import { memo, useState, useEffect, useRef } from "react";
 import { Card } from "./Card";
 import { BORDER, TEXT, MUTED, font, fontSans } from "../constants";
 import { IS_DEPLOYED } from "../utils";
+import { apiFetch } from "../lib/apiClient.js";
+import { DataFreshnessBadge } from "./DataFreshnessBadge.jsx";
 
 export const NewsAlerts = memo(function NewsAlerts({ liveData, mob, setTab }) {
   const [alerts, setAlerts] = useState(null);
@@ -20,7 +22,7 @@ export const NewsAlerts = memo(function NewsAlerts({ liveData, mob, setTab }) {
     async function tryCached() {
       if (!IS_DEPLOYED) return false;
       try {
-        const res = await fetch("/api/articles?type=alerts", { signal: AbortSignal.timeout(6000) });
+        const res = await apiFetch("/api/articles?type=alerts", { timeoutMs:6000 });
         if (!res.ok) return false;
         const data = await res.json();
         if (data.cached && data.alerts?.length > 0 && !data.stale) {
@@ -42,7 +44,7 @@ export const NewsAlerts = memo(function NewsAlerts({ liveData, mob, setTab }) {
       let googleNews = [];
       if (IS_DEPLOYED) {
         try {
-          const res = await fetch("/api/gdelt?signal=headlines", { signal: AbortSignal.timeout(12000) });
+          const res = await apiFetch("/api/gdelt?signal=headlines");
           if (res.ok) {
             const h = await res.json();
             googleNews = (h.all || []).filter(a => a.title?.length > 20).slice(0, 15);
@@ -79,7 +81,7 @@ INSTRUCCIONES:
 
       try {
         if (IS_DEPLOYED) {
-          const res = await fetch("/api/ai", {
+          const res = await apiFetch("/api/ai", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ prompt, max_tokens: 600 }),
@@ -151,6 +153,7 @@ INSTRUCCIONES:
             hace {cachedAge < 1 ? "<1h" : cachedAge.toFixed(0) + "h"}
           </span>
         )}
+        <DataFreshnessBadge timestamp={cachedAge == null ? null : Date.now()-(cachedAge*3600000)} maxAgeMs={6*3600000} compact />
         <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Google News + RSS · Clasificación IA</span>
         {loading && <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Clasificando noticias...</span>}
         {status === "error" && !alerts && !loading && <span style={{ fontSize:9, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Reintentando...</span>}

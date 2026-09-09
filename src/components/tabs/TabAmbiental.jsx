@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { BG, BG2, BG3, BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "../../constants";
 import { loadScript, loadCSS } from "../../utils";
+import { apiFetch } from "../../lib/apiClient.js";
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -156,6 +157,7 @@ function buildHistoryWindows(weeks = DEFAULT_HISTORY_WEEKS, anchorDate = new Dat
 
 // ── fetch con timeout compatible con todos los browsers (reemplaza AbortSignal.timeout) ──
 function fetchTimeout(url, ms) {
+  if (url.startsWith("/api/")) return apiFetch(url, { timeoutMs:ms });
   const ctrl = new AbortController();
   const id = setTimeout(() => ctrl.abort(), ms);
   return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(id));

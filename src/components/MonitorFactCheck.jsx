@@ -6,6 +6,7 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { Badge } from "./Badge";
 import { Card } from "./Card";
 import { TwitterTimeline } from "./TwitterTimeline";
+import { apiFetch } from "../lib/apiClient.js";
 
 export function MonitorFactCheck() {
   const mob = useIsMobile();
@@ -30,7 +31,7 @@ export function MonitorFactCheck() {
     async function fetchFactCheck() {
       if (IS_DEPLOYED) {
         try {
-          const res = await fetch("/api/articles?type=factcheck&limit=20", { signal: AbortSignal.timeout(8000) });
+          const res = await apiFetch("/api/articles?type=factcheck&limit=20", { timeoutMs:8000 });
           if (res.ok) { const data = await res.json(); if (data.articles?.length) { setLiveArticles(data.articles.map(a => ({...a, date:a.published_at, isLive:true}))); setSource("supabase"); setLoading(false); return; } }
         } catch {}
       }

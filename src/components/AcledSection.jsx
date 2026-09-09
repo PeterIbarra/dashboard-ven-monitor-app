@@ -5,6 +5,7 @@ import { LeafletMap } from "./LeafletMap";
 import { VZ_MAP } from "../data/static.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, font } from "../constants";
 import { IS_DEPLOYED } from "../utils";
+import { apiFetch } from "../lib/apiClient.js";
 
 export function AcledSection() {
   const mob = useIsMobile();
@@ -23,7 +24,7 @@ export function AcledSection() {
     async function load() {
       setLoading(true);
       try {
-        const res = await fetch("/api/acled?type=events&limit=2000", { signal: AbortSignal.timeout(20000) });
+        const res = await apiFetch("/api/acled?type=events&limit=2000", { timeoutMs:20000 });
         if (res.ok) {
           const data = await res.json();
           const evts = data.data || data || [];
@@ -34,7 +35,7 @@ export function AcledSection() {
         }
       } catch (e) { setError(e.message); }
       try {
-        const res = await fetch("/api/acled?type=cast", { signal: AbortSignal.timeout(15000) });
+        const res = await apiFetch("/api/acled?type=cast", { timeoutMs:15000 });
         if (res.ok) { const data = await res.json(); const p = data.data || data || []; if (Array.isArray(p)) setCast(p); }
       } catch {}
       setLoading(false);

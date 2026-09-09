@@ -8,6 +8,7 @@ import { AMNISTIA_TRACKER } from "../../data/amnistia.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SEM, font, fontSans } from "../../constants";
 import { IS_DEPLOYED, loadScript } from "../../utils";
 import { sanitizeHtml } from "../../sanitize";
+import { apiFetch } from "../../lib/apiClient.js";
 
 export function TabSitrep({ liveData = {}, week }) {
   const mob = useIsMobile();
@@ -38,7 +39,7 @@ export function TabSitrep({ liveData = {}, week }) {
     let newsPolitica = [], newsEconomia = [], newsInternacional = [];
     if (IS_DEPLOYED) {
       try {
-        const headRes = await fetch("/api/gdelt?signal=headlines", { signal: AbortSignal.timeout(12000) });
+        const headRes = await apiFetch("/api/gdelt?signal=headlines");
         if (headRes.ok) {
           const h = await headRes.json();
           newsPolitica = (h.politica || []).filter(a => a.title?.length > 20).slice(0, 6);
@@ -92,7 +93,7 @@ ${rssHeadlines.map(a => `• "${a.title}" [${a.source}]`).join("\n") || "Sin not
 7. Al final, una línea de cierre con la valoración general del día en relación al escenario dominante.`;
 
     try {
-      const res = await fetch("/api/ai", {
+      const res = await apiFetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, max_tokens: 800 }),
@@ -193,7 +194,7 @@ ${Object.keys(liveContext).length > 0 ? JSON.stringify(liveContext, null, 2) : "
       let text = "";
       if (IS_DEPLOYED) {
         // On Vercel: use serverless proxy (Gemini free → Claude fallback)
-        const res = await fetch("/api/ai", {
+        const res = await apiFetch("/api/ai", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt, max_tokens: 2000 }),

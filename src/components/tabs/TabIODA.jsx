@@ -6,6 +6,8 @@ import { Card } from "../Card";
 import { TwitterTimeline } from "../TwitterTimeline";
 import { VE_REGIONS, getPrior, iodaFetch, computeRegionElectric } from "../../lib/iodaElectric";
 import { IODAChoroplethMap } from "../IODAChoroplethMap";
+import { apiFetch } from "../../lib/apiClient.js";
+import { DataFreshnessBadge } from "../DataFreshnessBadge.jsx";
 
 const hoursMap = { "24h":24, "48h":48, "7d":168, "30d":720 };
 
@@ -1115,7 +1117,7 @@ export function TabIODA() {
     }
     const prompt = `Eres un analista de conectividad de internet en Venezuela. Basándote en estos datos de IODA (Georgia Tech), explica de forma clara y concisa qué está ocurriendo con la conectividad en Venezuela en este momento. Si hay caídas, indica posibles causas (censura gubernamental, fallas de infraestructura CANTV, problemas regionales, cortes eléctricos). Si todo está normal, indícalo. Máximo 3 párrafos.\n\nDatos:\n${ctx.join("\n")}`;
     try {
-      const res = await fetch("/api/ai", {
+      const res = await apiFetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, max_tokens: 600 }),
@@ -1405,6 +1407,7 @@ export function TabIODA() {
         <Badge color={source==="live"?"#7c3aed":source==="failed"?"#dc2626":"#a17d08"}>
           {source==="live"?"EN VIVO":source==="failed"?"OFFLINE":"..."}
         </Badge>
+        <DataFreshnessBadge timestamp={signals?.[signals.length-1]?.ts} maxAgeMs={30*60*1000} compact />
         <button onClick={() => changePreset(timePreset)} title="Refrescar datos"
           style={{ fontSize:14, padding:"4px 8px", background:"transparent", border:`1px solid ${BORDER}`,
             cursor:"pointer", borderRadius:4, color:MUTED, lineHeight:1 }}>🔄</button>

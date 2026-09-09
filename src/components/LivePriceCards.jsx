@@ -5,6 +5,8 @@ import { BrentChart } from "./charts/BrentChart";
 import { VenProductionChart } from "./charts/VenProductionChart";
 import { MUTED, font } from "../constants";
 import { IS_DEPLOYED, CORS_PROXIES } from "../utils";
+import { apiFetch } from "../lib/apiClient.js";
+import { DataFreshnessBadge } from "./DataFreshnessBadge.jsx";
 
 export function LivePriceCards() {
   const [prices, setPrices] = useState(null);
@@ -19,7 +21,7 @@ export function LivePriceCards() {
       // Try our Vercel serverless function first (has API key server-side)
       if (IS_DEPLOYED) {
         try {
-          const res = await fetch("/api/oil-prices", { signal: AbortSignal.timeout(20000) });
+          const res = await apiFetch("/api/oil-prices", { timeoutMs:20000 });
           if (res.ok) {
             const data = await res.json();
             if (data.brent || data.wti || data.natgas) {
@@ -153,6 +155,7 @@ export function LivePriceCards() {
             </div>
             <div style={{ fontSize: 9, fontFamily: font, color: MUTED, marginTop: 6 }}>{item.unit} · {item.desc}</div>
             {item.time && <div style={{ fontSize: 7, fontFamily: font, color: `${MUTED}80`, marginTop: 3 }}>{fmtTime(item.time)}</div>}
+            <div style={{ marginTop:5 }}><DataFreshnessBadge timestamp={item.time} maxAgeMs={30*60*1000} compact /></div>
           </Card>
         ))}
       </div>

@@ -14,8 +14,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ClerkProvider
       publishableKey={PUBLISHABLE_KEY}
       afterSignOutUrl="/"
-      afterSignInUrl="/"
-      afterSignUpUrl="/"
+      signInFallbackRedirectUrl="/"
+      signUpFallbackRedirectUrl="/"
     >
       <MonitorPNUD />
     </ClerkProvider>

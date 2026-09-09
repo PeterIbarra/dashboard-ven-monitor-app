@@ -4,6 +4,7 @@ import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "../../con
 import { loadCSS, loadScript } from "../../utils";
 import { EarthquakeEvolution } from "../EarthquakeEvolution";
 import { EARTHQUAKE_HISTORY } from "../../data/earthquakeHistory";
+import { apiFetch } from "../../lib/apiClient.js";
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -139,6 +140,7 @@ function mergeQuakeSources(usgsList, emscList) {
 }
 
 function fetchTimeout(url, ms) {
+  if (url.startsWith("/api/")) return apiFetch(url, { timeoutMs:ms });
   const ctrl = new AbortController();
   const id = setTimeout(() => ctrl.abort(), ms);
   return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(id));

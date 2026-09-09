@@ -1,4 +1,5 @@
 import { IS_DEPLOYED } from "../utils";
+import { apiFetch } from "../lib/apiClient.js";
 
 const UMBRAL_URL = "https://asbimzawahtyrhpwrrld.supabase.co";
 const UMBRAL_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzYmltemF3YWh0eXJocHdycmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzUzMjAsImV4cCI6MjA4NjE1MTMyMH0.sF5JDpw6RC6vb9btaw8SPt78l17hkdphz-0tMWW4MsI";
@@ -7,7 +8,7 @@ const fields = "id,gazette_number,gazette_type,gazette_date,decree_number,change
 
 export async function fetchUmbralGacetas(limit=5000) {
   if (IS_DEPLOYED) {
-    const response = await fetch(`/api/articles?type=gacetas&limit=${limit}`, { signal:AbortSignal.timeout(18000) });
+    const response = await apiFetch(`/api/articles?type=gacetas&limit=${limit}`, { timeoutMs:18000 });
     if (!response.ok) throw new Error(`API Gacetas: ${response.status}`);
     return response.json();
   }

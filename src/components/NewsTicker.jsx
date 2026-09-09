@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { BG, BG2, BORDER, TEXT, MUTED, ACCENT, font, fontSans } from "../constants";
 import { IS_DEPLOYED } from "../utils";
+import { apiFetch } from "../lib/apiClient.js";
 
 export function NewsTicker() {
   const [items, setItems] = useState([]);
@@ -16,7 +17,7 @@ export function NewsTicker() {
       // Fetch Google News headlines
       if (IS_DEPLOYED) {
         try {
-          const newsRes = await fetch("/api/gdelt?signal=headlines", { signal: AbortSignal.timeout(10000) });
+          const newsRes = await apiFetch("/api/gdelt?signal=headlines", { timeoutMs:10000 });
           if (newsRes.ok) {
             const h = await newsRes.json();
             const allNews = (h.all || []).filter(a => a.title?.length > 20).slice(0, 6);
@@ -28,7 +29,7 @@ export function NewsTicker() {
 
         // Fetch Polymarket prices
         try {
-          const pmRes = await fetch("/api/polymarket", { signal: AbortSignal.timeout(10000) });
+          const pmRes = await apiFetch("/api/polymarket", { timeoutMs:10000 });
           if (pmRes.ok) {
             const pm = await pmRes.json();
             (pm.markets || []).slice(0, 6).forEach(m => {

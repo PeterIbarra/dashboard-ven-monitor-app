@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // UTILITIES — Shared functions, env detection, GDELT fetcher
 // ═══════════════════════════════════════════════════════════════
+import { apiFetch } from "./lib/apiClient.js";
 
 // ── Environment detection ──
 // 127.0.0.1 contains dots, so a generic "hostname includes dot" check incorrectly
@@ -114,7 +115,7 @@ async function fetchGdeltSignal(url) {
 export async function fetchAllGdelt() {
   if (IS_DEPLOYED && GDELT_QUERIES.all) {
     try {
-      const res = await fetch(GDELT_QUERIES.all, { signal: AbortSignal.timeout(12000) });
+      const res = await apiFetch(GDELT_QUERIES.all);
       if (res.ok) {
         const json = await res.json();
         if (json.data && json.data.length > 0) return json.data;

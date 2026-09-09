@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SEM, font, fontSans } from "../constants";
 import { sanitizeHtml } from "../sanitize";
+import { apiFetch } from "../lib/apiClient.js";
 
 const MAX_TOOL_ROUNDS = 3;
 
@@ -201,7 +202,7 @@ export function ChatBot({ weeks, liveData, signals, weekDrivers, indicators, sit
         rounds++;
         setLoadingMsg(rounds === 1 ? "analizando consulta..." : `consultando herramientas (ronda ${rounds})...`);
 
-        const res = await fetch("/api/ai", {
+        const res = await apiFetch("/api/ai", {
           method:"POST", headers:{"Content-Type":"application/json"},
           body: JSON.stringify({ messages:cur, use_tools:true, max_tokens:2500 }),
         });
@@ -213,7 +214,7 @@ export function ChatBot({ weeks, liveData, signals, weekDrivers, indicators, sit
           setLoadingMsg("modo alternativo...");
           const ctx = executors.buildFallbackContext();
           const fp = `${ctx}\n\n=== CONVERSACIÓN ===\n${cur.map(m=>`${m.role==="user"?"Usuario":"Asistente"}: ${m.content}`).join("\n\n")}\n\nAsistente:`;
-          const fr = await fetch("/api/ai", { method:"POST", headers:{"Content-Type":"application/json"},
+          const fr = await apiFetch("/api/ai", { method:"POST", headers:{"Content-Type":"application/json"},
             body:JSON.stringify({ prompt:fp, max_tokens:2500 }) });
           const fd = await fr.json();
           if (fd.text) {

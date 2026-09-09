@@ -4,6 +4,7 @@ import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, font } from "../constants";
 import { IS_DEPLOYED } from "../utils";
 import { Badge } from "./Badge";
 import { Card } from "./Card";
+import { apiFetch } from "../lib/apiClient.js";
 
 export function MonitorNoticias() {
   const [liveNews, setLiveNews] = useState([]);
@@ -21,11 +22,11 @@ export function MonitorNoticias() {
     async function fetchNews() {
       if (IS_DEPLOYED) {
         try {
-          const res = await fetch("/api/articles?type=news&limit=30", { signal: AbortSignal.timeout(8000) });
+          const res = await apiFetch("/api/articles?type=news&limit=30", { timeoutMs:8000 });
           if (res.ok) { const data = await res.json(); if (data.articles?.length) { setLiveNews(filterBlocked(data.articles.map(a => ({...a, date:a.published_at, isLive:true})))); setSource("supabase"); setLoading(false); return; } }
         } catch {}
         try {
-          const res = await fetch("/api/news", { signal: AbortSignal.timeout(12000) });
+          const res = await apiFetch("/api/news");
           if (res.ok) { const data = await res.json(); if (data.news?.length) { setLiveNews(filterBlocked(data.news.map(n => ({...n, isLive:true})))); setSource("live"); setLoading(false); return; } }
         } catch {}
       }

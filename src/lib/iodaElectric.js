@@ -16,6 +16,7 @@
 //
 // TabIODA.jsx imports VE_REGIONS / RATIONING_PRIOR / getPrior / iodaFetch
 // / computeRegionElectric from here instead of defining its own copies,
+import { apiFetch } from "./apiClient.js";
 // so both call sites can never drift out of calibration with each other.
 
 import { IS_DEPLOYED, CORS_PROXIES } from "../utils";
@@ -86,7 +87,10 @@ export async function iodaFetch(path, params = {}) {
   for (let attempt = 0; attempt < 2; attempt++) {
     for (const getUrl of urls) {
       try {
-        const res = await fetch(getUrl(), { signal: AbortSignal.timeout(15000), headers: { Accept: "application/json" } });
+        const url = getUrl();
+        const res = url.startsWith("/api/")
+          ? await apiFetch(url, { timeoutMs:15000 })
+          : await fetch(url, { signal:AbortSignal.timeout(15000), headers:{ Accept:"application/json" } });
         if (!res.ok) continue;
         const json = await res.json();
         if (json?.error || !json?.data) continue; // proxy returned error JSON

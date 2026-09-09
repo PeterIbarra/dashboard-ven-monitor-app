@@ -4,6 +4,8 @@ import { Badge } from "./Badge";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, font } from "../constants";
 import { IS_DEPLOYED } from "../utils";
 import { SOCIOECONOMIC_LOCAL, MACRO_LATEST_CUT } from "../data/macroLatest.js";
+import { apiFetch } from "../lib/apiClient.js";
+import { DataFreshnessBadge } from "./DataFreshnessBadge.jsx";
 
 export function SocioeconomicPanel({ mob }) {
   const [data, setData] = useState(null);
@@ -11,7 +13,7 @@ export function SocioeconomicPanel({ mob }) {
 
   useEffect(() => {
     if (!IS_DEPLOYED) { setLoading(false); return; }
-    fetch("/api/socioeconomic", { signal: AbortSignal.timeout(15000) })
+    apiFetch("/api/socioeconomic", { timeoutMs:15000 })
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setData(d); setLoading(false); })
       .catch(() => setLoading(false));
@@ -165,6 +167,7 @@ export function SocioeconomicPanel({ mob }) {
 
       {/* Sources */}
       <div style={{ fontSize:8, fontFamily:font, color:`${MUTED}50`, textAlign:"center", padding:"4px 0" }}>
+        <DataFreshnessBadge timestamp={data.fetchedAt} maxAgeMs={7*24*3600000} compact />{" · "}
         Fuentes: World Bank Open Data (api.worldbank.org) · IMF World Economic Outlook · UNHCR/R4V · Datos anuales, actualización automática · {data.indicators?.length || 0} indicadores · Último fetch: {new Date(data.fetchedAt).toLocaleString("es")}
       </div>
     </div>

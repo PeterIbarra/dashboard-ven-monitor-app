@@ -16,6 +16,7 @@ import { GacetasMiniWidget } from "../GacetasMiniWidget";
 import { MacroPulseWidget } from "../MacroPulseWidget";
 import { WEEKS, KPIS_LATEST, TENSIONS, CONF_SEMANAL } from "../../data/weekly.js";
 import { SCENARIOS } from "../../data/static.js";
+import { apiFetch } from "../../lib/apiClient.js";
 import { AMNISTIA_TRACKER, FORO_PENAL_LATEST } from "../../data/amnistia.js";
 import { BG2, BG3, BORDER, TEXT, MUTED, ACCENT, SC, SEM, font, fontSans } from "../../constants";
 import { computeInstabilityIndex } from "../../lib/instabilityIndex";
@@ -36,7 +37,7 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
     if (!fpOpen || fpData) return;
     setFpLoading(true);
     setFpError(null);
-    fetch("/api/gdelt?source=foropenal")
+    apiFetch("/api/gdelt?source=foropenal")
       .then(r => r.json())
       .then(d => {
         if (d.error) { setFpError(d.error); } else { setFpData(d); }
@@ -455,7 +456,7 @@ Párrafo 1: Explica por qué el índice está en ${displayIndex}/100. Identifica
 Párrafo 2: Qué vigilar esta semana y qué podría hacer que el índice suba o baje. Menciona riesgos específicos basados en los datos.
 
 No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. Escribe en prosa analítica fluida.`;
-                  const res = await fetch("/api/ai", {
+                  const res = await apiFetch("/api/ai", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ prompt, max_tokens: 500 }),
@@ -751,7 +752,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
                         onClick={(e) => {
                           e.stopPropagation();
                           setFpData(null); setFpLoading(true); setFpError(null);
-                          fetch("/api/gdelt?source=foropenal")
+                          apiFetch("/api/gdelt?source=foropenal")
                             .then(r=>r.json())
                             .then(d=>{ if(d.error) setFpError(d.error); else setFpData(d); })
                             .catch(e=>setFpError(e.message))

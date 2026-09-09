@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { lazy, Suspense, useState, useEffect } from "react";
+import { apiFetch } from "./lib/apiClient.js";
 
 // ═══════════════════════════════════════════════════════════════
 // DATA
@@ -26,24 +27,27 @@ import { Badge } from "./components/Badge";
 // TABS & LAYOUT COMPONENTS
 // ═══════════════════════════════════════════════════════════════
 import { TabDashboard } from "./components/tabs/TabDashboard";
-import { TabSitrep } from "./components/tabs/TabSitrep";
-import { TabMatriz } from "./components/tabs/TabMatriz";
-import { TabMonitor } from "./components/tabs/TabMonitor";
-import { TabGacetas } from "./components/tabs/TabGacetas";
-import { TabClimaSocial } from "./components/tabs/TabClimaSocial";
-import { TabOpinionPublica } from "./components/tabs/TabOpinionPublica";
-import { TabGdelt } from "./components/tabs/TabGdelt";
-import { TabConflictividad } from "./components/tabs/TabConflictividad";
-import { TabIODA } from "./components/tabs/TabIODA";
 import { computeRegionElectric, summarizeNationalElectric } from "./lib/iodaElectric";
-import { TabMercados } from "./components/tabs/TabMercados";
-import { TabMacro } from "./components/tabs/TabMacro";
-import { TabAmbiental } from "./components/tabs/TabAmbiental";
-import { TabSismos } from "./components/tabs/TabSismos";
 import { NewsTicker } from "./components/NewsTicker";
 import { MethodologyFooter } from "./components/MethodologyFooter";
 import { AuthGate, UserButton } from "./components/AuthGate";
 import { ChatBot } from "./components/ChatBot";
+import { ModuleBoundary, ModuleLoading } from "./components/ModuleBoundary";
+
+const lazyNamed = (loader, name) => lazy(() => loader().then(module => ({ default:module[name] })));
+const TabSitrep = lazyNamed(() => import("./components/tabs/TabSitrep"), "TabSitrep");
+const TabMatriz = lazyNamed(() => import("./components/tabs/TabMatriz"), "TabMatriz");
+const TabMonitor = lazyNamed(() => import("./components/tabs/TabMonitor"), "TabMonitor");
+const TabGacetas = lazyNamed(() => import("./components/tabs/TabGacetas"), "TabGacetas");
+const TabClimaSocial = lazyNamed(() => import("./components/tabs/TabClimaSocial"), "TabClimaSocial");
+const TabOpinionPublica = lazyNamed(() => import("./components/tabs/TabOpinionPublica"), "TabOpinionPublica");
+const TabGdelt = lazyNamed(() => import("./components/tabs/TabGdelt"), "TabGdelt");
+const TabConflictividad = lazyNamed(() => import("./components/tabs/TabConflictividad"), "TabConflictividad");
+const TabIODA = lazyNamed(() => import("./components/tabs/TabIODA"), "TabIODA");
+const TabMercados = lazyNamed(() => import("./components/tabs/TabMercados"), "TabMercados");
+const TabMacro = lazyNamed(() => import("./components/tabs/TabMacro"), "TabMacro");
+const TabAmbiental = lazyNamed(() => import("./components/tabs/TabAmbiental"), "TabAmbiental");
+const TabSismos = lazyNamed(() => import("./components/tabs/TabSismos"), "TabSismos");
 
 const PNUD_LOGO_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 44" shape-rendering="crispEdges"><rect width="32" height="22" fill="#0468B1"/><rect x="11" y="2" width="10" height="1" fill="white"/><rect x="9" y="3" width="2" height="1" fill="white"/><rect x="21" y="3" width="2" height="1" fill="white"/><rect x="8" y="4" width="1" height="1" fill="white"/><rect x="23" y="4" width="1" height="1" fill="white"/><rect x="7" y="5" width="1" height="3" fill="white"/><rect x="24" y="5" width="1" height="3" fill="white"/><rect x="7" y="8" width="1" height="3" fill="white"/><rect x="24" y="8" width="1" height="3" fill="white"/><rect x="7" y="11" width="1" height="3" fill="white"/><rect x="24" y="11" width="1" height="3" fill="white"/><rect x="8" y="14" width="1" height="1" fill="white"/><rect x="23" y="14" width="1" height="1" fill="white"/><rect x="9" y="15" width="2" height="1" fill="white"/><rect x="21" y="15" width="2" height="1" fill="white"/><rect x="11" y="16" width="10" height="1" fill="white"/><rect x="15" y="3" width="2" height="14" fill="white" opacity="0.5"/><rect x="8" y="9" width="16" height="1" fill="white" opacity="0.5"/><rect x="13" y="4" width="6" height="1" fill="white" opacity="0.4"/><rect x="12" y="5" width="1" height="1" fill="white" opacity="0.4"/><rect x="19" y="5" width="1" height="1" fill="white" opacity="0.4"/><rect x="11" y="6" width="1" height="2" fill="white" opacity="0.4"/><rect x="20" y="6" width="1" height="2" fill="white" opacity="0.4"/><rect x="11" y="10" width="1" height="2" fill="white" opacity="0.4"/><rect x="20" y="10" width="1" height="2" fill="white" opacity="0.4"/><rect x="12" y="13" width="1" height="1" fill="white" opacity="0.4"/><rect x="19" y="13" width="1" height="1" fill="white" opacity="0.4"/><rect x="13" y="14" width="6" height="1" fill="white" opacity="0.4"/><rect x="5" y="5" width="1" height="1" fill="white" opacity="0.6"/><rect x="4" y="6" width="1" height="2" fill="white" opacity="0.6"/><rect x="4" y="8" width="1" height="3" fill="white" opacity="0.6"/><rect x="4" y="11" width="1" height="2" fill="white" opacity="0.6"/><rect x="5" y="13" width="1" height="1" fill="white" opacity="0.6"/><rect x="26" y="5" width="1" height="1" fill="white" opacity="0.6"/><rect x="27" y="6" width="1" height="2" fill="white" opacity="0.6"/><rect x="27" y="8" width="1" height="3" fill="white" opacity="0.6"/><rect x="27" y="11" width="1" height="2" fill="white" opacity="0.6"/><rect x="26" y="13" width="1" height="1" fill="white" opacity="0.6"/><rect x="15" y="17" width="2" height="2" fill="white" opacity="0.5"/><rect x="13" y="18" width="1" height="1" fill="white" opacity="0.4"/><rect x="18" y="18" width="1" height="1" fill="white" opacity="0.4"/><rect y="22" width="32" height="1" fill="#e8ecf0"/><rect y="23" width="15" height="10" fill="#0468B1"/><rect x="17" y="23" width="15" height="10" fill="#0468B1"/><rect y="33" width="32" height="1" fill="#e8ecf0"/><rect y="34" width="15" height="10" fill="#0468B1"/><rect x="17" y="34" width="15" height="10" fill="#0468B1"/><rect x="3" y="25" width="1" height="6" fill="white"/><rect x="4" y="25" width="3" height="1" fill="white"/><rect x="7" y="25" width="1" height="3" fill="white"/><rect x="4" y="28" width="3" height="1" fill="white"/><rect x="20" y="25" width="1" height="6" fill="white"/><rect x="21" y="26" width="1" height="1" fill="white"/><rect x="22" y="27" width="1" height="1" fill="white"/><rect x="23" y="28" width="1" height="1" fill="white"/><rect x="24" y="29" width="1" height="1" fill="white"/><rect x="25" y="25" width="1" height="6" fill="white"/><rect x="3" y="36" width="1" height="6" fill="white"/><rect x="9" y="36" width="1" height="6" fill="white"/><rect x="4" y="41" width="5" height="1" fill="white"/><rect x="20" y="36" width="1" height="6" fill="white"/><rect x="21" y="36" width="3" height="1" fill="white"/><rect x="24" y="37" width="1" height="4" fill="white"/><rect x="21" y="41" width="3" height="1" fill="white"/></svg>';
 const PNUD_LOGO = "data:image/svg+xml," + encodeURIComponent(PNUD_LOGO_SVG);
@@ -133,7 +137,7 @@ export default function MonitorPNUD() {
       try {
         // Dolar
         const dolarUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
-        const dRes = await fetch(dolarUrl, { signal:AbortSignal.timeout(8000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+        const dRes = await (dolarUrl.startsWith("/api/") ? apiFetch(dolarUrl, { timeoutMs:8000 }) : fetch(dolarUrl, { signal:AbortSignal.timeout(8000) })).then(r=>r.json()).catch(()=>null);
         if (dRes && Array.isArray(dRes)) {
           const o = dRes.find(d=>d.fuente==="oficial"), p = dRes.find(d=>d.fuente==="paralelo");
           if (o?.promedio || p?.promedio) results.dolar = { bcv:o?.promedio, paralelo:p?.promedio, brecha: o?.promedio && p?.promedio ? (((p.promedio-o.promedio)/o.promedio)*100).toFixed(1)+"%" : null };
@@ -143,7 +147,7 @@ export default function MonitorPNUD() {
         // Oil prices
         const oilUrl = IS_DEPLOYED ? "/api/oil-prices" : null;
         if (oilUrl) {
-          const oRes = await fetch(oilUrl, { signal:AbortSignal.timeout(12000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          const oRes = await apiFetch(oilUrl).then(r=>r.json()).catch(()=>null);
           if (oRes) results.oil = { brent:oRes.brent?.price, wti:oRes.wti?.price, gas:oRes.natgas?.price, source:oRes.source || "unknown" };
         }
       } catch {}
@@ -151,7 +155,7 @@ export default function MonitorPNUD() {
         // News headlines (top 5)
         const newsUrl = IS_DEPLOYED ? "/api/news" : null;
         if (newsUrl) {
-          const nRes = await fetch(newsUrl, { signal:AbortSignal.timeout(8000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          const nRes = await apiFetch(newsUrl, { timeoutMs:8000 }).then(r=>r.json()).catch(()=>null);
           if (nRes?.news?.length) results.news = nRes.news.slice(0,5).map(n => n.title || n.headline || "").filter(Boolean);
         }
       } catch {}
@@ -159,7 +163,7 @@ export default function MonitorPNUD() {
         // GDELT tone via proxy (avoids CORS — proxy has the data)
         const gdeltUrl = IS_DEPLOYED ? "/api/gdelt" : null;
         if (gdeltUrl) {
-          const gRes = await fetch(gdeltUrl, { signal:AbortSignal.timeout(8000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          const gRes = await apiFetch(gdeltUrl, { timeoutMs:8000 }).then(r=>r.json()).catch(()=>null);
           if (gRes?.data?.length > 0) {
             const last7 = gRes.data.slice(-7);
             const tones = last7.map(d => d.tone).filter(v => v != null);
@@ -175,14 +179,14 @@ export default function MonitorPNUD() {
         // Bilateral Threat Index (PizzINT/GDELT)
         const bilUrl = IS_DEPLOYED ? `/api/bilateral?_t=${Math.floor(Date.now()/600000)}` : null;
         if (bilUrl) {
-          const bRes = await fetch(bilUrl, { signal:AbortSignal.timeout(12000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          const bRes = await apiFetch(bilUrl).then(r=>r.json()).catch(()=>null);
           if (bRes?.latest) results.bilateral = bRes;
         }
       } catch {}
       try {
         // Government Cohesion Index (ICG) — from Supabase cache (cron saves every 8h)
         if (IS_DEPLOYED) {
-          const cRes = await fetch(`/api/articles?type=icg&_t=${Math.floor(Date.now()/600000)}`, { signal:AbortSignal.timeout(6000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+          const cRes = await apiFetch(`/api/articles?type=icg&_t=${Math.floor(Date.now()/600000)}`, { timeoutMs:6000 }).then(r=>r.json()).catch(()=>null);
           if (cRes?.cached && cRes.icg?.index != null) {
             const icg = cRes.icg;
             const level = icg.index >= 75 ? "ALTA" : icg.index >= 55 ? "MEDIA" : icg.index >= 35 ? "BAJA" : "CRITICA";
@@ -212,7 +216,7 @@ export default function MonitorPNUD() {
           // Helper: fetch IODA endpoint
           const iodaGet = async (path, params) => {
             const qs = Object.entries(params).map(([k,v])=>`${k}=${v}`).join("&");
-            return fetch(`/api/ioda?path=${path}&${qs}`, { signal:AbortSignal.timeout(10000) }).then(r=>r.ok?r.json():null).catch(()=>null);
+            return apiFetch(`/api/ioda?path=${path}&${qs}`, { timeoutMs:10000 }).then(r=>r.json()).catch(()=>null);
           };
           
           // National health from signals/raw (last 6h)
@@ -512,20 +516,24 @@ export default function MonitorPNUD() {
 
       {/* CONTENT */}
       <div style={{ maxWidth:1340, margin:"0 auto", padding:mob?"12px 10px 40px":"24px 24px 60px" }}>
-        {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} setTab={setTab} setOpinionSection={setOpinionSection} setSismosSection={setSismosSection} setMacroSection={setMacroSection} />}
-        {tab === "sitrep" && <TabSitrep week={week} liveData={liveData} />}
-        {tab === "matriz" && <TabMatriz />}
-        {tab === "monitor" && <TabMonitor />}
-        {tab === "gacetas" && <TabGacetas />}
-        {tab === "clima" && <TabClimaSocial liveData={liveData} />}
-        {tab === "opinion" && <TabOpinionPublica section={opinionSection} setSection={setOpinionSection} />}
-        {tab === "gdelt" && <TabGdelt />}
-        {tab === "conflictividad" && <TabConflictividad />}
-        {tab === "ioda" && <TabIODA />}
-        {tab === "mercados" && <TabMercados />}
-        {tab === "macro" && <TabMacro section={macroSection} setSection={setMacroSection} />}
-        {tab === "ambiental" && <TabAmbiental />}
-        {tab === "sismos" && <TabSismos subView={sismosSection} setSubView={setSismosSection} />}
+        <ModuleBoundary key={tab} name={TABS.find(item => item.id === tab)?.label || "el módulo"}>
+          <Suspense fallback={<ModuleLoading name={TABS.find(item => item.id === tab)?.label || "módulo"} />}>
+            {tab === "dashboard" && <TabDashboard week={week} liveData={liveData} setTab={setTab} setOpinionSection={setOpinionSection} setSismosSection={setSismosSection} setMacroSection={setMacroSection} />}
+            {tab === "sitrep" && <TabSitrep week={week} liveData={liveData} />}
+            {tab === "matriz" && <TabMatriz />}
+            {tab === "monitor" && <TabMonitor />}
+            {tab === "gacetas" && <TabGacetas />}
+            {tab === "clima" && <TabClimaSocial liveData={liveData} />}
+            {tab === "opinion" && <TabOpinionPublica section={opinionSection} setSection={setOpinionSection} />}
+            {tab === "gdelt" && <TabGdelt />}
+            {tab === "conflictividad" && <TabConflictividad />}
+            {tab === "ioda" && <TabIODA />}
+            {tab === "mercados" && <TabMercados />}
+            {tab === "macro" && <TabMacro section={macroSection} setSection={setMacroSection} />}
+            {tab === "ambiental" && <TabAmbiental />}
+            {tab === "sismos" && <TabSismos subView={sismosSection} setSubView={setSismosSection} />}
+          </Suspense>
+        </ModuleBoundary>
       </div>
 
       {/* FOOTER + METHODOLOGY */}
