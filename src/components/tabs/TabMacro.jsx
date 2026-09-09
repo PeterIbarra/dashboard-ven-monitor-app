@@ -270,8 +270,8 @@ export function TabMacro({ section, setSection }) {
 
         {dolar?.updated && (
           <div style={{ fontSize:9, fontFamily:font, color:`${MUTED}60`, marginTop:8 }}>
-            <DataFreshnessBadge timestamp={dolar.updated} maxAgeMs={15*60*1000} compact />{" · "}
-            Fuente: DolarAPI.com (ve.dolarapi.com) · Última actualización: {new Date(dolar.updated).toLocaleString("es")} · Refresco cada 5 min
+            <DataFreshnessBadge timestamp={dolar.updated} maxAgeMs={36*3600000} freshLabel="VIGENTE" compact />{" · "}
+            Fuente: DolarAPI.com (ve.dolarapi.com) · Fecha del dato: {new Date(dolar.updated).toLocaleString("es")} · Consulta automática cada 5 min
           </div>
         )}
       </>)}

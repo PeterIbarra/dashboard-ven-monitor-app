@@ -16,10 +16,12 @@ function ageLabel(ageMs) {
   return `Actualizado hace ${Math.floor(hours / 24)} d`;
 }
 
-export function DataFreshnessBadge({ timestamp, payload, maxAgeMs, compact = false }) {
+export function DataFreshnessBadge({ timestamp, payload, maxAgeMs, compact = false, freshLabel }) {
   const freshness = getDataFreshness(timestamp ? { updatedAt:timestamp } : payload, { maxAgeMs });
   const state = STATES[freshness.status];
-  const label = compact && freshness.status === "fresh" ? "AL DÍA" : state.label;
+  const label = freshness.status === "fresh"
+    ? (freshLabel || (compact ? "AL DÍA" : state.label))
+    : state.label;
   const detail = ageLabel(freshness.ageMs);
   return (
     <span title={detail} aria-label={`${state.label}. ${detail}`} style={{
