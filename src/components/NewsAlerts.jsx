@@ -10,10 +10,21 @@ export const NewsAlerts = memo(function NewsAlerts({ liveData, mob, setTab }) {
   const [loading, setLoading] = useState(false);
   const [provider, setProvider] = useState("");
   const [status, setStatus] = useState("waiting"); // waiting | loading | done | error
+  const [refreshKey, setRefreshKey] = useState(0);
   const attempted = useRef(false);
   const retryTimers = useRef([]);
 
   const [cachedAge, setCachedAge] = useState(null);
+  const [classifiedAt, setClassifiedAt] = useState(null);
+
+  const retry = () => {
+    attempted.current = false;
+    retryTimers.current.forEach(timer => clearTimeout(timer));
+    retryTimers.current = [];
+    setProvider("");
+    setStatus("waiting");
+    setRefreshKey(key => key + 1);
+  };
 
   useEffect(() => {
     if (attempted.current || !liveData?.fetched) return;
@@ -26,10 +37,13 @@ export const NewsAlerts = memo(function NewsAlerts({ liveData, mob, setTab }) {
         const res = await apiFetch("/api/articles?type=alerts", { timeoutMs:6000 });
         if (!res.ok) return false;
         const data = await res.json();
-        if (data.cached && data.alerts?.length > 0 && !data.stale) {
+        // The cron runs daily, so keep the last successful classification visible
+        // beyond the API's shorter freshness window.
+        if (data.cached && data.alerts?.length > 0) {
           setAlerts(data.alerts.slice(0, 8));
           setProvider(data.provider || "cached");
           setCachedAge(data.age_hours);
+          setClassifiedAt(data.classified_at || null);
           setStatus("done");
           return true;
         }
@@ -90,16 +104,23 @@ INSTRUCCIONES:
           });
           if (res.ok) {
             const data = await res.json();
-            if (data.provider) setProvider(data.provider);
             if (data.text) {
               try {
-                const clean = data.text.replace(/```json\s?|```/g, "").trim();
+                const clean = data.text.replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/```(?:json)?\s?|```/gi, "").trim();
                 const parsed = JSON.parse(clean);
-                if (Array.isArray(parsed) && parsed.length > 0) { setAlerts(parsed.slice(0, 8)); setLoading(false); setStatus("done"); return true; }
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                  setAlerts(parsed.slice(0, 8)); setProvider(data.provider || "ia");
+                  setClassifiedAt(new Date().toISOString()); setCachedAge(0);
+                  setLoading(false); setStatus("done"); return true;
+                }
               } catch {
-                const match = data.text.match(/\[[\s\S]*\]/);
+                const match = data.text.replace(/<think>[\s\S]*?<\/think>/gi, "").match(/\[[\s\S]*\]/);
                 if (match) {
-                  try { const p = JSON.parse(match[0]); if (Array.isArray(p) && p.length > 0) { setAlerts(p.slice(0, 8)); setLoading(false); setStatus("done"); return true; } } catch {}
+                  try { const p = JSON.parse(match[0]); if (Array.isArray(p) && p.length > 0) {
+                    setAlerts(p.slice(0, 8)); setProvider(data.provider || "ia");
+                    setClassifiedAt(new Date().toISOString()); setCachedAge(0);
+                    setLoading(false); setStatus("done"); return true;
+                  } } catch {}
                 }
               }
             }
@@ -133,7 +154,7 @@ INSTRUCCIONES:
       retryTimers.current.forEach(timer => clearTimeout(timer));
       retryTimers.current = [];
     };
-  }, [liveData?.fetched]);
+  }, [liveData?.fetched, refreshKey]);
 
   if (status === "waiting") return null;
 
@@ -160,10 +181,13 @@ INSTRUCCIONES:
             hace {cachedAge < 1 ? "<1h" : cachedAge.toFixed(0) + "h"}
           </span>
         )}
-        <DataFreshnessBadge timestamp={cachedAge == null ? null : Date.now()-(cachedAge*3600000)} maxAgeMs={6*3600000} compact />
+        {(alerts || loading) && <DataFreshnessBadge timestamp={classifiedAt} maxAgeMs={26*3600000} compact />}
         <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Google News + RSS · Clasificación IA</span>
         {loading && <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Clasificando noticias...</span>}
         {status === "error" && !alerts && !loading && <span style={{ fontSize:9, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Reintentando...</span>}
+        {(status === "error" || status === "unavailable") && !loading && (
+          <button onClick={retry} style={{ marginLeft:"auto", border:`1px solid ${BORDER}`, background:"#fff", color:TEXT, padding:"4px 8px", fontSize:9, fontFamily:font, cursor:"pointer" }}>Reintentar</button>
+        )}
       </div>
       {status === "error" && !alerts && !loading && (
         <div style={{ fontSize:11, fontFamily:font, color:MUTED, padding:"12px", textAlign:"center", border:`1px dashed ${BORDER}`, borderRadius:4 }}>
