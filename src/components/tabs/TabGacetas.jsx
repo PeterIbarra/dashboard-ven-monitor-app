@@ -14,7 +14,11 @@ export function TabGacetas() {
   const [selectedDate,setSelectedDate]=useState(null), [gazetteType,setGazetteType]=useState("Todos");
   const [selectedOrganism,setSelectedOrganism]=useState(null), [institutionsOpen,setInstitutionsOpen]=useState(false);
   const [page,setPage]=useState(1), [pageSize,setPageSize]=useState(25);
-  useEffect(()=>{ fetchUmbralGacetas().then(setData).catch(e=>setError(e.message)).finally(()=>setLoading(false)); },[]);
+  const load = (force=false) => {
+    setLoading(true); setError(null);
+    fetchUmbralGacetas(5000, { force }).then(setData).catch(e=>setError(e.message)).finally(()=>setLoading(false));
+  };
+  useEffect(()=>{ load(); },[]);
   const records=data?.records||[];
   const types=["Todos",...new Set(records.map(r=>r.change_label).filter(Boolean))];
   const filtered=useMemo(()=>records.filter(r=>{
@@ -54,7 +58,7 @@ export function TabGacetas() {
       <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"baseline",flexWrap:"wrap",marginBottom:9}}><div style={{fontSize:11,fontWeight:800,color:TEXT}}>Novedades institucionales · {WEEKLY_INSTITUTIONAL.period}</div><div style={{fontSize:8,color:MUTED,fontFamily:font}}>{WEEKLY_INSTITUTIONAL.note}</div></div>
       <div style={{display:"grid",gridTemplateColumns:mob?"1fr":"repeat(5,1fr)",gap:7}}>{WEEKLY_INSTITUTIONAL.items.map(item=><div key={item.title} style={{border:`1px solid ${BORDER}`,borderTop:`3px solid ${item.color}`,padding:"9px 10px",background:"#fff"}}><div style={{fontSize:7,color:item.color,fontFamily:font,textTransform:"uppercase",fontWeight:800,marginBottom:4}}>{item.type}</div><div style={{fontSize:10,fontWeight:800,color:TEXT,lineHeight:1.25,marginBottom:4}}>{item.title}</div><div style={{fontSize:8,color:MUTED,lineHeight:1.45}}>{item.text}</div></div>)}</div>
     </Card>
-    {error&&<Card accent="#dc2626"><div style={{color:"#dc2626",fontSize:11}}>No se pudo consultar la fuente externa: {error}.</div></Card>}
+    {error&&<Card accent="#dc2626"><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,color:"#dc2626",fontSize:11}}>No se pudo consultar la fuente externa: {error}. <button onClick={()=>load(true)} style={{border:"1px solid #dc262650",background:"#fff",color:"#dc2626",padding:"6px 10px",fontSize:9,cursor:"pointer"}}>Reintentar</button></div></Card>}
     {!error&&<>
       <div style={{display:"grid",gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)",gap:8}}>{[
         [records.length,"Cambios totales",ACCENT],[ordinary,"Gacetas ordinarias","#0f766e"],[extraordinary,"Gacetas extraordinarias","#8b5cf6"],[designations,"Designaciones","#0468B1"],[militaryPeople,"Personas militares","#ca8a04"],[militaryPosts,"Cargos militares","#f97316"],[`${militaryDesignationPct.toFixed(0)}%`,"Designaciones de militares","#dc2626"],[organismCount,"Organismos identificados","#64748b"]

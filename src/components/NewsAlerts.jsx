@@ -11,6 +11,7 @@ export const NewsAlerts = memo(function NewsAlerts({ liveData, mob, setTab }) {
   const [provider, setProvider] = useState("");
   const [status, setStatus] = useState("waiting"); // waiting | loading | done | error
   const attempted = useRef(false);
+  const retryTimers = useRef([]);
 
   const [cachedAge, setCachedAge] = useState(null);
 
@@ -116,16 +117,22 @@ INSTRUCCIONES:
       if (cached) return;
       // Live fallback with retries: 4s, then 60s, then 180s
       const attempt = (delay, remaining) => {
-        setTimeout(async () => {
+        const timer = setTimeout(async () => {
           const success = await classifyNewsLive();
           if (!success && remaining > 0) {
             attempt(remaining > 1 ? 60000 : 180000, remaining - 1);
           }
         }, delay);
+        retryTimers.current.push(timer);
       };
-      attempt(4000, 2);
+      if (IS_DEPLOYED) attempt(4000, 2);
+      else setStatus("unavailable");
     }
     run();
+    return () => {
+      retryTimers.current.forEach(timer => clearTimeout(timer));
+      retryTimers.current = [];
+    };
   }, [liveData?.fetched]);
 
   if (status === "waiting") return null;
@@ -161,6 +168,11 @@ INSTRUCCIONES:
       {status === "error" && !alerts && !loading && (
         <div style={{ fontSize:11, fontFamily:font, color:MUTED, padding:"12px", textAlign:"center", border:`1px dashed ${BORDER}`, borderRadius:4 }}>
           Esperando clasificación IA — reintentando automáticamente
+        </div>
+      )}
+      {status === "unavailable" && !alerts && (
+        <div style={{ fontSize:11, fontFamily:font, color:MUTED, padding:"12px", textAlign:"center", border:`1px dashed ${BORDER}`, borderRadius:4 }}>
+          Clasificación en vivo disponible al desplegar · en local se conserva el resto del dashboard sin bloquear la carga
         </div>
       )}
       {alerts && alerts.map((a, i) => (

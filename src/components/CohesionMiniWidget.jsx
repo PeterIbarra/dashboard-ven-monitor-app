@@ -14,11 +14,14 @@ export const CohesionMiniWidget = memo(function CohesionMiniWidget({ liveData = 
   const statusLabel = {ALINEADO:"Alineado",NEUTRO:"Neutro",TENSION:"Tensión",SILENCIO:"Silencio"};
 
   if (!data) {
+    const finishedWithoutData = liveData?.fetched;
     return (
       <div style={{ border:`1px solid ${BORDER}`, background:BG2, padding:"10px 14px", display:"flex", alignItems:"center", gap:10 }}>
         <span style={{ fontSize:14 }}>🏛</span>
-        <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>COHESIÓN DE GOBIERNO · Cargando...</span>
-        <span style={{ width:6, height:6, borderRadius:"50%", background:MUTED, animation:"pulse 1.5s infinite", marginLeft:"auto" }} />
+        <span style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em" }}>
+          COHESIÓN DE GOBIERNO · {finishedWithoutData ? "Sin dato en vivo" : "Cargando…"}
+        </span>
+        <span style={{ width:6, height:6, borderRadius:"50%", background:finishedWithoutData?"#ca8a04":MUTED, animation:finishedWithoutData?"none":"pulse 1.5s infinite", marginLeft:"auto" }} />
       </div>
     );
   }

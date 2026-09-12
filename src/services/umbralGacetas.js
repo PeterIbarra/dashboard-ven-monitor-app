@@ -5,8 +5,11 @@ const UMBRAL_URL = "https://asbimzawahtyrhpwrrld.supabase.co";
 const UMBRAL_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzYmltemF3YWh0eXJocHdycmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzUzMjAsImV4cCI6MjA4NjE1MTMyMH0.sF5JDpw6RC6vb9btaw8SPt78l17hkdphz-0tMWW4MsI";
 const headers = { apikey:UMBRAL_ANON, Authorization:`Bearer ${UMBRAL_ANON}` };
 const fields = "id,gazette_number,gazette_type,gazette_date,decree_number,change_type,change_label,person_name,post_or_position,institution,organism,is_military_person,military_rank,is_military_post,summary";
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const cache = new Map();
+const pending = new Map();
 
-export async function fetchUmbralGacetas(limit=5000) {
+async function requestUmbralGacetas(limit) {
   if (IS_DEPLOYED) {
     const response = await apiFetch(`/api/articles?type=gacetas&limit=${limit}`, { timeoutMs:18000 });
     if (!response.ok) throw new Error(`API Gacetas: ${response.status}`);
@@ -26,6 +29,22 @@ export async function fetchUmbralGacetas(limit=5000) {
     if(page.length<pageSize) break;
   }
   return { records, total:records.length, batchUpdatedAt:batch.uploaded_at, source:"Umbral / Gaceta Oficial", external:true, sourceUrl:"https://www.umbral.watch/installing-democracy" };
+}
+
+export async function fetchUmbralGacetas(limit=5000, { force=false }={}) {
+  const key = Math.min(limit, 5000);
+  const cached = cache.get(key);
+  if (!force && cached && Date.now() - cached.savedAt < CACHE_TTL_MS) return cached.data;
+  if (!force && pending.has(key)) return pending.get(key);
+
+  const request = requestUmbralGacetas(key)
+    .then(data => {
+      cache.set(key, { data, savedAt:Date.now() });
+      return data;
+    })
+    .finally(() => pending.delete(key));
+  pending.set(key, request);
+  return request;
 }
 
 export const gacetaOfficialUrl = number => `http://www.gacetaoficial.gob.ve/gacetas/${number}`;

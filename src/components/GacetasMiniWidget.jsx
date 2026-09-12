@@ -5,8 +5,14 @@ import { BORDER,MUTED,TEXT,font } from "../constants";
 
 export function GacetasMiniWidget({setTab}){
   const [data,setData]=useState(null);
+  const [error,setError]=useState(null);
+  const [loading,setLoading]=useState(true);
   const [expanded,setExpanded]=useState(false);
-  useEffect(()=>{fetchUmbralGacetas().then(setData).catch(()=>{});},[]);
+  const load = (force=false) => {
+    setLoading(true); setError(null);
+    fetchUmbralGacetas(5000, { force }).then(setData).catch(e=>setError(e.message)).finally(()=>setLoading(false));
+  };
+  useEffect(()=>{ load(); },[]);
   const records=data?.records||[];
   const latestDate=records[0]?.gazette_date;
   const latest=latestDate?records.filter(r=>r.gazette_date===latestDate):[];
@@ -22,7 +28,7 @@ export function GacetasMiniWidget({setTab}){
   return <Card accent="#0f766e" style={{padding:0,overflow:"hidden"}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,flexWrap:"wrap",padding:"10px 14px",borderBottom:expanded?`1px solid ${BORDER}`:"none"}}>
       <div><div style={{fontSize:10,color:"#0f766e",fontFamily:font,fontWeight:800,textTransform:"uppercase",letterSpacing:".12em"}}>Monitor de Gacetas Oficiales</div><div style={{fontSize:9,color:MUTED}}>Designaciones y cambios en la administración pública</div></div>
-      <div style={{display:"flex",alignItems:"center",gap:7,flexWrap:"wrap"}}><span style={{fontSize:10,color:"#0f766e",fontFamily:font,fontWeight:800}}>{data?`${records.length} cambios · ${latestDate}`:"Consultando…"}</span><button onClick={()=>setExpanded(value=>!value)} aria-expanded={expanded} style={{border:"1px solid #0f766e50",background:expanded?"#ecfdf5":"#fff",color:"#0f766e",padding:"6px 10px",fontSize:9,fontFamily:font,cursor:"pointer"}}>{expanded?"Ocultar ▲":"Desplegar ▼"}</button><button onClick={()=>{setTab("gacetas");window.scrollTo({top:0,behavior:"smooth"});}} style={{border:0,background:"#0f766e",color:"#fff",padding:"6px 10px",fontSize:9,fontFamily:font,cursor:"pointer"}}>Ver monitor →</button></div>
+      <div style={{display:"flex",alignItems:"center",gap:7,flexWrap:"wrap"}}><span style={{fontSize:10,color:error?"#dc2626":"#0f766e",fontFamily:font,fontWeight:800}}>{data?`${records.length} cambios · ${latestDate}`:error?"Fuente no disponible":loading?"Consultando…":"Sin datos"}</span>{error&&<button onClick={()=>load(true)} style={{border:"1px solid #dc262650",background:"#fff",color:"#dc2626",padding:"6px 10px",fontSize:9,fontFamily:font,cursor:"pointer"}}>Reintentar</button>}<button onClick={()=>setExpanded(value=>!value)} disabled={!data} aria-expanded={expanded} style={{border:"1px solid #0f766e50",background:expanded?"#ecfdf5":"#fff",color:"#0f766e",padding:"6px 10px",fontSize:9,fontFamily:font,cursor:data?"pointer":"not-allowed",opacity:data?1:.5}}>{expanded?"Ocultar ▲":"Desplegar ▼"}</button><button onClick={()=>{setTab("gacetas");window.scrollTo({top:0,behavior:"smooth"});}} style={{border:0,background:"#0f766e",color:"#fff",padding:"6px 10px",fontSize:9,fontFamily:font,cursor:"pointer"}}>Ver monitor →</button></div>
     </div>
     {expanded&&<>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(125px,1fr))",borderBottom:`1px solid ${BORDER}`}}>{[[records.length,"Cambios totales"],[ordinary,"Ordinarias"],[extraordinary,"Extraordinarias"],[designations,"Designaciones"],[militaryPeople,"Personas militares"],[militaryPosts,"Cargos militares"],[`${militaryPct.toFixed(0)}%`,"Designaciones militares"]].map(([value,label],index)=><div key={label} style={{padding:"10px 12px",borderRight:index<6?`1px solid ${BORDER}`:"none"}}><div style={{fontSize:20,fontWeight:900,color:index>3?"#ca8a04":"#0f766e",fontFamily:font}}>{value}</div><div style={{fontSize:8,color:MUTED,fontFamily:font,textTransform:"uppercase"}}>{label}</div></div>)}</div>
