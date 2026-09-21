@@ -49,25 +49,21 @@ module.exports = async function handler(req, res) {
   const errors = [];
   const results = {};
 
-  // 1. Exchange rates
-  results.rates = await fetchRates(errors);
-
-  // 2. RSS articles
-  results.rss = await fetchRSS(errors);
-
-  // 3. Daily readings (GDELT, oil, bilateral, snapshot)
-  results.readings = await dailyReadings(errors);
-
-  // 4. ICG via AI
-  results.icg = await icgAnalysis(errors);
-
-  // 5. News alerts classification
+  // Alert classification is time-sensitive and must run before the heavier
+  // ingestion tasks. Otherwise a 60-second serverless timeout can leave the
+  // dashboard serving the last successful classification indefinitely.
   try {
     results.alerts = await classifyNewsAlerts(errors);
   } catch (e) {
     errors.push(`News alerts: ${e.message}`);
     results.alerts = { error: e.message };
   }
+
+  // Remaining daily ingestion tasks
+  results.rates = await fetchRates(errors);
+  results.rss = await fetchRSS(errors);
+  results.readings = await dailyReadings(errors);
+  results.icg = await icgAnalysis(errors);
 
   return res.status(200).json({
     ok: true,
