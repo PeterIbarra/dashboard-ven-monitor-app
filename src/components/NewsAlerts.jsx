@@ -37,15 +37,15 @@ export const NewsAlerts = memo(function NewsAlerts({ liveData, mob, setTab }) {
         const res = await apiFetch("/api/articles?type=alerts", { timeoutMs:6000 });
         if (!res.ok) return false;
         const data = await res.json();
-        // The cron runs daily, so keep the last successful classification visible
-        // beyond the API's shorter freshness window.
+        // Keep the last successful classification visible as a fallback, but do
+        // not let a stale cache prevent the live classifier from running.
         if (data.cached && data.alerts?.length > 0) {
           setAlerts(data.alerts.slice(0, 8));
           setProvider(data.provider || "cached");
           setCachedAge(data.age_hours);
           setClassifiedAt(data.classified_at || null);
           setStatus("done");
-          return true;
+          return !data.stale;
         }
       } catch {}
       return false;
@@ -181,7 +181,7 @@ INSTRUCCIONES:
             hace {cachedAge < 1 ? "<1h" : cachedAge.toFixed(0) + "h"}
           </span>
         )}
-        {(alerts || loading) && <DataFreshnessBadge timestamp={classifiedAt} maxAgeMs={26*3600000} compact />}
+        {(alerts || loading) && <DataFreshnessBadge timestamp={classifiedAt} maxAgeMs={8*3600000} compact />}
         <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Google News + RSS · Clasificación IA</span>
         {loading && <span style={{ fontSize:10, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Clasificando noticias...</span>}
         {status === "error" && !alerts && !loading && <span style={{ fontSize:9, fontFamily:font, color:MUTED, marginLeft:"auto", animation:"pulse 1.5s infinite" }}>Reintentando...</span>}
