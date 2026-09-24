@@ -138,11 +138,11 @@ export default function MonitorPNUD() {
   }, []);
 
   // ── Shared live data (fetched once, available to all tabs including AI) ──
-  const [liveData, setLiveData] = useState({ dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, cohesion:null, ioda:null, fetched:false });
+  const [liveData, setLiveData] = useState({ dolar:null, dolarStatus:"loading", oil:null, gdeltSummary:null, news:null, bilateral:null, cohesion:null, ioda:null, fetched:false });
 
   useEffect(() => {
     async function fetchLiveData() {
-      const results = { dolar:null, oil:null, gdeltSummary:null, news:null, bilateral:null, cohesion:null, ioda:null, fetched:true };
+      const results = { dolar:null, dolarStatus:"loading", oil:null, gdeltSummary:null, news:null, bilateral:null, cohesion:null, ioda:null, fetched:true };
       try {
         // Dolar
         const dolarUrl = IS_DEPLOYED ? "/api/dolar?type=live" : "https://ve.dolarapi.com/v1/dolares";
@@ -152,6 +152,9 @@ export default function MonitorPNUD() {
           if (o?.promedio || p?.promedio) results.dolar = { bcv:o?.promedio, paralelo:p?.promedio, brecha: o?.promedio && p?.promedio ? (((p.promedio-o.promedio)/o.promedio)*100).toFixed(1)+"%" : null };
         }
       } catch {}
+      results.dolarStatus = results.dolar ? "ready" : "error";
+      // The exchange-rate card should not wait for slower sources such as IODA.
+      setLiveData(prev => ({ ...prev, dolar:results.dolar, dolarStatus:results.dolarStatus }));
       try {
         // Oil prices
         const oilUrl = IS_DEPLOYED ? "/api/oil-prices" : null;
