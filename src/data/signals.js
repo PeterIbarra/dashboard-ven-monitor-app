@@ -131,6 +131,24 @@ export const SCENARIO_SIGNALS = [
         "sem": "green",
         "val": "GL 61 y 62 (telecom, 21 ago.) y ocho licencias actualizadas (27 ago.), excluyendo a China, Rusia, Irán, Corea del Norte y Cuba (S33).",
         "isNew": true
+      },
+      {
+        "name": "NABEP queda formalizado sobre 17 campos petroleros",
+        "sem": "green",
+        "val": "La Casa Blanca confirma concesiones de 100 años sobre ≈65.000M bbl, 35% estadounidense en la matriz y derechos de compra sobre la producción; los contratos venezolanos completos siguen sin publicarse (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Segunda ola de contratos energéticos independientes",
+        "sem": "green",
+        "val": "Chevron, Eni, GeoPark y GE Vernova formalizan proyectos de petróleo y electricidad que amplían la coalición material interesada en la continuidad contractual (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Fragilidad jurídica binacional del acuerdo NABEP",
+        "sem": "yellow",
+        "val": "Persisten dudas constitucionales y de autorización en Venezuela, mientras el Congreso de EE.UU. cuestiona la autoridad legal del Pentágono para adquirir 35% de NABEP (S34).",
+        "isNew": true
       }
     ]
   },
@@ -232,6 +250,18 @@ export const SCENARIO_SIGNALS = [
         "sem": "red",
         "val": "Matriz de escenarios 21–28 ago.: ausencia de escisión de aparato y exclusión persistente de Machado y González Urrutia de los canales de diálogo.",
         "isNew": true
+      },
+      {
+        "name": "E1 cae a 6% y amplía a 52pp su brecha con E3",
+        "sem": "red",
+        "val": "Trump y Delcy Rodríguez convergen en posponer las elecciones hasta una estabilización sin fecha ni criterios objetivos; no existe escisión verificable en la FANB o la coalición dominante (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Reforma del TSJ sin transferencia electoral",
+        "sem": "yellow",
+        "val": "El Comité de Postulaciones pasa de 21 a 23 integrantes y gana mayoría civil formal, pero la selección final de los 32 magistrados permanece dentro del proceso pactado (S34).",
+        "isNew": true
       }
     ]
   },
@@ -316,6 +346,24 @@ export const SCENARIO_SIGNALS = [
         "sem": "yellow",
         "val": "Reclamaciones y laudos arbitrales por más de USD 30.000M; el comité aún no ha contactado a Centerview Partners (S33).",
         "isNew": true
+      },
+      {
+        "name": "Brecha entre inversión anunciada y recuperación real",
+        "sem": "yellow",
+        "val": "NABEP proyecta USD 100.000M, frente a necesidades externas estimadas entre USD 140.000M y 210.000M; los montos anunciados no equivalen a desembolsos ejecutados (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Sesenta protestas en cinco días sin masa crítica territorial",
+        "sem": "yellow",
+        "val": "El promedio sube a 12 protestas diarias; predominan demandas socioeconómicas y el documento no consolida un total único de entidades, por lo que no se infiere fractura territorial (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Bono 2027 alcanza 54 centavos",
+        "sem": "green",
+        "val": "Máximo de cuatro meses y mejora de percepción de mercado, aunque la deuda permanece en niveles distressed y altamente sensible al desenlace político (S34).",
+        "isNew": true
       }
     ]
   },
@@ -387,6 +435,24 @@ export const SCENARIO_SIGNALS = [
         "name": "Sin fricción visible en la cúpula coercitiva",
         "sem": "green",
         "val": "Eliminación de alcabalas urbanas, cooperación con el CICR y sanción disciplinaria rápida a Ecarri sugieren descompresión selectiva sin escalada represiva (S33).",
+        "isNew": true
+      },
+      {
+        "name": "FANB respalda formalmente el acuerdo NABEP",
+        "sem": "yellow",
+        "val": "El Alto Mando cierra filas en un contexto de dudas jurídicas y soberanistas, reforzando la cohesión del aparato y la disponibilidad de capacidad coercitiva (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Marcha sindical hacia la delegación estadounidense es obstaculizada",
+        "sem": "red",
+        "val": "Funcionarios de seguridad bloquean el 3 de septiembre una protesta con demandas por presos políticos y elecciones; coerción selectiva documentada sin escalada sistémica (S34).",
+        "isNew": true
+      },
+      {
+        "name": "E4 sube a 20% por prima coercitiva alrededor del pacto",
+        "sem": "red",
+        "val": "El respaldo militar, el bloqueo selectivo y el rechazo transversal al acuerdo elevan E4 en 3pp, aunque la vía negociada sigue dominando (S34).",
         "isNew": true
       }
     ]

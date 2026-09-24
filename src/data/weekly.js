@@ -1,67 +1,67 @@
 export const KPIS_LATEST = {
   "energia": [
     {
+      "k": "Reservas NABEP",
+      "v": "≈65.000M bbl · 17 campos",
+      "c": "#22c55e"
+    },
+    {
+      "k": "Participación EE.UU.",
+      "v": "35% de la matriz de NABEP",
+      "c": "#22c55e"
+    },
+    {
+      "k": "Chevron",
+      "v": "USD 7.000M · meta 600.000 b/d",
+      "c": "#22c55e"
+    },
+    {
       "k": "Producción actual",
       "v": "≈1,1–1,25M b/d",
-      "c": "#22c55e"
-    },
-    {
-      "k": "Exportaciones a EE.UU.",
-      "v": "786.000 b/d en julio · máx. desde 2019",
-      "c": "#22c55e"
-    },
-    {
-      "k": "Techo operativo portuario",
-      "v": "1,25M b/d · esperas de hasta 30 días en José",
-      "c": "#f59e0b"
-    },
-    {
-      "k": "Demanda eléctrica",
-      "v": "15.625 MW · récord del año (10 ago.)",
       "c": "#f59e0b"
     }
   ],
   "politico": [
     {
       "k": "E3 dominante",
-      "v": "59% · +5pp",
+      "v": "58% · −1pp",
       "c": "#38bdf8"
     },
     {
       "k": "E1",
-      "v": "8% · −2pp",
+      "v": "6% · −2pp",
       "c": "#22c55e"
     },
     {
       "k": "E4",
-      "v": "17% · −1pp",
+      "v": "20% · +3pp",
       "c": "#ca8a04"
     },
     {
       "k": "E2",
-      "v": "16% · −2pp",
+      "v": "16% · 0pp",
       "c": "#ef4444"
     }
   ],
   "opinion": [
     {
-      "k": "Balance oficial",
-      "v": "6.509 fallecidos",
-      "c": "#ef4444"
+      "k": "Conflictividad",
+      "v": "60 protestas · 5 días",
+      "c": "#dc2626"
     },
     {
-      "k": "Viviendas afectadas",
-      "v": "60.785 evaluadas",
+      "k": "Bono 2027",
+      "v": "54 centavos · máx. 4 meses",
       "c": "#f59e0b"
     },
     {
-      "k": "Protestas",
-      "v": "23 · 21–26 ago",
-      "c": "#f59e0b"
+      "k": "Comité TSJ",
+      "v": "23 integrantes · 11 AN + 12 civiles",
+      "c": "#0468B1"
     },
     {
       "k": "Brecha E3–E1",
-      "v": "51 puntos",
+      "v": "52 puntos · máxima del ciclo",
       "c": "#f59e0b"
     }
   ]
@@ -2533,37 +2533,115 @@ export const WEEKS = [
         { "name": "Riesgo soberanista", "detail": "Los términos petroleros pueden activar resistencia nacionalista.", "impact": 4, "persistence": 4, "evidence": 3, "confidence": "Media" }
       ] }
     }
+  },
+  {
+    "label": "28 ago–4 sep",
+    "short": "S34",
+    "probs": [
+      { "sc": 1, "v": 6, "t": "down" },
+      { "sc": 2, "v": 16, "t": "flat" },
+      { "sc": 3, "v": 58, "t": "down" },
+      { "sc": 4, "v": 20, "t": "up" }
+    ],
+    "xy": { "x": 0.36, "y": 0.22 },
+    "sem": { "g": 8, "y": 10, "r": 9 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "NABEP: concesiones de 100 años sobre 17 campos con ≈65.000M bbl",
+        "ingresos": "35% de la matriz para EE.UU.; compra al costo de 20% y primera opción sobre 80%",
+        "licencias": "OFAC 51D, 54C y 55A amplían el marco hacia carbón y otros minerales",
+        "cambio": "Chevron anuncia USD 7.000M en 5 años; GE Vernova proyecta +1 GW en 2 años"
+      },
+      "economico": {
+        "inflacion": "Sin nuevo dato mensual verificable en el corte",
+        "ingresos_pob": "60 protestas en 5 días; predominan demandas socioeconómicas",
+        "electricidad": "GE Vernova: estabilización en 6–12 meses y hasta +6 GW en 6 años",
+        "pib": "Inversión NABEP anunciada: USD 100.000M vs. necesidad estimada USD 140.000–210.000M"
+      },
+      "opinion": {
+        "direccion": "E3–E1: brecha aumenta a 52pp, máxima del ciclo",
+        "elecciones": "Washington y Caracas posponen el calendario hasta una estabilización sin criterios verificables",
+        "mcm": "Exige transparencia del acuerdo sin rechazar la inversión estadounidense",
+        "eeuu": "Congreso cuestiona la autoridad legal del Pentágono para adquirir 35% de NABEP"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Formalización NABEP:</b> La Casa Blanca precisa concesiones de 100 años, participación estadounidense de 35% y derechos sobre la producción de 17 campos." },
+      { "l": "green", "t": "<b>Segunda ola de inversión:</b> Chevron, Eni, GeoPark y GE Vernova amplían la coalición material interesada en la continuidad contractual." },
+      { "l": "yellow", "t": "<b>Fragilidad jurídica:</b> Persisten dudas constitucionales en Venezuela y escrutinio congresional sobre la autoridad legal del Pentágono en EE.UU." },
+      { "l": "yellow", "t": "<b>Calendario electoral:</b> Trump y Rodríguez convergen en posponerlo hasta una estabilización sin fecha ni criterios objetivos." },
+      { "l": "yellow", "t": "<b>TSJ negociado:</b> El Comité de Postulaciones pasa de 21 a 23 integrantes, pero la selección final de magistrados no sale del circuito pactado." },
+      { "l": "red", "t": "<b>Coerción selectiva:</b> Funcionarios de seguridad obstaculizan el 3 de septiembre una marcha sindical hacia la delegación estadounidense." },
+      { "l": "red", "t": "<b>Conflictividad politizada:</b> Se registran 60 protestas en cinco días y aumentan las demandas por presos políticos y elecciones." },
+      { "l": "red", "t": "<b>Legitimidad del acuerdo:</b> El rechazo atraviesa a la oposición institucional y al chavismo crítico, mientras los contratos venezolanos siguen sin publicarse." }
+    ],
+    "lectura": "La Continuidad Negociada (E3) conserva la primacía con 58% (−1pp), sostenida por la formalización del acuerdo NABEP, la segunda ola de contratos con operadores internacionales y una reforma judicial que produce resultados institucionales dentro del circuito negociado. El ajuste no expresa debilitamiento estructural del escenario, sino el traslado de una parte del riesgo hacia la Resistencia Coercitiva y la apertura de dos frentes jurídicos: la base constitucional y contractual venezolana y la autoridad de la Oficina de Capital Estratégico del Pentágono para adquirir el 35% de NABEP.\n\nLa Transición Pacífica (E1) cae a 6% (−2pp), nuevo mínimo del ciclo. Washington y Caracas convergen en posponer un calendario electoral hasta una estabilización sin fecha ni criterios objetivos; la reforma del Comité de Postulaciones no transfiere la decisión final a un órgano autónomo y no existe una fractura verificable en la FANB o en la coalición dominante.\n\nLa Resistencia Coercitiva (E4) sube a 20% (+3pp) por el respaldo explícito del Alto Mando Militar al acuerdo energético y por el bloqueo selectivo de la marcha sindical del 3 de septiembre. La coerción opera como respaldo del pacto, no todavía como estrategia dominante. El Colapso y Fragmentación (E2) permanece en 16%: la inversión anunciada y la ampliación de operadores crean un piso anticolapso, pero la brecha entre anuncios y desembolsos, las necesidades de recuperación y una conflictividad creciente impiden reducir el riesgo.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 se mantiene dominante en 58% por la formalización jurídica de NABEP, la segunda ola de contratos y la reforma del Comité del TSJ",
+      "E4 sube a 20% por respaldo militar al acuerdo y coerción selectiva contra una protesta con demanda política explícita",
+      "E1 cae a 6% por la convergencia Washington–Caracas en aplazar elecciones; E2 queda en 16% por la brecha entre inversión anunciada y recuperación real"
+    ],
+    "dominantComposition": {
+      "scenario": 3,
+      "method": "impacto × persistencia × evidencia",
+      "factors": [
+        { "name": "Formalización jurídica de NABEP", "detail": "La Casa Blanca publica la arquitectura oficial de derechos económicos y de gobernanza sobre 17 campos.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Coalición de operadores internacionales", "detail": "Chevron, Eni, GeoPark y GE Vernova comprometen proyectos independientes que elevan el costo de una ruptura.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Reforma judicial negociada", "detail": "El Comité de Postulaciones se amplía a 23 integrantes sin trasladar la decisión final fuera del acuerdo político.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Postergación electoral convergente", "detail": "Washington y Caracas subordinan las elecciones a una estabilización sin plazo verificable.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Fragilidad jurídica binacional", "detail": "Dudas constitucionales en Venezuela y escrutinio congresional en EE.UU. moderan el escenario dominante.", "impact": 4, "persistence": 4, "evidence": 4, "confidence": "Media-alta" }
+      ]
+    },
+    "scenarioCompositions": {
+      "1": { "scenario": 1, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Reforma institucional potencial", "detail": "La renovación del TSJ podría abrir garantías si la selección produce magistrados efectivamente independientes.", "impact": 3, "persistence": 3, "evidence": 4, "confidence": "Media-alta" },
+        { "name": "Sin cronograma verificable", "detail": "No existe fecha, árbitro independiente ni criterios objetivos para la convocatoria electoral.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Coalición dominante cohesionada", "detail": "La FANB respalda el acuerdo y no presenta escisión verificable.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" }
+      ] },
+      "2": { "scenario": 2, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Piso anticolapso contractual", "detail": "La ampliación de operadores con capital comprometido reduce el incentivo a una ruptura disruptiva.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Brecha de inversión", "detail": "USD 100.000M anunciados permanecen por debajo de necesidades estimadas entre USD 140.000M y 210.000M.", "impact": 4, "persistence": 5, "evidence": 4, "confidence": "Media-alta" },
+        { "name": "Presión social creciente", "detail": "Sesenta protestas en cinco días elevan el riesgo, aunque siguen dispersas y predominantemente socioeconómicas.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" }
+      ] },
+      "4": { "scenario": 4, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Respaldo militar al acuerdo", "detail": "El Alto Mando de la FANB cierra filas ante las dudas jurídicas y soberanistas.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Coerción selectiva documentada", "detail": "La marcha sindical del 3 de septiembre fue obstaculizada cuando se dirigía hacia la delegación estadounidense.", "impact": 5, "persistence": 3, "evidence": 5, "confidence": "Alta" },
+        { "name": "Rechazo político transversal", "detail": "Oposición institucional y chavismo crítico cuestionan legitimidad, transparencia y soberanía del acuerdo.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Sin escalada sistémica", "detail": "La capacidad coercitiva respalda el pacto, pero no sustituye la vía negociada como estrategia dominante.", "impact": 4, "persistence": 3, "evidence": 4, "confidence": "Media-alta" }
+      ] }
+    }
   }
 ];
 
 export const TENSIONS = [
   {
     "level": "green",
-    "text": "La PDNA completa su validación multisectorial y avanza hacia un marco de recuperación resiliente."
+    "text": "La formalización de NABEP y los contratos de Chevron, Eni, GeoPark y GE Vernova amplían la coalición económica interesada en la continuidad del marco vigente."
   },
   {
     "level": "green",
-    "text": "La preferencia por negociación alcanza 50,2% y refuerza la salida transaccional."
+    "text": "El bono soberano 2027 alcanza 54 centavos, máximo de cuatro meses, aunque permanece en niveles distressed."
   },
   {
     "level": "yellow",
-    "text": "La reforma del TSJ amplía la participación civil, pero la designación final permanece bajo control de la AN."
+    "text": "La reforma amplía el Comité de Postulaciones Judiciales de 21 a 23 integrantes, pero no transfiere la selección final de magistrados fuera del proceso negociado."
   },
   {
     "level": "yellow",
-    "text": "La participación extranjera en 17 campos puede estabilizar ingresos, pero abre riesgos de legitimidad y soberanía."
-  },
-  {
-    "level": "yellow",
-    "text": "25.240 viviendas están restringidas o en alto riesgo y solo se reportan 377 entregadas."
+    "text": "Los contratos venezolanos de NABEP no se han publicado y el Congreso de EE.UU. cuestiona la autoridad legal del Pentágono para adquirir 35% de la empresa matriz."
   },
   {
     "level": "red",
-    "text": "Las lluvias afectan más de 150 viviendas y dejan al menos seis personas desaparecidas."
+    "text": "Washington y Caracas posponen el calendario electoral hasta una estabilización sin fecha ni criterios objetivos verificables."
   },
   {
     "level": "red",
-    "text": "El cuello de botella portuario genera esperas de hasta 30 días y limita la expansión exportadora."
+    "text": "La conflictividad asciende a 60 protestas en cinco días y desde el 1 de septiembre aumenta el peso de las demandas políticas y de derechos humanos."
+  },
+  {
+    "level": "red",
+    "text": "Funcionarios de seguridad obstaculizan una marcha sindical dirigida hacia la delegación estadounidense, primer episodio de coerción selectiva de este tipo en el ciclo."
   }
 ];
 
@@ -2600,7 +2678,8 @@ export const MONITOR_WEEKS = [
   "S30",
   "S31",
   "S32",
-  "S33"
+  "S33",
+  "S34"
 ];
 
 export const ICG_HISTORY = [
@@ -2801,6 +2880,12 @@ export const ICG_HISTORY = [
     "score": 80,
     "sitrep": true,
     "note": "La arquitectura petrolera y financiera, la reforma judicial administrada y la coordinación de la PDNA elevan la cohesión operativa; la baja representación y los costos de legitimidad limitan el avance."
+  },
+  {
+    "week": "S34",
+    "score": 82,
+    "sitrep": true,
+    "note": "El respaldo formal del PSUV, la Asamblea Nacional y el Alto Mando Militar al acuerdo NABEP, junto con la segunda ola de contratos, eleva la cohesión operativa; el rechazo transversal y el escrutinio jurídico limitan el avance."
   }
 ];
 
@@ -3719,6 +3804,22 @@ export const CONF_SEMANAL = [
       { "fecha": "21 Agosto", "protestas": 9, "estados": 7, "tipo": "Social/político", "exigencias": "Participación política, salud, trabajo y vivienda" },
       { "fecha": "25 Agosto", "protestas": 7, "estados": 5, "tipo": "Social/laboral", "exigencias": "Salud, trabajo, vivienda y agua" },
       { "fecha": "26 Agosto", "protestas": 7, "estados": 6, "tipo": "Mixto", "exigencias": "Seguridad social, trabajo, vivienda, justicia y protesta pacífica" }
+    ]
+  },
+  {
+    "week": "S34",
+    "label": "28 ago–4 sep",
+    "protestas": 60,
+    "estados": null,
+    "reprimidas": 1,
+    "motivos": ["Seguridad social", "Vivienda", "Participación política", "Medio ambiente", "Agua", "Derechos laborales", "Salud", "Alimentación", "Libertad de presos políticos", "Justicia", "Elecciones"],
+    "hecho": "El OVCS registra 60 protestas entre el 28 de agosto y el 3 de septiembre, con un promedio de 12 diarias. Desde el 1 de septiembre aumentan las demandas políticas y de derechos humanos; el documento no consolida un total único de entidades para el período.",
+    "dias": [
+      { "fecha": "28 Agosto", "protestas": 14, "estados": 8, "tipo": "Social/político", "exigencias": "Seguridad social, vivienda, participación política y medio ambiente" },
+      { "fecha": "31 Agosto", "protestas": 11, "estados": 8, "tipo": "Social/laboral", "exigencias": "Seguridad social, vivienda, agua, trabajo, salud y alimentación" },
+      { "fecha": "1 Septiembre", "protestas": 9, "estados": 7, "tipo": "Derechos humanos", "exigencias": "Libertad de presos políticos, justicia, trabajo, vivienda y agua" },
+      { "fecha": "2 Septiembre", "protestas": 13, "estados": 8, "tipo": "Mixto", "exigencias": "Libertad de presos políticos, justicia, trabajo, vivienda y salud" },
+      { "fecha": "3 Septiembre", "protestas": 13, "estados": 8, "tipo": "Político/sindical", "exigencias": "Libertad de presos políticos, elecciones, derechos y participación política; marcha obstaculizada por seguridad" }
     ]
   }
 ];

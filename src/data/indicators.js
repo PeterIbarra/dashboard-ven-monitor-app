@@ -171,6 +171,11 @@ export const INDICATORS = [
         "green",
         "up",
         "Exportaciones a EE. UU. alcanzan 786.000 bpd en julio, máximo desde 2019 (reportes de mercado); el techo operativo se mantiene en ~1,25M bpd por cuellos de botella portuarios, con esperas de hasta 30 días en José, que concentra ~70% de las exportaciones (Reuters)."
+      ],
+      [
+        "green",
+        "flat",
+        "Sin nuevo dato consolidado de exportaciones S34; la producción nacional se sitúa en ≈1,1–1,25M b/d y la meta oficial asociada a NABEP es 1,5M b/d."
       ]
     ]
   },
@@ -346,6 +351,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "PDVSA factura ≈USD 15.900M entre enero y julio (+89% interanual, Bitácora Económica); el Financial Times estimó en julio que EE. UU. habría recaudado unos USD 13.000M de esos ingresos, sin conciliación pública entre lo facturado y lo efectivamente disponible para la banca venezolana."
+      ],
+      [
+        "yellow",
+        "up",
+        "El Gobierno proyecta USD 209.000M en ingresos tributarios durante la ejecución de NABEP; es una estimación prospectiva, no ingreso realizado ni disponible en caja."
       ]
     ]
   },
@@ -521,6 +531,11 @@ export const INDICATORS = [
         "green",
         "up",
         "OFAC emite las Licencias Generales 61 y 62 (telecomunicaciones, 21 ago.) y actualiza ocho licencias adicionales —46D, 47B, 48C, 50C, 51C, 52B, 54B y 61A— el 27 de agosto, eliminando la obligación de que ciertos contratos se rijan por legislación estadounidense, con exclusión explícita de China, Rusia, Irán, Corea del Norte y Cuba."
+      ],
+      [
+        "green",
+        "up",
+        "OFAC emite las Licencias Generales 51D, 54C y 55A el 2 de septiembre, ampliando la flexibilización más allá de hidrocarburos y oro hacia carbón y otros minerales."
       ]
     ]
   },
@@ -696,6 +711,11 @@ export const INDICATORS = [
         "green",
         "up",
         "Chevron eleva su producción a 269.000–280.000 bpd (desde 228.000 en enero), con una inversión estimada entre USD 400M y 1.000M (Finanzas Digital); ONGC Videsh anuncia USD 200M para reactivar San Cristóbal (meta: 45.000–50.000 bpd) y SLB obtiene acceso a las bases de datos petroleras de PDVSA."
+      ],
+      [
+        "green",
+        "up",
+        "Chevron anuncia USD 7.000M en cinco años y meta de ≈600.000 b/d; Eni asume Junín 5 con inversión inicial prevista de USD 1.500M; GeoPark entra al bloque Bare y GE Vernova acuerda rehabilitación eléctrica."
       ]
     ]
   },
@@ -876,6 +896,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de infraestructura de refinación S33."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato nuevo verificable S34; se conserva el último valor disponible: Sin datos nuevos de infraestructura de refinación S33."
       ]
     ]
   },
@@ -1051,6 +1076,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin dato nuevo de taladros activos S33; SLB obtiene acceso a las bases de datos petroleras de PDVSA para digitalizar información fragmentada u obsoleta, sin cifra de despliegue de taladros confirmada esta semana."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato nuevo verificable S34; se conserva el último valor disponible: Sin dato nuevo de taladros activos S33; SLB obtiene acceso a las bases de datos petroleras de PDVSA para digitalizar información fragmentada u obsoleta, sin cifra de despliegue de taladros confirmada esta semana."
       ]
     ]
   },
@@ -1197,6 +1227,11 @@ export const INDICATORS = [
         "yellow",
         "up",
         "Delcy Rodríguez presenta una agenda de digitalización de servicios públicos y simplificación tributaria (sistema más simple, digital y automatizado) en el marco de la reducción de la brecha cambiaria; sin dato de recaudación mensual nuevo S33."
+      ],
+      [
+        "yellow",
+        "up",
+        "Delcy Rodríguez presenta parámetros prospectivos de NABEP: regalía de 16%, ISLR de 34% y USD 209.000M en ingresos tributarios durante la ejecución; no se reporta recaudación efectiva nueva S34."
       ]
     ]
   },
@@ -1338,6 +1373,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "OFAC actualiza ocho licencias generales que incluyen minería (incluido el oro) el 27 de agosto, ampliando el marco regulatorio sin inversión minera adicional verificable confirmada esta semana."
+      ],
+      [
+        "green",
+        "up",
+        "Las GL 51D, 54C y 55A amplían el andamiaje regulatorio hacia carbón y otros minerales, todavía sin acuerdos mineros concretos ni desembolsos verificables."
       ]
     ]
   },
@@ -1469,6 +1509,11 @@ export const INDICATORS = [
         "green",
         "flat",
         "Sin datos nuevos de gas natural S33."
+      ],
+      [
+        "green",
+        "flat",
+        "Sin dato nuevo verificable S34; se conserva el último valor disponible: Sin datos nuevos de gas natural S33."
       ]
     ]
   },
@@ -1644,6 +1689,11 @@ export const INDICATORS = [
         "red",
         "flat",
         "El balance oficial se mantiene en 1.046 retornados a hogares, sin recuperación desde la caída registrada en S32; Diosdado Cabello niega que las excarcelaciones estén en la mesa de diálogo, atribuyéndolas a decisiones internas del sistema de justicia."
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nuevo balance cuantitativo verificable S34. Se conserva el corte anterior y aumenta la demanda de libertad de presos políticos en las protestas del 1 al 3 de septiembre."
       ]
     ]
   },
@@ -1819,6 +1869,11 @@ export const INDICATORS = [
         "red",
         "flat",
         "Sin nuevas verificaciones independientes reportadas esta semana; el balance oficial permanece estancado en 1.046 retornados y ≈12.000 beneficiados con medidas procesales, por debajo del ritmo esperado de excarcelaciones."
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nuevas verificaciones independientes S34; último corte disponible: 1.065 liberaciones/excarcelaciones en 2026 y 326 presos políticos según Foro Penal al 24 de agosto."
       ]
     ]
   },
@@ -1960,6 +2015,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin dato específico de cautelares vigentes S33; el Gobierno reporta ≈12.000 beneficiados acumulados por medidas procesales, una métrica distinta que no permite actualizar la cifra de cautelares pendientes (8.426 en S32)."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin dato nuevo de cautelares S34; los 12.000 beneficios procesales reportados por el Gobierno no son equivalentes a cautelares pendientes."
       ]
     ]
   },
@@ -2135,6 +2195,11 @@ export const INDICATORS = [
         "green",
         "up",
         "No se registran señales de fricción en la cúpula coercitiva; la rápida destitución de Ecarri de la presidencia del Grupo de Amistad AN–EE. UU. por su iniciativa de dolarización demuestra disciplina interna, mientras el escrow y el comité de acreedores reducen el margen para una estrategia coercitiva autónoma."
+      ],
+      [
+        "green",
+        "up",
+        "El Alto Mando Militar respalda explícitamente el acuerdo NABEP y descarta pérdida de soberanía; no se observa escisión verificable en la cúpula."
       ]
     ]
   },
@@ -2315,6 +2380,11 @@ export const INDICATORS = [
         "yellow",
         "up",
         "Calixto Ortega asume la presidencia del Banco de Venezuela con una nueva junta de siete directores; el Ejecutivo anuncia la eliminación de alcabalas policiales urbanas y un nuevo esquema de patrullaje preventivo; la AN autoriza una nueva designación diplomática ante Egipto, Eritrea y Sudán."
+      ],
+      [
+        "green",
+        "up",
+        "La AN amplía a 23 integrantes el Comité de Postulaciones Judiciales y el Gobierno coordina respaldo del PSUV, gobernadores y alcaldes al acuerdo energético."
       ]
     ]
   },
@@ -2490,6 +2560,11 @@ export const INDICATORS = [
         "red",
         "down",
         "E1 cae a 8%, nuevo mínimo del ciclo (matriz de escenarios); Machado y González Urrutia continúan excluidos de los canales de diálogo facilitados por Qatar, y Washington mantiene las fases económicas antes de una fase electoral, sin compromiso de cronograma verificable."
+      ],
+      [
+        "red",
+        "down",
+        "E1 cae a 6%, nuevo mínimo del ciclo: Trump y Delcy Rodríguez convergen en posponer las elecciones hasta una estabilización sin fecha ni criterios objetivos verificables."
       ]
     ]
   },
@@ -2665,6 +2740,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin nuevos marcos restrictivos formales S33; la destitución de Ecarri de la presidencia del Grupo de Amistad Parlamentaria AN–EE. UU. por su iniciativa de dolarización ilustra límites disciplinarios internos de la AN, no una medida represiva hacia la oposición externa."
+      ],
+      [
+        "yellow",
+        "up",
+        "Funcionarios de seguridad obstaculizan el 3 de septiembre una marcha sindical hacia la delegación estadounidense; coerción selectiva documentada, sin escalada sistémica."
       ]
     ]
   },
@@ -2806,6 +2886,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Encuesta DatinCorp (23 ago., n=1.200): Machado lidera con 33,3% de capacidad percibida para dirigir una transición y 25,0% de 'mucha confianza', por encima de Lorenzo Mendoza y Delcy Rodríguez; no obstante, 59,0% no se siente representado por ningún liderazgo y 66,6% no se identifica con ningún partido."
+      ],
+      [
+        "yellow",
+        "up",
+        "María Corina Machado exige transparencia sobre quién firma, financia y garantiza NABEP, sin rechazar la inversión estadounidense; continúa fuera de un canal formal de decisión."
       ]
     ]
   },
@@ -2981,6 +3066,11 @@ export const INDICATORS = [
         "green",
         "down",
         "Brecha cambiaria en 19,1% al cierre del 28 de agosto (oficial Bs. 794,99/USD vs. mercado Bs. 946,73/USD); el Gobierno reporta además una reducción a 12,3% en su propia métrica (desde ≈30% en dos meses), sosteniéndose por debajo del umbral de alerta (30%)."
+      ],
+      [
+        "green",
+        "flat",
+        "Sin nuevo cierre cambiario verificable S34; se conserva como último dato el 19,1% del 28 de agosto, sin presentarlo como actualización semanal."
       ]
     ]
   },
@@ -3156,6 +3246,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin dato mensual de inflación nuevo S33."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nuevo dato mensual verificable S34."
       ]
     ]
   },
@@ -3331,6 +3426,11 @@ export const INDICATORS = [
         "red",
         "flat",
         "51,4% de los consultados identifica inflación, ingresos y desempleo como la prioridad inmediata del país (DatinCorp, 23 ago.), confirmando la persistencia de la presión sobre el ingreso real; sin ajuste salarial nuevo S33."
+      ],
+      [
+        "red",
+        "up",
+        "Sesenta protestas en cinco días mantienen como demandas predominantes servicios, vivienda, salud, alimentación y trabajo; no se reporta ajuste salarial estructural."
       ]
     ]
   },
@@ -3506,6 +3606,11 @@ export const INDICATORS = [
         "yellow",
         "up",
         "La demanda eléctrica nacional marca récord del año: 15.625 MW el 10 de agosto (Ecoanalítica), reflejando recuperación del consumo residencial e industrial pero elevando la presión sobre generación, transmisión y distribución; sin reporte específico de horas de corte urbano esta semana."
+      ],
+      [
+        "green",
+        "up",
+        "GE Vernova acuerda estabilización del sistema en 6–12 meses, +1 GW en dos años y +5 GW adicionales en cuatro años, con prioridad para Guri; son metas anunciadas, no capacidad ya incorporada."
       ]
     ]
   },
@@ -3681,6 +3786,11 @@ export const INDICATORS = [
         "red",
         "flat",
         "Nueva encuesta DatinCorp (23 ago.): solo 21,8% percibe buen rumbo del país, 46,0% regular y 27,9% mal camino; 53,0% evalúa negativamente la gestión de Delcy Rodríguez y 41,4% considera que las condiciones empeoraron respecto a hace un año."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nueva encuesta representativa S34. Un social listening citado por Ricardo Ríos registra 87% de rechazo digital a NABEP, señal cualitativa no extrapolable a la población nacional."
       ]
     ]
   },
@@ -3827,6 +3937,11 @@ export const INDICATORS = [
         "green",
         "flat",
         "Sin nuevo dato trimestral de PIB S33; PDVSA reporta facturación de USD 15.900M entre enero y julio (+89% interanual), consistente con la expansión petrolera del trimestre anterior."
+      ],
+      [
+        "green",
+        "flat",
+        "Sin nuevo dato trimestral de PIB S34; la expansión energética anunciada aún no constituye producción ni crecimiento realizado."
       ]
     ]
   },
@@ -4002,6 +4117,11 @@ export const INDICATORS = [
         "green",
         "up",
         "EE. UU. negocia participación directa de largo plazo en 17 campos petroleros (~90.000M bbl), liderada por Rubio y Delcy Rodríguez, con posible viaje de Chris Wright; OFAC amplía licencias (GL 61/62 de telecomunicaciones más ocho licencias actualizadas); la Embajada de EE. UU. y FIBA capacitan al BCV y la banca privada, y Project HOPE financia centros de salud."
+      ],
+      [
+        "green",
+        "up",
+        "La Casa Blanca formaliza NABEP: concesiones de 100 años sobre 17 campos con ≈65.000M bbl, 35% estadounidense en la matriz y derechos de compra sobre la producción."
       ]
     ]
   },
@@ -4177,6 +4297,11 @@ export const INDICATORS = [
         "green",
         "flat",
         "Sin datos nuevos de sanciones UE S33."
+      ],
+      [
+        "green",
+        "flat",
+        "Sin dato nuevo verificable S34; se conserva el último valor disponible: Sin datos nuevos de sanciones UE S33."
       ]
     ]
   },
@@ -4352,6 +4477,11 @@ export const INDICATORS = [
         "yellow",
         "down",
         "OFAC excluye explícitamente a China, Rusia, Irán, Corea del Norte y Cuba de las licencias generales actualizadas (GL 61/62 y ocho licencias adicionales); Axios señala que algunos de los 17 campos en negociación con EE. UU. estuvieron vinculados previamente a intereses chinos, sin reacción pública de Beijing o Moscú."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin reacción pública verificable de China o Rusia S34 ante la formalización de NABEP y la ampliación de operadores occidentales."
       ]
     ]
   },
@@ -4527,6 +4657,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de FMI S33."
+      ],
+      [
+        "green",
+        "up",
+        "El FMI evalúa abrir una oficina permanente en Caracas y reanudar intercambio de datos, paso previo potencial a una consulta del Artículo IV suspendida desde 2004."
       ]
     ]
   },
@@ -4702,6 +4837,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin novedades sobre reapertura de embajada de EE. UU. S33; el canciller Félix Plasencia se reúne con el Nuncio Apostólico, monseñor Alberto Ortega Martín, para ratificar la agenda de diálogo con la Santa Sede."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin anuncio nuevo sobre reapertura de embajada S34; la relación bilateral se profundiza principalmente por la vía energética, regulatoria y corporativa."
       ]
     ]
   },
@@ -4843,6 +4983,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de presión legislativa en el Congreso de EE. UU. S33."
+      ],
+      [
+        "red",
+        "up",
+        "El Congreso cuestiona la autoridad legal de la Oficina de Capital Estratégico del Pentágono para adquirir 35% de NABEP y solicita información a la administración."
       ]
     ]
   },
@@ -4974,6 +5119,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos de la relación Venezuela-Colombia S33."
+      ],
+      [
+        "green",
+        "up",
+        "GeoPark, bajo control del grupo colombiano Gilinski, obtiene un CPP de 25 años sobre el bloque Bare; empresas colombianas de servicios evalúan ampliar presencia."
       ]
     ]
   },
@@ -5105,6 +5255,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "Sin datos nuevos del proceso judicial de Maduro S33."
+      ],
+      [
+        "yellow",
+        "up",
+        "La defensa de Nicolás Maduro solicita desestimación por inmunidad soberana; audiencia fijada para el 17 de noviembre y juicio, si no prospera, para el 1 de junio de 2027."
       ]
     ]
   },
@@ -5280,6 +5435,11 @@ export const INDICATORS = [
         "yellow",
         "down",
         "23 protestas registradas en tres jornadas (21, 25 y 26 de agosto), muy por debajo de las 50 del corte anterior; predominan demandas socioeconómicas, laborales y de vivienda en 14 entidades (OVCS)."
+      ],
+      [
+        "red",
+        "up",
+        "OVCS registra 60 protestas entre el 28 de agosto y el 3 de septiembre, promedio de 12 diarias; desde el 1 de septiembre crecen las demandas políticas y de derechos humanos."
       ]
     ]
   },
@@ -5460,6 +5620,11 @@ export const INDICATORS = [
         "yellow",
         "down",
         "La cobertura desciende a 14 entidades distintas (21–26 de agosto), por debajo del umbral casi nacional de 18, aunque se mantiene en el rango multi-regional (OVCS)."
+      ],
+      [
+        "yellow",
+        "up",
+        "El documento registra entre 7 y 8 estados por jornada y alta recurrencia en Lara, Portuguesa, Anzoátegui y el centro-oriente, pero no consolida un total único de entidades para S34."
       ]
     ]
   },
@@ -5591,6 +5756,11 @@ export const INDICATORS = [
         "yellow",
         "down",
         "Sin nuevo dato de conectividad eléctrica por estado S33; la demanda nacional alcanza un récord del año (15.625 MW, 10 de agosto, Ecoanalítica), lo que eleva el riesgo de sobrecarga sobre la capacidad instalada."
+      ],
+      [
+        "yellow",
+        "up",
+        "GE Vernova anuncia estabilización en 6–12 meses y expansión de hasta 6 GW en seis años; sin nueva medición IODA consolidada por estado S34."
       ]
     ]
   },
@@ -5717,6 +5887,11 @@ export const INDICATORS = [
         "red",
         "flat",
         "Nueva encuesta DatinCorp (23 ago.): 53,0% evalúa negativamente la gestión de Delcy Rodríguez (solo 5,3% de forma positiva); 59,0% no se siente representado por ningún liderazgo actual y 69,4% considera necesario un liderazgo nuevo."
+      ],
+      [
+        "yellow",
+        "flat",
+        "Sin nueva encuesta representativa S34; el 87% de rechazo observado en conversación digital sobre NABEP se mantiene como señal cualitativa no extrapolable."
       ]
     ]
   },
@@ -5848,6 +6023,11 @@ export const INDICATORS = [
         "green",
         "up",
         "Continúa la expansión de inversión de majors: Chevron incrementa capital en sus empresas mixtas hasta 269.000–280.000 bpd, ONGC Videsh compromete USD 200M en San Cristóbal buscando además recuperar más de USD 500M en dividendos pendientes, y SLB firma contrato de acceso a datos con PDVSA."
+      ],
+      [
+        "green",
+        "up",
+        "NABEP proyecta hasta USD 100.000M; Chevron anuncia USD 7.000M, Eni USD 1.500M iniciales y GeoPark y GE Vernova formalizan proyectos. Son compromisos y metas, no desembolsos ejecutados."
       ]
     ]
   },
@@ -5974,6 +6154,11 @@ export const INDICATORS = [
         "yellow",
         "flat",
         "La demanda eléctrica récord (15.625 MW, 10 de agosto) confirma la recuperación del consumo, pero el plan de reconstrucción energética (~USD 100.000M) sigue priorizando la producción petrolera sobre transmisión, almacenamiento y transporte (Reuters)."
+      ],
+      [
+        "green",
+        "up",
+        "GE Vernova fija metas de estabilización en 6–12 meses, +1 GW en dos años y +5 GW adicionales en cuatro años, priorizando Guri."
       ]
     ]
   },
@@ -6095,6 +6280,11 @@ export const INDICATORS = [
         "red",
         "flat",
         "Sin nuevo pronunciamiento sobre el artículo 234 S33; la Consulta Popular convocada para el 18 de octubre continúa sin resolver el vacío de continuidad del interinato."
+      ],
+      [
+        "red",
+        "flat",
+        "Sin nuevo pronunciamiento sobre el artículo 234 S34; la formalización de acuerdos de hasta 100 años amplifica el debate sobre mandato, autorización y legitimidad contractual."
       ]
     ]
   },
@@ -6161,6 +6351,11 @@ export const INDICATORS = [
         "yellow",
         "up",
         "La AN aprueba en primera discusión, por unanimidad, la reforma de la Ley Orgánica del TSJ (27 ago.), ampliando el Comité de Postulaciones Judiciales de 21 a 23 miembros —primer resultado legislativo verificable del ciclo de diálogo iniciado el 12 de agosto—; la designación final de los magistrados permanece en manos de la AN, sin cronograma electoral vinculante."
+      ],
+      [
+        "yellow",
+        "up",
+        "La AN aprueba el 1 de septiembre ampliar el Comité de Postulaciones de 21 a 23 integrantes; es un resultado institucional concreto, pero la decisión final sobre 32 magistrados sigue en el circuito negociado."
       ]
     ]
   },
@@ -6222,6 +6417,11 @@ export const INDICATORS = [
         "yellow",
         "down",
         "Asesores legales y financieros organizan un comité de acreedores comerciales para agrupar reclamaciones y laudos arbitrales por más de USD 30.000M, dentro de un pasivo total estimado en USD 150.000–240.000M; el comité aún no ha contactado a Centerview Partners, el asesor financiero designado por Venezuela para la reestructuración."
+      ],
+      [
+        "yellow",
+        "up",
+        "El bono soberano 2027 alcanza 54 centavos, máximo de cuatro meses. VanEck estima reclamaciones de hasta USD 229.000M y proyecta quitas muy sensibles al desenlace político."
       ]
     ]
   }
@@ -6360,6 +6560,24 @@ export const SCENARIO_SIGNALS = [
         "sem": "green",
         "val": "GL 61 y 62 (telecom, 21 ago.) y ocho licencias actualizadas (27 ago.), excluyendo a China, Rusia, Irán, Corea del Norte y Cuba (S33).",
         "isNew": true
+      },
+      {
+        "name": "NABEP queda formalizado sobre 17 campos petroleros",
+        "sem": "green",
+        "val": "La Casa Blanca confirma concesiones de 100 años sobre ≈65.000M bbl, 35% estadounidense en la matriz y derechos de compra sobre la producción; los contratos venezolanos completos siguen sin publicarse (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Segunda ola de contratos energéticos independientes",
+        "sem": "green",
+        "val": "Chevron, Eni, GeoPark y GE Vernova formalizan proyectos de petróleo y electricidad que amplían la coalición material interesada en la continuidad contractual (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Fragilidad jurídica binacional del acuerdo NABEP",
+        "sem": "yellow",
+        "val": "Persisten dudas constitucionales y de autorización en Venezuela, mientras el Congreso de EE.UU. cuestiona la autoridad legal del Pentágono para adquirir 35% de NABEP (S34).",
+        "isNew": true
       }
     ]
   },
@@ -6461,6 +6679,18 @@ export const SCENARIO_SIGNALS = [
         "sem": "red",
         "val": "Matriz de escenarios 21–28 ago.: ausencia de escisión de aparato y exclusión persistente de Machado y González Urrutia de los canales de diálogo.",
         "isNew": true
+      },
+      {
+        "name": "E1 cae a 6% y amplía a 52pp su brecha con E3",
+        "sem": "red",
+        "val": "Trump y Delcy Rodríguez convergen en posponer las elecciones hasta una estabilización sin fecha ni criterios objetivos; no existe escisión verificable en la FANB o la coalición dominante (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Reforma del TSJ sin transferencia electoral",
+        "sem": "yellow",
+        "val": "El Comité de Postulaciones pasa de 21 a 23 integrantes y gana mayoría civil formal, pero la selección final de los 32 magistrados permanece dentro del proceso pactado (S34).",
+        "isNew": true
       }
     ]
   },
@@ -6545,6 +6775,24 @@ export const SCENARIO_SIGNALS = [
         "sem": "yellow",
         "val": "Reclamaciones y laudos arbitrales por más de USD 30.000M; el comité aún no ha contactado a Centerview Partners (S33).",
         "isNew": true
+      },
+      {
+        "name": "Brecha entre inversión anunciada y recuperación real",
+        "sem": "yellow",
+        "val": "NABEP proyecta USD 100.000M, frente a necesidades externas estimadas entre USD 140.000M y 210.000M; los montos anunciados no equivalen a desembolsos ejecutados (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Sesenta protestas en cinco días sin masa crítica territorial",
+        "sem": "yellow",
+        "val": "El promedio sube a 12 protestas diarias; predominan demandas socioeconómicas y el documento no consolida un total único de entidades, por lo que no se infiere fractura territorial (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Bono 2027 alcanza 54 centavos",
+        "sem": "green",
+        "val": "Máximo de cuatro meses y mejora de percepción de mercado, aunque la deuda permanece en niveles distressed y altamente sensible al desenlace político (S34).",
+        "isNew": true
       }
     ]
   },
@@ -6616,6 +6864,24 @@ export const SCENARIO_SIGNALS = [
         "name": "Sin fricción visible en la cúpula coercitiva",
         "sem": "green",
         "val": "Eliminación de alcabalas urbanas, cooperación con el CICR y sanción disciplinaria rápida a Ecarri sugieren descompresión selectiva sin escalada represiva (S33).",
+        "isNew": true
+      },
+      {
+        "name": "FANB respalda formalmente el acuerdo NABEP",
+        "sem": "yellow",
+        "val": "El Alto Mando cierra filas en un contexto de dudas jurídicas y soberanistas, reforzando la cohesión del aparato y la disponibilidad de capacidad coercitiva (S34).",
+        "isNew": true
+      },
+      {
+        "name": "Marcha sindical hacia la delegación estadounidense es obstaculizada",
+        "sem": "red",
+        "val": "Funcionarios de seguridad bloquean el 3 de septiembre una protesta con demandas por presos políticos y elecciones; coerción selectiva documentada sin escalada sistémica (S34).",
+        "isNew": true
+      },
+      {
+        "name": "E4 sube a 20% por prima coercitiva alrededor del pacto",
+        "sem": "red",
+        "val": "El respaldo militar, el bloqueo selectivo y el rechazo transversal al acuerdo elevan E4 en 3pp, aunque la vía negociada sigue dominando (S34).",
         "isNew": true
       }
     ]

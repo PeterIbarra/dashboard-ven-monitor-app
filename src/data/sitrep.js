@@ -5545,6 +5545,82 @@ export const SITREP_ALL = [
       { "tag": "Humanitario", "color": "#dc2626", "title": "Ejecución de la PDNA", "text": "La validación debe traducirse en metas, financiamiento y cobertura habitacional." },
       { "tag": "Social", "color": "#7c3aed", "title": "Vacío de representación", "text": "La demanda de nuevos liderazgos puede reordenar alianzas y participación." }
     ]
+  },
+  {
+    "period": "28 de agosto – 4 de septiembre de 2026",
+    "periodShort": "28 ago–4 sep 2026",
+    "keyPoints": [
+      { "tag": "Energía", "color": "#22c55e", "title": "NABEP queda formalizado sobre 17 campos", "text": "La Casa Blanca precisa concesiones de 100 años sobre ≈65.000 millones de barriles y una participación estadounidense de 35% en la matriz." },
+      { "tag": "Contratos", "color": "#22c55e", "title": "Se abre una segunda ola de inversión", "text": "Chevron, Eni, GeoPark y GE Vernova anuncian proyectos independientes de NABEP en petróleo y electricidad." },
+      { "tag": "Jurídico", "color": "#f59e0b", "title": "El acuerdo enfrenta escrutinio en ambos países", "text": "Persisten dudas constitucionales en Venezuela y el Congreso de EE.UU. cuestiona la autoridad del Pentágono para adquirir 35% de NABEP." },
+      { "tag": "Judicial", "color": "#0468B1", "title": "El Comité del TSJ pasa de 21 a 23 integrantes", "text": "La sociedad civil obtiene mayoría formal, pero la decisión final sobre los 32 magistrados permanece dentro del proceso negociado." },
+      { "tag": "Electoral", "color": "#dc2626", "title": "Washington y Caracas aplazan el calendario", "text": "Trump y Rodríguez subordinan las elecciones a una estabilización sin fecha ni criterios objetivos verificables." },
+      { "tag": "Social", "color": "#dc2626", "title": "60 protestas en cinco días", "text": "Las demandas socioeconómicas siguen predominando, pero desde el 1 de septiembre crecen las exigencias por presos políticos y elecciones." },
+      { "tag": "Coerción", "color": "#dc2626", "title": "Seguridad bloquea una marcha sindical", "text": "El 3 de septiembre se obstaculiza una movilización hacia el Hotel Marriott, sede de la delegación estadounidense." },
+      { "tag": "Mercados", "color": "#f59e0b", "title": "El bono 2027 alcanza 54 centavos", "text": "El máximo de cuatro meses mejora la percepción de mercado, aunque la deuda continúa en niveles distressed." },
+      { "tag": "Finanzas", "color": "#f59e0b", "title": "La inversión anunciada no equivale a desembolso", "text": "Los USD 100.000M proyectados para NABEP se comparan con necesidades externas de USD 140.000M–210.000M." },
+      { "tag": "Escenarios", "color": "#0468B1", "title": "E3 domina y E4 gana peso", "text": "E3 queda en 58%, E1 cae a 6%, E4 sube a 20% y E2 permanece en 16%." }
+    ],
+    "sintesis": "La semana formaliza la arquitectura económica de la Continuidad Negociada, pero abre una prima coercitiva y jurídica mayor. E3 conserva el 58% porque NABEP, los contratos independientes y la reforma del Comité del TSJ profundizan la administración pactada; E4 sube a 20% por el respaldo militar al acuerdo y el bloqueo selectivo de una protesta política. E1 cae a 6% ante la postergación electoral convergente entre Washington y Caracas, mientras E2 permanece en 16% por la distancia entre inversión anunciada, ejecución real y bienestar social.",
+    "actores": [
+      { "name": "Estados Unidos", "items": ["Formaliza la arquitectura de NABEP y los derechos económicos sobre 17 campos.", "Chris Wright acompaña acuerdos con Chevron, Eni y GE Vernova.", "El Congreso abre escrutinio sobre la autoridad legal del Pentágono para adquirir 35% de NABEP."] },
+      { "name": "Gobierno encargado", "items": ["Presenta parámetros económicos y fiscales del acuerdo.", "Obtiene respaldo del PSUV, la AN y el Alto Mando Militar.", "Avanza la reforma del Comité de Postulaciones y coordina nuevos contratos energéticos."] },
+      { "name": "Oposición y sociedad civil", "items": ["Machado, Capriles, Guanipá, González Urrutia y otros actores exigen transparencia.", "Sectores del chavismo crítico denuncian ocupación y tutelaje.", "Las protestas incorporan con mayor fuerza presos políticos y elecciones."] },
+      { "name": "Operadores y comunidad internacional", "items": ["Chevron, Eni, GeoPark y GE Vernova formalizan proyectos.", "El FMI evalúa una oficina permanente en Caracas.", "Mercados y acreedores revalúan deuda y ejecución contractual."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesOficiales": 1046, "beneficiosProcesales": 12000, "privadosLiberados": null, "cautelares": null, "militares": 144, "fpVerificados": 1065, "fpDetenidos": 326, "fpNota": "El documento no incorpora un nuevo balance verificable. Se conserva el corte de S33: 1.046 liberaciones y 12.000 beneficios procesales según el Gobierno; 1.065 liberaciones/excarcelaciones en 2026 y 326 presos políticos según Foro Penal al 24 de agosto. No se presentan como cifras equivalentes." },
+      "rodriguez": [
+        { "title": "Arquitectura NABEP", "text": "Defiende el acuerdo y presenta regalía de 16%, ISLR de 34% e ingresos tributarios proyectados." },
+        { "title": "Coalición interna", "text": "Consolida respaldo del PSUV, gobernadores, alcaldes, AN y Alto Mando Militar." },
+        { "title": "Reforma judicial", "text": "Avanza el Comité de 23 integrantes para preseleccionar 32 magistrados." }
+      ],
+      "mcmAgenda": ["Exigir publicación y trazabilidad de los contratos petroleros.", "Vincular recuperación económica con transición democrática.", "Evitar que la estabilización sin plazo sustituya un cronograma electoral verificable."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "≈65.000M bbl", "label": "Reservas en los 17 campos NABEP", "color": "#22c55e" },
+        { "value": "35%", "label": "Participación de EE.UU. en la matriz", "color": "#0468B1" },
+        { "value": "USD 7.000M", "label": "Inversión Chevron anunciada · 5 años", "color": "#22c55e" },
+        { "value": "54 centavos", "label": "Bono soberano 2027 · máximo 4 meses", "color": "#f59e0b" },
+        { "value": "USD 229.000M", "label": "Reclamaciones de deuda estimadas por VanEck", "color": "#dc2626" },
+        { "value": "USD 140–210.000M", "label": "Necesidad externa estimada de recuperación petrolera", "color": "#dc2626" }
+      ],
+      "empresas": [
+        { "empresa": "Chevron", "desarrollo": "Anuncia USD 7.000M en cinco años y una meta aproximada de 600.000 b/d." },
+        { "empresa": "Eni", "desarrollo": "Obtiene un CPPH de 25 años para Junín 5, con inversión inicial prevista de USD 1.500M." },
+        { "empresa": "GeoPark", "desarrollo": "Ingresa mediante un CPP de 25 años sobre el bloque Bare, con ≈1.000M bbl." },
+        { "empresa": "GE Vernova", "desarrollo": "Acuerda estabilización eléctrica y metas de +1 GW en dos años y +5 GW adicionales en cuatro años." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 60, "promDiario": 12, "periodo": "28 ago–3 sep · cinco jornadas registradas", "variacion": "+161% frente a S33", "composicion": "Servicios, vivienda, salud, alimentación, trabajo, presos políticos, justicia y elecciones.", "nota": "El documento no consolida un total único de entidades para todo el período. El 3 de septiembre una marcha sindical hacia la delegación estadounidense fue obstaculizada por seguridad." },
+      "percepcion": { "fuente": "Social listening citado por Ricardo Ríos", "titulo": "Rechazo digital al acuerdo NABEP", "nota": "La medición corresponde a conversación digital y no es representativa de la opinión pública nacional; se usa como señal cualitativa, no como encuesta.", "datos": [{ "factor": "Rechazo en conversación digital", "pct": 87 }] },
+      "excarcelados": { "fp": 1065, "presos": 326, "militares": 144, "fuente": "Último corte disponible: Foro Penal · 24 ago 2026; sin nuevo balance verificable en S34" }
+    },
+    "marcoNormativo": {
+      "titulo": "Acuerdo NABEP, reforma judicial y ampliación regulatoria",
+      "resumen": "El período convierte anuncios energéticos y políticos en instrumentos formales, aunque persisten brechas de publicación, autorización y control independiente.",
+      "cambios": [
+        { "titulo": "Hoja informativa NABEP", "texto": "Washington publica la arquitectura oficial del acuerdo, incluido el 35% estadounidense y los derechos de compra.", "color": "#22c55e" },
+        { "titulo": "Respaldo parlamentario", "texto": "La AN aprueba un acuerdo político de apoyo, pero no publica el texto contractual completo.", "color": "#f59e0b" },
+        { "titulo": "Comité del TSJ", "texto": "Pasa de 21 a 23 integrantes: 11 diputados y 12 representantes de la sociedad civil.", "color": "#0468B1" },
+        { "titulo": "Licencias OFAC", "texto": "Las GL 51D, 54C y 55A amplían la flexibilización hacia carbón y otros minerales.", "color": "#7c3aed" }
+      ],
+      "lecturaAnalitica": "La formalización eleva previsibilidad económica, pero no resuelve la validez constitucional venezolana, la autoridad legal estadounidense ni la ausencia de un calendario electoral verificable."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "58%", "color": "#0468B1", "text": "Baja 1pp, pero conserva la primacía por NABEP, contratos independientes y reforma judicial pactada." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "20%", "color": "#ca8a04", "text": "Sube 3pp por respaldo militar al acuerdo y coerción selectiva contra la marcha del 3 de septiembre." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "16%", "color": "#dc2626", "text": "Permanece estable: la coalición inversora contiene la disrupción, pero la brecha social y de ejecución sigue abierta." },
+      { "name": "Transición Política Pacífica (E1)", "prob": "6%", "color": "#2d8a30", "text": "Cae 2pp a un nuevo mínimo por la postergación electoral y la ausencia de fractura en la coalición dominante." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Contratos y autoridad legal", "text": "La publicación de los contratos venezolanos y la resolución del escrutinio congresional definirán la resiliencia jurídica de NABEP." },
+      { "tag": "Institucional", "color": "#0468B1", "title": "Selección del TSJ", "text": "Los criterios y resultados efectivos importan más que la mayoría civil formal del Comité." },
+      { "tag": "Social", "color": "#dc2626", "title": "Politización de la protesta", "text": "Debe observarse si las demandas por presos y elecciones se generalizan más allá de Caracas." },
+      { "tag": "Económico", "color": "#f59e0b", "title": "Anuncios frente a ejecución", "text": "Los compromisos deben medirse por desembolsos, producción y mejoras de servicios, no por montos proyectados." }
+    ]
   }
 ];
 

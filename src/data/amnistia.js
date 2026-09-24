@@ -517,5 +517,13 @@ export const AMNISTIA_TRACKER = [
     "fp": { "verificados": 1065, "detenidos": 326, "militares": 144, "civiles": 182, "hombres": 315, "mujeres": 11, "condenados": 140, "noCondenados": 186 },
     "recentBatch": { "official": 131, "foroPenal": 81, "pud": 105 },
     "hito": "Corte actualizado: el Gobierno reporta 1.046 liberaciones y 12.000 beneficios procesales. Foro Penal registra 326 presos políticos y 1.065 liberaciones/excarcelaciones en 2026 al 24 de agosto. Los acumulados responden a metodologías distintas; el contraste comparable del lote reciente es 131 anunciadas, 81 confirmadas por Foro Penal y 105 por la PUD."
+  },
+  {
+    "week": "S34",
+    "label": "28 ago–4 sep",
+    "gob": { "solicitudes": null, "libertades": 1046, "privadosLiberados": 1046, "beneficiosProcesales": 12000, "cautelares": null, "militares": null },
+    "fp": { "verificados": 1065, "detenidos": 326, "militares": 144, "civiles": 182, "hombres": 315, "mujeres": 11, "condenados": 140, "noCondenados": 186 },
+    "recentBatch": { "official": 131, "foroPenal": 81, "pud": 105 },
+    "hito": "Sin nuevo balance cuantitativo verificable en los documentos de S34. Se conserva el corte de S33 sin presentarlo como actualización: 1.046 liberaciones y 12.000 beneficios procesales según el Gobierno; 1.065 liberaciones/excarcelaciones en 2026 y 326 presos políticos según Foro Penal al 24 de agosto. La liberación de presos políticos gana peso en las protestas del 1 al 3 de septiembre."
   }
 ];

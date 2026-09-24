@@ -49,7 +49,7 @@ export const WEEK_DRIVERS_S32 = {
   }
 };
 
-export const WEEK_DRIVERS = {
+export const WEEK_DRIVERS_S33 = {
   "1": {
     "label": "Transición pacífica — 8% · −2pp",
     "drivers": [
@@ -98,9 +98,61 @@ export const WEEK_DRIVERS = {
   }
 };
 
+export const WEEK_DRIVERS = {
+  "1": {
+    "label": "Transición pacífica — 6% · −2pp",
+    "drivers": [
+      "La reforma del Comité de Postulaciones amplía la participación formal, pero la decisión final sobre los 32 magistrados continúa dentro del proceso negociado.",
+      "Trump y Delcy Rodríguez convergen en posponer las elecciones hasta una estabilización sin fecha ni criterios objetivos.",
+      "La secuencia descrita por Washington sitúa la convocatoria electoral después de la reconstrucción del TSJ, el CNE y las libertades políticas.",
+      "No existe escisión verificable en la FANB ni en la coalición dominante; el Alto Mando respalda expresamente el acuerdo energético.",
+      "María Corina Machado exige transparencia, pero permanece fuera de un canal formal de decisión y sin garantías verificables de retorno.",
+      "E1 cae 2pp y marca un nuevo mínimo del ciclo porque no aparece un catalizador efectivo de transferencia electoral."
+    ],
+    "signals": ["Cronograma electoral con fecha y árbitro independiente", "Magistrados efectivamente independientes", "Incorporación de la oposición con mayor legitimidad electoral", "Pronunciamiento reformista o quiebre de disciplina en la FANB"]
+  },
+  "2": {
+    "label": "Colapso y fragmentación — 16% · 0pp",
+    "drivers": [
+      "Chevron, Eni, GeoPark y GE Vernova amplían la coalición de actores con inversión material comprometida en la continuidad del marco vigente.",
+      "La inversión anunciada para NABEP alcanza USD 100.000M, pero las necesidades externas de recuperación se estiman entre USD 140.000M y 210.000M.",
+      "El bono 2027 sube a 54 centavos, máximo de cuatro meses, sin abandonar niveles de deuda distressed.",
+      "Se registran 60 protestas en cinco días, todavía dispersas y de composición predominantemente socioeconómica.",
+      "La ejecución del acuerdo aún no produce beneficios tangibles verificables para la población.",
+      "E2 permanece estable: el piso contractual contiene la disrupción, pero la brecha social y de inversión impide reducir el riesgo."
+    ],
+    "signals": ["Desembolsos efectivos de los contratos", "Promedio diario y politización de las protestas", "Brecha entre inversión anunciada y necesidades reales", "Reacción de los mercados de deuda", "Fractura territorial o de mando"]
+  },
+  "3": {
+    "label": "Continuidad negociada — 58% · −1pp",
+    "drivers": [
+      "La Casa Blanca formaliza la arquitectura de NABEP: concesiones de 100 años sobre 17 campos, 35% estadounidense y derechos económicos sobre la producción.",
+      "La segunda ola de contratos con Chevron, Eni, GeoPark y GE Vernova extiende la apertura más allá del acuerdo excepcional NABEP.",
+      "La reforma del Comité de Postulaciones Judiciales pasa de 21 a 23 integrantes y produce un resultado institucional dentro del circuito pactado.",
+      "Washington y Caracas coinciden en subordinar el calendario electoral a una estabilización previa.",
+      "El escrutinio del Congreso de EE.UU. y la falta de publicación de los contratos venezolanos introducen fragilidad jurídica binacional.",
+      "E3 baja solo 1pp: conserva el patrón dominante, pero cede riesgo hacia E4 por coerción selectiva y rechazo transversal."
+    ],
+    "signals": ["Publicación de los contratos venezolanos de NABEP", "Resolución del escrutinio congresional en EE.UU.", "Criterios de selección de los magistrados del TSJ", "Desembolsos de Chevron, Eni, GeoPark y GE Vernova", "Avance de una oficina permanente del FMI"]
+  },
+  "4": {
+    "label": "Resistencia coercitiva — 20% · +3pp",
+    "drivers": [
+      "El Alto Mando Militar de la FANB respalda explícitamente el acuerdo energético ante cuestionamientos jurídicos y soberanistas.",
+      "Funcionarios de seguridad obstaculizan la marcha sindical del 3 de septiembre hacia la delegación estadounidense.",
+      "Desde el 1 de septiembre aumentan las demandas por liberación de presos políticos y convocatoria electoral.",
+      "El rechazo al acuerdo atraviesa tanto a la oposición institucional como al chavismo crítico.",
+      "La capacidad coercitiva acompaña la consolidación de NABEP, pero todavía no sustituye la vía negociada.",
+      "E4 sube 3pp por dos vectores simultáneos: respaldo militar al pacto y coerción selectiva frente a protesta política."
+    ],
+    "signals": ["Repetición del bloqueo selectivo de protestas", "Nuevos pronunciamientos de la FANB", "Evolución de la posición de Machado", "Resolución de la duda jurídica sobre el 35% estadounidense", "Escalada sistémica del instrumento coercitivo"]
+  }
+};
+
 // Archivo acumulativo de drivers detallados. Al incorporar una semana nueva,
 // agregar una nueva clave y conservar todas las anteriores.
 export const WEEK_DRIVERS_BY_WEEK = {
   S32: WEEK_DRIVERS_S32,
-  S33: WEEK_DRIVERS,
+  S33: WEEK_DRIVERS_S33,
+  S34: WEEK_DRIVERS,
 };
