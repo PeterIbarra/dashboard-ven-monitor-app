@@ -166,7 +166,39 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           }
         }
 
-        if (liveAlerts.length === 0) return null;
+        const alertsLoading = !liveData?.fetched;
+
+        if (liveAlerts.length === 0 && alertsLoading) {
+          return (
+            <div role="status" aria-live="polite" style={{ border:"1px solid #fbbf24", background:"#fffbeb", padding:mob?"12px":"14px 16px" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:9, flexWrap:"wrap" }}>
+                <span aria-hidden="true" style={{ width:14, height:14, border:"2px solid #fcd34d", borderTopColor:"#b45309", borderRadius:"50%", animation:"spin .8s linear infinite", flexShrink:0 }} />
+                <span style={{ fontSize:10, fontFamily:font, letterSpacing:"0.1em", textTransform:"uppercase", color:"#92400e", fontWeight:800 }}>
+                  Cargando alertas en vivo…
+                </span>
+                <span style={{ width:7, height:7, borderRadius:"50%", background:"#d97706", animation:"pulse 1.2s ease-in-out infinite" }} />
+              </div>
+              <div style={{ marginTop:7, fontSize:10, fontFamily:font, color:"#a16207", lineHeight:1.45 }}>
+                Consultando dólar, petróleo, conectividad, electricidad e índice bilateral para comprobar los umbrales de alerta.
+              </div>
+              <div style={{ height:3, marginTop:10, overflow:"hidden", background:"#fde68a" }}>
+                <div style={{ width:"55%", height:"100%", background:"#d97706", animation:"alertLoadingSlide 1.4s ease-in-out infinite" }} />
+              </div>
+            </div>
+          );
+        }
+
+        if (liveAlerts.length === 0) {
+          return (
+            <div role="status" style={{ border:"1px solid #16a34a35", background:"#16a34a08", padding:mob?"10px 12px":"12px 16px", display:"flex", alignItems:"center", gap:9, flexWrap:"wrap" }}>
+              <span style={{ width:7, height:7, borderRadius:"50%", background:"#16a34a" }} />
+              <span style={{ fontSize:10, fontFamily:font, letterSpacing:"0.1em", textTransform:"uppercase", color:"#15803d", fontWeight:800 }}>
+                Sin alertas activas
+              </span>
+              <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Consulta completada · ningún indicador supera actualmente los umbrales definidos</span>
+            </div>
+          );
+        }
 
         const reds = liveAlerts.filter(a => a.level === "red");
         const alertDestination = (name) => {
@@ -188,10 +220,18 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
                 {liveAlerts.length} alerta{liveAlerts.length>1?"s":""} en vivo
                 {reds.length > 0 && !alertsOpen ? ` · ${reds.length} roja${reds.length>1?"s":""}` : ""}
               </span>
-              <span style={{ width:6, height:6, borderRadius:"50%", background:"#22c55e", animation:"pulse 1.5s infinite" }} />
-              <span style={{ fontSize:9, fontFamily:font, color:MUTED }}>Datos en tiempo real · cada 5 min</span>
+              <span style={{ width:6, height:6, borderRadius:"50%", background:alertsLoading?"#d97706":"#22c55e", animation:"pulse 1.5s infinite" }} />
+              <span style={{ fontSize:9, fontFamily:font, color:alertsLoading?"#a16207":MUTED }}>
+                {alertsLoading ? "Actualizando fuentes en vivo…" : "Datos en tiempo real · cada 5 min"}
+              </span>
               <span style={{ marginLeft:"auto", fontSize:12, color:MUTED, transition:"transform 0.2s", transform:alertsOpen?"rotate(180deg)":"rotate(0deg)" }}>▼</span>
             </div>
+            {alertsLoading && (
+              <div role="status" aria-live="polite" style={{ display:"flex", alignItems:"center", gap:8, marginTop:9, padding:"7px 9px", background:"#fffbeb", border:"1px solid #fbbf2460", color:"#92400e", fontSize:9, fontFamily:font, fontWeight:700 }}>
+                <span aria-hidden="true" style={{ width:11, height:11, border:"2px solid #fcd34d", borderTopColor:"#b45309", borderRadius:"50%", animation:"spin .8s linear infinite", flexShrink:0 }} />
+                Hay alertas preliminares; seguimos cargando dólar, petróleo, conectividad y electricidad.
+              </div>
+            )}
             {alertsOpen && (
               <div style={{ marginTop:8 }}>
                 {liveAlerts.map((a, i) => (
@@ -216,6 +256,8 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           </div>
         );
       })()}
+
+      <style>{`@keyframes alertLoadingSlide { 0% { transform:translateX(-110%); } 50% { transform:translateX(45%); } 100% { transform:translateX(190%); } }`}</style>
 
       {/* ── ROW 1: Scenario Hero Cards ── */}
       <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:1, background:BORDER, border:`1px solid ${BORDER}` }}>
