@@ -1412,6 +1412,16 @@ export function TabIODA() {
           style={{ fontSize:14, padding:"4px 8px", background:"transparent", border:`1px solid ${BORDER}`,
             cursor:"pointer", borderRadius:4, color:MUTED, lineHeight:1 }}>🔄</button>
       </div>
+      <Card accent="#f59e0b" style={{marginBottom:12}}>
+        <div style={{fontSize:10,fontFamily:font,fontWeight:800,color:"#b45309",textTransform:"uppercase",letterSpacing:".08em"}}>Agua y electricidad · estudio ANOVA · 18–25 sep</div>
+        <div style={{display:"flex",gap:14,flexWrap:"wrap",marginTop:7,fontFamily:font,fontSize:12,color:TEXT}}><strong>70,2% de hogares</strong><span>servicio precario en 2026</span><span>+21,7pp frente a 2025</span></div>
+        <div style={{fontSize:10,color:MUTED,lineHeight:1.5,marginTop:6}}>ANOVA estima una asociación con 494.763 ocupaciones menos y alrededor de 1,4% del PIB no generado. Son resultados modelados con datos de encuesta, no un recuento de personas fuera de la fuerza laboral ni una prueba causal estricta. El Ministerio reportó además un pico de demanda eléctrica de 16.030 MW el 18 de septiembre; demanda máxima no equivale a generación firme disponible.</div>
+      </Card>
+      <Card accent="#dc2626" style={{marginBottom:12}}>
+        <div style={{fontSize:10,fontFamily:font,fontWeight:800,color:"#dc2626",textTransform:"uppercase",letterSpacing:".08em"}}>Guri · restricción estructural · corte 11–18 sep</div>
+        <div style={{display:"flex",gap:14,flexWrap:"wrap",marginTop:7,fontFamily:font,fontSize:12,color:TEXT}}><strong>6.141 / 10.350 MW</strong><span>≈59% de capacidad instalada</span><span>7 de 20 turbinas fuera de servicio</span></div>
+        <div style={{fontSize:10,color:MUTED,lineHeight:1.5,marginTop:6}}>El ACS atribuye estos valores a información sobre la central de Guri. La Unidad 17 salió de servicio el 29 de agosto y la Unidad 15 tuvo otra parada el 10 de septiembre. Este contexto estructural es distinto de las señales de conectividad y electricidad en vivo que aparecen debajo.</div>
+      </Card>
       {/* Time controls */}
       <div style={{ display:"flex", gap:8, marginBottom:14, flexWrap:"wrap", alignItems:"center" }}>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}` }}>

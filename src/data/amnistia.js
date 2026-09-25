@@ -525,5 +525,29 @@ export const AMNISTIA_TRACKER = [
     "fp": { "verificados": 1065, "detenidos": 326, "militares": 144, "civiles": 182, "hombres": 315, "mujeres": 11, "condenados": 140, "noCondenados": 186 },
     "recentBatch": { "official": 131, "foroPenal": 81, "pud": 105 },
     "hito": "Sin nuevo balance cuantitativo verificable en los documentos de S34. Se conserva el corte de S33 sin presentarlo como actualización: 1.046 liberaciones y 12.000 beneficios procesales según el Gobierno; 1.065 liberaciones/excarcelaciones en 2026 y 326 presos políticos según Foro Penal al 24 de agosto. La liberación de presos políticos gana peso en las protestas del 1 al 3 de septiembre."
+  },
+  {
+    "week": "S35",
+    "label": "4–11 sep",
+    "gob": { "solicitudes": null, "libertades": 1046, "privadosLiberados": 1046, "beneficiosProcesales": 12000, "cautelares": null, "militares": null },
+    "fp": { "verificados": 1065, "detenidos": 326, "militares": 144, "civiles": 182, "hombres": 315, "mujeres": 11, "condenados": 140, "noCondenados": 186 },
+    "recentBatch": { "official": 131, "foroPenal": 81, "pud": 105 },
+    "hito": "El informe del 4–11 de septiembre no aporta un balance cuantitativo nuevo de presos políticos o excarcelaciones. Se conserva, claramente fechado, el último registro disponible: Gobierno, 1.046 liberaciones y 12.000 beneficios procesales; Foro Penal, 1.065 liberaciones/excarcelaciones en 2026 y 326 presos políticos al 24 de agosto. Las protestas por libertad y justicia persisten en el corte parcial del 7–10 de septiembre."
+  },
+  {
+    "week": "S36",
+    "label": "11–18 sep",
+    "gob": { "solicitudes": null, "libertades": 1046, "privadosLiberados": 1046, "beneficiosProcesales": 12000, "cautelares": null, "militares": null },
+    "fp": { "verificados": 1065, "detenidos": 326, "militares": 144, "civiles": 182, "hombres": 315, "mujeres": 11, "condenados": 140, "noCondenados": 186 },
+    "recentBatch": { "official": 131, "foroPenal": 81, "pud": 105 },
+    "hito": "El ACS 11–18 de septiembre no incluye un balance cuantitativo nuevo de presos políticos. Se mantienen como último dato registrado, no como cifra actualizada: 1.046 liberaciones y 12.000 beneficios según el Gobierno; 1.065 liberaciones/excarcelaciones en 2026 y 326 presos políticos según Foro Penal al 24 de agosto. La misión independiente de la ONU advierte que el aparato represivo permanece en gran medida intacto."
+  },
+  {
+    "week": "S37",
+    "label": "18–25 sep",
+    "gob": { "solicitudes": null, "libertades": 1046, "privadosLiberados": 1046, "beneficiosProcesales": 12000, "cautelares": null, "militares": null },
+    "fp": { "verificados": 1065, "detenidos": 326, "militares": 144, "civiles": 182, "hombres": 315, "mujeres": 11, "condenados": 140, "noCondenados": 186 },
+    "recentBatch": { "official": 131, "foroPenal": 81, "pud": 105 },
+    "hito": "No hay nuevo balance comparable de Foro Penal en el ACS S37: se conserva su corte del 24 de agosto (326 presos y 1.065 liberaciones/excarcelaciones). CLIPPVE reporta más de 400 personas presas por motivos políticos en un universo y fecha distintos; no sustituye la serie de Foro Penal. HRW abre un canal para listas de detenidos y Dinorah Figuera reconoce que el tema no integró la mesa formal."
   }
 ];

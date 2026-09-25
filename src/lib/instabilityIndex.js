@@ -67,14 +67,18 @@ export function computeInstabilityIndex(wk, liveData) {
   const brentFactor = brentPrice < 55 ? 100 : brentPrice < 65 ? 70 : brentPrice < 75 ? 30 : brentPrice < 85 ? 10 : 0;
 
   // Protests: weekly SITREP data (CONF_SEMANAL) — more current than monthly OVCS
-  const lastWeekConf = CONF_SEMANAL[CONF_SEMANAL.length - 1];
+  // A partial OVCS window is displayed as context, not treated as a complete
+  // weekly observation in the comparable instability-index factors.
+  const completeConfWeeks = CONF_SEMANAL.filter(w => !w.partial);
+  const lastWeekConf = completeConfWeeks.at(-1);
   const maxWeekProtests = Math.max(...CONF_SEMANAL.map(w => w.protestas), 1);
   const protestPct = lastWeekConf ? (lastWeekConf.protestas / maxWeekProtests) * 100 : 50;
   // Territorial spread: 23/24 estados = almost national = high instability signal
-  const spreadPct = lastWeekConf ? (lastWeekConf.estados / 24) * 100 : 30;
+  const spreadConf = [...completeConfWeeks].reverse().find(w => Number.isFinite(w.estados) && w.estados > 0);
+  const spreadPct = spreadConf ? (spreadConf.estados / 24) * 100 : 30;
   const repressionPct = lastWeekConf?.reprimidas > 0 ? Math.min(lastWeekConf.reprimidas * 25, 100) : 0;
   // Monthly trend: sum last 4 weeks of CONF_SEMANAL, compare to 2025 monthly average
-  const last4Weeks = CONF_SEMANAL.slice(-4);
+  const last4Weeks = completeConfWeeks.slice(-4);
   const monthlyTotal = last4Weeks.reduce((s, w) => s + w.protestas, 0);
   const avg2025Monthly = CONF_MESES.reduce((s, m) => s + m.t, 0) / CONF_MESES.length; // ~185
   const monthlyTrendPct = avg2025Monthly > 0 ? Math.min((monthlyTotal / avg2025Monthly) * 100, 150) : 50; // >100 = escalating vs 2025
@@ -175,7 +179,7 @@ export function computeInstabilityIndex(wk, liveData) {
     zone: instabilityZoneFor(index),
     factors: {
       e1, e2, e3, e4, redCount, totalInds, tensRed, totalTens, sigActive, sigTotal,
-      brechaLive, brentPrice, brentFactor, lastWeekConf, protestPct, spreadPct, repressionPct,
+      brechaLive, brentPrice, brentFactor, lastWeekConf, spreadConf, protestPct, spreadPct, repressionPct,
       avg2025Monthly, monthlyTotal, monthlyTrendPct, amnLatest, amnBrechaPct, presosPct,
       bilV, bilPct, icgRaw, icgInverted, polAltaPct, convAltaPct, convInverted,
       iodaHealth, iodaInverted, elecHealth, elecInverted,

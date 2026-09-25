@@ -44,15 +44,26 @@ export function TabMercados() {
           {/* OilPriceAPI live ticker */}
           <OilPriceTicker />
 
-          <Card accent="#22c55e">
-            <div style={{display:"flex",justifyContent:"space-between",gap:8,flexWrap:"wrap",marginBottom:9}}><div style={{fontSize:12,fontWeight:800,color:TEXT}}>Pulso petrolero semanal · 21–28 ago</div><div style={{fontSize:8,color:MUTED,fontFamily:font}}>Datos del corte analítico; separados de precios en vivo</div></div>
+          <Card accent="#f59e0b">
+            <div style={{fontSize:12,fontWeight:800,color:TEXT,marginBottom:8}}>Apertura energética · corte 18–25 sep</div>
             <div style={{display:"grid",gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)",gap:7}}>{[
-              ["1,25M b/d","Techo operativo exportador","Limitado por infraestructura portuaria"],
-              ["30 días","Espera máxima de buques","Cuello de botella en terminales"],
-              ["USD 15.900M","Facturación PDVSA","Estimación enero–julio 2026"],
-              ["USD 200M","Plan de ONGC","San Cristóbal · meta 45–50 mil b/d"]
+              ["MoU","TotalEnergies–PDVSA","Firmado 20 sep · no es desembolso"],
+              ["USD 7.000M","Chevron","Inversión anunciada, no ejecutada"],
+              ["1,17M b/d","Exportaciones","Agosto · Reuters; casi estables"],
+              ["USD 5/bbl","Flete Aframax","José–Golfo · desde USD 1,90"]
+            ].map(([value,label,detail])=><div key={label} style={{padding:"9px 10px",border:`1px solid ${BORDER}`,background:BG2}}><div style={{fontSize:17,fontWeight:900,color:"#f59e0b",fontFamily:font}}>{value}</div><div style={{fontSize:8,fontFamily:font,color:TEXT,textTransform:"uppercase",fontWeight:700}}>{label}</div><div style={{fontSize:8,color:MUTED,marginTop:3,lineHeight:1.35}}>{detail}</div></div>)}</div>
+            <div style={{fontSize:9,color:MUTED,lineHeight:1.5,marginTop:8}}>PDVSA habría facturado ~USD 17.200M en enero–agosto (+76% interanual), según estimación periodística citada en el ACS. Facturación no equivale a caja disponible. Halliburton firmó memorandos con Eneva/WESCA; Exxon conversa sobre Petromonagas, sin contrato cerrado. Los datos de producción OPEP y capacidad portuaria más abajo tienen cortes propios.</div>
+          </Card>
+
+          <Card accent="#22c55e">
+            <div style={{display:"flex",justifyContent:"space-between",gap:8,flexWrap:"wrap",marginBottom:9}}><div style={{fontSize:12,fontWeight:800,color:TEXT}}>Antecedente · corte 11–18 sep</div><div style={{fontSize:8,color:MUTED,fontFamily:font}}>Anuncios, acuerdos y conversaciones; no producción ejecutada</div></div>
+            <div style={{display:"grid",gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)",gap:7}}>{[
+              ["MoU","Continental–PDVSA","Ayacucho 2 · ~30.000M bbl in situ"],
+              ["≤USD 1.000M","Mina Chocó","Inversión inicial anunciada · Heeney/Mercuria"],
+              ["20 años","Denarius","Acuerdo petrolero anunciado"],
+              ["Conversaciones","ExxonMobil","Eventual retorno; contrato no cerrado"]
             ].map(([value,label,detail])=><div key={label} style={{padding:"9px 10px",border:`1px solid ${BORDER}`,background:BG2}}><div style={{fontSize:18,fontWeight:900,color:"#22c55e",fontFamily:font}}>{value}</div><div style={{fontSize:8,fontFamily:font,color:TEXT,textTransform:"uppercase",fontWeight:700}}>{label}</div><div style={{fontSize:8,color:MUTED,marginTop:3,lineHeight:1.35}}>{detail}</div></div>)}</div>
-            <div style={{fontSize:9,color:MUTED,lineHeight:1.5,marginTop:8}}>El terminal de José concentra alrededor de 70% de las exportaciones; Guaraguao operaba con dos de siete puestos. OFAC actualizó ocho licencias y SLB obtuvo acceso a bases de campos para digitalización y analítica.</div>
+            <div style={{fontSize:9,color:MUTED,lineHeight:1.5,marginTop:8}}>Los instrumentos anunciados en Houston aún deben madurar para generar desembolsos, producción o ingresos fiscales. Como último dato productivo fechado, OPEP registró 1,201M b/d en agosto (+1.000 b/d frente a julio). Los datos de capacidad portuaria mostrados más abajo son antecedentes, no novedades de S36.</div>
           </Card>
 
           {/* Price cards */}

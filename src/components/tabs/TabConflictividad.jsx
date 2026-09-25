@@ -68,14 +68,14 @@ export function TabConflictividad() {
         const maxP = Math.max(...CONF_SEMANAL.map(w => w.protestas), 1);
         const maxE = Math.max(...CONF_SEMANAL.map(w => w.estados), 1);
         const totalAcum = CONF_SEMANAL.reduce((s, w) => s + w.protestas, 0);
-        const deltaP = prev ? latest.protestas - prev.protestas : null;
-        const deltaPct = prev && prev.protestas > 0 ? Math.round(((latest.protestas - prev.protestas) / prev.protestas) * 100) : null;
+        const deltaP = prev && !latest.partial && !prev.partial ? latest.protestas - prev.protestas : null;
+        const deltaPct = deltaP != null && prev.protestas > 0 ? Math.round((deltaP / prev.protestas) * 100) : null;
 
         return (<>
           {/* KPI row */}
           <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(5,1fr)", gap:10, marginBottom:16 }}>
             <Card accent={latest.protestas > 50 ? "#dc2626" : latest.protestas > 30 ? "#ca8a04" : "#16a34a"}>
-              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Protestas semana</div>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>{latest.partial ? "Protestas · corte parcial" : "Protestas semana"}</div>
               <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
                 <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:latest.protestas > 50 ? "#dc2626" : latest.protestas > 30 ? "#ca8a04" : TEXT }}>{latest.protestas}</span>
                 {deltaP != null && deltaP !== 0 && (
@@ -84,27 +84,27 @@ export function TabConflictividad() {
                   </span>
                 )}
               </div>
-              <div style={{ fontSize:10, color:MUTED }}>{latest.label}</div>
+              <div style={{ fontSize:10, color:MUTED }}>{latest.label}{latest.partial ? " · días documentados" : ""}</div>
             </Card>
             <Card>
               <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Estados</div>
               <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:latest.estados > 18 ? "#dc2626" : TEXT }}>{latest.estados}</span>
-              <div style={{ fontSize:10, color:MUTED }}>de 24 entidades</div>
+              <div style={{ fontSize:10, color:MUTED }}>{latest.week === "S37" ? "de 24 · día 24; mínimo del corte" : latest.partial ? "de 24 · unión de balances parciales" : "de 24 entidades"}</div>
             </Card>
             <Card>
               <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Reprimidas</div>
-              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:latest.reprimidas > 0 ? "#dc2626" : "#16a34a" }}>{latest.reprimidas}</span>
-              <div style={{ fontSize:10, color:MUTED }}>esta semana</div>
+              <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:latest.reprimidas == null ? MUTED : latest.reprimidas > 0 ? "#dc2626" : "#16a34a" }}>{latest.reprimidas ?? "—"}</span>
+              <div style={{ fontSize:10, color:MUTED }}>{latest.reprimidas == null ? "sin dato consolidado" : "esta semana"}</div>
             </Card>
             <Card>
-              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Acumulado 2026</div>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Suma disponible 2026</div>
               <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:ACCENT }}>{totalAcum}</span>
-              <div style={{ fontSize:10, color:MUTED }}>S1–{latest.week}</div>
+              <div style={{ fontSize:10, color:MUTED }}>S1–{latest.week} · incluye cortes parciales</div>
             </Card>
             <Card>
-              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Prom. semanal</div>
+              <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Media por registro</div>
               <span style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Mono',monospace", color:TEXT }}>{Math.round(totalAcum / CONF_SEMANAL.length)}</span>
-              <div style={{ fontSize:10, color:MUTED }}>protestas/semana</div>
+              <div style={{ fontSize:10, color:MUTED }}>media de registros · incluye parciales</div>
             </Card>
           </div>
 
@@ -126,7 +126,7 @@ export function TabConflictividad() {
 
           {/* Evolución semanal — gráfica de barras */}
           <Card style={{ marginBottom:16 }}>
-            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:12 }}>Evolución semanal · Protestas S1 → {latest.week}</div>
+            <div style={{ fontSize:10, fontFamily:font, color:MUTED, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:12 }}>Evolución de registros S1 → {latest.week} · los cortes parciales no son comparables con semanas completas</div>
             <div style={{ display:"flex", gap:3, alignItems:"flex-end", height:140 }}>
               {CONF_SEMANAL.map((w, i) => {
                 const h = Math.max(4, (w.protestas / maxP) * 120);
@@ -138,7 +138,7 @@ export function TabConflictividad() {
                     <div style={{ width:"100%", height:h, background:barColor, opacity:isLast ? 1 : 0.5, borderRadius:"3px 3px 0 0", transition:"height 0.3s", position:"relative" }}>
                       {isLast && <div style={{ position:"absolute", top:-2, left:"50%", transform:"translateX(-50%)", width:6, height:6, borderRadius:"50%", background:barColor, boxShadow:`0 0 6px ${barColor}` }} />}
                     </div>
-                    <span style={{ fontSize:8, fontFamily:font, color:isLast ? barColor : MUTED, fontWeight:isLast ? 700 : 400 }}>{w.week}</span>
+                    <span style={{ fontSize:8, fontFamily:font, color:isLast ? barColor : MUTED, fontWeight:isLast ? 700 : 400 }}>{w.week}{w.partial ? "*" : ""}</span>
                   </div>
                 );
               })}
@@ -157,7 +157,7 @@ export function TabConflictividad() {
                   <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
                     <span style={{ fontSize:9, fontFamily:font, fontWeight:isLast ? 700 : 400, color:isLast ? barColor : MUTED }}>{w.estados}</span>
                     <div style={{ width:"100%", height:h, background:barColor, opacity:isLast ? 1 : 0.5, borderRadius:"3px 3px 0 0" }} />
-                    <span style={{ fontSize:8, fontFamily:font, color:isLast ? barColor : MUTED, fontWeight:isLast ? 700 : 400 }}>{w.week}</span>
+                    <span style={{ fontSize:8, fontFamily:font, color:isLast ? barColor : MUTED, fontWeight:isLast ? 700 : 400 }}>{w.week}{w.partial ? "*" : ""}</span>
                   </div>
                 );
               })}
@@ -193,11 +193,11 @@ export function TabConflictividad() {
                     const isLast = w.week === latest.week;
                     return (
                       <tr key={w.week} style={{ borderBottom:`1px solid ${BORDER}30`, background:isLast ? `${ACCENT}06` : "transparent" }}>
-                        <td style={{ padding:"6px 8px", fontWeight:isLast ? 700 : 400, color:isLast ? ACCENT : TEXT }}>{w.week}</td>
+                        <td style={{ padding:"6px 8px", fontWeight:isLast ? 700 : 400, color:isLast ? ACCENT : TEXT }}>{w.week}{w.partial ? "*" : ""}</td>
                         <td style={{ padding:"6px 8px", color:MUTED }}>{w.label}</td>
                         <td style={{ padding:"6px 8px", fontWeight:600, color:w.protestas > 50 ? "#dc2626" : w.protestas > 30 ? "#ca8a04" : TEXT }}>{w.protestas}</td>
                         <td style={{ padding:"6px 8px", color:w.estados > 18 ? "#dc2626" : TEXT }}>{w.estados}/24</td>
-                        <td style={{ padding:"6px 8px", color:w.reprimidas > 0 ? "#dc2626" : "#16a34a" }}>{w.reprimidas}</td>
+                        <td style={{ padding:"6px 8px", color:w.reprimidas == null ? MUTED : w.reprimidas > 0 ? "#dc2626" : "#16a34a" }}>{w.reprimidas ?? "—"}</td>
                         <td style={{ padding:"6px 8px", color:MUTED, fontSize:11, maxWidth:250, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{w.hecho}</td>
                       </tr>
                     );
@@ -232,7 +232,7 @@ export function TabConflictividad() {
                   {[
                     { value:selWeek.protestas, label:"Protestas", color:selWeek.protestas>50?"#dc2626":TEXT },
                     { value:`${selWeek.estados}/24`, label:"Estados", color:selWeek.estados>18?"#dc2626":TEXT },
-                    { value:selWeek.reprimidas, label:"Reprimidas", color:selWeek.reprimidas>0?"#dc2626":"#16a34a" },
+                    { value:selWeek.reprimidas ?? "—", label:"Reprimidas", color:selWeek.reprimidas == null ? MUTED : selWeek.reprimidas>0?"#dc2626":"#16a34a" },
                   ].map(item => <div key={item.label} style={{ background:BG2, padding:"8px 10px", textAlign:"center" }}>
                     <span style={{ fontSize:18, fontWeight:800, color:item.color, fontFamily:"'Space Mono',monospace" }}>{item.value}</span>
                     <div style={{ fontSize:8, fontFamily:font, color:MUTED, letterSpacing:"0.08em", textTransform:"uppercase" }}>{item.label}</div>

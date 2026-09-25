@@ -15,7 +15,7 @@ export function ProtestasWidget({ onOpen }) {
   const previous = selectedIndex > 0 ? CONF_SEMANAL[selectedIndex - 1] : null;
   if (!latest || !current) return null;
 
-  const delta = previous?.protestas > 0 ? ((current.protestas - previous.protestas) / previous.protestas) * 100 : null;
+  const delta = !current.partial && !previous?.partial && previous?.protestas > 0 ? ((current.protestas - previous.protestas) / previous.protestas) * 100 : null;
   const max = Math.max(...history.map(item => item.protestas), 1);
   const dailyRows = current.dias?.filter(item => !String(item.fecha).includes("–")) || [];
   const peak = current.week === "S31"
@@ -36,10 +36,10 @@ export function ProtestasWidget({ onOpen }) {
     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:10, flexWrap:"wrap", padding:"10px 14px", borderBottom:`1px solid ${BORDER}` }}>
       <div>
         <div style={{ fontSize:10, fontFamily:font, color:"#dc2626", letterSpacing:".12em", textTransform:"uppercase", fontWeight:700 }}>Pulso de protestas</div>
-        <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>Conflictividad social · semana seleccionada: <b style={{ color:"#dc2626" }}>{current.week} · {current.label}</b></div>
+        <div style={{ fontSize:9, color:MUTED, marginTop:2 }}>Conflictividad social · semana seleccionada: <b style={{ color:"#dc2626" }}>{current.week} · {current.label}</b>{current.partial ? ` · corte parcial ${current.observedPeriod}` : ""}</div>
       </div>
       <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
-        <span style={{ fontSize:10, color:delta > 0 ? "#dc2626" : "#16a34a", fontFamily:font, fontWeight:800 }}>{current.protestas} protestas · {delta == null ? "sin comparación" : `${delta > 0 ? "▲" : "▼"}${Math.abs(Math.round(delta))}% semanal`}</span>
+        <span style={{ fontSize:10, color:delta == null ? MUTED : delta > 0 ? "#dc2626" : "#16a34a", fontFamily:font, fontWeight:800 }}>{current.protestas} protestas · {current.partial ? "corte parcial" : delta == null ? "sin comparación" : `${delta > 0 ? "▲" : "▼"}${Math.abs(Math.round(delta))}% semanal`}</span>
         <button onClick={()=>setExpanded(value=>!value)} aria-expanded={expanded} style={{ border:`1px solid #dc262650`, background:expanded?"#fee2e2":"#fff", color:"#dc2626", padding:"6px 10px", fontFamily:font, fontSize:9, cursor:"pointer", borderRadius:3 }}>{expanded?"Ocultar ▲":"Desplegar ▼"}</button>
         <button onClick={onOpen} style={{ border:"none", background:"#dc2626", color:"#fff", padding:"6px 10px", fontFamily:font, fontSize:9, cursor:"pointer", borderRadius:3 }}>Ver conflictividad →</button>
       </div>
@@ -50,7 +50,7 @@ export function ProtestasWidget({ onOpen }) {
       <div style={{ padding:"13px 14px", borderRight:`1px solid ${BORDER}`, borderBottom:mob?`1px solid ${BORDER}`:"none" }}>
         <div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase" }}>Protestas registradas</div>
         <div style={{ fontSize:34, fontWeight:900, color:"#dc2626", fontFamily:font, lineHeight:1.05 }}>{current.protestas}</div>
-        <div style={{ fontSize:10, color:delta > 0 ? "#dc2626" : "#16a34a", fontFamily:font, marginTop:4 }}>{delta == null ? "Sin comparación" : `${delta > 0 ? "▲" : "▼"} ${Math.abs(Math.round(delta))}% vs ${previous.short || previous.week}`}</div>
+        <div style={{ fontSize:10, color:delta == null ? MUTED : delta > 0 ? "#dc2626" : "#16a34a", fontFamily:font, marginTop:4 }}>{current.partial ? `Corte parcial ${current.observedPeriod}; no comparable` : delta == null ? "Sin comparación" : `${delta > 0 ? "▲" : "▼"} ${Math.abs(Math.round(delta))}% vs ${previous.short || previous.week}`}</div>
       </div>
 
       <div style={{ padding:"13px 14px", borderRight:mob?"none":`1px solid ${BORDER}`, borderBottom:mob?`1px solid ${BORDER}`:"none" }}>
@@ -61,7 +61,7 @@ export function ProtestasWidget({ onOpen }) {
       </div>
 
       <div style={{ padding:"11px 14px", gridColumn:mob?"1 / -1":"auto" }}>
-        <div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase", marginBottom:6 }}>Evolución · selecciona una barra o semana</div>
+        <div style={{ fontSize:9, color:MUTED, fontFamily:font, textTransform:"uppercase", marginBottom:6 }}>Evolución · selecciona una barra o semana · S35 parcial</div>
         <div style={{ height:52, display:"flex", alignItems:"flex-end", gap:mob?6:10, borderBottom:`1px solid ${BORDER}` }}>
           {history.map(item => <button key={item.week} type="button" onClick={()=>setSelectedWeek(item.week)} aria-label={`Seleccionar ${item.week}: ${item.protestas} protestas`} title={`Seleccionar ${item.week}: ${item.protestas} protestas`} style={{ flex:1, height:`${Math.max(4,(item.protestas/max)*48)}px`, padding:0, border:item.week===current.week?"1px solid #991b1b":"none", background:item.week===current.week?"#dc2626":"#fca5a5", position:"relative", minWidth:12, cursor:"pointer", boxShadow:item.week===current.week?"0 0 0 2px #fecaca":"none", transition:"all .15s" }}><span style={{ position:"absolute", top:-14, left:"50%", transform:"translateX(-50%)", fontSize:8, color:item.week===current.week?"#dc2626":MUTED, fontFamily:font, fontWeight:item.week===current.week?800:400 }}>{item.protestas}</span></button>)}
         </div>

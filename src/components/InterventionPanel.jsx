@@ -15,6 +15,12 @@ export function InterventionPanel({ mob }) {
       </div>
     </div>
 
+    <Card accent="#b45309">
+      <div style={{fontSize:10,fontFamily:font,color:"#b45309",fontWeight:800,textTransform:"uppercase",letterSpacing:".08em",marginBottom:6}}>Último análisis cuantitativo disponible · 11–18 sep 2026</div>
+      <div style={{fontSize:11,color:TEXT,lineHeight:1.55}}>El ACS sitúa la intervención acumulada de agosto en aproximadamente USD 1.780–1.785 MM y proyecta una reducción hacia USD 1.400 MM en septiembre. El gasto de la semana se proyectó en alrededor de USD 773 MM (+90%); la brecha central de 17,4% al 18 de septiembre es una estimación, no un cierre observado. Las reservas líquidas se sitúan en USD 1.652 MM dentro de USD 12.855 MM de reservas internacionales al 10 de septiembre.</div>
+      <div style={{fontSize:9,color:MUTED,marginTop:6}}>El ACS S37 no aporta un nuevo desglose diario de intervención. Los gráficos y operaciones detalladas más abajo conservan su fecha de agosto.</div>
+    </Card>
+
     <div style={{ display:"grid", gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)", gap:8 }}>
       {[
         {k:"Julio 2026",v:"USD 2.200 MM",s:"Dato registrado",c:ACCENT},
@@ -45,7 +51,7 @@ export function InterventionPanel({ mob }) {
         [`USD ${EXCHANGE_WEEK_SUMMARY.publicSpending} MM`,`Gasto público · ${EXCHANGE_WEEK_SUMMARY.spendingChange}%`,"#7c3aed"]
       ].map(([value,label,color])=><div key={label} style={{border:`1px solid ${BORDER}`,padding:"8px 9px",background:BG2}}><div style={{fontSize:17,fontWeight:900,color,fontFamily:font}}>{value}</div><div style={{fontSize:8,color:MUTED}}>{label}</div></div>)}</div>
       <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:9}}><thead><tr>{["Día","Intervención","Acumulado","Tasa de mercado","Brecha"].map(h=><th key={h} style={{textAlign:"left",padding:"5px 6px",color:MUTED,fontFamily:font,borderBottom:`1px solid ${BORDER}`}}>{h}</th>)}</tr></thead><tbody>{INTERVENTION_DAILY.map(row=><tr key={row.date}><td style={{padding:"6px",borderBottom:`1px solid ${BORDER}50`,fontWeight:700}}>{row.date}</td><td style={{padding:6}}>USD {row.value} MM</td><td style={{padding:6,color:ACCENT,fontWeight:700}}>USD {row.cumulative} MM</td><td style={{padding:6}}>{row.market.toLocaleString("es-VE")} Bs/$</td><td style={{padding:6,color:row.gap>=20?"#dc2626":"#b45309",fontWeight:700}}>{row.gap.toLocaleString("es-VE")}%</td></tr>)}</tbody></table></div>
-      <div style={{fontSize:9,color:MUTED,lineHeight:1.5,marginTop:8}}>La tasa alcanzó un máximo intr semanal el jueves y retrocedió al cierre. La moderación del gasto y USD 36 MM esterilizados mediante TCC compensaron parcialmente la menor oferta de divisas.</div>
+      <div style={{fontSize:9,color:MUTED,lineHeight:1.5,marginTop:8}}>La tasa alcanzó un máximo intrasemanal el jueves y retrocedió al cierre. La moderación del gasto y USD 36 MM esterilizados mediante TCC compensaron parcialmente la menor oferta de divisas.</div>
     </Card>
 
     <Card>

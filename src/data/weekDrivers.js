@@ -149,10 +149,80 @@ export const WEEK_DRIVERS = {
   }
 };
 
+export const WEEK_DRIVERS_S36 = {
+  "1": {
+    label:"Transición pacífica — 7% · +2pp",
+    drivers:["Diez portales desbloqueados constituyen un resultado verificable, pero persisten al menos 188 dominios bloqueados.","La Gaceta 7.074 activa el Comité de Postulaciones Judiciales de 23 miembros.","La mesa no tiene calendario electoral exigible ni incluye al movimiento de Machado.","La ONU advierte que la apertura es parcial, condicional y reversible."],
+    signals:["Acuerdo electoral publicado", "Selección judicial independiente", "Participación de actores excluidos", "Apertura mediática sostenida"]
+  },
+  "2": {
+    label:"Colapso y fragmentación — 14% · −2pp",
+    drivers:["Diálogo y respaldo diplomático ofrecen canales de gestión.","OVCS registra 58 protestas en cuatro balances, sin fractura de mando comprobada.","Guri opera con 6.141 de 10.350 MW y amenaza servicios esenciales.","La falta de datos sobre cohesión militar es incertidumbre, no prueba de cohesión."],
+    signals:["Fracturas verificables de mando", "Pérdida de control territorial", "Fallas prolongadas de servicios", "Respuesta ante Guri"]
+  },
+  "3": {
+    label:"Continuidad negociada — 54% · −2pp",
+    drivers:["La segunda ronda ya se instaló con agenda institucional amplia.","Estados Unidos restablece relaciones y Reino Unido eleva la representación a embajadores.","La reforma judicial abre un procedimiento, no una garantía de independencia.","Los anuncios de Houston y el oro pendiente aún no son ingresos disponibles."],
+    signals:["Compromisos negociados verificables", "Decisión judicial sobre el oro", "Desembolsos efectivos", "Condiciones del respaldo externo"]
+  },
+  "4": {
+    label:"Resistencia coercitiva — 25% · +2pp",
+    drivers:["El margen de divisas más estrecho limita la respuesta material a demandas.","La misión independiente de la ONU describe el aparato represivo como en gran medida intacto.","La detención y liberación de Javier Oropeza es un episodio reversible, no prueba una tendencia general.","La escalada coercitiva es un riesgo, no una consecuencia automática del deterioro económico."],
+    signals:["Repetición de detenciones", "Respuesta estatal a protestas", "Brecha observada frente a proyección", "Reversión del desbloqueo"]
+  }
+};
+
+export const WEEK_DRIVERS_S37 = {
+  "1": {
+    label:"Transición pacífica — 7% · sin cambio",
+    drivers:["#SetTheDate demanda calendario y garantías de retorno para María Corina Machado; el 24 de julio de 2027 es una propuesta, no fecha acordada.","HRW abre un canal para listas de detenidos arbitrariamente, sin balance nuevo de liberaciones.","Rodríguez anuncia elecciones ante la ONU sin fecha ni mecanismo independiente de verificación.","El Departamento de Estado aclara que el encuentro Trump–Rodríguez no implica legitimación formal."],
+    signals:["Fecha electoral oficial", "CNE independiente", "Garantías de retorno y participación", "Resultados verificables sobre detenidos"]
+  },
+  "2": {
+    label:"Colapso y fragmentación — 15% · +1pp",
+    drivers:["OVCS registra 78 protestas en cinco jornadas, con 29 el 24 de septiembre en una movilización laboral.","ANOVA estima 70,2% de hogares con agua o electricidad precaria y 494.763 ocupaciones menos asociadas; no demuestra causalidad estricta.","La base social del reclamo se amplía a jubilados, pensionados y trabajadores.","No se acredita coordinación nacional sostenida ni fractura de la cadena de seguridad."],
+    signals:["Repetición de movilizaciones laborales", "Continuidad de agua y electricidad", "Articulación territorial", "Rupturas verificables de mando"]
+  },
+  "3": {
+    label:"Continuidad negociada — 56% · +2pp",
+    drivers:["Rodríguez interviene ante la AGNU y se reúne brevemente con Trump; el contacto amplía reconocimiento práctico sin legitimación formal.","FMI anuncia oficina técnica para 2027 y BID prepara plan a dos años, sin desembolsos aprobados.","La AN no designa a los 11 diputados del Comité Judicial pese al plazo de Gaceta; conserva control sobre el ritmo institucional.","TotalEnergies, Chevron y Halliburton amplían anuncios energéticos, mientras exportaciones y márgenes siguen restringidos."],
+    signals:["Instalación efectiva del Comité Judicial", "Resultado sustantivo de la mesa", "Decisión británica sobre el oro", "Desembolsos y exportaciones observados"]
+  },
+  "4": {
+    label:"Resistencia coercitiva — 22% · −3pp",
+    drivers:["No aparece una nueva fractura institucional o escalada coercitiva sistémica en el corte.","CLIPPVE informa más de 400 personas presas por motivos políticos, con universo distinto del último balance de Foro Penal.","Figuera reconoce que los detenidos no forman parte de la agenda formal de diálogo.","La coordinación de Ejecutivo, AN y TSJ mantiene capacidad de contención, aunque no elimina el riesgo de coerción selectiva."],
+    signals:["Respuesta estatal a la movilización del 24 sep", "Liberaciones verificadas", "Persistencia de la demora judicial", "Cambios en cohesión de la FANB"]
+  }
+};
+
 // Archivo acumulativo de drivers detallados. Al incorporar una semana nueva,
 // agregar una nueva clave y conservar todas las anteriores.
 export const WEEK_DRIVERS_BY_WEEK = {
   S32: WEEK_DRIVERS_S32,
   S33: WEEK_DRIVERS_S33,
   S34: WEEK_DRIVERS,
+  S35: {
+    "1": {
+      label:"Transición pacífica — 5% · −1pp",
+      drivers:["La segunda ronda anunciada tiene meta de nuevos poderes para diciembre, sin fecha electoral.","La condición institucional de Rubio no contiene un mecanismo de cumplimiento vinculante.","Cabello declara disponibilidad electoral sin comprometer un calendario.","Machado no se incorpora al formato negociador formal y no se observa fractura en la coalición dominante."],
+      signals:["Fecha electoral acordada", "Criterios de independencia del TSJ y CNE", "Incorporación de la oposición principal", "Resultado de la sesión del 15 de septiembre"]
+    },
+    "2": {
+      label:"Colapso y fragmentación — 16% · 0pp",
+      drivers:["Meganalisis registra 82,4% de desconfianza en la mesa y 88,4% de urgencia de cambio político.","OVCS contabiliza 41 protestas en cuatro días; no hay evidencia de articulación nacional ni ruptura de mando.","La recentralización administrativa prevista de Citgo funciona como contrapeso institucional a corto plazo.","OPEP registra solo 1.000 b/d adicionales en agosto, por debajo de las expectativas de recuperación."],
+      signals:["Articulación territorial de protestas", "Fractura de la cadena de mando", "Ejecución de inversiones anunciadas", "Litigio de Citgo"]
+    },
+    "3": {
+      label:"Continuidad negociada — 56% · −2pp",
+      drivers:["Las juntas opositoras de Citgo se preparan para transferir la administración a la gestión de Rodríguez.","La segunda ronda AN2015–Gobierno está anunciada desde el 15 de septiembre con agenda legislativa.","Más de 25 empresas anuncian planes de inversión u operación, aún sin desembolsos equivalentes.","La legitimidad del Gobierno y de actores estadounidenses se deteriora en AtlasIntel/Bloomberg.","La inflación mensual baja a 8,9%, pero la producción OPEP permanece casi estancada."],
+      signals:["Transferencia efectiva de Citgo y licencia del 17 de septiembre", "Primera sesión de la segunda ronda", "Respuesta de la Casa Blanca sobre NABEP", "Desembolsos y producción observada"]
+    },
+    "4": {
+      label:"Resistencia coercitiva — 23% · +3pp",
+      drivers:["La desaprobación de Rodríguez alcanza 60,5% y la aprobación de Trump cae de 51% a 30% entre julio y agosto.","La protesta combina demandas socioeconómicas con reclamos de justicia y presos políticos.","El bloqueo de una marcha sindical en S34 permanece como antecedente de coerción selectiva.","El cuestionamiento demócrata a NABEP amplía el riesgo de gobernanza externa.","El alza de E4 no representa una nueva escalada represiva sistémica confirmada en S35."],
+      signals:["Respuesta estatal a protestas políticas", "Nueva coerción selectiva verificable", "Extensión del escrutinio NABEP", "Posición pública de Machado y la FANB"]
+    }
+  },
+  S36: WEEK_DRIVERS_S36,
+  S37: WEEK_DRIVERS_S37,
 };

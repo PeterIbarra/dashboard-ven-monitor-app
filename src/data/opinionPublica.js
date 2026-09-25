@@ -1,24 +1,17 @@
 export const OPINION_SNAPSHOT = {
-  period: "21–28 ago 2026",
-  source: "DatinCorp · AtlasIntel/Bloomberg · Meganálisis",
+  period: "Últimas encuestas disponibles al corte S37 · campo 24 ago–3 sep 2026; sin encuesta nueva en el ACS",
+  source: "AtlasIntel/Bloomberg · Meganalisis",
   cards: [
-    { label: "Gestión de Delcy Rodríguez: mal camino", value: 53, suffix: "%", delta: "DatinCorp · 23 ago", color: "#dc2626" },
-    { label: "Prefiere negociar acuerdos", value: 50.2, suffix: "%", delta: "vs. 22,6% confrontar", color: "#2d8a30" },
-    { label: "Ningún líder lo representa", value: 59, suffix: "%", delta: "69,4% pide nuevos liderazgos", color: "#ca8a04" },
-    { label: "Independiente / no alineado", value: 64.6, suffix: "%", delta: "DatinCorp · muestra nacional", color: "#7c3aed" },
+    { label: "Desaprueba gestión de Delcy Rodríguez", value: 60.5, suffix: "%", delta: "AtlasIntel/Bloomberg · 30 ago–3 sep", color: "#dc2626" },
+    { label: "Rechaza el acuerdo petrolero", value: 37.6, suffix: "%", delta: "35,4% a favor · AtlasIntel", color: "#ca8a04" },
+    { label: "No confía en la mesa de diálogo", value: 82.4, suffix: "%", delta: "Meganalisis · 24–31 ago", color: "#dc2626" },
+    { label: "Intención de voto por Machado", value: 61.2, suffix: "%", delta: "Meganalisis · pregunta electoral", color: "#7c3aed" },
   ],
 };
 
 export const LEADERSHIP = [
-  { name: "María Corina Machado", positive: 72, negative: 14, balance: 58, source: "AtlasIntel/Bloomberg" },
-  { name: "Edmundo González", positive: 61, negative: 17, balance: 44, source: "AtlasIntel/Bloomberg" },
-  { name: "Lorenzo Mendoza", positive: 58, negative: 20, balance: 38, source: "AtlasIntel/Bloomberg" },
-  { name: "Marco Rubio", positive: 54, negative: 24, balance: 30, source: "AtlasIntel/Bloomberg" },
-  { name: "Donald Trump", positive: 51, negative: 29, balance: 22, source: "AtlasIntel/Bloomberg" },
-  { name: "Delcy Rodríguez", positive: 19, negative: 71, balance: -52, source: "AtlasIntel/Bloomberg" },
-  { name: "Nicolás Maduro", positive: 11, negative: 79, balance: -68, source: "AtlasIntel/Bloomberg" },
-  { name: "Diosdado Cabello", positive: 10, negative: 79, balance: -69, source: "AtlasIntel/Bloomberg" },
-  { name: "Jorge Rodríguez", positive: 5, negative: 76, balance: -71, source: "AtlasIntel/Bloomberg" },
+  { name: "María Corina Machado", positive: 53, negative: 25, balance: 28, source: "AtlasIntel/Bloomberg · 30 ago–3 sep" },
+  { name: "Donald Trump", positive: 30, negative: 43, balance: -13, source: "AtlasIntel/Bloomberg · agosto" },
 ];
 
 export const RODRIGUEZ_TREND = [
@@ -57,6 +50,8 @@ export const US_RELATION = [
 ];
 
 export const SURVEY_SOURCES = [
+  { name: "AtlasIntel / Bloomberg LATAM Pulse", period: "30 ago–3 sep 2026", scope: "1.922 adultos · reclutamiento digital aleatorio", note: "Margen ±2pp, 95% de confianza. Diferenciar imagen de líderes, aprobación de gestión y opinión del acuerdo." },
+  { name: "Meganalisis Verdad Venezuela", period: "24–31 ago 2026", scope: "1.129 adultos · entrevistas telefónicas CATI · 23 estados y Distrito Capital", note: "Margen ±2,92pp, 95% de confianza. La intención de voto no equivale a imagen positiva." },
   { name: "DatinCorp", period: "23 de agosto de 2026", scope: "1.200 entrevistas en hogares · Caracas y 16 estados · ≈90% de la población electoral", note: "Margen de error ±2,83% y 95% de confianza. Comparar cada pregunta con su formulación original." },
   { name: "AtlasIntel / Bloomberg LATAM Pulse", period: "Agosto 2026", scope: "Imagen de liderazgos y preocupaciones", note: "Comparar solo con olas de la misma firma y formulación." },
   { name: "More Consulting", period: "Enero–julio 2026", scope: "Aceptación de la presidenta encargada", note: "Serie longitudinal utilizada para mostrar tendencia interna." },
@@ -121,6 +116,16 @@ export const EARTHQUAKE_OPINION = {
 // Archivo acumulativo: cada estudio conserva su propia pregunta, universo y metodología.
 // No se combinan porcentajes de firmas distintas en una serie única.
 export const SURVEY_ARCHIVE = [
+  {
+    id:"atlas-bloomberg-2026-09", source:"AtlasIntel / Bloomberg LATAM Pulse", period:"30 ago–3 sep 2026",
+    methodology:"1.922 adultos · reclutamiento digital aleatorio · ±2pp · 95% de confianza. Medición citada en ACS 4–11 sep.",
+    results:[["Desaprueba gestión de Delcy Rodríguez",60.5],["Aprueba gestión de Delcy Rodríguez",24.6],["Rechaza acuerdo petrolero",37.6],["Apoya acuerdo petrolero",35.4],["Cree que EE.UU. será mayor beneficiario",50.2],["Imagen positiva de María Corina Machado",53],["Imagen negativa de María Corina Machado",25],["Imagen positiva de Edmundo González",47],["Aprobación de Donald Trump en agosto",30]]
+  },
+  {
+    id:"meganalisis-2026-08", source:"Meganalisis · Verdad Venezuela", period:"24–31 ago 2026",
+    methodology:"1.129 adultos · entrevistas telefónicas CATI · 23 estados y Distrito Capital · ±2,92pp · 95% de confianza. Medición citada en ACS 4–11 sep.",
+    results:[["No confía en la mesa de diálogo",82.4],["Considera urgente que el chavismo deje el poder",88.4],["Identifica elección presidencial como prioritaria",79.3],["Intención de voto de María Corina Machado",61.2],["Percibe que su economía no mejoró con Delcy Rodríguez",93.2]]
+  },
   {
     id:"datincorp-2026-08-23", source:"DatinCorp", period:"23 ago 2026",
     methodology:"1.200 entrevistas en hogares · Caracas y 16 estados · ±2,83% · 95% de confianza",

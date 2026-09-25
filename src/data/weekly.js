@@ -1,67 +1,67 @@
 export const KPIS_LATEST = {
   "energia": [
     {
-      "k": "Reservas NABEP",
-      "v": "≈65.000M bbl · 17 campos",
-      "c": "#22c55e"
-    },
-    {
-      "k": "Participación EE.UU.",
-      "v": "35% de la matriz de NABEP",
+      "k": "Acuerdo TotalEnergies",
+      "v": "MoU con PDVSA · 20 sep · sin inversión ejecutada",
       "c": "#22c55e"
     },
     {
       "k": "Chevron",
-      "v": "USD 7.000M · meta 600.000 b/d",
+      "v": "USD 7.000M anunciados · no desembolsados",
       "c": "#22c55e"
     },
     {
-      "k": "Producción actual",
-      "v": "≈1,1–1,25M b/d",
+      "k": "Exportaciones de crudo",
+      "v": "1,17M b/d · agosto · Reuters",
+      "c": "#22c55e"
+    },
+    {
+      "k": "Flete Aframax",
+      "v": "USD 5/bbl José–Golfo · desde USD 1,90",
       "c": "#f59e0b"
     }
   ],
   "politico": [
     {
       "k": "E3 dominante",
-      "v": "58% · −1pp",
+      "v": "56% · +2pp",
       "c": "#38bdf8"
     },
     {
       "k": "E1",
-      "v": "6% · −2pp",
+      "v": "7% · sin cambio",
       "c": "#22c55e"
     },
     {
       "k": "E4",
-      "v": "20% · +3pp",
+      "v": "22% · −3pp",
       "c": "#ca8a04"
     },
     {
       "k": "E2",
-      "v": "16% · 0pp",
+      "v": "15% · +1pp",
       "c": "#ef4444"
     }
   ],
   "opinion": [
     {
       "k": "Conflictividad",
-      "v": "60 protestas · 5 días",
+      "v": "78 protestas · 18–24 sep · 5 jornadas",
       "c": "#dc2626"
     },
     {
-      "k": "Bono 2027",
-      "v": "54 centavos · máx. 4 meses",
+      "k": "Gestión Rodríguez",
+      "v": "60,5% desaprueba · AtlasIntel, campo 30 ago–3 sep",
       "c": "#f59e0b"
     },
     {
-      "k": "Comité TSJ",
-      "v": "23 integrantes · 11 AN + 12 civiles",
+      "k": "Servicios precarios",
+      "v": "70,2% de hogares · ANOVA 2026",
       "c": "#0468B1"
     },
     {
       "k": "Brecha E3–E1",
-      "v": "52 puntos · máxima del ciclo",
+      "v": "49 puntos · S37",
       "c": "#f59e0b"
     }
   ]
@@ -2611,38 +2611,236 @@ export const WEEKS = [
         { "name": "Sin escalada sistémica", "detail": "La capacidad coercitiva respalda el pacto, pero no sustituye la vía negociada como estrategia dominante.", "impact": 4, "persistence": 3, "evidence": 4, "confidence": "Media-alta" }
       ] }
     }
+  },
+  {
+    "label": "4–11 sep", "short": "S35",
+    "probs": [
+      { "sc": 1, "v": 5, "t": "down" },
+      { "sc": 2, "v": 16, "t": "flat" },
+      { "sc": 3, "v": 56, "t": "down" },
+      { "sc": 4, "v": 23, "t": "up" }
+    ],
+    "xy": { "x": 0.39, "y": 0.21 },
+    "sem": { "g": 7, "y": 10, "r": 10 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "OPEP: producción de 1.201.000 b/d en agosto; apenas +1.000 b/d frente a julio",
+        "ingresos": "Citgo: transición de control administrativo hacia la gestión de Delcy Rodríguez; litigio pendiente",
+        "licencias": "Licencia del Tesoro que protege Citgo vigente hasta el 17 de septiembre",
+        "cambio": "Más de 25 empresas anuncian planes; distinguir anuncios de desembolsos efectivos"
+      },
+      "economico": {
+        "inflacion": "BCV: inflación de agosto 8,9% mensual; 200,1% acumulada y 534,2% interanual",
+        "ingresos_pob": "70% considera mala la economía y 72% evalúa negativamente el empleo (AtlasIntel/Bloomberg)",
+        "electricidad": "Matrícula oficial de 6.009.254 frente a 8.824.512 reportados en 2024; brecha requiere explicación",
+        "pib": "Bolsa de Caracas: +168,38% en 2026; USD 207,98M negociados en agosto"
+      },
+      "opinion": {
+        "direccion": "Brecha E3–E1: 51pp; 60,5% desaprueba la gestión de Delcy Rodríguez",
+        "elecciones": "Segunda ronda de diálogo anunciada para el 15 sep.; meta institucional de diciembre, sin fecha electoral",
+        "mcm": "Machado: 53% de imagen positiva (AtlasIntel); 61,2% de intención de voto (Meganalisis)",
+        "eeuu": "37,6% rechaza el acuerdo petrolero y 35,4% lo apoya (AtlasIntel/Bloomberg)"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Hoja de ruta anunciada:</b> La segunda ronda AN2015–Gobierno comenzaría el 15 de septiembre con agenda legislativa y meta institucional de diciembre." },
+      { "l": "green", "t": "<b>Control de activos:</b> La gestión de Delcy Rodríguez asumiría la administración de Citgo; la disputa judicial de propiedad sigue abierta." },
+      { "l": "yellow", "t": "<b>Condición electoral:</b> Washington pide reconstrucción institucional previa, sin fecha ni verificación vinculante de elecciones." },
+      { "l": "yellow", "t": "<b>Promesas económicas:</b> La inflación de agosto baja a 8,9%, pero la producción OPEP solo sube 1.000 b/d frente a julio." },
+      { "l": "yellow", "t": "<b>Escrutinio NABEP:</b> Un congresista demócrata pide aclarar beneficiarios, fondos y conflictos de interés; espera respuesta el 14 de septiembre." },
+      { "l": "red", "t": "<b>Legitimidad:</b> 60,5% desaprueba a Delcy Rodríguez; la aprobación de Trump cae de 51% a 30% entre julio y agosto." },
+      { "l": "red", "t": "<b>Protesta y derechos:</b> OVCS registra 41 protestas del 7 al 10 de septiembre en 15 entidades, con reclamos por presos políticos." },
+      { "l": "red", "t": "<b>Riesgo coercitivo:</b> E4 llega a 23%; el aumento refleja menor capital político del pacto, no una nueva represión sistémica confirmada." }
+    ],
+    "lectura": "E3 conserva la primacía con 56% (−2pp): el traspaso administrativo previsto de Citgo y la segunda ronda de diálogo mantienen la arquitectura negociada, pero la pérdida de legitimidad del Gobierno y de los actores estadounidenses reduce su margen político. E1 baja a 5% (−1pp): la meta institucional de diciembre carece de fecha electoral, árbitro y mecanismo de verificación vinculante. E4 sube a 23% (+3pp), igualando su máximo, ante el desgaste del pacto y la persistencia de demandas por justicia y presos políticos; no se documenta en este corte una nueva escalada represiva sistémica. E2 sigue en 16%: la desconfianza y las protestas no se traducen todavía en fragmentación de mando. Las 41 protestas corresponden solo al 7–10 de septiembre, no a siete días completos.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 baja a 56%, pero sigue dominante: control administrativo de Citgo y segunda ronda sostienen el pacto; la legitimidad se erosiona",
+      "E4 sube a 23% por pérdida de capital político de ambos lados y presión social con demandas de justicia",
+      "E1 cae a 5% por falta de verificación electoral; E2 queda en 16% sin articulación de protestas ni ruptura de mando"
+    ],
+    "dominantComposition": {
+      "scenario": 3, "method": "impacto × persistencia × evidencia",
+      "factors": [
+        { "name": "Control administrativo de Citgo", "detail": "La gestión de Rodríguez recibiría el control operativo, con litigio de propiedad y protección del Tesoro pendientes.", "impact": 5, "persistence": 5, "evidence": 4, "confidence": "Media-alta" },
+        { "name": "Segunda ronda de negociación", "detail": "Agenda legislativa desde el 15 de septiembre y meta institucional para diciembre, aún sin resultados ejecutados.", "impact": 5, "persistence": 4, "evidence": 4, "confidence": "Media-alta" },
+        { "name": "Coalición de inversión anunciada", "detail": "Más de 25 empresas anuncian planes, sin equivalencia automática con desembolsos.", "impact": 4, "persistence": 4, "evidence": 4, "confidence": "Media-alta" },
+        { "name": "Desgaste de legitimidad", "detail": "AtlasIntel documenta desaprobación de Rodríguez y caída de imagen de actores estadounidenses.", "impact": 5, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Producción petrolera estancada", "detail": "OPEP registra solo 1.000 b/d adicionales en agosto frente a julio.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" }
+      ]
+    },
+    "scenarioCompositions": {
+      "1": { "scenario": 1, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Meta institucional declarada", "detail": "Nuevos poderes judicial y electoral se anuncian para diciembre, sin fecha electoral.", "impact": 3, "persistence": 3, "evidence": 4, "confidence": "Media-alta" },
+        { "name": "Condición electoral indefinida", "detail": "Rubio exige instituciones previas sin calendario ni sanción por incumplimiento.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Exclusión de oposición principal", "detail": "Machado sigue fuera de un canal formal de decisión.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" }
+      ] },
+      "2": { "scenario": 2, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Desconfianza acumulada", "detail": "Meganalisis registra 82,4% sin confianza en la mesa de diálogo.", "impact": 4, "persistence": 4, "evidence": 4, "confidence": "Media-alta" },
+        { "name": "Protesta dispersa", "detail": "41 protestas en cuatro días y 15 entidades sin articulación nacional comprobada.", "impact": 4, "persistence": 3, "evidence": 5, "confidence": "Alta" },
+        { "name": "Recentralización de Citgo", "detail": "El control administrativo previsto reduce la bifurcación institucional a corto plazo.", "impact": 4, "persistence": 4, "evidence": 4, "confidence": "Media-alta" }
+      ] },
+      "4": { "scenario": 4, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Erosión de legitimidad del pacto", "detail": "Desaprobación de Rodríguez y caída de imagen de Trump y Rubio reducen capital negociador.", "impact": 5, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Reclamos de justicia", "detail": "Persisten protestas por liberación de presos políticos durante el corte parcial del OVCS.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Coerción selectiva previa", "detail": "El bloqueo sindical de S34 sigue como antecedente; S35 no confirma una nueva escalada sistémica.", "impact": 4, "persistence": 3, "evidence": 5, "confidence": "Alta" }
+      ] }
+    }
+  },
+  {
+    "label": "11–18 sep", "short": "S36",
+    "probs": [
+      { "sc": 1, "v": 7, "t": "up" },
+      { "sc": 2, "v": 14, "t": "down" },
+      { "sc": 3, "v": 54, "t": "down" },
+      { "sc": 4, "v": 25, "t": "up" }
+    ],
+    "xy": { "x": 0.39, "y": 0.21 },
+    "sem": { "g": 7, "y": 10, "r": 10 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "Continental y PDVSA firman un memorando para Ayacucho 2; aún no equivale a producción ni inversión ejecutada",
+        "ingresos": "Oro en Londres: posible traslado de 31 t (~USD 4.000M), sujeto a acuerdo y orden judicial británica",
+        "licencias": "GL 5Z posterga hasta el 5 de noviembre la autorización sobre bonos PDVSA 2020; Citgo sigue bajo salvaguardas",
+        "cambio": "Guri opera con 6.141 de 10.350 MW instalados; 7 de 20 turbinas fuera de servicio"
+      },
+      "economico": {
+        "inflacion": "Inflación interanual de agosto: 534,2% según el informe financiero citado; no es proyección de cierre",
+        "ingresos_pob": "Gasto público de la semana proyectado en ~USD 773M (+90%); 71% dirigido a hogares",
+        "electricidad": "Reservas internacionales USD 12.855M al 10 sep; solo USD 1.652M en divisas líquidas",
+        "pib": "Brecha cambiaria central proyectada al 18 sep: 17,4% (rango 15,6–18,9%)"
+      },
+      "opinion": {
+        "direccion": "E3 conserva 54% y E4 alcanza máximo de 25%; brecha E3–E1 cae a 47 puntos",
+        "elecciones": "Segunda ronda instalada el 17 sep; primeros 10 portales desbloqueados, con ≥188 dominios aún bloqueados",
+        "mcm": "El movimiento de María Corina Machado sigue fuera de la negociación formal; regreso sin fecha fijada",
+        "eeuu": "EE. UU. restablece relaciones diplomáticas y consulares; Reino Unido eleva vínculos a nivel de embajadores"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Diálogo instalado:</b> La segunda ronda AN2015–Gobierno comienza el 17 de septiembre; el desbloqueo de al menos 10 portales es un resultado observable, aunque parcial." },
+      { "l": "green", "t": "<b>Normalización diplomática:</b> Estados Unidos restablece relaciones diplomáticas y consulares; Reino Unido eleva su representación a embajadores." },
+      { "l": "green", "t": "<b>Reforma judicial:</b> La Gaceta Extraordinaria 7.074 activa el Comité de Postulaciones de 23 miembros; la independencia de su selección aún debe verificarse." },
+      { "l": "yellow", "t": "<b>Oro condicionado:</b> El posible traslado de 31 toneladas desde Londres requiere acuerdo y nueva orden judicial británica; no representa liquidez disponible hoy." },
+      { "l": "yellow", "t": "<b>Inversión anunciada:</b> Los acuerdos y conversaciones de Houston aún no equivalen a desembolsos ni ingresos fiscales efectivos." },
+      { "l": "yellow", "t": "<b>Infraestructura eléctrica:</b> Guri genera 6.141 de 10.350 MW instalados, con 7 de 20 turbinas fuera de servicio, según el ACS." },
+      { "l": "red", "t": "<b>Garantías pendientes:</b> El movimiento de Machado permanece fuera de la mesa y no hay calendario electoral ni mecanismo independiente de verificación." },
+      { "l": "red", "t": "<b>Derechos humanos:</b> La misión independiente de la ONU describe un aparato represivo en gran medida intacto y medidas de apertura parciales y reversibles." },
+      { "l": "red", "t": "<b>Presión social y cambiaria:</b> OVCS registra 58 protestas en cuatro balances del 11–17 sep; la brecha de 17,4% y el gasto semanal de ~USD 773M son proyecciones, no cierres observados." }
+    ],
+    "lectura": "E3 mantiene la primacía con 54% (−2pp): el diálogo ya se instaló, la normalización diplomática avanza y la reforma judicial activa un procedimiento, pero faltan compromisos exigibles, inclusión política y garantías electorales. E1 sube a 7% (+2pp) por el desbloqueo parcial de medios y los primeros hitos institucionales verificables, sin que ello constituya una transición consolidada. E4 llega a 25% (+2pp), máximo de la serie, por la combinación de presión económica y persistencia de estructuras coercitivas; no se infiere una escalada represiva automática. E2 baja a 14% (−2pp): hay protestas y fragilidad de servicios, pero no rupturas verificadas de mando o de control territorial. La posición en la matriz permanece en x=39% y y=21% porque E2 baja dos puntos mientras E4 sube dos, y E1 sube dos mientras E2 baja dos; las probabilidades cambian aunque sus sumas por eje no lo hagan.",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 baja a 54% pero domina: diálogo instalado, normalización diplomática y reforma judicial aún sin garantías exigibles",
+      "E1 sube a 7% por apertura mediática parcial; E4 sube a 25% por presión económica y aparato coercitivo persistente",
+      "E2 baja a 14% sin fragmentación de mando; los ejes de la matriz quedan en 39% violencia y 21% cambio estructural"
+    ],
+    "dominantComposition": { "scenario": 3, "method": "impacto × persistencia × evidencia", "factors": [
+      { "name": "Diálogo efectivamente instalado", "detail": "La segunda ronda comienza el 17 de septiembre con agenda institucional amplia, aún sin acuerdos exigibles.", "impact": 5, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+      { "name": "Normalización diplomática", "detail": "Estados Unidos restablece relaciones y Reino Unido eleva representación a embajadores.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+      { "name": "Reforma judicial procedimental", "detail": "La Gaceta 7.074 activa el Comité de 23 miembros sin demostrar todavía independencia efectiva.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+      { "name": "Oro e inversión pendientes", "detail": "El acuerdo sobre oro requiere orden judicial; los anuncios de Houston no son desembolsos.", "impact": 4, "persistence": 3, "evidence": 4, "confidence": "Media-alta" }
+    ] },
+    "scenarioCompositions": {
+      "1": { "scenario": 1, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Desbloqueo observable de medios", "detail": "CONATEL restablece acceso a al menos 10 portales, pero persisten al menos 188 dominios bloqueados.", "impact": 4, "persistence": 3, "evidence": 5, "confidence": "Alta" },
+        { "name": "Comité judicial activado", "detail": "La reforma del TSJ abre el proceso de selección; composición formal no garantiza independencia.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Exclusión y calendario pendiente", "detail": "El movimiento de Machado no participa y no existe compromiso electoral verificable.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" }
+      ] },
+      "2": { "scenario": 2, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Canales de gestión activos", "detail": "Diálogo y respaldo diplomático reducen el incentivo inmediato a una ruptura institucional.", "impact": 5, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Protesta sostenida", "detail": "OVCS registra 58 protestas en cuatro balances preliminares; no se acredita coordinación nacional sostenida.", "impact": 4, "persistence": 3, "evidence": 5, "confidence": "Alta" },
+        { "name": "Riesgo de servicios esenciales", "detail": "El deterioro de Guri puede agravar agua y salud, sin demostrar por sí solo pérdida de control territorial.", "impact": 5, "persistence": 5, "evidence": 4, "confidence": "Media-alta" }
+      ] },
+      "4": { "scenario": 4, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Margen cambiario más estrecho", "detail": "Reservas líquidas de USD 1.652M y menor intervención proyectada limitan la respuesta material a demandas sociales.", "impact": 5, "persistence": 5, "evidence": 4, "confidence": "Media-alta" },
+        { "name": "Estructuras coercitivas persistentes", "detail": "La misión independiente de la ONU describe un aparato represivo en gran medida intacto.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Episodio selectivo reversible", "detail": "La detención y posterior liberación de Javier Oropeza es un episodio documentado, no prueba una tendencia sistémica.", "impact": 3, "persistence": 2, "evidence": 4, "confidence": "Media-alta" }
+      ] }
+    }
+  },
+  {
+    "label": "18–25 sep", "short": "S37",
+    "probs": [
+      { "sc": 1, "v": 7, "t": "flat" },
+      { "sc": 2, "v": 15, "t": "up" },
+      { "sc": 3, "v": 56, "t": "up" },
+      { "sc": 4, "v": 22, "t": "down" }
+    ],
+    "xy": { "x": 0.37, "y": 0.22 },
+    "sem": { "g": 7, "y": 10, "r": 10 },
+    "kpis": {
+      "energia": {
+        "exportaciones": "Exportaciones de crudo: 1,17M b/d en agosto, prácticamente estables pese a los acuerdos anunciados",
+        "ingresos": "PDVSA: USD 17.200M facturados ene–ago (+76% interanual), estimación periodística; no es caja disponible",
+        "licencias": "TotalEnergies/PDVSA, Chevron y Halliburton anuncian instrumentos; ejecución aún por verificar",
+        "cambio": "Pico de demanda eléctrica de 16.030 MW el 18 sep, reportado por el Ministerio de Energía Eléctrica"
+      },
+      "economico": {
+        "inflacion": "Último dato: inflación BCV de agosto, 8,9% mensual; sin nuevo dato mensual en el ACS S37",
+        "ingresos_pob": "ANOVA estima 494.763 ocupaciones menos asociadas a precariedad de agua y electricidad; no es efecto causal probado",
+        "electricidad": "70,2% de los hogares recibió agua o electricidad de forma precaria en 2026, según ANOVA (+21,7pp interanual)",
+        "pib": "Pérdida de producto asociada estimada en ~USD 1.600M (1,4% del PIB); rango USD 1.250–1.975M"
+      },
+      "opinion": {
+        "direccion": "E3 56% y E1 7%: la brecha entre continuidad y transición aumenta a 49 puntos",
+        "elecciones": "La campaña #SetTheDate reclama fecha; el Gobierno confirma elecciones sin cronograma verificable",
+        "mcm": "María Corina Machado mantiene exigencia de garantías de retorno y participación; siete intentos fallidos reportados por ABC",
+        "eeuu": "Encuentro Trump–Rodríguez el 22 sep; el Departamento de Estado aclara que no implica legitimación formal"
+      }
+    },
+    "tensiones": [
+      { "l": "green", "t": "<b>Reinserción internacional:</b> Rodríguez interviene ante la Asamblea General de la ONU y se reúne brevemente con Trump; EE. UU. aclara que el encuentro no constituye reconocimiento formal." },
+      { "l": "green", "t": "<b>Canales multilaterales:</b> FMI anuncia oficina técnica para el primer semestre de 2027 y BID prepara plan a dos años; no hay desembolsos aprobados." },
+      { "l": "yellow", "t": "<b>Comité judicial demorado:</b> la AN no designa a los 11 diputados dentro del plazo previsto por la Gaceta 7.074; el mecanismo electoral sigue sin fecha." },
+      { "l": "yellow", "t": "<b>Oro condicionado:</b> el posible traslado de ~31 toneladas desde Londres continúa sin acuerdo final ni nueva orden judicial británica." },
+      { "l": "yellow", "t": "<b>Petróleo y caja:</b> memorandos e inversión anunciada conviven con exportaciones estancadas en 1,17M b/d y flete Aframax de USD 5/bbl." },
+      { "l": "red", "t": "<b>Derechos humanos:</b> CLIPPVE señala más de 400 personas presas por motivos políticos; HRW abre canal técnico, pero los presos no integran la mesa formal." },
+      { "l": "red", "t": "<b>Servicios y trabajo:</b> ANOVA estima 70,2% de hogares con agua o electricidad precaria y una asociación con 494.763 ocupaciones menos." },
+      { "l": "red", "t": "<b>Conflictividad:</b> OVCS registra 78 protestas en cinco jornadas del 18–24 sep, con 29 el día 24; el corte no cubre todas las fechas de la semana." }
+    ],
+    "lectura": "E3 sube a 56% (+2pp) por la mayor densidad diplomática y financiera —AGNU, encuentro Trump–Rodríguez, FMI y BID— sin que aparezca un calendario electoral exigible. La no designación de los 11 diputados del Comité de Postulaciones, pese al mandato de Gaceta, muestra control del ritmo institucional, no una fractura de mando demostrada. E1 permanece en 7%: #SetTheDate y el canal con HRW son presiones reales, pero no equivalen a una transferencia política verificable. E4 baja a 22% (−3pp) porque no se observa una nueva escalada coercitiva sistémica; persisten, sin embargo, más de 400 presos políticos según CLIPPVE. E2 sube a 15% (+1pp) por 78 protestas en cinco jornadas y por la estimación de ANOVA sobre el costo laboral de servicios precarios, sin coordinación nacional sostenida ni ruptura de la cadena de seguridad. La posición de la matriz pasa a 37% en el eje de coerción (E2+E4) y 22% en cambio estructural (E1+E2).",
+    "trendSc": 3,
+    "trendDrivers": [
+      "E3 alcanza 56%: reconocimiento internacional y cooperación técnica avanzan más rápido que las garantías electorales",
+      "E4 baja a 22% sin una nueva fractura o escalada sistémica; la detención política continúa como capacidad coercitiva",
+      "E2 sube a 15% por el pico de protesta y la precariedad de servicios, sin pérdida de control territorial comprobada"
+    ],
+    "dominantComposition": { "scenario": 3, "method": "impacto × persistencia × evidencia", "factors": [
+      { "name": "Reinserción diplomática", "detail": "AGNU y encuentro Trump–Rodríguez aumentan reconocimiento práctico, sin legitimación formal estadounidense.", "impact": 5, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+      { "name": "Cooperación multilateral", "detail": "FMI y BID anuncian canales técnicos y planes, todavía sin nuevos desembolsos aprobados.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+      { "name": "Control del calendario judicial", "detail": "La AN no designa a los 11 diputados del Comité dentro del plazo; la demora preserva discrecionalidad.", "impact": 5, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+      { "name": "Renta y activos condicionados", "detail": "Facturación petrolera estimada, oro sujeto a tribunal y nuevos memorandos no equivalen a liquidez ejecutada.", "impact": 4, "persistence": 4, "evidence": 4, "confidence": "Media-alta" }
+    ] },
+    "scenarioCompositions": {
+      "1": { "scenario": 1, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Presión por fecha electoral", "detail": "#SetTheDate eleva el costo político de la indefinición, pero no fija fecha acordada.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Canal técnico de derechos", "detail": "HRW abre vía para listas de detenidos; no hay liberación cuantificada en el corte.", "impact": 3, "persistence": 3, "evidence": 5, "confidence": "Alta" },
+        { "name": "Garantías ausentes", "detail": "Sin CNE independiente, calendario verificable o inclusión suficiente en la mesa.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" }
+      ] },
+      "2": { "scenario": 2, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Servicios públicos precarios", "detail": "ANOVA estima 70,2% de hogares afectados y menor ocupación asociada; no prueba causalidad estricta.", "impact": 5, "persistence": 5, "evidence": 5, "confidence": "Alta" },
+        { "name": "Protesta laboral extendida", "detail": "OVCS registra 78 protestas en cinco jornadas, con pico de 29 el 24 de septiembre.", "impact": 4, "persistence": 3, "evidence": 5, "confidence": "Alta" },
+        { "name": "Sin fragmentación verificada", "detail": "No se documenta pérdida sostenida de control territorial ni ruptura de la cadena de mando.", "impact": 5, "persistence": 4, "evidence": 4, "confidence": "Media-alta" }
+      ] },
+      "4": { "scenario": 4, "method": "impacto × persistencia × evidencia", "factors": [
+        { "name": "Detención política persistente", "detail": "CLIPPVE reporta más de 400 presos; el universo y fecha difieren del último corte de Foro Penal.", "impact": 5, "persistence": 5, "evidence": 4, "confidence": "Media-alta" },
+        { "name": "Exclusión de la mesa", "detail": "Figuera reconoce que los presos políticos no figuran en la agenda formal.", "impact": 4, "persistence": 4, "evidence": 5, "confidence": "Alta" },
+        { "name": "Sin escalada sistémica nueva", "detail": "La coordinación del Ejecutivo, AN y TSJ no evidencia fractura coercitiva adicional esta semana.", "impact": 4, "persistence": 3, "evidence": 4, "confidence": "Media-alta" }
+      ] }
+    }
   }
 ];
 
 export const TENSIONS = [
-  {
-    "level": "green",
-    "text": "La formalización de NABEP y los contratos de Chevron, Eni, GeoPark y GE Vernova amplían la coalición económica interesada en la continuidad del marco vigente."
-  },
-  {
-    "level": "green",
-    "text": "El bono soberano 2027 alcanza 54 centavos, máximo de cuatro meses, aunque permanece en niveles distressed."
-  },
-  {
-    "level": "yellow",
-    "text": "La reforma amplía el Comité de Postulaciones Judiciales de 21 a 23 integrantes, pero no transfiere la selección final de magistrados fuera del proceso negociado."
-  },
-  {
-    "level": "yellow",
-    "text": "Los contratos venezolanos de NABEP no se han publicado y el Congreso de EE.UU. cuestiona la autoridad legal del Pentágono para adquirir 35% de la empresa matriz."
-  },
-  {
-    "level": "red",
-    "text": "Washington y Caracas posponen el calendario electoral hasta una estabilización sin fecha ni criterios objetivos verificables."
-  },
-  {
-    "level": "red",
-    "text": "La conflictividad asciende a 60 protestas en cinco días y desde el 1 de septiembre aumenta el peso de las demandas políticas y de derechos humanos."
-  },
-  {
-    "level": "red",
-    "text": "Funcionarios de seguridad obstaculizan una marcha sindical dirigida hacia la delegación estadounidense, primer episodio de coerción selectiva de este tipo en el ciclo."
-  }
+  { "level": "green", "text": "Rodríguez intervino ante la AGNU y se reunió brevemente con Trump; el Departamento de Estado aclaró que el encuentro no implica legitimación formal." },
+  { "level": "green", "text": "FMI anunció oficina técnica para 2027 y BID prepara un plan a dos años; todavía no representan nuevos desembolsos aprobados." },
+  { "level": "yellow", "text": "La AN no designó a los 11 diputados del Comité de Postulaciones Judiciales dentro del plazo fijado por la Gaceta 7.074." },
+  { "level": "yellow", "text": "El traslado del oro desde Londres sigue sujeto a acuerdo y decisión judicial; el valor estimado no es liquidez disponible." },
+  { "level": "yellow", "text": "Los memorandos energéticos conviven con exportaciones petroleras estancadas en 1,17M b/d y mayor costo de flete." },
+  { "level": "red", "text": "CLIPPVE reporta más de 400 presos políticos con un corte distinto de Foro Penal; la mesa formal no incluyó el tema." },
+  { "level": "red", "text": "ANOVA estima que 70,2% de hogares recibe agua o electricidad de forma precaria; la asociación laboral no prueba causalidad estricta." },
+  { "level": "red", "text": "OVCS registra 78 protestas en cinco jornadas del 18 al 24 de septiembre; el pico de 29 corresponde al día 24." }
 ];
 
 export const MONITOR_WEEKS = [
@@ -2679,7 +2877,10 @@ export const MONITOR_WEEKS = [
   "S31",
   "S32",
   "S33",
-  "S34"
+  "S34",
+  "S35",
+  "S36",
+  "S37"
 ];
 
 export const ICG_HISTORY = [
@@ -3820,6 +4021,58 @@ export const CONF_SEMANAL = [
       { "fecha": "1 Septiembre", "protestas": 9, "estados": 7, "tipo": "Derechos humanos", "exigencias": "Libertad de presos políticos, justicia, trabajo, vivienda y agua" },
       { "fecha": "2 Septiembre", "protestas": 13, "estados": 8, "tipo": "Mixto", "exigencias": "Libertad de presos políticos, justicia, trabajo, vivienda y salud" },
       { "fecha": "3 Septiembre", "protestas": 13, "estados": 8, "tipo": "Político/sindical", "exigencias": "Libertad de presos políticos, elecciones, derechos y participación política; marcha obstaculizada por seguridad" }
+    ]
+  },
+  {
+    "week": "S35",
+    "label": "4–11 sep",
+    "partial": true,
+    "observedPeriod": "7–10 sep (4 jornadas)",
+    "protestas": 41,
+    "estados": 15,
+    "reprimidas": null,
+    "motivos": ["Vivienda", "Salud", "Agua", "Derechos laborales", "Seguridad social", "Justicia", "Libertad de presos políticos", "Educación", "Seguridad ciudadana"],
+    "hecho": "Corte parcial OVCS: 41 protestas del 7 al 10 de septiembre en 15 entidades. El 9 de septiembre concentró 19 eventos en 13 estados; no se informa un balance semanal completo ni un conteo de represión.",
+    "dias": [
+      { "fecha": "7 Septiembre", "protestas": 8, "estados": 6, "tipo": "Social/político", "exigencias": "Presos políticos, justicia, seguridad social, salud, vivienda y trabajo" },
+      { "fecha": "8 Septiembre", "protestas": 8, "estados": 6, "tipo": "Social", "exigencias": "Vivienda, salud, trabajo, educación y seguridad ciudadana" },
+      { "fecha": "9 Septiembre", "protestas": 19, "estados": 13, "tipo": "Mixto", "exigencias": "Vivienda, agua, salud, trabajo, justicia y seguridad ciudadana" },
+      { "fecha": "10 Septiembre", "protestas": 6, "estados": 5, "tipo": "Social/político", "exigencias": "Salud, trabajo, seguridad social y participación política" }
+    ]
+  },
+  {
+    "week": "S36",
+    "label": "11–18 sep",
+    "partial": true,
+    "observedPeriod": "11, 14, 15 y 17 sep (4 balances)",
+    "protestas": 58,
+    "estados": 17,
+    "reprimidas": null,
+    "motivos": ["Agua", "Vivienda", "Justicia", "Derechos laborales", "Participación política", "Salud", "Educación", "Medio ambiente", "Situación de personas detenidas", "Seguridad social", "Alimentación"],
+    "hecho": "OVCS registra 58 protestas en los cuatro balances preliminares citados (11, 14, 15 y 17 de septiembre). Agua, vivienda y justicia aparecen en todos. La unión de las listas de entidades citadas suma 17; no es un total semanal oficial consolidado ni permite comparar directamente con semanas completas.",
+    "dias": [
+      { "fecha": "11 Septiembre", "protestas": 22, "estados": 11, "tipo": "Mixto", "exigencias": "Agua, vivienda, justicia, medio ambiente sano, participación política, trabajo y salud" },
+      { "fecha": "14 Septiembre", "protestas": 11, "estados": 6, "tipo": "Social", "exigencias": "Agua, vivienda, justicia, medio ambiente sano y educación" },
+      { "fecha": "15 Septiembre", "protestas": 14, "estados": 13, "tipo": "Mixto", "exigencias": "Justicia, vivienda, agua, derechos laborales y participación política" },
+      { "fecha": "17 Septiembre", "protestas": 11, "estados": 8, "tipo": "Mixto", "exigencias": "Justicia, vivienda, agua, trabajo, detenidos, seguridad social, educación, salud y alimentación" }
+    ]
+  },
+  {
+    "week": "S37",
+    "label": "18–25 sep",
+    "partial": true,
+    "observedPeriod": "18, 21, 22, 23 y 24 sep (5 balances)",
+    "protestas": 78,
+    "estados": 17,
+    "reprimidas": null,
+    "motivos": ["Derechos laborales", "Seguridad social", "Justicia", "Participación política", "Vivienda", "Agua", "Libertad de presos políticos", "Salud", "Educación", "Medio ambiente"],
+    "hecho": "OVCS registra 78 protestas en cinco jornadas documentadas (18, 21, 22, 23 y 24 de septiembre); el día 24 concentró 29, con movilización de jubilados, pensionados y trabajadores. Diecisiete estados participaron ese día: es cobertura diaria mínima, no total semanal consolidado. No se informa balance de represión.",
+    "dias": [
+      { "fecha": "18 Septiembre", "protestas": 13, "estados": 9, "tipo": "Mixto", "exigencias": "Justicia, vivienda, trabajo, participación política, personas detenidas y seguridad social" },
+      { "fecha": "21 Septiembre", "protestas": 9, "estados": 7, "tipo": "Social/político", "exigencias": "Libertad de presos políticos, justicia y derechos laborales" },
+      { "fecha": "22 Septiembre", "protestas": 15, "estados": 12, "tipo": "Mixto", "exigencias": "Participación política, trabajo, vivienda, educación y nulidad de la Ley contra el Odio" },
+      { "fecha": "23 Septiembre", "protestas": 12, "estados": 9, "tipo": "Mixto", "exigencias": "Participación política, trabajo, vivienda, detenidos, agua y medio ambiente" },
+      { "fecha": "24 Septiembre", "protestas": 29, "estados": 17, "tipo": "Laboral/social", "exigencias": "Jubilados, pensionados y trabajadores: trabajo, seguridad social, vivienda, agua, detenidos, salud y justicia" }
     ]
   }
 ];

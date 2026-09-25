@@ -5621,6 +5621,235 @@ export const SITREP_ALL = [
       { "tag": "Social", "color": "#dc2626", "title": "Politización de la protesta", "text": "Debe observarse si las demandas por presos y elecciones se generalizan más allá de Caracas." },
       { "tag": "Económico", "color": "#f59e0b", "title": "Anuncios frente a ejecución", "text": "Los compromisos deben medirse por desembolsos, producción y mejoras de servicios, no por montos proyectados." }
     ]
+  },
+  {
+    "period": "04 – 11 de septiembre de 2026",
+    "periodShort": "4–11 sep 2026",
+    "keyPoints": [
+      { "tag": "Negociación", "color": "#0468B1", "title": "Segunda ronda AN2015–Gobierno anunciada para el 15 de septiembre", "text": "La agenda anunciada incluye Ley contra el Odio, regulación de ONG y disposiciones antiterroristas; la delegación apunta a nuevos poderes judicial y electoral en diciembre. Es una meta declarada, aún sin resultados ni fecha electoral vinculante." },
+      { "tag": "Activos", "color": "#f59e0b", "title": "Citgo entra en transición de control administrativo", "text": "Las juntas designadas por la oposición se preparan para ceder la gestión a Delcy Rodríguez. La propiedad continúa en litigio y la licencia del Tesoro que protege de la subasta vence el 17 de septiembre." },
+      { "tag": "EE. UU.", "color": "#dc2626", "title": "Primer cuestionamiento demócrata formal a NABEP", "text": "Raja Krishnamoorthi pide a la Casa Blanca información sobre beneficiarios, fondos públicos, controles de conflicto de interés y el papel de Alejandro Betancourt. El plazo de respuesta indicado es el 14 de septiembre." },
+      { "tag": "Opinión", "color": "#dc2626", "title": "60,5% desaprueba la gestión de Delcy Rodríguez", "text": "AtlasIntel/Bloomberg (n=1.922, campo 30 ago–3 sep) registra 24,6% de aprobación. Sobre NABEP, 37,6% se opone y 35,4% apoya; Trump baja de 51% a 30% de aprobación entre julio y agosto." },
+      { "tag": "Inflación", "color": "#f59e0b", "title": "BCV reporta 8,9% mensual en agosto", "text": "La inflación baja desde 19,9% en julio, pero acumula 200,1% en 2026 y 534,2% interanual. La atribución oficial de la baja al acuerdo petrolero es una interpretación, no una relación causal comprobada." },
+      { "tag": "Petróleo", "color": "#ca8a04", "title": "La producción nacional apenas crece 1.000 b/d", "text": "OPEP registra 1.201.000 b/d en agosto. Las metas de Chevron, Eni y NABEP son proyecciones futuras, aún no producción ejecutada." },
+      { "tag": "Protestas", "color": "#dc2626", "title": "41 protestas en cuatro días registrados", "text": "OVCS contabiliza 41 eventos del 7 al 10 de septiembre en 15 entidades. El 9 de septiembre concentra 19 protestas; persisten demandas socioeconómicas y por presos políticos." },
+      { "tag": "Oposición", "color": "#7c3aed", "title": "Machado condiciona acuerdos a garantías democráticas", "text": "Plantea Estado de derecho, liberación de presos políticos y elecciones verificables como condiciones de respaldo; no rechaza por principio la inversión estadounidense." },
+      { "tag": "Verificación", "color": "#f59e0b", "title": "Documento sobre permanencia de Rodríguez hasta 2031 desmentido", "text": "El informe identifica como apócrifo un supuesto documento del Departamento de Estado; no debe tratarse como posición oficial de Washington." },
+      { "tag": "Escenarios", "color": "#0468B1", "title": "E3 sigue dominante; E4 iguala su máximo", "text": "La matriz definitiva asigna E3 56% (−2pp), E4 23% (+3pp), E2 16% (sin cambio) y E1 5% (−1pp)." }
+    ],
+    "sintesis": "La segunda ronda de negociación y el traspaso administrativo previsto de Citgo profundizan el arreglo negociado sin una ruta electoral vinculante. A la vez, la desaprobación de Rodríguez y la caída de imagen de actores estadounidenses reducen el capital político del pacto. La inflación mensual desciende, pero la producción petrolera OPEP permanece prácticamente estable. El corte parcial de OVCS muestra una protesta sostenida con demandas sociales y de justicia. La matriz conserva E3 como escenario dominante (56%) y eleva E4 a 23%, sin documentar una nueva escalada represiva sistémica en esta semana.",
+    "actores": [
+      { "name": "Estados Unidos", "items": ["Rubio exige instituciones judiciales y electorales confiables antes de validar elecciones, sin fecha acordada.", "Krishnamoorthi solicita aclaraciones formales sobre NABEP con plazo al 14 de septiembre.", "La licencia del Tesoro sobre Citgo está vigente hasta el 17 de septiembre."] },
+      { "name": "Gobierno encargado", "items": ["Delcy Rodríguez participa en diálogo laboral y el Gobierno anuncia segunda ronda política.", "Cabello afirma que el PSUV está listo para elecciones en cualquier fecha, sin calendario comprometido.", "El Ministerio de Educación reporta 6.009.254 alumnos y daños sísmicos en 998 planteles: 900 menores, 87 estructurales y 11 colapsados."] },
+      { "name": "Oposición y sociedad civil", "items": ["La AN2015 anuncia agenda legislativa y meta institucional de diciembre.", "Machado vincula su apoyo económico a garantías democráticas verificables.", "Transparencia Venezuela plantea seis objeciones de legalidad, transparencia y salvaguardas al acuerdo NABEP."] },
+      { "name": "Sector privado y entorno regional", "items": ["Más de 25 empresas anuncian intención de invertir u operar; Oxford Economics mantiene cautela sobre la ejecución.", "Colombia y Estados Unidos abordan seguridad fronteriza y presencia del ELN.", "Las juntas de Citgo se preparan para ceder la administración mientras sigue el litigio de propiedad."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesOficiales": 1046, "beneficiosProcesales": 12000, "privadosLiberados": null, "cautelares": null, "militares": 144, "fpVerificados": 1065, "fpDetenidos": 326, "fpNota": "Sin balance nuevo en el informe S35. Se muestra el último corte registrado en S33/S34: Gobierno 1.046 liberaciones y 12.000 beneficios; Foro Penal 1.065 liberaciones/excarcelaciones en 2026 y 326 presos políticos al 24 de agosto. Metodologías no equivalentes." },
+      "rodriguez": [
+        { "title": "Evaluación pública", "text": "AtlasIntel/Bloomberg registra 60,5% de desaprobación y 24,6% de aprobación de gestión." },
+        { "title": "Diálogo y Citgo", "text": "Anuncia segunda ronda de negociación y se prepara para asumir la administración de Citgo; ambos procesos tienen hitos pendientes." },
+        { "title": "Inflación oficial", "text": "El BCV comunica 8,9% mensual en agosto, frente a 19,9% en julio." }
+      ],
+      "mcmAgenda": ["Liberación verificable de presos políticos y fin de la persecución.", "Elecciones con garantías, árbitro confiable y calendario acordado.", "Condiciones de Estado de derecho para respaldar los acuerdos económicos."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "8,9%", "label": "Inflación mensual agosto · BCV", "color": "#f59e0b" },
+        { "value": "200,1%", "label": "Inflación acumulada 2026 · BCV", "color": "#dc2626" },
+        { "value": "1.201.000 b/d", "label": "Producción agosto · OPEP", "color": "#0468B1" },
+        { "value": "+1.000 b/d", "label": "Variación mensual de producción", "color": "#f59e0b" },
+        { "value": "USD 207,98M", "label": "Volumen negociado en Bolsa de Caracas · agosto", "color": "#22c55e" },
+        { "value": "+168,38%", "label": "Variación acumulada del IBC en 2026", "color": "#22c55e" }
+      ],
+      "empresas": [
+        { "empresa": "Citgo", "desarrollo": "Transición administrativa hacia la gestión de Rodríguez prevista para septiembre; propiedad y subasta en litigio." },
+        { "empresa": "Chevron", "desarrollo": "Meta anunciada de 600.000 b/d hacia 2031 e inversión de más de USD 7.000M; no es producción observada." },
+        { "empresa": "Eni", "desarrollo": "Meta anunciada de 400.000 b/d para Junín 5 hacia 2030, desde 12.000 b/d actuales." },
+        { "empresa": "NABEP", "desarrollo": "Meta anunciada de 500.000 b/d hacia 2028, desde 200.000 b/d; su ejecución está pendiente de seguimiento." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 41, "promDiario": 10.25, "periodo": "7–10 sep · cuatro jornadas registradas", "variacion": "Corte parcial; no comparable directamente con siete días", "composicion": "Vivienda, salud, agua, trabajo y seguridad social, junto con justicia y libertad de presos políticos.", "nota": "OVCS identifica 15 entidades distintas. El 9 de septiembre registra 19 eventos en 13 estados (46,3% del total de cuatro días)." },
+      "percepcion": { "fuente": "AtlasIntel/Bloomberg + Meganalisis", "titulo": "Desaprobación y desconfianza en el diálogo", "nota": "AtlasIntel: 1.922 adultos, reclutamiento digital aleatorio, campo 30 ago–3 sep, ±2pp. Meganalisis: 1.129 entrevistas telefónicas CATI, campo 24–31 ago, ±2,92pp. Son estudios distintos y no forman una serie común.", "datos": [ { "factor": "Desaprueba gestión de Delcy Rodríguez (AtlasIntel)", "pct": 60.5 }, { "factor": "Rechaza el acuerdo petrolero (AtlasIntel)", "pct": 37.6 }, { "factor": "No confía en la mesa de diálogo (Meganalisis)", "pct": 82.4 }, { "factor": "Considera urgente la elección presidencial (Meganalisis)", "pct": 79.3 } ] },
+      "excarcelados": { "fp": 1065, "presos": 326, "militares": 144, "fuente": "Último dato anterior disponible: Foro Penal · 24 ago 2026; no hay actualización en S35" }
+    },
+    "marcoNormativo": {
+      "titulo": "Diálogo legislativo, control de Citgo y condiciones electorales",
+      "resumen": "La agenda de negociación propone reformas para diciembre, pero las condiciones electorales, el control de Citgo y el escrutinio sobre NABEP siguen abiertos.",
+      "cambios": [
+        { "titulo": "Segunda ronda anunciada", "texto": "Desde el 15 de septiembre se prevé discutir Ley contra el Odio, financiamiento de ONG y disposiciones antiterroristas; la meta de nuevos poderes es declarativa.", "color": "#0468B1" },
+        { "titulo": "Citgo", "texto": "El control administrativo se transferiría a la gestión de Rodríguez, mientras prosigue el litigio y la licencia de protección vence el 17 de septiembre.", "color": "#f59e0b" },
+        { "titulo": "Condición estadounidense", "texto": "Rubio pide un Poder Judicial y un árbitro electoral independientes antes de elecciones válidas, sin fijar plazo verificable.", "color": "#dc2626" },
+        { "titulo": "NABEP", "texto": "Krishnamoorthi pide a la Casa Blanca aclarar beneficiarios, garantías públicas y controles de conflicto de interés antes del 14 de septiembre.", "color": "#7c3aed" }
+      ],
+      "lecturaAnalitica": "La institucionalización anunciada puede consolidar E3 sin producir alternancia electoral. La verificación debe centrarse en resultados, plazos, transparencia y capacidad de control independiente."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "56%", "color": "#0468B1", "text": "Baja 2pp por desgaste de legitimidad, pero mantiene primacía mediante Citgo y el canal negociador." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "23%", "color": "#ca8a04", "text": "Sube 3pp por menor capital político y presión social; no implica represión sistémica nueva confirmada." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "16%", "color": "#dc2626", "text": "Estable: las protestas y la desconfianza no se traducen aún en ruptura organizada o de mando." },
+      { "name": "Transición Pacífica (E1)", "prob": "5%", "color": "#2d8a30", "text": "Baja 1pp: faltan fecha electoral, árbitro independiente y garantía de cumplimiento." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Sesión del 15 de septiembre", "text": "Comprobar si la segunda ronda crea hitos verificables y costos de incumplimiento para garantías electorales." },
+      { "tag": "Activos", "color": "#f59e0b", "title": "Citgo antes del 17 de septiembre", "text": "Seguir licencia del Tesoro, subasta y transferencia efectiva de administración por separado." },
+      { "tag": "EE. UU.", "color": "#0468B1", "title": "Respuesta sobre NABEP", "text": "Revisar la respuesta a Krishnamoorthi del 14 de septiembre y si abre investigación adicional." },
+      { "tag": "Social", "color": "#7c3aed", "title": "Después del pico de protestas", "text": "Observar volumen, demandas políticas y articulación territorial tras el 9 de septiembre." }
+    ]
+  },
+  {
+    "period": "11 – 18 de septiembre de 2026",
+    "periodShort": "11–18 sep 2026",
+    "keyPoints": [
+      { "tag": "Diplomacia", "color": "#0468B1", "title": "Estados Unidos restablece relaciones diplomáticas y consulares", "text": "El anuncio del 11 de septiembre formaliza un canal de interlocución con las autoridades provisionales, sin fijar por sí mismo un calendario electoral." },
+      { "tag": "Negociación", "color": "#0468B1", "title": "La segunda ronda AN2015–Gobierno se instala el 17 de septiembre", "text": "La agenda abarca partidos, inhabilitaciones, justicia, oro y reconstrucción. El desbloqueo de al menos diez portales es un resultado observable, pero la apertura mediática sigue parcial." },
+      { "tag": "Justicia", "color": "#f59e0b", "title": "La Gaceta 7.074 activa el Comité de Postulaciones Judiciales", "text": "La reforma del TSJ establece 23 integrantes (11 diputados y 12 representantes de sociedad civil). La independencia del proceso de selección aún debe comprobarse." },
+      { "tag": "Derechos", "color": "#dc2626", "title": "La misión independiente de la ONU advierte persistencia del aparato represivo", "text": "El análisis cita su evaluación de que la liberalización es parcial y reversible; el episodio de detención y liberación de Javier Oropeza no prueba por sí solo una escalada sistémica." },
+      { "tag": "Oro", "color": "#f59e0b", "title": "Se negocia el traslado de unas 31 toneladas desde Londres", "text": "El valor aproximado es USD 4.000 millones, pero el acuerdo no está cerrado y requiere una nueva decisión judicial británica; no equivale a divisas líquidas disponibles." },
+      { "tag": "Energía", "color": "#22c55e", "title": "Houston concentra acuerdos y conversaciones de inversión", "text": "Continental y PDVSA firman un memorando para Ayacucho 2; Heeney/Mercuria anuncian un proyecto minero; Exxon mantiene conversaciones. Los anuncios no son desembolsos ni producción ejecutada." },
+      { "tag": "Electricidad", "color": "#dc2626", "title": "Guri opera por debajo del 60% de su capacidad instalada", "text": "El informe cifra 6.141 de 10.350 MW y siete turbinas fuera de servicio, una restricción material para servicios básicos y reactivación productiva." },
+      { "tag": "Conflictividad", "color": "#dc2626", "title": "58 protestas en cuatro balances del 11 al 17 de septiembre", "text": "OVCS registra 22, 11, 14 y 11 protestas en los días citados. Agua, vivienda y justicia se repiten; no es un conteo de todos los días de la semana." },
+      { "tag": "Macro", "color": "#f59e0b", "title": "El informe proyecta mayor presión de gasto y divisas", "text": "El gasto semanal se estima en ~USD 773 millones (+90%); la brecha central proyectada al 18 de septiembre es 17,4% (rango 15,6–18,9%). Son proyecciones, no cierres observados." },
+      { "tag": "Escenarios", "color": "#0468B1", "title": "E3 sigue dominante y E4 alcanza 25%", "text": "La matriz asigna E3 54% (−2pp), E4 25% (+2pp), E2 14% (−2pp) y E1 7% (+2pp). La brecha E3–E1 baja a 47 puntos." }
+    ],
+    "sintesis": "El corte combina normalización diplomática, instalación efectiva del diálogo y pasos judiciales procedimentales con un primer desbloqueo parcial de medios. La apertura no equivale todavía a garantías electorales verificables: el movimiento de María Corina Machado sigue fuera del formato formal y la misión independiente de la ONU advierte que las estructuras represivas persisten. Los acuerdos de Houston y la negociación sobre el oro ofrecen opciones futuras, pero todavía no aportan liquidez comprobada. Guri y la fragilidad cambiaria limitan la capacidad material de sostener la recuperación; OVCS registra 58 protestas en cuatro balances. E3 se mantiene primero con 54%, E4 sube a un máximo de 25% y E1 mejora moderadamente a 7%.",
+    "actores": [
+      { "name": "Estados Unidos", "items": ["Restablece relaciones diplomáticas y consulares el 11 de septiembre.", "Rubio respalda elecciones pronto, condicionadas a instituciones judiciales y electorales confiables, sin fecha fijada.", "Una posible reunión Trump–Rodríguez durante la semana de la Asamblea General de la ONU se reporta como plan, no como encuentro confirmado."] },
+      { "name": "Gobierno encargado", "items": ["Delcy Rodríguez recibe a Michelle Muschett, directora regional del PNUD, en una misión de recuperación postsísmica.", "Participa en el foro energético de Houston y defiende los acuerdos de inversión.", "La reforma del TSJ queda publicada en la Gaceta Extraordinaria 7.074."] },
+      { "name": "Oposición y sociedad civil", "items": ["La delegación AN2015 instala la segunda ronda el 17 de septiembre.", "El movimiento de María Corina Machado permanece fuera del formato negociador; su regreso se anuncia sin fecha.", "Transparencia Venezuela mantiene observaciones sobre legalidad, selección y transparencia de NABEP."] },
+      { "name": "Comunidad internacional y empresas", "items": ["Reino Unido eleva las relaciones a nivel de embajadores y mantiene pendiente la decisión judicial sobre el oro.", "Continental/PDVSA y Heeney/Mercuria anuncian instrumentos, mientras Exxon conversa sobre un eventual retorno.", "La misión independiente de la ONU advierte que las medidas de liberalización siguen siendo parciales y reversibles."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesOficiales": 1046, "beneficiosProcesales": 12000, "privadosLiberados": null, "cautelares": null, "militares": 144, "fpVerificados": 1065, "fpDetenidos": 326, "fpNota": "Sin balance cuantitativo nuevo en el ACS S36. Se conserva el último dato disponible: Gobierno, 1.046 liberaciones y 12.000 beneficios; Foro Penal, 1.065 liberaciones/excarcelaciones en 2026 y 326 presos políticos al 24 de agosto. Metodologías y fechas distintas." },
+      "rodriguez": [
+        { "title": "Diplomacia", "text": "Recibe el restablecimiento formal de relaciones con Estados Unidos y la elevación de vínculos con Reino Unido." },
+        { "title": "Diálogo y justicia", "text": "La segunda ronda se instala y la reforma del TSJ activa un procedimiento de postulación, todavía sin independencia comprobada." },
+        { "title": "Recuperación", "text": "La visita de la dirección regional del PNUD se centra en la evaluación postsísmica y la cooperación de recuperación." }
+      ],
+      "mcmAgenda": ["Participación política efectiva y garantías de competencia electoral.", "Liberación verificable de presos políticos y fin de la persecución.", "Un calendario electoral con árbitro independiente y mecanismos de cumplimiento."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "534,2%", "label": "Inflación interanual agosto · informe financiero citado", "color": "#dc2626" },
+        { "value": "15%", "label": "Brecha observada · 11 sep", "color": "#f59e0b" },
+        { "value": "17,4%", "label": "Brecha central proyectada · 18 sep", "color": "#f59e0b" },
+        { "value": "USD 12.855M", "label": "Reservas internacionales · 10 sep", "color": "#0468B1" },
+        { "value": "USD 1.652M", "label": "Divisas líquidas dentro de reservas", "color": "#dc2626" },
+        { "value": "~USD 773M", "label": "Gasto semanal proyectado · +90%", "color": "#f59e0b" }
+      ],
+      "empresas": [
+        { "empresa": "Continental Resources / PDVSA", "desarrollo": "Memorando para Ayacucho 2; recursos in situ no equivalen a producción ni reservas probadas comercialmente." },
+        { "empresa": "Heeney Capital / Mercuria", "desarrollo": "Derechos anunciados sobre mina Chocó por 30 años, con inversión inicial de hasta USD 1.000M, sujeta a ejecución." },
+        { "empresa": "Denarius", "desarrollo": "Acuerdo anunciado de 20 años para proyecto petrolero; falta seguimiento de ejecución." },
+        { "empresa": "ExxonMobil", "desarrollo": "Conversaciones sobre eventual regreso a Petromonagas y evaluación de Carabobo; no es un contrato cerrado." },
+        { "empresa": "ConocoPhillips", "desarrollo": "Retorno estancado por litigio arbitral de aproximadamente USD 11.000M." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 58, "promDiario": 14.5, "periodo": "11, 14, 15 y 17 sep · cuatro balances citados", "variacion": "Corte parcial; no comparable con semanas completas", "composicion": "Demandas recurrentes de agua, vivienda y justicia, junto con trabajo, salud y participación política.", "nota": "OVCS reporta 22, 11, 14 y 11 protestas en las fechas citadas. La unión de entidades enumeradas suma 17, cifra derivada, no consolidado oficial." },
+      "percepcion": { "fuente": "AtlasIntel/Bloomberg + Meganalisis · último corte anterior disponible", "titulo": "Encuestas anteriores conservadas", "nota": "El ACS S36 no presenta una nueva encuesta comparable. Se conserva el campo AtlasIntel 30 ago–3 sep (n=1.922, ±2pp) y Meganalisis 24–31 ago (n=1.129, ±2,92pp), con sus fechas explícitas.", "datos": [ { "factor": "Desaprueba gestión de Delcy Rodríguez (AtlasIntel)", "pct": 60.5 }, { "factor": "No confía en la mesa de diálogo (Meganalisis)", "pct": 82.4 } ] },
+      "excarcelados": { "fp": 1065, "presos": 326, "militares": 144, "fuente": "Último dato anterior disponible: Foro Penal · 24 ago 2026; sin actualización cuantitativa en S36" }
+    },
+    "marcoNormativo": {
+      "titulo": "Diálogo instalado, reforma judicial y apertura mediática parcial",
+      "resumen": "Los hitos institucionales de la semana son observables, pero todavía no establecen una competencia electoral verificable ni una selección judicial independiente.",
+      "cambios": [
+        { "titulo": "Gaceta 7.074", "texto": "La reforma del TSJ fija un Comité de Postulaciones de 23 miembros y activa su convocatoria; la composición efectiva y autonomía deben verificarse.", "color": "#0468B1" },
+        { "titulo": "Segunda ronda", "texto": "La mesa AN2015–Gobierno se instala el 17 de septiembre con agenda amplia, todavía sin compromisos exigibles ni calendario electoral.", "color": "#0468B1" },
+        { "titulo": "CONATEL", "texto": "Desbloquea al menos diez portales, mientras organizaciones de monitoreo registran 188 dominios aún bloqueados.", "color": "#f59e0b" },
+        { "titulo": "Citgo y oro", "texto": "La gobernanza de Citgo mantiene salvaguardas del Tesoro; el traslado del oro requiere decisión judicial británica.", "color": "#f59e0b" }
+      ],
+      "lecturaAnalitica": "E3 puede consolidarse mediante procedimientos y reconocimiento externo sin redistribuir el poder. E1 solo ganará peso sostenido si hay inclusión política, garantías judiciales y compromisos electorales verificables."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "54%", "color": "#0468B1", "text": "Baja 2pp pero domina: diálogo instalado, normalización diplomática y reforma judicial aún sin garantías exigibles." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "25%", "color": "#ca8a04", "text": "Sube 2pp a máximo de serie por fragilidad económica y persistencia coercitiva; la escalada no es automática." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "14%", "color": "#dc2626", "text": "Baja 2pp: protestas y deterioro eléctrico sin ruptura de mando comprobada." },
+      { "name": "Transición Pacífica (E1)", "prob": "7%", "color": "#2d8a30", "text": "Sube 2pp por desbloqueo parcial y procedimiento judicial, sin calendario ni verificación electoral." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Del procedimiento al acuerdo", "text": "Comprobar si la mesa publica plazos, mecanismo de verificación y consecuencias por incumplimiento." },
+      { "tag": "Justicia", "color": "#0468B1", "title": "Comité del TSJ", "text": "Revisar convocatoria, criterios y autonomía real de los representantes de sociedad civil." },
+      { "tag": "Recursos", "color": "#f59e0b", "title": "Oro e inversión", "text": "Distinguir decisión judicial, disponibilidad efectiva, desembolsos y producción de los anuncios." },
+      { "tag": "Social", "color": "#7c3aed", "title": "Servicios y protesta", "text": "Observar si la crisis de Guri afecta agua y salud y si las protestas logran articulación sostenida." }
+    ]
+  },
+  {
+    "period": "18 – 25 de septiembre de 2026",
+    "periodShort": "18–25 sep 2026",
+    "keyPoints": [
+      { "tag": "Diplomacia", "color": "#0468B1", "title": "Rodríguez interviene ante la Asamblea General de la ONU", "text": "El 23 de septiembre confirma elecciones sin fecha ni cronograma. La intervención amplía visibilidad diplomática, no garantías electorales verificables." },
+      { "tag": "Bilateral", "color": "#0468B1", "title": "Trump y Rodríguez sostienen un encuentro breve el 22 de septiembre", "text": "El Departamento de Estado aclara que el contacto no supone legitimación formal del gobierno encargado." },
+      { "tag": "Multilateral", "color": "#22c55e", "title": "FMI y BID anuncian canales técnicos", "text": "El FMI prevé oficina en Caracas en el primer semestre de 2027; el BID prepara un plan de dos años. No se anuncian nuevos préstamos aprobados." },
+      { "tag": "Justicia", "color": "#f59e0b", "title": "Demora la integración del Comité de Postulaciones Judiciales", "text": "La AN no designó a los 11 diputados dentro del plazo ordenado por la Gaceta 7.074; la secuencia TSJ–CNE–elecciones continúa sin calendario." },
+      { "tag": "Derechos", "color": "#dc2626", "title": "Presos políticos siguen fuera de la agenda formal", "text": "Figuera admite la exclusión y HRW abre un canal para listas de detenidos. CLIPPVE reporta más de 400 personas presas con un universo distinto al último corte de Foro Penal." },
+      { "tag": "Servicios", "color": "#dc2626", "title": "ANOVA estima que 70,2% de hogares recibió agua o electricidad precaria", "text": "El estudio asocia esta precariedad con 494.763 ocupaciones menos y ~1,4% de PIB no generado; advierte que no demuestra causalidad estricta." },
+      { "tag": "Protesta", "color": "#dc2626", "title": "78 protestas en cinco jornadas del 18 al 24 de septiembre", "text": "OVCS registra un pico de 29 el día 24, impulsado por jubilados, pensionados y trabajadores. No es un conteo de todas las fechas de la semana." },
+      { "tag": "Energía", "color": "#f59e0b", "title": "Acuerdos petroleros avanzan mientras exportaciones se estancan", "text": "TotalEnergies firma un memorando; Chevron anuncia USD 7.000M. Reuters sitúa las exportaciones de agosto en 1,17M b/d y el flete José–Golfo en USD 5/bbl." },
+      { "tag": "Oro", "color": "#f59e0b", "title": "El posible traslado de 31 toneladas sigue pendiente", "text": "El acuerdo sobre el oro en Londres requiere salvaguardas y decisión judicial británica; su valor estimado no es liquidez disponible." },
+      { "tag": "Escenarios", "color": "#0468B1", "title": "E3 sube a 56%; E4 baja a 22%", "text": "La matriz fija E1 7%, E2 15%, E3 56% y E4 22%; la brecha E3–E1 aumenta a 49 puntos." }
+    ],
+    "sintesis": "La semana registra la mayor densidad de contactos diplomáticos y financieros del ciclo reciente, pero ningún calendario electoral exigible. El encuentro Trump–Rodríguez y la intervención ante la ONU elevan el reconocimiento práctico sin producir legitimación formal estadounidense. El FMI y el BID anuncian canales técnicos, no desembolsos. La AN incumple el plazo de designación del Comité Judicial. Los anuncios energéticos conviven con exportaciones estancadas y costos logísticos crecientes. En lo social, OVCS registra 78 protestas en cinco jornadas y ANOVA estima un costo laboral asociado a servicios públicos precarios. E3 sube a 56%, E4 baja a 22%, E2 sube a 15% y E1 permanece en 7%.",
+    "actores": [
+      { "name": "Estados Unidos", "items": ["Trump se reúne brevemente con Rodríguez el 22 de septiembre; el Departamento de Estado niega legitimación formal.", "Rubio prioriza reconstrucción y estabilidad; no fija límite electoral.", "El Congreso solicita explicaciones sobre la asociación con Alejandro Betancourt, según el ACS."] },
+      { "name": "Gobierno encargado", "items": ["Delcy Rodríguez interviene ante la AGNU el 23 de septiembre y anuncia elecciones sin fecha.", "La AN respalda su representación, pero no designa a los 11 diputados del Comité Judicial.", "Reporta un pico de consumo eléctrico de 16.030 MW el 18 de septiembre."] },
+      { "name": "Oposición y sociedad civil", "items": ["Machado y Vente Venezuela impulsan #SetTheDate; el 24 de julio de 2027 es una propuesta, no una fecha acordada.", "Figuera reconoce que los presos políticos no integran la mesa formal.", "HRW abre un canal técnico para listas de personas detenidas arbitrariamente."] },
+      { "name": "Comunidad internacional y empresas", "items": ["FMI prevé oficina técnica para 2027 y BID prepara plan de compromiso a dos años.", "TotalEnergies y PDVSA firman memorando; Chevron anuncia inversión, sin desembolso verificado.", "Reino Unido, Paraguay y Chile sostienen contactos; Lula expresa reservas sobre autonomía de Rodríguez."] }
+    ],
+    "nacional": {
+      "amnistia": { "solicitudes": null, "libertadesOficiales": 1046, "beneficiosProcesales": 12000, "privadosLiberados": null, "cautelares": null, "militares": 144, "fpVerificados": 1065, "fpDetenidos": 326, "fpNota": "Sin nuevo balance comparable de Foro Penal en el ACS S37. Se conserva el corte del 24 de agosto (326 presos); CLIPPVE informa más de 400 con universo y fecha distintos. Figuera reconoce que la mesa no incluyó el tema." },
+      "rodriguez": [
+        { "title": "AGNU", "text": "Interviene ante la ONU el 23 de septiembre y promete elecciones sin fecha verificable." },
+        { "title": "Reinserción", "text": "Se reúne con Trump y representantes de FMI, BID y Banco Mundial; los contactos no son reconocimiento formal ni financiamiento aprobado." },
+        { "title": "Instituciones", "text": "La designación de diputados al Comité Judicial queda pendiente pese al plazo previsto en Gaceta." }
+      ],
+      "mcmAgenda": ["Publicar calendario electoral verificable y condiciones de competencia.", "Garantizar retorno y participación sin inhabilitaciones.", "Liberar presos políticos y asegurar independencia judicial y electoral."]
+    },
+    "economia": {
+      "kpis": [
+        { "value": "USD 17.200M", "label": "Facturación PDVSA ene–ago · estimación periodística, no caja", "color": "#22c55e" },
+        { "value": "1,17M b/d", "label": "Exportaciones petroleras · agosto · Reuters", "color": "#f59e0b" },
+        { "value": "USD 5/bbl", "label": "Flete Aframax José–Golfo · Reuters", "color": "#f59e0b" },
+        { "value": "70,2%", "label": "Hogares con agua o electricidad precaria · ANOVA 2026", "color": "#dc2626" },
+        { "value": "494.763", "label": "Menor ocupación asociada estimada · no causal", "color": "#dc2626" },
+        { "value": "~1,4%", "label": "PIB no generado estimado por ANOVA", "color": "#dc2626" }
+      ],
+      "empresas": [
+        { "empresa": "TotalEnergies / PDVSA", "desarrollo": "Memorando de entendimiento en hidrocarburos suscrito el 20 de septiembre; no es inversión ejecutada." },
+        { "empresa": "Chevron", "desarrollo": "Anuncia USD 7.000M a través de empresas conjuntas; falta seguimiento de desembolsos." },
+        { "empresa": "Halliburton / Eneva / WESCA", "desarrollo": "Memorandos para desarrollo petrolero y gasífero." },
+        { "empresa": "ExxonMobil", "desarrollo": "Conversaciones de posible retorno a Petromonagas y Carabobo, sin contrato cerrado." }
+      ]
+    },
+    "opinionPublica": {
+      "protestas": { "total": 78, "promDiario": 15.6, "periodo": "18, 21, 22, 23 y 24 sep · cinco balances", "variacion": "Corte parcial; no comparar directamente con S36", "composicion": "Demandas laborales, seguridad social, justicia y participación política; pico de 29 por movilización de jubilados y trabajadores el día 24.", "nota": "Se documentan 17 estados el 24 de septiembre, pero no un total único consolidado para toda la semana." },
+      "percepcion": { "fuente": "AtlasIntel/Bloomberg + Meganalisis · último campo disponible", "titulo": "Encuestas anteriores conservadas", "nota": "El ACS S37 no incluye una nueva encuesta comparable; se conservan las olas de agosto–septiembre con sus fechas y metodologías.", "datos": [ { "factor": "Desaprueba gestión de Delcy Rodríguez (AtlasIntel)", "pct": 60.5 }, { "factor": "No confía en la mesa de diálogo (Meganalisis)", "pct": 82.4 } ] },
+      "excarcelados": { "fp": 1065, "presos": 326, "militares": 144, "fuente": "Foro Penal · último corte 24 ago; CLIPPVE >400, universo distinto en informe S37" }
+    },
+    "marcoNormativo": {
+      "titulo": "Demora judicial y calendario electoral pendiente",
+      "resumen": "La reforma del TSJ existe en Gaceta, pero la integración del comité no se completó dentro del plazo. Los contactos diplomáticos no sustituyen hitos institucionales verificables.",
+      "cambios": [
+        { "titulo": "Gaceta 7.074", "texto": "La AN no había designado a los 11 diputados del Comité de Postulaciones Judiciales al cierre del corte.", "color": "#f59e0b" },
+        { "titulo": "Secuencia reportada", "texto": "Axios describe un posible plan TSJ–CNE–elecciones; no es un calendario oficial acordado.", "color": "#0468B1" },
+        { "titulo": "Mesa técnica", "texto": "La mesa de libertad de expresión fue anunciada; su continuidad y el desbloqueo efectivo deben verificarse.", "color": "#f59e0b" },
+        { "titulo": "Derechos", "texto": "HRW abre canal para listas de detenidos, mientras los presos políticos siguen fuera de la mesa formal.", "color": "#dc2626" }
+      ],
+      "lecturaAnalitica": "E3 se fortalece por reinserción externa y control del calendario; E1 requiere un mecanismo electoral verificable con garantías y costos de incumplimiento."
+    },
+    "escenarios": [
+      { "name": "Continuidad Negociada (E3)", "prob": "56%", "color": "#0468B1", "text": "Sube 2pp por diplomacia y cooperación técnica sin condicionalidad electoral vinculante." },
+      { "name": "Resistencia Coercitiva (E4)", "prob": "22%", "color": "#ca8a04", "text": "Baja 3pp sin nueva escalada sistémica, aunque persiste la detención política." },
+      { "name": "Colapso y Fragmentación (E2)", "prob": "15%", "color": "#dc2626", "text": "Sube 1pp por protestas y costo social de servicios, sin fractura de mando." },
+      { "name": "Transición Pacífica (E1)", "prob": "7%", "color": "#2d8a30", "text": "Permanece estable: contactos internacionales no son calendario ni garantías electorales." }
+    ],
+    "comentarios": [
+      { "tag": "Decisivo", "color": "#dc2626", "title": "Comité judicial", "text": "Verificar designación efectiva y si la demora crea precedente para CNE y elecciones." },
+      { "tag": "Oro", "color": "#f59e0b", "title": "Activos condicionados", "text": "Separar acuerdo político, orden judicial y financiamiento efectivamente disponible." },
+      { "tag": "Social", "color": "#7c3aed", "title": "Servicios y movilización", "text": "Seguir si la jornada laboral del 24 sep se articula de forma sostenida y cómo se atiende la precariedad de servicios." },
+      { "tag": "Finanzas", "color": "#0468B1", "title": "FMI y BID", "text": "No equiparar oficina técnica y plan de compromiso con préstamos aprobados." }
+    ]
   }
 ];
 

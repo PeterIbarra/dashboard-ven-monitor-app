@@ -2937,6 +2937,10 @@ export const MACRO_SERIES = {
     {
       "d": "2026-07",
       "v": 19.9
+    },
+    {
+      "d": "2026-08",
+      "v": 8.9
     }
   ],
   "canasta_basica_usd": [

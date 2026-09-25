@@ -317,7 +317,7 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
         const { index, factors } = computeInstabilityIndex(wk, liveData);
         const {
           e1, e2, e3, e4, redCount, totalInds, tensRed, totalTens, sigActive, sigTotal,
-          brechaLive, brentPrice, brentFactor, lastWeekConf, protestPct, spreadPct, repressionPct,
+          brechaLive, brentPrice, brentFactor, lastWeekConf, spreadConf, protestPct, spreadPct, repressionPct,
           avg2025Monthly, monthlyTotal, monthlyTrendPct, amnLatest, amnBrechaPct, presosPct,
           bilV, bilPct, icgRaw, icgInverted, polAltaPct, convAltaPct, convInverted,
           iodaHealth, iodaInverted, elecHealth, elecInverted,
@@ -411,7 +411,7 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
 
         // Breakdown items for display
         const breakdown = [
-          { label:"Ind. rojos", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100), w:"8%" },
+          { label:"Ind. rojos · S34", value:`${redCount}/${totalInds}`, pct:Math.round(redCount/totalInds*100), w:"8%", title:"Última revisión disponible de indicadores: S34. No equivale a una medición nueva de S37." },
           { label:"Brecha camb.", value:`${brechaLive.toFixed(0)}%`, pct:Math.min(brechaLive,100), w:"8%", live:true },
           { label:"Presión inflación", value:inflacionPct ? `${inflacionPct.toFixed(1)}%` : "—", pct:Math.round(inflacionFactor), w:"6%" },
           { label:"E2 Colapso", value:`${e2}%`, pct:e2, w:"6%" },
@@ -425,12 +425,12 @@ export function TabDashboard({ week, liveData = {}, setTab, setOpinionSection, s
           { label:"Pol. alta redes 🌡️", value:`${polAltaPct.toFixed(0)}%`, pct:Math.round(polAltaPct), w:"4%" },
           { label:"Tens. rojas", value:`${tensRed}/${totalTens}`, pct:Math.round(tensRed/totalTens*100), w:"4%" },
           { label:"Señales E4/E2", value:`${sigActive}/${sigTotal}`, pct:Math.round(sigActive/sigTotal*100), w:"4%" },
-          { label:"Protestas sem.", value:`${lastWeekConf?.protestas||"—"}`, pct:Math.round(protestPct), w:"4%" },
+          { label:`Protestas · ${lastWeekConf?.week || "últ. corte"}`, value:`${lastWeekConf?.protestas||"—"}`, pct:Math.round(protestPct), w:"4%", title:"Índice: último corte semanal completo. Los cortes parciales posteriores se muestran por separado en Pulso de protestas." },
           { label:"Volatilidad instit.", value:`${institucionalCount} cambios`, pct:Math.round(institucionalFactor), w:"4%" },
           { label:"Bilateral 🇺🇸🇻🇪", value:`${bilV.toFixed(1)}σ`, pct:Math.round(bilPct), w:"2%", live:true },
           { label:"Cohesión GOB 🏛", value:icgRaw != null ? `${icgRaw}` : "—", pct:icgInverted != null ? Math.round(icgInverted) : 50, w:"2%", live:true },
           { label:"Conv. baja redes 🌡️", value:`${convAltaPct.toFixed(0)}% alta`, pct:Math.round(convInverted), w:"2%" },
-          { label:"Cobertura terr.", value:`${lastWeekConf?.estados||"—"}/24`, pct:Math.round(spreadPct), w:"3%" },
+          { label:`Cobertura · ${spreadConf?.week || "últ. corte"}`, value:`${spreadConf?.estados||"—"}/24`, pct:Math.round(spreadPct), w:"3%", title:"Último corte semanal completo con cobertura territorial conocida. Los cortes parciales posteriores no sustituyen esta serie." },
           { label:"Brent", value:`$${brentPrice}`, pct:brentFactor, w:"3%", live:true },
           { label:"Tend. mensual", value:`${monthlyTotal} (4sem)`, pct:Math.round(Math.min(monthlyTrendPct,150)/1.5), w:"1%" },
           { label:"Represión", value:`${lastWeekConf?.reprimidas||0}`, pct:Math.round(repressionPct), w:"1%" },
@@ -1016,16 +1016,16 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
         <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr 1fr", gap:1, background:BORDER, border:`1px solid ${BORDER}` }}>
           {[
             {title:"Energético",icon:"⚡",rows:[
-              {k:"Exportaciones",v:wk.kpis.energia.exportaciones},
-              {k:"Ingresos",v:wk.kpis.energia.ingresos},
-              {k:"Licencias OFAC",v:wk.kpis.energia.licencias},
-              {k:"Tipo de cambio",v:wk.kpis.energia.cambio},
+              {k:wk.short==="S37"?"Exportaciones":wk.short==="S36"?"Ayacucho 2":wk.short==="S35"?"Producción OPEP":"Exportaciones",v:wk.kpis.energia.exportaciones},
+              {k:wk.short==="S37"?"Facturación PDVSA":wk.short==="S36"?"Oro en Londres":wk.short==="S35"?"Citgo":"Ingresos",v:wk.kpis.energia.ingresos},
+              {k:wk.short==="S37"?"Acuerdos anunciados":"Licencias OFAC",v:wk.kpis.energia.licencias},
+              {k:wk.short==="S37"?"Pico eléctrico":wk.short==="S36"?"Guri":wk.short==="S35"?"Inversión anunciada":"Tipo de cambio",v:wk.kpis.energia.cambio},
             ]},
             {title:"Económico",icon:"📊",rows:[
-              {k:"Inflación proy.",v:wk.kpis.economico.inflacion},
-              {k:"Ingresos pob.",v:wk.kpis.economico.ingresos_pob},
-              {k:"Electricidad",v:wk.kpis.economico.electricidad},
-              {k:"PIB 2026",v:wk.kpis.economico.pib},
+              {k:wk.short==="S37"?"Inflación BCV":wk.short==="S36"?"Inflación interanual":wk.short==="S35"?"Inflación BCV":"Inflación proy.",v:wk.kpis.economico.inflacion},
+              {k:wk.short==="S37"?"Ocupación estimada":wk.short==="S36"?"Gasto proyectado":wk.short==="S35"?"Percepción económica":"Ingresos pob.",v:wk.kpis.economico.ingresos_pob},
+              {k:wk.short==="S37"?"Servicios precarios":wk.short==="S36"?"Reservas":wk.short==="S35"?"Matrícula escolar":"Electricidad",v:wk.kpis.economico.electricidad},
+              {k:wk.short==="S37"?"Costo PIB estimado":wk.short==="S36"?"Brecha proyectada":wk.short==="S35"?"Bolsa de Caracas":"PIB 2026",v:wk.kpis.economico.pib},
             ]},
             {title:"Opinión",icon:"🗳",rows:[
               {k:"Dirección país",v:wk.kpis.opinion.direccion},
@@ -1051,7 +1051,7 @@ No uses markdown, no uses asteriscos, no uses bullet points, no uses negritas. E
         {/* Semáforo resumen */}
         <Card>
           <div style={{ fontSize:12, fontFamily:font, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:10, paddingBottom:6, borderBottom:`1px solid ${BORDER}` }}>
-            🚦 Señales activas
+            🚦 Señales · {["S36", "S37"].includes(wk.short) ? "referencia S35, sin nueva clasificación" : "clasificación semanal"}
           </div>
           {[{label:"Verde",count:wk.sem.g,color:"green"},
             {label:"Amarillo",count:wk.sem.y,color:"yellow"},

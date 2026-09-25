@@ -14,6 +14,8 @@ export function TabMonitor() {
   const [seccion, setSeccion] = useState("indicadores");
   const [expanded, setExpanded] = useState(null);
   const [showAllHist, setShowAllHist] = useState({});
+  const indicatorsLastWeek = "S34";
+  const indicatorsLastIndex = MONITOR_WEEKS.indexOf(indicatorsLastWeek);
   const dims = [...new Set(INDICATORS.map(i=>i.dim))];
   const grouped = dims.map(d => ({ dim:d, icon:INDICATORS.find(i=>i.dim===d).icon, inds:INDICATORS.filter(i=>i.dim===d) }));
 
@@ -37,8 +39,8 @@ export function TabMonitor() {
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14, flexWrap:"wrap" }}>
         <span style={{ fontSize:16 }}>🚦</span>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Monitor de Señales — {seccion === "senales" ? `${allSignals.length} señales · ${SCENARIO_SIGNALS.length} escenarios` : `${INDICATORS.length} indicadores · ${MONITOR_WEEKS.length} semanas`}</div>
-          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Semáforos, umbrales y señales por escenario</div>
+          <div style={{ fontSize:15, fontWeight:600, color:TEXT }}>Monitor de Señales — {seccion === "senales" ? `${allSignals.length} señales · ${SCENARIO_SIGNALS.length} escenarios` : `${INDICATORS.length} indicadores · ${indicatorsLastWeek} última clasificación`}</div>
+          <div style={{ fontSize:12, fontFamily:font, color:MUTED }}>Semáforos y señales de última revisión S34; la lectura editorial S37 está en Matriz y SITREP.</div>
         </div>
         <div style={{ display:"flex", gap:0, border:`1px solid ${BORDER}`, flexWrap:"wrap" }}>
           {[{id:"indicadores",label:"Indicadores"},{id:"senales",label:"Señales E1/E2/E3/E4"},{id:"noticias",label:"Noticias"},{id:"factcheck",label:"Verificación"}].map(s => (
@@ -87,13 +89,11 @@ export function TabMonitor() {
             const lastEntry = ind.hist.filter(h => h !== null).pop();
             if (!lastEntry) return null;
             const sem = lastEntry[0], trend = lastEntry[1], val = lastEntry[2];
-            // hist[] is stored compact (one entry per week since the indicator was added,
-            // NOT null-padded from S1), so the current week's entry is always the last
-            // element — not ind.hist[MONITOR_WEEKS.length - 1], which only works for
-            // indicators tracked since week 1.
-            const weekOffset = MONITOR_WEEKS.length - ind.hist.length;
-            const currentEntry = ind.hist[ind.hist.length - 1];
-            const displayVal = currentEntry ? currentEntry[2] : `${MONITOR_WEEKS[MONITOR_WEEKS.length - 1]} · sin dato nuevo`;
+            // hist[] is compact and currently ends at S34 for all 40 indicators.
+            // Reserve later weeks as genuinely missing instead of relabeling S34 as current.
+            const weekOffset = indicatorsLastIndex + 1 - ind.hist.length;
+            const currentEntry = ind.hist[MONITOR_WEEKS.length - 1 - weekOffset] || null;
+            const displayVal = currentEntry ? currentEntry[2] : `Últ. ${indicatorsLastWeek}: ${lastEntry[2]}`;
             const isNew = !!ind.addedWeek;
             const isExpanded = expanded === `${g.dim}-${j}`;
             return (
